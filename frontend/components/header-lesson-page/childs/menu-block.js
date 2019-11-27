@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 
 import PropTypes from "prop-types";
 import {getLessonNumber} from "tools/page-tools";
+import {lessonsSelector} from "ducks/lesson-menu";
 import {hideLessonMenu, showLessonMenu} from 'actions/app-actions';
 
 import LessonsList from './menu-list'
@@ -31,7 +32,7 @@ class MenuBlock extends React.Component {
     render() {
         let {lesson, test, lessonList} = this.props,
             _object = lesson ? lesson : test,
-            _total = lessonList.object.length,
+            _total = lessonList.length,
             _number = getLessonNumber(_object),
             _title = lesson ? "Лекция " : "Тест "
 
@@ -40,8 +41,8 @@ class MenuBlock extends React.Component {
                 <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
                         onClick={::this._switchMenu}><span className='caption'>{_title}</span>
                     <span className="num">
-                        <span className="current">{_number}</span>
-                        {'/' + _total}
+                        <span className="current">{test ? `"${test.Name}"` : _number}</span>
+                        {test ? "" : ('/' + _total)}
                     </span>
                 </button>
                 <LessonsList {...this.props}/>
@@ -52,8 +53,7 @@ class MenuBlock extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        // course: state.singleCourse.object,
-        lessonList: state.lessons,
+        lessonList: lessonsSelector(state),
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }

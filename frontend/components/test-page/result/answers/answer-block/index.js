@@ -2,26 +2,13 @@ import React from "react"
 import PropTypes from 'prop-types'
 
 import "./answer-block.sass"
-import {ANSWER_TYPES} from "../../../../constants/common-consts";
+import {ANSWER_TYPES} from "../../../../../constants/common-consts";
 
 export default class AnswerBlock extends React.Component {
 
     static propTypes = {
         question: PropTypes.object,
-        onChangeValue: PropTypes.func,
         answer: PropTypes.array || PropTypes.bool,
-    }
-
-    constructor(props) {
-        super(props)
-
-        this._value = null
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.question !== prevProps.question) {
-            $('.answer-text input').prop('checked',false);
-        }
     }
 
     render() {
@@ -44,22 +31,23 @@ export default class AnswerBlock extends React.Component {
 
     _getBoolTypeAnswers() {
         const {question, answer} = this.props,
-            _answerDefined = answer !== null,
-            _yesClassName = "select-block_item" + (_answerDefined && !!answer ? " marked _asSelected" : ""),
-            _noClassName = "select-block_item" + (_answerDefined && !answer ? " marked _asSelected" : "")
+            _markedYes = !!question.AnswBool || !!answer,
+            _yesClassName = "select-block_item" + (_markedYes ? " marked" : "") + (!!question.AnswBool ? " _asCorrect" : "") + (!!answer ? " _asSelected" : ""),
+            _markedNo = !question.AnswBool || !answer,
+            _noClassName = "select-block_item" + (_markedNo ? " marked" : "") + (!question.AnswBool ? " _asCorrect" : "") + (!answer ? " _asSelected" : "")
 
         return <React.Fragment>
             <div className={_yesClassName}>
                 <label className="answer-text">
                     Да
-                    <input type="radio" name={`bool${question.Id}`} onChange={::this._onChangeBoolValue} data-value={true}/>
+                    <input type="radio" name={`bool${question.Id}`} checked={!!answer} disabled/>
                     <span className="check-mark radio"/>
                 </label>
             </div>
             <div className={_noClassName}>
                 <label className="answer-text">
                     Нет
-                    <input type="radio" name={`bool${question.Id}`} onChange={::this._onChangeBoolValue} data-value={false}/>
+                    <input type="radio" name={`bool${question.Id}`} checked={!answer} disabled/>
                     <span className="check-mark radio"/>
                 </label>
             </div>
@@ -71,13 +59,16 @@ export default class AnswerBlock extends React.Component {
 
         return question.Answers.map((item) => {
 
-            let _marked = answer && answer.includes(item.Id),
-                _className = "select-block_item" + (_marked ? " marked _asSelected" : "")
+            let _marked = item.IsCorrect || answer.includes(item.Id),
+                _className = "select-block_item" +
+                    (_marked ? " marked" : "") +
+                    (item.IsCorrect ? " _asCorrect" : "") +
+                    (answer.includes(item.Id) ? " _asSelected" : "")
 
             return <div className={_className}>
                 <label className="answer-text">
                     {item.Text}
-                    <input type="radio" name={`radio${this.props.question.Id}`} onChange={::this._onChangeSelectedValue} data-value={item.Id}/>
+                    <input type="radio" name={`radio${this.props.question.Id}`} disabled checked={answer.includes(item.Id)}/>
                     <span className="check-mark radio"/>
                 </label>
             </div>
@@ -89,39 +80,19 @@ export default class AnswerBlock extends React.Component {
 
         return question.Answers.map((item) => {
 
-            let _marked = answer && answer.includes(item.Id),
-                _className = "select-block_item" + (_marked ? " marked _asSelected" : "")
+            let _marked = item.IsCorrect || answer.includes(item.Id),
+                _className = "select-block_item" +
+                    (_marked ? " marked" : "") +
+                    (item.IsCorrect ? " _asCorrect" : "") +
+                    (answer.includes(item.Id) ? " _asSelected" : "")
 
             return <div className={_className}>
                 <label className="answer-text">
                     {item.Text}
-                    <input type="checkbox" onChange={::this._onChangeSelectedValue} data-value={item.Id}/>
+                    <input type="checkbox" disabled checked={answer.includes(item.Id)}/>
                     <span className="check-mark checkbox"/>
                 </label>
             </div>
         })
-    }
-
-    _onChangeBoolValue(e) {
-        if (this.props.onChangeValue) {this.props.onChangeValue({
-            value: e.target.dataset.value === "true",
-        })}
-    }
-
-    _onChangeSelectedValue() {
-        let _answer = [],
-            _inputs = $('.answer-text input');
-
-        if (_inputs && (_inputs.length > 0)) {
-            for (let i = 0; i < _inputs.length; i++) {
-                if (_inputs[i].checked) {
-                    _answer.push(+_inputs[i].dataset.value)
-                }
-            }
-        }
-
-        if (this.props.onChangeValue) {this.props.onChangeValue({
-            value: _answer
-        })}
     }
 }

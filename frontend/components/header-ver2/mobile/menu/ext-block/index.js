@@ -6,8 +6,10 @@ import {
     filterCourseTypeSelector,
     toggleCourseTypeToFilter,
 } from "ducks/filters";
+import {hideMenu} from "actions/page-header-actions";
 import {FILTER_COURSE_TYPE} from "../../../../../constants/filters";
 import "./ext-block.sass"
+import {OverflowHandler} from "tools/page-tools";
 
 class ExtBlock extends React.Component {
 
@@ -19,7 +21,7 @@ class ExtBlock extends React.Component {
                     {
                         filterMainType === FILTER_COURSE_TYPE.THEORY &&
                             <div className={"selector__item menu-item" + (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? " active" : "")}
-                                 onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.PRACTICE)}}>
+                                 onClick={() => {this._toggle(FILTER_COURSE_TYPE.PRACTICE)}}>
                                 <span className="underlined-item">{filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? "- Навыки" : "+ Навыки"}</span>
                             </div>
                     }
@@ -27,19 +29,19 @@ class ExtBlock extends React.Component {
                         filterMainType === FILTER_COURSE_TYPE.PRACTICE &&
                         <div className="ext-block__button ext-block__item menu-item">
                             <div className={"selector__item"  + (filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? " active" : "")}
-                                 onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.THEORY)}}>
+                                 onClick={() => {this._toggle(FILTER_COURSE_TYPE.THEORY)}}>
                                 <span className="underlined-item">{filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? "- Знания" : "+ Знания"}</span>
                             </div>
                         </div>
                     }</div>
-                {/*<div className="mobile-menu__section ext-block">*/}
-                {/*    <div className="ext-block__selector ext-block__item menu-item">*/}
-                {/*        <span className="selector__item underlined-item">Курсы</span>*/}
-                {/*        <span className="selector__separator"> / </span>*/}
-                {/*        <span className="selector__item underlined-item">Лекции</span>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
             </React.Fragment>
+    }
+
+    _toggle(value) {
+        this.props.toggleCourseTypeToFilter(value)
+
+        this.props.hideMenu()
+        OverflowHandler.turnOff();
     }
 }
 
@@ -51,7 +53,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({toggleCourseTypeToFilter,}, dispatch)
+    return bindActionCreators({toggleCourseTypeToFilter, hideMenu}, dispatch)
 }
 
 

@@ -14,8 +14,6 @@ export default class LessonFull extends React.Component{
     }
 
     render() {
-        const _completeStatus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>'
-
         const {lesson, course} = this.props,
             url = '/' + this.props.courseUrl + '/' + lesson.URL,
             _multiAuthors = course.Authors.length > 1,

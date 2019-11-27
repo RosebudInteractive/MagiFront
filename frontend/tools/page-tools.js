@@ -190,6 +190,10 @@ export class OverflowHandler {
             _internalPos = 0
         }
     }
+
+    static setPositionAfterTurnOff(value) {
+        _internalPos = value
+    }
 }
 
 export const getScrollPage = () => {

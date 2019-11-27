@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
-import {GET_CONCRETE_COURSE_REQUEST} from "actions/courses-page-actions";
+import {getLessonsAll} from "ducks/lesson-menu";
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 
 /**
@@ -37,6 +37,7 @@ const TestRecord = Record({
     SnName: null,
     SnDescription: null,
     SnPost: null,
+    Qty: null,
     questionsCount: 0,
     estimatedTime: 0,
 })
@@ -52,9 +53,12 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-        case GET_TEST_START:
+        case GET_TEST_REQUEST:
             return state
                 .set('loaded', false)
+
+        case GET_TEST_START:
+            return state
                 .set('loading', true)
 
         case GET_TEST_SUCCESS:
@@ -66,7 +70,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_TEST_FAIL:
             return state
-            .set('loading', false)
+                .set('loading', false)
+                .set('loaded', true)
 
         default:
             return state
@@ -99,19 +104,20 @@ export const saga = function* () {
 }
 
 function* getTestSaga(data) {
-    let _time = yield select(successTimeSelector)
+    // let _time = yield select(successTimeSelector),
+    //     _test = yield select(testSelector)
 
-    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
-        yield put({type: GET_TEST_COMPLETED})
-        return
-    }
+    // if (!!_test && !!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
+    //     yield put({type: GET_TEST_COMPLETED})
+    //     return
+    // }
 
     yield put({type: GET_TEST_START})
 
     try {
         const _test = yield call(_fetchTest, `/api/tests/${data.payload}`)
 
-        yield put({type: GET_CONCRETE_COURSE_REQUEST, payload: _test.CourseURL})
+        yield put(getLessonsAll(_test.CourseURL))
 
         yield put({type: GET_TEST_SUCCESS, payload: _test})
         yield put({type: GET_TEST_COMPLETED})
@@ -129,13 +135,9 @@ function _fetchTest(url) {
                 data.CoverMeta = JSON.parse(data.CoverMeta)
             }
 
-            data.questionsCount = data.Questions.length
+            data.questionsCount = data.Qty
 
-            let _estimatedTime = data.Questions.reduce((acc, value) => {
-                return acc + value
-            }, 0)
-
-            data.estimatedTime = Math.round(_estimatedTime / 60)
+            data.estimatedTime = Math.round(data.AnswTime / 60)
             data.lastSuccessTime = Date.now()
 
             return data

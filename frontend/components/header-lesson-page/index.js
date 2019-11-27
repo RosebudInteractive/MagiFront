@@ -6,14 +6,16 @@ import LogoAndTitle from "./childs/logo-and-title";
 import Navigator from "./childs/navigator";
 import MenuBlock from "./childs/menu-block"
 
+import {courseSelector} from "ducks/lesson-menu"
+
 import $ from "jquery";
 
 class HeaderWrapper extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object,
         lesson: PropTypes.object,
         test: PropTypes.object,
+        active: PropTypes.number,
     };
 
     constructor(props) {
@@ -46,7 +48,7 @@ class HeaderWrapper extends React.Component {
         let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass,} = this.props,
             _singleLesson = course ? !!course.OneLesson : false,
             _type = this._getMenuType(),
-            _menuClassName = "lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
+            _menuClassName = "new-header lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
                 (isLessonMenuOpened ? ' opened' : '') +
                 (isMobileApp ? ' mobile' : ' desktop') +
                 (extClass ? ' ' + extClass : '') +
@@ -54,8 +56,7 @@ class HeaderWrapper extends React.Component {
 
         const _courseIsPaid = course ? (course.IsPaid && !course.IsGift && !course.IsBought) : false
 
-        return (
-            <div className={_menuClassName}>
+        return <div className={_menuClassName}>
                 <LogoAndTitle course={course} lesson={lesson} test={test}/>
                 <MenuBlock course={course} lesson={lesson} test={test}/>
                 {
@@ -70,7 +71,6 @@ class HeaderWrapper extends React.Component {
                 }
                 <div className='lectures-menu__gradient-block'/>
             </div>
-        )
     }
 }
 
@@ -79,6 +79,7 @@ function mapStateToProps(state) {
         isMobileApp: state.app.isMobileApp,
         // course: state.singleLesson.course,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
+        course: courseSelector(state)
     }
 }
 

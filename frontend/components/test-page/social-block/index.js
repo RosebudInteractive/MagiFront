@@ -11,7 +11,9 @@ export class SocialBlock extends React.Component {
     }
 
     render() {
-        let {shareUrl, title, counter} = this.props;
+        const SHARE_URL = window.location.href
+
+        let {title, counter} = this.props;
 
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
@@ -21,7 +23,7 @@ export class SocialBlock extends React.Component {
         return (
             <div className="social-block social-block--dark">
                 <div className='social-button-wrapper'>
-                    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">
+                    <FacebookShareButton url={SHARE_URL} quote={title} className="social-btn _active">
                         <div className="social-btn__icon">
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
@@ -30,7 +32,7 @@ export class SocialBlock extends React.Component {
                     </FacebookShareButton>
                 </div>
                 <div className='social-button-wrapper'>
-                    <VKShareButton url={shareUrl} className="social-btn _active">
+                    <VKShareButton url={SHARE_URL} className="social-btn _active">
                         <div className="social-btn__icon">
                             <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
@@ -39,7 +41,7 @@ export class SocialBlock extends React.Component {
                     </VKShareButton>
                 </div>
                 <div className='social-button-wrapper'>
-                    <OKShareButton url={shareUrl} className="social-btn _active">
+                    <OKShareButton url={SHARE_URL} className="social-btn _active">
                         <div className="social-btn__icon">
                             <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                         </div>
@@ -48,11 +50,10 @@ export class SocialBlock extends React.Component {
                     </OKShareButton>
                 </div>
                 <div className='social-button-wrapper'>
-                    <TwitterShareButton url={shareUrl} title={title} className="social-btn">
+                    <TwitterShareButton url={SHARE_URL} title={title} className="social-btn">
                         <div className="social-btn__icon">
                             <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
                         </div>
-                        {/*<span className="social-btn__actions">0</span>*/}
                     </TwitterShareButton>
                 </div>
             </div>

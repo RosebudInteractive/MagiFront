@@ -1,8 +1,11 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import Immutable, {Record, Map, Set} from 'immutable'
+import {all, put, takeEvery, select} from "@redux-saga/core/effects";
 import {GET_COURSES_REQUEST, GET_COURSES_SUCCESS} from "../constants/courses";
-import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
+import {FILTER_COURSE_TYPE,} from "../constants/filters";
+import {FILTER_TYPE} from "../constants/common-consts";
+import {replace} from "react-router-redux";
 
 /**
  * Constants
@@ -10,11 +13,14 @@ import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../consta
 export const moduleName = 'filters'
 const prefix = `${appName}/${moduleName}`
 
-export const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
-export const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
-export const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
-export const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
-export const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
+const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
+const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
+const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
+const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
+const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
+const SET_INITIAL_STATE = `${prefix}/SET_INITIAL_STATE`
+const ENABLE_SCROLL_GUARD = `${prefix}/ENABLE_SCROLL_GUARD`
+const DISABLE_SCROLL_GUARD = `${prefix}/DISABLE_SCROLL_GUARD`
 
 
 /**
@@ -34,6 +40,7 @@ export const ReducerRecord = Record({
     filters: new Map(),
     root: new FilterRecord(),
     loading: false,
+    scrollHandlerGuard: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -54,7 +61,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
         }
 
-
         case CLEAR_FILTERS:
             return state
                 .update('filters', filters => {
@@ -62,6 +68,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return item.set('selected', false)
                     });
                 })
+                .set('scrollHandlerGuard', true)
 
         case SWITCH_FILTERS:
             return state
@@ -72,26 +79,56 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return item.set('selected', _value)
                     });
                 })
+                .set('scrollHandlerGuard', true)
 
         case APPLY_EXTERNAL_FILTER: {
             if (payload) {
                 let _map = state.get('filters');
 
-                payload.forEach((item) => {
-                    if (_map.has(item)) {
-                        _map = _map.setIn([item, 'selected'], true)
+                if (payload.value.toLocaleLowerCase() === "all") {
+                    _map = _map.map((item) => {
+                        return item.set('selected', false)
+                    })
+                } else {
+                    _map = _map.setIn([payload.value, 'selected'], true)
+                }
+
+                let _mainType, _courseType
+                switch (payload.type) {
+                    case FILTER_TYPE.RAZDEL:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE])
+                        break
                     }
-                })
 
-                let _type = payload.includes(FILTER_MAIN_TYPE.PRACTICE) ? FILTER_COURSE_TYPE.PRACTICE : FILTER_COURSE_TYPE.THEORY,
-                    _courseType = new Set([_type])
+                    case FILTER_TYPE.RAZDEL_REVERSE:{
+                        _mainType = FILTER_COURSE_TYPE.PRACTICE
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE])
+                        break
+                    }
 
-                if (payload.includes(FILTER_ADDED_TYPE.THEORY)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.THEORY)}
-                if (payload.includes(FILTER_ADDED_TYPE.PRACTICE)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.PRACTICE)}
+                    case FILTER_TYPE.KNOWLEDGE:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY])
+                        break
+                    }
+
+                    case FILTER_TYPE.KNOWHOW:{
+                        _mainType = FILTER_COURSE_TYPE.PRACTICE
+                        _courseType = new Set([FILTER_COURSE_TYPE.PRACTICE])
+                        break
+                    }
+
+                    default:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY])
+                        break
+                    }
+                }
 
                 return state
                     .set('filters', _map)
-                    .set('mainType', _type)
+                    .set('mainType', _mainType)
                     .set('courseType', _courseType)
             } else {
                 return state
@@ -103,6 +140,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('courseType', new Set([payload]))
                 .set('mainType', payload)
+                .set('scrollHandlerGuard', true)
 
         case TOGGLE_FILTER_COURSE_TYPE:
             return state
@@ -113,6 +151,15 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return courseType.add(payload)
                     }
                 })
+                .set('scrollHandlerGuard', true)
+
+        case DISABLE_SCROLL_GUARD:
+            return state
+                .set('scrollHandlerGuard', false)
+
+        case ENABLE_SCROLL_GUARD:
+            return state
+                .set('scrollHandlerGuard', true)
 
         default:
             return state
@@ -168,6 +215,7 @@ export const filtersSelector = createSelector(stateSelector, state => state.filt
 export const filterCourseTypeSelector = createSelector(stateSelector, state => state.courseType)
 export const filterMainTypeSelector = createSelector(stateSelector, state => state.mainType)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const scrollGuardSelector = createSelector(stateSelector, state => state.scrollHandlerGuard)
 export const isEmptyFilterSelector = createSelector(filtersSelector, filter => filter.every(item => !item.get('selected')))
 export const selectedFilterSelector = createSelector(filtersSelector, filter => filter.filter(item => item.get('selected')))
 
@@ -186,12 +234,10 @@ export const switchFilter = (id) => {
     }
 }
 
-export const applyExternalFilter = (value) => {
-    let _array = value.split('+');
-
+export const applyExternalFilter = (filterType, value) => {
     return {
         type: APPLY_EXTERNAL_FILTER,
-        payload: _array
+        payload: {type: filterType, value: value}
     }
 }
 
@@ -201,4 +247,54 @@ export const setFilterCourseType = (value) => {
 
 export const toggleCourseTypeToFilter = (value) => {
     return { type: TOGGLE_FILTER_COURSE_TYPE, payload: value }
+}
+
+export const setInitialState = () => {
+    return { type: SET_INITIAL_STATE }
+}
+
+export const disableScrollGuard = () => {
+    return { type: DISABLE_SCROLL_GUARD}
+}
+
+export const enableScrollGuard = () => {
+    return { type: ENABLE_SCROLL_GUARD}
+}
+
+
+/**
+ * Sagas
+ */
+export const saga = function* () {
+    yield all([
+        takeEvery([SET_FILTER_COURSE_TYPE, TOGGLE_FILTER_COURSE_TYPE, APPLY_EXTERNAL_FILTER], switchFilterTypeSaga),
+        takeEvery(SET_INITIAL_STATE, setInitialStateSaga),
+    ])
+}
+
+function* switchFilterTypeSaga(data) {
+
+    const filterCourseType = yield select(filterCourseTypeSelector),
+        selectedFilter = yield select(selectedFilterSelector),
+        isEmptyFilter = yield select(isEmptyFilterSelector)
+
+    let _count = 0
+
+    selectedFilter.forEach((item) => {
+        for (let type in FILTER_COURSE_TYPE) {
+            _count = filterCourseType.has(FILTER_COURSE_TYPE[type]) ? _count + item.getIn(['count', type.toLowerCase()]) : _count
+        }
+    })
+
+    console.log(data, _count)
+
+    if (!isEmptyFilter && (_count === 0)) {
+        yield put(clear())
+    }
+}
+
+function* setInitialStateSaga() {
+    yield put(clear())
+    yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
+    yield put(replace("/"))
 }

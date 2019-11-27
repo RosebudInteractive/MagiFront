@@ -1,0 +1,55 @@
+@import "~tools/variables"
+
+.test-page
+  .result-header
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 30px
+    line-height: 36px
+    margin: 60px 0 0
+    color: $color-white
+    @media(max-width: 899px)
+      font-size: 20px
+      line-height: 24px
+      margin: 21px 0 0
+
+  .question-wrapper
+    background-color: $color-main-dark
+    position: relative
+    display: flex
+    flex-direction: column
+    align-items: center
+    padding: 30px 0 60px
+    width: auto
+    height: auto
+    & > *
+      width: 600px
+    @media(max-width: 899px)
+      padding: 0 36px 43px
+      & > *
+        width: 100%
+
+    @media(max-width: 639px)
+      padding: 0 20px 43px
+
+  .question-title
+    padding: 36px 0 28px
+    font-family: $font-fira
+    font-style: normal
+    font-weight: bold
+    font-size: 17px
+    line-height: 24px
+    color: $color-white
+    margin: 0
+
+    .current
+      color: $color-orange
+    .total
+      color: $color-white-06
+
+    .correct
+      color: $color-green
+
+    .wrong
+      color: $color-orange

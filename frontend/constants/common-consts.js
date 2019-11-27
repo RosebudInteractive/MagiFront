@@ -29,3 +29,18 @@ export const ANSWER_TYPES = {
     MULTI_SELECT: 4,
     TEXT: 5,
 }
+
+export const TEST_TYPE = {
+    COMMON: 1,
+    STARTED: 2,
+    FINISHED: 3,
+    EXT: 4,
+}
+
+export const FILTER_TYPE = {
+    RAZDEL: "RAZDEL",
+    RAZDEL_REVERSE: "RAZDEL-REV",
+    KNOWLEDGE: "KNOWLEDGE",
+    KNOWHOW: "KNOWHOW",
+    EMPTY: "EMPTY",
+}

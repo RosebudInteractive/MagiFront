@@ -21,6 +21,9 @@ import {
     filterCourseTypeSelector,
     filterMainTypeSelector,
     applyExternalFilter, clear,
+    setInitialState,
+    enableScrollGuard,
+    disableScrollGuard,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -28,7 +31,9 @@ import {setCurrentPage, clearCurrentPage,} from "ducks/app";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 import MetaTags from 'react-meta-tags';
 import $ from "jquery";
-import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
+import {FILTER_COURSE_TYPE,} from "../constants/filters";
+import {FILTER_TYPE} from "../constants/common-consts";
+import {OverflowHandler} from "../tools/page-tools";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -56,55 +61,46 @@ class CoursesPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter, filterMainType, filterCourseType} = this.props;
+        let {hasExternalFilter, externalFilter, filterType, loadingFilters, selectedFilter, filterMainType, filterCourseType} = this.props;
+
+        const _filterType = this._getFilterType()
+
+        if ((prevProps.filterType !== filterType) && (filterType === FILTER_TYPE.EMPTY)) {
+            this.props.setInitialState()
+        }
 
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
-                this.props.applyExternalFilter(externalFilter)
+                this.props.applyExternalFilter(filterType, externalFilter)
             }
         }
 
-        if (!hasExternalFilter && (prevProps.selectedFilter.size > 0)) {
-            this.props.clearFilter()
-        }
-
-        if (!prevProps.isEmptyFilter && isEmptyFilter) {
-            this._needRedirectToCourses = true
-            this.forceUpdate()
-        }
-
-        const _filterChanged = (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) ||
+        const _filterChanged = !prevProps.selectedFilter.equals(selectedFilter) ||
             (prevProps.filterMainType !== filterMainType) ||
             (!prevProps.filterCourseType.equals(filterCourseType))
 
         if (_filterChanged) {
-            let _filter = []
+            this.props.enableScrollGuard()
 
-            const _type = filterMainType === FILTER_COURSE_TYPE.THEORY ?
-                    isEmptyFilter ? '' : FILTER_MAIN_TYPE.THEORY
-                    :
-                    FILTER_MAIN_TYPE.PRACTICE
-
-            if (_type) {
-                _filter.push(_type)
-                if ((_type === FILTER_MAIN_TYPE.THEORY) && filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE)) {
-                    _filter.push(FILTER_ADDED_TYPE.PRACTICE)
-                }
-
-                if ((_type === FILTER_MAIN_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
-                    _filter.push(FILTER_ADDED_TYPE.THEORY)
-                }
+            if (!this.props.isMenuVisible) {
+                window.scrollTo(0, this._getTop())
+            } else {
+                OverflowHandler.setPositionAfterTurnOff(this._getTop())
             }
+
+            let _filter = []
 
             selectedFilter.forEach((item) => {
                 _filter.push(item.get('URL'))
             })
 
-            if (_filter.length > 0) {
-                this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
-            } else {
+            if ((_filter.length === 0) && ((_filterType === FILTER_TYPE.EMPTY) || (_filterType === FILTER_TYPE.KNOWLEDGE))) {
                 this._needRedirectToCourses = true
                 this.forceUpdate()
+            } else {
+                let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
+
+                this.props.history.replace(`/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search)
             }
         }
 
@@ -132,20 +128,21 @@ class CoursesPage extends React.Component {
             _courses = this.props.courses.items,
             _result = [];
 
-        _courses.forEach((course, index) => {
-            let _inFilter = false;
-
-            if (isEmptyFilter) {
-                _inFilter = filterCourseType.has(course.CourseType)
-            } else {
-                _inFilter = course.Categories.some((categoryId) => {
-                    return selectedFilter.find((item) => {
-                        return (item.get('id') === categoryId) && filterCourseType.has(course.CourseType)
+        _courses
+            .filter((course) => {
+                if (isEmptyFilter) {
+                    return filterCourseType.has(course.CourseType)
+                } else {
+                    return course.Categories.some((categoryId) => {
+                        return selectedFilter.find((item) => {
+                            return (item.get('id') === categoryId) && filterCourseType.has(course.CourseType)
+                        });
                     });
-                });
-            }
+                }
+            })
+            .forEach((course, index, array) => {
+                let _needLazyLoading = isEmptyFilter//(array.length > 3) && isEmptyFilter
 
-            if (_inFilter) {
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
                 } else {
@@ -163,11 +160,9 @@ class CoursesPage extends React.Component {
                         }
                     }
 
-                    _result.push(<CourseWrapper course={course} lazyload={isEmptyFilter} key={index} index={index}/>)
+                    _result.push(<CourseWrapper course={course} lazyload={_needLazyLoading} key={index} index={index}/>)
                 }
-
-            }
-        })
+            })
 
         return _result
     }
@@ -238,6 +233,30 @@ class CoursesPage extends React.Component {
 
         return _result
     }
+
+    _getFilterType() {
+        const {filterCourseType, filterMainType} = this.props
+
+        if (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
+            return (filterMainType === FILTER_COURSE_TYPE.THEORY) ? FILTER_TYPE.RAZDEL : FILTER_TYPE.RAZDEL_REVERSE
+        } else if (filterMainType === FILTER_COURSE_TYPE.THEORY) {
+            return FILTER_TYPE.KNOWLEDGE
+        } else if (filterMainType === FILTER_COURSE_TYPE.PRACTICE) {
+            return FILTER_TYPE.KNOWHOW
+        } else {
+            return FILTER_TYPE.EMPTY
+        }
+    }
+
+    _getTop() {
+        let _header = $('.page-header'),
+            _headerRow = $('.js-page-header-1')
+
+        return (_headerRow && (_headerRow.length > 0) && _header && (_header.length > 0) && _header.hasClass('_animate')) ?
+            _headerRow.outerHeight()
+            :
+            0
+    }
 }
 
 
@@ -257,6 +276,7 @@ function mapStateToProps(state, ownProps) {
         fixedLessonId: fixedLessonIdSelector(state),
         userPaidCourses: userPaidCoursesSelector(state),
         filterCourseType: filterCourseTypeSelector(state),
+        isMenuVisible: state.pageHeader.showMenu,
         ownProps,
     }
 }
@@ -272,6 +292,9 @@ function mapDispatchToProps(dispatch) {
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         whoAmI: bindActionCreators(whoAmI, dispatch),
         notifyCoursesShowed: bindActionCreators(notifyCoursesShowed, dispatch),
+        setInitialState: bindActionCreators(setInitialState, dispatch),
+        enableScrollGuard: bindActionCreators(enableScrollGuard, dispatch),
+        disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
     }
 }
 

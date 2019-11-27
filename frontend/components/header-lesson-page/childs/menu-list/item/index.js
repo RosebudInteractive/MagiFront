@@ -5,11 +5,14 @@ import {Link} from "react-router-dom";
 import ItemInfo from "./item-info";
 import PlayBlock from "./play-block"
 import SubList from "../sublist/"
+import {TEST_TYPE} from "../../../../../constants/common-consts";
+import LessonTests from "../lesson-tests";
 
 export default class MenuItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        test: PropTypes.object,
         course: PropTypes.object,
         active: PropTypes.string,
         showAuthor: PropTypes.bool,
@@ -44,6 +47,7 @@ export default class MenuItem extends React.Component {
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} isPaidCourse={this.props.isPaidCourse}/>
                 </Link>
                 <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active} onLinkClick={this.props.onLinkClick}/>
+                <LessonTests tests={lesson.Tests}/>
             </li>
         )
     }

@@ -23,7 +23,7 @@ class ButtonsBlock extends React.Component {
         return <div className="register-block">
             {
                 this.props.authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?
-                    <p className="register-block__title">Войти с помошью</p>
+                    <p className="register-block__title">Войти с помощью</p>
                     :
                     <p className="register-block__title">Регистрация с помощью</p>
             }

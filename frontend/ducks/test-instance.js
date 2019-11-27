@@ -271,39 +271,6 @@ function* setAnswerSaga(data) {
     yield put({type: SET_ANSWER_SUCCESS, payload: {instance: _instance, questions: _questions}})
 }
 
-// const _isAnswerCorrect = (question, answer) => {
-//     switch (question.AnswType) {
-//
-//         case ANSWER_TYPES.BOOL:
-//             return answer.value === question.AnswBool
-//
-//         case ANSWER_TYPES.SELECT: {
-//             const _answerItem = question.Answers.find((item) => {
-//                 return item.Id === answer.value[0]
-//             })
-//
-//             return !!_answerItem && _answerItem.IsCorrect
-//         }
-//
-//         case ANSWER_TYPES.MULTI_SELECT: {
-//             const _correctAnswers = question.Answers
-//                 .filter((item) => {
-//                     return item.IsCorrect
-//                 })
-//                 .map(item => item.Id)
-//
-//             const _firstStepCheck = answer.value.every(item => _correctAnswers.includes(item))
-//
-//             const _secondStepCheck = _correctAnswers.every(item => answer.value.includes(item))
-//
-//             return _firstStepCheck && _secondStepCheck
-//         }
-//
-//         default:
-//             return false
-//     }
-// }
-
 function* saveInstanceSaga() {
     let _instance = yield select(testInstanceSelector),
         _questions = yield select(questionsSelector)

@@ -83,7 +83,7 @@ class ImageBlock extends React.Component {
         return (
             <Link to={'/category/' + course.URL} onClick={::this._onLinkClickHandler}>
                 <div
-                    className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
+                    className={'course-module__image-block ' + course.Mask + (this.state.visible ? ' visible' : '')}>
                     <svg viewBox={`0 0 ${_mask.width} ${_mask.height}`}
                         // id={`cover${this.props.course.Id}`}
                          width={_mask.width}

@@ -55,12 +55,13 @@ import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 import {isMobilePlatform} from "./tools/page-tools";
-import {TEST_PAGE_TYPE} from "./constants/common-consts";
+import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
+import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
 
 Polyfill.registry();
 
 let _homePath = '/';
-const _globalScrollDelta = 80;
+const GLOBAL_SCROLL_DELTA = 80;
 
 class App extends Component {
 
@@ -175,11 +176,7 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _nextLocation;
 
         if (_isNewLocation) {
-            const _isFilterSwitched = (_thisLocation.startsWith('/razdel/') && _nextLocation.startsWith('/razdel/')) ||
-                (_thisLocation.startsWith('/razdel/') && (_nextLocation === _homePath)) ||
-                ((_thisLocation === _homePath) && _nextLocation.startsWith('/razdel/'))
-
-            if (!this.state.showHeader && !_isFilterSwitched) {
+            if (!this.state.showHeader && !this.props.filterScrollGuard) {
                 this.setState({showHeader: true,});
             }
 
@@ -221,6 +218,8 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.changePage(_thisLocation);
+
+            this._lastScrollPos = (document.scrollingElement) ? document.scrollingElement.scrollTop : 0
         }
     }
 
@@ -229,33 +228,36 @@ class App extends Component {
     }
 
     _handleScroll(event) {
+        const DIRECTION = {TOP: 1, BOTTOM: 2}
+
         if (!event.target.scrollingElement) {
             return
         }
 
-        let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
+        let _delta = this._lastScrollPos - event.target.scrollingElement.scrollTop,
+            _direction = (_delta > 0) ? DIRECTION.BOTTOM : DIRECTION.TOP,
+            _scrollDelta = (_direction === DIRECTION.BOTTOM) ? GLOBAL_SCROLL_DELTA : GLOBAL_SCROLL_DELTA / 3;
 
-        let _scrollDelta = _bellowScreen ? _globalScrollDelta / 2 : _globalScrollDelta;
+        let _needHandle = (_direction === DIRECTION.BOTTOM) && (this._lastScrollPos < GLOBAL_SCROLL_DELTA)
 
-        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop);
-        if (_delta < _scrollDelta) {
+        _delta = Math.abs(_delta)
+        if ((_delta < _scrollDelta) && !_needHandle) {
             return
-        }
-
-        let _header = $('.page-header._fixed');
-        if (_header && _header.length > 0) {
-            if (_bellowScreen) {
-                _header.css("-webkit-transition", "all 0.2s ease")
-                _header.css("transition", "all 0.2s ease")
-            } else {
-                _header.css("-webkit-transition", "all 0.4s ease")
-                _header.css("transition", "all 0.4s ease")
-            }
         }
 
         let _newScrollTop = event.target.scrollingElement.scrollTop
 
-        if ((_newScrollTop < _scrollDelta) && (!this.state.showHeader)) {
+        if (this.props.filterScrollGuard) {
+            this.props.disableScrollGuard()
+            return
+        }
+
+        if ((this._lastScrollPos === 0) && (_direction === DIRECTION.TOP)) {
+            this._lastScrollPos = _newScrollTop
+            return;
+        }
+
+        if ((_newScrollTop < _scrollDelta) && (_direction === DIRECTION.BOTTOM) && (!this.state.showHeader)) {
             this.setState({showHeader: true})
         }
 
@@ -275,9 +277,16 @@ class App extends Component {
     _getMainDiv() {
         return (
             <Switch >
-                <Route exact path={_homePath} component={CoursePage}/>
-                <Route exact path={_homePath + 'razdel/:filter'}
-                       render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>
+                <Route exact path={_homePath}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={false} filterType={FILTER_TYPE.EMPTY}/>)}/>
+                <Route path={_homePath + 'razdel/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL}/>)}/>
+                <Route path={_homePath + 'razdel-rev/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL_REVERSE}/>)}/>
+                <Route path={_homePath + 'knowledge/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWLEDGE}/>)}/>
+                <Route path={_homePath + 'knowhow/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWHOW}/>)}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>
@@ -350,8 +359,8 @@ class App extends Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        showFiltersForm: state.pageHeader.showFiltersForm,
-        currentPage: state.pageHeader.currentPage,
+        // showFiltersForm: state.pageHeader.showFiltersForm,
+        // currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         sendPulseScript: state.app.sendPulseScript,
         showSizeInfo: state.app.showSizeInfo,
@@ -360,6 +369,7 @@ function mapStateToProps(state, ownProps) {
         showFeedbackWindow: showFeedbackWindowSelector(state),
         showFeedbackResultMessage: showFeedbackResultMessageSelector(state),
         isWaiting: waitingSelector(state),
+        filterScrollGuard: scrollGuardSelector(state),
         ownProps,
     }
 }
@@ -378,7 +388,8 @@ function mapDispatchToProps(dispatch) {
         setBillingWaitingAuthorizeData: bindActionCreators(setBillingWaitingAuthorizeData, dispatch),
         setPlayerWaitingAuthorizeData: bindActionCreators(setPlayerWaitingAuthorizeData, dispatch),
         notifyNewUserRegistered: bindActionCreators(notifyNewUserRegistered, dispatch),
-        showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch)
+        showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
+        disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
     }
 }
 

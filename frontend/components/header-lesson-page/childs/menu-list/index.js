@@ -9,6 +9,9 @@ import {OverflowHandler} from 'tools/page-tools'
 import $ from 'jquery'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {notifyLessonLinkClicked} from "ducks/google-analytics";
+import {lessonsSelector, authorsSelector} from "ducks/lesson-menu";
+import {TEST_TYPE} from "../../../../constants/common-consts";
+import TestItem from "./test-item";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -19,7 +22,7 @@ class LessonsListWrapper extends React.Component {
         super(props);
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
             OverflowHandler.rememberScrollPos()
         }
@@ -54,22 +57,18 @@ class LessonsListWrapper extends React.Component {
     }
 
     render() {
-        return (
-            (this.props.fetching) ?
-                null
-                : (
-                    <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
-                        <ol className="lectures-list">
-                            {this._getLessonsList()}
-                        </ol>
-                    </div>
-                )
-        )
+        return <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
+            <ol className="lectures-list">
+                <TestItem test={this._getStartedTest()}/>
+                {this._getLessonsList()}
+                <TestItem test={this._getFinishedTest()}/>
+            </ol>
+        </div>
     }
 
     _getLessonsList() {
-        const {object: lessons, authors} = this.props.lessons;
-        const {course, userPaidCourses} = this.props;
+        const {lessons, authors, course, userPaidCourses} = this.props;
+
         let _needShowAuthor = (authors && (authors.length > 1)),
             _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
 
@@ -84,17 +83,28 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}
+            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index}
+                             isPaidCourse={_isPaidCourse}
                              onLinkClick={this.props.notifyLessonLinkClicked}/>
         });
+    }
+
+    _getStartedTest() {
+        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
+            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.STARTED)
+    }
+
+    _getFinishedTest() {
+        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
+            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.FINISHED)
     }
 }
 
 function mapStateToProps(state) {
     return {
-        fetching: state.lessons.fetching,
-        lessons: state.lessons,
-        userPaidCourses : userPaidCoursesSelector(state),
+        lessons: lessonsSelector(state),
+        authors: authorsSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }

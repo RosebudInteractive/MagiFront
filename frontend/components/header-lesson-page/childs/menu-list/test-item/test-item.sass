@@ -1,0 +1,58 @@
+@import "~tools/variables"
+
+.lectures-list__test
+  display: flex
+  padding: 17px 17px 19px 7px
+  position: relative
+  &::after
+    content: ""
+    position: absolute
+    bottom: -1px
+    right: 0
+    left: 45px
+    border-bottom: $border-white-02
+
+
+.test__complete-status
+  &._green
+    fill: $color-green
+    fill-opacity: 0.6
+
+  &._yellow
+    fill: $color-yellow
+
+  &._gray
+    fill: $color-white-06
+
+
+.test__info-wrapper
+  display: flex
+  flex-grow: 1
+  margin-left: 20px
+
+.test__name
+  flex-grow: 1
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 24px
+  color: $color-white
+  span
+    border-bottom: $border-hidden-link
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+  &:hover
+    span
+      border-bottom: $border-orange-03
+
+
+.test__time
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 14px
+  line-height: 18px
+  letter-spacing: 0.01em
+  color: $color-white-06
+  align-self: center

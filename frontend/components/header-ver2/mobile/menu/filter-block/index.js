@@ -13,6 +13,8 @@ import {
 } from "ducks/filters";
 import {FILTER_COURSE_TYPE} from "../../../../../constants/filters";
 import './fiter-block.sass'
+import {OverflowHandler} from "tools/page-tools";
+import {hideMenu} from "actions/page-header-actions";
 
 class FiltersRow extends React.Component {
 
@@ -29,7 +31,7 @@ class FiltersRow extends React.Component {
 
         let _array = []
 
-        _array.push(<li className={"filter-item menu-item" + (isEmptyFilter ? ' active' : "")} onClick={::this.props.clearFilter}>
+        _array.push(<li className={"filter-item menu-item" + (isEmptyFilter ? ' active' : "")} onClick={::this._allClick}>
                         <span className="filter-btn__title underlined-item">
                             {rootItem.name}
                             <span className="filter-btn__index">
@@ -39,17 +41,21 @@ class FiltersRow extends React.Component {
         </li>)
 
         filters.forEach((item, key) => {
-            _array.push(<React.Fragment>
-                    <li key={key} className={"filter-item menu-item" + (item.get('selected') ? ' active' : "")} onClick={() => {::this._onItemClick(item.get('URL'))}}>
+            const _count = this._getCount(item.toJS())
+
+            if (_count) {
+                _array.push(<React.Fragment>
+                        <li key={key} className={"filter-item menu-item" + (item.get('selected') ? ' active' : "")} onClick={() => {::this._onItemClick(item.get('URL'))}}>
                         <span className="filter-btn__title underlined-item">
                             {item.get('name') + ' '}
                             <span className="filter-btn__index">
-                                {this._getCount(item.toJS())}
+                                {_count}
                             </span>
                         </span>
-                    </li>
-                </React.Fragment>
-            )
+                        </li>
+                    </React.Fragment>)
+            }
+
         })
 
         return _array
@@ -68,6 +74,15 @@ class FiltersRow extends React.Component {
 
     _onItemClick(url) {
         this.props.switchFilter(url)
+
+        this.props.hideMenu()
+        OverflowHandler.turnOff();
+    }
+
+    _allClick() {
+        this.props.clearFilter()
+        this.props.hideMenu()
+        OverflowHandler.turnOff();
     }
 }
 
@@ -83,7 +98,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({switchFilter, toggleCourseTypeToFilter, clearFilter: clear}, dispatch)
+    return bindActionCreators({switchFilter, toggleCourseTypeToFilter, clearFilter: clear, hideMenu}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FiltersRow);
