@@ -48,8 +48,17 @@ class Main extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.course) {
-            document.title = 'Курс: ' + this.props.course.Name + ' - Магистерия'
+        let {course} = this.props
+
+        if (course) {
+            let _authors = course.Authors
+                    .map(item => item.FirstName + " " + item.LastName)
+                    .join(", "),
+                _categories = course.Categories
+                    .map(item => item.Name)
+                    .join(", ")
+
+            document.title = `${this.props.course.Name}. ${_authors}. ${_categories} - Магистерия`
         }
 
         if (prevProps.fetching && !this.props.fetching) {

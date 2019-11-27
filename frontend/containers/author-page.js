@@ -36,7 +36,7 @@ class AuthorPage extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.author) {
-            document.title = 'Автор : ' + this.props.author.FirstName + ' ' + this.props.author.LastName;
+            document.title = this.props.author.FirstName + ' ' + this.props.author.LastName + '. Автор онлайн лекций - Магистерия';
         }
 
         if (prevProps.loading && !this.props.loading) {

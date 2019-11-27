@@ -224,7 +224,7 @@ class CombineLessonPage extends React.Component {
         }
 
         if (_lesson) {
-            document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
+            document.title = `${_lesson.Name} лекция смотреть, слушать и читать онлайн. Курс ${_lesson.Course.Name}. ${_lesson.Author.FirstName} ${_lesson.Author.LastName} - Магистерия`
         }
 
 

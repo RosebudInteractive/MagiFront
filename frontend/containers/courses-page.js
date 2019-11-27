@@ -50,7 +50,7 @@ class CoursesPage extends React.Component {
     }
 
     componentDidMount() {
-        document.title = 'Магистерия'
+        document.title = this._getTitle()
         this.props.setCurrentPage(this);
     }
 
@@ -61,7 +61,7 @@ class CoursesPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {hasExternalFilter, externalFilter, filterType, loadingFilters, selectedFilter, filterMainType, filterCourseType} = this.props;
+        let {hasExternalFilter, externalFilter, filterType, loadingFilters, selectedFilter, filterMainType, filterCourseType,} = this.props;
 
         const _filterType = this._getFilterType()
 
@@ -80,6 +80,8 @@ class CoursesPage extends React.Component {
             (!prevProps.filterCourseType.equals(filterCourseType))
 
         if (_filterChanged) {
+            document.title = this._getTitle()
+
             this.props.enableScrollGuard()
 
             if (!this.props.isMenuVisible) {
@@ -140,8 +142,8 @@ class CoursesPage extends React.Component {
                     });
                 }
             })
-            .forEach((course, index, array) => {
-                let _needLazyLoading = isEmptyFilter//(array.length > 3) && isEmptyFilter
+            .forEach((course, index,) => {
+                let _needLazyLoading = isEmptyFilter
 
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
@@ -193,7 +195,7 @@ class CoursesPage extends React.Component {
         this._removeRobotsMetaTags()
 
         return <MetaTags>
-            <meta name="description" content="Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом."/>
+            <meta name="description" content="Смотреть и читать онлайн лекции для студентов, старшеклассников и всех людей с культурными запросами. Зачерпни знания у источника!"/>
         </MetaTags>
     }
 
@@ -245,6 +247,16 @@ class CoursesPage extends React.Component {
             return FILTER_TYPE.KNOWHOW
         } else {
             return FILTER_TYPE.EMPTY
+        }
+    }
+
+    _getTitle() {
+        if (this.props.isEmptyFilter) {
+            return "Магистерия. Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории, искусству, религии, психологии."
+        } else {
+            let _category = this.props.selectedFilter.first().get("name")
+
+            return `${_category}. Лекции смотреть, слушать и читать онлайн - Магистерия`
         }
     }
 
