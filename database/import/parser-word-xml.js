@@ -312,7 +312,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
             }
             if (result.link) {
                 result.text = result.text + " [[" + result.link + "]]";
-                result.html = `<a href="${escape(result.link)}">${result.html}</a>`;
+                result.html = `<a href="${escape(result.link)}" rel="nofollow" target="_blank">${result.html}</a>`;
             }
         }
         return result;
@@ -358,7 +358,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                                     if (props.end) {
                                         if (fieldLink) {
                                             result.text += textField + " [[" + fieldLink + "]]";
-                                            result.html += `<a href="${escape(fieldLink)}">${htmlField}</a>`;
+                                            result.html += `<a href="${escape(fieldLink)}" rel="nofollow" target="_blank">${htmlField}</a>`;
                                         }
                                         else {
                                             result.text += textField;
