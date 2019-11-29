@@ -43,7 +43,7 @@ class Row extends React.Component {
                 </a>
                 <ul className="footer-actions">
                     <li>
-                        <a href="http://ideas.magisteria.ru/">
+                        <a href="http://ideas.magisteria.ru/" target="_blank" rel="nofollow">
                             <div className="icon">
                                 <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _idea}}/>
                             </div>
@@ -120,7 +120,7 @@ class SocialLink extends React.Component {
         const _logo = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#' + logo + '"/>';
 
         return (
-            <a href={href} target="_blank" className="social-link">
+            <a href={href} target="_blank" className="social-link" rel="nofollow">
                 <span className="social-link__icon">
                     <svg width={icoWidth} height={icoHeight} dangerouslySetInnerHTML={{__html: _logo}}/>
                 </span>
