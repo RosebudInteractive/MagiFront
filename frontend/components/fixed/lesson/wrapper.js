@@ -37,7 +37,7 @@ class Wrapper extends React.Component {
         }
 
         return [
-            <div className="course-module _small _fixed">
+            <div className="course-module _small _fixed course-page__item">
                 <div className="course-module__info-block">
                     <div className="course-module__header">
                         <h1 className="course-module__title">
