@@ -21,11 +21,6 @@ export default class Item extends React.Component {
         forceCheck()
     }
 
-    componentDidUpdate(){
-        console.log("componentDidUpdate")
-        forceCheck()
-    }
-
     render() {
         let {course, isMobile} = this.props;
 
