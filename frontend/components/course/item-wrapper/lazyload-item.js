@@ -6,7 +6,8 @@ import CourseModule from "../course-module";
 import ScrollMemoryStorage from "../../../tools/scroll-memory-storage"
 import { forceCheck } from 'react-lazyload';
 
-const DEFAULT_HEIGHT = 685
+const DEFAULT_COURSE_HEIGHT = 685,
+    DEFAULT_LESSON_HEIGHT = 400
 
 export default class Item extends React.Component {
 
@@ -23,7 +24,7 @@ export default class Item extends React.Component {
     render() {
         let {course, isMobile} = this.props;
 
-        return <LazyLoad height={this._getHeight()} once={true} unmountIfInvisible={true}>
+        return <LazyLoad height={this._getHeight()} unmountIfInvisible={true}>
             {
                 course.OneLesson ?
                     <SingleLesson course={course} needShowAuthors={true}/>
@@ -36,6 +37,9 @@ export default class Item extends React.Component {
     _getHeight() {
         const _value = ScrollMemoryStorage.getInstance().getCourseBundleHeight(this.props.index)
 
-        return _value ? _value : DEFAULT_HEIGHT;
+        return _value ?
+            _value 
+            :
+            this.props.course.OneLesson ? DEFAULT_LESSON_HEIGHT : DEFAULT_COURSE_HEIGHT;
     }
 }

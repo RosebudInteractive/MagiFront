@@ -84,10 +84,11 @@ class CoursesPage extends React.Component {
 
             this.props.enableScrollGuard()
 
+            const _top = this._getTop()
             if (!this.props.isMenuVisible) {
-                window.scrollTo(0, this._getTop())
+                window.scrollTo(0, _top)
             } else {
-                OverflowHandler.setPositionAfterTurnOff(this._getTop())
+                OverflowHandler.setPositionAfterTurnOff(_top)
             }
 
             let _filter = []
@@ -97,8 +98,9 @@ class CoursesPage extends React.Component {
             })
 
             if ((_filter.length === 0) && ((_filterType === FILTER_TYPE.EMPTY) || (_filterType === FILTER_TYPE.KNOWLEDGE))) {
-                this._needRedirectToCourses = true
-                this.forceUpdate()
+                // this._needRedirectToCourses = true
+                // this.forceUpdate()
+                this.props.setInitialState()
             } else {
                 let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
 
