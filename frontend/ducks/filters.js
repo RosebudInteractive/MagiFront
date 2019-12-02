@@ -35,7 +35,7 @@ const FilterRecord = Record({
 })
 
 export const ReducerRecord = Record({
-    courseType: new Set([FILTER_COURSE_TYPE.THEORY]),
+    courseType: new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE]),
     mainType: FILTER_COURSE_TYPE.THEORY,
     filters: new Map(),
     root: new FilterRecord(),

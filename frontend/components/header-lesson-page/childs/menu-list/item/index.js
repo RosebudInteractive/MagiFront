@@ -38,7 +38,7 @@ export default class MenuItem extends React.Component {
                         Id: course.Id,
                         Name: course.Name,
                         author: lesson ? lesson.Author.FirstName + lesson.Author.LastName : null,
-                        category: course.Categories[0].Name,
+                        category: course.Categories && course.Categories[0].Name,
                         lessonName: lesson ? lesson.Name : null,
                         price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
                     })

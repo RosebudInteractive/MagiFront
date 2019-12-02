@@ -68,12 +68,13 @@
 
   a
     color: $color-main-dark
-    -webkit-transition: border-color 0.3s ease
-    transition: border-color 0.3s ease
-    border-bottom: $border-hidden-link
+    //-webkit-transition: border-color 0.3s ease
+    //transition: border-color 0.3s ease
+    //border-bottom: $border-hidden-link
 
     &:hover
-      border-bottom: $border-orange-03
+      .item-info__name
+        border-bottom: $border-orange-03
 
   .item-info__duration, .item-info__duration a
     position: relative
@@ -86,6 +87,11 @@
 .item-info__name
   font-weight: bold
   display: inline
+  -webkit-transition: border-color 0.3s ease
+  transition: border-color 0.3s ease
+  border-bottom: $border-hidden-link
+  //&:hover
+  //  border-bottom: $border-orange-03
 
 .item-info__ext
   margin-left: 16px

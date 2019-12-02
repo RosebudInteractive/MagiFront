@@ -7,7 +7,7 @@ import ScrollMemoryStorage from "../../../tools/scroll-memory-storage"
 import { forceCheck } from 'react-lazyload';
 
 const DEFAULT_COURSE_HEIGHT = 685,
-    DEFAULT_LESSON_HEIGHT = 400
+    DEFAULT_LESSON_HEIGHT = 320
 
 export default class Item extends React.Component {
 

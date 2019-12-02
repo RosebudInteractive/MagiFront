@@ -26,8 +26,10 @@ export default class LessonFull extends React.Component{
                     <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
                     <div className="lessons-list__item-info">
                         <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
-                        <Link to={url} className="item-info__name">{_title}</Link>
-                        <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
+                        <Link to={url}>
+                            <span className="item-info__name">{_title}</span>
+                            <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
+                        </Link>
                         <div className="item-info__duration">
                             <span >{lesson.DurationFmt}</span>
                             {
