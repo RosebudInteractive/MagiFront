@@ -9,7 +9,7 @@ import Navigator from '../common/navigator';
 import FiltersRow from './filter';
 
 import {hideUserBlock} from "actions/app-actions";
-import {setRootState} from "ducks/filters";
+import {setInitialState} from "ducks/filters";
 
 import './desktop-header.sass'
 
@@ -28,7 +28,7 @@ class DesktopHeader extends React.Component {
 
         return <React.Fragment>
                 <div className={"page-header__wrapper js-page-header-1"}>
-                    <Link to={'/'} className="logo" onClick={::this.props.setRootState}>
+                    <Link to={'/'} className="logo" onClick={::this.props.setInitialState}>
                         <svg width="130" height="31" dangerouslySetInnerHTML={{__html: LOGO}}/>
                     </Link>
                     <Navigator/>
@@ -41,7 +41,7 @@ class DesktopHeader extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({hideUserBlock, setRootState}, dispatch)
+    return bindActionCreators({hideUserBlock, setInitialState}, dispatch)
 }
 
 export default connect(null, mapDispatchToProps)(DesktopHeader)

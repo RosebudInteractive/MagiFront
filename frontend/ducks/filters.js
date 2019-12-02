@@ -307,6 +307,7 @@ function* switchFilterTypeSaga(data) {
 function* setInitialStateSaga() {
     yield put(clear())
     yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
+    yield put({type: SET_ALL_COURSE_TYPE})
     yield put(replace("/"))
 }
 

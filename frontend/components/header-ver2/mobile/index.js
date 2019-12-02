@@ -10,6 +10,7 @@ import Menu from './menu'
 import {OverflowHandler} from "tools/page-tools";
 
 import {showMenu, hideMenu} from "actions/page-header-actions";
+import {setInitialState} from "ducks/filters";
 
 class MobileHeader extends React.Component {
 
@@ -27,7 +28,7 @@ class MobileHeader extends React.Component {
 
         return (
             <div className="page-header__menu-mobile">
-                <Link to={'/'} className="logo-mobile">
+                <Link to={'/'} className="logo-mobile" onClick={::this.props.setInitialState}>
                     <svg width="70" height="38" dangerouslySetInnerHTML={{__html: LOGO}}/>
                 </Link>
                 <Navigator isPhoneViewPort={this.props.isPhoneViewPort}/>
@@ -71,7 +72,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({showMenu, hideMenu}, dispatch)
+    return bindActionCreators({showMenu, hideMenu, setInitialState}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MobileHeader)

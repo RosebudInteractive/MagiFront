@@ -97,7 +97,7 @@ class CoursesPage extends React.Component {
                 _filter.push(item.get('URL'))
             })
 
-            if ((_filter.length === 0) && ((_filterType === FILTER_TYPE.EMPTY) || (_filterType === FILTER_TYPE.KNOWLEDGE))) {
+            if ((_filter.length === 0) && (_filterType === FILTER_TYPE.EMPTY)) {
                 this.props.setInitialState()
             } else {
                 let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
@@ -237,10 +237,14 @@ class CoursesPage extends React.Component {
     }
 
     _getFilterType() {
-        const {filterCourseType, filterMainType} = this.props
+        const {filterCourseType, filterMainType, isEmptyFilter} = this.props
 
         if (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
-            return (filterMainType === FILTER_COURSE_TYPE.THEORY) ? FILTER_TYPE.RAZDEL : FILTER_TYPE.RAZDEL_REVERSE
+            if (!isEmptyFilter) {
+                return (filterMainType === FILTER_COURSE_TYPE.THEORY) ? FILTER_TYPE.RAZDEL : FILTER_TYPE.RAZDEL_REVERSE
+            } else {
+                return (filterMainType === FILTER_COURSE_TYPE.THEORY) ? FILTER_TYPE.EMPTY : FILTER_TYPE.RAZDEL_REVERSE
+            }
         } else if (filterMainType === FILTER_COURSE_TYPE.THEORY) {
             return FILTER_TYPE.KNOWLEDGE
         } else if (filterMainType === FILTER_COURSE_TYPE.PRACTICE) {
