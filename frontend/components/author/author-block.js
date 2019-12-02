@@ -42,7 +42,7 @@ class AuthorBlock extends React.Component {
                     </div>
                     <div className="author-block__col">
                         <div className="author-block__info">
-                            <h2 className="author-block__name">{author.FirstName + ' ' + author.LastName}</h2>
+                            <h1 className="author-block__name">{author.FirstName + ' ' + author.LastName}</h1>
                             <p className="author-block__descr">{author.Description}</p>
                             <Books books={author.Books} titleClassName={"books__title"} extClass={"_vertical"} listClass={CourseBooksList}/>
                         </div>

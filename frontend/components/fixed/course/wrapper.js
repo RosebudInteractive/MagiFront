@@ -75,17 +75,16 @@ class Wrapper extends React.Component {
             <div className="course-module _small _fixed course-page__item">
                 <div className="course-module__info-block">
                     <div className="course-module__header">
-                        <h1 className="course-module__title">
-
+                        <div className="course-module__title">
                             <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
                             <Link to={'/category/' + course.URL} id={`course-link${this.props.course.Id}`}>
                                 <p className="course-module__label">
                                     { getCrownForCourse(this.props.course) }
                                     Курс:
                                 </p>
-                                <span>{course.Name}</span>
+                                <span><h1>{course.Name}</h1></span>
                             </Link>
-                        </h1>
+                        </div>
                         <div className="course-module__info">
                             <div className="course-module__stats">
                                 <b className="category">{_categories}</b>
