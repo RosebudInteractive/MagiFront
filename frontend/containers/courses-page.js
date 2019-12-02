@@ -98,8 +98,6 @@ class CoursesPage extends React.Component {
             })
 
             if ((_filter.length === 0) && ((_filterType === FILTER_TYPE.EMPTY) || (_filterType === FILTER_TYPE.KNOWLEDGE))) {
-                // this._needRedirectToCourses = true
-                // this.forceUpdate()
                 this.props.setInitialState()
             } else {
                 let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
