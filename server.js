@@ -217,9 +217,13 @@ Promise.resolve()
             res.sendFile(path.join(__dirname, 'mailing', 'index.html'));
         });
 
+        let logPrerenderRequest = config.has("server.prerender.logRequest") ? config.get("server.prerender.logRequest") : false;
         if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
             app.get("/*", function (req, res) {
-                res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null" });
+                let is_prerender = req.headers["x-prerender"] === "1" ? true : false;
+                if (is_prerender && logPrerenderRequest)
+                    console.log(buildLogString(`### Prerender request: ${req.url}.`));
+                res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null", is_prerender: is_prerender });
             });
 
         app.listen(port, address, function (error) {
