@@ -40,13 +40,13 @@ class Wrapper extends React.Component {
             <div className="course-module _small _fixed course-page__item">
                 <div className="course-module__info-block">
                     <div className="course-module__header">
-                        <h1 className="course-module__title">
+                        <div className="course-module__title">
                             <span className={"favourites" + (this._isLessonInBookmarks(lesson.URL) ? ' active' : '')}
                                   onClick={::this._favoritesClick}>В закладки</span>
                             <Link to={'/' + course.URL + '/' + lesson.URL}>
-                                <p className="course-module__label">Лекция:</p> <span>{lesson.Name}</span>
+                                <p className="course-module__label">Лекция:</p> <span><h1>{lesson.Name}</h1></span>
                             </Link>
-                        </h1>
+                        </div>
                         <div className="course-module__info">
                             <div className="course-module__stats">
                                 <b className="category">{_categories}</b>

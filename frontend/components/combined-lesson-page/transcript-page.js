@@ -246,12 +246,12 @@ class TextBlock extends React.Component {
                                isPaidCourse={isPaidCourse}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
-                        <div className='text-block__headline'>
+                        <h1 className='text-block__headline'>
                             <span className="number">
                                 {_number}
                             </span>
                             {lesson.Name}
-                        </div>
+                        </h1>
                         {this._getText()}
                         {
                             this.props.isPaidCourse && !lesson.IsFreeInPaidCourse ?

@@ -5788,18 +5788,32 @@ ul.user-tooltip {
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       -webkit-transition: border-color 0.3s ease;
       transition: border-color 0.3s ease; }
+    .course-module__title span h1 {
+      font-weight: inherit;
+      margin: inherit;
+      line-height: inherit;
+      font-size: inherit;
+      display: inherit;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0);
+      -webkit-transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease;
+    }
     .course-module--extended .course-module__title span {
       margin-left: 0;
       vertical-align: top;
     }
-    .course-module__title:hover span {
+    .course-module__title:hover h1 {
       border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
-    .course-module__title.no_underline span {
+    .course-module__title.no_underline span h1 {
         padding-left: 4px;
         border-bottom: none;
         -webkit-transition: none;
         transition: none; }
-    .course-module__title.no_underline:hover span {
+    .course-module__title.no_underline:hover span h1 {
         border-bottom: none; }
   .course-module__label {
     position: relative;

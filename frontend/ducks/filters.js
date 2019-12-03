@@ -17,8 +17,10 @@ const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
 const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
 const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
 const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
+const SET_ALL_COURSE_TYPE = `${prefix}/SET_ALL_COURSE_TYPE`
 const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
 const SET_INITIAL_STATE = `${prefix}/SET_INITIAL_STATE`
+const SET_ROOT_STATE = `${prefix}/SET_ROOT_STATE`
 const ENABLE_SCROLL_GUARD = `${prefix}/ENABLE_SCROLL_GUARD`
 const DISABLE_SCROLL_GUARD = `${prefix}/DISABLE_SCROLL_GUARD`
 
@@ -161,6 +163,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('scrollHandlerGuard', true)
 
+        case SET_ALL_COURSE_TYPE:
+            return state
+                .set('courseType', new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE]))
+
         default:
             return state
     }
@@ -253,6 +259,10 @@ export const setInitialState = () => {
     return { type: SET_INITIAL_STATE }
 }
 
+export const setRootState = () => {
+    return { type: SET_ROOT_STATE }
+}
+
 export const disableScrollGuard = () => {
     return { type: DISABLE_SCROLL_GUARD}
 }
@@ -269,6 +279,7 @@ export const saga = function* () {
     yield all([
         takeEvery([SET_FILTER_COURSE_TYPE, TOGGLE_FILTER_COURSE_TYPE, APPLY_EXTERNAL_FILTER], switchFilterTypeSaga),
         takeEvery(SET_INITIAL_STATE, setInitialStateSaga),
+        takeEvery(SET_ROOT_STATE, setInitialStateSaga),
     ])
 }
 
@@ -296,5 +307,13 @@ function* switchFilterTypeSaga(data) {
 function* setInitialStateSaga() {
     yield put(clear())
     yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
+    yield put({type: SET_ALL_COURSE_TYPE})
     yield put(replace("/"))
+}
+
+function* setRootStateSaga() {
+    // yield put(clear())
+    // yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
+    // yield put({type: SET_ALL_COURSE_TYPE})
+    // yield put(replace("/"))
 }

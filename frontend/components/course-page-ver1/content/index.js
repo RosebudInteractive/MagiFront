@@ -37,15 +37,15 @@ class TitleWrapper extends React.Component {
 
         return (
             <div className="course-module__title-wrapper">
-                <h1 className="course-module__title no_underline">
+                <div className="course-module__title no_underline">
                     <span className={"favourites" + (isFavorite ? ' active' : '')}
                           onClick={onFavoritesClick}>В закладки</span>
                     <p className="course-module__label">
                         { getCrownForCourse(course) }
                         Курс:
                     </p>
-                    <span>{course.Name}</span>
-                </h1>
+                    <span><h1>{course.Name}</h1></span>
+                </div>
             </div>
         )
     }
