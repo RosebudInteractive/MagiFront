@@ -23,7 +23,7 @@ export default class LessonFullWrapper extends React.Component {
 
     render() {
         let {lesson, course, isAdmin,} = this.props,
-            _cover = getCoverPath(lesson, ImageSize.small)
+            _cover = getCoverPath(lesson, ImageSize.medium)
 
         return (
             <div className="lecture-full__wrapper">

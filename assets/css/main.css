@@ -11455,11 +11455,8 @@ ul.lectures-tab {
       color: rgba(47, 47, 47, 0.6);
     }
   .lecture-full._single .lecture-full__fav {
-    top: 0;
+    top: 8px;
     left: -27px; }
-    @media (max-width: 1279px) {
-      .lecture-full._single .lecture-full__fav {
-        top: 8px; } }
     @media (max-width: 639px) {
       .lecture-full._single .lecture-full__fav {
         left: auto;
