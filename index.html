@@ -7,7 +7,11 @@
     <script>
         dataLayer = [];
         var id = <%= id %>;
+        var email = <%= email %>;
+        var is_prerender = <%= is_prerender %>;
+
         if (!!id) {dataLayer.push({UID: id})}
+        if (!!email) {dataLayer.push({email: email})}
     </script>
     <!--Google Tag Manager-->
     <script>(function (w, d, s, l, i) {
