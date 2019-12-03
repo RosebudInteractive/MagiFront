@@ -495,6 +495,7 @@ function* _pushAnalyticsData(data) {
     if (window.dataLayer && data) {
         if (_state.user.user && _state.user.user.Id) {
             data.UID = _state.user.user.Id
+            data.email = _state.user.user.Email
         }
 
         window.dataLayer.push(data)
