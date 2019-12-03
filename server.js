@@ -223,7 +223,11 @@ Promise.resolve()
                 let is_prerender = req.headers["x-prerender"] === "1" ? true : false;
                 if (is_prerender && logPrerenderRequest)
                     console.log(buildLogString(`### Prerender request: ${req.url}.`));
-                res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null", is_prerender: is_prerender });
+                res.render(__dirname + '/index.html', {
+                    id: req.user ? req.user.Id : "null",
+                    email: req.user ? req.user.Email : "null",
+                    is_prerender: is_prerender ? "true" : "false"
+                });
             });
 
         app.listen(port, address, function (error) {
