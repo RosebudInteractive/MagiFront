@@ -28,7 +28,7 @@ export default class TranscriptPage extends React.Component {
 
         return [
             <TextBlock {...this.props} />,
-            isNeedHideGallery ? null : <GallerySlides {...this.props}/>
+            isNeedHideGallery && !window.prerenderEnable ? null : <GallerySlides {...this.props}/>
         ]
     }
 }

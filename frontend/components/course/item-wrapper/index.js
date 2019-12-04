@@ -43,7 +43,7 @@ class Wrapper extends React.Component {
             return null
         }
 
-        return lazyload
+        return lazyload && !window.prerenderEnable
             ?
             <LazyItem course={course} isMobile={this._getIsMobile()} key={course.Id} index={this.props.index}/>
             :
