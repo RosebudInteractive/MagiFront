@@ -7,12 +7,14 @@
     <script>
         dataLayer = [];
         var id = <%= id %>;
-        var email = <%= email %>;
+        var email = "<%= email %>";
         var is_prerender = <%= is_prerender %>;
 
-        if (!!id) {dataLayer.push({UID: id})}
-        if (!!email) {dataLayer.push({email: email})}
+        var _obj = {}
+        if (!!id) {_obj.UID = id}
+        if (!!email) {_obj.email = email}
 
+        dataLayer.push(_obj)
         window.prerenderEnable = !!is_prerender
     </script>
     <!--Google Tag Manager-->
