@@ -6,15 +6,20 @@
     <meta name="theme-color" content="#000000">
     <script>
         dataLayer = [];
-        var id = <%= id %>;
-        var email = "<%= email %>";
-        var is_prerender = <%= is_prerender %>;
+        var id = <%- id %>,
+            email = <%- email %>,
+            name = <%- name %>,
+            carrotquestHash = <%- carrotquest_hash %>
+
+        var is_prerender = <%- is_prerender %>;
 
         var _obj = null
         if (!!id) {
             _obj = {};
             _obj.UID = id
             _obj.email = email
+            _obj.name = name
+            _obj.carrotquest_hash = carrotquestHash
         }
 
         if (_obj) { dataLayer.push(_obj) }

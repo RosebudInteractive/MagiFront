@@ -496,6 +496,8 @@ function* _pushAnalyticsData(data) {
         if (_state.user.user && _state.user.user.Id) {
             data.UID = _state.user.user.Id
             data.email = _state.user.user.Email
+            data.name = _state.user.user.DisplayName
+            data.carrotquest_hash = _state.user.user.CqHash
         }
 
         window.dataLayer.push(data)
