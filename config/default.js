@@ -57,6 +57,11 @@ module.exports = {
         logModif: false
     },
     dbProvider: 'mysql',
+    integration: {
+        carrotquest: {
+            userAuthKey: "carrotquest-test-userAuthKey"
+        }
+    },
     session: {
         name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',

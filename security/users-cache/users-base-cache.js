@@ -1,4 +1,5 @@
 'use strict'
+const crypto = require('crypto');
 const _ = require('lodash');
 const config = require('config');
 const randomstring = require('randomstring');
@@ -23,8 +24,11 @@ const STATUS_PENDING = 2;
 const SubsExtPeriod = config.has("billing.subsExtPeriod") ? config.get("billing.subsExtPeriod") : null;
 const TokenExpTime = config.has("authentication.tokenExpTime") ? config.get("authentication.tokenExpTime") : TOKEN_EXP_TIME;
 const TokenUpdTime = config.has("authentication.tokenUpdTime") ? config.get("authentication.tokenUpdTime") : TOKEN_UPD_TIME;
+const CqUserAuthKey = config.has("integration.carrotquest.userAuthKey") ? config.get("integration.carrotquest.userAuthKey") : null;
 
-const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "RegDate", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
+const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData",
+    "RegDate", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
+
 const CONV_USER_DATA_FN = (rawUser) => {
     rawUser.SubsExpDateExt = null;
     if (rawUser.RegDate)
@@ -39,6 +43,11 @@ const CONV_USER_DATA_FN = (rawUser) => {
             rawUser.PData = JSON.parse(rawUser.PData);
         }
         catch (e) { rawUser.PData = {}; }
+    }
+    if (CqUserAuthKey) {
+        const hmac = crypto.createHmac('sha256', CqUserAuthKey);
+        hmac.update(`${rawUser.Id}`);
+        rawUser.CqHash = hmac.digest('hex');
     }
     return rawUser;
 };
@@ -96,7 +105,7 @@ const USER_USERROLE_EXPRESSION = {
 exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
     static UserToClientJSON(user) {
-        return {
+        let rc= {
             Id: user.Id,
             Name: user.Name,
             Email: user.Email,
@@ -105,6 +114,9 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
             SubsExpDateExt: user.SubsExpDateExt ? user.SubsExpDateExt : user.SubsExpDate,
             PData: user.PData
         };
+        if (user.CqHash)
+            rc.CqHash = user.CqHash;
+        return rc;
     }
 
     constructor(opts) {

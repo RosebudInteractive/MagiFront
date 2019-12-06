@@ -225,7 +225,9 @@ Promise.resolve()
                     console.log(buildLogString(`### Prerender request: ${req.url}.`));
                 res.render(__dirname + '/index.html', {
                     id: req.user ? req.user.Id : "null",
-                    email: req.user ? req.user.Email : "null",
+                    email: req.user ? `"${req.user.Email}"` : "null",
+                    name: req.user ? `"${req.user.DisplayName}"` : "null",
+                    carrotquest_hash: req.user ? `"${req.user.CqHash}"` : "null",
                     is_prerender: is_prerender ? "true" : "false"
                 });
             });
