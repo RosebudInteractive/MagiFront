@@ -24,7 +24,7 @@ export default class Item extends React.Component {
     render() {
         let {course, isMobile} = this.props;
 
-        return <LazyLoad height={this._getHeight()} unmountIfInvisible={true}>
+        return <LazyLoad height={this._getHeight()} unmountIfInvisible={true} resize={true}>
             {
                 course.OneLesson ?
                     <SingleLesson course={course} needShowAuthors={true}/>
