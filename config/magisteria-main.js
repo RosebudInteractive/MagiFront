@@ -33,6 +33,12 @@ module.exports = {
         logModif: false
     },
     dbProvider: 'mysql',
+    integration: {
+        carrotquest: {
+            userAuthKey: pk.integration && pk.integration.carrotquest
+                && pk.integration.carrotquest.userAuthKey ? pk.integration.carrotquest.userAuthKey : null
+        }
+    },
     session: {
         name: 'magisteria.sid',
         secret: pk.session.secret,
