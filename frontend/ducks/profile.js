@@ -622,11 +622,23 @@ const handleHistoryData = (data) => {
                 _todayMonth = Months[_today.getMonth()],
                 _todayDay = _today.getDate();
 
-            let _isLastVisitToday = (_year === _todayYear) && (_month === _todayMonth) && (_day === _todayDay);
+            let _yesterday = new Date(new Date().setDate(new Date().getDate()-1)),
+                _yesterdayYear = _yesterday.getFullYear(),
+                _yesterdayMonth = Months[_yesterday.getMonth()],
+                _yesterdayDay = _yesterday.getDate();
+
+            let _isLastVisitToday = (_year === _todayYear) && (_month === _todayMonth) && (_day === _todayDay),
+                _isLastVisitYesterday = (_year === _yesterdayYear) && (_month === _yesterdayMonth) && (_day === _yesterdayDay)
 
             lesson.lastVisitDate = _lastVisitDate;
-            lesson.lastVisitDay = _isLastVisitToday ? "Сегодня" : _day + ' ' + _month + ' ' + _year;
-            lesson.lastVisitTime = _hours + ':' + _minutes;
+            lesson.lastVisitDay = _isLastVisitToday ?
+                "Сегодня"
+                :
+                _isLastVisitYesterday ?
+                    "Вчера"
+                    :
+                    _day + ' ' + _month + ' ' + _year;
+            lesson.lastVisitTime = _hours + ':' + _minutes.toString().padStart(2, "0");
 
             let _course = data.Courses[lesson.CourseId];
 
@@ -973,18 +985,18 @@ export const saga = function* () {
 }
 
 const Months = [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь',
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря',
 ];
 
 let mockTransactions = {

@@ -26,7 +26,7 @@ class Item extends React.Component {
         return (
             <div className="history-item">
                 <div className="history-item__date-block">
-                    <p className="history-item__date">{item.lastVisitDay}<br/>{item.lastVisitTime}</p>
+                    <p className="history-item__date">{item.lastVisitDay + " "}<br/>{item.lastVisitTime}</p>
                     {
                         item.isSubLesson ?
                             <span className="history-item__icon">

@@ -15188,7 +15188,7 @@ ul.lectures-tab {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding-top: 35px;
-    padding-right: 65px;
+    padding-right: 35px;
     min-height: 136px; }
     @media (max-width: 899px) {
       .history-item__date-block {
@@ -15198,7 +15198,7 @@ ul.lectures-tab {
         -ms-flex: 0 0 119px;
         flex: 0 0 119px;
         padding-top: 28px;
-        padding-right: 50px;
+        padding-right: 15px;
         min-height: 98px; } }
     @media (max-width: 768px) {
       .history-item__date-block {
