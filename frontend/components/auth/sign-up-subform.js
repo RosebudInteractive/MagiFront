@@ -23,7 +23,7 @@ const validate = values => {
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
         errors.login = 'Invalid email address'
     }
-    if (!values.username) {
+    if (!values.username || (values.username.trim() === "")) {
         errors.username = 'Required'
     }
     if (!values.password1) {
@@ -72,7 +72,7 @@ let SignUpForm = class SignUpForm extends React.Component {
         if (values.login && values.password1) {
             this.setState({
                 login: values.login,
-                name: values.username,
+                name: values.username.trim(),
                 password: values.password1,
             })
             this.recaptcha.execute();
