@@ -31,7 +31,14 @@ class AuthGoogle {
                 return;
             }
 
-            profile.displayName = profile.name.givenName + " " + profile.name.familyName;
+            let name_arr = [];
+            if (profile.name) {
+                if (profile.name.givenName)
+                    name_arr.push(profile.name.givenName);
+                if (profile.name.familyName)
+                    name_arr.push(profile.name.familyName);
+            }
+            profile.displayName = name_arr.length > 0 ? name_arr.join(" ") : profile.emails[0];
             profile.username = profile.name.givenName;
             profile.firstName = profile.name.givenName;
             profile.lastName = profile.name.familyName;

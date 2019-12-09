@@ -37,7 +37,14 @@ class AuthFB {
             //     json: true
             // });
 
-            profile.displayName = profile.name.givenName + " " + profile.name.familyName;
+            let name_arr = [];
+            if (profile.name) {
+                if (profile.name.givenName)
+                    name_arr.push(profile.name.givenName);
+                if (profile.name.familyName)
+                    name_arr.push(profile.name.familyName);
+            }
+            profile.displayName = name_arr.length > 0 ? name_arr.join(" ") : profile.emails[0];
             profile.username = profile.name.givenName;
             profile.description = profile._json.about && (profile._json.about.length > 0) ? profile._json.about : null;
             profile.city = profile._json.city ? profile._json.city.title : null;
