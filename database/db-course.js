@@ -1474,26 +1474,46 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(async () => {
                         if (course) {
-                            let result = await $data.execSql({
-                                dialect: {
-                                    mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: courseId }),
-                                    mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: courseId })
-                                }
-                            }, {});
-                            if (result && result.detail && (result.detail.length > 0)) {
-                                course.PageMeta.Images = {};
-                                result.detail.forEach((elem) => {
-                                    course.PageMeta.Images[elem.Type] = {
-                                        FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
-                                        MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
-                                    };
-                                })
-                            }
+                            course.PageMeta.Images = await this.getCourseImages(courseId, isAbsPath, dLink);
+                            // let result = await $data.execSql({
+                            //     dialect: {
+                            //         mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: courseId }),
+                            //         mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: courseId })
+                            //     }
+                            // }, {});
+                            // if (result && result.detail && (result.detail.length > 0)) {
+                            //     course.PageMeta.Images = {};
+                            //     result.detail.forEach((elem) => {
+                            //         course.PageMeta.Images[elem.Type] = {
+                            //             FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
+                            //             MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
+                            //         };
+                            //     })
+                            // }
                         }
                         return course;
                     })
             );
         })
+    }
+
+    async getCourseImages(courseId, isAbsPath, dLink) {
+        let images = {};
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: courseId }),
+                mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: courseId })
+            }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach((elem) => {
+                images[elem.Type] = {
+                    FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
+                    MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
+                };
+            })
+        }
+        return images;
     }
 
     getAuthors(id) {

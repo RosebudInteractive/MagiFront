@@ -1507,6 +1507,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 OneLesson: elem.OneLesson ? true : false,
                                 Categories: []
                             };
+                            data.Course.MetaImages = await CoursesService().getCourseImages(data.Course.Id, isAbsPath, dLink);
                             await CoursesService().getCoursePrice(data.Course);
                             showTranscript = showTranscript || (!data.Course.IsPaid)
                                 || (data.Course.IsPaid && (data.Course.IsBought || data.Course.IsGift));
