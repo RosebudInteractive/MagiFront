@@ -385,6 +385,7 @@ const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
+    "  c.[Cover], c.[CoverMeta],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -585,6 +586,7 @@ const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
+    "  c.`Cover`, c.`CoverMeta`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -1494,6 +1496,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
                                 URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL,
+                                Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                 IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                     || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                 PaidTp: elem.PaidTp,
