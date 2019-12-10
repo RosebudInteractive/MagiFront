@@ -17,7 +17,7 @@ import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as userActions from "../actions/user-actions";
 
-import {pages} from '../tools/page-tools';
+import {getDomain, pages} from '../tools/page-tools';
 import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";
@@ -247,6 +247,7 @@ class CombineLessonPage extends React.Component {
                 IsBought: this.props.course.IsBought,
                 IsGift: this.props.course.IsGift,
                 URL: this.props.course.URL,
+                image: this.props.course.MetaImages && this.props.course.MetaImages.og ? this.props.course.MetaImages.og.FileName : null
             })
 
             if (window.prerenderEnable) {_openGallerySlider()}

@@ -287,7 +287,11 @@ function* addConcreteCoursePageShowedSaga(data) {
 
     let _author = _course.Authors && _course.Authors[0] ? _course.Authors[0].FirstName + " " + _course.Authors[0].LastName : '',
         _category = _course.Categories && _course.Categories[0] ? _course.Categories[0].Name : '',
-        _price = _course.IsPaid ? (_course.DPrice && _course.Discount ? _course.DPrice : _course.Price) : 0
+        _price = _course.IsPaid ? (_course.DPrice && _course.Discount ? _course.DPrice : _course.Price) : 0,
+        _image = _course.PageMeta && _course.PageMeta.Images && _course.PageMeta.Images.og ?
+            getDomain() + `/data/${_course.PageMeta.Images.og.FileName}`
+            :
+            ""
 
     let _data = {
         ecommerce: {
@@ -301,7 +305,8 @@ function* addConcreteCoursePageShowedSaga(data) {
                     'price': _price, // '23.5',
                     'buy_course': _course.IsBought || _course.IsGift,
                     'brand': _author, // 'Имя автора',
-                    'category': _category // 'Категория курса'
+                    'category': _category, // 'Категория курса'
+                    'img_course': _image,
                 }]
             },
         },
@@ -334,6 +339,7 @@ function* addLessonPageShowedSaga(data) {
                     'brand': _course.author,
                     'category': _course.category, //'Категория курса',
                     'variant': _course.lessonName,
+                    'img_course': _course.image ? getDomain() + `/data/${_course.image}` : "",
                 }]
             },
         },
