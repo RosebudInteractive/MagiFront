@@ -5,6 +5,7 @@ import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
 import {analyticsDebugModeSelector} from './app'
+import {getDomain} from "tools/page-tools";
 
 /**
  * Constants
@@ -294,9 +295,11 @@ function* addConcreteCoursePageShowedSaga(data) {
             'detail': {
                 'actionField': {'list': ''},
                 'products': [{
+                    'url_course': getDomain()  + `/category/${_course.URL}`,
                     'name': _course.Name, // 'Название курса',
                     'id': _course.Id, // 'ID1',
                     'price': _price, // '23.5',
+                    'buy_course': _course.IsBought || _course.IsGift,
                     'brand': _author, // 'Имя автора',
                     'category': _category // 'Категория курса'
                 }]
@@ -323,9 +326,11 @@ function* addLessonPageShowedSaga(data) {
             'detail': {
                 'actionField': {'list': ''},
                 'products': [{
+                    'url_course': getDomain()  + `/category/${_course.URL}`,
                     'name': _course.Name, // 'Название курса',
                     'id': _course.Id, // 'ID1',
                     'price': _course.price,
+                    'buy_course': _course.IsBought || _course.IsGift,
                     'brand': _course.author,
                     'category': _course.category, //'Категория курса',
                     'variant': _course.lessonName,

@@ -243,7 +243,10 @@ class CombineLessonPage extends React.Component {
                 category: this.props.course.Categories[0].Name,
                 author: this.props.lesson.Author.FirstName + ' ' + this.props.lesson.Author.LastName,
                 lessonName: this.props.lesson.Name,
-                price: this.props.course.IsPaid ? (this.props.course.DPrice ? this.props.course.DPrice : this.props.course.Price) : 0
+                price: this.props.course.IsPaid ? (this.props.course.DPrice ? this.props.course.DPrice : this.props.course.Price) : 0,
+                IsBought: this.props.course.IsBought,
+                IsGift: this.props.course.IsGift,
+                URL: this.props.course.URL,
             })
 
             if (window.prerenderEnable) {_openGallerySlider()}
