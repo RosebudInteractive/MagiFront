@@ -167,7 +167,7 @@ class TestPage extends React.Component {
                 (type === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
         return fetching || !testLoaded ?
-            <LoadingFrame/>
+            <LoadingFrame extClass={"test-page"}/>
             :
             notFound ?
                 <NotFoundPage/>
