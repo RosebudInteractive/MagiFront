@@ -247,7 +247,7 @@ class CombineLessonPage extends React.Component {
                 IsBought: this.props.course.IsBought,
                 IsGift: this.props.course.IsGift,
                 URL: this.props.course.URL,
-                image: this.props.course.MetaImages && this.props.course.MetaImages.og ? this.props.course.MetaImages.og.FileName : null
+                image: this.props.course.MetaImages && this.props.course.MetaImages.og ? this.props.course.MetaImages.og.FileName : this.props.course.Cover
             })
 
             if (window.prerenderEnable) {_openGallerySlider()}

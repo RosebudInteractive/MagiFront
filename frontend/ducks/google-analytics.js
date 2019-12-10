@@ -291,7 +291,7 @@ function* addConcreteCoursePageShowedSaga(data) {
         _image = _course.PageMeta && _course.PageMeta.Images && _course.PageMeta.Images.og ?
             getDomain() + `/data/${_course.PageMeta.Images.og.FileName}`
             :
-            ""
+            getDomain() + `/data/${_course.Cover}`
 
     let _data = {
         ecommerce: {
