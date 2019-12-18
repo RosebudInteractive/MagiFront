@@ -208,6 +208,15 @@
                 "mysql": "./build_24/upgrade_24_mysql.sql"
             },
             "upgrader": "./build_24"
+        },
+        "25": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_25/upgrade_25_mssql.sql",
+                "mysql": "./build_25/upgrade_25_mysql.sql"
+            },
+            "upgrader": "./build_25"
         }
     }
 }

@@ -801,7 +801,7 @@ exports.Payment = class Payment extends DbObject {
                     root_obj = await this._getObjById(-1, null, dbOpts);
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
-                    if ((!isRefund) && invoiceData && (invoiceData.Sum === 0) && data.Promo) {
+                    if ((!isRefund) && invoiceData && (invoiceData.Sum === 0) && data.Promo && data.Promo.Id) {
                         let giftCourses = [];
                         for (let i = 0; i < invoiceData.Items.length; i++) {
                             let itm = invoiceData.Items[i];
@@ -832,8 +832,9 @@ exports.Payment = class Payment extends DbObject {
                         await root_obj.edit();
 
                         let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId, SendStatus: 0 };
-                        if ((!isRefund) && data.Promo && data.Promo.Id) {
-                            fields.PromoCodeId = data.Promo.Id;
+                        if ((!isRefund) && data.Promo) {
+                            fields.PromoCodeId = data.Promo.Id ? data.Promo.Id : null;
+                            fields.PromoCode = data.Promo.PromoCode ? data.Promo.PromoCode : null;
                             fields.PromoSum = data.Promo.PromoSum ? data.Promo.PromoSum : 0;
                         }
                         let result = await root_obj.newObject({
