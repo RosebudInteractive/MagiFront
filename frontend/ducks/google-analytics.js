@@ -6,6 +6,7 @@ import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
 import {analyticsDebugModeSelector} from './app'
 import {getDomain} from "tools/page-tools";
+import $ from "jquery";
 
 /**
  * Constants
@@ -513,11 +514,35 @@ function* _pushAnalyticsData(data) {
 
         window.dataLayer.push(data)
 
+        if (data['gtm-ee-event-action'] === "Purchase") {
+            for (let i = 0; i < data.ecommerce.purchase.products.length - 1; i++) {
+                const _params = {
+                    UID: data.UID,
+                    purchaseId: data.purchase.actionField.id,
+                    revenue: data.purchase.actionField.revenue,
+                    productId: data.purchase.products[i].id
+                }
+
+                yield _fetchPurchaseTrace(_params)
+            }
+        }
+
+
         if (_isDebugMode) {
             console.log(data)
         }
     }
 }
+
+const _fetchPurchaseTrace = (params) => {
+    const _str = $.param(params),
+        _url = '/api' + (_str ? '?' + _str : '');
+
+    return fetch(_url, {method: 'GET', credentials: 'include', cache: 'no-cache'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 
 const dataToEntries = (values, DataRecord) => {
     return Object.values(values)
