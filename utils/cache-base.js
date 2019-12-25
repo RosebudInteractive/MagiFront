@@ -149,8 +149,10 @@ exports.CacheableObject = class CacheableObject {
                     return connection.setAsync(args);
                 });
             }
-            else
+            else {
                 this._cache[id] = opts.json ? JSON.stringify(data) : data;
+                rc = "OK";
+            }
             resolve(rc);
         });
     }
