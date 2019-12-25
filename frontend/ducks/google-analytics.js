@@ -515,15 +515,15 @@ function* _pushAnalyticsData(data) {
         window.dataLayer.push(data)
 
         if (data['gtm-ee-event-action'] === "Purchase") {
-            for (let i = 0; i < data.ecommerce.purchase.products.length - 1; i++) {
+            for (let i = 0; i < data.ecommerce.purchase.products.length; i++) {
                 const _params = {
                     UID: data.UID,
-                    purchaseId: data.purchase.actionField.id,
-                    revenue: data.purchase.actionField.revenue,
-                    productId: data.purchase.products[i].id
+                    purchaseId: data.ecommerce.purchase.actionField.id,
+                    revenue: data.ecommerce.purchase.actionField.revenue,
+                    productId: data.ecommerce.purchase.products[i].id
                 }
 
-                yield _fetchPurchaseTrace(_params)
+                yield call(_fetchPurchaseTrace, _params)
             }
         }
 
@@ -540,7 +540,6 @@ const _fetchPurchaseTrace = (params) => {
 
     return fetch(_url, {method: 'GET', credentials: 'include', cache: 'no-cache'})
         .then(checkStatus)
-        .then(parseJSON)
 }
 
 
