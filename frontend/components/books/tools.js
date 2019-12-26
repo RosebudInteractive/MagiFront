@@ -8,6 +8,7 @@ const HOSTS = {
     'ru.bookmate.com': { order: 4, title: 'Bookmate', },
     'www.storytel.com': { order: 5, title: 'Storytel', },
     'zvukislov.ru': { order: 6, title: 'Звуки слов', },
+    'www.chitai-gorod.ru': { order: 7, title: 'Читай-город', },
 }
 
 export const getExtLinks = (extLinks) => {
