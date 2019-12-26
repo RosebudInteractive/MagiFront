@@ -13,6 +13,7 @@ const AVAILABLE_LINKS = {
     'ru.bookmate.com': {name: 'bookmate', availableFor: AVAILABLE_FOR.COURSE_AND_BOOK},
     'www.storytel.com': {name: 'storytel', availableFor: AVAILABLE_FOR.COURSE},
     'zvukislov.ru': {name: 'zvukislov', availableFor: AVAILABLE_FOR.COURSE},
+    'www.chitai-gorod.ru': {name: 'zvukislov', availableFor: AVAILABLE_FOR.BOOK},
 }
 
 export class ExtLinkObject {
