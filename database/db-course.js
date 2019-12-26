@@ -7,6 +7,7 @@ const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { PartnerLink } = require('../utils/partner-link');
+const { getPromoDate, getPromoDiscount } = require('../utils/promo-codes');
 const { Product } = require('../const/product');
 const { ProductService } = require('./db-product');
 const { AccessFlags } = require('../const/common');
@@ -1109,26 +1110,49 @@ const DbCourse = class DbCourse extends DbObject {
             })
             await this.getCoursePrice(course);
             if (opts.promo && course.ProductId) {
+                let promo = null;
                 let promoService = this.getService("promo", true);
                 if (promoService) {
                     let promos = await promoService.get({ code: opts.promo, prodList: true });
-                    if (promos.length === 1) {
-                        let promo = promos[0];
-                        let isValid = (!promo.Products) || promo.Products[course.ProductId] ? true : false;
-                        if (promo.Counter)
-                            isValid = isValid && (promo.Rest > 0);
-                        if (promo.FirstDate)
-                            isValid = isValid && ((now - promo.FirstDate) >= 0) && ((!promo.LastDate) || ((now - promo.LastDate) < 0));
-                        if (isValid) {
-                            course.Promo = {
-                                Id: promo.Id,
-                                Description: promo.Description,
-                                Perc: promo.Perc
-                            };
-                            let dprice = course.Price * (1 - promo.Perc / 100);
-                            course.Promo.Sum = Math.trunc(dprice / 10) * 10;
-                            course.Promo.PromoSum = course.Price - course.Promo.Sum;
-                        }
+                    if (promos.length === 1)
+                        promo = promos[0];
+                }
+                if (!promo) {
+                    // Check for hard coded promo
+                    try {
+                        let last_date = getPromoDate(opts.promo);
+                        let discount = 0;
+                        if (last_date)
+                            discount = getPromoDiscount(opts.promo);
+                        if (last_date && (discount > 0)) {
+                            last_date.setDate(last_date.getDate() + 1);
+                            promo = {
+                                Id: null,
+                                Code: opts.promo,
+                                FirstDate: now,
+                                LastDate: last_date,
+                                Perc: discount
+                            }
+                        };
+                    }
+                    catch (e) { };
+                }
+                if (promo) {
+                    let isValid = (!promo.Products) || promo.Products[course.ProductId] ? true : false;
+                    if (promo.Counter)
+                        isValid = isValid && (promo.Rest > 0);
+                    if (promo.FirstDate)
+                        isValid = isValid && ((now - promo.FirstDate) >= 0) && ((!promo.LastDate) || ((now - promo.LastDate) < 0));
+                    if (isValid) {
+                        course.Promo = {
+                            Id: promo.Id,
+                            Description: promo.Description,
+                            Perc: promo.Perc,
+                            PromoCode: promo.Code ? promo.Code : null
+                        };
+                        let dprice = course.Price * (1 - promo.Perc / 100);
+                        course.Promo.Sum = Math.trunc(dprice / 10) * 10;
+                        course.Promo.PromoSum = course.Price - course.Promo.Sum;
                     }
                 }
             }
