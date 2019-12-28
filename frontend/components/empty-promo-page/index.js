@@ -30,7 +30,7 @@ class EmptyPromoPage extends React.Component{
     }
 
     render() {
-        if (this.state.redirect) {
+        if (this.state.redirect && !window.prerenderEnable) {
             return <Redirect to={'/'}/>
         } else {
             let _url = getPageUrl(),
