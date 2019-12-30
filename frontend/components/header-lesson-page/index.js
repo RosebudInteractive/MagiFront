@@ -9,6 +9,7 @@ import MenuBlock from "./childs/menu-block"
 import {courseSelector} from "ducks/lesson-menu"
 
 import $ from "jquery";
+import RestartButton from "./restart-test-button";
 
 class HeaderWrapper extends React.Component {
 
@@ -59,6 +60,7 @@ class HeaderWrapper extends React.Component {
         return <div className={_menuClassName}>
                 <LogoAndTitle course={course} lesson={lesson} test={test}/>
                 <MenuBlock course={course} lesson={lesson} test={test}/>
+                {!!test && <RestartButton test={test}/>}
                 {
                     lesson &&
                         <React.Fragment>
