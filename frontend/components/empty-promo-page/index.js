@@ -6,10 +6,10 @@ import MetaTags from "react-meta-tags";
 import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
 
-const DESCRIPTION = "Описание страницы",
-    TITLE = "Заголовок страницы",
-    OG_IMAGE = "2019/06/Chrysanthemum-Description1-id-1.jpg",
-    TW_IMAGE = "2019/06/id-8-Tulips-Tulips-desc-1559656921020.jpg"
+const DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
+    TITLE = "Каникулы здорового человека",
+    OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
+    TW_IMAGE = "2019/12/tw-2019-2020_3.jpg"
 
 class EmptyPromoPage extends React.Component{
     constructor(props) {
