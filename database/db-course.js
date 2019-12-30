@@ -13,6 +13,7 @@ const { ProductService } = require('./db-product');
 const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
 const { SubscriptionService } = require('../services/mail-subscription');
+const { TestService } = require('./db-test');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
@@ -1216,6 +1217,8 @@ const DbCourse = class DbCourse extends DbObject {
                             let authors_list = {};
                             let now = new Date();
                             let courseUrl;
+                            let tests = await TestService().getTestsByCourse(result.detail[0].Id, userId, opts);
+
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
                                     isFirst = false;
@@ -1269,6 +1272,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         ShareCounters: {},
                                         PageMeta: {}
                                     };
+
+                                    if (tests)
+                                        course.Tests = tests.Course;
                                     if (elem.SnName)
                                         course.PageMeta.Name = elem.SnName;
                                     if (elem.SnDescription)
@@ -1303,6 +1309,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Audios: [],
                                         Videos: []
                                     };
+                                    if (tests && tests.Lessons[lsn.Id])
+                                        lsn.Tests = tests.Lessons[lsn.Id];
                                     course.IsSubsRequired = course.IsSubsRequired || lsn.IsSubsRequired;
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
