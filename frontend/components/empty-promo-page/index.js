@@ -31,7 +31,10 @@ class EmptyPromoPage extends React.Component{
 
     render() {
         if (this.state.redirect && !window.prerenderEnable) {
-            return <Redirect to={'/'}/>
+            const {ownProps} = this.props,
+                _url = '/' + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
+            
+            return <Redirect to={_url}/>
         } else {
             let _url = getPageUrl(),
                 _domain = getDomain(),
@@ -95,9 +98,10 @@ class EmptyPromoPage extends React.Component{
     }
 }
 
-const MapStateToProps = (state) => {
+const MapStateToProps = (state, ownProps) => {
     return {
         facebookAppID: facebookAppIdSelector(state),
+        ownProps: ownProps
     }
 }
 
