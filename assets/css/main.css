@@ -12697,6 +12697,15 @@ ul.lectures-tab {
     width: 18px;
     height: 18px; }
 
+
+@media print {
+  .popup, header, footer, .new-header, .gallery-controls, .gallery-slider-wrapper, .gallery-trigger {
+    display: none
+  }
+  .lesson-wrapper {
+    height: auto !important;
+  }
+}
 .popup {
   position: absolute;
   top: 0;
