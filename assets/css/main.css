@@ -17529,12 +17529,9 @@ ul.lectures-tab {
   opacity: 0.6;
 }
 .item__video-icon {
+  display: inline-flex;
+  vertical-align: bottom;
   margin-left: 5px; }
-.item__video-icon svg {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
 .extras-list__play-btn {
   padding: 0;
   background-color: rgba(255, 255, 255, 0);

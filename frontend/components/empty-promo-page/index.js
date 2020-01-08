@@ -6,10 +6,10 @@ import MetaTags from "react-meta-tags";
 import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
 
-const DESCRIPTION = "Описание страницы",
-    TITLE = "Заголовок страницы",
-    OG_IMAGE = "2019/06/Chrysanthemum-Description1-id-1.jpg",
-    TW_IMAGE = "2019/06/id-8-Tulips-Tulips-desc-1559656921020.jpg"
+const DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
+    TITLE = "Каникулы здорового человека",
+    OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
+    TW_IMAGE = "2019/12/tw-2019-2020_3.jpg"
 
 class EmptyPromoPage extends React.Component{
     constructor(props) {
@@ -31,7 +31,10 @@ class EmptyPromoPage extends React.Component{
 
     render() {
         if (this.state.redirect && !window.prerenderEnable) {
-            return <Redirect to={'/'}/>
+            const {ownProps} = this.props,
+                _url = '/' + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
+            
+            return <Redirect to={_url}/>
         } else {
             let _url = getPageUrl(),
                 _domain = getDomain(),
@@ -95,9 +98,10 @@ class EmptyPromoPage extends React.Component{
     }
 }
 
-const MapStateToProps = (state) => {
+const MapStateToProps = (state, ownProps) => {
     return {
         facebookAppID: facebookAppIdSelector(state),
+        ownProps: ownProps
     }
 }
 
