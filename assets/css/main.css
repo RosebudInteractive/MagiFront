@@ -9781,6 +9781,9 @@ body[data-page="fullpage-player"] .lectures-menu {
     @media (max-width: 599px) {
       .text-block__headline {
         margin-bottom: 23px; } }
+    @media (max-width: 599px) {
+      .text-block__headline {
+        text-indent: 0 !important; } }
     .text-block__headline .number {
       text-align: right;
       text-align: -webkit-right;
@@ -9806,6 +9809,11 @@ body[data-page="fullpage-player"] .lectures-menu {
           width: auto;
           font-size: 30px;
           line-height: 30px; } }
+      @media print {
+        .text-block__headline .number {
+          margin-left: 0 !important;
+          padding-right: 0 !important;
+          min-width: auto !important; } }
   .text-block__content {
     position: relative; }
   .text-block__content._isPaid:after {
@@ -12699,11 +12707,12 @@ ul.lectures-tab {
 
 
 @media print {
-  .popup, header, footer, .new-header, .gallery-controls, .gallery-slider-wrapper, .gallery-trigger {
-    display: none
+  .popup, header, footer, .new-header, .gallery-controls, .gallery-slider-wrapper, .gallery-trigger, .balloon-wrapper {
+    display: none !important;
   }
-  .lesson-wrapper {
-    height: auto !important;
+  .lesson-wrapper, .lecture-wrapper {
+    /*height: auto !important;*/
+    display: none !important;
   }
 }
 .popup {

@@ -24,7 +24,7 @@ export default class ResultPreview extends React.Component {
                 </h1>
                 <h1 className="title">
                     <div className="label">Тест по лекеции: </div>
-                    <span className="name">{test.Name.trim()}</span>
+                    <span className="name">{test ? test.Name.trim() : ""}</span>
                 </h1>
             </div>
         </div>
