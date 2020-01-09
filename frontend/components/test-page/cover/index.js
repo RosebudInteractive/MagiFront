@@ -44,7 +44,7 @@ class Cover extends React.Component {
                 <div className="test-page__info">
                     <h1 className="title">
                         <p className="title__label">Тест:</p>
-                        <span>{test.Name.trim()}</span>
+                        <span>{test.Name ? test.Name.trim() : ""}</span>
                     </h1>
                     <div className="detail">
                         <div className="info__detail-item">{test.questionsCount + ' ' + getQuestionsTitle(test.questionsCount)}</div>
