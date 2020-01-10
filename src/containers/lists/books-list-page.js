@@ -191,7 +191,7 @@ class BooksPage extends React.Component {
         })
 
         if (_index > 0) {
-            window.$$("courses-grid").select(this.props.books[_index - 1].id)
+            window.$$("books-grid").select(this.props.books[_index - 1].id)
         }
 
         this._onEditBtnClick()
@@ -203,7 +203,7 @@ class BooksPage extends React.Component {
         })
 
         if (_index < this.props.books.length - 1) {
-            window.$$("courses-grid").select(this.props.books[_index + 1].id)
+            window.$$("books-grid").select(this.props.books[_index + 1].id)
         }
 
         this._onEditBtnClick()
