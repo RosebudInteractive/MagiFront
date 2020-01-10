@@ -2,12 +2,15 @@
 
 
 .test-result__cover
-  height: 100%
+  //height: 100%
   position: relative
   background-repeat: no-repeat
   -webkit-background-size: cover
   background-size: cover
   background-position: top center
+  height: 512px
+  @media(max-width: 899px)
+    height: 420px
 
   .margin-block
     height: 100%

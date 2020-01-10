@@ -18,6 +18,9 @@
 
   .test-page__content
     position: relative
+    height: 512px
+    @media(max-width: 899px)
+      height: 420px
 
   .content-wrapper
     position: absolute
@@ -44,7 +47,10 @@
 
   &.added
     .test-page__content
-      height: calc(56.25vw + 130px)
+      //height: calc(56.25vw + 130px)
+      height: 642px
+      @media(max-width: 899px)
+        height: 550px
     .lectures-menu._plain-menu
       position: inherit
       background-color: #2f2f2f

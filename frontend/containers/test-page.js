@@ -14,7 +14,7 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 // import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
-import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest,} from "ducks/test";
+import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest, notFoundSelector} from "ducks/test";
 import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
 import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
@@ -55,8 +55,8 @@ class TestPage extends React.Component {
                     this.setState({isLandscape: true})
                 }
                 _div.removeClass('added')
-                this._height = this._getHeight();
-                this._width = this._getWidth();
+                this._height = (this.props.type !== TEST_PAGE_TYPE.RESULT) ? this._getHeight() : "";
+                this._width = (this.props.type !== TEST_PAGE_TYPE.RESULT) ? this._getWidth() : "";
                 _wrapper.css('min-height', this._height).css('width', this._width);
             } else {
                 if (this.state.isLandscape) {
@@ -144,7 +144,7 @@ class TestPage extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.test) {
-            document.title = 'Тест: ' + this.props.test.Name + ' - Магистерия'
+            document.title = this.props.test.Name ? 'Тест: ' + this.props.test.Name + ' - Магистерия' : "Тесты - Магистерия"
         }
 
         if (prevProps.fetching && !this.props.fetching) {
@@ -336,7 +336,8 @@ function mapStateToProps(state, ownProps) {
 
         // course: state.singleCourse.object,
         test: testSelector(state),
-        testLoaded: testLoaded(state)
+        testLoaded: testLoaded(state),
+        notFound: notFoundSelector(state),
     }
 }
 

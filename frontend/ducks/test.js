@@ -17,6 +17,7 @@ const GET_TEST_START = `${prefix}/GET_TEST_START`
 const GET_TEST_SUCCESS = `${prefix}/GET_TEST_SUCCESS`
 export const GET_TEST_COMPLETED = `${prefix}/GET_TEST_COMPLETED`
 export const GET_TEST_FAIL = `${prefix}/GET_TEST_FAIL`
+const TEST_NOT_FOUND = `${prefix}/TEST_NOT_FOUND`
 
 
 const TestRecord = Record({
@@ -47,6 +48,7 @@ const ReducerRecord = Record({
     loaded: false,
     test: new TestRecord(),
     lastSuccessTime: null,
+    notFound: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -56,6 +58,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_TEST_REQUEST:
             return state
                 .set('loaded', false)
+                .set('notFound', false)
 
         case GET_TEST_START:
             return state
@@ -73,6 +76,12 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('loaded', true)
 
+        case TEST_NOT_FOUND:
+            return state
+                .set('loading', false)
+                .set('loaded', true)
+                .set('notFound', true)
+
         default:
             return state
     }
@@ -86,6 +95,7 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
 const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
 export const testSelector = createSelector(stateSelector, state => state.test)
+export const notFoundSelector = createSelector(stateSelector, state => state.notFound)
 
 /**
  * Action Creators
@@ -122,7 +132,11 @@ function* getTestSaga(data) {
         yield put({type: GET_TEST_SUCCESS, payload: _test})
         yield put({type: GET_TEST_COMPLETED})
     } catch (e) {
-        yield put({ type: GET_TEST_FAIL, payload: {e} })
+        if (e.status && (e.status === 404)) {
+            yield put({ type: TEST_NOT_FOUND })
+        } else {
+            yield put({ type: GET_TEST_FAIL, payload: {e} })
+        }
     }
 }
 
