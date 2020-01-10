@@ -12710,7 +12710,7 @@ ul.lectures-tab {
   .popup, header, footer, .new-header, .gallery-controls, .gallery-slider-wrapper, .gallery-trigger, .balloon-wrapper {
     display: none !important;
   }
-  .lesson-wrapper, .lecture-wrapper, .lecture-info__wrapper, .lecture-info {
+  .lesson-wrapper, .lecture-wrapper, .lecture-info__wrapper, .lecture-info, .text-block p.text-block__label {
     /*height: auto !important;*/
     display: none !important;
   }
