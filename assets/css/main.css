@@ -12717,6 +12717,14 @@ ul.lectures-tab {
   .global-wrapper {
     display: block;
   }
+  .play-block, .social-block-vertical {
+    display: none;
+  }
+  .text-block__wrapper {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+  }
 }
 .popup {
   position: absolute;
