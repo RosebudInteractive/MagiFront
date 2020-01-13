@@ -60,6 +60,7 @@ class FileLink extends React.Component {
                                   acceptType={this.props.acceptType}
                                   disabled={disabled}/>
                     </div>
+                    {this.props.input.value && this.props.input.value.file && <img className="image-link__preview" src={'/data/' + this.props.input.value.file}/>}
                     {_errorText}
                 </div>
             </div>

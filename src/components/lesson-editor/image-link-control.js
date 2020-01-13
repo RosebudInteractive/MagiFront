@@ -34,15 +34,21 @@ class ImageLink extends React.Component {
         }
 
         this._name = '';
+        this._fileName = '';
     }
 
     componentWillMount() {
-        this._name = this._getResourceName(this.props.input.value)
+        let {fileName, name} = this._getResourceName(this.props.input.value)
+
+        this._name = name
+        this._fileName = fileName
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.input.value !== prevProps.input.value) {
-            this._name = this._getResourceName(this.props.input.value)
+            let {fileName, name} = this._getResourceName(this.props.input.value)
+            this._name = name
+            this._fileName = fileName
             this.forceUpdate()
         }
     }
@@ -58,7 +64,7 @@ class ImageLink extends React.Component {
             return item.Id === resourceId
         })
 
-        return _resource ? _resource.Name : ''
+        return _resource ? {name : _resource.Name, fileName: _resource.FileName} : {name: "", fileName: ""}
     }
 
     render() {
@@ -76,6 +82,7 @@ class ImageLink extends React.Component {
                         <button className="image-link-wrapper__button upload" onClick={::this._showCreateDialog} disabled={disabled}/>
                         <button className="image-link-wrapper__button find" onClick={::this._showSelectDialog} disabled={disabled}/>
                     </div>
+                    {this._fileName && <img className="image-link__preview" src={'/data/' + this._fileName}/>}
                     {_errorText}
                 </div>
             </div>
