@@ -2,12 +2,47 @@ import React from "react";
 import {FacebookShareButton, OKShareButton, TwitterShareButton, VKShareButton} from "react-share";
 import PropTypes from "prop-types";
 import './social-block.sass'
+import ReactDOM from "react-dom";
 
 export class SocialBlock extends React.Component {
 
     static propTypes = {
         counter: PropTypes.object,
-        shareUrl: PropTypes.string
+        shareUrl: PropTypes.string,
+        beforeOnClick: PropTypes.func,
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.setFbRef = element => {
+            this.fbButton = element.children[0]
+        };
+
+        this.state = {
+            urlCreated : false,
+            fbUrl: window.location.href
+        }
+    }
+
+    setFbUrl(url) {
+        for (let prop in this.fbButton) {
+            if (this.fbButton.hasOwnProperty(prop) && prop.startsWith("__reactEventHandlers")) {
+                this.clickFunk = this.fbButton[prop].onClick;
+                break
+            }
+        }
+
+        this.setState({urlCreated: true, fbUrl: url})
+    }
+
+    componentDidUpdate(props, prevState) {
+        if (this.state.urlCreated && !prevState.urlCreated) {
+            if (this.clickFunk) {
+                this.clickFunk(new MouseEvent("click", {}));
+                this.clickFunk = null
+            }
+        }
     }
 
     render() {
@@ -22,8 +57,8 @@ export class SocialBlock extends React.Component {
 
         return (
             <div className="social-block social-block--dark">
-                <div className='social-button-wrapper'>
-                    <FacebookShareButton url={SHARE_URL} quote={title} className="social-btn _active">
+                <div className='social-button-wrapper' ref={this.setFbRef}>
+                    <FacebookShareButton url={this.state.fbUrl} quote={title} className="social-btn _active" beforeOnClick={!this.state.urlCreated ? ::this._beforeOnClick : null}>
                         <div className="social-btn__icon">
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
@@ -58,5 +93,13 @@ export class SocialBlock extends React.Component {
                 </div>
             </div>
         )
+    }
+
+    _beforeOnClick() {
+        return new Promise(() => {
+            if (this.props.beforeOnClick) { this.props.beforeOnClick(this) }
+
+
+        })
     }
 }
