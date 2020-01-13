@@ -56,7 +56,7 @@ class Cover extends React.Component {
                     <div className="button btn--brown start-button" onClick={::this._createInstance}>
                         Начать тест
                     </div>
-                    <SocialBlock beforeOnClick={::this._beforeOnClick}/>
+                    <SocialBlock/>
                 </div>
             </div>
         </div>
@@ -64,14 +64,6 @@ class Cover extends React.Component {
 
     _createInstance() {
         this.props.createNewTestInstance(this.props.test.URL)
-    }
-
-    _beforeOnClick(button) {
-        // return new Promise((resolve, reject) => {
-        //     reject()
-
-            button.setFbUrl("https://magisteria.ru/old-testament-iconography/jacob")
-        // })
     }
 }
 

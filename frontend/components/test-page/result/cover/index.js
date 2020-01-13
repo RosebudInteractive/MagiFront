@@ -62,7 +62,7 @@ class Cover extends React.Component {
 
                 <div className="social-block__title">Поделится результатом с друзьями</div>
                 <div className="social-block__wrapper">
-                    <SocialBlock shareUrl={window.location.href}/>
+                    <SocialBlock beforeOnClick={::this._beforeOnClick}/>
                     <div className="reinit-button" onClick={::this._createInstance}>
                         <span>
                             <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
@@ -76,6 +76,13 @@ class Cover extends React.Component {
 
     _createInstance() {
         this.props.createNewTestInstance(this.props.test.URL)
+    }
+
+    _beforeOnClick(socialBlock, button) {
+        return new Promise((resolve, reject) => {
+            socialBlock.setUrl("https://magisteria.ru/old-testament-iconography/jacob", button)
+            reject()
+        })
     }
 }
 
