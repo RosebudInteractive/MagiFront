@@ -7,6 +7,7 @@ import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/te
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 import {isAnswerCorrect} from "tools/tests-tools";
+// import {getTestResult} from "ducks/test-result";
 
 /**
  * Constants
@@ -239,6 +240,10 @@ function* getTestInstanceSaga(data) {
         yield put(getTest(_instance.TestId))
 
         yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
+
+        // if (_instance.IsFinished) {
+        //     yield put(getTestResult(_instance.TestId))
+        // }
     } catch (e) {
         yield put({ type: GET_TEST_INSTANCE_FAIL, payload: {e} })
     }
@@ -335,12 +340,12 @@ function* finishInstanceSaga(data) {
 
     yield put(save())
 
-    const {success} = yield race({
-        success: take(SAVE_INSTANCE_SUCCESS),
-        error: take(SAVE_INSTANCE_FAIL)
-    })
+    // const {success} = yield race({
+    //     success: take(SAVE_INSTANCE_SUCCESS),
+    //     error: take(SAVE_INSTANCE_FAIL)
+    // })
 
-    if (!success) { return }
+    // if (!success) { return }
 
-    yield put(push(`/test-result/${_instance.Id}`))
+    // yield put(push(`/test-result/${_instance.Id}`))
 }

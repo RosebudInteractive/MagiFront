@@ -15,7 +15,7 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest, notFoundSelector} from "ducks/test";
-import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
+import {testInstanceSelector, loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
 import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
@@ -55,8 +55,8 @@ class TestPage extends React.Component {
                     this.setState({isLandscape: true})
                 }
                 _div.removeClass('added')
-                this._height = (this.props.type !== TEST_PAGE_TYPE.RESULT) ? this._getHeight() : "";
-                this._width = (this.props.type !== TEST_PAGE_TYPE.RESULT) ? this._getWidth() : "";
+                this._height = (this._getPageType(this.props) !== TEST_PAGE_TYPE.RESULT) ? this._getHeight() : "";
+                this._width = (this._getPageType(this.props) !== TEST_PAGE_TYPE.RESULT) ? this._getWidth() : "";
                 _wrapper.css('min-height', this._height).css('width', this._width);
             } else {
                 if (this.state.isLandscape) {
@@ -90,7 +90,7 @@ class TestPage extends React.Component {
         this.props.refreshStorage();
         this.props.headerSetPage(pages.test);
 
-        switch (this.props.type) {
+        switch (this._getPageType(this.props)) {
             case TEST_PAGE_TYPE.TEST: {
                 this.props.getTest(this.props.testUrl)
                 return
@@ -117,8 +117,11 @@ class TestPage extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.type !== this.props.type) {
-            switch (nextProps.type) {
+        let _currentType = this._getPageType(this.props),
+            _nextType = this._getPageType(nextProps)
+
+        if (_currentType !== _nextType) {
+            switch (_nextType) {
                 case TEST_PAGE_TYPE.TEST: {
                     this.props.getTest(nextProps.testUrl)
                     return
@@ -180,13 +183,13 @@ class TestPage extends React.Component {
                             {this._getContent()}
                         </div>
                     </div>
-                    {type === TEST_PAGE_TYPE.RESULT && <Answers/>}
+                    {(this._getPageType(this.props) === TEST_PAGE_TYPE.RESULT) && <Answers/>}
                 </div>
 
     }
 
     _getContent() {
-        let {type} = this.props;
+        let type = this._getPageType(this.props);
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
@@ -201,6 +204,13 @@ class TestPage extends React.Component {
             default:
                 return <Cover/>
         }
+    }
+
+    _getPageType(props) {
+        return (props.type === TEST_PAGE_TYPE.INSTANCE) ?
+            props.testInstance.IsFinished ? TEST_PAGE_TYPE.RESULT : TEST_PAGE_TYPE.INSTANCE
+            :
+            TEST_PAGE_TYPE.TEST
     }
 
     reload() {
@@ -330,12 +340,9 @@ function mapStateToProps(state, ownProps) {
             testInstanceLoading(state) ||
             testResultLoading(state) ||
             menuDataLoading(state) ||
-            // state.singleCourse.fetching ||
             state.user.loading,
-            // state.courses.fetching,
-
-        // course: state.singleCourse.object,
         test: testSelector(state),
+        testInstance: testInstanceSelector(state),
         testLoaded: testLoaded(state),
         notFound: notFoundSelector(state),
     }
@@ -346,8 +353,6 @@ function mapDispatchToProps(dispatch) {
         getTest,
         getTestInstance,
         getTestResult,
-        // getCourse,
-        // getCourses,
         whoAmI,
         refreshStorage,
         headerSetPage,

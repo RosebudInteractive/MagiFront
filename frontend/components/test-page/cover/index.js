@@ -56,7 +56,7 @@ class Cover extends React.Component {
                     <div className="button btn--brown start-button" onClick={::this._createInstance}>
                         Начать тест
                     </div>
-                    <SocialBlock />
+                    <SocialBlock/>
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@ import PlayBlock from "../../../../common/small-play-block";
 import React from "react";
 import PropTypes from "prop-types";
 import {CONTENT_TYPE} from "../../../../../constants/common-consts";
+import LessonTests from "./lesson-tests";
 
 const _videoIcon = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#video-lesson"/>'
 
@@ -55,6 +56,7 @@ export default class LessonFull extends React.Component{
                 <ol className="course-scheme__lessons-list _sublessons">
                     {this._getSublessons()}
                 </ol>
+            <LessonTests tests={lesson.Tests}/>
             </React.Fragment>
     }
 
