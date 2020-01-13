@@ -8,8 +8,18 @@ import {facebookAppIdSelector} from "ducks/app";
 
 const DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
     TITLE = "Каникулы здорового человека",
-    OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
-    TW_IMAGE = "2019/12/tw-2019-2020_3.jpg"
+    DEFAULT_OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
+    DEFAULT_TW_IMAGE = "2019/12/tw-2019-2020_3.jpg",
+    OG_IMAGE = {
+        "sale2020": DEFAULT_OG_IMAGE,
+        "sale2020-1": "2020/01/fb-2020-sale.jpg",
+    },
+    TW_IMAGE = {
+        "sale2020": DEFAULT_TW_IMAGE,
+        "sale2020-1": "2020/01/tw-2020-sale.jpg",
+    }
+
+
 
 class EmptyPromoPage extends React.Component{
     constructor(props) {
@@ -52,19 +62,18 @@ class EmptyPromoPage extends React.Component{
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={this.props.facebookAppID}/>
-                <meta property="og:image" content={_imagePath + OG_IMAGE}/>
-                <meta property="og:image:secure_url" content={_imagePath + OG_IMAGE}/>
+                <meta property="og:image" content={_imagePath + this._getOgImage()}/>
+                <meta property="og:image:secure_url" content={_imagePath + this._getOgImage()}/>
                 <meta property="og:image:width" content={1200}/>
                 <meta property="og:image:height" content={640}/>
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:title" content={TITLE}/>
                 <meta name="twitter:description" content={DESCRIPTION}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                <meta name="twitter:image" content={_imagePath + TW_IMAGE}/>
+                <meta name="twitter:image" content={_imagePath + this._getTwImage()}/>
                 <meta name="twitter:creator" content="@MagisteriaRu"/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
-
             </MetaTags>
         }
     }
@@ -95,6 +104,20 @@ class EmptyPromoPage extends React.Component{
     _removeRobotsMetaTags() {
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _getOgImage() {
+        let _code = this.props.ownProps.match.params.code,
+            _path = OG_IMAGE[_code]
+
+        return _path ? _path : DEFAULT_OG_IMAGE
+    }
+
+    _getTwImage() {
+        let _code = this.props.ownProps.match.params.code,
+            _path = TW_IMAGE[_code]
+
+        return _path ? _path : DEFAULT_TW_IMAGE
     }
 }
 
