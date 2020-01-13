@@ -7,9 +7,13 @@ import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
 
 const DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
-    TITLE = "Каникулы здорового человека",
+    DEFAULT_TITLE = "Каникулы здорового человека",
     DEFAULT_OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
     DEFAULT_TW_IMAGE = "2019/12/tw-2019-2020_3.jpg",
+    TITLE = {
+        "sales2020": DEFAULT_TITLE,
+        "sales2020-1": "Праздник, который останется с вами",
+    },
     OG_IMAGE = {
         "sales2020": DEFAULT_OG_IMAGE,
         "sales2020-1": "2020/01/fb-2020-sale.jpg",
@@ -57,7 +61,7 @@ class EmptyPromoPage extends React.Component{
                 <link rel="canonical" href={_url}/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="article"/>
-                <meta property="og:title" content={TITLE}/>
+                <meta property="og:title" content={this._getTitle()}/>
                 <meta property="og:description" content={DESCRIPTION}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
@@ -67,7 +71,7 @@ class EmptyPromoPage extends React.Component{
                 <meta property="og:image:width" content={1200}/>
                 <meta property="og:image:height" content={640}/>
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:title" content={TITLE}/>
+                <meta name="twitter:title" content={this._getTitle()}/>
                 <meta name="twitter:description" content={DESCRIPTION}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 <meta name="twitter:image" content={_imagePath + this._getTwImage()}/>
@@ -104,6 +108,13 @@ class EmptyPromoPage extends React.Component{
     _removeRobotsMetaTags() {
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _getTitle() {
+        let _code = this.props.ownProps.match.params.code,
+            _title = TITLE[_code]
+
+        return _title ? _title : DEFAULT_TITLE
     }
 
     _getOgImage() {
