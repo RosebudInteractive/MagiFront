@@ -11,12 +11,12 @@ const DESCRIPTION = "Иллюстрированные онлайн-курсы д
     DEFAULT_OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
     DEFAULT_TW_IMAGE = "2019/12/tw-2019-2020_3.jpg",
     OG_IMAGE = {
-        "sale2020": DEFAULT_OG_IMAGE,
-        "sale2020-1": "2020/01/fb-2020-sale.jpg",
+        "sales2020": DEFAULT_OG_IMAGE,
+        "sales2020-1": "2020/01/fb-2020-sale.jpg",
     },
     TW_IMAGE = {
-        "sale2020": DEFAULT_TW_IMAGE,
-        "sale2020-1": "2020/01/tw-2020-sale.jpg",
+        "sales2020": DEFAULT_TW_IMAGE,
+        "sales2020-1": "2020/01/tw-2020-sale.jpg",
     }
 
 
