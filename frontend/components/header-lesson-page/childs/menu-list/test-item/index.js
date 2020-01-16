@@ -15,10 +15,11 @@ export default class TestItem extends React.Component {
         const COMPLETE_STATUS = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>'
 
         const {test} = this.props,
-            _estimatedTime = test ? this._getEstimatedTime() : 0
+            _estimatedTime = test ? this._getEstimatedTime() : 0,
+            _url = test.Instance ? `/test-instance/${test.Instance.URL}` : `/test/${test.URL}`
 
         return test ?
-            <Link to={`/test/${test.URL}`} className="lectures-list__test">
+            <Link to={_url} className="lectures-list__test">
                 <div className={"test__complete-status " + this._getColor(test)}>
                     <svg width="18" height="18"
                          dangerouslySetInnerHTML={{__html: COMPLETE_STATUS}}/>

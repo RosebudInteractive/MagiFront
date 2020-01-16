@@ -53,7 +53,6 @@ class MainTab extends React.Component {
             <Field component={TextBox} name="maxQ" label="Количество вопросов" placeholder="Выберите максимальное количество вопросов" disabled={_disabled}/>
             <Field component={RadioBox} name="fromLesson" label="Брать вопросы из эпизодов" options={RADIO_BOX_VALUES} disabled={_disabled}/>
             <Field component={RadioBox} name="isTimeLimited" label="Ограничивать по времени" options={RADIO_BOX_VALUES} disabled={_disabled}/>
-            <Field component={RadioBox} name="isTimeLimited" label="Ограничивать по времени" options={RADIO_BOX_VALUES} disabled={_disabled}/>
             <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
         </div>
     }

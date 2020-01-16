@@ -59,16 +59,17 @@ export default class AnswerBlock extends React.Component {
 
         return question.Answers.map((item) => {
 
-            let _marked = item.IsCorrect || answer.includes(item.Id),
+            let _included = answer && Array.isArray(answer) && answer.includes(item.Id),
+                _marked = item.IsCorrect || _included,
                 _className = "select-block_item" +
                     (_marked ? " marked" : "") +
                     (item.IsCorrect ? " _asCorrect" : "") +
-                    (answer.includes(item.Id) ? " _asSelected" : "")
+                    (_included ? " _asSelected" : "")
 
             return <div className={_className}>
                 <label className="answer-text">
                     {item.Text}
-                    <input type="radio" name={`radio${this.props.question.Id}`} disabled checked={answer.includes(item.Id)}/>
+                    <input type="radio" name={`radio${this.props.question.Id}`} disabled checked={_included}/>
                     <span className="check-mark radio"/>
                 </label>
             </div>
@@ -80,16 +81,17 @@ export default class AnswerBlock extends React.Component {
 
         return question.Answers.map((item) => {
 
-            let _marked = item.IsCorrect || answer.includes(item.Id),
+            let _included = answer && Array.isArray(answer) && answer.includes(item.Id),
+                _marked = item.IsCorrect || _included,
                 _className = "select-block_item" +
                     (_marked ? " marked" : "") +
                     (item.IsCorrect ? " _asCorrect" : "") +
-                    (answer.includes(item.Id) ? " _asSelected" : "")
+                    (_included ? " _asSelected" : "")
 
             return <div className={_className}>
                 <label className="answer-text">
                     {item.Text}
-                    <input type="checkbox" disabled checked={answer.includes(item.Id)}/>
+                    <input type="checkbox" disabled checked={_included}/>
                     <span className="check-mark checkbox"/>
                 </label>
             </div>

@@ -14,13 +14,15 @@ class TestResultPreview extends React.Component{
     constructor(props) {
         super(props)
 
-        this.props.getTestResult(this.props.instanceId)
-
         $(body).addClass("result-preview")
     }
 
     componentWillUnmount(){
         $(body).removeClass("result-preview")
+    }
+
+    componentDidMount() {
+        this.props.getTestResult(this.props.instanceId)
     }
 
     render() {

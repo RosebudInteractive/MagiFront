@@ -8,7 +8,7 @@ export const isAnswerCorrect = (question, answer) => {
 
         case ANSWER_TYPES.SELECT: {
             const _answerItem = question.Answers.find((item) => {
-                return item.Id === answer[0]
+                return answer && Array.isArray(answer) && (item.Id === answer[0])
             })
 
             return !!_answerItem && _answerItem.IsCorrect
@@ -20,6 +20,8 @@ export const isAnswerCorrect = (question, answer) => {
                     return item.IsCorrect
                 })
                 .map(item => item.Id)
+
+            if (!(answer && Array.isArray(answer))) { return false }
 
             const _firstStepCheck = answer.every(item => _correctAnswers.includes(item))
 

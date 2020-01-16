@@ -7,7 +7,6 @@ import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/te
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 import {isAnswerCorrect} from "tools/tests-tools";
-// import {getTestResult} from "ducks/test-result";
 
 /**
  * Constants
@@ -50,6 +49,8 @@ const InstanceRecord = Record({
     StTime: null,
     TestId: null,
     UserId: null,
+    CorrectCount: 0,
+    TotalCount: 0,
 })
 
 const ReducerRecord = Record({
@@ -65,7 +66,8 @@ const QuestionRecord = Record({
     AnswTime: null,
     Answer: null,
     Question: null,
-    Score: null
+    Score: null,
+    IsCorrect: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -105,7 +107,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case FINISH_INSTANCE_SUCCESS:
             return state
-                .set('testInstance', payload)
+                .set('testInstance', payload.instance)
 
         default:
             return state
@@ -131,7 +133,7 @@ export const questionsSelector = createSelector(stateSelector, (state) => {
     let _array = state.questions.toArray();
 
     return _array.map((item, index) => {
-        let _item = item.toObject()
+        let _item = item.toJS()
 
         _item.Number = index + 1
         return _item
@@ -197,8 +199,8 @@ function* createNewTestInstanceSaga(data) {
 
         const _instance = yield call(_fetchCreateInstanceTest, _test.Id)
 
-        yield put({type: CREATE_TEST_INSTANCE_SUCCESS, payload: _instance})
         yield put(push(`/test-instance/${_instance.Id}`))
+        yield put({type: CREATE_TEST_INSTANCE_SUCCESS, payload: _instance})
     } catch (e) {
         yield put({ type: CREATE_TEST_INSTANCE_FAIL, payload: {e} })
     }
@@ -227,7 +229,7 @@ function* getTestInstanceSaga(data) {
     let _time = yield select(successTimeSelector),
         _instance = yield select(testInstanceSelector)
 
-    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === data.payload) {
+    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })
         return
     }
@@ -241,9 +243,6 @@ function* getTestInstanceSaga(data) {
 
         yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
 
-        // if (_instance.IsFinished) {
-        //     yield put(getTestResult(_instance.TestId))
-        // }
     } catch (e) {
         yield put({ type: GET_TEST_INSTANCE_FAIL, payload: {e} })
     }
@@ -254,6 +253,20 @@ function _fetchGetInstanceTest(testId) {
         .then(checkStatus)
         .then(parseJSON)
         .then((data) => {
+            data.Questions.forEach((question) => {
+                if (typeof question.Answer === "string") {
+                    question.Answer = JSON.parse(question.Answer)
+                }
+
+                question.IsCorrect = isAnswerCorrect(question.Question, question.Answer)
+            })
+
+            data.CorrectCount = data.Questions.reduce((acc, value) => {
+                return acc + (value.IsCorrect ? 1 : 0)
+            }, 0)
+
+            data.TotalCount = data.Questions.length
+
             return {...data, lastSuccessTime: Date.now()}
         })
 }
@@ -267,11 +280,13 @@ function* setAnswerSaga(data) {
         _question = _questions.get(_answer.questionId)
 
     if (isAnswerCorrect(_question.Question, _answer.value)) {
-        _questions = _questions.setIn([_answer.questionId, 'Score'], _question.Question.Score)
+        _questions = _questions
+            .setIn([_answer.questionId, 'Score'], _question.Question.Score)
+            .setIn([_answer.questionId, 'IsCorrect'], true)
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     }
 
-    _questions = _questions.setIn([_answer.questionId, 'Answer'], JSON.stringify(_answer.value))
+    _questions = _questions.setIn([_answer.questionId, 'Answer'], _answer.value)
 
     yield put({type: SET_ANSWER_SUCCESS, payload: {instance: _instance, questions: _questions}})
 }
@@ -282,17 +297,22 @@ function* saveInstanceSaga() {
 
     try{
         let _obj = _instance.toJS()
-        _obj.Questions = _questions
+        _obj.Questions = _questions.map(question => Object.assign({}, question))
+
+        _obj.Questions.forEach((question) => {
+            question.Answer = (question.Answer !== null) ? JSON.stringify(question.Answer) : null
+        })
 
         yield put({ type: SAVE_INSTANCE_START })
 
-        const _result = yield call(_fetchSaveInstanceTest, _obj)
-
-        console.log(_result)
+        yield call(_fetchSaveInstanceTest, _obj)
 
         yield put({ type: SAVE_INSTANCE_SUCCESS })
 
     } catch (e) {
+
+        console.log(e)
+
         yield put({ type: SAVE_INSTANCE_FAIL, payload: {e} })
     }
 }
@@ -313,15 +333,9 @@ const _fetchSaveInstanceTest = (data) => {
 
 function* setAnswerAndSaveSaga(data) {
 
-    console.log('setAnswerAndSaveSaga')
-
     yield put(setAnswer(data.payload))
 
-    console.log(SET_ANSWER_SUCCESS)
-
     yield take(SET_ANSWER_SUCCESS)
-
-    console.log(SET_ANSWER_SUCCESS)
 
     yield put(save())
 }
@@ -332,20 +346,18 @@ function* finishInstanceSaga(data) {
 
     yield take(SET_ANSWER_SUCCESS)
 
-    let _instance = yield select(testInstanceSelector)
+    let _instance = yield select(testInstanceSelector),
+        _questions = yield select(questionsSelector)
+
+    let _correctCount = _questions.reduce((acc, value) => {
+        return acc + (value.IsCorrect ? 1 : 0)
+    }, 0)
 
     _instance = _instance.set("IsFinished", true)
+        .set("TotalCount", _questions.length)
+        .set("CorrectCount", _correctCount)
 
-    yield put({ type: FINISH_INSTANCE_SUCCESS, payload: _instance })
+    yield put({ type: FINISH_INSTANCE_SUCCESS, payload: {instance: _instance}})
 
     yield put(save())
-
-    // const {success} = yield race({
-    //     success: take(SAVE_INSTANCE_SUCCESS),
-    //     error: take(SAVE_INSTANCE_FAIL)
-    // })
-
-    // if (!success) { return }
-
-    // yield put(push(`/test-result/${_instance.Id}`))
 }

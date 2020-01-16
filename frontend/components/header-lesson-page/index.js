@@ -11,6 +11,8 @@ import {courseSelector} from "ducks/lesson-menu"
 import $ from "jquery";
 import RestartButton from "./restart-test-button";
 
+import "./header-lesson-page.sass"
+
 class HeaderWrapper extends React.Component {
 
     static propTypes = {
