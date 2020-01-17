@@ -57,6 +57,7 @@ class CombineLessonPage extends React.Component {
         }
 
         this._resizeTimer = null;
+        this._isDesktopLandscape = !this.props.isMobileApp && isDesktopInLandscape()
 
         this._handleScroll = () => {
             let _controls = $('.js-gallery-controls');
@@ -136,6 +137,14 @@ class CombineLessonPage extends React.Component {
 
         this._resizeHandler = () => {
             $('body').addClass('resizing');
+
+            let _isDesktopLandscape = !this.props.isMobileApp && isDesktopInLandscape()
+            console.log(this._isDesktopLandscape, _isDesktopLandscape)
+            if (this._isDesktopLandscape !== _isDesktopLandscape) {
+                this._isDesktopLandscape = _isDesktopLandscape
+                this.forceUpdate()
+            }
+
             clearTimeout(this._resizeTimer);
             this._resizeTimer = setTimeout(() => {
                 $('body').removeClass('resizing');

@@ -7579,11 +7579,17 @@ ul.user-tooltip {
   padding-right: 20px;
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease; }
+  .resizing .lectures-menu {
+    -webkit-transition: none;
+    transition: none; }
   @media (max-width: 899px) {
     .lectures-menu {
       -webkit-transition: background-color 0.3s ease, opacity 0.3s ease;
       transition: background-color 0.3s ease, opacity 0.3s ease;
-      padding-right: 0; } }
+      padding-right: 0; }
+    .resizing .lectures-menu {
+      -webkit-transition: none;
+      transition: none; } }
   .lectures-menu:after {
     content: "";
     position: absolute;
