@@ -1,5 +1,11 @@
 'use strict';
+const path = require('path');
+const fs = require('fs');
+const { URL, URLSearchParams } = require('url');
+const config = require('config');
 const _ = require('lodash');
+const randomstring = require('randomstring');
+const request = require('request');
 const { LANGUAGE_ID } = require('../const/sql-req-common');
 const { DbObject } = require('./db-object');
 const { HttpError } = require('../errors/http-error');
@@ -44,6 +50,21 @@ const TEST_INST_REQ_TREE = {
                 {
                     dataObject: {
                         name: "InstanceQuestion"
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const SHARED_REQ_TREE = {
+    expr: {
+        model: {
+            name: "TestInstanceShared",
+            childs: [
+                {
+                    dataObject: {
+                        name: "TestInstanceShMetaImage"
                     }
                 }
             ]
@@ -111,7 +132,7 @@ const GET_QUESTION_IDS_MYSQL =
     "where (t.`Status` = 2) and (t.`CourseId` = <%= course_id %>) and (not t.`LessonId` is NULL)";
 
 const TEST_MSSQL_PUBLIC_REQ =
-    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method],\n" +
+    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method], t.[IsAuthRequired],\n" +
     "  t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited], t.[Status], t.[Cover], t.[CoverMeta], t.[URL],\n" +
     "  t.[SnPost], t.[SnDescription], t.[SnName], q.[AnswTime], c.[URL] CourseURL, cl.[Name] CourseName,\n" +
     "  l.[URL] LsnURL, ll.[Name] LsnName\n" +
@@ -132,7 +153,7 @@ const TEST_MSSQL_IMG_REQ =
     "select [Id], [Type], [FileName], [MetaData] from [TestMetaImage] where [TestId] = <%= id %>";
 
 const TEST_MYSQL_PUBLIC_REQ =
-    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`,\n" +
+    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`, t.`IsAuthRequired`,\n" +
     "  t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`, t.`Status`, t.`Cover`, t.`CoverMeta`, t.`URL`,\n" +
     "  t.`SnPost`, t.`SnDescription`, t.`SnName`, q.`AnswTime`, c.`URL` CourseURL, cl.`Name` CourseName,\n" +
     "  l.`URL` LsnURL, ll.`Name` LsnName\n" +
@@ -153,12 +174,12 @@ const TEST_MYSQL_IMG_REQ =
     "select `Id`, `Type`, `FileName`, `MetaData` from `TestMetaImage` where `TestId` = <%= id %>";
 
 const TEST_BY_COURSE_MSSQL =
-    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method],\n" +
+    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method], t.[IsAuthRequired],\n" +
     "  t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited], t.[Status], t.[Cover], t.[CoverMeta],\n" +
     "  t.[URL], q.[AnswTime]\n" +
     "from [Test] t\n" +
     "  join [Question] q on q.[TestId] = t.[Id]\n" +
-    "where t.[CourseId] = <%= course_id %>\n" +
+    "where (t.[CourseId] = <%= course_id %>) and (t.[Status] = 2)\n" +
     "order by t.[Id]";
 
 const INST_BY_COURSE_MSSQL =
@@ -168,8 +189,22 @@ const INST_BY_COURSE_MSSQL =
     "where t.[CourseId] = <%= course_id %> and i.[UserId] = <%= user_id %>\n" +
     "order by i.[TestId], i.[Id] desc";
 
+const SHARED_INSTANCE_MSSQL =
+    "select t.[Id], t.[Code], t.[TestId], t.[TestInstanceId], t.[UserId], t.[SnName],\n" +
+    "  t.[SnDescription], i.[Type], i.[FileName], i.[MetaData]\n" +
+    "from [TestInstanceShared] t\n" +
+    "  join [TestInstanceShMetaImage] i on i.[TestInstanceSharedId] = t.[Id]\n" +
+    "where t.[Code] = '<%= instance_id %>'";
+    
+const SHARED_INSTANCE_MYSQL =
+    "select t.`Id`, t.`Code`, t.`TestId`, t.`TestInstanceId`, t.`UserId`, t.`SnName`,\n" +
+    "  t.`SnDescription`, i.`Type`, i.`FileName`, i.`MetaData`\n" +
+    "from `TestInstanceShared` t\n" +
+    "  join `TestInstanceShMetaImage` i on i.`TestInstanceSharedId` = t.`Id`\n" +
+    "where t.`Code` = '<%= instance_id %>'";
+
 const TEST_BY_COURSE_MYSQL =
-    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`,\n" +
+    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`, t.`IsAuthRequired`,\n" +
     "  t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`, t.`Status`, t.`Cover`, t.`CoverMeta`,\n" +
     "  t.`URL`, q.`AnswTime`\n" +
     "from `Test` t\n" +
@@ -188,6 +223,26 @@ const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
 
+const NUM_PART_LENGTH = 9;
+const RND_PART_LENGTH = 10;
+const DFLT_SHARING_SETTINGS = {
+    previewUrl: "/test-result-preview",
+    imgDir: "tests",
+    imgUrl: "tests",
+    images: {
+        og: {
+            imageType: "jpeg",
+            width: 1200,
+            height: 630
+        },
+        twitter: {
+            imageType: "jpeg",
+            width: 1008,
+            height: 530
+        }
+    }
+};
+
 const DbTest = class DbTest extends DbObject {
 
     constructor(options) {
@@ -197,6 +252,157 @@ const DbTest = class DbTest extends DbObject {
     _getObjById(id, expression, options) {
         var exp = expression || TEST_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    async _createImage(basePath, fileName, renderServerUrl, targetUrl, options) {
+        let opts = options || {};
+        let img_type = opts.imageType === "png" ? opts.imageType : "jpeg";
+        let reqUrl = new URL("/render", renderServerUrl);
+        reqUrl.searchParams.append("renderType", img_type);
+        reqUrl.searchParams.append("url", targetUrl);
+        if (opts.width)
+            reqUrl.searchParams.append("width", opts.width);
+        if (opts.height)
+            reqUrl.searchParams.append("height", opts.height);
+        let file_name = path.join(basePath, fileName);
+        await new Promise((resolve, reject) => {
+            let ws = fs.createWriteStream(file_name)
+                .on('error', err => {
+                    reject(err);
+                })
+                .on('close', () => {
+                    resolve();
+                });
+            request
+                .get(reqUrl.href)
+                .on('error', err => {
+                    reject(err);
+                })
+                .on('response', response => {
+                    if (response.statusCode !== HttpCode.OK)
+                        reject(new Error(`DbTest::_createImage: HTTP Status Code: ${response.statusCode}.`));
+                })
+                .pipe(ws);
+        });
+        return file_name;
+    }
+
+    async getSharedInstance(instanceId, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(SHARED_INSTANCE_MYSQL)({ instance_id: instanceId }),
+                mssql: _.template(SHARED_INSTANCE_MSSQL)({ instance_id: instanceId })
+            }
+        }, dbOpts);
+        let data = {};
+        if (result && result.detail && (result.detail.length > 0)) {
+            let is_first = true;
+            result.detail.forEach(elem => {
+                if (is_first) {
+                    is_first = false;
+                    data = {
+                        Id: elem.Id,
+                        Code: elem.Code,
+                        TestId: elem.TestId,
+                        TestInstanceId: elem.TestInstanceId,
+                        UserId: elem.UserId,
+                        SnName: elem.SnName,
+                        SnDescription: elem.SnDescription,
+                        Images: {}
+                    }
+                }
+                data.Images[elem.Type] = {
+                    FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
+                    MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
+                };
+            })
+        }
+        else
+            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Shared instance "${instanceId}" not found.`);
+        return data;
+    }
+
+    async createSharedInstance(instanceId, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let sharedObj = null;
+        let newId;
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(-1, SHARED_REQ_TREE, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let test_instance = await this.getTestInstance(instanceId, opts);
+                    if (!test_instance.IsFinished)
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Test isn't finished yet.`);
+
+                    await root_obj.edit();
+                    let newHandler = await root_obj.newObject({
+                        fields: {
+                            TestId: test_instance.TestId,
+                            TestInstanceId: test_instance.Id,
+                            UserId: test_instance.UserId
+                        }
+                    }, dbOpts);
+
+                    newId = newHandler.keyValue;
+                    sharedObj = this._db.getObj(newHandler.newObject);
+
+                    let shared_code = DbUtils.intFmtWithLeadingZeros(newId, NUM_PART_LENGTH) + "-" + randomstring.generate(RND_PART_LENGTH);
+                    sharedObj.code(shared_code);
+
+                    let base_path = path.join(config.uploadPath, config.has('knowledge_testing.imgDir') ?
+                        config.get('knowledge_testing.imgDir') : DFLT_SHARING_SETTINGS.imgDir);
+                    let preview_url = this._getAbsUrl(config.has('knowledge_testing.previewUrl') ? config.get('knowledge_testing.previewUrl') :
+                        DFLT_SHARING_SETTINGS.previewUrl);
+                    preview_url = `${preview_url}${test_instance.Id}`;
+                    let prerender_url = config.get('server.prerender.url');
+                    let file_base_url = config.has('knowledge_testing.imgUrl') ?
+                        config.get('knowledge_testing.imgUrl') : DFLT_SHARING_SETTINGS.imgUrl;
+
+                    let img_settings = _.defaultsDeep(config.knowledge_testing.images, DFLT_SHARING_SETTINGS.images);
+                    let keys = Object.keys(img_settings);
+                    let root_img = sharedObj.getDataRoot("TestInstanceShMetaImage");
+
+                    for (let i = 0; i < keys.length; i++) {
+                        let tp = keys[i];
+                        let ext = img_settings[tp].imageType;
+                        let fn = `${shared_code}_${tp}.${ext}`;
+                        await this._createImage(base_path, fn, prerender_url, preview_url, img_settings[tp]);
+                        let file_url = `${file_base_url}/${fn}`;
+                        await root_img.newObject({
+                            fields: {
+                                Type: tp,
+                                FileName: file_url,
+                                MetaData: JSON.stringify({
+                                    path: `${file_base_url}/`,
+                                    "mime-type": `image/${img_settings[tp].imageType}`,
+                                    size: {
+                                        width: img_settings[tp].width,
+                                        height: img_settings[tp].height
+                                    },
+                                    name: fn
+                                })
+                            }
+                        }, dbOpts);
+                    }
+
+                    await root_obj.save(dbOpts);
+                    return { Id: shared_code };
+                })
+        }, memDbOptions);
     }
 
     async getList(options) {
@@ -283,6 +489,7 @@ const DbTest = class DbTest extends DbObject {
                         Name: elem.Name,
                         TestTypeId: elem.TestTypeId,
                         URL: isAbsPath ? this._absTestUrl + elem.URL : elem.URL,
+                        IsAuthRequired: elem.IsAuthRequired ? true : false,
                         AnswTime: 0,
                         Qty: 0
                     };
@@ -366,6 +573,7 @@ const DbTest = class DbTest extends DbObject {
                     }
                     testData.IsTimeLimited = elem.IsTimeLimited ? true : false;
                     testData.FromLesson = elem.FromLesson ? true : false;
+                    testData.IsAuthRequired = elem.IsAuthRequired ? true : false;
                     testData.URL = isAbsPath ? this._absTestUrl + elem.URL : elem.URL;
                     testData.CourseURL = elem.CourseURL && isAbsPath ? this._absCourseUrl + elem.CourseURL : elem.CourseURL;
                     testData.LsnURL = elem.LsnURL && isAbsPath ? this._baseUrl + elem.CourseURL + '/' + elem.LsnURL : elem.LsnURL;
@@ -429,6 +637,7 @@ const DbTest = class DbTest extends DbObject {
                     testData.Method = testObj.method();
                     testData.MaxQ = testObj.maxQ();
                     testData.FromLesson = testObj.fromLesson();
+                    testData.IsAuthRequired = testObj.isAuthRequired();
                     testData.Duration = testObj.duration();
                     testData.IsTimeLimited = testObj.isTimeLimited();
                     testData.Cover = testObj.cover();
@@ -948,7 +1157,7 @@ const DbTest = class DbTest extends DbObject {
                     root_obj = result;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
-                    let fields = _.defaults(_.clone(inpFields), { LanguageId: LANGUAGE_ID });
+                    let fields = _.defaults(_.clone(inpFields), { LanguageId: LANGUAGE_ID, IsAuthRequired: false });
                     delete fields.Questions;
                     delete fields.Id;
 
@@ -972,7 +1181,7 @@ const DbTest = class DbTest extends DbObject {
                     testObj = this._db.getObj(newHandler.newObject);
 
                     if (Array.isArray(inpFields.Images) && (inpFields.Images.length > 0)) {
-                        let root_img = testObj.getDataRoot("CourseMetaImage");
+                        let root_img = testObj.getDataRoot("TestMetaImage");
                         for (let i = 0; i < inpFields.Images.length; i++) {
                             let fld = _.cloneDeep(inpFields.Images[i]);
                             if (typeof (fld.MetaData) !== "undefined")

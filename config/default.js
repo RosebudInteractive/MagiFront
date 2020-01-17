@@ -115,6 +115,23 @@ module.exports = {
     general: {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        
     },
+    knowledge_testing: {
+        previewUrl: "/test-result-preview",
+        imgDir: "tests",
+        imgUrl: "tests",
+        images: {
+            og: {
+                imageType: "jpeg",
+                width: 1200,
+                height: 630
+            },
+            twitter: {
+                imageType: "jpeg",
+                width: 1008,
+                height: 530
+            }
+        }
+    },
     billing: {
         module: "./yandex-kassa",
         enabled: false,

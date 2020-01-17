@@ -10,9 +10,10 @@ function setupTests(app) {
 
     app.get('/api/tests/course/:course_id', async (req, res, next) => {
         try {
-            let user_id = req.user ? req.user.Id : null;
-            let options = _.defaultsDeep(req.query, { dbOpts: { userId: user_id } });
-            options.dbOptions = { userId: user_id };
+            let user_id = req.user ? req.user.Id : 0;
+            let options = _.cloneDeep(req.query);
+            if (user_id)
+                options.dbOptions = { userId: user_id };
             let rows = await TestService()
                 .getTestsByCourse(parseInt(req.params.course_id), user_id, options);
             res.send(rows);
@@ -23,17 +24,14 @@ function setupTests(app) {
     });
 
     app.get('/api/tests/instance/:id', (req, res, next) => {
-        if (!req.user)
-            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else
-            TestService()
-                .getTestInstance(parseInt(req.params.id), { dbOptions: { userId: req.user.Id } })
-                .then(rows => {
-                    res.send(rows);
-                })
-                .catch(err => {
-                    next(err);
-                });
+        TestService()
+            .getTestInstance(parseInt(req.params.id), { dbOptions: {} })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
     });
 
     app.post('/api/tests/instance', (req, res, next) => {
@@ -51,6 +49,37 @@ function setupTests(app) {
                 .catch(err => {
                     next(err);
                 });
+        }
+    });
+
+    app.post('/api/tests/instance/share', async (req, res, next) => {
+        try {
+            let instance_id = req.body && req.body.InstanceId ? req.body.InstanceId : null;
+            if (!instance_id)
+                res.status(HttpCode.ERR_BAD_REQ).json({ message: 'Invalid or missing "instance_id" arg.' })
+            let options = {};
+            if (req.user)
+                options.dbOptions = { userId: req.user.Id };
+            let rows = await TestService()
+                .createSharedInstance(instance_id, options);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
+    app.get('/api/tests/instance/share/:id', async (req, res, next) => {
+        try {
+            let options = _.cloneDeep(req.query);
+            if (req.user)
+                options.dbOptions = { userId: req.user.Id };
+            let rows = await TestService()
+                .getSharedInstance(req.params.id, options);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
         }
     });
 
