@@ -12,10 +12,13 @@ export default class TestItem extends React.Component {
     }
 
     render() {
+        const {test} = this.props
+
+        if (!test) return null
+
         const COMPLETE_STATUS = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>'
 
-        const {test} = this.props,
-            _estimatedTime = test ? this._getEstimatedTime() : 0,
+        const _estimatedTime = test ? this._getEstimatedTime() : 0,
             _url = test.Instance ? `/test-instance/${test.Instance.URL}` : `/test/${test.URL}`
 
         return test ?
