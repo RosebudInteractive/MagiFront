@@ -19,6 +19,7 @@ class HeaderWrapper extends React.Component {
         lesson: PropTypes.object,
         test: PropTypes.object,
         active: PropTypes.number,
+        showRestartButton: PropTypes.bool
     };
 
     constructor(props) {
@@ -48,7 +49,7 @@ class HeaderWrapper extends React.Component {
     render() {
         const FULLSCREEN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
 
-        let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass,} = this.props,
+        let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass, showRestartButton} = this.props,
             _singleLesson = course ? !!course.OneLesson : false,
             _type = this._getMenuType(),
             _menuClassName = "new-header lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
@@ -62,7 +63,7 @@ class HeaderWrapper extends React.Component {
         return <div className={_menuClassName}>
                 <LogoAndTitle course={course} lesson={lesson} test={test}/>
                 <MenuBlock course={course} lesson={lesson} test={test}/>
-                {!!test && <RestartButton test={test}/>}
+                {!!test && showRestartButton && <RestartButton test={test}/>}
                 {
                     lesson &&
                         <React.Fragment>

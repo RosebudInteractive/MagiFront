@@ -24,6 +24,7 @@ export default class Scheme extends React.Component {
             <TestItem test={this._getStartedTest()}/>
             <LessonsList course={course}/>
             <TestItem test={this._getFinishedTest()}/>
+            {this._getOtherTests()}
         </div>
     }
 
@@ -35,5 +36,14 @@ export default class Scheme extends React.Component {
     _getFinishedTest() {
         return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
             this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.FINISHED)
+    }
+
+    _getOtherTests() {
+        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
+            this.props.course.Tests
+                .filter((item) => {
+                    return ((item.TestTypeId !== TEST_TYPE.FINISHED) && (item.TestTypeId !== TEST_TYPE.STARTED))
+                })
+                .map(item => <TestItem test={item}/>)
     }
 }

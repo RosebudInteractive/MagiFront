@@ -484,8 +484,6 @@ const _fetchCoursePriceInfo = ({courseId, promo}) => {
 
 function* sendPaymentSaga(data) {
 
-    console.log(data)
-
     yield put({type: SEND_PAYMENT_START});
 
     try {

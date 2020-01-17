@@ -98,12 +98,7 @@ const stateSelector = state => state[moduleName]
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
 // const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
-export const lessonsSelector = createSelector(stateSelector, (state) => {
-
-    console.log(state.lessons)
-
-    return state.lessons
-})
+export const lessonsSelector = createSelector(stateSelector, state => state.lessons)
 export const courseSelector = createSelector(stateSelector, state => state.course)
 export const authorsSelector = createSelector(stateSelector, (state) => {
     let _array = state.authors.toArray();

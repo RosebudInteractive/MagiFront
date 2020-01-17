@@ -60,6 +60,7 @@ const ReducerRecord = Record({
     testInstance: new InstanceRecord(),
     questions: new Map([]),
     lastSuccessTime: null,
+    blocked: false,
 })
 
 const QuestionRecord = Record({
@@ -74,11 +75,17 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-        case CREATE_TEST_INSTANCE_START:
         case GET_TEST_INSTANCE_START:
             return state
                 .set('loaded', false)
                 .set('loading', true)
+                .set('blocked', false)
+
+        case CREATE_TEST_INSTANCE_START:
+            return state
+                .set('loaded', false)
+                .set('loading', true)
+                .set('blocked', true)
 
         case GET_TEST_INSTANCE_SUCCESS:
         case CREATE_TEST_INSTANCE_SUCCESS:
@@ -88,11 +95,13 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('testInstance', new InstanceRecord(payload))
                 .set('questions', dataToEntries(payload.Questions, QuestionRecord))
                 .set('lastSuccessTime', payload.lastSuccessTime)
+                .set('blocked', false)
 
         case CREATE_TEST_INSTANCE_FAIL:
         case GET_TEST_INSTANCE_FAIL:
             return state
                 .set('loading', false)
+                .set('blocked', false)
 
         case GET_TEST_INSTANCE_COMPLETED:
             return state
@@ -127,6 +136,7 @@ const dataToEntries = (values, DataRecord) => {
 const stateSelector = state => state[moduleName]
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
+export const blockedSelector = createSelector(stateSelector, state => state.blocked)
 const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
 export const testInstanceSelector = createSelector(stateSelector, state => state.testInstance)
 export const questionsSelector = createSelector(stateSelector, (state) => {
@@ -199,8 +209,8 @@ function* createNewTestInstanceSaga(data) {
 
         const _instance = yield call(_fetchCreateInstanceTest, _test.Id)
 
-        yield put(push(`/test-instance/${_instance.Id}`))
         yield put({type: CREATE_TEST_INSTANCE_SUCCESS, payload: _instance})
+        yield put(push(`/test-instance/${_instance.Id}`))
     } catch (e) {
         yield put({ type: CREATE_TEST_INSTANCE_FAIL, payload: {e} })
     }
@@ -228,6 +238,8 @@ function* getTestInstanceSaga(data) {
 
     let _time = yield select(successTimeSelector),
         _instance = yield select(testInstanceSelector)
+
+    console.log((Date.now() - _time), DATA_EXPIRATION_TIME, _instance.Id, +data.payload)
 
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })

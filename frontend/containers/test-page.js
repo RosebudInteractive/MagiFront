@@ -15,7 +15,7 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest, notFoundSelector} from "ducks/test";
-import {testInstanceSelector, loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
+import {testInstanceSelector, loadingSelector as testInstanceLoading, getTestInstance, blockedSelector as testInstanceBlockedSelector} from "ducks/test-instance";
 import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
@@ -96,7 +96,6 @@ class TestPage extends React.Component {
 
             default:
                 return;
-
         }
     }
 
@@ -116,13 +115,21 @@ class TestPage extends React.Component {
                 }
 
                 case TEST_PAGE_TYPE.INSTANCE: {
-                    this.props.getTestInstance(nextProps.testUrl)
+                    if (!this.props.instanceBlocked) {
+                        this.props.getTestInstance(nextProps.testUrl)
+                    }
+                    return
+                }
+
+                case TEST_PAGE_TYPE.RESULT: {
+                    if ((this.props.testUrl !== nextProps.testUrl) && !this.props.instanceBlocked){
+                        this.props.getTestInstance(nextProps.testUrl)
+                    }
                     return
                 }
 
                 default:
                     return;
-
             }
         }
     }
@@ -153,10 +160,10 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound, test, type, testLoaded,} = this.props,
+        let {fetching, notFound, test, testLoaded,} = this.props,
             _className = "test-page" +
                 (this.state.isMobile ? " _mobile" : " _desktop") +
-                (type === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
+                (this._getPageType(this.props) === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
         return fetching || !testLoaded ?
             <LoadingFrame extClass={"test-page"}/>
@@ -166,7 +173,7 @@ class TestPage extends React.Component {
                 :
                 <div className={_className}>
                     {this._getMetaTags()}
-                    <Header test={test}/>
+                    <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/>
                     <div className="test-page__content">
                         <div className="content-wrapper">
                             {this._getContent()}
@@ -332,6 +339,7 @@ function mapStateToProps(state, ownProps) {
             state.user.loading,
         test: testSelector(state),
         testInstance: testInstanceSelector(state),
+        instanceBlocked: testInstanceBlockedSelector(state),
         testLoaded: testLoaded(state),
         notFound: notFoundSelector(state),
     }

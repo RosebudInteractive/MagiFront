@@ -18,7 +18,9 @@
 
   .test-page__content
     position: relative
-    height: 565px
+    height: 686px
+    @media(max-width: 1679px)
+      height: 565px
     @media(max-width: 899px)
       height: 473px
 
@@ -48,7 +50,9 @@
   &.added
     .test-page__content
       //height: calc(56.25vw + 130px)
-      height: 512px
+      height: 633px
+      @media(max-width: 1679px)
+        height: 512px
       @media(max-width: 899px)
         height: 420px
     .lectures-menu._plain-menu

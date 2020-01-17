@@ -139,7 +139,6 @@ class CombineLessonPage extends React.Component {
             $('body').addClass('resizing');
 
             let _isDesktopLandscape = !this.props.isMobileApp && isDesktopInLandscape()
-            console.log(this._isDesktopLandscape, _isDesktopLandscape)
             if (this._isDesktopLandscape !== _isDesktopLandscape) {
                 this._isDesktopLandscape = _isDesktopLandscape
                 this.forceUpdate()

@@ -297,8 +297,6 @@ function* switchFilterTypeSaga(data) {
         }
     })
 
-    console.log(data, _count)
-
     if (!isEmptyFilter && (_count === 0)) {
         yield put(clear())
     }
@@ -309,11 +307,4 @@ function* setInitialStateSaga() {
     yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
     yield put({type: SET_ALL_COURSE_TYPE})
     yield put(replace("/"))
-}
-
-function* setRootStateSaga() {
-    // yield put(clear())
-    // yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
-    // yield put({type: SET_ALL_COURSE_TYPE})
-    // yield put(replace("/"))
 }
