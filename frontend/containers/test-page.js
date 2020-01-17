@@ -67,18 +67,6 @@ class TestPage extends React.Component {
 
                 _div.addClass('added')
             }
-
-            // if (_content && (_content.length > 0)) {
-            //     let _contentHeight = _content.outerHeight()
-            //
-            //     _wrapper.css("height", "")
-            //
-            //     let _wrapperHeight = _wrapper.height()
-            //
-            //     if (_contentHeight >= _wrapperHeight) {
-            //         _wrapper.css("height", _contentHeight)
-            //     }
-            // }
         }.bind(this)
 
         this._addEventListeners();
@@ -102,7 +90,7 @@ class TestPage extends React.Component {
             }
 
             case TEST_PAGE_TYPE.RESULT: {
-                this.props.getTestResult(this.props.testUrl)
+                this.props.getTestInstance(this.props.testUrl)
                 return
             }
 
@@ -120,7 +108,7 @@ class TestPage extends React.Component {
         let _currentType = this._getPageType(this.props),
             _nextType = this._getPageType(nextProps)
 
-        if (_currentType !== _nextType) {
+        if ((_currentType !== _nextType) || (this.props.testUrl !== nextProps.testUrl)) {
             switch (_nextType) {
                 case TEST_PAGE_TYPE.TEST: {
                     this.props.getTest(nextProps.testUrl)
@@ -132,16 +120,10 @@ class TestPage extends React.Component {
                     return
                 }
 
-                case TEST_PAGE_TYPE.RESULT: {
-                    this.props.getTestResult(nextProps.testUrl)
-                    return
-                }
-
                 default:
                     return;
 
             }
-
         }
     }
 
@@ -155,6 +137,13 @@ class TestPage extends React.Component {
             ScrollMemoryStorage.scrollPage(_key)
             this._resizeHandler();
         }
+
+        let _currentType = this._getPageType(this.props),
+            _prevType = this._getPageType(prevProps)
+
+        if ((_currentType !== _prevType) && (_currentType === TEST_PAGE_TYPE.RESULT)) {
+            this._resizeHandler()
+        }
     }
 
     componentWillUnmount() {
@@ -164,7 +153,7 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound, test, type, testLoaded} = this.props,
+        let {fetching, notFound, test, type, testLoaded,} = this.props,
             _className = "test-page" +
                 (this.state.isMobile ? " _mobile" : " _desktop") +
                 (type === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")

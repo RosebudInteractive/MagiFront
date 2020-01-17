@@ -2,10 +2,10 @@ import React from 'react'
 import {bindActionCreators} from 'redux';
 import './cover.sass'
 import {testSelector} from "ducks/test";
-import {testResultSelector} from "ducks/test-result";
+// import {testResultSelector} from "ducks/test-result";
 import {connect} from "react-redux";
 import {SocialBlock} from "../../social-block";
-import {createNewTestInstance} from "ducks/test-instance";
+import {createNewTestInstance, testInstanceSelector} from "ducks/test-instance";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
@@ -89,7 +89,7 @@ class Cover extends React.Component {
 const mapStateToProps = (state) => {
     return {
         test: testSelector(state),
-        result: testResultSelector(state)
+        result: testInstanceSelector(state)
     }
 }
 

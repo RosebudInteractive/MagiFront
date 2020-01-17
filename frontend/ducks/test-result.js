@@ -43,14 +43,6 @@ const ReducerRecord = Record({
     lastSuccessTime: null,
 })
 
-const QuestionRecord = Record({
-    AnswTime: null,
-    Answer: null,
-    Question: null,
-    Score: null,
-    IsCorrect: false,
-})
-
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
@@ -65,7 +57,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('loaded', true)
                 .set('testResult', new ResultRecord(payload))
-                .set('questions', dataToEntries(payload.Questions, QuestionRecord))
                 .set('lastSuccessTime', payload.lastSuccessTime)
 
         case GET_TEST_RESULT_FAIL:
@@ -77,14 +68,6 @@ export default function reducer(state = new ReducerRecord(), action) {
     }
 }
 
-const dataToEntries = (values, DataRecord) => {
-    return values.reduce(
-        (acc, value) => acc.set(value.Question.Id, new DataRecord(value)),
-        new Map({})
-    )
-}
-
-
 /**
  * Selectors
  * */
@@ -93,16 +76,6 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
 const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
 export const testResultSelector = createSelector(stateSelector, state => state.testResult)
-export const questionsSelector = createSelector(stateSelector, (state) => {
-    let _array = state.questions.toArray();
-
-    return _array.map((item, index) => {
-        let _item = item.toObject()
-
-        _item.Number = index + 1
-        return _item
-    })
-})
 
 
 /**
@@ -126,7 +99,7 @@ function* getTestResultSaga(data) {
     let _time = yield select(successTimeSelector),
         _instance = yield select(testResultSelector)
 
-    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === data.payload) {
+    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
         yield put({ type: GET_TEST_RESULT_COMPLETED })
         return
     }

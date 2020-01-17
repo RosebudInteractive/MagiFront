@@ -8,10 +8,10 @@ export default class ResultPreview extends React.Component {
         result: PropTypes.object,
     }
 
-
     render() {
         const {test, result} = this.props,
             _cover = this._getCoverStyle(),
+            _title = `Тест по ${test.LessonId ? 'лекции' : 'курсу'}: `,
             LOGO = '<use xlink:href="#logo-mob"/>'
 
         return <div className="result-preview__cover" style={_cover}>
@@ -23,7 +23,7 @@ export default class ResultPreview extends React.Component {
                     {`${result.CorrectCount} из ${result.TotalCount}`}
                 </h1>
                 <h1 className="title">
-                    <div className="label">Тест по лекеции: </div>
+                    <div className="label">{_title}</div>
                     <span className="name">{test.Name ? test.Name.trim() : ""}</span>
                 </h1>
             </div>

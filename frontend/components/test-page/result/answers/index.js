@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from "react-redux";
 import PropTypes from 'prop-types'
-import {questionsSelector,} from "ducks/test-result";
+import {questionsSelector,} from "ducks/test-instance";
 import AnswerBlock from "./answer-block";
 
 import "./answers.sass"
