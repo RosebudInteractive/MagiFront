@@ -25,7 +25,7 @@ function setupTests(app) {
 
     app.get('/api/tests/instance/:id', (req, res, next) => {
         TestService()
-            .getTestInstance(parseInt(req.params.id), { dbOptions: {} })
+            .getTestInstance(req.params.id, { dbOptions: {} })
             .then(rows => {
                 res.send(rows);
             })
@@ -34,21 +34,23 @@ function setupTests(app) {
             });
     });
 
-    app.post('/api/tests/instance', (req, res, next) => {
-        if (!req.user)
-            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else {
+    app.post('/api/tests/instance', async (req, res, next) => {
+        try {
             let test_id = req.body && req.body.TestId ? req.body.TestId : null;
             if (!test_id)
-                res.status(HttpCode.ERR_BAD_REQ).json({ message: 'Invalid or missing "test_id" arg.' })
-            TestService()
-                .createTestInstance(req.user.Id, test_id, { params: req.body, dbOptions: { userId: req.user.Id } })
-                .then(rows => {
-                    res.send(rows);
-                })
-                .catch(err => {
-                    next(err);
-                });
+                res.status(HttpCode.ERR_BAD_REQ).json({ message: 'Invalid or missing "TestId" arg.' })
+            else {
+                let userId = req.user ? req.user.Id : null;
+                let options = { params: req.body };
+                if (userId)
+                    options.dbOptions = { userId: userId };
+                let rows = await TestService()
+                    .createTestInstance(userId, test_id, options);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
         }
     });
 
@@ -88,7 +90,7 @@ function setupTests(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             TestService()
-                .updateTestInstance(parseInt(req.params.id), req.body, { dbOptions: { userId: req.user.Id } })
+                .updateTestInstance(req.params.id, req.body, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })

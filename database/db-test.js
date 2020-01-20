@@ -243,10 +243,19 @@ const DFLT_SHARING_SETTINGS = {
     }
 };
 
+const EST_INSTANCE_CACHE_PREFIX = "tstinst:";
+const INSTANCE_TTL_MS = 1000 * 60 * 60 * 1; // 1 hour
+const INSTANCE_KEY_LENGTH = 20;
+const LOCAL_INSTANCE_PREFIX = "$";
+
 const DbTest = class DbTest extends DbObject {
 
     constructor(options) {
-        super(options);
+        let opts = _.cloneDeep(options || {});
+        opts.cache = opts.cache ? opts.cache : {};
+        if (!opts.cache.prefix)
+            opts.cache.prefix = EST_INSTANCE_CACHE_PREFIX;
+        super(opts);
     }
 
     _getObjById(id, expression, options) {
@@ -352,8 +361,8 @@ const DbTest = class DbTest extends DbObject {
                     let newHandler = await root_obj.newObject({
                         fields: {
                             TestId: test_instance.TestId,
-                            TestInstanceId: test_instance.Id,
-                            UserId: test_instance.UserId
+                            TestInstanceId: test_instance.IsLocal ? null : test_instance.Id,
+                            UserId: test_instance.IsLocal ? null : test_instance.UserId
                         }
                     }, dbOpts);
 
@@ -769,63 +778,76 @@ const DbTest = class DbTest extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
         let testObj = null;
-        let testData = { Questions: [] };
 
-        return Utils.editDataWrapper(() => {
-            return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
-            })
-                .then(async (root) => {
-                    root_obj = root;
-                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-
-                    let col = root_obj.getCol("DataElements");
-                    if (col.count() !== 1)
-                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
-
-                    testObj = col.get(0);
-                    testData.Id = testObj.id();
-                    testData.UserId = testObj.userId();
-                    testData.TestId = testObj.testId();
-                    testData.StTime = testObj.stTime();
-                    testData.ActDuration = testObj.actDuration();
-                    testData.Duration = testObj.duration();
-                    testData.Score = testObj.score();
-                    testData.MaxScore = testObj.maxScore();
-                    testData.IsFinished = testObj.isFinished();
-                    testData.IsVisible = testObj.isVisible();
-
-                    let root_iq = testObj.getDataRoot("InstanceQuestion");
-                    let col_i = root_iq.getCol("DataElements");
-                    let questions_list = {};
-                    if (col_i.count()) {
-                        testData.Questions = new Array(col_i.count());
-                        for (let n = 0; n < col_i.count(); n++) {
-                            let qobj = col_i.get(n);
-                            let qi = {
-                                Answer: qobj.answer(),
-                                AnswTime: qobj.answTime(),
-                                Score: qobj.score()
-                            }
-                            testData.Questions[qobj.number() - 1] = qi;
-                            questions_list[qobj.questionId()] = qi;
-                        }
-                        let qids = Object.keys(questions_list).map(item => {
-                            return parseInt(item);
-                        });
-                        let arr_q = splitArray(qids, MAX_QUESTIONS_REQ_LEN);
-                        for (let i = 0; i < arr_q.length; i++){
-                            let q = await this._getQuestionsByIds(arr_q[i], { dbOptions: dbOpts });
-                            for (let id in q) {
-                                let item = questions_list[id];
-                                if (item)
-                                    item.Question = q[id];
-                            }
-                        }
-                    }
-                    return testData;
+        let method_result;
+        let idx = ("" + id).indexOf(LOCAL_INSTANCE_PREFIX)
+        if (idx === 0) {
+            method_result = await this.cacheGet(id, { json: true });
+            method_result.IsLocal = true;
+            if (!method_result)
+                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+        }
+        else {
+            let testData = { Questions: [] };
+            if (typeof (id) === "string")
+                id = parseInt(id);
+            method_result = Utils.editDataWrapper(() => {
+                return new MemDbPromise(this._db, resolve => {
+                    resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
                 })
-        }, memDbOptions);
+                    .then(async (root) => {
+                        root_obj = root;
+                        memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                        let col = root_obj.getCol("DataElements");
+                        if (col.count() !== 1)
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+
+                        testObj = col.get(0);
+                        testData.Id = testObj.id();
+                        testData.UserId = testObj.userId();
+                        testData.TestId = testObj.testId();
+                        testData.StTime = testObj.stTime();
+                        testData.ActDuration = testObj.actDuration();
+                        testData.Duration = testObj.duration();
+                        testData.Score = testObj.score();
+                        testData.MaxScore = testObj.maxScore();
+                        testData.IsFinished = testObj.isFinished();
+                        testData.IsVisible = testObj.isVisible();
+
+                        let root_iq = testObj.getDataRoot("InstanceQuestion");
+                        let col_i = root_iq.getCol("DataElements");
+                        let questions_list = {};
+                        if (col_i.count()) {
+                            testData.Questions = new Array(col_i.count());
+                            for (let n = 0; n < col_i.count(); n++) {
+                                let qobj = col_i.get(n);
+                                let qi = {
+                                    Answer: qobj.answer(),
+                                    AnswTime: qobj.answTime(),
+                                    Score: qobj.score()
+                                }
+                                testData.Questions[qobj.number() - 1] = qi;
+                                questions_list[qobj.questionId()] = qi;
+                            }
+                            let qids = Object.keys(questions_list).map(item => {
+                                return parseInt(item);
+                            });
+                            let arr_q = splitArray(qids, MAX_QUESTIONS_REQ_LEN);
+                            for (let i = 0; i < arr_q.length; i++) {
+                                let q = await this._getQuestionsByIds(arr_q[i], { dbOptions: dbOpts });
+                                for (let id in q) {
+                                    let item = questions_list[id];
+                                    if (item)
+                                        item.Question = q[id];
+                                }
+                            }
+                        }
+                        return testData;
+                    })
+            }, memDbOptions);
+        }
+        return method_result;
     }
 
     async updateTestInstance(id, data, options) {
@@ -837,49 +859,62 @@ const DbTest = class DbTest extends DbObject {
         let testObj = null;
         let inpFields = data || {};
 
-        return Utils.editDataWrapper(() => {
-            return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
-            })
-                .then(async (result) => {
-                    root_obj = result;
-                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+        let method_result = { result: "OK", id: id };
+        let idx = ("" + id).indexOf(LOCAL_INSTANCE_PREFIX)
+        if (idx === 0) {
+            await this.cacheSet(id, inpFields, {
+                json: true,
+                ttlInMSec: INSTANCE_TTL_MS
+            });
+        }
+        else {
+            if (typeof (id) === "string")
+                id = parseInt(id);
+            method_result = Utils.editDataWrapper(() => {
+                return new MemDbPromise(this._db, resolve => {
+                    resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
+                })
+                    .then(async (result) => {
+                        root_obj = result;
+                        memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
-                    let col = root_obj.getCol("DataElements");
-                    if (col.count() !== 1)
-                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+                        let col = root_obj.getCol("DataElements");
+                        if (col.count() !== 1)
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
 
-                    testObj = col.get(0);
-                    await root_obj.edit();
+                        testObj = col.get(0);
+                        await root_obj.edit();
 
-                    let fields = _.clone(inpFields);
-                    delete fields.Questions;
-                    this._setFieldValues(testObj, fields, { Id: true, UserId: true, Duration: true, MaxScore: true });
+                        let fields = _.clone(inpFields);
+                        delete fields.Questions;
+                        this._setFieldValues(testObj, fields, { Id: true, UserId: true, Duration: true, MaxScore: true });
 
-                    if (Array.isArray(inpFields.Questions)) {
-                        let root_q = testObj.getDataRoot("InstanceQuestion");
-                        let col_q = root_q.getCol("DataElements");
-                        let q_list = {};
-                        for (let i = 0; i < col_q.count(); i++) {
-                            let obj = col_q.get(i);
-                            q_list[obj.number()] = obj;
-                        }
-                        for (let i = 0; i < inpFields.Questions.length; i++) {
-                            let fld = _.cloneDeep(inpFields.Questions[i]);
-                            fld.Number = i + 1;
-                            delete fld.Answers;
-                            let list_obj = q_list[i + 1];
-                            if (list_obj) {
-                                this._setFieldValues(list_obj, fld, { Id: true, QuestionId: true, Number: true });
-                                delete q_list[i + 1];
+                        if (Array.isArray(inpFields.Questions)) {
+                            let root_q = testObj.getDataRoot("InstanceQuestion");
+                            let col_q = root_q.getCol("DataElements");
+                            let q_list = {};
+                            for (let i = 0; i < col_q.count(); i++) {
+                                let obj = col_q.get(i);
+                                q_list[obj.number()] = obj;
+                            }
+                            for (let i = 0; i < inpFields.Questions.length; i++) {
+                                let fld = _.cloneDeep(inpFields.Questions[i]);
+                                fld.Number = i + 1;
+                                delete fld.Answers;
+                                let list_obj = q_list[i + 1];
+                                if (list_obj) {
+                                    this._setFieldValues(list_obj, fld, { Id: true, QuestionId: true, Number: true });
+                                    delete q_list[i + 1];
+                                }
                             }
                         }
-                    }
 
-                    await root_obj.save(dbOpts);
-                    return { result: "OK", id: id };
-                })
-        }, memDbOptions);
+                        await root_obj.save(dbOpts);
+                        return { result: "OK", id: id };
+                    })
+            }, memDbOptions);
+        }
+        return method_result;
     }
 
     async createTestInstance(user_id, test_id, options) {
@@ -892,6 +927,9 @@ const DbTest = class DbTest extends DbObject {
         let testObj = null;
 
         let testData = await this.get(test_id, { dbOptions: dbOpts });
+        if ((!user_id) && testData.IsAuthRequired)
+            throw new HttpError(HttpCode.ERR_UNAUTH, ``);
+        
         let testInstanse = {
             Id: null,
             UserId: user_id,
@@ -956,40 +994,51 @@ const DbTest = class DbTest extends DbObject {
         for (let i = 0; i < testInstanse.Questions.length; i++)
             testInstanse.MaxScore += testInstanse.Questions[i].Score ? testInstanse.Questions[i].Score : 1;
         
-        return Utils.editDataWrapper(() => {
-            return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(-1, TEST_INST_REQ_TREE, dbOpts));
-            })
-                .then(async (result) => {
-                    root_obj = result;
-                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-
-                    let fields = _.clone(testInstanse);
-                    delete fields.Questions;
-                    delete fields.Id;
-
-                    await root_obj.edit();
-                    let newHandler = await root_obj.newObject({ fields: fields }, dbOpts);
-
-                    testInstanse.Id = newHandler.keyValue;
-                    testObj = this._db.getObj(newHandler.newObject);
-
-                    if (testInstanse.Questions.length > 0) {
-                        let root_q = testObj.getDataRoot("InstanceQuestion");
-                        for (let i = 0; i < testInstanse.Questions.length; i++) {
-                            let fld = _.cloneDeep(testInstanse.Questions[i]);
-                            fld.Number = i + 1;
-                            fld.QuestionId = fld.Question.Id;
-                            delete fld.Question;
-                            delete fld.Id;
-                            await root_q.newObject({ fields: fld }, dbOpts);
-                        }
-                    }
-
-                    await root_obj.save(dbOpts);
-                    return { result: "OK", test: testInstanse };
+        let metod_result = { result: "OK", test: testInstanse };
+        if (!user_id) {
+            testInstanse.IsLocal = true;
+            testInstanse.Id = LOCAL_INSTANCE_PREFIX + randomstring.generate(INSTANCE_KEY_LENGTH);
+            await this.cacheSet(testInstanse.Id, testInstanse, {
+                json: true,
+                ttlInMSec: INSTANCE_TTL_MS
+            });
+        }
+        else
+            metod_result= Utils.editDataWrapper(() => {
+                return new MemDbPromise(this._db, resolve => {
+                    resolve(this._getObjById(-1, TEST_INST_REQ_TREE, dbOpts));
                 })
-        }, memDbOptions);
+                    .then(async (result) => {
+                        root_obj = result;
+                        memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                        let fields = _.clone(testInstanse);
+                        delete fields.Questions;
+                        delete fields.Id;
+
+                        await root_obj.edit();
+                        let newHandler = await root_obj.newObject({ fields: fields }, dbOpts);
+
+                        testInstanse.Id = newHandler.keyValue;
+                        testObj = this._db.getObj(newHandler.newObject);
+
+                        if (testInstanse.Questions.length > 0) {
+                            let root_q = testObj.getDataRoot("InstanceQuestion");
+                            for (let i = 0; i < testInstanse.Questions.length; i++) {
+                                let fld = _.cloneDeep(testInstanse.Questions[i]);
+                                fld.Number = i + 1;
+                                fld.QuestionId = fld.Question.Id;
+                                delete fld.Question;
+                                delete fld.Id;
+                                await root_q.newObject({ fields: fld }, dbOpts);
+                            }
+                        }
+
+                        await root_obj.save(dbOpts);
+                        return { result: "OK", test: testInstanse };
+                    })
+            }, memDbOptions);
+        return metod_result;
     }
 
     async delTestInstance(id, options) {
