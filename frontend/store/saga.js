@@ -7,6 +7,7 @@ import {saga as googleAnalyticsSaga} from 'ducks/google-analytics'
 import {saga as testSaga} from 'ducks/test'
 import {saga as testInstanceSaga} from 'ducks/test-instance'
 import {saga as testResultSaga} from 'ducks/test-result'
+import {saga as testShareResultSaga} from 'ducks/test-share-result'
 import {saga as filtersSaga} from 'ducks/filters'
 // пока костыль
 import {saga as coursesSaga} from 'actions/courses-page-actions'
@@ -22,6 +23,7 @@ export default function* rootSaga() {
         testSaga(),
         testInstanceSaga(),
         testResultSaga(),
+        testShareResultSaga(),
         coursesSaga(),
         lessonMenuSaga(),
         filtersSaga(),

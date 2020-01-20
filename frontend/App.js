@@ -16,14 +16,13 @@ import ProjectPage from './containers/project-page'
 import TestPage from './containers/test-page'
 import TestResultPreview from './containers/test-result-preview'
 import EmptyPromoPage from './components/empty-promo-page'
+import TestResultSharePage from './components/test-result-share-page'
 
-// import PageHeader from './components/page-header/page-header';
 import PageHeader from './components/header-ver2';
 import PageFooter from './components/page-footer/page-footer';
 import FeedbackMessageBox from './components/messages/feedback';
 import FeedbackResultMessage from './components/messages/feedback-result-message';
 
-import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
@@ -304,7 +303,7 @@ class App extends Component {
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
                 <Route path={_homePath + 'test/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.TEST}/>)}/>
                 <Route path={_homePath + 'test-instance/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.INSTANCE}/>)}/>
-                <Route path={_homePath + 'test-result/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.RESULT}/>)}/>
+                <Route path={_homePath + 'test-result/:code'} render={(props) => (<TestResultSharePage {...props} type={TEST_PAGE_TYPE.RESULT}/>)}/>
                 <Route path={_homePath + 'test-result-preview/:instanceId'} component={TestResultPreview}/>
                 <Route path={_homePath + 'promo/:code'} component={EmptyPromoPage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/:garbage'} component={NotFound}/>

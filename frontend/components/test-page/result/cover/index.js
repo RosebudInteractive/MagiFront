@@ -5,7 +5,8 @@ import {testSelector} from "ducks/test";
 // import {testResultSelector} from "ducks/test-result";
 import {connect} from "react-redux";
 import {SocialBlock} from "../../social-block";
-import {createNewTestInstance, testInstanceSelector} from "ducks/test-instance";
+import {createNewTestInstance, getShareLink, testInstanceSelector} from "ducks/test-instance";
+import {getDomain} from "tools/page-tools";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
@@ -80,8 +81,14 @@ class Cover extends React.Component {
 
     _beforeOnClick(socialBlock, button) {
         return new Promise((resolve, reject) => {
-            socialBlock.setUrl("https://magisteria.ru/old-testament-iconography/jacob", button)
-            reject()
+            getShareLink(this.props.result.Id)
+                .then((data) => {
+                    socialBlock.setUrl(`${getDomain()}/test-result/${data.Id}`, button)
+                    reject()
+                })
+                .catch((e) => {
+                    console.error(e)
+                })
         })
     }
 }
