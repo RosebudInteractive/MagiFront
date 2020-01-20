@@ -373,3 +373,17 @@ function* finishInstanceSaga(data) {
 
     yield put(save())
 }
+
+export const getShareLink = (instanceId) => {
+    return fetch("/api/tests/instance/share",
+        {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({InstanceId: instanceId}),
+            credentials: 'include'
+        })
+        .then(checkStatus)
+        .then(parseJSON)
+}
