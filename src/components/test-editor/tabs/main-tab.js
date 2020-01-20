@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {bindActionCreators} from 'redux';
 import {connect} from "react-redux";
 import {Field, formValueSelector, isDirty} from "redux-form";
-import {TextBox} from "../../common/input-controls";
+import {CheckBox, TextBox} from "../../common/input-controls";
 import Select from "../../common/select-control";
 import RadioBox from "../../common/radio-box-control";
 import {getCourseLessons, typesSelector} from 'adm-ducks/single-test'
@@ -47,6 +47,7 @@ class MainTab extends React.Component {
             <Field component={Select} name="lessonId" label="Урок" placeholder="Выберите урок" options={this._getLessons()} disabled={_disabled}/>
             <Field component={TextBox} name="name" label="Название" placeholder="Введите название" disabled={_disabled}/>
             <Field component={TextBox} name="URL" label="URL" placeholder="Введите URL" disabled={_disabled}/>
+            <Field component={CheckBox} name="isAuthRequired" label="Требуется авторизация" disabled={_disabled}/>
             <Field component={Select} name="testTypeId" label="Вид теста" placeholder="Выберите вид теста" options={this._getTestTypes()} disabled={_disabled}/>
             <Field component={Select} name="method" label="Принцип тестирования" placeholder="Выберите способ тестирования" options={METHODS} disabled={_disabled}/>
             <Field component={Select} name="status" label="Статус" placeholder="Укажите статус" options={STATUS} disabled={_disabled}/>

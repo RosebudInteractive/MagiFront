@@ -51,6 +51,7 @@ const InstanceRecord = Record({
     UserId: null,
     CorrectCount: 0,
     TotalCount: 0,
+    IsLocal: false,
 })
 
 const ReducerRecord = Record({
@@ -210,7 +211,9 @@ function* createNewTestInstanceSaga(data) {
         const _instance = yield call(_fetchCreateInstanceTest, _test.Id)
 
         yield put({type: CREATE_TEST_INSTANCE_SUCCESS, payload: _instance})
-        yield put(push(`/test-instance/${_instance.Id}`))
+        if (!_instance.IsLocal) {
+            yield put(push(`/test-instance/${_instance.Id}`))
+        }
     } catch (e) {
         yield put({ type: CREATE_TEST_INSTANCE_FAIL, payload: {e} })
     }

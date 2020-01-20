@@ -39,6 +39,7 @@ const TestRecord = Record({
     SnDescription: null,
     SnPost: null,
     Qty: null,
+    IsAuthRequired: false,
     questionsCount: 0,
     estimatedTime: 0,
 })

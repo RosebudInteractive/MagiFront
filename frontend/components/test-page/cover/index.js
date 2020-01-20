@@ -18,8 +18,10 @@ class Cover extends React.Component {
     }
 
     render() {
-        const {test,} = this.props,
-            _coverUrl = test.Cover
+        const {test, authorized} = this.props,
+            _coverUrl = test.Cover,
+            _startButtonDisabled = test && test.IsAuthRequired && !authorized
+
 
         if (typeof test.CoverMeta === "string") {
             test.CoverMeta = JSON.parse(test.CoverMeta)
@@ -53,7 +55,7 @@ class Cover extends React.Component {
                     </div>
                 </div>
                 <div className="start-button__block">
-                    <div className="button btn--brown start-button" onClick={::this._createInstance}>
+                    <div className={"button btn--brown start-button" + (_startButtonDisabled ? " disabled" : "")} onClick={::this._createInstance}>
                         Начать тест
                     </div>
                     <SocialBlock/>
@@ -63,12 +65,20 @@ class Cover extends React.Component {
     }
 
     _createInstance() {
-        this.props.createNewTestInstance(this.props.test.URL)
+        const {test, authorized} = this.props,
+            _startButtonDisabled = test && test.IsAuthRequired && !authorized
+
+        if (!_startButtonDisabled) {
+            this.props.createNewTestInstance(test.URL)
+        }
     }
 }
 
 const mapStateToProps = (state) => {
-    return {test: testSelector(state)}
+    return {
+        test: testSelector(state),
+        authorized: !!state.user.user,
+    }
 }
 
 const mapDispatchToProps = (dispatch) => {

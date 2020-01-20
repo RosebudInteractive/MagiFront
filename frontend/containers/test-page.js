@@ -203,7 +203,7 @@ class TestPage extends React.Component {
     }
 
     _getPageType(props) {
-        return (props.type === TEST_PAGE_TYPE.INSTANCE) ?
+        return (props.type === TEST_PAGE_TYPE.INSTANCE) || ((props.type === TEST_PAGE_TYPE.TEST) && (props.testInstance.TestId === props.test.Id) && props.testInstance.IsLocal) ?
             props.testInstance.IsFinished ? TEST_PAGE_TYPE.RESULT : TEST_PAGE_TYPE.INSTANCE
             :
             TEST_PAGE_TYPE.TEST
