@@ -23,6 +23,12 @@ const GET_COURSES_SM_MSSQL =
 const GET_COURSES_IMG_SM_MSSQL =
     "select c.[URL], c.[CoverMeta] from[Course] c where c.[State] = 'P'";
 
+const GET_TESTS_SM_MSSQL =
+    "select t.[TimeMdf] as ReadyDate, t.[URL], t.[Cover], t.[CoverMeta] from [Test] t where t.[Status] = 2 order by 1 desc";
+
+const GET_TESTS_SM_MYSQL =
+    "select t.`TimeMdf` as ReadyDate, t.`URL`, t.`Cover`, t.`CoverMeta` from `Test` t where t.`Status` = 2 order by 1 desc";
+
 const GET_CATEGORIES_SM_MSSQL =
     "select max(lc.[ReadyDate]) as [ReadyDate], g.[URL] from[Course] c\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -118,6 +124,11 @@ let dfltSiteMapSettings = {
         file: "page-sitemap.xml",
         aboutUrl: "/about",
         guid: "9902d23d-0dd6-4fb1-95f9-04f801762969"
+    },
+    test: {
+        file: "test-sitemap.xml",
+        prefixUrl: "/test",
+        guid: "4aaeab32-8b4b-4049-8f2b-007b84798a5b"
     },
     index: {
         file: "sitemap_index.xml",
@@ -248,6 +259,51 @@ exports.SiteMapTask = class SiteMapTask extends FileTask {
                 return sitemap;
             });
         return this._genFile(data, this._siteMapSettings.course);
+    }
+
+    _genTestSM() {
+        let data = new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: GET_TESTS_SM_MYSQL,
+                        mssql: GET_TESTS_SM_MSSQL
+                    }
+                }, {})
+            );
+        })
+            .then((result) => {
+                let siteMapOptions = { urls: [] };
+                if (result && result.detail && (result.detail.length > 0)) {
+                    let urls = [];
+                    let prefixUrl = this._siteMapSettings.test.prefixUrl;
+                    result.detail.forEach((elem) => {
+                        let img = elem.Cover ?
+                            { url: this._href(this._dataUrl + "/" + elem.Cover), title: this._getFileName(elem.Cover) } : null;
+                        if (elem.Cover && elem.CoverMeta) {
+                            try {
+                                let meta = JSON.parse(elem.CoverMeta);
+                                if (meta.name)
+                                    img.title = meta.name;
+                                if (meta.description)
+                                    img.caption = meta.description;
+                            } catch (err) { };
+                        }
+                        urls.push({
+                            url: this._href(this._siteHost + prefixUrl + "/" + elem.URL),
+                            lastmodISO: elem.ReadyDate.toISOString(),
+                            img: img ? [img] : []
+                        });
+                    });
+                    siteMapOptions = { urls: urls };
+                }
+                let xslUrl = this._siteMapSettings.test.xslUrl || this._xslUrl;
+                if (xslUrl)
+                    siteMapOptions.xslUrl = xslUrl;
+                let sitemap = sm.createSitemap(siteMapOptions).toString();
+                return sitemap;
+            });
+        return this._genFile(data, this._siteMapSettings.test);
     }
 
     _genCategorySM() {
@@ -440,6 +496,10 @@ exports.SiteMapTask = class SiteMapTask extends FileTask {
             .then((result) => {
                 isModified = isModified || result;
                 return this._genAuthorSM();
+            })
+            .then((result) => {
+                isModified = isModified || result;
+                return this._genTestSM();
             })
             .then((result) => {
                 isModified = isModified || result;
