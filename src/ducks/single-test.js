@@ -49,6 +49,7 @@ const TestRecord = Record({
     TestTypeId: null,
     CourseId: null,
     LessonId: null,
+    IsAuthRequired: null,
     Name: null,
     Method: null,
     MaxQ: 0,
