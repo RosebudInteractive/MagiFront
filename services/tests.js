@@ -85,18 +85,18 @@ function setupTests(app) {
         }
     });
 
-    app.put('/api/tests/instance/:id', (req, res, next) => {
-        if (!req.user)
-            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else
-            TestService()
-                .updateTestInstance(req.params.id, req.body, { dbOptions: { userId: req.user.Id } })
-                .then(rows => {
-                    res.send(rows);
-                })
-                .catch(err => {
-                    next(err);
-                });
+    app.put('/api/tests/instance/:id', async (req, res, next) => {
+        try {
+            let options = {};
+            if (req.user)
+                options.dbOptions = { userId: req.user.Id };
+            let rows = await TestService()
+                .updateTestInstance(req.params.id, req.body, options);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     app.delete('/api/tests/instance/:id', (req, res, next) => {
