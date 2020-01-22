@@ -226,6 +226,11 @@
                 "mysql": "./build_26/upgrade_26_mysql.sql"
             },
             "upgrader": "./build_26"
+        },
+        "27": {
+            "script_before": null,
+            "script_after": null,
+            "upgrader": "./build_27"
         }
     }
 }

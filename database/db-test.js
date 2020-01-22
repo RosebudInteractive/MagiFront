@@ -219,6 +219,16 @@ const INST_BY_COURSE_MYSQL =
     "where t.`CourseId` = <%= course_id %> and i.`UserId` = <%= user_id %>\n" +
     "order by i.`TestId`, i.`Id` desc";
 
+const TEST_SHARE_COUNTERS_MSSQL_REQ =
+    "select sp.[Code], ts.[Counter] from [TestShareCounter] ts\n" +
+    "  join [SNetProvider] sp on sp.[Id] = ts.[SNetProviderId]\n" +
+    "where [TestId] = <%= testId %>";
+
+const TEST_SHARE_COUNTERS_MYSQL_REQ =
+    "select sp.`Code`, ts.`Counter` from `TestShareCounter` ts\n" +
+    "  join `SNetProvider` sp on sp.`Id` = ts.`SNetProviderId`\n" +
+    "where `TestId` = <%= testId %>";
+
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
@@ -572,7 +582,7 @@ const DbTest = class DbTest extends DbObject {
                 mssql: _.template(TEST_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
             }
         }, {});
-        let testData = { Images: {} };
+        let testData = { Images: {}, ShareCounters: {} };
         if (result && result.detail && (result.detail.length > 0)) {
             result.detail.forEach(elem => {
                 if (!testData.Id) {
@@ -610,6 +620,18 @@ const DbTest = class DbTest extends DbObject {
                     FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
                     MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
                 };
+            })
+        }
+
+        result = await $data.execSql({
+            dialect: {
+                mysql: _.template(TEST_SHARE_COUNTERS_MYSQL_REQ)({ testId: testData.Id }),
+                mssql: _.template(TEST_SHARE_COUNTERS_MSSQL_REQ)({ testId: testData.Id })
+            }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach((elem) => {
+                testData.ShareCounters[elem.Code] = elem.Counter;
             })
         }
 

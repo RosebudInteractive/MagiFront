@@ -21,6 +21,10 @@ const GET_LESSONS_MSSQL =
     "order by lc.[ReadyDate] desc\n" +
     "offset <%= offset %> rows fetch next <%= nrec %> rows only";
 
+const GET_TESTS_MSSQL =
+    "select t.[TimeMdf] as ReadyDate, t.[URL], t.[Id] from [Test] t where t.[Status] = 2 order by 1 desc\n"+
+    "offset <%= offset %> rows fetch next <%= nrec %> rows only";
+
 const GET_SNLIST_MSSQL =
     "select [Id], [Code] from [SNetProvider]";
 
@@ -32,6 +36,10 @@ const GET_LESSONS_MYSQL =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "order by lc.`ReadyDate` desc\n" +
+    "limit <%= offset %>,<%= nrec %>";
+
+const GET_TESTS_MYSQL =
+    "select t.`TimeMdf` as ReadyDate, t.`URL`, t.`Id` from `Test` t where t.`Status` = 2 order by 1 desc\n" +
     "limit <%= offset %>,<%= nrec %>";
 
 const GET_SNLIST_MYSQL =
@@ -69,7 +77,6 @@ exports.SnCounterTask = class SnCounterTask extends Task {
         this._settings.baseUrl = this._settings.baseUrl ? this._settings.baseUrl : config.proxyServer.siteHost;
         this._snList = {};
         this._snListById = {};
-        this._courses = {};
         this._setDfltDelay(this._settings.urlDelay);
     }
 
@@ -114,6 +121,17 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                 let lessons = (result && result.detail) ? result.detail : [];
                 return lessons;
             });
+    }
+
+    async _getTests() {
+        await this._getSnList();
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_TESTS_MYSQL)({ offset: this._settings.offset, nrec: this._settings.maxUrls }),
+                mssql: _.template(GET_TESTS_MSSQL)({ offset: this._settings.offset, nrec: this._settings.maxUrls })
+            }
+        }, {});
+        return (result && result.detail) ? result.detail : [];
     }
 
     // А можно и без авторизации: https://graph.facebook.com/?id=https://magisteria.ru/islam/intro/
@@ -395,17 +413,18 @@ exports.SnCounterTask = class SnCounterTask extends Task {
 
     _processLessons() {
         let self = this;
+        let courses = {};
         return this._getLessons()
             .then((lessons) => {
                 return Utils.seqExec(lessons, (lesson) => {
                     let rc = self._delay();
-                    if (!self._courses[lesson.CID]) {
+                    if (!courses[lesson.CID]) {
                         rc = rc.then(() => {
                             let url = self._settings.baseUrl + '/category/' + lesson.URL;
                             return self._processItem(lesson, url, "CrsShareCounter", "CourseId", "CID");
                         })
                             .then(() => {
-                                self._courses[lesson.CID] = true;
+                                courses[lesson.CID] = true;
                                 return self._delay();
                             });
                     }
@@ -417,7 +436,18 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             });
     }
 
-    run(fireDate) {
-        return this._processLessons();
+    async _processTests() {
+        let tests = await this._getTests();
+        for (let i = 0; i < tests.length; i++){
+            let test = tests[i];
+            let url = this._settings.baseUrl + '/test/' + test.URL;
+            await this._delay();
+            await this._processItem(test, url, "TestShareCounter", "TestId", "Id");
+        }
+    }
+
+    async run(fireDate) {
+        await this._processLessons();
+        await this._processTests();
     }
 };
