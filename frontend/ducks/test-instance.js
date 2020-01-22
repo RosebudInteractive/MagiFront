@@ -7,6 +7,8 @@ import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/te
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 import {isAnswerCorrect} from "tools/tests-tools";
+import {LOGOUT_SUCCESS,} from "../constants/user";
+import {GET_USER_INFO_REQUEST} from "ducks/profile";
 
 /**
  * Constants
@@ -14,6 +16,8 @@ import {isAnswerCorrect} from "tools/tests-tools";
 export const moduleName = 'test-instance'
 const prefix = `${appName}/${moduleName}`
 
+
+const CLEAR_INSTANCE = `${prefix}/CLEAR_INSTANCE`
 
 const CREATE_TEST_INSTANCE_REQUEST = `${prefix}/CREATE_TEST_INSTANCE_REQUEST`
 const CREATE_TEST_INSTANCE_START = `${prefix}/CREATE_TEST_INSTANCE_START`
@@ -25,6 +29,7 @@ const GET_TEST_INSTANCE_START = `${prefix}/GET_TEST_INSTANCE_START`
 const GET_TEST_INSTANCE_COMPLETED = `${prefix}/GET_TEST_INSTANCE_COMPLETED`
 const GET_TEST_INSTANCE_SUCCESS = `${prefix}/GET_TEST_INSTANCE_SUCCESS`
 const GET_TEST_INSTANCE_FAIL = `${prefix}/GET_TEST_INSTANCE_FAIL`
+const INSTANCE_NOT_FOUND = `${prefix}/INSTANCE_NOT_FOUND`
 
 const SET_ANSWER_REQUEST = `${prefix}/SET_ANSWER_REQUEST`
 const SET_ANSWER_SUCCESS = `${prefix}/SET_ANSWER_SUCCESS`
@@ -37,6 +42,9 @@ const SAVE_INSTANCE_FAIL = `${prefix}/SAVE_INSTANCE_FAIL`
 const SET_ANSWER_AND_SAVE_REQUEST = `${prefix}/SET_ANSWER_AND_SAVE_REQUEST`
 const FINISH_INSTANCE_REQUEST = `${prefix}/FINISH_INSTANCE_REQUEST`
 const FINISH_INSTANCE_SUCCESS = `${prefix}/FINISH_INSTANCE_SUCCESS`
+
+const SET_SHARE_URL = `${prefix}/SET_SHARE_URL`
+const CLEAR_SHARE_URL = `${prefix}/CLEAR_SHARE_URL`
 
 const InstanceRecord = Record({
     ActDuration: 0,
@@ -62,6 +70,9 @@ const ReducerRecord = Record({
     questions: new Map([]),
     lastSuccessTime: null,
     blocked: false,
+    notFound: false,
+    shareUrl: null,
+    urlCreated: null,
 })
 
 const QuestionRecord = Record({
@@ -107,6 +118,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_TEST_INSTANCE_COMPLETED:
             return state
                 .set('loading', false)
+                .set('loaded', true)
 
         case SET_ANSWER_SUCCESS:
             return state
@@ -118,6 +130,27 @@ export default function reducer(state = new ReducerRecord(), action) {
         case FINISH_INSTANCE_SUCCESS:
             return state
                 .set('testInstance', payload.instance)
+
+        case INSTANCE_NOT_FOUND:
+            return state
+                .set('loading', false)
+                .set('loaded', true)
+                .set('notFound', true)
+                .set('blocked', false)
+
+        case CLEAR_INSTANCE:
+        case LOGOUT_SUCCESS:
+            return state = new ReducerRecord()
+
+        case SET_SHARE_URL:
+            return state
+                .set('shareUrl', payload)
+                .set('urlCreated', true)
+
+        case CLEAR_SHARE_URL:
+            return state
+                .set('shareUrl', null)
+                .set('urlCreated', false)
 
         default:
             return state
@@ -140,6 +173,9 @@ export const loadedSelector = createSelector(stateSelector, state => state.loade
 export const blockedSelector = createSelector(stateSelector, state => state.blocked)
 const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
 export const testInstanceSelector = createSelector(stateSelector, state => state.testInstance)
+export const notFoundSelector = createSelector(stateSelector, state => state.notFound)
+export const shareUrlSelector = createSelector(stateSelector, state => state.shareUrl)
+export const urlCreatedSelector = createSelector(stateSelector, state => state.urlCreated)
 export const questionsSelector = createSelector(stateSelector, (state) => {
     let _array = state.questions.toArray();
 
@@ -179,6 +215,18 @@ export const setAnswerAndFinish = (answer) => {
     return { type: FINISH_INSTANCE_REQUEST, payload: answer }
 }
 
+export const clearInstance = () => {
+    return {type: CLEAR_INSTANCE}
+}
+
+export const setShareUrl = (url) => {
+    return {type: SET_SHARE_URL, payload: url}
+}
+
+export const clearShareUrl = () => {
+    return {type: CLEAR_SHARE_URL}
+}
+
 /**
  * Sagas
  */
@@ -195,6 +243,7 @@ export const saga = function* () {
 
 function* createNewTestInstanceSaga(data) {
     yield put({ type: CREATE_TEST_INSTANCE_START })
+    yield put(clearShareUrl())
 
     yield put(getTest(data.payload))
 
@@ -240,13 +289,27 @@ function _fetchCreateInstanceTest(testId) {
 function* getTestInstanceSaga(data) {
 
     let _time = yield select(successTimeSelector),
-        _instance = yield select(testInstanceSelector)
+        _instance = yield select(testInstanceSelector),
+        _user = yield select(state => state.user)
 
-    console.log((Date.now() - _time), DATA_EXPIRATION_TIME, _instance.Id, +data.payload)
+    console.log(_user)
+
+    if (_user.loading) {
+        yield take(GET_USER_INFO_REQUEST)
+    }
+
+    _user = yield select(state => state.user)
+    console.log(_user)
 
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })
         return
+    }
+
+    if (!!_instance.Id && _instance.Id !== +data.payload) {
+        yield put(clearShareUrl())
+        
+        console.log("clear  ")
     }
 
     yield put({ type: GET_TEST_INSTANCE_START })
@@ -254,12 +317,20 @@ function* getTestInstanceSaga(data) {
     try {
         const _instance = yield call(_fetchGetInstanceTest, data.payload)
 
-        yield put(getTest(_instance.TestId))
-
-        yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
+        if (!!_user.user && (_instance.UserId === _user.user.Id)) {
+            yield put(getTest(_instance.TestId))
+            yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
+        } else {
+            yield put(clearInstance())
+            yield put(push(`/test/${_instance.TestId}`))
+        }
 
     } catch (e) {
-        yield put({ type: GET_TEST_INSTANCE_FAIL, payload: {e} })
+        if (e.status && (e.status === 404)) {
+            yield put({ type: INSTANCE_NOT_FOUND })
+        } else {
+            yield put({type: GET_TEST_INSTANCE_FAIL, payload: {e}})
+        }
     }
 }
 
@@ -325,9 +396,6 @@ function* saveInstanceSaga() {
         yield put({ type: SAVE_INSTANCE_SUCCESS })
 
     } catch (e) {
-
-        console.log(e)
-
         yield put({ type: SAVE_INSTANCE_FAIL, payload: {e} })
     }
 }

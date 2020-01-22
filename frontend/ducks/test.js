@@ -133,6 +133,9 @@ function* getTestSaga(data) {
         yield put({type: GET_TEST_SUCCESS, payload: _test})
         yield put({type: GET_TEST_COMPLETED})
     } catch (e) {
+
+        console.log(JSON.stringify(e))
+
         if (e.status && (e.status === 404)) {
             yield put({ type: TEST_NOT_FOUND })
         } else {

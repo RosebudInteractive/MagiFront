@@ -36,6 +36,7 @@ const ReducerRecord = Record({
     shareResult: new ResultRecord(),
     notFound: false,
     lastSuccessTime: null,
+    shareUrl: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
