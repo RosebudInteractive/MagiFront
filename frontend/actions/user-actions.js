@@ -33,7 +33,7 @@ import {
     RECOVERY_PASSWORD_FAIL,
     WHO_AM_I_START,
     WHO_AM_I_SUCCESS,
-    WHO_AM_I_FAIL, REDIRECT_TO_APP, REDIRECT_TO_APP_COMPLETE,
+    WHO_AM_I_FAIL, REDIRECT_TO_APP, REDIRECT_TO_APP_COMPLETE, USER_HAS_BEEN_LOADED,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -103,6 +103,10 @@ export const setCaptcha = (value) => {
         type: SET_SIGN_IN_CAPTCHA,
         payload: value
     }
+}
+
+export const notifyUserHasBeenLoaded = () => {
+    return {type: USER_HAS_BEEN_LOADED}
 }
 
 

@@ -4,6 +4,7 @@ import {Record,} from 'immutable'
 import {all, call, put, takeEvery, select,} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
+import {loadTestData} from "ducks/test";
 
 /**
  * Constants
@@ -36,6 +37,7 @@ const ReducerRecord = Record({
     shareResult: new ResultRecord(),
     notFound: false,
     lastSuccessTime: null,
+    shareUrl: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -105,6 +107,7 @@ function* getShareResultSaga(data) {
         _result = yield select(shareResultSelector)
 
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_result && _result.Code === data.payload) {
+        yield put(loadTestData(_result.TestId))
         yield put({ type: GET_RESULT_COMPLETED })
         return
     }
@@ -112,9 +115,19 @@ function* getShareResultSaga(data) {
     yield put({ type: GET_RESULT_START })
 
     try {
-        const _instance = yield call(_fetchGetTestResult, data.payload)
+        const _result = yield call(_fetchGetTestResult, data.payload)
 
-        yield put({type: GET_RESULT_SUCCESS, payload: _instance})
+        console.log(_result.TestId)
+
+        if (_result.TestId) {
+            yield loadTestData(_result.TestId)
+        } else {
+            yield put({ type: RESULT_NOT_FOUND })
+        }
+
+        console.log(_result.TestId)
+
+        yield put({type: GET_RESULT_SUCCESS, payload: _result})
     } catch (e) {
         if (e.status && (e.status === 404)) {
             yield put({ type: RESULT_NOT_FOUND })
