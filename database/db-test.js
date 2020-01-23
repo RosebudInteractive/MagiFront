@@ -379,6 +379,8 @@ const DbTest = class DbTest extends DbObject {
 
         if (shared_code)
             return { Id: shared_code };
+        
+        let test = await this.getPublic(test_instance.TestId, opts);
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -393,7 +395,10 @@ const DbTest = class DbTest extends DbObject {
                         fields: {
                             TestId: test_instance.TestId,
                             TestInstanceId: test_instance.IsLocal ? null : test_instance.Id,
-                            UserId: test_instance.IsLocal ? null : test_instance.UserId
+                            UserId: test_instance.IsLocal ? null : test_instance.UserId,
+                            SnName: opts.SnName ? opts.SnName : (test.SnName ? test.SnName : null),
+                            SnDescription: opts.SnDescription ?
+                                opts.SnDescription : (test.SnDescription ? test.SnDescription : null)
                         }
                     }, dbOpts);
 
@@ -572,7 +577,7 @@ const DbTest = class DbTest extends DbObject {
         return tests;
     }
 
-    async getPublic(url, user, options) {
+    async getPublic(url, options) {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;

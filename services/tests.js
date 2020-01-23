@@ -59,7 +59,8 @@ function setupTests(app) {
             let instance_id = req.body && req.body.InstanceId ? req.body.InstanceId : null;
             if (!instance_id)
                 res.status(HttpCode.ERR_BAD_REQ).json({ message: 'Invalid or missing "instance_id" arg.' })
-            let options = {};
+            let options = _.cloneDeep(req.body);
+            delete options.InstanceId;
             if (req.user)
                 options.dbOptions = { userId: req.user.Id };
             let rows = await TestService()
@@ -181,7 +182,7 @@ function setupTests(app) {
 
     app.get('/api/tests/:url', (req, res, next) => {
         TestService()
-            .getPublic(req.params.url, req.user, req.query)
+            .getPublic(req.params.url, req.query)
             .then(rows => {
                 res.send(rows);
             })
