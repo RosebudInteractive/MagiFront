@@ -251,11 +251,11 @@ const DFLT_SHARING_SETTINGS = {
             width: 1200,
             height: 630
         },
-        twitter: {
-            imageType: "jpeg",
-            width: 1008,
-            height: 530
-        }
+        // twitter: {
+        //     imageType: "jpeg",
+        //     width: 1008,
+        //     height: 530
+        // }
     }
 };
 
