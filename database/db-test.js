@@ -229,6 +229,12 @@ const TEST_SHARE_COUNTERS_MYSQL_REQ =
     "  join `SNetProvider` sp on sp.`Id` = ts.`SNetProviderId`\n" +
     "where `TestId` = <%= testId %>";
 
+const SHARED_INSTANCE_BY_INSTID_MSSQL =
+    "select [Code] from [TestInstanceShared] where [TestInstanceId] = <%= instance_id %> order by Id desc";
+
+const SHARED_INSTANCE_BY_INSTID_MYSQL =
+    "select `Code` from `TestInstanceShared` where `TestInstanceId` = <%= instance_id %> order by Id desc";
+
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
@@ -355,6 +361,25 @@ const DbTest = class DbTest extends DbObject {
         let newId;
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
 
+        let test_instance = await this.getTestInstance(instanceId, opts);
+        if (!test_instance.IsFinished)
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Test isn't finished yet.`);
+
+        let shared_code = null;
+        if (!test_instance.IsLocal) {
+            let result = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SHARED_INSTANCE_BY_INSTID_MYSQL)({ instance_id: test_instance.Id }),
+                    mssql: _.template(SHARED_INSTANCE_BY_INSTID_MSSQL)({ instance_id: test_instance.Id })
+                }
+            }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0))
+                shared_code = result.detail[0].Code;
+        }
+
+        if (shared_code)
+            return { Id: shared_code };
+
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
                 resolve(this._getObjById(-1, SHARED_REQ_TREE, dbOpts));
@@ -362,10 +387,6 @@ const DbTest = class DbTest extends DbObject {
                 .then(async (result) => {
                     root_obj = result;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-
-                    let test_instance = await this.getTestInstance(instanceId, opts);
-                    if (!test_instance.IsFinished)
-                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Test isn't finished yet.`);
 
                     await root_obj.edit();
                     let newHandler = await root_obj.newObject({
@@ -379,7 +400,7 @@ const DbTest = class DbTest extends DbObject {
                     newId = newHandler.keyValue;
                     sharedObj = this._db.getObj(newHandler.newObject);
 
-                    let shared_code = DbUtils.intFmtWithLeadingZeros(newId, NUM_PART_LENGTH) + "-" + randomstring.generate(RND_PART_LENGTH);
+                    shared_code = DbUtils.intFmtWithLeadingZeros(newId, NUM_PART_LENGTH) + "-" + randomstring.generate(RND_PART_LENGTH);
                     sharedObj.code(shared_code);
 
                     let base_path = path.join(config.uploadPath, config.has('knowledge_testing.imgDir') ?
