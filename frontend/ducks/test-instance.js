@@ -291,27 +291,13 @@ function* getTestInstanceSaga(data) {
         _instance = yield select(testInstanceSelector),
         _user = yield select(state => state.user)
 
-    console.log(_user)
-
     if (!_user.user && _user.loading) {
-
-        console.log(_user)
-
         yield take(USER_HAS_BEEN_LOADED)
-
-        console.log(_user)
     }
-
-    console.log(_user)
 
     _user = yield select(state => state.user)
 
-    console.log(_user)
-
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
-
-        console.log(_instance)
-
         yield loadTestData(_instance.TestId)
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })
         return
@@ -326,21 +312,14 @@ function* getTestInstanceSaga(data) {
     try {
         const _instance = yield call(_fetchGetInstanceTest, data.payload)
 
-        console.log(_instance)
-
         if (!!_user.user && (_instance.UserId === _user.user.Id)) {
-
-            console.log(_instance)
-
             yield put(getTest(_instance.TestId))
             yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
         } else {
-
-            console.log(_instance)
-
             yield loadTestData(_instance.TestId)
             yield put(clearInstance())
-            const _test = select(testSelector)
+            const _test = yield select(testSelector)
+
             yield put(push(`/test/${_test.URL}`))
         }
 

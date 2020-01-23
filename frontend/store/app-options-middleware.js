@@ -1,4 +1,4 @@
-import {SIGN_IN_SUCCESS, WHO_AM_I_SUCCESS, LOGOUT_SUCCESS} from "../constants/user";
+import {SIGN_IN_SUCCESS, WHO_AM_I_SUCCESS, WHO_AM_I_FAIL, LOGOUT_SUCCESS} from "../constants/user";
 import {calcBillingEnable, reloadCurrentPage} from "ducks/app";
 import {getUserProfile,} from "ducks/profile";
 import {store} from './configureStore';
@@ -22,6 +22,20 @@ const AppOptionsMiddleware = store => next => action => {
             if (!_authorizedOld && _authorizedNew) {
                 dispatchLoadUserProfile()
             }
+
+            if (_userLoadingOld && !_userLoadingNew) {
+                dispatchNotifyUserHasBeenLoaded()
+            }
+
+            return result
+        }
+
+        case WHO_AM_I_FAIL: {
+            const _userLoadingOld = !!store.getState().user.loading
+
+            let result = next(action)
+
+            const _userLoadingNew = !!store.getState().user.loading
 
             if (_userLoadingOld && !_userLoadingNew) {
                 dispatchNotifyUserHasBeenLoaded()

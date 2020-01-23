@@ -117,15 +117,11 @@ function* getShareResultSaga(data) {
     try {
         const _result = yield call(_fetchGetTestResult, data.payload)
 
-        console.log(_result.TestId)
-
         if (_result.TestId) {
             yield loadTestData(_result.TestId)
         } else {
             yield put({ type: RESULT_NOT_FOUND })
         }
-
-        console.log(_result.TestId)
 
         yield put({type: GET_RESULT_SUCCESS, payload: _result})
     } catch (e) {

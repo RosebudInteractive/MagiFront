@@ -120,9 +120,6 @@ export const saga = function* () {
 }
 
 function* getTestSaga(data) {
-
-    console.log(data)
-
     let _time = yield select(successTimeSelector),
         _test = yield select(testSelector),
         _sameTest = (typeof data.payload === "number") ?
@@ -130,14 +127,10 @@ function* getTestSaga(data) {
             :
             _test.URL === data.payload
 
-    console.log(_test)
-
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && _sameTest) {
         yield put({type: GET_TEST_COMPLETED})
         return
     }
-
-    console.log(_test)
 
     yield put({type: GET_TEST_START})
 
@@ -179,8 +172,6 @@ function _fetchTest(url) {
 }
 
 export function* loadTestData(testId) {
-
-    console.log(testId)
 
     yield put(getTest(+testId))
 
