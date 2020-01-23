@@ -8,6 +8,8 @@ import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
 import {getShareResult, shareResultSelector, loadingSelector, loadedSelector, notFoundSelector} from "ducks/test-share-result";
 import NotFoundPage from "../not-found";
+import {setShareUrl} from "ducks/test-instance";
+import {testSelector} from "ducks/test";
 
 
 class TestResultSharePage extends React.Component{
@@ -35,6 +37,8 @@ class TestResultSharePage extends React.Component{
         if (this.state.redirect && !window.prerenderEnable) {
             const {ownProps, notFound} = this.props,
                 _url = this._getRedirectUrl() + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
+
+            this._setShareUrl()
             
             return notFound ? <NotFoundPage/> : <Redirect to={_url}/>
         } else {
@@ -116,10 +120,19 @@ class TestResultSharePage extends React.Component{
     }
 
     _getRedirectUrl() {
-        let {user, shareInfo,resultLoaded} = this.props,
+        let {user, shareInfo, resultLoaded, test} = this.props,
             _testOwnCurrentUser = !!user && resultLoaded && (user.Id === shareInfo.UserId)
 
-        return _testOwnCurrentUser ? `/test-instance/${shareInfo.TestInstanceId}` : `/test/${shareInfo.TestId}`
+        return _testOwnCurrentUser ? `/test-instance/${shareInfo.TestInstanceId}` : `/test/${test.URL}`
+    }
+
+    _setShareUrl() {
+        let {user, shareInfo, resultLoaded} = this.props,
+            _testOwnCurrentUser = !!user && resultLoaded && (user.Id === shareInfo.UserId)
+
+        if (_testOwnCurrentUser) {
+            this.props.setShareUrl(`${getDomain()}/test-result/${this.props.shareCode}`)
+        }
     }
 }
 
@@ -131,13 +144,14 @@ const mapStateToProps = (state, ownProps) => {
         fetching: loadingSelector(state),
         resultLoaded: loadedSelector(state),
         notFound: notFoundSelector(state),
+        test: testSelector(state),
         user: state.user.user,
         ownProps: ownProps
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({getShareResult}, dispatch)
+    return bindActionCreators({getShareResult, setShareUrl}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TestResultSharePage)

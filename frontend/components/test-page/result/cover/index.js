@@ -2,10 +2,16 @@ import React from 'react'
 import {bindActionCreators} from 'redux';
 import './cover.sass'
 import {testSelector} from "ducks/test";
-// import {testResultSelector} from "ducks/test-result";
 import {connect} from "react-redux";
 import {SocialBlock} from "../../social-block";
-import {createNewTestInstance, getShareLink, testInstanceSelector} from "ducks/test-instance";
+import {
+    testInstanceSelector,
+    shareUrlSelector,
+    urlCreatedSelector,
+    createNewTestInstance,
+    getShareLink,
+    setShareUrl,
+} from "ducks/test-instance";
 import {getDomain} from "tools/page-tools";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
@@ -17,7 +23,7 @@ class Cover extends React.Component {
     }
 
     render() {
-        const {test, result} = this.props,
+        const {test, result, urlCreated, shareUrl} = this.props,
             _coverUrl = test.Cover
 
         if (typeof test.CoverMeta === "string") {
@@ -63,7 +69,7 @@ class Cover extends React.Component {
 
                 <div className="social-block__title">Поделится результатом с друзьями</div>
                 <div className="social-block__wrapper">
-                    <SocialBlock beforeOnClick={::this._beforeOnClick}/>
+                    <SocialBlock beforeOnClick={::this._beforeOnClick} shareUrl={urlCreated ? shareUrl : null} urlCreated={urlCreated}/>
                     <div className="reinit-button" onClick={::this._createInstance}>
                         <span>
                             <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
@@ -83,8 +89,9 @@ class Cover extends React.Component {
         return new Promise((resolve, reject) => {
             getShareLink(this.props.result.Id)
                 .then((data) => {
-                    socialBlock.setUrl(`${getDomain()}/test-result/${data.Id}`, button)
-                    reject()
+                    socialBlock.doBeforeSetUrl(button)
+                    this.props.setShareUrl(`${getDomain()}/test-result/${data.Id}`)
+                    // reject()
                 })
                 .catch((e) => {
                     console.error(e)
@@ -96,12 +103,14 @@ class Cover extends React.Component {
 const mapStateToProps = (state) => {
     return {
         test: testSelector(state),
-        result: testInstanceSelector(state)
+        result: testInstanceSelector(state),
+        shareUrl: shareUrlSelector(state),
+        urlCreated: urlCreatedSelector(state),
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({createNewTestInstance}, dispatch)
+    return bindActionCreators({createNewTestInstance, setShareUrl}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cover)

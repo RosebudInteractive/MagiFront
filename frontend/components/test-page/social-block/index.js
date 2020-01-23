@@ -10,6 +10,7 @@ export class SocialBlock extends React.Component {
         counter: PropTypes.object,
         shareUrl: PropTypes.string,
         beforeOnClick: PropTypes.func,
+        urlCreated: PropTypes.bool,
     }
 
     constructor(props) {
@@ -26,19 +27,17 @@ export class SocialBlock extends React.Component {
         }
     }
 
-    setUrl(url, button) {
+    doBeforeSetUrl(button) {
         for (let prop in button) {
             if (button.hasOwnProperty(prop) && prop.startsWith("__reactEventHandlers")) {
                 this.clickFunk = button[prop].onClick;
                 break
             }
         }
-
-        this.setState({urlCreated: true, shareUrl: url})
     }
 
-    componentDidUpdate(props, prevState) {
-        if (this.state.urlCreated && !prevState.urlCreated) {
+    componentDidUpdate(prevProps,) {
+        if (this.props.urlCreated && !prevProps.urlCreated) {
             if (this.clickFunk) {
                 this.clickFunk(new MouseEvent("click", {}));
                 this.clickFunk = null
@@ -47,18 +46,21 @@ export class SocialBlock extends React.Component {
     }
 
     render() {
-        let {title, counter} = this.props;
+        let {title, counter, shareUrl, urlCreated} = this.props,
+            _shareUrl = shareUrl ? shareUrl : window.location.href
 
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
 
+
+
         return (
             <div className="social-block social-block--dark">
                 <div className='social-button-wrapper' ref={this.setFbRef}>
-                    <FacebookShareButton url={this.state.shareUrl} quote={title} className="social-btn _active"
-                                         beforeOnClick={!this.state.urlCreated ? () => this._beforeOnClick(this.fbButton) : null}>
+                    <FacebookShareButton url={_shareUrl} quote={title} className="social-btn _active"
+                                         beforeOnClick={!urlCreated ? () => this._beforeOnClick(this.fbButton) : null}>
                         <div className="social-btn__icon">
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
@@ -67,8 +69,8 @@ export class SocialBlock extends React.Component {
                     </FacebookShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setVkRef}>
-                    <VKShareButton url={this.state.shareUrl} className="social-btn _active"
-                                   beforeOnClick={!this.state.urlCreated ? () => this._beforeOnClick(this.vkButton) : null}>
+                    <VKShareButton url={_shareUrl} className="social-btn _active"
+                                   beforeOnClick={!urlCreated ? () => this._beforeOnClick(this.vkButton) : null}>
                         <div className="social-btn__icon">
                             <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
@@ -77,8 +79,8 @@ export class SocialBlock extends React.Component {
                     </VKShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setOkRef}>
-                    <OKShareButton url={this.state.shareUrl} className="social-btn _active"
-                                   beforeOnClick={!this.state.urlCreated ? () => this._beforeOnClick(this.okButton) : null}>
+                    <OKShareButton url={_shareUrl} className="social-btn _active"
+                                   beforeOnClick={!urlCreated ? () => this._beforeOnClick(this.okButton) : null}>
                         <div className="social-btn__icon">
                             <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                         </div>
@@ -87,8 +89,8 @@ export class SocialBlock extends React.Component {
                     </OKShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setTwRef}>
-                    <TwitterShareButton url={this.state.shareUrl} title={title} className="social-btn"
-                                        beforeOnClick={!this.state.urlCreated ? () => this._beforeOnClick(this.twButton) : null}>
+                    <TwitterShareButton url={_shareUrl} title={title} className="social-btn"
+                                        beforeOnClick={!urlCreated ? () => this._beforeOnClick(this.twButton) : null}>
                         <div className="social-btn__icon">
                             <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
                         </div>

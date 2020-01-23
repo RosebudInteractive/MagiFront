@@ -1,7 +1,7 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
-import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
+import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {getLessonsAll} from "ducks/lesson-menu";
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
@@ -77,6 +77,11 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('loaded', true)
 
+        case GET_TEST_COMPLETED:
+            return state
+                .set('loading', false)
+                .set('loaded', true)
+
         case TEST_NOT_FOUND:
             return state
                 .set('loading', false)
@@ -115,13 +120,24 @@ export const saga = function* () {
 }
 
 function* getTestSaga(data) {
-    // let _time = yield select(successTimeSelector),
-    //     _test = yield select(testSelector)
 
-    // if (!!_test && !!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
-    //     yield put({type: GET_TEST_COMPLETED})
-    //     return
-    // }
+    console.log(data)
+
+    let _time = yield select(successTimeSelector),
+        _test = yield select(testSelector),
+        _sameTest = (typeof data.payload === "number") ?
+            _test.Id === data.payload
+            :
+            _test.URL === data.payload
+
+    console.log(_test)
+
+    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && _sameTest) {
+        yield put({type: GET_TEST_COMPLETED})
+        return
+    }
+
+    console.log(_test)
 
     yield put({type: GET_TEST_START})
 
@@ -133,6 +149,9 @@ function* getTestSaga(data) {
         yield put({type: GET_TEST_SUCCESS, payload: _test})
         yield put({type: GET_TEST_COMPLETED})
     } catch (e) {
+
+        console.log(JSON.stringify(e))
+
         if (e.status && (e.status === 404)) {
             yield put({ type: TEST_NOT_FOUND })
         } else {
@@ -157,4 +176,20 @@ function _fetchTest(url) {
 
             return data
         })
+}
+
+export function* loadTestData(testId) {
+
+    console.log(testId)
+
+    yield put(getTest(+testId))
+
+    const {success} = yield race({
+        success: take(GET_TEST_COMPLETED),
+        error: take(GET_TEST_FAIL)
+    })
+
+    if (!success) {
+        throw new Error("Test loading error")
+    }
 }

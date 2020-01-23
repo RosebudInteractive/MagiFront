@@ -14,8 +14,21 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 // import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
-import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest, notFoundSelector} from "ducks/test";
-import {testInstanceSelector, loadingSelector as testInstanceLoading, getTestInstance, blockedSelector as testInstanceBlockedSelector} from "ducks/test-instance";
+import {
+    testSelector,
+    loadingSelector as testLoading,
+    loadedSelector as testLoaded,
+    notFoundSelector as testNotFound,
+    getTest,
+} from "ducks/test";
+import {
+    testInstanceSelector,
+    loadingSelector as testInstanceLoading,
+    blockedSelector as testInstanceBlockedSelector,
+    notFoundSelector as instanceNotFound,
+    getTestInstance,
+    clearInstance,
+} from "ducks/test-instance";
 import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
@@ -110,6 +123,7 @@ class TestPage extends React.Component {
         if ((_currentType !== _nextType) || (this.props.testUrl !== nextProps.testUrl)) {
             switch (_nextType) {
                 case TEST_PAGE_TYPE.TEST: {
+                    this._clearLocalInstance();
                     this.props.getTest(nextProps.testUrl)
                     return
                 }
@@ -157,7 +171,11 @@ class TestPage extends React.Component {
         TestPage._removeMetaTags();
         this.props.clearCurrentPage();
         this._removeEventListeners();
+
+        this._clearLocalInstance();
     }
+
+
 
     render() {
         let {fetching, notFound, test, testLoaded,} = this.props,
@@ -165,7 +183,7 @@ class TestPage extends React.Component {
                 (this.state.isMobile ? " _mobile" : " _desktop") +
                 (this._getPageType(this.props) === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
-        return fetching || !testLoaded ?
+        return (fetching || !testLoaded) && !notFound ?
             <LoadingFrame extClass={"test-page"}/>
             :
             notFound ?
@@ -203,7 +221,7 @@ class TestPage extends React.Component {
     }
 
     _getPageType(props) {
-        return (props.type === TEST_PAGE_TYPE.INSTANCE) || ((props.type === TEST_PAGE_TYPE.TEST) && (props.testInstance.TestId === props.test.Id) && props.testInstance.IsLocal) ?
+        return (props.type === TEST_PAGE_TYPE.INSTANCE) || ((props.type === TEST_PAGE_TYPE.TEST) && (props.testUrl === props.test.URL) && (props.testInstance.TestId === props.test.Id) && props.testInstance.IsLocal) ?
             props.testInstance.IsFinished ? TEST_PAGE_TYPE.RESULT : TEST_PAGE_TYPE.INSTANCE
             :
             TEST_PAGE_TYPE.TEST
@@ -325,6 +343,13 @@ class TestPage extends React.Component {
     _getWidth() {
         return this.state.isMobile ? Mobile.getLandscapeWidth() : Desktop.getLandscapeWidth()
     }
+
+    _clearLocalInstance() {
+        const {testInstance} = this.props
+        if (testInstance && testInstance.Id && testInstance.IsLocal) {
+            this.props.clearInstance()
+        }
+    }
 }
 
 function mapStateToProps(state, ownProps) {
@@ -341,7 +366,7 @@ function mapStateToProps(state, ownProps) {
         testInstance: testInstanceSelector(state),
         instanceBlocked: testInstanceBlockedSelector(state),
         testLoaded: testLoaded(state),
-        notFound: notFoundSelector(state),
+        notFound: testNotFound(state) || instanceNotFound(state),
     }
 }
 
@@ -349,6 +374,7 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({
         getTest,
         getTestInstance,
+        clearInstance,
         getTestResult,
         whoAmI,
         refreshStorage,
