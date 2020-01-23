@@ -3,12 +3,11 @@ import {createSelector} from 'reselect'
 import {Map, Record,} from 'immutable'
 import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
-import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/test";
+import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, loadTestData, testSelector} from "ducks/test";
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 import {isAnswerCorrect} from "tools/tests-tools";
-import {LOGOUT_SUCCESS,} from "../constants/user";
-import {GET_USER_INFO_REQUEST} from "ducks/profile";
+import {LOGOUT_SUCCESS, USER_HAS_BEEN_LOADED} from "../constants/user";
 
 /**
  * Constants
@@ -294,22 +293,32 @@ function* getTestInstanceSaga(data) {
 
     console.log(_user)
 
-    if (_user.loading) {
-        yield take(GET_USER_INFO_REQUEST)
+    if (!_user.user && _user.loading) {
+
+        console.log(_user)
+
+        yield take(USER_HAS_BEEN_LOADED)
+
+        console.log(_user)
     }
 
+    console.log(_user)
+
     _user = yield select(state => state.user)
+
     console.log(_user)
 
     if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === +data.payload) {
+
+        console.log(_instance)
+
+        yield loadTestData(_instance.TestId)
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })
         return
     }
 
     if (!!_instance.Id && _instance.Id !== +data.payload) {
         yield put(clearShareUrl())
-        
-        console.log("clear  ")
     }
 
     yield put({ type: GET_TEST_INSTANCE_START })
@@ -317,15 +326,28 @@ function* getTestInstanceSaga(data) {
     try {
         const _instance = yield call(_fetchGetInstanceTest, data.payload)
 
+        console.log(_instance)
+
         if (!!_user.user && (_instance.UserId === _user.user.Id)) {
+
+            console.log(_instance)
+
             yield put(getTest(_instance.TestId))
             yield put({type: GET_TEST_INSTANCE_SUCCESS, payload: _instance})
         } else {
+
+            console.log(_instance)
+
+            yield loadTestData(_instance.TestId)
             yield put(clearInstance())
-            yield put(push(`/test/${_instance.TestId}`))
+            const _test = select(testSelector)
+            yield put(push(`/test/${_test.URL}`))
         }
 
     } catch (e) {
+
+        console.log(e)
+
         if (e.status && (e.status === 404)) {
             yield put({ type: INSTANCE_NOT_FOUND })
         } else {

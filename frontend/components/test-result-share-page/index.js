@@ -9,6 +9,7 @@ import {facebookAppIdSelector} from "ducks/app";
 import {getShareResult, shareResultSelector, loadingSelector, loadedSelector, notFoundSelector} from "ducks/test-share-result";
 import NotFoundPage from "../not-found";
 import {setShareUrl} from "ducks/test-instance";
+import {testSelector} from "ducks/test";
 
 
 class TestResultSharePage extends React.Component{
@@ -119,10 +120,10 @@ class TestResultSharePage extends React.Component{
     }
 
     _getRedirectUrl() {
-        let {user, shareInfo, resultLoaded} = this.props,
+        let {user, shareInfo, resultLoaded, test} = this.props,
             _testOwnCurrentUser = !!user && resultLoaded && (user.Id === shareInfo.UserId)
 
-        return _testOwnCurrentUser ? `/test-instance/${shareInfo.TestInstanceId}` : `/test/${shareInfo.TestId}`
+        return _testOwnCurrentUser ? `/test-instance/${shareInfo.TestInstanceId}` : `/test/${test.URL}`
     }
 
     _setShareUrl() {
@@ -143,6 +144,7 @@ const mapStateToProps = (state, ownProps) => {
         fetching: loadingSelector(state),
         resultLoaded: loadedSelector(state),
         notFound: notFoundSelector(state),
+        test: testSelector(state),
         user: state.user.user,
         ownProps: ownProps
     }
