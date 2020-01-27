@@ -22,13 +22,27 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getNotSentTrans(req.user.Id)
+                .getNotSentTrans(req.user.Id, false)
                 .then(rows => {
                     res.send(rows);
                 })
                 .catch(err => {
                     next(err);
                 });
+    });
+
+    app.get('/api/users/not-sent-trans-src', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().getNotSentTrans(req.user.Id, true);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     app.post('/api/users/send-trans', (req, res, next) => {
@@ -43,6 +57,34 @@ function setupUsers(app) {
                 .catch(err => {
                     next(err);
                 });
+    });
+
+    app.post('/api/users/send-tran-src', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().markTransSrcAsSent(req.user.Id, req.body);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);            
+        }
+    });
+
+    app.get('/api/users/send-tran-src', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().markTransSrcAsSent(req.user.Id, req.query);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     app.get('/api/users/invoice', (req, res, next) => {
