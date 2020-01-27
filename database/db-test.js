@@ -209,7 +209,7 @@ const TEST_BY_COURSE_MYSQL =
     "  t.`URL`, q.`AnswTime`\n" +
     "from `Test` t\n" +
     "  join `Question` q on q.`TestId` = t.`Id`\n" +
-    "where t.`CourseId` = <%= course_id %>\n" +
+    "where (t.`CourseId` = <%= course_id %>) and (t.`Status` = 2)\n" +
     "order by t.`Id`";
 
 const INST_BY_COURSE_MYSQL =
