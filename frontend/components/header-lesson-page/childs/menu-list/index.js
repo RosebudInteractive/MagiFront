@@ -16,13 +16,19 @@ import TestItem from "./test-item";
 class LessonsListWrapper extends React.Component {
     static propTypes = {
         isDark: PropTypes.bool,
+        lesson: PropTypes.object,
+        test: PropTypes.object,
     };
 
     constructor(props) {
         super(props);
+
+        this._calcActiveObject(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
+        this._calcActiveObject(nextProps)
+
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
             OverflowHandler.rememberScrollPos()
         }
@@ -32,7 +38,8 @@ class LessonsListWrapper extends React.Component {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
             OverflowHandler.turnOn()
 
-            let _control = $("#lesson-" + this.props.active);
+            let _selector = this._isLessonActive ? `#lesson-${this._activeLessonId}` : `#test-${this._activeTestId}`,
+                _control = $(_selector);
             if (_control.length > 0) {
                 let _list = $(".lectures-list-wrapper"),
                     _listCurrentScrollPosition = _list.scrollTop(),
@@ -59,16 +66,26 @@ class LessonsListWrapper extends React.Component {
     render() {
         return <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
             <ol className="lectures-list">
-                <TestItem test={this._getStartedTest()}/>
+                <TestItem test={this._getStartedTest()} activeTestId={this._activeTestId ? this._activeTestId : null}/>
                 {this._getLessonsList()}
-                <TestItem test={this._getFinishedTest()}/>
+                <TestItem test={this._getFinishedTest()} activeTestId={this._activeTestId ? this._activeTestId : null}/>
                 {this._getOtherTests()}
             </ol>
         </div>
     }
 
+    _calcActiveObject(props) {
+        const {test, lesson} = props
+
+        this._isLessonActive = !!lesson
+        this._activeLessonId = lesson ? lesson.Id : null
+
+        this._isTestActive = !!test
+        this._activeTestId = test ? test.Id : null
+    }
+
     _getLessonsList() {
-        const {lessons, authors, course, userPaidCourses} = this.props;
+        const {lessons, authors, course, userPaidCourses, lesson: current} = this.props;
 
         let _needShowAuthor = (authors && (authors.length > 1)),
             _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
@@ -86,7 +103,9 @@ class LessonsListWrapper extends React.Component {
 
             return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index}
                              isPaidCourse={_isPaidCourse}
-                             onLinkClick={this.props.notifyLessonLinkClicked}/>
+                             onLinkClick={this.props.notifyLessonLinkClicked}
+                             active={this._isLessonActive ? this._activeLessonId : null}
+                             activeTestId={this._isTestActive ? this._activeTestId : null}/>
         });
     }
 
@@ -104,9 +123,9 @@ class LessonsListWrapper extends React.Component {
         return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
             this.props.course.Tests
                 .filter((item) => {
-                    return ((item.TestTypeId !== TEST_TYPE.FINISHED) || (item.TestTypeId !== TEST_TYPE.STARTED))
+                    return ((item.TestTypeId !== TEST_TYPE.FINISHED) && (item.TestTypeId !== TEST_TYPE.STARTED))
                 })
-                .map(item => <TestItem test={item}/>)
+                .map(item => <TestItem test={item} activeTestId={this._activeTestId ? this._activeTestId : null}/>)
     }
 }
 

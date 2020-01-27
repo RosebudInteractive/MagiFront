@@ -17,7 +17,7 @@ import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as userActions from "../actions/user-actions";
 
-import {getDomain, pages} from '../tools/page-tools';
+import {pages} from '../tools/page-tools';
 import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";

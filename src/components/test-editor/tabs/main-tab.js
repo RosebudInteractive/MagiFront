@@ -44,15 +44,15 @@ class MainTab extends React.Component {
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <Field component={Select} name="courseId" label="Курс" options={this._getCourses()} placeholder="Выберите курс" disabled={true}/>
-            <Field component={Select} name="lessonId" label="Урок" placeholder="Выберите урок" options={this._getLessons()} disabled={_disabled}/>
+            <Field component={Select} name="lessonId" label="Лекция" placeholder="Выберите лекцию" options={this._getLessons()} disabled={_disabled}/>
             <Field component={TextBox} name="name" label="Название" placeholder="Введите название" disabled={_disabled}/>
             <Field component={TextBox} name="URL" label="URL" placeholder="Введите URL" disabled={_disabled}/>
             <Field component={CheckBox} name="isAuthRequired" label="Требуется авторизация" disabled={_disabled}/>
             <Field component={Select} name="testTypeId" label="Вид теста" placeholder="Выберите вид теста" options={this._getTestTypes()} disabled={_disabled}/>
-            <Field component={Select} name="method" label="Принцип тестирования" placeholder="Выберите способ тестирования" options={METHODS} disabled={_disabled}/>
+            <Field component={Select} name="method" label="Способ отображения вопросов" placeholder="Выберите способ" options={METHODS} disabled={_disabled}/>
             <Field component={Select} name="status" label="Статус" placeholder="Укажите статус" options={STATUS} disabled={_disabled}/>
             <Field component={TextBox} name="maxQ" label="Количество вопросов" placeholder="Выберите максимальное количество вопросов" disabled={_disabled}/>
-            <Field component={RadioBox} name="fromLesson" label="Брать вопросы из эпизодов" options={RADIO_BOX_VALUES} disabled={_disabled}/>
+            <Field component={RadioBox} name="fromLesson" label="Брать вопросы из лекций" options={RADIO_BOX_VALUES} disabled={_disabled}/>
             <Field component={RadioBox} name="isTimeLimited" label="Ограничивать по времени" options={RADIO_BOX_VALUES} disabled={_disabled}/>
             <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
         </div>

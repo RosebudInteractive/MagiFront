@@ -573,13 +573,14 @@ html,
     opacity: 0.6;
 }
 
-.app .dlg .dlg-window {
+.dlg .dlg-window {
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
     background: #fff;
     top: 50%;
     width: auto;
+    min-width: 20%;
 }
 
 .grid_container {

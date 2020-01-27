@@ -39,10 +39,12 @@ class AnswerGrid extends React.Component {
 
     componentDidMount() {
         this._setObjectsRank(this.props.input.value)
+        this.forceUpdate()
     }
 
     render() {
-        const {meta: {error, touched}} = this.props;
+        const {meta: {error, touched}} = this.props,
+            _data = this._getAnswers()
 
         const _errorText = touched && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
@@ -55,8 +57,9 @@ class AnswerGrid extends React.Component {
                          moveDownAction={::this._moveDown}
                          editMode={this.props.editMode}
                          selected={this._selected}
-                         data={this.props.input.value}
-                         disabled={!this.props.enableButtons}/>
+                         data={_data}
+                         disabled={!this.props.enableButtons}
+                         onDataUpdate={::this._updateByGrid}/>
             {
                 this.state.showDialog ?
                     <AnswerForm cancel={::this._cancel}
@@ -73,6 +76,10 @@ class AnswerGrid extends React.Component {
             {_errorText}
         </div>
 
+    }
+
+    _getAnswers() {
+        return this.props.input.value.map(item => Object.assign({}, item))
     }
 
     _isFirstEdit() {
@@ -239,10 +246,28 @@ class AnswerGrid extends React.Component {
             }
         })
     }
+
+    _updateByGrid(data) {
+        this._update(data)
+        this.props.touch('QuestionEditor', 'Answers')
+    }
 }
 
 
 class AnswersGrid extends GridControl {
+
+    getUI() {
+        let _gui = super.getUI();
+
+        _gui.on.onDataUpdate = (id, data) => {
+            if (this.props.onDataUpdate) {
+                data.IsCorrect = !!data.IsCorrect
+                this.props.onDataUpdate(data)
+            }
+        }
+
+        return _gui;
+    }
 
     _getId() {
         return 'question-answers';
@@ -252,7 +277,7 @@ class AnswersGrid extends GridControl {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
             {id: 'Text', header: 'Текст ответа', fillspace: true},
-            {id: 'IsCorrect', header: 'Правильный', width: 110, css: "center", template: "{common.checkbox()}"},
+            {id: 'IsCorrect', header: 'Правильный', width: 110, css: "center", template: "{common.checkbox()}",}
         ];
 
         _columns.push(...super._getColumns());
