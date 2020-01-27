@@ -6,7 +6,8 @@ import TestItem from "../test-item";
 export default class LessonTests extends React.Component {
 
     static propTypes = {
-        tests: PropTypes.array
+        tests: PropTypes.array,
+        activeTestId: PropTypes.number,
     }
 
     render() {
@@ -28,7 +29,7 @@ export default class LessonTests extends React.Component {
                 return +b.TestTypeId - +a.TestTypeId
             })
             .map((item) => {
-                return <TestItem test={item}/>
+                return <TestItem test={item} activeTestId={this.props.activeTestId}/>
             })
     }
 

@@ -4,25 +4,26 @@ import {Link} from "react-router-dom";
 import "./test-item.sass"
 import {getCountMinutesTitle} from "tools/word-tools";
 
-
 export default class TestItem extends React.Component {
 
     static propTypes = {
-        test: PropTypes.object
+        test: PropTypes.object,
+        activeTestId: PropTypes.number
     }
 
     render() {
-        const {test} = this.props
+        const {test, activeTestId} = this.props
 
         if (!test) return null
 
         const COMPLETE_STATUS = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>'
 
         const _estimatedTime = test ? this._getEstimatedTime() : 0,
-            _url = test.Instance ? `/test-instance/${test.Instance.URL}` : `/test/${test.URL}`
+            _url = test.Instance ? `/test-instance/${test.Instance.URL}` : `/test/${test.URL}`,
+            _isActive = activeTestId && (activeTestId === test.Id)
 
         return test ?
-            <Link to={_url} className="lectures-list__test">
+            <Link to={_url} className={"lectures-list__test" + (_isActive ? ' active' : '')} id={'test-' + test.Id}>
                 <div className={"test__complete-status " + this._getColor(test)}>
                     <svg width="18" height="18"
                          dangerouslySetInnerHTML={{__html: COMPLETE_STATUS}}/>

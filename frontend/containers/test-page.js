@@ -11,7 +11,6 @@ import {getDomain, getPageUrl, isMobilePlatform, pages} from "tools/page-tools";
 import {refreshState as refreshStorage} from "actions/lesson-info-storage-actions";
 import {whoAmI} from "actions/user-actions";
 import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
-// import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import {
@@ -156,15 +155,10 @@ class TestPage extends React.Component {
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
-            this._resizeHandler();
+            // this._resizeHandler();
         }
 
-        let _currentType = this._getPageType(this.props),
-            _prevType = this._getPageType(prevProps)
-
-        if ((_currentType !== _prevType) && (_currentType === TEST_PAGE_TYPE.RESULT)) {
-            this._resizeHandler()
-        }
+        this._resizeHandler()
     }
 
     componentWillUnmount() {
@@ -354,7 +348,6 @@ class TestPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        courseUrl: ownProps.match.params.courseUrl,
         testUrl: ownProps.match.params.testUrl,
         facebookAppID: facebookAppIdSelector(state),
         fetching: testLoading(state) ||

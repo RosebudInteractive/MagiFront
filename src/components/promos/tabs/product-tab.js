@@ -3,6 +3,7 @@ import {Field,} from 'redux-form'
 import PropTypes from "prop-types";
 // import {connect} from "react-redux";
 import ProductGrid from "../product-grid";
+import './product-tab.sass'
 
 export default class ProductTab extends React.Component {
 

@@ -9,11 +9,11 @@ import AnswerGrid from "../grids/answers";
 import {bindActionCreators} from "redux";
 
 const ANSWER_TYPES = [
-        {id: 1, value: 'Число'},
+        // {id: 1, value: 'Число'},
         {id: 2, value: 'Да/Нет'},
         {id: 3, value: '1 из многих'},
         {id: 4, value: 'N из многих'},
-        {id: 5, value: 'Текст'},
+        // {id: 5, value: 'Текст'},
     ],
     RADIO_BOX_VALUES = [
         {value: 1, text: "Да"},
