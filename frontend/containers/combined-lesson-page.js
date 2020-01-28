@@ -357,7 +357,14 @@ class CombineLessonPage extends React.Component {
             let _hasSubLessons = _lesson.Childs && (_lesson.Childs.length > 0)
             if (_hasSubLessons) {
                 _lesson.Childs.forEach(sublesson => {
-                    sublesson.Author = Object.assign({}, _lesson.Author)
+                    if (!sublesson.Author) {
+                        sublesson.Author = Object.assign({}, _lesson.Author)
+                    }
+
+                    if (!sublesson.Course) {
+                        sublesson.Course = {}
+                        sublesson.Course.Name = _lesson.Course.Name
+                    }
                 })
             }
         }
