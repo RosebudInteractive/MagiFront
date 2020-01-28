@@ -204,7 +204,7 @@ exports.CacheableObject = class CacheableObject {
 
     cacheHgetAll(key, options) {
         return new Promise(resolve => {
-            let rc = {};
+            let rc = null;
             let opts = options || {};
             let id = opts.isInternal ? key : this.cacheGetKey(key);
             if (this._isRedis) {
@@ -223,13 +223,16 @@ exports.CacheableObject = class CacheableObject {
                         });
                 }).bind(this));
             }
+            else {
+                rc = this._cache[id];
+            }
             resolve(rc);
         });
     }
 
     cacheHset(hKey, key, data, options) {
         return new Promise(resolve => {
-            let rc = {};
+            let rc = null;
             let opts = options || {};
             let id = opts.isInternal ? hKey : this.cacheGetKey(hKey);
             if (this._isRedis) {
@@ -239,6 +242,11 @@ exports.CacheableObject = class CacheableObject {
                             return;
                         });
                 }).bind(this));
+            }
+            else {
+                if (!this._cache[id])
+                    this._cache[id] = {};
+                this._cache[id][key] = _.cloneDeep(data);
             }
             resolve(rc);
         });
