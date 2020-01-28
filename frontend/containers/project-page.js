@@ -4,6 +4,8 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {notifyAnalyticsChangePage} from "ducks/app";
+import {setCurrentPage} from "actions/page-header-actions";
+import {pages} from "tools/page-tools";
 
 const TITLE = "Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом. Отличная помощь студентам, продвинутым старшеклассникам и всем людям с культурными запросами. Зачерпни знания у источника!"
 
@@ -11,11 +13,13 @@ class ProjectPage extends React.Component {
 
     componentWillMount() {
         window.scrollTo(0, 0)
+        this.props.setCurrentPage(pages.about)
     }
+
 
     componentDidMount() {
         document.title = TITLE
-        this.props.changePage(this.props.ownProps.location.pathname)
+        this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
     }
 
     componentWillUnmount() {
@@ -102,7 +106,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({changePage: notifyAnalyticsChangePage}, dispatch)
+    return bindActionCreators({notifyAnalyticsChangePage, setCurrentPage}, dispatch)
 }
 
 

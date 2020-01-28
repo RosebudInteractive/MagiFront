@@ -157,7 +157,7 @@ class TestPage extends React.Component {
             ScrollMemoryStorage.scrollPage(_key)
             // this._resizeHandler();
 
-            this.props.changePage(this.props.ownProps.location.pathname)
+            this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
 
         this._resizeHandler()
@@ -377,7 +377,7 @@ function mapDispatchToProps(dispatch) {
         headerSetPage,
         setCurrentPage,
         clearCurrentPage,
-        changePage: notifyAnalyticsChangePage,
+        notifyAnalyticsChangePage ,
     }, dispatch)
 }
 

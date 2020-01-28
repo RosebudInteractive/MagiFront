@@ -43,7 +43,7 @@ class AuthorPage extends React.Component {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
 
-            this.props.changePage(this.props.ownProps.location.pathname)
+            this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -165,7 +165,7 @@ function mapDispatchToProps(dispatch) {
         getAuthor: bindActionCreators(getAuthor, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
-        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
+        notifyAnalyticsChangePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 

@@ -71,7 +71,7 @@ class Main extends React.Component {
             ScrollMemoryStorage.scrollPage(_key)
             this.props.notifyConcreteCourseShowed(this.props.course)
 
-            this.props.changePage(this.props.ownProps.location.pathname)
+            this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -311,7 +311,7 @@ function mapDispatchToProps(dispatch) {
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyConcreteCourseShowed: bindActionCreators(notifyConcreteCourseShowed, dispatch),
-        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
+        notifyAnalyticsChangePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 
