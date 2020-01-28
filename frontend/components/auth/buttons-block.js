@@ -9,6 +9,10 @@ import {
     isWaitingAuthorize as isPlayerWaitingAuthorize,
     waitingDataSelector as playerWaitingAuthData,
 } from 'ducks/player'
+import {
+    isWaitingAuthorize as isTestWaitingAuthorize,
+    waitingDataSelector as testWaitingAuthData,
+} from 'ducks/test-instance'
 import $ from "jquery";
 
 class ButtonsBlock extends React.Component {
@@ -69,6 +73,14 @@ class ButtonsBlock extends React.Component {
             _data = Object.assign({}, this.props.playerWaitingAuthData)
             _data.p1 = _key
             _data.t = 'p'
+        } else if (this.props.isTestWaitingAuthorize) {
+            let _key = Math.random().toString(36).substring(7)
+            localStorage.setItem('s1', _key)
+
+            _data = {}
+            _data.url = this.props.testWaitingAuthData
+            _data.p1 = _key
+            _data.t = 't'
         } else {
             _data = {t: 'a'}
         }
@@ -99,6 +111,8 @@ function mapStateToProps(state) {
         billingWaitingAuthData: billingWaitingAuthData(state),
         isPlayerWaitingAuthorize: isPlayerWaitingAuthorize(state),
         playerWaitingAuthData: playerWaitingAuthData(state),
+        isTestWaitingAuthorize: isTestWaitingAuthorize(state),
+        testWaitingAuthData: testWaitingAuthData(state),
     }
 }
 

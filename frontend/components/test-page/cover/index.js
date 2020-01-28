@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 
 import {getCountMinutesTitle, getQuestionsTitle} from "tools/word-tools";
 import {testSelector} from "ducks/test";
-import {createNewTestInstance} from "ducks/test-instance";
+import {createNewTestInstance, unlockTest} from "ducks/test-instance";
 
 import './cover.sass'
 import {SocialBlock} from "../social-block";
@@ -18,9 +18,8 @@ class Cover extends React.Component {
     }
 
     render() {
-        const {test, authorized} = this.props,
-            _coverUrl = test.Cover,
-            _startButtonDisabled = test && test.IsAuthRequired && !authorized
+        const {test,} = this.props,
+            _coverUrl = test.Cover
 
 
         if (typeof test.CoverMeta === "string") {
@@ -55,7 +54,7 @@ class Cover extends React.Component {
                     </div>
                 </div>
                 <div className="start-button__block">
-                    <div className={"button btn--brown start-button" + (_startButtonDisabled ? " disabled" : "")} onClick={::this._createInstance}>
+                    <div className="button btn--brown start-button" onClick={::this._createInstance}>
                         Начать тест
                     </div>
                     <SocialBlock counter={test.ShareCounters}/>
@@ -66,10 +65,12 @@ class Cover extends React.Component {
 
     _createInstance() {
         const {test, authorized} = this.props,
-            _startButtonDisabled = test && test.IsAuthRequired && !authorized
+            _canCreateInstance = test && test.IsAuthRequired && !authorized
 
-        if (!_startButtonDisabled) {
+        if (!_canCreateInstance) {
             this.props.createNewTestInstance(test.URL)
+        } else {
+            this.props.unlockTest(test.URL)
         }
     }
 }
@@ -82,7 +83,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({createNewTestInstance}, dispatch)
+    return bindActionCreators({createNewTestInstance, unlockTest}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cover)

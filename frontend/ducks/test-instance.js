@@ -7,7 +7,10 @@ import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, loadTestData, testSelector} 
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 import {isAnswerCorrect} from "tools/tests-tools";
-import {LOGOUT_SUCCESS, USER_HAS_BEEN_LOADED} from "../constants/user";
+import {LOGOUT_SUCCESS, SHOW_SIGN_IN_FORM, USER_HAS_BEEN_LOADED} from "../constants/user";
+import {CLEAR_WAITING_AUTHORIZE} from "ducks/app";
+import {FINISH_LOAD_PROFILE} from "ducks/profile";
+import {START_BILLING_BY_REDIRECT} from "ducks/billing";
 
 /**
  * Constants
@@ -44,6 +47,8 @@ const FINISH_INSTANCE_SUCCESS = `${prefix}/FINISH_INSTANCE_SUCCESS`
 
 const SET_SHARE_URL = `${prefix}/SET_SHARE_URL`
 const CLEAR_SHARE_URL = `${prefix}/CLEAR_SHARE_URL`
+const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
+const UNLOCK_TEST_REQUEST = `${prefix}/UNLOCK_TEST_REQUEST`
 
 const InstanceRecord = Record({
     ActDuration: 0,
@@ -61,6 +66,8 @@ const InstanceRecord = Record({
     IsLocal: false,
 })
 
+const Waiting = Record({data: null, active: false})
+
 const ReducerRecord = Record({
     loading: false,
     saving: false,
@@ -72,6 +79,7 @@ const ReducerRecord = Record({
     notFound: false,
     shareUrl: null,
     urlCreated: null,
+    waiting: new Waiting(),
 })
 
 const QuestionRecord = Record({
@@ -151,6 +159,16 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('shareUrl', null)
                 .set('urlCreated', false)
 
+        case SET_WAITING_AUTHORIZE:
+            return state
+                .setIn(['waiting', 'data'], payload)
+                .setIn(['waiting', 'active'], true)
+
+        case CLEAR_WAITING_AUTHORIZE:
+            return state
+                .setIn(['waiting', 'data'], null)
+                .setIn(['waiting', 'active'], false)
+
         default:
             return state
     }
@@ -184,6 +202,11 @@ export const questionsSelector = createSelector(stateSelector, (state) => {
         _item.Number = index + 1
         return _item
     })
+})
+const waitingAuth = createSelector(stateSelector, state => state.waiting)
+export const isWaitingAuthorize = createSelector(waitingAuth, waiting => waiting.active)
+export const waitingDataSelector = createSelector(waitingAuth, (waiting) => {
+    return waiting.active ? waiting.data : null
 })
 
 
@@ -226,25 +249,64 @@ export const clearShareUrl = () => {
     return {type: CLEAR_SHARE_URL}
 }
 
+export const setWaitingAuthorizeData = (data) => {
+    return {type: SET_WAITING_AUTHORIZE, payload: data}
+}
+
+export const unlockTest = (data) => {
+    return {type: UNLOCK_TEST_REQUEST, payload: data}
+}
+
 /**
  * Sagas
  */
 export const saga = function* () {
     yield all([
         takeEvery(CREATE_TEST_INSTANCE_REQUEST, createNewTestInstanceSaga),
+        takeEvery(UNLOCK_TEST_REQUEST, unlockAndCreateNewTestInstanceSaga),
         takeEvery(GET_TEST_INSTANCE_REQUEST, getTestInstanceSaga),
         takeEvery(SET_ANSWER_REQUEST, setAnswerSaga),
         takeEvery(SAVE_INSTANCE_REQUEST, saveInstanceSaga),
         takeEvery(SET_ANSWER_AND_SAVE_REQUEST, setAnswerAndSaveSaga),
         takeEvery(FINISH_INSTANCE_REQUEST, finishInstanceSaga),
+        takeEvery(FINISH_LOAD_PROFILE, onFinishLoadProfileSaga),
     ])
 }
 
+
+
 function* createNewTestInstanceSaga(data) {
+    yield _createInstance(data.payload)
+}
+
+function* unlockAndCreateNewTestInstanceSaga(data) {
+    const _state = yield select(state => state),
+        _authorized = !!_state.user.user;
+
+    console.log(data)
+
+    if (!_authorized) {
+        yield _setWaitingAuthorize(data.payload)
+    } else {
+        yield _createInstance(data.payload)
+    }
+}
+
+function* _setWaitingAuthorize(data) {
+    yield put(setWaitingAuthorizeData(data))
+    yield put({type: SHOW_SIGN_IN_FORM})
+}
+
+function* _createInstance(data) {
+    const _waiting = yield select(waitingAuth),
+        _data = _waiting.active ? _waiting.data : data
+
+    console.log(_data)
+
     yield put({ type: CREATE_TEST_INSTANCE_START })
     yield put(clearShareUrl())
 
-    yield put(getTest(data.payload))
+    yield put(getTest(_data))
 
     const {success} = yield race({
         success: take(GET_TEST_COMPLETED),
@@ -458,4 +520,14 @@ export const getShareLink = (instanceId) => {
         })
         .then(checkStatus)
         .then(parseJSON)
+}
+
+function* onFinishLoadProfileSaga(data) {
+    const _waiting = yield select(waitingAuth)
+
+    console.log(data)
+
+    if (_waiting.active) {
+        yield _createInstance(data)
+    }
 }

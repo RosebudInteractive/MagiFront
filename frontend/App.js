@@ -31,6 +31,7 @@ import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
 import {setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
 import {setWaitingAuthorizeData as setPlayerWaitingAuthorizeData,} from "./ducks/player";
+import {setWaitingAuthorizeData as setTestWaitingAuthorizeData,} from "./ducks/test-instance";
 import {showFeedbackWindowSelector, showModalErrorMessage} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 import {loadVersion} from "ducks/version"
@@ -114,6 +115,7 @@ class App extends Component {
         const _params = new URLSearchParams(this.props.location.search),
             _isBilling = _params.get('t') ? _params.get('t') === 'b' : false,
             _isPlayer= _params.get('t') ? _params.get('t') === 'p' : false,
+            _isTest = _params.get('t') ? _params.get('t') === 't' : false,
             _isAuth = _params.get('t') ? _params.get('t') === 'a' : false,
             _isNewUser = _params.get('_is_new_user') ? _params.get('_is_new_user') === 'true' : false,
             _message = _params.get('message')
@@ -147,6 +149,18 @@ class App extends Component {
             if (_inKey === _savedKey) {
                 localStorage.removeItem('s1');
                 this.props.setPlayerWaitingAuthorizeData({returnUrl: _params.get('returnUrl')})
+            }
+        }
+
+        if (_isTest) {
+            this.props.history.replace(this.props.location.pathname)
+
+            const _inKey = _params.get('p1'),
+                _savedKey = localStorage.getItem('s1')
+
+            if (_inKey === _savedKey) {
+                localStorage.removeItem('s1');
+                this.props.setTestWaitingAuthorizeData(_params.get('url'))
             }
         }
 
@@ -390,6 +404,7 @@ function mapDispatchToProps(dispatch) {
         getAppOptions: bindActionCreators(getAppOptions, dispatch),
         setBillingWaitingAuthorizeData: bindActionCreators(setBillingWaitingAuthorizeData, dispatch),
         setPlayerWaitingAuthorizeData: bindActionCreators(setPlayerWaitingAuthorizeData, dispatch),
+        setTestWaitingAuthorizeData: bindActionCreators(setTestWaitingAuthorizeData, dispatch),
         notifyNewUserRegistered: bindActionCreators(notifyNewUserRegistered, dispatch),
         showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
