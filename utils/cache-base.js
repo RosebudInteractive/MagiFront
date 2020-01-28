@@ -211,12 +211,14 @@ exports.CacheableObject = class CacheableObject {
                 rc = ConnectionWrapper(((connection) => {
                     return connection.hgetAllAsync(id)
                         .then((result) => {
-                            let res = {};
-                            if (result)
+                            let res = null;
+                            if (result) {
+                                res = {};
                                 for (let id in result) {
                                     let data = opts.json ? JSON.parse(result[id]) : result[id];
                                     res[id] = data;
                                 };
+                            }
                             return res;
                         });
                 }).bind(this));

@@ -336,6 +336,10 @@ const GET_SHORT_NOT_SENT_TRANS_MSSQL =
     "select c.[Id] from[Cheque] c\n" +
     "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)";
 
+const SET_TRAN_SEND_STATUS_MSSQL =
+    "update [Cheque] set [SendStatus] = 1, [SendStatusChangedAt] = GETDATE()\n" +
+    "where ([Id] = <%= tran_id %>) and ([StateId] = 4) and ([SendStatus] = 0)";
+
 const GET_NOT_SENT_TRANS_MYSQL =
     "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
     "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price` `Sum`,\n" +
@@ -358,10 +362,17 @@ const GET_SHORT_NOT_SENT_TRANS_MYSQL =
     "select c.`Id` from`Cheque` c\n" +
     "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)";
 
+const SET_TRAN_SEND_STATUS_MYSQL =
+    "update `Cheque` set `SendStatus` = 1, `SendStatusChangedAt` = NOW()\n" +
+    "where (`Id` = <%= tran_id %>) and (`StateId` = 4) and (`SendStatus` = 0)";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
 const LOCK_TIMEOUT_SEC = 5 * 60; // 5 min lock
+
+const STAT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
+const STAT_SRC_TIMEOUT = 1000 * 60 * 10; // 10 min
 
 const DbUser = class DbUser extends DbObject {
 
@@ -373,13 +384,43 @@ const DbUser = class DbUser extends DbObject {
         super(opts);
         this._usersCache = UsersCache();
         this._coursesService = CoursesService();
+        this._srcList = {};
+        for (let i = 0; i < STAT_SRC_LIST.length; i++)
+            this._srcList[STAT_SRC_LIST[i]] = true;
     }
 
     _getTranLockKey(userId) {
         return `tranlock:${userId}`;
     }
 
-    async getNotSentTrans(userId) {
+    _getTranStateKey(tranId) {
+        return `transtate:${tranId}`;
+    }
+
+    async _checkAndSetTranSent(tran, userId) {
+        let rc = false;
+        let done_cnt = 0;
+        if (tran["_sys"])
+            for (let j = 0; j < STAT_SRC_LIST.length; j++) {
+                let curr_src = STAT_SRC_LIST[j];
+                if (tran[curr_src + "_done"])
+                    done_cnt++;
+            }
+        if ((!tran["_sys"]) || (done_cnt === STAT_SRC_LIST.length)) {
+            await $data.execSql({
+                dialect: {
+                    mysql: _.template(SET_TRAN_SEND_STATUS_MYSQL)({ tran_id: tran["_sys"].id }),
+                    mssql: _.template(SET_TRAN_SEND_STATUS_MSSQL)({ tran_id: tran["_sys"].id })
+                }
+            }, {});
+            await this.cacheDel(this._getTranStateKey(tran["_sys"].id));
+            await this.cacheDel(this._getTranLockKey(userId));
+            rc = true;
+        }
+        return rc;
+    }
+
+    async getNotSentTrans(userId, bySrc) {
         let trans = [];
         let result = await $data.execSql({
             dialect: {
@@ -404,14 +445,67 @@ const DbUser = class DbUser extends DbObject {
                 if (result && result.detail && (result.detail.length > 0)) {
                     let currTranId = -1;
                     let cuttItemId = -1;
-                    let currTran;
-                    result.detail.forEach(elem => {
+                    let currTran = null;
+                    for (let i = 0; i < result.detail.length; i++) {
+                        let elem = result.detail[i];
                         if (elem.TranId !== currTranId) {
-                            currTran = { id: elem.TranId, currencyCode: "RUB", revenue: 0, tax: 0, coupon: elem.Coupon, products: [] };
-                            trans.push(currTran);
+                            currTran = null;
+                            let src = [];
+                            if (bySrc) {
+                                let tstate_key = this._getTranStateKey(elem.TranId);
+                                let lastDate = (new Date()) - 0;
+                                let tran = await this.cacheHgetAll(tstate_key, { json: true });
+                                if (!tran) {
+                                    await this.cacheHset(tstate_key, "_sys", {
+                                        id: elem.TranId,
+                                        crDate: lastDate,
+                                        lastDate: lastDate
+                                    }, { json: true });
+                                    for (let j = 0; j < STAT_SRC_LIST.length; j++){
+                                        let curr_src = STAT_SRC_LIST[j];
+                                        await this.cacheHset(tstate_key, curr_src, {
+                                            lastDate: lastDate,
+                                            cnt: 1,
+                                        }, { json: true });
+                                        src.push(curr_src);
+                                    }
+                                }
+                                else {
+                                    let is_already_sent = await this._checkAndSetTranSent(tran, userId);
+                                    if (!is_already_sent) {
+                                        if ((lastDate - tran["_sys"].lastDate) > STAT_SRC_TIMEOUT) {
+                                            await this.cacheHset(tstate_key, "_sys", {
+                                                id: tran["_sys"].id,
+                                                crDate: tran["_sys"].crDate,
+                                                lastDate: lastDate
+                                            }, { json: true });
+                                            for (let j = 0; j < STAT_SRC_LIST.length; j++) {
+                                                let curr_src = STAT_SRC_LIST[j];
+                                                let prev_data = tran[curr_src];
+                                                if (prev_data && (!tran[curr_src + "_done"])) {
+                                                    await this.cacheHset(tstate_key, curr_src,
+                                                        {
+                                                            lastDate: lastDate,
+                                                            cnt: ++prev_data.cnt,
+                                                        }, { json: true });
+                                                    src.push(curr_src);
+                                                }
+                                            }
+                                        }
+                                        // else
+                                        //     trans.push({ id: elem.TranId, waitFor: (lastDate - tran["_sys"].lastDate) });
+                                    }
+                                }
+                            }
+                            if ((!bySrc) || (bySrc && (src.length > 0))) {
+                                currTran = { id: elem.TranId, currencyCode: "RUB", revenue: 0, tax: 0, coupon: elem.Coupon, products: [] };
+                                if (src.length > 0)
+                                    currTran.call_payment = src;
+                                trans.push(currTran);
+                            }
                             currTranId = elem.TranId;
                         }
-                        if (cuttItemId !== elem.ItemId) {
+                        if (currTran && (cuttItemId !== elem.ItemId)) {
                             let currItem = {
                                 id: elem.CourseId,
                                 name: elem.Name,
@@ -425,7 +519,7 @@ const DbUser = class DbUser extends DbObject {
                             currTran.tax += elem.Tax;
                             cuttItemId = elem.ItemId;
                         }
-                    })
+                    }
                 }
 
                 if (trans.length === 0)
@@ -433,6 +527,29 @@ const DbUser = class DbUser extends DbObject {
             }
         }
         return trans;
+    }
+
+    async markTransSrcAsSent(userId, data, options) {
+        let opts = options || {};
+        let trans = data || {};
+
+        if (!trans.id)
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Arg "id" is invalid or missig ("${trans.id}").`);
+        let id = +trans.id;
+
+        if (!this._srcList[trans.src])
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Arg "src" is invalid or missig ("${trans.src}").`);
+
+        let tstate_key = this._getTranStateKey(id);
+        await this.cacheHset(tstate_key, trans.src + "_done",
+            {
+                ts: (new Date()) - 0
+            },
+            { json: true });
+
+        let tran = await this.cacheHgetAll(tstate_key, { json: true });
+        await this._checkAndSetTranSent(tran, userId);
+        return { result: "OK" };
     }
 
     async markTransAsSent(userId, data, options) {
