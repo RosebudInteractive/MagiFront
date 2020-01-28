@@ -420,6 +420,30 @@ const DbUser = class DbUser extends DbObject {
         return rc;
     }
 
+    async _LogTranStat(id, tp, data, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(-1, { expr: { model: { name: "ChequeStatLog" } } }, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    let fields = { ChequeId: id, RecType: tp, Data: JSON.stringify(data) };
+                    await root_obj.newObject({ fields: fields }, dbOpts);
+
+                    await root_obj.save(dbOpts);
+                })
+        }, memDbOptions);
+    }
+
     async getNotSentTrans(userId, bySrc) {
         let trans = [];
         let result = await $data.execSql({
@@ -523,7 +547,12 @@ const DbUser = class DbUser extends DbObject {
                 }
 
                 if (trans.length === 0)
-                    await this.cacheDel(key);
+                    await this.cacheDel(key)
+                else
+                    for (let i = 0; i < trans.length; i++) {
+                        let tran = trans[i];
+                        await this._LogTranStat(tran.id, 1, tran, { dbOptions: { userId: userId } });
+                    }
             }
         }
         return trans;
@@ -536,6 +565,8 @@ const DbUser = class DbUser extends DbObject {
         if (!trans.id)
             throw new HttpError(HttpCode.ERR_BAD_REQ, `Arg "id" is invalid or missig ("${trans.id}").`);
         let id = +trans.id;
+
+        await this._LogTranStat(id, 2, trans, { dbOptions: { userId: userId } });
 
         if (!this._srcList[trans.src])
             throw new HttpError(HttpCode.ERR_BAD_REQ, `Arg "src" is invalid or missig ("${trans.src}").`);
