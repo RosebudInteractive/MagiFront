@@ -1,11 +1,21 @@
 import React from "react";
 import MetaTags from "react-meta-tags";
 import $ from "jquery";
+import {connect} from "react-redux";
+import {bindActionCreators} from 'redux';
+import {notifyAnalyticsChangePage} from "ducks/app";
 
-export default class ProjectPage extends React.Component {
+const TITLE = "Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом. Отличная помощь студентам, продвинутым старшеклассникам и всем людям с культурными запросами. Зачерпни знания у источника!"
+
+class ProjectPage extends React.Component {
 
     componentWillMount() {
         window.scrollTo(0, 0)
+    }
+
+    componentDidMount() {
+        document.title = TITLE
+        this.props.changePage(this.props.ownProps.location.pathname)
     }
 
     componentWillUnmount() {
@@ -70,8 +80,8 @@ export default class ProjectPage extends React.Component {
         this._removeRobotsMetaTags()
 
         return <MetaTags>
-            <meta name="description"
-                  content="Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом. Отличная помощь студентам, продвинутым старшеклассникам и всем людям с культурными запросами. Зачерпни знания у источника!"/>
+            <meta name = "description"
+                  content = {TITLE}/>
         </MetaTags>
     }
 
@@ -86,3 +96,14 @@ export default class ProjectPage extends React.Component {
         $('meta[name="prerender-status-code"]').remove();
     }
 }
+
+const mapStateToProps = (state, ownProps) => {
+    return {ownProps}
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({changePage: notifyAnalyticsChangePage}, dispatch)
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectPage)

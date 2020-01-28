@@ -12,7 +12,7 @@ import {refreshState as refreshStorage} from "actions/lesson-info-storage-action
 import {whoAmI} from "actions/user-actions";
 import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import $ from "jquery";
-import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
+import {facebookAppIdSelector, clearCurrentPage, setCurrentPage, notifyAnalyticsChangePage} from "ducks/app";
 import {
     testSelector,
     loadingSelector as testLoading,
@@ -156,6 +156,8 @@ class TestPage extends React.Component {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
             // this._resizeHandler();
+
+            this.props.changePage(this.props.ownProps.location.pathname)
         }
 
         this._resizeHandler()
@@ -360,6 +362,7 @@ function mapStateToProps(state, ownProps) {
         instanceBlocked: testInstanceBlockedSelector(state),
         testLoaded: testLoaded(state),
         notFound: testNotFound(state) || instanceNotFound(state),
+        ownProps,
     }
 }
 
@@ -374,6 +377,7 @@ function mapDispatchToProps(dispatch) {
         headerSetPage,
         setCurrentPage,
         clearCurrentPage,
+        changePage: notifyAnalyticsChangePage,
     }, dispatch)
 }
 

@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import MetaTags from 'react-meta-tags';
 
 import {authorSelector, loadingSelector, notFoundSelector, getAuthor} from 'ducks/author'
-import {facebookAppIdSelector, setCurrentPage, clearCurrentPage} from 'ducks/app'
+import {facebookAppIdSelector, setCurrentPage, clearCurrentPage, notifyAnalyticsChangePage} from 'ducks/app'
 import AuthorBlock from '../components/author/author-block';
 import CoursesBlock from '../components/author/courses-and-lessons';
 import NotFoundPage from '../components/not-found'
@@ -42,6 +42,8 @@ class AuthorPage extends React.Component {
         if (prevProps.loading && !this.props.loading) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
+
+            this.props.changePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -151,6 +153,7 @@ function mapStateToProps(state, ownProps) {
         notFound: notFoundSelector(state),
         authorUrl: ownProps.match.params.url,
         facebookAppID: facebookAppIdSelector(state),
+        ownProps,
     }
 }
 
@@ -162,6 +165,7 @@ function mapDispatchToProps(dispatch) {
         getAuthor: bindActionCreators(getAuthor, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
+        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 

@@ -35,7 +35,7 @@ export default class SubList extends React.Component {
                         Id: course.Id,
                         Name: course.Name,
                         author: lesson.Author.FirstName + lesson.Author.LastName,
-                        category: course.Categories[0].Name,
+                        category: course.Categories ? course.Categories[0].Name : "",
                         lessonName: lesson.Name,
                         price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
                     })

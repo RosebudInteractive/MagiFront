@@ -59,9 +59,9 @@ class Row extends React.Component {
                         </div>
                     </li>
                     <li>
-                        <a href="/about">
+                        <Link to="/about">
                             <span>О проекте</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>

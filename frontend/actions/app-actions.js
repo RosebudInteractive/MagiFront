@@ -17,18 +17,11 @@ import {
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
     GET_APP_OPTIONS_FAIL,
-    APP_CHANGE_PAGE, ENABLE_BILLING, DISABLE_BILLING, GET_COOKIES_CONFIRMATION, CONFIRM_COOKIES
+    ENABLE_BILLING, DISABLE_BILLING, GET_COOKIES_CONFIRMATION, CONFIRM_COOKIES
 } from '../constants/app'
 
 import $ from 'jquery'
 import 'jquery.cookie'
-
-export const changePage = (url) => {
-    return {
-        type: APP_CHANGE_PAGE,
-        payload: url
-    }
-}
 
 export const switchSizeTo = (size) => {
     return {

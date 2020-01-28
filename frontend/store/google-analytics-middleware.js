@@ -1,6 +1,6 @@
 import {SIGN_IN_SUCCESS, SIGN_UP_SUCCESS, WHO_AM_I_SUCCESS,} from "../constants/user";
 import {PLAYER_PLAYED, PLAYER_SET_CURRENT_TIME, PLAYER_SET_PROGRESS_PERCENT} from '../constants/player'
-import {APP_CHANGE_PAGE} from "../constants/app";
+import {NOTIFY_GA_CHANGE_PAGE} from "ducks/app";
 
 import {setProgressPercent} from "../actions/player-actions";
 import {MAIL_SUBSCRIBE_SUCCESS} from "ducks/message";
@@ -33,15 +33,18 @@ const GoogleAnalyticsMiddleware = store => next => action => {
             return result
         }
 
-        case APP_CHANGE_PAGE: {
+        case NOTIFY_GA_CHANGE_PAGE: {
+            let result = next(action)
+
             let _pathPrefix = window.location.protocol + '//' + window.location.host;
 
             Analytics.getInstance().sendPageChanged({
                 'event': 'Pageview',
-                'url': _pathPrefix + action.payload
+                'url': _pathPrefix + action.payload,
+                'page_title': document.title
             });
 
-            return next(action)
+            return result
         }
 
         case SIGN_UP_SUCCESS: {

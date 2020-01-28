@@ -27,7 +27,7 @@ import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
-import {facebookAppIdSelector, setCurrentPage, clearCurrentPage,} from "ducks/app";
+import {facebookAppIdSelector, setCurrentPage, clearCurrentPage, notifyAnalyticsChangePage,} from "ducks/app";
 import {notifyLessonShowed,} from "ducks/google-analytics";
 import {getLessonsAll, loadingSelector as menuDataLoading} from "ducks/lesson-menu";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
@@ -259,6 +259,8 @@ class CombineLessonPage extends React.Component {
             })
 
             if (window.prerenderEnable) {_openGallerySlider()}
+
+            this.props.changePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -651,6 +653,7 @@ function mapStateToProps(state, ownProps) {
 
         facebookAppID: facebookAppIdSelector(state),
         userPaidCourses: userPaidCoursesSelector(state),
+        ownProps,
     }
 }
 
@@ -666,6 +669,7 @@ function mapDispatchToProps(dispatch) {
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyLessonShowed: bindActionCreators(notifyLessonShowed, dispatch),
         getLessonsAll: bindActionCreators(getLessonsAll, dispatch),
+        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 

@@ -34,6 +34,7 @@ import $ from "jquery";
 import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
 import {OverflowHandler} from "../tools/page-tools";
+import {notifyAnalyticsChangePage} from 'ducks/app';
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -116,6 +117,8 @@ class CoursesPage extends React.Component {
             if (!hasExternalFilter) {
                 this.props.notifyCoursesShowed(this._getVisibleCourses())
             }
+
+            this.props.changePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -311,6 +314,7 @@ function mapDispatchToProps(dispatch) {
         setInitialState: bindActionCreators(setInitialState, dispatch),
         enableScrollGuard: bindActionCreators(enableScrollGuard, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
+        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 

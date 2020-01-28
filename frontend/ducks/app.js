@@ -30,6 +30,11 @@ export const HIDE_WAITING_FORM = `${prefix}/HIDE_WAITING_FORM`
 
 export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
 
+export const NOTIFY_GA_CHANGE_PAGE_REQUEST = `${prefix}/NOTIFY_GA_CHANGE_PAGE_REQUEST`;
+export const NOTIFY_GA_CHANGE_PAGE = `${prefix}/NOTIFY_GA_CHANGE_PAGE`;
+export const APP_CHANGE_PAGE = `${prefix}/APP_CHANGE_PAGE`;
+export const SET_CURRENT_GA_URL = `${prefix}/SET_CURRENT_URL`;
+
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
@@ -52,6 +57,7 @@ export const ReducerRecord = Record({
     fetching: false,
     currentPageRef: null,
     isWaiting: false,
+    currentUrl: null,
     debug: new DebugRecord()
 })
 
@@ -100,6 +106,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('isWaiting', false)
 
+        case SET_CURRENT_GA_URL:
+            return state
+                .set('currentUrl', payload)
+
         default:
             return state
     }
@@ -132,6 +142,7 @@ export const enabledPaidCoursesSelector = createSelector(stateSelector, (state) 
 const currentPageRefSelector = createSelector(stateSelector, state => state.currentPageRef)
 export const waitingSelector = createSelector(stateSelector, state => state.isWaiting)
 export const analyticsDebugModeSelector = createSelector(stateSelector, state => state.getIn(['debug', 'gtm']))
+const currentUrlSelector = createSelector(stateSelector, state => state.currentUrl)
 
 
 /**
@@ -161,10 +172,40 @@ export const clearWaitingAuthorize = () => {
     return {type: CLEAR_WAITING_AUTHORIZE}
 }
 
+export const notifyAnalyticsChangePage = (url) => {
+    return {type: NOTIFY_GA_CHANGE_PAGE_REQUEST, payload: url}
+}
+
+export const pageChanged = () => {
+    return {type: APP_CHANGE_PAGE}
+}
 
 /**
  * Sagas
  */
+export const saga = function* () {
+    yield all([
+        takeEvery(GET_OPTIONS_REQUEST, getOptionsSaga),
+        takeEvery(CALC_BILLING_ENABLE_REQUEST, calcBillingEnabledSaga),
+        takeEvery(RELOAD_CURRENT_PAGE_REQUEST, reloadCurrentPageSaga),
+        takeEvery(NOTIFY_GA_CHANGE_PAGE_REQUEST, changeCurrentPageSaga),
+    ])
+}
+
+function* changeCurrentPageSaga(data) {
+    const _currentUrl = yield select(currentUrlSelector),
+        _newUrl = data.payload
+
+    if (_currentUrl !== _newUrl) {
+
+        if (!!_currentUrl) { yield put({type: NOTIFY_GA_CHANGE_PAGE, payload: _newUrl}) }
+
+        yield put({type: SET_CURRENT_GA_URL, payload: _newUrl})
+
+    }
+}
+
+
 function* getOptionsSaga() {
     yield put({type: GET_OPTIONS_START})
     try {
@@ -219,10 +260,3 @@ function* reloadCurrentPageSaga() {
     }
 }
 
-export const saga = function* () {
-    yield all([
-        takeEvery(GET_OPTIONS_REQUEST, getOptionsSaga),
-        takeEvery(CALC_BILLING_ENABLE_REQUEST, calcBillingEnabledSaga),
-        takeEvery(RELOAD_CURRENT_PAGE_REQUEST, reloadCurrentPageSaga),
-    ])
-}

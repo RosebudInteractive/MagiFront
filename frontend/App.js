@@ -52,7 +52,7 @@ import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import {getAppOptions, waitingSelector} from 'ducks/app'
+import {getAppOptions, pageChanged, waitingSelector} from 'ducks/app'
 import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
@@ -84,8 +84,6 @@ class App extends Component {
         }
 
         this.props.getAppOptions()
-
-        this._mediaQuery = window.matchMedia("(orientation: portrait)");
     }
 
     componentWillMount() {
@@ -232,8 +230,7 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _prevLocation;
 
         if (_isNewLocation) {
-            this.props.appActions.changePage(_thisLocation);
-
+            this.props.pageChanged()
             this._lastScrollPos = (document.scrollingElement) ? document.scrollingElement.scrollTop : 0
         }
     }
@@ -329,19 +326,8 @@ class App extends Component {
         )
     }
 
-    _addDevWarn(text) {
-        let _dev = $('#dev'),
-            isVisible = _dev.is(':visible');
-
-        if (isVisible === true) {
-            if (_dev.children().last().text() !== text)
-                _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
-        }
-    }
-
     render() {
         let {
-            // sendPulseScript,
             showSignInForm,
             showSizeInfo,
             showFeedbackWindow,
@@ -367,17 +353,8 @@ class App extends Component {
     }
 }
 
-// sendPulseScript ?
-//     <MetaTags>
-//         <script charSet="UTF-8" src={sendPulseScript} async/>
-//     </MetaTags>
-//     :
-//     null,
-
 function mapStateToProps(state, ownProps) {
     return {
-        // showFiltersForm: state.pageHeader.showFiltersForm,
-        // currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         sendPulseScript: state.app.sendPulseScript,
         showSizeInfo: state.app.showSizeInfo,
@@ -408,6 +385,7 @@ function mapDispatchToProps(dispatch) {
         notifyNewUserRegistered: bindActionCreators(notifyNewUserRegistered, dispatch),
         showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
+        pageChanged: bindActionCreators(pageChanged, dispatch),
     }
 }
 

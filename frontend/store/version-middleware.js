@@ -1,4 +1,4 @@
-import {APP_CHANGE_PAGE} from "../constants/app";
+import {APP_CHANGE_PAGE} from "ducks/app";
 import {checkVersion, CHECK_SUCCESS} from 'ducks/version'
 import {store as mainStore} from './configureStore';
 import {PLAYER_PLAYED} from "../constants/player";

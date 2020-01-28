@@ -10,13 +10,18 @@ import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import * as userActions from "../actions/user-actions";
-import PropTypes from 'prop-types';
 
 import $ from 'jquery'
 
 import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
-import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
+import {
+    enabledPaidCoursesSelector,
+    facebookAppIdSelector,
+    setCurrentPage,
+    clearCurrentPage,
+    notifyAnalyticsChangePage
+} from "ducks/app";
 import {notifyConcreteCourseShowed} from "ducks/google-analytics";
 
 import ScrollMemoryStorage from "../tools/scroll-memory-storage"
@@ -65,6 +70,8 @@ class Main extends React.Component {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
             this.props.notifyConcreteCourseShowed(this.props.course)
+
+            this.props.changePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -288,7 +295,8 @@ function mapStateToProps(state, ownProps) {
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
         facebookAppID: facebookAppIdSelector(state),
-        enabledPaidCourse: enabledPaidCoursesSelector(state)
+        enabledPaidCourse: enabledPaidCoursesSelector(state),
+        ownProps
     }
 }
 
@@ -303,6 +311,7 @@ function mapDispatchToProps(dispatch) {
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyConcreteCourseShowed: bindActionCreators(notifyConcreteCourseShowed, dispatch),
+        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 
