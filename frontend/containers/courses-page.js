@@ -100,10 +100,13 @@ class CoursesPage extends React.Component {
 
             if ((_filter.length === 0) && (_filterType === FILTER_TYPE.EMPTY)) {
                 this.props.setInitialState()
+                this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
             } else {
-                let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
+                let _filters = (_filter.length > 0) ? _filter.join('+') : 'all',
+                    _url = `/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search
 
-                this.props.history.replace(`/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search)
+                this.props.history.replace(_url)
+                this.props.notifyAnalyticsChangePage(_url)
             }
         }
 
@@ -118,7 +121,7 @@ class CoursesPage extends React.Component {
                 this.props.notifyCoursesShowed(this._getVisibleCourses())
             }
 
-            this.props.changePage(this.props.ownProps.location.pathname)
+            this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -314,7 +317,7 @@ function mapDispatchToProps(dispatch) {
         setInitialState: bindActionCreators(setInitialState, dispatch),
         enableScrollGuard: bindActionCreators(enableScrollGuard, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
-        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
+        notifyAnalyticsChangePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 

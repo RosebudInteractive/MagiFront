@@ -45,6 +45,7 @@ export const pages = {
     history: {name: 'history', url: '/history'},
     test: {name: 'test', url: null},
     notFound: {name: 'not-found', url: null},
+    about: {name: 'about', url: null},
 }
 
 export const ImageSize = {

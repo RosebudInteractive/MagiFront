@@ -260,7 +260,7 @@ class CombineLessonPage extends React.Component {
 
             if (window.prerenderEnable) {_openGallerySlider()}
 
-            this.props.changePage(this.props.ownProps.location.pathname)
+            this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
     }
 
@@ -669,7 +669,7 @@ function mapDispatchToProps(dispatch) {
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyLessonShowed: bindActionCreators(notifyLessonShowed, dispatch),
         getLessonsAll: bindActionCreators(getLessonsAll, dispatch),
-        changePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
+        notifyAnalyticsChangePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
     }
 }
 
