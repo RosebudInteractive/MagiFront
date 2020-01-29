@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {Record, OrderedMap} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
-import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
+import {all, takeEvery, put, call, select,} from 'redux-saga/effects'
 import {analyticsDebugModeSelector} from './app'
 import {getDomain} from "tools/page-tools";
 import $ from "jquery";
@@ -27,8 +27,13 @@ const SEND_USER_SIGN_UP = `${prefix}/SEND_USER_SIGN_UP`
 
 const GET_NON_REGISTER_TRANSACTION_REQUEST = `${prefix}/GET_NON_REGISTER_TRANSACTION_REQUEST`
 const GET_NON_REGISTER_TRANSACTION_START = `${prefix}/GET_NON_REGISTER_TRANSACTION_START`
-export const GET_NON_REGISTER_TRANSACTION_SUCCESS = `${prefix}/GET_NON_REGISTER_TRANSACTION_SUCCESS`
+const GET_NON_REGISTER_TRANSACTION_SUCCESS = `${prefix}/GET_NON_REGISTER_TRANSACTION_SUCCESS`
 const GET_NON_REGISTER_TRANSACTION_FAIL = `${prefix}/GET_NON_REGISTER_TRANSACTION_FAIL`
+
+const SEND_REGISTER_TRANSACTION_REQUEST = `${prefix}/SEND_REGISTER_TRANSACTION_REQUEST`
+const SEND_REGISTER_TRANSACTION_START = `${prefix}/SEND_REGISTER_TRANSACTION_START`
+const SEND_REGISTER_TRANSACTION_SUCCESS = `${prefix}/SEND_REGISTER_TRANSACTION_SUCCESS`
+const SEND_REGISTER_TRANSACTION_FAIL = `${prefix}/SEND_REGISTER_TRANSACTION_FAIL`
 
 const SET_TRANSACTION_REGISTERED_REQUEST = `${prefix}/SET_TRANSACTION_REGISTERED_REQUEST`
 const SET_TRANSACTION_REGISTERED_START = `${prefix}/SET_TRANSACTION_REGISTERED_START`
@@ -53,7 +58,8 @@ const TransactionRecord = new Record({
     revenue: 0,
     tax: 0,
     coupon: null,
-    products: []
+    products: [],
+    call_payment: [],
 })
 
 
@@ -92,6 +98,10 @@ const transactions = createSelector(stateSelector, state => state.entries)
  * */
 export const getNonRegisterTransaction = () => {
     return { type: GET_NON_REGISTER_TRANSACTION_REQUEST }
+}
+
+export const sendRegisterTransactionSrc = (data) => {
+    return { type: SEND_REGISTER_TRANSACTION_REQUEST, payload: data }
 }
 
 export const notifyCoursesShowed = (courses) => {
@@ -148,6 +158,7 @@ export const setPlayerProgress = (data) => {
 export const saga = function* () {
     yield all([
         takeEvery(GET_NON_REGISTER_TRANSACTION_REQUEST, getNonRegisterTransactionSaga),
+        takeEvery(SEND_REGISTER_TRANSACTION_REQUEST, sendRegisterTransactionSrcSaga),
         takeEvery(SET_TRANSACTION_REGISTERED_REQUEST, registerTransactionsSaga),
         takeEvery(COURSES_PAGE_SHOWED, addCoursesPageShowedSaga),
         takeEvery(CONCRETE_COURSE_PAGE_SHOWED, addConcreteCoursePageShowedSaga),
@@ -178,7 +189,30 @@ function* getNonRegisterTransactionSaga() {
 }
 
 const _fetchNonRegisterTransactions = () => {
-    return fetch('/api/users/not-sent-trans', {method: 'GET', credentials: 'include', cache: 'no-cache'})
+    return fetch('/api/users/not-sent-trans-src', {method: 'GET', credentials: 'include', cache: 'no-cache'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* sendRegisterTransactionSrcSaga(data) {
+    yield put({type: SEND_REGISTER_TRANSACTION_START})
+
+    try {
+        yield call(_fetchSendTransactionsSrc, data.payload)
+
+        yield put({type: SEND_REGISTER_TRANSACTION_SUCCESS})
+    } catch (error) {
+
+        console.log(error)
+
+        yield put({type: SEND_REGISTER_TRANSACTION_FAIL})
+    }
+}
+
+const _fetchSendTransactionsSrc = (data) => {
+    const _url = `/api/users/send-tran-src?src=${data.systemName}&id=${data.id}`
+
+    return fetch(_url, {method: 'GET', credentials: 'include', cache: 'no-cache'})
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -216,7 +250,8 @@ function* _registerTransactions(data) {
                             'tax': item.tax, // '9.4', //сумма всех налогов транзакции
                             'coupon': item.coupon // 'Coupon 1' //промокод, использовавшийся при оформлении заказа
                         },
-                        'products': []
+                        'products': [],
+                        'call_payment': []
                     }
                 },
                 'event': 'gtm-ee-event',
@@ -225,6 +260,7 @@ function* _registerTransactions(data) {
                 'gtm-ee-event-non-interaction': 'False',
             }
             _data.ecommerce.purchase.products = item.products.slice()
+            _data.ecommerce.purchase.call_payment = item.call_payment.slice()
         })
     }
 

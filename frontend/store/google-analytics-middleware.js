@@ -6,13 +6,11 @@ import {setProgressPercent} from "../actions/player-actions";
 import {MAIL_SUBSCRIBE_SUCCESS} from "ducks/message";
 import {store} from "./configureStore";
 import {
-    getNonRegisterTransaction,
     notifyUserIdChanged,
     notifyNewUserRegistered,
-    setPlayerProgress, notifyPageChanged, notifyPlayerPlayed, GET_NON_REGISTER_TRANSACTION_SUCCESS
+    setPlayerProgress, notifyPageChanged, notifyPlayerPlayed,
 } from "ducks/google-analytics";
 import PaymentsChecker from "tools/payments-checker";
-import {SEND_PAYMENT_SUCCESS} from "ducks/billing";
 
 const GoogleAnalyticsMiddleware = store => next => action => {
 
@@ -27,7 +25,7 @@ const GoogleAnalyticsMiddleware = store => next => action => {
 
             if ((!_prevState.user && _nextState.user) || (_prevState.user && _nextState.user && _prevState.user.Id !== _nextState.user.Id)) {
                 Analytics.getInstance().sendUserId(_nextState.user.Id)
-                Analytics.getInstance().loadNonRegisterTransactions()
+                PaymentsChecker.startPing()
             }
 
             return result
@@ -146,27 +144,6 @@ const GoogleAnalyticsMiddleware = store => next => action => {
             return result;
         }
 
-        case GET_NON_REGISTER_TRANSACTION_SUCCESS: {
-            let _data = action.payload
-
-            if (_data && Array.isArray(_data) && _data.length > 0) {
-                PaymentsChecker.clear()
-            } else {
-                if (PaymentsChecker.hasPendingPayment()) {
-                    PaymentsChecker.startPing()
-                }
-            }
-
-            return next(action)
-        }
-
-        case SEND_PAYMENT_SUCCESS: {
-            PaymentsChecker.setPaymentDate()
-
-            return next(action)
-        }
-
-
         default:
             return next(action)
     }
@@ -182,10 +159,6 @@ class Analytics {
         }
 
         return _instance
-    }
-
-    loadNonRegisterTransactions() {
-        store.dispatch(getNonRegisterTransaction());
     }
 
     sendUserId(userId) {

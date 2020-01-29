@@ -59,6 +59,7 @@ import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 import {isMobilePlatform} from "./tools/page-tools";
 import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
 import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
+import {callbackPayment} from "./tools/payments-checker"
 
 Polyfill.registry();
 
@@ -84,6 +85,7 @@ class App extends Component {
         }
 
         this.props.getAppOptions()
+        window.callback_payment = callbackPayment
     }
 
     componentWillMount() {
