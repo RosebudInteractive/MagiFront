@@ -231,6 +231,11 @@
             "script_before": null,
             "script_after": null,
             "upgrader": "./build_27"
+        },
+        "28": {
+            "script_before": null,
+            "script_after": null,
+            "upgrader": "./build_28"
         }
     }
 }
