@@ -400,22 +400,23 @@ const DbUser = class DbUser extends DbObject {
     async _checkAndSetTranSent(tran, userId) {
         let rc = false;
         let done_cnt = 0;
-        if (tran["_sys"])
+        if (tran["_sys"]) {
             for (let j = 0; j < STAT_SRC_LIST.length; j++) {
                 let curr_src = STAT_SRC_LIST[j];
                 if (tran[curr_src + "_done"])
                     done_cnt++;
             }
-        if ((!tran["_sys"]) || (done_cnt === STAT_SRC_LIST.length)) {
-            await $data.execSql({
-                dialect: {
-                    mysql: _.template(SET_TRAN_SEND_STATUS_MYSQL)({ tran_id: tran["_sys"].id }),
-                    mssql: _.template(SET_TRAN_SEND_STATUS_MSSQL)({ tran_id: tran["_sys"].id })
-                }
-            }, {});
-            await this.cacheDel(this._getTranStateKey(tran["_sys"].id));
-            await this.cacheDel(this._getTranLockKey(userId));
-            rc = true;
+            if ((!tran["_sys"]) || (done_cnt === STAT_SRC_LIST.length)) {
+                await $data.execSql({
+                    dialect: {
+                        mysql: _.template(SET_TRAN_SEND_STATUS_MYSQL)({ tran_id: tran["_sys"].id }),
+                        mssql: _.template(SET_TRAN_SEND_STATUS_MSSQL)({ tran_id: tran["_sys"].id })
+                    }
+                }, {});
+                await this.cacheDel(this._getTranStateKey(tran["_sys"].id));
+                await this.cacheDel(this._getTranLockKey(userId));
+                rc = true;
+            }
         }
         return rc;
     }
@@ -572,14 +573,14 @@ const DbUser = class DbUser extends DbObject {
             throw new HttpError(HttpCode.ERR_BAD_REQ, `Arg "src" is invalid or missig ("${trans.src}").`);
 
         let tstate_key = this._getTranStateKey(id);
-        await this.cacheHset(tstate_key, trans.src + "_done",
-            {
-                ts: (new Date()) - 0
-            },
-            { json: true });
+        await this.cacheHset(tstate_key, trans.src + "_done", { ts: (new Date()) - 0 }, { json: true });
 
         let tran = await this.cacheHgetAll(tstate_key, { json: true });
-        await this._checkAndSetTranSent(tran, userId);
+        if (tran["_sys"])
+            await this._checkAndSetTranSent(tran, userId)
+        else
+            await this.cacheDel(tstate_key);
+
         return { result: "OK" };
     }
 
