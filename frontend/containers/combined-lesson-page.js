@@ -17,7 +17,7 @@ import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as userActions from "../actions/user-actions";
 
-import {pages} from '../tools/page-tools';
+import {getDomain, pages} from '../tools/page-tools';
 import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";
@@ -149,18 +149,30 @@ class CombineLessonPage extends React.Component {
                 $('body').removeClass('resizing');
             }, 500);
         }
+
+        this._copyHandler = (e) => {
+            const _courseName = this.props.course ? this.props.course.Name : "",
+                _lesson = this._getLesson(),
+                _lessonName = _lesson ? _lesson.Name : ""
+
+            const _text = `\n\n${getDomain()}\nКурс: "${_courseName}"\nЛекция: "${_lessonName}"\nМатериалы защищены авторскими правами, использование требует согласование с правообладателем`;
+            e.clipboardData.setData('text/plain', document.getSelection() + _text);
+            e.preventDefault();
+        }
+
         this._addEventListeners();
     }
 
     _addEventListeners() {
         window.addEventListener('scroll', this._handleScroll);
         window.addEventListener('resize', this._resizeHandler);
-
+        document.addEventListener("copy", this._copyHandler)
     }
 
     _removeEventListeners() {
         window.removeEventListener('scroll', this._handleScroll);
         window.removeEventListener('resize', this._resizeHandler);
+        document.removeEventListener("copy", this._copyHandler)
         $('body').removeClass('_player');
     }
 

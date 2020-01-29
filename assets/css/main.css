@@ -9665,6 +9665,9 @@ body[data-page="fullpage-player"] .lectures-menu {
         padding-right: 16px;
         width: 100%;
         min-width: 280px; } }
+  .text-block__wrapper * {
+    user-select: text;
+  }
   .text-block h2 {
     margin: 0 0 20px 0;
     font-family: "Fira Sans", Arial, sans-serif;
