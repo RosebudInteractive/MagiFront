@@ -35,10 +35,7 @@ const SEND_REGISTER_TRANSACTION_START = `${prefix}/SEND_REGISTER_TRANSACTION_STA
 const SEND_REGISTER_TRANSACTION_SUCCESS = `${prefix}/SEND_REGISTER_TRANSACTION_SUCCESS`
 const SEND_REGISTER_TRANSACTION_FAIL = `${prefix}/SEND_REGISTER_TRANSACTION_FAIL`
 
-const SET_TRANSACTION_REGISTERED_REQUEST = `${prefix}/SET_TRANSACTION_REGISTERED_REQUEST`
-const SET_TRANSACTION_REGISTERED_START = `${prefix}/SET_TRANSACTION_REGISTERED_START`
-const SET_TRANSACTION_REGISTERED_SUCCESS = `${prefix}/SET_TRANSACTION_REGISTERED_SUCCESS`
-const SET_TRANSACTION_REGISTERED_FAIL = `${prefix}/SET_TRANSACTION_REGISTERED_FAIL`
+const REGISTER_GTM_TRANSACTION_REQUEST = `${prefix}/REGISTER_GTM_TRANSACTION_REQUEST`
 
 const SET_PLAYER_PROGRESS_PERCENT = `${prefix}/SET_PLAYER_PROGRESS_PERCENT`
 const PLAYER_PLAYED = `${prefix}/PLAYER_PLAYED`
@@ -159,7 +156,7 @@ export const saga = function* () {
     yield all([
         takeEvery(GET_NON_REGISTER_TRANSACTION_REQUEST, getNonRegisterTransactionSaga),
         takeEvery(SEND_REGISTER_TRANSACTION_REQUEST, sendRegisterTransactionSrcSaga),
-        takeEvery(SET_TRANSACTION_REGISTERED_REQUEST, registerTransactionsSaga),
+        takeEvery(REGISTER_GTM_TRANSACTION_REQUEST, registerGtmTransactionsSaga),
         takeEvery(COURSES_PAGE_SHOWED, addCoursesPageShowedSaga),
         takeEvery(CONCRETE_COURSE_PAGE_SHOWED, addConcreteCoursePageShowedSaga),
         takeEvery(CONCRETE_COURSE_LINK_CLICKED, addConcreteCourseLinkClickedSaga),
@@ -182,7 +179,7 @@ function* getNonRegisterTransactionSaga() {
         let _data = yield call(_fetchNonRegisterTransactions)
 
         yield put({type: GET_NON_REGISTER_TRANSACTION_SUCCESS, payload: _data})
-        yield put({type: SET_TRANSACTION_REGISTERED_REQUEST})
+        yield put({type: REGISTER_GTM_TRANSACTION_REQUEST})
     } catch (error) {
         yield put({type: GET_NON_REGISTER_TRANSACTION_FAIL})
     }
@@ -202,9 +199,6 @@ function* sendRegisterTransactionSrcSaga(data) {
 
         yield put({type: SEND_REGISTER_TRANSACTION_SUCCESS})
     } catch (error) {
-
-        console.log(error)
-
         yield put({type: SEND_REGISTER_TRANSACTION_FAIL})
     }
 }
@@ -217,20 +211,10 @@ const _fetchSendTransactionsSrc = (data) => {
         .then(parseJSON)
 }
 
-function* registerTransactionsSaga() {
+function* registerGtmTransactionsSaga() {
     const _transactions = yield select(transactions)
 
-    let _result = yield call(_registerTransactions, _transactions)
-
-    yield put({type: SET_TRANSACTION_REGISTERED_START})
-    try {
-        if (_result.length > 0) {
-            yield call(_fetchSetRegisterTransactions, _result)
-        }
-        yield put({type: SET_TRANSACTION_REGISTERED_SUCCESS})
-    } catch (error) {
-        yield put({type: SET_TRANSACTION_REGISTERED_FAIL})
-    }
+    yield _registerTransactions(_transactions)
 }
 
 function* _registerTransactions(data) {
@@ -267,20 +251,6 @@ function* _registerTransactions(data) {
     yield call(_pushAnalyticsData, _data)
 
     return _result
-}
-
-const _fetchSetRegisterTransactions = (values) => {
-    return fetch('/api/users/send-trans', {
-        method: 'POST',
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: JSON.stringify(values),
-        credentials: 'include',
-        redirect: 'manual'
-    })
-        .then(checkStatus)
-        .then(parseJSON)
 }
 
 function* addCoursesPageShowedSaga(data) {
