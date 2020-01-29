@@ -63,11 +63,21 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function isStringEmpty(str) {
+    let res = true;
+    if (str) {
+        let _str = '' + str;
+        res = _str.length === 0;
+    }
+    return res;
+}
+
 module.exports = {
     getTimeStr: getTimeStr,
     buildLogString: buildLogString,
     roundNumber: roundNumber,
     splitArray: splitArray,
     truncateHtml: truncateHtml,
-    validateEmail: validateEmail
+    validateEmail: validateEmail,
+    isStringEmpty: isStringEmpty
 };

@@ -11,7 +11,8 @@ const { DbObject } = require('./db-object');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { DbUtils } = require('./db-utils');
-const { splitArray } = require('../utils');
+const { splitArray, isStringEmpty } = require('../utils');
+const { PrerenderCache } = require('../prerender/prerender-cache');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
@@ -272,6 +273,7 @@ const DbTest = class DbTest extends DbObject {
         if (!opts.cache.prefix)
             opts.cache.prefix = EST_INSTANCE_CACHE_PREFIX;
         super(opts);
+        this._prerenderCache = PrerenderCache();
     }
 
     _getObjById(id, expression, options) {
@@ -1147,11 +1149,14 @@ const DbTest = class DbTest extends DbObject {
                     testObj = col.get(0);
                     await root_obj.edit();
 
+                    let old_URL = isStringEmpty(testObj.uRL()) ? null : (config.testUrl + "/" + testObj.uRL() + "/");
                     let fields = _.clone(inpFields);
                     delete fields.Questions;
                     this._setFieldValues(testObj, fields);
                     if (testObj.uRL() && this._isNumericString(testObj.uRL()))
                         throw new Error(`Test URL can't be numeric: ${inpFields["URL"]}`);
+                    if ((testObj.status() === 2) && isStringEmpty(testObj.uRL()))
+                        throw new Error(`Test URL can't be empty.`);
 
                     if (Array.isArray(inpFields.Images)) {
                         let root_img = testObj.getDataRoot("TestMetaImage");
@@ -1231,7 +1236,14 @@ const DbTest = class DbTest extends DbObject {
                             col_q._del(q_list[id]);
                     }
 
-                    await root_obj.save(dbOpts);
+                    let op_result = await root_obj.save(dbOpts);
+                    if (op_result && op_result.detail && (op_result.detail.length > 0)){
+                        let new_URL = isStringEmpty(testObj.uRL()) ? null : (config.testUrl + "/" + testObj.uRL() + "/");
+                        if (old_URL)
+                            await this._prerenderCache.del(old_URL);
+                        if ((testObj.status() === 2) && new_URL)
+                            await this._prerenderCache.prerender(new_URL);
+                    }
                     return { result: "OK", id: id };
                 })
         }, memDbOptions);
@@ -1325,7 +1337,12 @@ const DbTest = class DbTest extends DbObject {
                         }
                     }
 
-                    await root_obj.save(dbOpts);
+                    let op_result = await root_obj.save(dbOpts);
+                    if (op_result && op_result.detail && (op_result.detail.length > 0)) {
+                        let new_URL = isStringEmpty(testObj.uRL()) ? null : (config.testUrl + "/" + testObj.uRL() + "/");
+                        if ((testObj.status() === 2) && new_URL)
+                            await this._prerenderCache.prerender(new_URL);
+                    }
                     return { result: "OK", id: newId };
                 })
         }, memDbOptions);
@@ -1361,6 +1378,9 @@ const DbTest = class DbTest extends DbObject {
                     col._del(testObj);
 
                     await root_obj.save(dbOpts);
+                    let old_URL = isStringEmpty(testObj.uRL()) ? null : (config.testUrl + "/" + testObj.uRL() + "/");
+                    if (old_URL)
+                        await this._prerenderCache.del(old_URL);
                     return { result: "OK", id: id };
                 })
         }, memDbOptions);
