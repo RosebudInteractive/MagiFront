@@ -192,13 +192,22 @@ const _fetchNonRegisterTransactions = () => {
 }
 
 function* sendRegisterTransactionSrcSaga(data) {
+    const _isDebugMode = yield select(analyticsDebugModeSelector)
+
+    if (_isDebugMode) {console.log(`callback_payment :: EXEC with params ${JSON.stringify(data.payload)}`)}
+
     yield put({type: SEND_REGISTER_TRANSACTION_START})
 
     try {
         yield call(_fetchSendTransactionsSrc, data.payload)
 
+        if (_isDebugMode) {console.log(`callback_payment :: SUCCESS with params ${JSON.stringify(data.payload)}`)}
+
         yield put({type: SEND_REGISTER_TRANSACTION_SUCCESS})
     } catch (error) {
+
+        if (_isDebugMode) {console.error(`callback_payment :: ERROR with params ${JSON.stringify(data.payload)}\n${error}`)}
+
         yield put({type: SEND_REGISTER_TRANSACTION_FAIL})
     }
 }
