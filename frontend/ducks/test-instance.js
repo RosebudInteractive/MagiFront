@@ -525,8 +525,6 @@ export const getShareLink = (instanceId) => {
 function* onFinishLoadProfileSaga(data) {
     const _waiting = yield select(waitingAuth)
 
-    console.log(data)
-
     if (_waiting.active) {
         yield _createInstance(data)
     }

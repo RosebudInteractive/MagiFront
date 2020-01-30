@@ -2,7 +2,13 @@ import React from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types'
-import {testInstanceSelector, questionsSelector, setAnswerAndSave, setAnswerAndFinish} from "ducks/test-instance";
+import {
+    testInstanceSelector,
+    questionsSelector,
+    setAnswerAndSave,
+    setAnswerAndFinish,
+    loadingSelector as testInstanceLoading
+} from "ducks/test-instance";
 import AnswerButton from "./answer-button";
 import AnswerBlock from "./answer-block";
 
@@ -34,8 +40,11 @@ class Instance extends React.Component {
     }
 
     render() {
-        const {test, questions} = this.props,
-            _total = questions.length,
+        const {test, questions, fetching} = this.props
+
+        if (fetching || (!questions.length)) { return null }
+
+        const _total = questions.length,
             _text = questions[this.state.currentIndex].Question.Text
 
         return <div className="question-wrapper js-test-content">
@@ -79,6 +88,7 @@ class Instance extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
+        fetching: testInstanceLoading(state),
         test: testInstanceSelector(state),
         questions: questionsSelector(state),
     }

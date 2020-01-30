@@ -10,7 +10,7 @@ const NEW_QUESTION = {
     Text: null,
     Picture: null,
     PictureMeta: null,
-    AnswType: 1,
+    AnswType: 2,
     Score: 1,
     StTime: null,
     EndTime: null,

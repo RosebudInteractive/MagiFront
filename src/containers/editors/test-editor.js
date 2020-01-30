@@ -12,7 +12,7 @@ import {connect} from 'react-redux';
 
 const NEW_TEST = {
     Id: null,
-    TestTypeId: null,
+    TestTypeId: 1,
     CourseId: null,
     LessonId: null,
     Name: null,
