@@ -369,7 +369,7 @@ const SET_TRAN_SEND_STATUS_MYSQL =
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
-const LOCK_TIMEOUT_SEC = 5 * 60; // 5 min lock
+const LOCK_TIMEOUT_SEC = 20; // 20 sec
 
 const STAT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
 const STAT_SRC_TIMEOUT = 1000 * 60 * 10; // 10 min
