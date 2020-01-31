@@ -283,8 +283,6 @@ function* unlockAndCreateNewTestInstanceSaga(data) {
     const _state = yield select(state => state),
         _authorized = !!_state.user.user;
 
-    console.log(data)
-
     if (!_authorized) {
         yield _setWaitingAuthorize(data.payload)
     } else {
@@ -300,8 +298,6 @@ function* _setWaitingAuthorize(data) {
 function* _createInstance(data) {
     const _waiting = yield select(waitingAuth),
         _data = _waiting.active ? _waiting.data : data
-
-    console.log(_data)
 
     yield put({ type: CREATE_TEST_INSTANCE_START })
     yield put(clearShareUrl())

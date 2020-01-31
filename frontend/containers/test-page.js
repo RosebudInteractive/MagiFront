@@ -155,7 +155,6 @@ class TestPage extends React.Component {
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
-            // this._resizeHandler();
 
             this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }

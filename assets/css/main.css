@@ -5783,6 +5783,7 @@ ul.user-tooltip {
         margin-bottom: 21px;
         line-height: 31px; } }
     .course-module__title span {
+      display: inline;
       margin-left: 11px;
       padding-left: 4px;
       border-bottom: 1px solid rgba(255, 255, 255, 0);

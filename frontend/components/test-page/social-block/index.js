@@ -39,7 +39,20 @@ export class SocialBlock extends React.Component {
     componentDidUpdate(prevProps,) {
         if (this.props.urlCreated && !prevProps.urlCreated) {
             if (this.clickFunk) {
-                this.clickFunk(new MouseEvent("click", {}));
+
+                let _mouseEvent = null
+                //This is true only for IE,firefox
+                if(document.createEvent){
+                    _mouseEvent = document.createEvent("MouseEvent");
+                    _mouseEvent.initMouseEvent("click", true,true,window,0,0,0,0,0,false,false,false,false,0,null);
+                }
+                else{
+                    _mouseEvent = new MouseEvent('click', {});
+                }
+
+                if (_mouseEvent) {
+                    this.clickFunk(_mouseEvent);
+                }
                 this.clickFunk = null
             }
         }
@@ -53,8 +66,6 @@ export class SocialBlock extends React.Component {
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
-
-
 
         return (
             <div className="social-block social-block--dark">
