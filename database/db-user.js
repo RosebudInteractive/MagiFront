@@ -369,7 +369,7 @@ const SET_TRAN_SEND_STATUS_MYSQL =
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
-const LOCK_TIMEOUT_SEC = 5 * 60; // 5 min lock
+const LOCK_TIMEOUT_SEC = 60 * 5; // 5 min
 
 const STAT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
 const STAT_SRC_TIMEOUT = 1000 * 60 * 10; // 10 min
@@ -547,13 +547,16 @@ const DbUser = class DbUser extends DbObject {
                     }
                 }
 
-                if (trans.length === 0)
-                    await this.cacheDel(key)
-                else
+                if (bySrc) {
                     for (let i = 0; i < trans.length; i++) {
                         let tran = trans[i];
                         await this._LogTranStat(tran.id, 1, tran, { dbOptions: { userId: userId } });
                     }
+                    await this.cacheDel(key);
+                }
+                else
+                    if (trans.length === 0)
+                        await this.cacheDel(key);
             }
         }
         return trans;
