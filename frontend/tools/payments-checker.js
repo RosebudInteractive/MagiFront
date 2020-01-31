@@ -18,5 +18,6 @@ export default class PaymentsChecker {
 }
 
 export const callbackPayment = (id, systemName) => {
+    console.log(`callback_payment :: START with params id:${id} systemName:${systemName}`)
     store.dispatch(sendRegisterTransactionSrc({id: id, systemName: systemName}))
 }
