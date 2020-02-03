@@ -40,8 +40,9 @@ class Cover extends React.Component {
                 backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
             }
 
-        const _preTimeChar = test.estimatedTime ? '≈' : "<",
-            _time = test.estimatedTime ? test.estimatedTime : 1
+        const _preTimeChar = test.estimatedTime ? "≈" : "<",
+            _time = test.estimatedTime ? test.estimatedTime : 1,
+            _title = test.estimatedTime ? getCountMinutesTitle(_time) : "минуты"
 
         return <div className="test-page__cover js-test-content" style={_coverStyle}>
             <div className="margin-block flex-column-block">
@@ -53,7 +54,7 @@ class Cover extends React.Component {
                     <div className="detail">
                         <div className="info__detail-item">{test.questionsCount + ' ' + getQuestionsTitle(test.questionsCount)}</div>
                         {INFO_SEPARATOR}
-                        <div className="info__detail-item">{`${_preTimeChar} ${_time} ${getCountMinutesTitle(_time)}`}</div>
+                        <div className="info__detail-item">{`${_preTimeChar} ${_time} ${_title}`}</div>
                     </div>
                 </div>
                 <div className="start-button__block">

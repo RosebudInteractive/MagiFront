@@ -20,6 +20,7 @@ export default class TestItem extends React.Component {
         const _estimatedTime = test ? this._getEstimatedTime() : 0,
             _preTimeChar = _estimatedTime ? "≈" : "<",
             _time = _estimatedTime ? _estimatedTime : 1,
+            _title = _estimatedTime ? getCountMinutesTitle(_time) : "минуты",
             _url = test.Instance ? `/test-instance/${test.Instance.URL}` : `/test/${test.URL}`
 
         return <Link to={_url} className="course-scheme__test">
@@ -29,7 +30,7 @@ export default class TestItem extends React.Component {
                 </div>
                 <div className="test__info-wrapper">
                     <div className="test__name"><span>{test.Name}</span></div>
-                    <div className="test__time">{`${_preTimeChar} ${_time} ${getCountMinutesTitle(_time)}`}</div>
+                    <div className="test__time">{`${_preTimeChar} ${_time} ${_title}`}</div>
                 </div>
             </Link>
     }

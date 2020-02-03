@@ -45,12 +45,7 @@ export default class LessonFull extends React.Component{
                         </div>
                     </div>
                     <div className="item-info__ext">
-                        {/*<div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>*/}
-                        {/*    <svg width="18" height="18"*/}
-                        {/*         dangerouslySetInnerHTML={{__html: _completeStatus}}/>*/}
-                        {/*</div>*/}
                         <PlayBlock lesson={lesson} course={course} wrapperClass={"lessons-list__item__play-block"}/>
-                        {/*<div className={"item-info__arrow-down"}/>*/}
                     </div>
                 </li>
                 <ol className="course-scheme__lessons-list _sublessons">

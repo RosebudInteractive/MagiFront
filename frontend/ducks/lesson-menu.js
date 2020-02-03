@@ -171,6 +171,12 @@ const _handleLessons = (data) => {
             lesson.Lessons.forEach((subLesson) => {
                 subLesson.Number = _parentNumber + '.' + subLesson.Number
             })
+
+            if (lesson.Tests && lesson.Tests.length) {
+                lesson.Tests.sort((a, b) => {
+                    return a.TestTypeId - b.TestTypeId
+                })
+            }
         });
 
         return data

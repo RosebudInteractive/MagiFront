@@ -25,9 +25,6 @@ export default class LessonTests extends React.Component {
 
     _getTests() {
         return this.props.tests
-            .sort((a, b) => {
-                return +b.TestTypeId - +a.TestTypeId
-            })
             .map((item) => {
                 return <TestItem test={item} activeTestId={this.props.activeTestId}/>
             })
