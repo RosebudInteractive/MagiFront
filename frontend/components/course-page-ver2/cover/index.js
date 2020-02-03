@@ -21,8 +21,7 @@ export default class Cover extends React.Component {
 
     render() {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
-            _smallCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown-small"/>'
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
 
         const {course, isFavorite} = this.props,
             _coverUrl = course.LandCover ? course.LandCover : course.Cover,
@@ -38,7 +37,8 @@ export default class Cover extends React.Component {
                 },
             _coverStyle = {
                 backgroundImage : "url(" + '/data/' + _coverUrl + ")",
-                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`
+                backgroundPositionX: _backgroundPosition.left,
+                backgroundPositionY: _backgroundPosition.top,
             }
 
         return <div className="course-page__cover" style={_coverStyle}>
@@ -52,14 +52,6 @@ export default class Cover extends React.Component {
                         <span className="title__course-pay-status">
                             { getCrownForCourse(this.props.course) }
                         </span>
-                        {/*{*/}
-                        {/*    course.IsPaid ?*/}
-                        {/*        <span className="title__course-pay-status">*/}
-                        {/*            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>*/}
-                        {/*        </span>*/}
-                        {/*        :*/}
-                        {/*        null*/}
-                        {/*}*/}
                         <p className="title__label">Курс:</p>
                         <span>{course.Name.trim()}</span>
                     </h1>

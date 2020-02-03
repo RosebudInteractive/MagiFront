@@ -50,7 +50,8 @@ export default class ResultPreview extends React.Component {
 
         return  {
                 backgroundImage : "linear-gradient(rgba(47, 47, 47, 0.4) 0%, rgba(47, 47, 47, 0.4) 100%), url(" + '/data/' + _coverUrl + ")",
-                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
+                backgroundPositionX: _backgroundPosition.left,
+                backgroundPositionY: _backgroundPosition.top,
             }
     }
 }

@@ -45,7 +45,8 @@ class Cover extends React.Component {
                 },
             _coverStyle = {
                 backgroundImage : "linear-gradient(rgba(47, 47, 47, 0.4) 0%, rgba(47, 47, 47, 0.4) 100%), url(" + '/data/' + _coverUrl + ")",
-                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
+                backgroundPositionX: _backgroundPosition.left,
+                backgroundPositionY: _backgroundPosition.top,
             }
 
         const _percent = Math.round((result.CorrectCount / result.TotalCount) * 100)

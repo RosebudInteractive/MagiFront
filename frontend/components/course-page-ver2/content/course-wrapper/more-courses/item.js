@@ -27,7 +27,8 @@ export default class Item extends React.Component {
                 },
             _coverStyle = {
                 backgroundImage : "url(" + '/data/' + _coverUrl + ")",
-                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`
+                backgroundPositionX: _backgroundPosition.left,
+                backgroundPositionY: _backgroundPosition.top,
             }
 
         return <div className="more-item">
