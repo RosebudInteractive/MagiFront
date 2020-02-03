@@ -73,7 +73,7 @@ class Cover extends React.Component {
                     </div>
                     {
                         _nextLessonUrl &&
-                        <Link to={_nextLessonUrl}>
+                        <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
                             <div className="button btn--brown next-lesson-button">
                                 Следующая лекция
                             </div>

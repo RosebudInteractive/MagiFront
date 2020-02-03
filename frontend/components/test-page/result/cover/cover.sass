@@ -32,7 +32,7 @@
     display: flex
     flex-direction: column
     justify-content: flex-end
-    width: 60%
+    width: 90%
     margin-bottom: 21px
     color: $color-white
     @media(max-width: 899px)
@@ -166,17 +166,22 @@
     @media (max-width: 639px)
       width: 100%
 
+    .next-lesson-button__wrapper
+      width: auto
+      flex-grow: 0
+      @media(max-width: 899px)
+        width: 50%
+      @media(max-width: 639px)
+        flex-grow: 1
+
     .next-lesson-button
       padding-left: 0
       padding-right: 0
       height: 26px
       width: 216px
       cursor: pointer
-      flex-grow: 0
       @media(max-width: 899px)
-        width: 50%
-      @media(max-width: 639px)
-        flex-grow: 1
+        width: 100%
 
     .reinit-button
       display: none
