@@ -14,22 +14,19 @@ import {
 } from "ducks/test-instance";
 import {getDomain} from "tools/page-tools";
 import {Link} from "react-router-dom";
-import PropTypes from "prop-types";
+import {lessonsSelector, courseSelector} from "ducks/lesson-menu";
+import {LESSON_STATE, TEST_TYPE} from "../../../../constants/common-consts";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
 class Cover extends React.Component {
-
-    static propTypes = {
-        nextLessonUrl: PropTypes.object,
-    }
 
     constructor(props) {
         super(props)
     }
 
     render() {
-        const {test, result, urlCreated, shareUrl, nextLessonUrl} = this.props,
+        const {test, result, urlCreated, shareUrl, course} = this.props,
             _coverUrl = test.Cover
 
         if (typeof test.CoverMeta === "string") {
@@ -53,6 +50,10 @@ class Cover extends React.Component {
 
         const _percent = Math.round((result.CorrectCount / result.TotalCount) * 100)
 
+        let _nextLessonUrl = this._getNextLessonUrl()
+
+        _nextLessonUrl = _nextLessonUrl ? `/${course.URL}/${_nextLessonUrl}` : null
+
         return <div className="test-result__cover js-test-content" style={_coverStyle}>
             <div className="margin-block flex-column-block">
                 <div className="test-result__info">
@@ -71,8 +72,8 @@ class Cover extends React.Component {
                         Пройти заново
                     </div>
                     {
-                        nextLessonUrl &&
-                        <Link to={nextLessonUrl}>
+                        _nextLessonUrl &&
+                        <Link to={_nextLessonUrl}>
                             <div className="button btn--brown next-lesson-button">
                                 Следующая лекция
                             </div>
@@ -99,17 +100,57 @@ class Cover extends React.Component {
     }
 
     _beforeOnClick(socialBlock, button) {
-        return new Promise((resolve, reject) => {
+        return new Promise(() => {
             getShareLink(this.props.result.Id)
                 .then((data) => {
                     socialBlock.doBeforeSetUrl(button)
                     this.props.setShareUrl(`${getDomain()}/test-result/${data.Id}`)
-                    // reject()
                 })
                 .catch((e) => {
                     console.error(e)
                 })
         })
+    }
+
+    _getNextLessonUrl() {
+        const {test, lessonList} = this.props,
+            _isLessonTest = !!test.LessonId
+
+        if (_isLessonTest) {
+            const _lessons = this._convertLessonList(),
+                _index = _lessons.findIndex(item => item.Id === test.LessonId)
+
+            if (_index === (_lessons.length - 1)) return null
+
+            const _cutArray = _lessons.slice(_index + 1),
+                _nextLesson = _cutArray.find(item => item.State === LESSON_STATE.READY)
+
+            return _nextLesson ? _nextLesson.URL : null
+        }
+        else {
+            if (test.TestTypeId === TEST_TYPE.STARTED) {
+                const _nextLesson = lessonList.find(item => item.State === LESSON_STATE.READY)
+
+                return _nextLesson ? _nextLesson.URL : null
+            } else {
+                return null
+            }
+        }
+    }
+
+    _convertLessonList() {
+        let _result = []
+
+        this.props.lessonList.forEach((item) => {
+            _result.push({Id: item.Id, URL: item.URL, State: item.State})
+            if (item.Lessons && item.Lessons.length) {
+                item.Lessons.forEach((subitem) => {
+                    _result.push({Id: subitem.Id, URL: subitem.URL, State: subitem.State})
+                })
+            }
+        })
+
+        return _result
     }
 }
 
@@ -119,6 +160,8 @@ const mapStateToProps = (state) => {
         result: testInstanceSelector(state),
         shareUrl: shareUrlSelector(state),
         urlCreated: urlCreatedSelector(state),
+        lessonList: lessonsSelector(state),
+        course: courseSelector(state),
     }
 }
 

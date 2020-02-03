@@ -129,6 +129,7 @@ class QuestionGrid extends React.Component {
         })
 
         if (_currentIndex >= 0) {
+            this._selected = +id;
             let _question = this.props.input.value[_currentIndex];
 
             this._question = Object.assign({}, _question);
@@ -198,6 +199,8 @@ class QuestionGrid extends React.Component {
             _current = _array[_index]
 
         if (_index > 0) {
+            this._selected = +id;
+
             let _prev = _array[_index - 1],
                 _currentNumber = _current.Number;
 
@@ -218,6 +221,8 @@ class QuestionGrid extends React.Component {
             _current = _array[_index]
 
         if (_index < _array.length - 1) {
+            this._selected = +id;
+
             let _next = _array[_index + 1],
                 _currentNumber = _current.Number;
 

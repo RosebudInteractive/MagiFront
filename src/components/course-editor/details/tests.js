@@ -13,10 +13,30 @@ class CourseTestsWrapper extends React.Component {
         courseId: PropTypes.number,
     }
 
-    render() {
-        let {tests, selectedLesson, editMode, enableButtons} = this.props;
+    constructor(props) {
+        super(props)
 
-        return <CourseTests selected={selectedLesson}
+        this._selected = 0
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const _oldLength = this.props.tests.length,
+            _newLength = nextProps.tests.length
+
+        if (_oldLength !== _newLength) {
+            if (_newLength > _oldLength) {
+                this._selected = _newLength - 1
+            } else {
+                this._selected = this._selected < _newLength ? this._selected : _newLength - 1
+            }
+        }
+    }
+
+    render() {
+        let {tests, editMode, enableButtons} = this.props,
+            _selected = tests[this._selected] ? tests[this._selected].Id : null
+
+        return <CourseTests selected={_selected}
                             editMode={editMode}
                             data={tests}
                             lessons={this.props.courseLessons}
@@ -35,10 +55,11 @@ class CourseTestsWrapper extends React.Component {
     }
 
     _remove(id) {
-        const _test = this.props.tests.find(item => item.Id === id)
+        const _index = this.props.tests.findIndex(item => item.Id === id)
 
-        if (_test) {
-            this.props.deleteTest(_test)
+        if (_index > -1) {
+            this._selected = _index
+            this.props.deleteTest(this.props.tests[_index])
         }
     }
 
