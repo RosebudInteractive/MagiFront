@@ -61,6 +61,11 @@ module.exports = {
             "set-user-subscription": true
         }
     },
+    statistics: {
+        srcList: ["fb", "vk", "ya", "gl", "cq"],
+        serverTimeout: 30, // 30 sec
+        clientTimeout: 60, // 60 sec
+    },
     authentication: {
         enabled: true,
         useJWT: true,
