@@ -6,23 +6,27 @@ const { URL, URLSearchParams } = require('url');
 
 const { Task } = require('../lib/task');
 const { HttpCode } = require('../../const/http-codes');
+const { DbObject } = require('../../database/db-object');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_CHEQUE_MSSQL =
     "select<%= limit %> [Id], coalesce([LastTrialTs], convert(datetime, 0)) Ts from[Cheque]\n" +
-    "where ([StateId] = 4) and([ReceiptDate] is NULL) and(([TrialNum] is NULL) or([TrialNum] < <%= max_trial %>))\n" +
+    "where ([StateId] = 4) and ([ChequeDate] >= convert(datetime, '<%= st_date %>'))\n" +
+    "and ([ReceiptDate] is NULL) and (([TrialNum] is NULL) or ([TrialNum] < <%= max_trial %>))\n" +
     "order by 2";
 
 const GET_CHEQUE_MYSQL =
     "select `Id`, coalesce(`LastTrialTs`, convert(0, datetime)) Ts from`Cheque`\n" +
-    "where (`StateId` = 4) and(`ReceiptDate` is NULL) and((`TrialNum` is NULL) or(`TrialNum` < <%= max_trial %>))\n" +
+    "where (`StateId` = 4) and (`ChequeDate` >= '<%= st_date %>')\n" +
+    "and (`ReceiptDate` is NULL) and ((`TrialNum` is NULL) or (`TrialNum` < <%= max_trial %>))\n" +
     "order by 2<%= limit %>";
 
 const dfltSettings = {
     maxRecNum: 100,
-    maxTrial: 10
+    maxTrial: 10,
+    startDate: "2019-05-08 00:00:00"
 };
 
 exports.ReceiptCollectionTask = class ReceiptCollectionTask extends Task {
@@ -31,6 +35,7 @@ exports.ReceiptCollectionTask = class ReceiptCollectionTask extends Task {
         super(name, options);
         let opts = options || {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
+        this._settings.startDate = new Date(this._settings.startDate);
         if (config.billing.enabled && config.has("billing.module")) {
             const { PaymentObject } = require(config.billing.module);
             this._paymentServise = PaymentObject();
@@ -54,10 +59,11 @@ exports.ReceiptCollectionTask = class ReceiptCollectionTask extends Task {
                 limit_mssql = ` top ${this._settings.maxRecNum}`;
                 limit_mysql = `\nlimit ${this._settings.maxRecNum}`;
             }
+            let st_date = DbObject.dateToString(this._settings.startDate, true, true);
             let recs = await $data.execSql({
                 dialect: {
-                    mysql: _.template(GET_CHEQUE_MYSQL)({ max_trial: this._settings.maxTrial, limit: limit_mysql }),
-                    mssql: _.template(GET_CHEQUE_MSSQL)({ max_trial: this._settings.maxTrial, limit: limit_mssql })
+                    mysql: _.template(GET_CHEQUE_MYSQL)({ max_trial: this._settings.maxTrial, limit: limit_mysql, st_date: st_date }),
+                    mssql: _.template(GET_CHEQUE_MSSQL)({ max_trial: this._settings.maxTrial, limit: limit_mssql, st_date: st_date })
                 }
             }, {});
             if (recs && recs.detail && (recs.detail.length > 0))

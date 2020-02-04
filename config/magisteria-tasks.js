@@ -11,11 +11,12 @@ module.exports = {
             name: "Receipt collection",
             module: "./receipt-collection",
             type: "scheduled-task",
-            disabled: true,
+            disabled: false,
             schedule: "0 44 * * * *", // run every hour
             options: {
                 maxRecNum: 100,
-                maxTrial: 5
+                maxTrial: 5,
+                startDate: "2019-12-23 00:00:00"
             }
         },
         {
