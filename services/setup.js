@@ -49,6 +49,7 @@ const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
 const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 Hour
+const DFLT_CLIENT_TIMEOUT = 60 * 10; // 10 min
 
 function errorHandler(err, req, res, next) {
     let errStr = err.message ? err.message : err.toString();
@@ -213,7 +214,7 @@ function setupAPI(express, app) {
         let options;
         Promise.resolve()
             .then(() => {
-                options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams }, debug: {} };
+                options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams }, debug: {}, stat: {} };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('snets.vk.appId'))
@@ -238,6 +239,9 @@ function setupAPI(express, app) {
                     options.debug.lsnPositions = config.lessonPositions.debug;
                 if (config.has('debug.clientTrace.gtm'))
                     options.debug.gtm = config.debug.clientTrace.gtm;
+                options.stat.clientTimeout = DFLT_CLIENT_TIMEOUT;
+                if (config.has('statistics.clientTimeout'))
+                    options.stat.clientTimeout = config.statistics.clientTimeout;
 
                 return ParametersService().getAllParameters(true)
                     .then(params => { options.parameters = params })

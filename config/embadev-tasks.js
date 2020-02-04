@@ -26,7 +26,8 @@ let options = {
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 maxRecNum: 100,
-                maxTrial: 2
+                maxTrial: 2,
+                startDate: "2019-06-01 00:00:00"
             }
         },
         {

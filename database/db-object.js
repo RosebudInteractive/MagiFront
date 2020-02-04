@@ -12,6 +12,17 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 
 exports.DbObject = class DbObject extends CacheableObject {
 
+    static dateToString(dt, withTime, withTimeMs) {
+        let timeMsFlag = typeof (withTimeMs) === "boolean" ? withTimeMs : true;
+        let result = "" + dt.getFullYear() + "-" +
+            intFmtWithLeadingZeros((dt.getMonth() + 1), 2) + "-" + intFmtWithLeadingZeros(dt.getDate(), 2);
+        if (withTime)
+            result = result + " " + intFmtWithLeadingZeros(dt.getHours(), 2) + ":" + intFmtWithLeadingZeros(dt.getMinutes(), 2) +
+                ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) +
+                (timeMsFlag ? ("." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3)) : '');
+        return result;
+    }
+
     constructor(options) {
         let opts = _.cloneDeep(options || {});
         let optsCache = opts.cache ? opts.cache : {};
@@ -193,14 +204,7 @@ exports.DbObject = class DbObject extends CacheableObject {
     }
 
     _dateToString(dt, withTime, withTimeMs) {
-        let timeMsFlag = typeof (withTimeMs) === "boolean" ? withTimeMs : true;
-        let result = "" + dt.getFullYear() + "-" +
-            intFmtWithLeadingZeros((dt.getMonth() + 1), 2) + "-" + intFmtWithLeadingZeros(dt.getDate(), 2);
-        if (withTime)
-            result = result + " " + intFmtWithLeadingZeros(dt.getHours(), 2) + ":" + intFmtWithLeadingZeros(dt.getMinutes(), 2) +
-                ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) +
-                (timeMsFlag ? ("." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3)) : '');
-        return result;
+        return DbObject.dateToString(dt, withTime, withTimeMs);
     }
 
     async _getVideoInfo(url) {

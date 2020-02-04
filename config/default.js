@@ -115,6 +115,11 @@ module.exports = {
     general: {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        
     },
+    statistics: {
+        srcList: ["fb", "vk", "ya", "gl", "cq"],
+        serverTimeout: 60 * 9, // 9 min
+        clientTimeout: 60 * 10, // 10 min
+    },
     knowledge_testing: {
         previewUrl: "/test-result-preview",
         imgDir: "tests",

@@ -332,7 +332,8 @@ class YandexKassa extends Payment {
                             let elem = result.items[i]
                             if (elem.status === "succeeded") {
                                 let ms = Date.parse(elem.registered_at);
-                                cheque.ReceiptDate = new Date(ms);
+                                if (!isNaN(ms))
+                                    cheque.ReceiptDate = new Date(ms);
                                 break;
                             }
                         }

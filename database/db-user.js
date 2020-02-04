@@ -371,8 +371,10 @@ const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
 const LOCK_TIMEOUT_SEC = 60 * 5; // 5 min
 
-const STAT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
-const STAT_SRC_TIMEOUT = 1000 * 60 * 10; // 10 min
+const DFLT_STAT_OPTIONS = {
+    srcList: ["fb", "vk", "ya", "gl", "cq"],
+    serverTimeout: 60 * 9, // 9 min
+};
 
 const DbUser = class DbUser extends DbObject {
 
@@ -384,9 +386,11 @@ const DbUser = class DbUser extends DbObject {
         super(opts);
         this._usersCache = UsersCache();
         this._coursesService = CoursesService();
+        this._stat_settings = _.defaultsDeep(config.statistics ? config.get('statistics') : {}, DFLT_STAT_OPTIONS);
+        this._stat_settings.serverTimeoutMs = this._stat_settings.serverTimeout * 1000;
         this._srcList = {};
-        for (let i = 0; i < STAT_SRC_LIST.length; i++)
-            this._srcList[STAT_SRC_LIST[i]] = true;
+        for (let i = 0; i < this._stat_settings.srcList.length; i++)
+            this._srcList[this._stat_settings.srcList[i]] = true;
     }
 
     _getTranLockKey(userId) {
@@ -401,12 +405,12 @@ const DbUser = class DbUser extends DbObject {
         let rc = false;
         let done_cnt = 0;
         if (tran["_sys"]) {
-            for (let j = 0; j < STAT_SRC_LIST.length; j++) {
-                let curr_src = STAT_SRC_LIST[j];
+            for (let j = 0; j < this._stat_settings.srcList.length; j++) {
+                let curr_src = this._stat_settings.srcList[j];
                 if (tran[curr_src + "_done"])
                     done_cnt++;
             }
-            if ((!tran["_sys"]) || (done_cnt === STAT_SRC_LIST.length)) {
+            if ((!tran["_sys"]) || (done_cnt === this._stat_settings.srcList.length)) {
                 await $data.execSql({
                     dialect: {
                         mysql: _.template(SET_TRAN_SEND_STATUS_MYSQL)({ tran_id: tran["_sys"].id }),
@@ -486,8 +490,8 @@ const DbUser = class DbUser extends DbObject {
                                         crDate: lastDate,
                                         lastDate: lastDate
                                     }, { json: true });
-                                    for (let j = 0; j < STAT_SRC_LIST.length; j++){
-                                        let curr_src = STAT_SRC_LIST[j];
+                                    for (let j = 0; j < this._stat_settings.srcList.length; j++){
+                                        let curr_src = this._stat_settings.srcList[j];
                                         await this.cacheHset(tstate_key, curr_src, {
                                             lastDate: lastDate,
                                             cnt: 1,
@@ -498,14 +502,14 @@ const DbUser = class DbUser extends DbObject {
                                 else {
                                     let is_already_sent = await this._checkAndSetTranSent(tran, userId);
                                     if (!is_already_sent) {
-                                        if ((lastDate - tran["_sys"].lastDate) > STAT_SRC_TIMEOUT) {
+                                        if ((lastDate - tran["_sys"].lastDate) > this._stat_settings.serverTimeoutMs) {
                                             await this.cacheHset(tstate_key, "_sys", {
                                                 id: tran["_sys"].id,
                                                 crDate: tran["_sys"].crDate,
                                                 lastDate: lastDate
                                             }, { json: true });
-                                            for (let j = 0; j < STAT_SRC_LIST.length; j++) {
-                                                let curr_src = STAT_SRC_LIST[j];
+                                            for (let j = 0; j < this._stat_settings.srcList.length; j++) {
+                                                let curr_src = this._stat_settings.srcList[j];
                                                 let prev_data = tran[curr_src];
                                                 if (prev_data && (!tran[curr_src + "_done"])) {
                                                     await this.cacheHset(tstate_key, curr_src,
