@@ -315,9 +315,9 @@ const GET_SUBS_INFO_MYSQL =
     "where u.`SysParentId` = <%= id %>";
 
 const GET_NOT_SENT_TRANS_MSSQL =
-    "select c.[Id] [TranId], ii.[Id] [ItemId], cc.[CourseId], al.[FirstName]+ ' ' + al.[LastName][Author],\n" +
-    "  ct.[Name] [Category], cl.[Name], ii.[Price], ii.[Qty], ii.[Qty] * ii.[Price][Sum],\n" +
-    "  ii.[Qty] * round(ii.[Price] * ii.[VATRate] / (100 + ii.[VATRate]), 2)[Tax], g.[Code][Coupon]\n" +
+    "select c.[Id] [TranId], ii.[Id] [ItemId], cc.[CourseId], al.[FirstName]+ ' ' + al.[LastName] [Author],\n" +
+    "  ct.[Name] [Category], cl.[Name], ii.[Price], ii.[Qty], ii.[Qty] * ii.[Price] [Sum],\n" +
+    "  ii.[Qty] * round(ii.[Price] * ii.[VATRate] / (100 + ii.[VATRate]), 2)[Tax], c.[PromoCode] [Coupon]\n" +
     "from[Cheque] c\n" +
     "  join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
     "  join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
@@ -328,7 +328,6 @@ const GET_NOT_SENT_TRANS_MSSQL =
     "  join[CategoryLng] ct on ct.[CategoryId] = cc.[CategoryId]\n" +
     "  join[AuthorToCourse] ac on ac.[CourseId] = cc.[CourseId]\n" +
     "  join[AuthorLng] al on ac.[AuthorId] = al.[AuthorId]\n" +
-    "  left join[PromoCode] g on g.[Id] = c.[PromoCodeId]\n" +
     "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)\n" +
     "order by c.[Id], ii.[Id]";
 
@@ -343,7 +342,7 @@ const SET_TRAN_SEND_STATUS_MSSQL =
 const GET_NOT_SENT_TRANS_MYSQL =
     "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
     "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price` `Sum`,\n" +
-    "  ii.`Qty` * round(ii.`Price` * ii.`VATRate` / (100 + ii.`VATRate`), 2) `Tax`, g.`Code` `Coupon`\n" +
+    "  ii.`Qty` * round(ii.`Price` * ii.`VATRate` / (100 + ii.`VATRate`), 2) `Tax`, c.`PromoCode` `Coupon`\n" +
     "from`Cheque` c\n" +
     "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
     "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
@@ -354,7 +353,6 @@ const GET_NOT_SENT_TRANS_MYSQL =
     "  join`CategoryLng` ct on ct.`CategoryId` = cc.`CategoryId`\n" +
     "  join`AuthorToCourse` ac on ac.`CourseId` = cc.`CourseId`\n" +
     "  join`AuthorLng` al on ac.`AuthorId` = al.`AuthorId`\n" +
-    "  left join`PromoCode` g on g.`Id` = c.`PromoCodeId`\n" +
     "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)\n" +
     "order by c.`Id`, ii.`Id`";
 
