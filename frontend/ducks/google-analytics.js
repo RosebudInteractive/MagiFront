@@ -530,12 +530,16 @@ function* _pushAnalyticsData(data) {
         window.dataLayer.push(data)
 
         if (data['gtm-ee-event-action'] === "Purchase") {
+
+            console.log(data)
+
             for (let i = 0; i < data.ecommerce.purchase.products.length; i++) {
                 const _params = {
                     UID: data.UID,
                     purchaseId: data.ecommerce.purchase.actionField.id,
                     revenue: data.ecommerce.purchase.actionField.revenue,
-                    productId: data.ecommerce.purchase.products[i].id
+                    productId: data.ecommerce.purchase.products[i].id,
+                    call_payment: data.ecommerce.purchase.call_payment.join("+"),
                 }
 
                 yield call(_fetchPurchaseTrace, _params)
@@ -550,7 +554,7 @@ function* _pushAnalyticsData(data) {
 }
 
 const _fetchPurchaseTrace = (params) => {
-    const _str = $.param(params),
+    const _str = decodeURIComponent($.param(params)),
         _url = '/api' + (_str ? '?' + _str : '');
 
     return fetch(_url, {method: 'GET', credentials: 'include', cache: 'no-cache'})
