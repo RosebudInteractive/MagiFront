@@ -370,9 +370,9 @@ const CACHE_PREFIX = "user:";
 const LOCK_TIMEOUT_SEC = 60 * 5; // 5 min
 
 const DFLT_STAT_OPTIONS = {
-    srcList: ["fb", "vk", "ya", "gl", "cq"],
     serverTimeout: 60 * 9, // 9 min
 };
+const DFLT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
 
 const DbUser = class DbUser extends DbObject {
 
@@ -385,6 +385,8 @@ const DbUser = class DbUser extends DbObject {
         this._usersCache = UsersCache();
         this._coursesService = CoursesService();
         this._stat_settings = _.defaultsDeep(config.statistics ? config.get('statistics') : {}, DFLT_STAT_OPTIONS);
+        if (typeof (this._stat_settings.srcList) === "undefined")
+            this._stat_settings.srcList = DFLT_SRC_LIST;
         this._stat_settings.serverTimeoutMs = this._stat_settings.serverTimeout * 1000;
         this._srcList = {};
         for (let i = 0; i < this._stat_settings.srcList.length; i++)
