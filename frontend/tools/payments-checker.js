@@ -1,13 +1,15 @@
 import {store} from "../store/configureStore";
 import {getNonRegisterTransaction, sendRegisterTransactionSrc} from "ducks/google-analytics";
-
-const PING_INTERVAL = 10 * 60 * 1000
+import {paymentPingIntervalSelector} from "ducks/app";
 
 let _interval = null
 
 export default class PaymentsChecker {
     static startPing() {
         if (!_interval) {
+            const SECONDS = paymentPingIntervalSelector(store.getState()),
+                PING_INTERVAL = SECONDS * 1000
+
             store.dispatch(getNonRegisterTransaction())
 
             _interval = setInterval(() => {

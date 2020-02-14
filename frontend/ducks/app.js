@@ -46,6 +46,10 @@ const DebugRecord = Record({
     lsnPositions: false,
     gtm: true,
 })
+
+const StatRecord = Record({
+    clientTimeout: 10 * 60
+})
 /**
  * Reducer
  * */
@@ -58,7 +62,8 @@ export const ReducerRecord = Record({
     currentPageRef: null,
     isWaiting: false,
     currentUrl: null,
-    debug: new DebugRecord()
+    debug: new DebugRecord(),
+    stat: new StatRecord(),
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -81,6 +86,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('billing', new Billing(payload.billing))
                 .set('fetching', false)
                 .set('debug', new DebugRecord(payload.debug))
+                .set('stat', new StatRecord(payload.stat))
 
         case GET_OPTIONS_FAIL:
             return state
@@ -143,6 +149,7 @@ const currentPageRefSelector = createSelector(stateSelector, state => state.curr
 export const waitingSelector = createSelector(stateSelector, state => state.isWaiting)
 export const analyticsDebugModeSelector = createSelector(stateSelector, state => state.getIn(['debug', 'gtm']))
 const currentUrlSelector = createSelector(stateSelector, state => state.currentUrl)
+export const paymentPingIntervalSelector = createSelector(stateSelector, state => state.getIn(['stat', 'clientTimeout']))
 
 
 /**

@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {Record, OrderedMap} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
-import {all, takeEvery, put, call, select,} from 'redux-saga/effects'
+import {all, takeEvery, put, call, select, fork} from 'redux-saga/effects'
 import {analyticsDebugModeSelector} from './app'
 import {getDomain} from "tools/page-tools";
 import $ from "jquery";
@@ -229,13 +229,9 @@ function* registerGtmTransactionsSaga() {
 }
 
 function* _registerTransactions(data) {
-    let _result = [],
-        _data = null
-
     if (data.size > 0) {
-        data.forEach((item) => {
-            _result.push(item.id)
-            _data = {
+        let _array = data.map((item) => {
+            let _data = {
                 'ecommerce': {
                     'currencyCode': 'RUB',
                     'purchase': {
@@ -256,12 +252,14 @@ function* _registerTransactions(data) {
             }
             _data.ecommerce.purchase.products = item.products.slice()
             _data.ecommerce.purchase.call_payment = item.call_payment.slice()
-        })
+
+            return _data
+        }).toArray()
+
+        yield all(_array.map((item) => {
+            return fork(_pushAnalyticsData, item)
+        }))
     }
-
-    yield call(_pushAnalyticsData, _data)
-
-    return _result
 }
 
 function* addCoursesPageShowedSaga(data) {
