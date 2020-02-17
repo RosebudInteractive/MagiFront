@@ -535,8 +535,6 @@ function* _pushAnalyticsData(data) {
 
         if (data['gtm-ee-event-action'] === "Purchase") {
 
-            console.log(data)
-
             const _params = {
                 UID: data.UID,
                 purchaseId: data.ecommerce.purchase.actionField.id,
