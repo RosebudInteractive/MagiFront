@@ -251,7 +251,11 @@ function* _registerTransactions(data) {
                 'gtm-ee-event-non-interaction': 'False',
             }
             _data.ecommerce.purchase.products = item.products.slice()
-            _data.ecommerce.purchase.call_payment = item.call_payment.slice()
+
+            let _array = item.call_payment.slice()
+
+            _data.ecommerce.purchase.call_payment = _array
+            _data.ecommerce.purchase.call_payment_string = _array.join("+")
 
             return _data
         }).toArray()
@@ -533,17 +537,15 @@ function* _pushAnalyticsData(data) {
 
             console.log(data)
 
-            for (let i = 0; i < data.ecommerce.purchase.products.length; i++) {
-                const _params = {
-                    UID: data.UID,
-                    purchaseId: data.ecommerce.purchase.actionField.id,
-                    revenue: data.ecommerce.purchase.actionField.revenue,
-                    productId: data.ecommerce.purchase.products[i].id,
-                    call_payment: data.ecommerce.purchase.call_payment.join("+"),
-                }
-
-                yield call(_fetchPurchaseTrace, _params)
+            const _params = {
+                UID: data.UID,
+                purchaseId: data.ecommerce.purchase.actionField.id,
+                revenue: data.ecommerce.purchase.actionField.revenue,
+                productId: data.ecommerce.purchase.products.join("+"),
+                call_payment: data.ecommerce.purchase.call_payment.join("+"),
             }
+
+            yield call(_fetchPurchaseTrace, _params)
         }
 
 
