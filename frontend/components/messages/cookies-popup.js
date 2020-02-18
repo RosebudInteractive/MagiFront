@@ -8,7 +8,7 @@ class CookiesMessage extends React.Component {
     render() {
         return (
             !this.props.cookiesConfirmed ?
-                <div className="balloon-wrapper">
+                <div className="balloon-wrapper js-cookies-popup">
                     <div className="balloon-wrapper_message">
                         <p className="balloon-wrapper_message__body">
                             {'В целях улучшения качества сервиса мы собираем и используем ' +

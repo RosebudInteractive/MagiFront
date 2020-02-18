@@ -39,10 +39,6 @@ export default class Wrapper extends React.Component {
             if (!_isCoverVisible && this.state.transparentMenu) {
                 this.setState({transparentMenu: false})
             }
-
-            if (!!e && (e.type === 'resize')) {
-                this.forceUpdate()
-            }
         }
 
         $(window).on('resize scroll', ::this._resizeHandler)
