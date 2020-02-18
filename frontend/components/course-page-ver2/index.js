@@ -28,7 +28,7 @@ export default class Wrapper extends React.Component {
             transparentMenu: true
         }
 
-        this._resizeHandler = () => {
+        this._resizeHandler = (e) => {
             const _margin =$('.page-header').height()
 
             let _isCoverVisible = isInViewport('.course-page__cover', _margin)
@@ -38,6 +38,10 @@ export default class Wrapper extends React.Component {
 
             if (!_isCoverVisible && this.state.transparentMenu) {
                 this.setState({transparentMenu: false})
+            }
+
+            if (!!e && (e.type === 'resize')) {
+                this.forceUpdate()
             }
         }
 
