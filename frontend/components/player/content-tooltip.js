@@ -25,6 +25,13 @@ class ContentTooltip extends Component {
 
     componentDidMount() {
         this._mountCustomScroll()
+
+        let _id = this.props.currentContent ? this.props.currentContent.id : 0
+
+        if (_id) {
+            let _selector = `#toc-${_id}`;
+            $("#mcs_container").mCustomScrollbar("scrollTo", _selector);
+        }
     }
 
     componentWillReceiveProps(nextProps){
@@ -72,7 +79,7 @@ class ContentTooltip extends Component {
 
             return <li className={_isActive ? 'active' : ''} key={index}
                        onClick={() => {that._goToContent(item.begin)}}>
-                <div className='contents-tooltip_item'>{item.title}</div>
+                <div className='contents-tooltip_item' id={`toc-${item.id}`}>{item.title}</div>
                 {
                     _isActive ?
                         <div className={"equalizer" + (that.props.paused ? " paused" : "")}>
