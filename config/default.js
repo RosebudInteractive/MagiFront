@@ -45,7 +45,7 @@ module.exports = {
         },
         siteHost: defer(function () {
             return this.server.protocol + '://' +
-                (this.server.address === '0.0.0.0' ? 'localhost' : this.server.address) + ':' +
+                (this.server.address === '0.0.0.0' ? 'localhost' : this.server.address) +
                 (this.server.port ? (':' + this.server.port) : '');
         })
     },

@@ -510,6 +510,20 @@ const CHECKIF_CAN_DEL_MYSQL =
     "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
     "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
+const COURSE_MSSQL_LSN_COVER_REQ =
+    "select c.[Id], l.[Cover], c.[ProductId] from [LessonCourse] lc\n" +
+    "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where (not c.[ProductId] is NULL) and (c.[State] = 'P') and (lc.[State] = 'R') and (lc.[ParentId] is NULL)\n" +
+    "order by c.[Id], lc.[Number]";
+
+const COURSE_MYSQL_LSN_COVER_REQ =
+    "select c.`Id`, l.`Cover`, c.`ProductId` from `LessonCourse` lc\n" +
+    "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where (not c.`ProductId` is NULL) and (c.`State` = 'P') and (lc.`State` = 'R') and (lc.`ParentId` is NULL)\n" +
+    "order by c.`Id`, lc.`Number`";
+
 const DFLT_ADDRESS_BOOK = "Магистерия";
 const DFLT_SENDER_NAME = "Magisteria.ru";
 
@@ -795,6 +809,28 @@ const DbCourse = class DbCourse extends DbObject {
         let absDataUrl = this._getAbsDataUrl(baseUrl);
         let absCourseUrl = this._getAbsCourseUrl(baseUrl);
 
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(COURSE_MYSQL_LSN_COVER_REQ)({}),
+                mssql: _.template(COURSE_MSSQL_LSN_COVER_REQ)({})
+            }
+        }, {});
+        let ext_images = {};
+        let currId = -1;
+        let currImgs = { str: "" };
+        for (let i = 0; result && result.detail && (i < result.detail.length); i++) {
+            let elem = result.detail[i];
+            if (elem.Cover) {
+                if (currId !== elem.Id) {
+                    currId = elem.Id;
+                    ext_images[currId] = currImgs = { str: "" };
+                }
+                if (currImgs.str.length > 0)
+                    currImgs.str += ",";
+                currImgs.str += absDataUrl + elem.Cover;
+            }
+        }
+
         let data = await this.getAllPublic(null, { price_list: true });
         let authors = {};
         for (let i = 0; i < data.Authors.length; i++) {
@@ -818,12 +854,13 @@ const DbCourse = class DbCourse extends DbObject {
                     brand: `${authors[elem.Authors[0]].FirstName} ${authors[elem.Authors[0]].LastName}`,
                     sale_price: elem.Discount ? `${elem.DPrice} ${CURRENCY_CODE}` : null,
                     sale_price_effective_date: elem.Discount ?
-                        `${elem.Discount.FirstDate.toISOString()}/${elem.Discount.LastDate.toISOString()}` : null
+                        `${elem.Discount.FirstDate.toISOString()}/${elem.Discount.LastDate.toISOString()}` : null,
+                    additional_image_link: ext_images[elem.Id] ? ext_images[elem.Id].str : null
                 });
             }
         }
         let columns = ["id", "title", "description", "availability", "condition", "price",
-            "link", "image_link", "google_product_category", "brand", "sale_price", "sale_price_effective_date"];
+            "link", "image_link", "google_product_category", "brand", "sale_price", "sale_price_effective_date", "additional_image_link"];
         let content = columns.join("\t");
         for (let i = 0; i < courses.length; i++)
             for (let j = 0; j < columns.length; j++)
