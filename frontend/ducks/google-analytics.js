@@ -250,7 +250,7 @@ function* _registerTransactions(data) {
                 'gtm-ee-event-action': 'Purchase',
                 'gtm-ee-event-non-interaction': 'False',
             }
-            _data.ecommerce.purchase.products = item.products.slice()
+            _data.ecommerce.purchase.products = item.products.map(item => item.id)
 
             let _array = item.call_payment.slice()
 
