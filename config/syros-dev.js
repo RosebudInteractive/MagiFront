@@ -62,7 +62,7 @@ module.exports = {
         }
     },
     statistics: {
-        srcList: ["fb", "vk", "ya", "gl", "cq"],
+        srcList: ["fb", "vk", "ya", "gl", "cq", "mt"],
         serverTimeout: 30, // 30 sec
         clientTimeout: 60, // 60 sec
     },
