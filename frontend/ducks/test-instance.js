@@ -404,10 +404,11 @@ function _fetchGetInstanceTest(testId) {
                 }
 
                 question.IsCorrect = isAnswerCorrect(question.Question, question.Answer)
+                question.IsPartCorrect = question.IsCorrect ? false : isAnswerPartCorrect(question.Question, question.Answer)
             })
 
             data.CorrectCount = data.Questions.reduce((acc, value) => {
-                return acc + (value.IsCorrect ? 1 : 0)
+                return acc + (value.IsCorrect ? 1 : value.IsPartCorrect ? 0.5 : 0)
             }, 0)
 
             data.TotalCount = data.Questions.length
@@ -498,7 +499,7 @@ function* finishInstanceSaga(data) {
         _questions = yield select(questionsSelector)
 
     let _correctCount = _questions.reduce((acc, value) => {
-        return acc + (value.IsCorrect ? 1 : 0)
+        return acc + (value.IsCorrect ? 1 : value.IsPartCorrect ? 0.5 : 0)
     }, 0)
 
     _instance = _instance.set("IsFinished", true)
