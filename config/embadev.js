@@ -79,7 +79,7 @@ let options = {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
     },
     statistics: {
-        srcList: ["fb", "vk", "ya", "gl", "cq"],
+        srcList: ["fb", "vk", "ya", "gl", "cq", "mt"],
         serverTimeout: 30, // 30 sec
         clientTimeout: 60, // 60 sec
     },

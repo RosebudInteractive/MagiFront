@@ -372,7 +372,7 @@ const LOCK_TIMEOUT_SEC = 60 * 5; // 5 min
 const DFLT_STAT_OPTIONS = {
     serverTimeout: 60 * 9, // 9 min
 };
-const DFLT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq"];
+const DFLT_SRC_LIST = ["fb", "vk", "ya", "gl", "cq", "mt"];
 
 const DbUser = class DbUser extends DbObject {
 
