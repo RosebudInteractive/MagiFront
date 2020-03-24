@@ -29,8 +29,11 @@ class ContentTooltip extends Component {
         let _id = this.props.currentContent ? this.props.currentContent.id : 0
 
         if (_id) {
-            let _selector = `#toc-${_id}`;
-            $("#mcs_container").mCustomScrollbar("scrollTo", _selector);
+            let _selector = `#toc-${_id}`,
+                _position = $(_selector).parent().position()
+
+            _position.top -= 8
+            $("#mcs_container").mCustomScrollbar("scrollTo", Object.values(_position), { scrollInertia : 0, timeout : 0 });
         }
     }
 
