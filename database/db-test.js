@@ -236,6 +236,27 @@ const SHARED_INSTANCE_BY_INSTID_MSSQL =
 const SHARED_INSTANCE_BY_INSTID_MYSQL =
     "select `Code` from `TestInstanceShared` where `TestInstanceId` = <%= instance_id %> order by Id desc";
 
+const HAS_INSTANCES_MSSQL =
+    "select 1 as tp, count(*) as cnt from [TestInstance] where [TestId] = <%= id %>\n" +
+    "union all\n" +
+    "select 2, count(*) from [TestInstanceShared] where [TestId] = <%= id %>";
+
+const HAS_INSTANCES_MYSQL =
+    "select 1 as tp, count(*) as cnt from `TestInstance` where `TestId` = <%= id %>\n" +
+    "union all\n" +
+    "select 2, count(*) from `TestInstanceShared` where `TestId` = <%= id %>";
+
+const DELETE_INSTANCES_MSSQL =
+    [
+        "delete from [TestInstanceShared] where [TestId] = <%= id %>",
+        "delete from [TestInstance] where [TestId] = <%= id %>"
+    ];
+
+const DELETE_INSTANCES_MYSQL =
+    [
+        "delete from `TestInstanceShared` where `TestId` = <%= id %>",
+        "delete from `TestInstance` where `TestId` = <%= id %>"
+    ];
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
@@ -1134,6 +1155,26 @@ const DbTest = class DbTest extends DbObject {
         let inpFields = data || {};
         let testObj = null;
 
+        if (!inpFields.deleteInstances) {
+            let result = await $data.execSql({
+                dialect: {
+                    mysql: _.template(HAS_INSTANCES_MYSQL)({ id: id }),
+                    mssql: _.template(HAS_INSTANCES_MSSQL)({ id: id })
+                }
+            }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0)) {
+                let has_instances = false;
+                result.detail.forEach(elem => {
+                    has_instances = has_instances || (elem.cnt > 0);
+                })
+                if (has_instances)
+                    throw new HttpError(HttpCode.ERR_CONFLICT, {
+                        error: "testHasInstances",
+                        message: "Тест имеет инстансы, модификация невозможна."
+                    });
+            }
+        }
+
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
                 resolve(this._getObjById(id, null, dbOpts));
@@ -1235,6 +1276,18 @@ const DbTest = class DbTest extends DbObject {
                         for (let id in q_list)
                             col_q._del(q_list[id]);
                     }
+
+                    if (inpFields.deleteInstances) {
+                        let mysql_script = [];
+                        DELETE_INSTANCES_MYSQL.forEach((elem) => {
+                            mysql_script.push(_.template(elem)({ id: id }));
+                        });
+                        let mssql_script = [];
+                        DELETE_INSTANCES_MSSQL.forEach((elem) => {
+                            mssql_script.push(_.template(elem)({ id: id }));
+                        });
+                        await DbUtils.execSqlScript(mysql_script, mssql_script, dbOpts);
+                    };
 
                     let op_result = await root_obj.save(dbOpts);
                     if (op_result && op_result.detail && (op_result.detail.length > 0)){
