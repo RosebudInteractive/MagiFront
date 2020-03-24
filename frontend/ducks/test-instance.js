@@ -6,11 +6,10 @@ import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, loadTestData, testSelector} from "ducks/test";
 import {push} from 'react-router-redux'
 import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
-import {isAnswerCorrect} from "tools/tests-tools";
+import {isAnswerCorrect, isAnswerPartCorrect} from "tools/tests-tools";
 import {LOGOUT_SUCCESS, SHOW_SIGN_IN_FORM, USER_HAS_BEEN_LOADED} from "../constants/user";
 import {CLEAR_WAITING_AUTHORIZE} from "ducks/app";
 import {FINISH_LOAD_PROFILE} from "ducks/profile";
-import {START_BILLING_BY_REDIRECT} from "ducks/billing";
 
 /**
  * Constants
@@ -88,6 +87,7 @@ const QuestionRecord = Record({
     Question: null,
     Score: null,
     IsCorrect: false,
+    IsPartCorrect: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -426,8 +426,14 @@ function* setAnswerSaga(data) {
 
     if (isAnswerCorrect(_question.Question, _answer.value)) {
         _questions = _questions
-            .setIn([_answer.questionId, 'Score'], _question.Question.Score)
+            .setIn([_answer.questionId, 'Score'], _question.Question.Score * 10)
             .setIn([_answer.questionId, 'IsCorrect'], true)
+        _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
+    } else if (isAnswerPartCorrect(_question.Question, _answer.value)) {
+        _questions = _questions
+            .setIn([_answer.questionId, 'Score'], _question.Question.Score * 5)
+            .setIn([_answer.questionId, 'IsCorrect'], false)
+            .setIn([_answer.questionId, 'IsPartCorrect'], true)
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     }
 

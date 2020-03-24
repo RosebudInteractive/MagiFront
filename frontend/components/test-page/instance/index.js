@@ -13,6 +13,7 @@ import AnswerButton from "./answer-button";
 import AnswerBlock from "./answer-block";
 
 import "./instance.sass"
+import {ANSWER_TYPES} from "../../../constants/common-consts";
 
 class Instance extends React.Component {
     static propTypes = {
@@ -45,15 +46,18 @@ class Instance extends React.Component {
         if (fetching || (!questions.length)) { return null }
 
         const _total = questions.length,
-            _text = questions[this.state.currentIndex].Question.Text
+            _question = questions[this.state.currentIndex].Question,
+            _needHint = _question.AnswType === ANSWER_TYPES.MULTI_SELECT,
+            _text = _question.Text
 
         return <div className="question-wrapper js-test-content">
             <h3 className="question-title">
                 <span className="current">{this.state.currentIndex + 1}</span>
                 <span className="total">{"/" + _total + ": "}</span>
                 {_text}
+                {_needHint && <div className="hint">На этот вопрос возможно несколько правильных ответов</div>}
             </h3>
-            <AnswerBlock question={questions[this.state.currentIndex].Question} onChangeValue={::this._onChangeValue} answer={this.state.answer && this.state.answer.value}/>
+            <AnswerBlock question={_question} onChangeValue={::this._onChangeValue} answer={this.state.answer && this.state.answer.value}/>
             <AnswerButton test={test} disabled={!this.state.hasAnswer} onButtonClick={::this._onForward}/>
         </div>
     }

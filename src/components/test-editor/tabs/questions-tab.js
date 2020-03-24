@@ -16,7 +16,8 @@ export default class QuestionsTab extends React.Component{
         this._resizeHandler = () => {
             let _questions = window.$$('test-questions'),
                 _width = $('.editor__main-area').width() - 2,
-                _height = $('.editor__main-area').height() - $('.episode-toc .action-bar').height() - 14
+                _actionBarHeight = $('.test-questions .action-bar').height(),
+                _height = $('.editor__main-area').height() - _actionBarHeight - 14
 
             if (_questions) {
                 _questions.$setSize(_width, _height);

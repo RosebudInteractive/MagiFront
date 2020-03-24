@@ -34,3 +34,17 @@ export const isAnswerCorrect = (question, answer) => {
             return false
     }
 }
+
+export const isAnswerPartCorrect = (question, answer) => {
+    if (question.AnswType === ANSWER_TYPES.MULTI_SELECT) {
+        const _correctAnswers = question.Answers
+            .filter((item) => {
+                return item.IsCorrect
+            })
+            .map(item => item.Id)
+
+        return _correctAnswers.some(item => answer.includes(item))
+    } else {
+        return false
+    }
+}
