@@ -4,9 +4,9 @@ import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
 import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
-import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
+import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
-import {confirmDeleteObjectSaga} from "adm-ducks/messages";
+import {queryUserConfirmationSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -160,7 +160,7 @@ function* editTestSaga(data) {
 
 function* deleteTestSaga(data) {
 
-    const _confirmed = yield confirmDeleteObjectSaga(`Удалить тест "${data.payload.Name}"?`)
+    const _confirmed = yield queryUserConfirmationSaga(`Удалить тест "${data.payload.Name}"?`)
 
     if (_confirmed) {
         yield put({type: DELETE_TEST_START})

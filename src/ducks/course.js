@@ -5,7 +5,7 @@ import {all, takeEvery, put, call, select} from 'redux-saga/effects'
 import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {DISABLE_BUTTONS, ENABLE_BUTTONS,} from "adm-ducks/app";
 import {SHOW_ERROR_DIALOG} from "../constants/Common";
-import {confirmDeleteObjectSaga} from "adm-ducks/messages";
+import {queryUserConfirmationSaga} from "adm-ducks/messages";
 import {createSelector} from "reselect";
 
 /**
@@ -64,7 +64,7 @@ export const sendEmail = (courseId) => {
  */
 function* sendEmailSaga(data) {
 
-    const _confirmed = yield confirmDeleteObjectSaga(`Запустить рассылку?`)
+    const _confirmed = yield queryUserConfirmationSaga(`Запустить рассылку?`)
 
     if (!_confirmed) { return }
 

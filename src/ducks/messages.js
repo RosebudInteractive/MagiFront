@@ -83,7 +83,7 @@ export function* confirmCloseEditorSaga() {
     return !!yes;
 }
 
-export function* confirmDeleteObjectSaga(message) {
+export function* queryUserConfirmationSaga(message) {
 
     yield put(showConfirmation(message));
 

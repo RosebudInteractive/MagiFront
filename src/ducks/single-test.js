@@ -8,6 +8,7 @@ import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
 import {reset} from "redux-form";
 import {EDIT_TEST_REQUEST} from "adm-ducks/test-list";
+import {queryUserConfirmationSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -40,6 +41,8 @@ export const UPDATE_TEST_REQUEST = `${prefix}/UPDATE_TEST_REQUEST`
 export const UPDATE_TEST_START = `${prefix}/UPDATE_TEST_START`
 export const UPDATE_TEST_SUCCESS = `${prefix}/UPDATE_TEST_SUCCESS`
 export const UPDATE_TEST_FAIL = `${prefix}/UPDATE_TEST_FAIL`
+
+const TEST_ALREADY_HAS_INSTANCES = "testHasInstances"
 
 /**
  * Reducer
@@ -313,10 +316,24 @@ function* updateTestSaga(data) {
         yield put(reset('TestEditor'))
         yield put({type: GET_TEST_REQUEST, payload: _testId})
     } catch (e) {
-        yield put({ type: UPDATE_TEST_FAIL })
+        if ((e.status === +409) && e.serverData && e.serverData.error && (e.serverData.error === TEST_ALREADY_HAS_INSTANCES)) {
+            const _confirmed = yield queryUserConfirmationSaga(`У теста есть инстансы. При сохранении изменений они будут удалены. Продолжить сохранение?`)
 
-        const _message = yield call(getErrorMessage, e)
-        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+            if (_confirmed) {
+                let _data = Object.assign({}, data.payload)
+                _data.deleteInstances = true
+
+                yield put({ type: UPDATE_TEST_FAIL })
+                yield put({type: UPDATE_TEST_REQUEST, payload: _data})
+            } else {
+                yield put({ type: UPDATE_TEST_FAIL })
+            }
+        } else {
+            yield put({ type: UPDATE_TEST_FAIL })
+
+            const _message = yield call(getErrorMessage, e)
+            yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+        }
     }
 }
 
