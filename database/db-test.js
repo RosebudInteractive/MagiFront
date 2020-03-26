@@ -1155,6 +1155,7 @@ const DbTest = class DbTest extends DbObject {
         let inpFields = data || {};
         let testObj = null;
 
+        let has_instances = false;
         if (!inpFields.deleteInstances) {
             let result = await $data.execSql({
                 dialect: {
@@ -1163,18 +1164,13 @@ const DbTest = class DbTest extends DbObject {
                 }
             }, dbOpts);
             if (result && result.detail && (result.detail.length > 0)) {
-                let has_instances = false;
                 result.detail.forEach(elem => {
                     has_instances = has_instances || (elem.cnt > 0);
                 })
-                if (has_instances)
-                    throw new HttpError(HttpCode.ERR_CONFLICT, {
-                        error: "testHasInstances",
-                        message: "Тест имеет инстансы, модификация невозможна."
-                    });
             }
         }
 
+        let has_deleted_qa = false;
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
                 resolve(this._getObjById(id, null, dbOpts));
@@ -1269,12 +1265,16 @@ const DbTest = class DbTest extends DbObject {
                                         await root_answ.newObject({ fields: fld_a }, dbOpts);
                                     }
                                 }
-                                for (let id in a_list)
+                                for (let id in a_list) {
+                                    has_deleted_qa = true;
                                     col_a._del(a_list[id]);
+                                }
                             }
                         }
-                        for (let id in q_list)
+                        for (let id in q_list) {
+                            has_deleted_qa = true;
                             col_q._del(q_list[id]);
+                        }
                     }
 
                     if (inpFields.deleteInstances) {
@@ -1287,7 +1287,15 @@ const DbTest = class DbTest extends DbObject {
                             mssql_script.push(_.template(elem)({ id: id }));
                         });
                         await DbUtils.execSqlScript(mysql_script, mssql_script, dbOpts);
-                    };
+                    }
+                    else {
+                        if (has_deleted_qa && has_instances)
+                            throw new HttpError(HttpCode.ERR_CONFLICT, {
+                                error: "testHasInstances",
+                                message: "Тест имеет инстансы, модификация невозможна."
+                            });
+                        
+                    }
 
                     let op_result = await root_obj.save(dbOpts);
                     if (op_result && op_result.detail && (op_result.detail.length > 0)){
