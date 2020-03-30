@@ -6,21 +6,35 @@ import MetaTags from "react-meta-tags";
 import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
 
-const DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
+const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
     DEFAULT_TITLE = "Каникулы здорового человека",
     DEFAULT_OG_IMAGE = "2019/12/fb-2019-2020_3.jpg",
     DEFAULT_TW_IMAGE = "2019/12/tw-2019-2020_3.jpg",
+    ROOT_URL = "/",
     TITLE = {
         "sales2020": DEFAULT_TITLE,
         "sales2020-1": "Праздник, который останется с вами",
+        "robinson2020": "Пока все дома",
     },
     OG_IMAGE = {
         "sales2020": DEFAULT_OG_IMAGE,
         "sales2020-1": "2020/01/fb-2020-sale.jpg",
+        "robinson2020": "2020/03/fb-Eastman-Johnson_Reading-Boy_1863.jpg",
     },
     TW_IMAGE = {
         "sales2020": DEFAULT_TW_IMAGE,
         "sales2020-1": "2020/01/tw-2020-sale.jpg",
+        "robinson2020": "2020/03/tw-Eastman-Johnson_Reading-Boy_1863.jpg",
+    },
+    DESCRIPTION = {
+        "sales2020": DEFAULT_DESCRIPTION,
+        "sales2020-1": DEFAULT_DESCRIPTION,
+        "robinson2020": "Слушай, смотри, думай, читай!",
+    },
+    URL = {
+        "sales2020": ROOT_URL,
+        "sales2020-1": ROOT_URL,
+        "robinson2020": "/razdel/literature",
     }
 
 
@@ -46,7 +60,7 @@ class EmptyPromoPage extends React.Component{
     render() {
         if (this.state.redirect && !window.prerenderEnable) {
             const {ownProps} = this.props,
-                _url = '/' + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
+                _url = this._getUrl() + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
             
             return <Redirect to={_url}/>
         } else {
@@ -57,12 +71,12 @@ class EmptyPromoPage extends React.Component{
             this._removeRobotsMetaTags()
 
             return <MetaTags>
-                <meta name="description" content={DESCRIPTION}/>
+                <meta name="description" content={this._getDescr()}/>
                 <link rel="canonical" href={_url}/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content={this._getTitle()}/>
-                <meta property="og:description" content={DESCRIPTION}/>
+                <meta property="og:description" content={this._getDescr()}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={this.props.facebookAppID}/>
@@ -72,7 +86,7 @@ class EmptyPromoPage extends React.Component{
                 <meta property="og:image:height" content={640}/>
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:title" content={this._getTitle()}/>
-                <meta name="twitter:description" content={DESCRIPTION}/>
+                <meta name="twitter:description" content={this._getDescr()}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 <meta name="twitter:image" content={_imagePath + this._getTwImage()}/>
                 <meta name="twitter:creator" content="@MagisteriaRu"/>
@@ -129,6 +143,20 @@ class EmptyPromoPage extends React.Component{
             _path = TW_IMAGE[_code]
 
         return _path ? _path : DEFAULT_TW_IMAGE
+    }
+
+    _getDescr() {
+        let _code = this.props.ownProps.match.params.code,
+            _descr = DESCRIPTION[_code]
+
+        return _descr ? _descr : DEFAULT_TW_IMAGE
+    }
+
+    _getUrl() {
+        let _code = this.props.ownProps.match.params.code,
+            _url = URL[_code]
+
+        return _url ? _url : ROOT_URL
     }
 }
 
