@@ -48,7 +48,7 @@ class Answers extends React.Component {
                     <span className="current">{index + 1}</span>
                     <span className="total">{"/" + _total + ": "}</span>
                     {item.Question.Text}
-                    <span className={item.IsCorrect ? "correct" : "wrong"}>{item.IsCorrect ? " Верно" : item.IsPartCorrect ? " Неполный  ответ" : " Неверно"}</span>
+                    <span className={"answer__hint " + (item.IsCorrect ? "correct" : item.IsPartCorrect ? "part-correct" : "wrong") }>{item.IsCorrect ? "Правильный ответ" : item.IsPartCorrect ? "Неполный  ответ" : "Ошибка"}</span>
                 </h3>
                 <AnswerBlock question={item.Question} answer={item.Answer}/>
             </React.Fragment>
