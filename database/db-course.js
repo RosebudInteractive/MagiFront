@@ -1179,8 +1179,9 @@ const DbCourse = class DbCourse extends DbObject {
                     let isValid = (!promo.Products) || promo.Products[course.ProductId] ? true : false;
                     if (promo.Counter)
                         isValid = isValid && (promo.Rest > 0);
-                    if (promo.FirstDate)
-                        isValid = isValid && ((now - promo.FirstDate) >= 0) && ((!promo.LastDate) || ((now - promo.LastDate) < 0));
+                    if (promo.FirstDate || promo.LastDate)
+                        isValid = isValid && ((now - (promo.FirstDate ? promo.FirstDate : 0)) >= 0) &&
+                            ((!promo.LastDate) || ((now - promo.LastDate) < 0));
                     if (isValid) {
                         course.Promo = {
                             Id: promo.Id,
@@ -1648,7 +1649,9 @@ const DbCourse = class DbCourse extends DbObject {
         return result;
     }
 
-    get(id) {
+    get(id, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
         let course = {};
         return new Promise((resolve, reject) => {
             resolve(
@@ -1657,7 +1660,7 @@ const DbCourse = class DbCourse extends DbObject {
                         mysql: _.template(COURSE_MYSQL_ID_REQ)({ accountId: ACCOUNT_ID, id: id }),
                         mssql: _.template(COURSE_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, id: id })
                     }
-                }, {})
+                }, dbOpts)
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length === 1)) {
                             course = result.detail[0];
@@ -1674,7 +1677,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ id: id }),
                                 mssql: _.template(COURSE_MSSQL_AUTHOR_REQ)({ id: id })
                             }
-                        }, {});
+                        }, dbOpts);
                     })
                     .then((result) => {
                         let authors = [];
@@ -1689,7 +1692,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 mysql: _.template(COURSE_MYSQL_CATEGORY_REQ)({ id: id }),
                                 mssql: _.template(COURSE_MSSQL_CATEGORY_REQ)({ id: id })
                             }
-                        }, {});
+                        }, dbOpts);
                     })
                     .then((result) => {
                         let categories = [];
@@ -1704,7 +1707,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 mysql: _.template(COURSE_MYSQL_LESSON_REQ)({ id: id }),
                                 mssql: _.template(COURSE_MSSQL_LESSON_REQ)({ id: id })
                             }
-                        }, {});
+                        }, dbOpts);
                     })
                     .then((result) => {
                         course.Lessons = [];
@@ -1722,7 +1725,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: id }),
                                 mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: id })
                             }
-                        }, {});
+                        }, dbOpts);
                         let images = [];
                         if (result && result.detail && (result.detail.length > 0)) {
                             images = result.detail;

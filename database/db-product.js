@@ -32,12 +32,12 @@ const PRODUCT_REQ_TREE = {
 };
 
 const GET_PROD_MSSQL =
-    "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields], p.[ProductTypeId]\n" +
+    "select p.[Id], p.[Code], p.[Name], p.[AccName], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields], p.[ProductTypeId]\n" +
     "from[Product] p\n" +
     "where (<%= alias %>.[<%= field %>] <%= cond %>)<%= discontinued %>";
 
 const GET_PROD_DETAIL_MSSQL =
-    "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
+    "select p.[Id], p.[Code], p.[Name], p.[AccName], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
     "  p.[ProductTypeId], pt.[Code] as [TypeCode], pt.[ExtFields] as [TpExt], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
     "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription]\n" +
@@ -58,7 +58,7 @@ const GET_PROD_DETAIL_MSSQL =
     "  and((vr.[LastDate] > convert(datetime, '<%= dt %>')) or(vr.[LastDate] is NULL)))<%= discontinued %>";
 
 const GET_PROD_DETAIL_MYSQL =
-    "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
+    "select p.`Id`, p.`Code`, p.`Name`, p.`AccName`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
     "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, pt.`ExtFields` as `TpExt`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
     "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`\n" +
@@ -79,7 +79,7 @@ const GET_PROD_DETAIL_MYSQL =
     "  and((vr.`LastDate` > '<%= dt %>') or(vr.`LastDate` is NULL)))<%= discontinued %>";
 
 const GET_PROD_MYSQL =
-    "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`, p.`ProductTypeId`\n" +
+    "select p.`Id`, p.`Code`, p.`Name`, p.`AccName`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`, p.`ProductTypeId`\n" +
     "from`Product` p\n" +
     "where (<%= alias %>.`<%= field %>` <%= cond %>)<%= discontinued %>";
 
@@ -429,6 +429,8 @@ const DbProduct = class DbProduct extends DbObject {
                         productObj.code(inpFields.Code);
                     if (typeof (inpFields.Name) !== "undefined")
                         productObj.name(inpFields.Name);
+                    if (typeof (inpFields.AccName) === "string")
+                        productObj.accName(inpFields.AccName);
                     if (typeof (inpFields.Picture) !== "undefined")
                         productObj.picture(inpFields.Picture);
                     if (typeof (inpFields.PictureMeta) !== "undefined")
@@ -503,6 +505,9 @@ const DbProduct = class DbProduct extends DbObject {
                         fields.Name = inpFields.Name
                     else
                         throw new Error(`Missing field "Name"`);
+                    fields.AccName = fields.Name;
+                    if (typeof (inpFields.AccName) === "string")
+                        fields.AccName = inpFields.AccName;
                     if (typeof (inpFields.Picture) !== "undefined")
                         fields.Picture = inpFields.Picture;
                     if (typeof (inpFields.PictureMeta) !== "undefined")

@@ -8,7 +8,8 @@ exports.Product = {
         Book: 2,
         AudioBook: 3,
         EBook: 4,
-        CourseOnLine: 5
+        CourseOnLine: 5,
+        CoursePromoCode: 6
     },
     VATTypes: {
         Vat20Id: 1,

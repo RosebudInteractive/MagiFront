@@ -173,6 +173,22 @@ let options = {
                     pass: process.env.GMAIL_PWD
                 }
             }
+        },
+        promoCourse: {
+            type: "test",
+            template: "./templates/mail/promo-course.tmpl",
+            subject: "Промо-код на приобретение курса \"<%= course %>\".",
+            sender: '"Magisteria" <' + process.env.GMAIL_USER + '@gmail.com>',
+            options: {
+                disableUrlAccess: false,
+                host: process.env.GMAIL_SMTP_HOST,
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: process.env.GMAIL_USER,
+                    pass: process.env.GMAIL_PWD
+                }
+            }
         }
     },
     pricelist: {
