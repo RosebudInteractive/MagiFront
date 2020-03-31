@@ -256,7 +256,7 @@ class Main extends React.Component {
                 const _bought1 = item1.IsBought || item1.IsGift,
                     _bought2 = item2.IsBought || item2.IsGift
 
-                _result = _bought2 - _bought1
+                _result = _bought1 - _bought2
             }
 
 
