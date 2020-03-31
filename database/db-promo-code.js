@@ -32,14 +32,14 @@ const RECEIVE_PROMO_MYSQL =
     "update `PromoCode` set `Rest` = `Rest` - 1 where (`Id` = <%= id %>) and (coalesce(`Counter`, 0)> 0) and (coalesce(`Rest`, 0)> 0)";
 
 const GET_PROMO_MSSQL =
-    "select c.[Id], c.[Code], c.[Description], c.[Perc], c.[Counter], c.[Rest], c.[FirstDate], c.[LastDate],\n" +
+    "select c.[Id], c.[Code], c.[Description], c.[PromoProductId], c.[IsVisible], c.[Perc], c.[Counter], c.[Rest], c.[FirstDate], c.[LastDate],\n" +
     "  p.[Id] as [pId], p.[ProductId]\n" +
     "from [PromoCode] c\n" +
     "  left join [PromoCodeProduct] p on p.[PromoCodeId] = c.[Id]<%= where %>\n" +
     "order by c.[Id]";
 
 const GET_PROMO_MYSQL =
-    "select c.`Id`, c.`Code`, c.`Description`, c.`Perc`, c.`Counter`, c.`Rest`, c.`FirstDate`, c.`LastDate`,\n" +
+    "select c.`Id`, c.`Code`, c.`Description`, c.`PromoProductId`, c.`IsVisible`, c.`Perc`, c.`Counter`, c.`Rest`, c.`FirstDate`, c.`LastDate`,\n" +
     "  p.`Id` as `pId`, p.`ProductId`\n" +
     "from `PromoCode` c\n" +
     "  left join `PromoCodeProduct` p on p.`PromoCodeId` = c.`Id`<%= where %>\n" +
@@ -47,6 +47,18 @@ const GET_PROMO_MYSQL =
 
 const WHERE_PROMO_MSSQL = "\nwhere c.[<%= field %>] =  <%= value %>";
 const WHERE_PROMO_MYSQL = "\nwhere c.`<%= field %>` =  <%= value %>";
+
+const ROLLBACK_PURCHASE_MSSQL =
+    [
+        "update [PromoCode] set [LastDate]=GETDATE() where [Id] = <%= id %>",
+        "delete from [UserGiftCourse] where [PromoCodeId] = <%= id %>"
+    ];
+
+const ROLLBACK_PURCHASE_MYSQL =
+    [
+        "update `PromoCode` set `LastDate`=now() where `Id` = <%= id %>",
+        "delete from `UserGiftCourse` where `PromoCodeId` = <%= id %>"
+    ];
 
 const DbPromoCode = class DbPromoCode extends DbObject {
 
@@ -71,6 +83,21 @@ const DbPromoCode = class DbPromoCode extends DbObject {
         }, dbOpts);
     }
 
+    async rollbackPurchase(id, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+
+        let mysql_script = [];
+        ROLLBACK_PURCHASE_MYSQL.forEach((elem) => {
+            mysql_script.push(_.template(elem)({ id: id }));
+        });
+        let mssql_script = [];
+        ROLLBACK_PURCHASE_MSSQL.forEach((elem) => {
+            mssql_script.push(_.template(elem)({ id: id }));
+        });
+        await DbUtils.execSqlScript(mysql_script, mssql_script, dbOpts);
+    }
+
     async get(options) {
         let opts = options || {};
         let dbOpts = opts.dbOptions || {};
@@ -78,15 +105,23 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
         let where_mssql = "";
         let where_mysql = "";
-        if (opts.id) {
-            where_mysql = _.template(WHERE_PROMO_MYSQL)({ field: "Id", value: opts.id });
-            where_mssql = _.template(WHERE_PROMO_MSSQL)({ field: "Id", value: opts.id });
+        if ((typeof (opts.is_visible) === "boolean") || (opts.is_visible === "true") || (opts.is_visible === "false")) {
+            let is_visible = (typeof (opts.is_visible) === "boolean") ? opts.is_visible : (
+                opts.is_visible === "true" ? true : false
+            );
+            where_mysql = _.template(WHERE_PROMO_MYSQL)({ field: "IsVisible", value: is_visible ? 1 : 0 });
+            where_mssql = _.template(WHERE_PROMO_MSSQL)({ field: "IsVisible", value: is_visible ? 1 : 0 });
         }
         else
-            if (opts.code) {
-                where_mysql = _.template(WHERE_PROMO_MYSQL)({ field: "Code", value: `'${opts.code}'` });
-                where_mssql = _.template(WHERE_PROMO_MSSQL)({ field: "Code", value: `'${opts.code}'` });
+            if (opts.id) {
+                where_mysql = _.template(WHERE_PROMO_MYSQL)({ field: "Id", value: opts.id });
+                where_mssql = _.template(WHERE_PROMO_MSSQL)({ field: "Id", value: opts.id });
             }
+            else
+                if (opts.code) {
+                    where_mysql = _.template(WHERE_PROMO_MYSQL)({ field: "Code", value: `'${opts.code}'` });
+                    where_mssql = _.template(WHERE_PROMO_MSSQL)({ field: "Code", value: `'${opts.code}'` });
+                }
         let result = await $data.execSql({
             dialect: {
                 mysql: _.template(GET_PROMO_MYSQL)({ where: where_mysql}),
@@ -102,6 +137,8 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     currObj.Id = currId = elem.Id;
                     currObj.Code = elem.Code;
                     currObj.Description = elem.Description;
+                    currObj.PromoProductId = elem.PromoProductId;
+                    currObj.IsVisible = elem.IsVisible;
                     currObj.Perc = elem.Perc;
                     currObj.Counter = elem.Counter;
                     currObj.Rest = elem.Rest;
@@ -151,6 +188,12 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
                     if (typeof (inpFields.Description) !== "undefined")
                         promoObj.description(inpFields.Description);
+
+                    if (typeof (inpFields.PromoProductId) !== "undefined")
+                        promoObj.promoProductId(inpFields.PromoProductId);
+
+                    if (typeof (inpFields.IsVisible) !== "undefined")
+                        promoObj.isVisible(inpFields.IsVisible);
 
                     if (typeof (inpFields.Perc) !== "undefined") {
                         promoObj.perc(+inpFields.Perc);
@@ -251,6 +294,7 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
                     let fields = {
                         PriceListId: Product.DefaultPriceListId,
+                        IsVisible: true,
                         Counter: 0,
                         Rest: 0
                     };
@@ -262,6 +306,12 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
                     if (typeof (inpFields.Description) !== "undefined")
                         fields.Description = inpFields.Description;
+
+                    if (typeof (inpFields.IsVisible) !== "undefined")
+                        fields.IsVisible = inpFields.IsVisible;
+
+                    if (typeof (inpFields.PromoProductId) !== "undefined")
+                        fields.PromoProductId = inpFields.PromoProductId;
 
                     if (typeof (inpFields.Perc) !== "undefined") {
                         let perc = +inpFields.Perc;

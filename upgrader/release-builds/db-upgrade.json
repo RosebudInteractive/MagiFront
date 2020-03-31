@@ -236,6 +236,15 @@
             "script_before": null,
             "script_after": null,
             "upgrader": "./build_28"
+        },
+        "29": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_29/upgrade_29_mssql.sql",
+                "mysql": "./build_29/upgrade_29_mysql.sql"
+            },
+            "upgrader": "./build_29"
         }
     }
 }

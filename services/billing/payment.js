@@ -1,5 +1,14 @@
+const path = require('path');
+const fs = require('fs');
+const { promisify } = require('util');
+const readFileAsync = promisify(fs.readFile);
 const _ = require('lodash');
+const config = require('config');
+const randomstring = require('randomstring');
+const { buildLogString } = require('../../utils');
+const { SendMail } = require('../../mail');
 const { DbObject } = require('../../database/db-object');
+const { ProductService } = require('../../database/db-product');
 const { InvoiceService } = require('../../database/db-invoice');
 const { UsersService } = require('../../database/db-user');
 const { Accounting } = require('../../const/accounting');
@@ -10,6 +19,8 @@ const { UsersCache } = require("../../security/users-cache");
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
+
+const PROMO_MAIL_CFG_NAME = "promoCourse";
 
 const CHEQUE_REQ_TREE = {
     expr: {
@@ -128,6 +139,121 @@ exports.Payment = class Payment extends DbObject {
         })
     }
 
+    async _sendPromoCodeViaEmail(email, promo_product) {
+        try {
+            if (config.has(`mail.${PROMO_MAIL_CFG_NAME}.template`)) {
+                if(promo_product){}
+                let fn = config.mail[PROMO_MAIL_CFG_NAME].template;
+                if (!path.isAbsolute(fn))
+                    fn = path.join(config.root, fn);
+                let template = await readFileAsync(fn, "utf8");
+                let body = _.template(template)(
+                    {
+                        promo_code: promo_product.promoCode,
+                        course_name: promo_product.courseName
+                    });
+                let mailOptions = {
+                    disableUrlAccess: false,
+                    from: config.mail[PROMO_MAIL_CFG_NAME].sender, // sender address
+                    to: email, // list of receivers
+                    subject: _.template(config.mail[PROMO_MAIL_CFG_NAME].subject)({ course: promo_product.courseName}), // Subject line
+                    html: body // html body
+                };
+                let mailResult = await SendMail(PROMO_MAIL_CFG_NAME, mailOptions);
+                if (mailResult && mailResult.msgUrl)
+                    console.error(buildLogString(`### Promo-code email: ${mailResult.msgUrl}`));
+                return mailResult;
+            }
+        }
+        catch (err) {
+            console.error(buildLogString(`Payment::_sendPromoCodeViaEmail: ${err}`));
+        }
+    }
+
+    async _createPromoProduct(orig_product, options) {
+        let opts = options || {};
+        let code = randomstring.generate({ length: 20, charset: "alphanumeric", capitalization: "uppercase" });
+
+        let courseData;
+        let courseService = this.getService("courses");
+        if (orig_product.ExtFields && orig_product.ExtFields.courseId)
+            courseData = await courseService.get(orig_product.ExtFields.courseId, opts)
+        else
+            throw new Error(`Payment::_createPromoProduct: Missing "courseId" field.`);
+        
+        let prodData = {
+            ProductTypeId: Product.ProductTypes.CoursePromoCode,
+            VATTypeId: orig_product.VATTypeId,
+            Code: `PROMO-${code}`,
+            Name: `Промо-код "${code}", курс "${courseData.Name}".`,
+            AccName: orig_product.AccName,
+            Price: orig_product.Price,
+            ExtFields: orig_product.ExtFields
+        };
+        prodData.ExtFields.courseName = courseData.Name;
+        let res = await ProductService().insert(prodData, opts);
+        
+        let promo_data = {
+            Code: code,
+            Perc: 100,
+            Counter: 1,
+            FirstDate: new Date(),
+            IsVisible: false,
+            PromoProductId: res.id,
+            Products: [orig_product.Id]
+        };
+
+        let promoService = this.getService("promo");
+        let promo_res = await promoService.insert(promo_data, opts);
+        prodData.ExtFields.promoCode = promo_res.Code;
+        prodData.ExtFields.promoId = promo_res.Id;
+        await ProductService().update(res.id, { ExtFields: prodData.ExtFields }, opts);
+        return { ProductId: res.id, Code: prodData.Code };
+    }
+
+    async _subsProducts(data, options) {
+        let inv_data = _.cloneDeep(data);
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        if (inv_data.Items && Array.isArray(inv_data.Items)) {
+            let new_items = [];
+            for (let i = 0; i < inv_data.Items.length; i++){
+                let elem = inv_data.Items[i];
+                if (elem.GenPromo) {
+                    let field;
+                    let reqParam;
+                    if (elem.ProductId) {
+                        field = "ProductId";
+                        reqParam = "Ids";
+                    }
+                    else
+                        if (elem.Code) {
+                            field = "Code";
+                            reqParam = "Codes";
+                        }
+                    if (!field)
+                        throw new Error(`Missing field "ProductId" or "Code" in "Items" array.`);
+                    let reqArr = [elem[field]];
+                    let request = { dbOptions: dbOpts, Detail: true };
+                    request[reqParam] = reqArr;
+                    let orig_prod = await ProductService().get(request);
+                    if (orig_prod && Array.isArray(orig_prod) && (orig_prod.length > 0)) {
+                        let promo_prod = await this._createPromoProduct(orig_prod[0], opts);
+                        let itm = { Price: elem.Price };
+                        itm[field] = promo_prod[field];
+                        new_items.push(itm); 
+                    }
+                    else
+                        throw new Error(`Missing product in "Items" array: "${field}":${elem[field]}.`);
+                }
+                else
+                    new_items.push(elem);
+            }
+            inv_data.Items = new_items;
+        }
+        return inv_data;
+    }
+
     _getOrCreateInvoice(data, options) {
         let opts = options || {};
         return new Promise(resolve => {
@@ -135,7 +261,10 @@ exports.Payment = class Payment extends DbObject {
             if (data.InvoiceId)
                 rc = { result: "OK", id: data.InvoiceId }
             else
-                rc = InvoiceService().insert(data, opts);
+                rc = this._subsProducts(data, opts)
+                    .then(inv => {
+                        return InvoiceService().insert(inv, opts);
+                    });
             resolve(rc);
         })
             .then(result => {
@@ -518,6 +647,7 @@ exports.Payment = class Payment extends DbObject {
                         let duration = null;
                         let prod = null;
                         let paidCourses = [];
+                        let promoProducts = [];
                         for (let i = 0; i < invoiceData.Items.length; i++) {
                             let itm = invoiceData.Items[i];
                             if (itm.ExtFields && itm.ExtFields.prod) {
@@ -530,6 +660,9 @@ exports.Payment = class Payment extends DbObject {
                                         break;
                                     case Product.ProductTypes.CourseOnLine:
                                         paidCourses.push(itm.ExtFields.prod.courseId)
+                                        break;
+                                    case Product.ProductTypes.CoursePromoCode:
+                                        promoProducts.push(itm.ExtFields.prod)
                                         break;
                                 }
                             }
@@ -564,6 +697,20 @@ exports.Payment = class Payment extends DbObject {
                             let data = {};
                             data[isRefund ? "deleted" : "added"] = paidCourses;
                             await UsersCache().paidCourses(user.Id, data, dbOpts);
+                        }
+                        if (promoProducts.length > 0) {
+                            if (!isRefund) {
+                                for (let i = 0; i < promoProducts.length; i++)
+                                    // we shouldn't "await" here !!! we don't care about a result
+                                    self._sendPromoCodeViaEmail(chequeObj.receiptEmail(), promoProducts[i]);
+                            }
+                            else {
+                                let promoService = self.getService("promo", true);
+                                if (promoService) {
+                                    for (let i = 0; i < promoProducts.length; i++)
+                                        await promoService.rollbackPurchase(promoProducts[i].promoId);
+                                }
+                            }
                         }
                     }
                     if (Object.keys(fields).length > 0)
@@ -870,8 +1017,8 @@ exports.Payment = class Payment extends DbObject {
                             if (refundInvoiceId)
                                 return InvoiceService().rollbackRefund(refundInvoiceId)
                                     .catch(err => {
-                                        console.error(`Error in "InvoiceService().rollbackRefund" call: ` +
-                                            `${err && err.message ? err.message : JSON.stringify(err)}`);
+                                        console.error(buildLogString(`Error in "InvoiceService().rollbackRefund" call: ` +
+                                            `${err && err.message ? err.message : JSON.stringify(err)}`));
                                     });
                         })
                         .then(() => {

@@ -526,7 +526,7 @@ class YandexKassa extends Payment {
                                 item.vat_code = elem.ExtFields.vat.yandexKassaCode
                             else
                                 throw new Error(`Missing field "vat_code" for "${elem.Name}"`);
-                            item.description = elem.Name;
+                            item.description = elem.AccName ? elem.AccName : elem.Name;
                             item.quantity = elem.Qty;
                             item.amount = { value: elem.Price, currency: curr };
                             if (payment_mode)

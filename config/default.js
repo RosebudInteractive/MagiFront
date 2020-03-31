@@ -208,6 +208,12 @@ module.exports = {
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
             sender: '"Magisteria" <administrator@magisteria.ru>'
+        },
+        promoCourse: {
+            type: "test",
+            template: "./templates/mail/promo-course.tmpl",
+            subject: "Промо-код на приобретение курса \"<%= course %>\".",
+            sender: '"Magisteria" <administrator@magisteria.ru>'
         }
     },
     snets: {

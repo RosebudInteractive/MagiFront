@@ -38,7 +38,7 @@ const convertToInt = (val) => {
 const GET_INVOICE_MSSQL =
     "select i.[Id], i.[UserId], i.[ParentId], i.[InvoiceTypeId], i.[StateId], i.[CurrencyId], c.[Code] as [CCode], i.[ChequeId], i.[Name],\n" +
     "  i.[Description], i.[InvoiceNum], i.[InvoiceDate], i.[Sum], i.[RefundSum], it.[Id] as [ItemId], it.[ProductId],\n" +
-    "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
+    "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[AccName] as [ItemAccName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
     "from[Invoice] i\n" +
     "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
     "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
@@ -53,7 +53,7 @@ const GET_INVOICE_FILTER_MSSQL = {
 const GET_INVOICE_MYSQL =
     "select i.`Id`, i.`UserId`, i.`ParentId`, i.`InvoiceTypeId`, i.`StateId`, i.`CurrencyId`, c.`Code` as `CCode`, i.`ChequeId`, i.`Name`,\n" +
     "  i.`Description`, i.`InvoiceNum`, i.`InvoiceDate`, i.`Sum`, i.`RefundSum`, it.`Id` as `ItemId`, it.`ProductId`,\n" +
-    "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
+    "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`AccName` as `ItemAccName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
     "from`Invoice` i\n" +
     "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
     "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
@@ -153,6 +153,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                 VATTypeId: elem.VATTypeId,
                                 Code: elem.Code,
                                 Name: elem.ItemName,
+                                AccName: elem.ItemAccName,
                                 VATRate: elem.VATRate,
                                 Price: elem.Price,
                                 Qty: elem.Qty,
@@ -277,6 +278,9 @@ const DbInvoice = class DbInvoice extends DbObject {
                                 data.Code = elem.Code;
                             if (typeof (elem.Name) !== "undefined")
                                 data.Name = elem.Name;
+                            data.AccName = data.Name;
+                            if (typeof (elem.AccName) !== "undefined")
+                                data.AccName = elem.AccName;
                             if (typeof (elem.VATRate) !== "undefined")
                                 data.VATRate = elem.VATRate;
                             if (typeof (elem.Price) !== "undefined")
@@ -487,7 +491,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                 inpFields.Items.forEach(elem => {
                                     reqArr.push(elem[field]);
                                 });
-                                let request = { Detail: true };
+                                let request = { dbOptions: dbOpts, Detail: true };
                                 request[reqParam] = reqArr;
                                 rc = rc.then(() => {
                                     return ProductService().get(request);
@@ -506,6 +510,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                             fields.VATTypeId = elem.VATTypeId ? elem.VATTypeId : p.VATTypeId;
                                             fields.Code = elem.Code ? elem.Code : p.Code;
                                             fields.Name = elem.Name ? elem.Name : p.Name;
+                                            fields.AccName = elem.AccName ? elem.AccName : p.AccName;
                                             fields.VATRate = elem.VATRate ? elem.VATRate : p.Rate;
                                             fields.Price = typeof (elem.Price) === "number" ? elem.Price : p.Price;
                                             fields.Qty = elem.Qty ? elem.Qty : 1;
@@ -592,6 +597,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                         fields.VATTypeId = elem.obj.vATTypeId();
                                         fields.Code = elem.obj.code();
                                         fields.Name = elem.obj.name();
+                                        fields.AccName = elem.obj.accName();
                                         fields.VATRate = elem.obj.vATRate();
                                         fields.Price = elem.obj.price();
                                         fields.Qty = elem.Qty;
