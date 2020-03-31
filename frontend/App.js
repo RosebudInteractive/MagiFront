@@ -49,7 +49,8 @@ import NotFound from './components/not-found'
 import SizeInfo from './components/size-info'
 
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
-import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
+// import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
+import CoursePaymentWrapper from "./components/messages/billing-ver-2";
 import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions, pageChanged, waitingSelector} from 'ducks/app'
@@ -60,6 +61,7 @@ import {isMobilePlatform} from "./tools/page-tools";
 import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
 import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
 import {callbackPayment} from "./tools/payments-checker"
+import "./tools/fonts.sass"
 
 Polyfill.registry();
 

@@ -205,7 +205,7 @@ function* getPromoCodesSaga() {
 }
 
 const _fetchPromoCodes = () => {
-    return fetch("/api/promo-codes", {method: 'GET', credentials: 'include'})
+    return fetch("/api/promo-codes?is_visible=true", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
