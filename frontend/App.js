@@ -49,8 +49,8 @@ import NotFound from './components/not-found'
 import SizeInfo from './components/size-info'
 
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
-// import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
-import CoursePaymentWrapper from "./components/messages/billing-ver-2";
+import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
+// import CoursePaymentWrapper from "./components/messages/billing-ver-2";
 import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions, pageChanged, waitingSelector} from 'ducks/app'
