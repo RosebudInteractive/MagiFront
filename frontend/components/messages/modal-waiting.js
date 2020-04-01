@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import WaitingFrame from "./billing/waiting-frame";
+import WaitingFrame from "./billing/controls/waiting-frame";
 import $ from "jquery";
 import Platform from "platform";
 

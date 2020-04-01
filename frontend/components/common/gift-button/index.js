@@ -6,29 +6,20 @@ import {
     isRedirectActiveSelector,
     loadingSelector,
     loadingCourseIdSelector,
-    showCoursePaymentWindow,
 } from "ducks/billing";
-import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
-import {getCurrencySign} from "../../../tools/page-tools";
+import "./gift-button.sass";
 
 class GiftButton extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
-        title: PropTypes.string,
     }
-
-    static defaultProps = {
-        title: 'Купить'
-    }
-
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title} = this.props,
-            _currency = getCurrencySign()
+        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId,} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -38,36 +29,10 @@ class GiftButton extends React.Component {
             return null
         }
 
-        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description,
-            _disabled = loading && (loadingCourseId === course.Id)
+        let _disabled = loading && (+loadingCourseId === course.Id)
 
-        return <div className={"course-module__price-block" + (!_hasDiscountDescr ? " _no-description" : "")}>
-            <div className="course-module__price-block-wrapper button-block">
-                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
-                <div className="course-module__price-block-section">
-                    {
-                        _hasDiscount ?
-                            <React.Fragment>
-                                <p className="course-module__price">{course.DPrice + _currency + " "}<span className="discount">{`-${course.Discount.Perc}%`}</span></p>
-                                <p className="course-module__old-price">{course.Price + _currency}</p>
-                            </React.Fragment>
-                            :
-                            <p className="course-module__price">{course.Price + _currency}</p>
-                    }
-                </div>
-            </div>
-            {
-                _hasDiscountDescr ?
-                    <div className="course-module__price-block-wrapper">
-                        <p className="course-module__price-block-info">
-                            {/*<span className="label">Персональная скидка.</span>*/}
-                            {" " + course.Discount.Description}
-                        </p>
-                    </div>
-                    :
-                    null
-            }
+        return <div className={"course-module__gift-button"}>
+                <div className={"btn btn-white font-universal__button-default" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>Подарить курс</div>
         </div>
     }
 
@@ -76,7 +41,15 @@ class GiftButton extends React.Component {
             _returnUrl = '/category/' + course.URL,
             {author, category} = this._getAuthorAndCategory();
 
-        this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl, author: author, category: category, name: course.Name})
+        this.props.getPaidCourseInfo({
+            courseId: course.Id,
+            productId: course.ProductId,
+            returnUrl: _returnUrl,
+            author: author,
+            category: category,
+            name: course.Name,
+            buyAsGift: true,
+        })
     }
     
     _getAuthorAndCategory() {
@@ -119,9 +92,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        showSignInForm: bindActionCreators(showSignInForm, dispatch),
     }
 }
 

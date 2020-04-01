@@ -1,25 +1,21 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import Platform from 'platform';
 
 import {
-    showBillingWindowSelector,
+    showCoursePaymentWindowSelector,
     billingStepSelector,
-    loadingSelector,
-    // isRedirectActiveSelector,
-    BillingStep,
-    hideBillingWindow,
+    loadingSelector as billingFetching,
+    hideCoursePaymentWindow,
     redirectComplete,
-    // isRedirectUrlSelector
-} from "../../../ducks/billing";
+} from "ducks/billing";
 
-import Subscription from './billing-subscription'
-import Payment from './billing-payments'
+import Payment, {PAYMENT_TYPE} from '../controls/forms/payment-form'
 import $ from "jquery";
-import {enabledSubscriptionSelector} from "ducks/app";
-import Platform from "platform";
+import {enabledPaidCoursesSelector} from "ducks/app";
 
-class BillingWrapper extends React.Component {
+class CoursePaymentWindow extends React.Component {
     constructor(props) {
         super(props)
 
@@ -29,20 +25,12 @@ class BillingWrapper extends React.Component {
         }
     }
 
-    // componentWillReceiveProps(nextProps) {
-    //     if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
-    //
-    //         this.props.complete();
-    //         window.location = nextProps.redirectUrl;
-    //     }
-    // }
-
     componentDidUpdate(prevProps) {
-        if (!prevProps.showBillingWindow && this.props.showBillingWindow) {
+        if (!prevProps.showWindow && this.props.showWindow) {
             this._onShow()
         }
 
-        if (prevProps.showBillingWindow && !this.props.showBillingWindow) {
+        if (prevProps.showWindow && !this.props.showWindow) {
             this._onHide()
         }
 
@@ -67,21 +55,6 @@ class BillingWrapper extends React.Component {
         })
     }
 
-    _getStep() {
-        let {billingStep: step, loading,} = this.props;
-
-        switch (step) {
-            case BillingStep.subscription:
-                return <Subscription/>
-
-            case BillingStep.payment:
-                return <Payment loading={loading}/>
-
-            default:
-                return null;
-        }
-    }
-
     _onCloseClick() {
         this.setState({
             opened: false
@@ -94,19 +67,19 @@ class BillingWrapper extends React.Component {
     }
 
     render() {
-        let {showBillingWindow, enabledBilling, showSignInForm} = this.props;
+        let {showWindow, enabledPaidCourses, showSignInForm, fetching} = this.props;
 
         const _className = "modal-overlay modal-wrapper js-modal-wrapper" +
             (this.state.isIE ? ' ms-based' : '') +
             (this.state.opened ? ' is-opened' : ' invisible')
 
-        return (showBillingWindow && enabledBilling && !showSignInForm) ?
+        return (showWindow && enabledPaidCourses && !showSignInForm) ?
             <div className={_className}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
-                            onClick={::this._onCloseClick}>Закрыть
+                            onClick={::this._onCloseClick} disabled={fetching}>Закрыть
                     </button>
-                    {this._getStep()}
+                    <Payment paymentType={PAYMENT_TYPE.COURSE}/>
                 </div>
             </div>
             :
@@ -117,13 +90,13 @@ class BillingWrapper extends React.Component {
 function mapStateToProps(state) {
     return {
         showSignInForm: state.app.showSignInForm,
-        showBillingWindow: showBillingWindowSelector(state),
+        showWindow: showCoursePaymentWindowSelector(state),
         billingStep: billingStepSelector(state),
-        loading: loadingSelector(state),
+        fetching: billingFetching(state),
         // needRedirect: isRedirectActiveSelector(state),
         // redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
-        enabledBilling: enabledSubscriptionSelector(state),
+        enabledPaidCourses: enabledPaidCoursesSelector(state),
 
         error: state.user.error,
     }
@@ -131,9 +104,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        close: bindActionCreators(hideBillingWindow, dispatch),
+        close: bindActionCreators(hideCoursePaymentWindow, dispatch),
         complete: bindActionCreators(redirectComplete, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BillingWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(CoursePaymentWindow);

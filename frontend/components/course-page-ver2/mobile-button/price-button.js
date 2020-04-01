@@ -42,7 +42,7 @@ class PriceButton extends React.Component {
                 <div className="price-button__crown">
                     <svg className="course-module__label-icon" width="18" height="18" fill="#FFF" dangerouslySetInnerHTML={{__html: CROWN}}/>
                 </div>
-                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`Купить ${_price + _currency} `}</div>
+                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`${_price + _currency} `}</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?

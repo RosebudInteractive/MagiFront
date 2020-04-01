@@ -1,23 +1,25 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import Platform from 'platform';
 
 import {
-    showCoursePaymentWindowSelector,
+    showBillingWindowSelector,
     billingStepSelector,
-    loadingSelector as billingFetching,
+    loadingSelector,
     // isRedirectActiveSelector,
-    hideCoursePaymentWindow,
+    BillingStep,
+    hideBillingWindow,
     redirectComplete,
     // isRedirectUrlSelector
 } from "ducks/billing";
 
-import Payment, {PAYMENT_TYPE} from './billing-payments'
+import Subscription from '../controls/forms/subscription-form'
+import Payment from '../controls/forms/payment-form'
 import $ from "jquery";
-import {enabledPaidCoursesSelector} from "ducks/app";
+import {enabledSubscriptionSelector} from "ducks/app";
+import Platform from "platform";
 
-class CoursePaymentWrapper extends React.Component {
+class SubscriptionWindow extends React.Component {
     constructor(props) {
         super(props)
 
@@ -36,11 +38,11 @@ class CoursePaymentWrapper extends React.Component {
     // }
 
     componentDidUpdate(prevProps) {
-        if (!prevProps.showWindow && this.props.showWindow) {
+        if (!prevProps.showBillingWindow && this.props.showBillingWindow) {
             this._onShow()
         }
 
-        if (prevProps.showWindow && !this.props.showWindow) {
+        if (prevProps.showBillingWindow && !this.props.showBillingWindow) {
             this._onHide()
         }
 
@@ -65,6 +67,21 @@ class CoursePaymentWrapper extends React.Component {
         })
     }
 
+    _getStep() {
+        let {billingStep: step, loading,} = this.props;
+
+        switch (step) {
+            case BillingStep.subscription:
+                return <Subscription/>
+
+            case BillingStep.payment:
+                return <Payment loading={loading}/>
+
+            default:
+                return null;
+        }
+    }
+
     _onCloseClick() {
         this.setState({
             opened: false
@@ -77,19 +94,19 @@ class CoursePaymentWrapper extends React.Component {
     }
 
     render() {
-        let {showWindow, enabledPaidCourses, showSignInForm, fetching} = this.props;
+        let {showBillingWindow, enabledBilling, showSignInForm} = this.props;
 
         const _className = "modal-overlay modal-wrapper js-modal-wrapper" +
             (this.state.isIE ? ' ms-based' : '') +
             (this.state.opened ? ' is-opened' : ' invisible')
 
-        return (showWindow && enabledPaidCourses && !showSignInForm) ?
+        return (showBillingWindow && enabledBilling && !showSignInForm) ?
             <div className={_className}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
-                            onClick={::this._onCloseClick} disabled={fetching}>Закрыть
+                            onClick={::this._onCloseClick}>Закрыть
                     </button>
-                    <Payment paymentType={PAYMENT_TYPE.COURSE}/>
+                    {this._getStep()}
                 </div>
             </div>
             :
@@ -100,13 +117,13 @@ class CoursePaymentWrapper extends React.Component {
 function mapStateToProps(state) {
     return {
         showSignInForm: state.app.showSignInForm,
-        showWindow: showCoursePaymentWindowSelector(state),
+        showBillingWindow: showBillingWindowSelector(state),
         billingStep: billingStepSelector(state),
-        fetching: billingFetching(state),
+        loading: loadingSelector(state),
         // needRedirect: isRedirectActiveSelector(state),
         // redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
-        enabledPaidCourses: enabledPaidCoursesSelector(state),
+        enabledBilling: enabledSubscriptionSelector(state),
 
         error: state.user.error,
     }
@@ -114,9 +131,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        close: bindActionCreators(hideCoursePaymentWindow, dispatch),
+        close: bindActionCreators(hideBillingWindow, dispatch),
         complete: bindActionCreators(redirectComplete, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CoursePaymentWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionWindow);

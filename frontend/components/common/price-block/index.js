@@ -6,9 +6,7 @@ import {
     isRedirectActiveSelector,
     loadingSelector,
     loadingCourseIdSelector,
-    showCoursePaymentWindow,
 } from "ducks/billing";
-import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
@@ -76,7 +74,15 @@ class PriceBlock extends React.Component {
             _returnUrl = '/category/' + course.URL,
             {author, category} = this._getAuthorAndCategory();
 
-        this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl, author: author, category: category, name: course.Name})
+        this.props.getPaidCourseInfo({
+            courseId: course.Id,
+            productId: course.ProductId,
+            returnUrl: _returnUrl,
+            author: author,
+            category: category,
+            name: course.Name,
+            buyAsGift: false,
+        })
     }
     
     _getAuthorAndCategory() {
@@ -119,9 +125,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        showSignInForm: bindActionCreators(showSignInForm, dispatch),
     }
 }
 

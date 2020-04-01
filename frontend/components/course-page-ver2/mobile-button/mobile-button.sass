@@ -1,26 +1,40 @@
 @import "~tools/variables"
 
-.mobile-button_wrapper
+.mobile-buttons__block
   display: none
   position: fixed
   z-index: 1000
   bottom: 0
   width: 100%
-  margin-bottom: 26px
+  margin: 0 56px 26px
   @media (max-width: 899px)
-    display: block
+    display: flex
+    width: calc(100% - 112px)
   @media (max-width: 639px)
     width: calc(100% - 12px)
     margin: 0 6px 6px
 
+  .gift-button__wrapper
+    margin: 0 0 0 10px
+    .btn
+      width: 100%
+
+  .price-button__wrapper
+    margin-right: 10px
+
+  .mobile-button_wrapper
+    flex-basis: 50%
+    position: relative
 
 .mobile-button
   max-width: 627px
   margin: 0 auto
-  height: 57px
+  height: 54px
 
   .course-module__price-btn
     flex-grow: 2
+    min-width: auto
+    padding: 16px 10px
 
   .price-button__crown
     flex-basis: 46px
@@ -38,7 +52,7 @@
     font-weight: normal
 
 .mobile-button_background
-  max-width: 626px
+  //max-width: 626px
   margin: 0 auto
   position: absolute
   background-color: $color-white

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import { applyPromo, clearPromo, promoValuesSelector,} from "ducks/billing";
-import {getCurrencySign} from "../../../tools/page-tools";
+import {getCurrencySign} from "tools/page-tools";
 
 const APPLY_TIMEOUT = 1000
 

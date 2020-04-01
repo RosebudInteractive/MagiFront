@@ -458,6 +458,7 @@ function* _getPaidCourseInfoSaga(data) {
                     CourseName: _data.name,
                     Author: _data.author,
                     Category: _data.category,
+                    buyAsGift: _data.buyAsGift,
                 }
 
                 yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _offer})

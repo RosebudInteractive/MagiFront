@@ -7,11 +7,11 @@ import {
     loadingSelector,
     errorSelector,
     typesSelector,
-} from "../../../ducks/billing";
+} from "ducks/billing";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {billingTestModeSelector} from "ducks/app";
-import {getCurrencySign} from "../../../tools/page-tools";
+import {getCurrencySign} from "tools/page-tools";
 
 class SubscriptionForm extends React.Component {
 

@@ -6,6 +6,11 @@ export default class EmailField extends React.Component {
     static propTypes = {
         defaultValue: PropTypes.string,
         onChange: PropTypes.func,
+        promoEnable: PropTypes.bool,
+    }
+
+    static defaultProps = {
+        promoEnable: false
     }
 
     constructor(props) {
@@ -48,7 +53,14 @@ export default class EmailField extends React.Component {
                     {_errorText}
                 </div>
             </div>
-            <span className='vp1-universal__body-small secondary-dark'>Введите ваш e-mail для получения <span className="main-dark">промокода</span> и фискального чека</span>
+            {
+                this.props.promoEnable
+                    ?
+                    <span className='email__info font-universal__body-small secondary-dark'>Введите ваш e-mail для получения <span
+                        className="main-dark">промокода</span> и фискального чека</span>
+                    :
+                    <span className='email__info font-universal__body-small secondary-dark'>Введите адрес вашей электронной почты для получения фискального чека</span>
+            }
         </div>
     }
 

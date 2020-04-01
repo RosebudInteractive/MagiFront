@@ -11,25 +11,22 @@ import {
     sendPayment,
     switchToSubscription,
 } from "ducks/billing";
-import StoredCard from "../common/stored-card";
+import StoredCard from "./common/stored-card";
 import {
-    Alfa,
     AutosubscribeButton,
     Card,
-    Mobile,
     OfferMessage,
     Qiwi,
     Sberbank,
     WebMoney,
     Yandex,
-} from "../common/payment-items";
+} from "./common/payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
 import {notifyPaymentButtonClicked, notifyPriceButtonClicked} from "ducks/google-analytics";
-import WaitingFrame from "../common/waiting-frame";
-import EmailField from "../common/email-field";
-import PromoField from "../common/promo-field";
+import WaitingFrame from "./common/waiting-frame";
+import EmailField from "./common/email-field";
 import {getCurrencySign} from "../../../tools/page-tools";
-
+import PromoField from "./common/promo-field";
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -136,6 +133,7 @@ class PaymentForm extends React.Component {
                     {
                         ProductId: this.props.selectedSubscription.Id,
                         Price: this.props.price,
+                        GenPromo: !!selectedSubscription.buyAsGift
                     }
                 ]
             }
@@ -209,20 +207,25 @@ class PaymentForm extends React.Component {
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
-        let {selectedSubscription, paymentType, user} = this.props;
+        let {selectedSubscription, user} = this.props;
 
         if (!selectedSubscription) {
             return null
         }
 
         const _isFullDiscount = !this.props.price,
-            _currency = getCurrencySign()
+            _currency = getCurrencySign(),
+            _buyAsGift = selectedSubscription.buyAsGift,
+            _title = _buyAsGift ?
+                "Купить в подарок"
+                :
+                _isFullDiscount ? "Получить" : "Купить"
 
         return <div className="billing-steps__item js-billing-step active">
             <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
-            <div className="vp1-universal__title-medium">{(_isFullDiscount ? "Получить " : "Купить ") + "«" + selectedSubscription.Title + "»"}</div>
+            <div className="font-universal__title-medium">{`${_title} «${selectedSubscription.Title}»`}</div>
             <div className="modal__body payment-methods">
-                <div className="vp1-universal__title-small title-2">Выберите способ оплаты</div>
+                <div className="font-universal__title-small title-2">Выберите способ оплаты</div>
                 <form action="#" method="post" className="payment-form">
                     <div className={"payment-methods__wrapper"}>
                         <StoredCard onChange={::this._selectPayment}
@@ -232,17 +235,14 @@ class PaymentForm extends React.Component {
                             <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
                             <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yandex_money'}/>
                             <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
-                            {/*<Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>*/}
                             <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
                             <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
-                            {/*<Mobile onClick={::this._selectPayment}*/}
-                            {/*        checked={this.state.selectedMethod === 'mobile_balance'}/>*/}
                         </ul>
                     </div>
                     <div className="payment-form__footer-wrapper">
-                        <div className="vp1-universal__body-small">Промокод будет отправлен вам на почту, а также доступен в разделе "Платежи" Вашего личного кабинета</div>
-                        <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
-                        {/*<PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/>*/}
+                        { _buyAsGift && <div className="font-universal__body-small">Промокод будет отправлен вам на почту, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
+                        <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={!_buyAsGift}/>
+                        {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton
                                 visible={this.state.showSaveMethodButton}

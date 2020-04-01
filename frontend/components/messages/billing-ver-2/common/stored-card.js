@@ -1,5 +1,5 @@
 import React from 'react'
-import CardBlock from "../../profile/subscription/card-block";
+import CardBlock from "../../../profile/subscription/card-block";
 import PropTypes from "prop-types";
 
 export default class StoredCard extends React.Component {
@@ -26,7 +26,7 @@ export default class StoredCard extends React.Component {
                         <input type="radio" className="payment-form__option _single" name="stored" id="stored-card"
                                checked={checked} onChange={::this._onChange}/>
                         <label htmlFor="stored-card" className="payment-form__text">
-                            <span>Запомненные реквизиты</span>
+                            <span className="font-universal__body-large">Запомненные реквизиты</span>
                         </label>
                     </div>
                     <div className="payment-methods__stored-col">

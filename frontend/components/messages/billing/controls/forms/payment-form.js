@@ -11,7 +11,7 @@ import {
     sendPayment,
     switchToSubscription,
 } from "ducks/billing";
-import StoredCard from "./stored-card";
+import StoredCard from "../stored-card";
 import {
     Alfa,
     AutosubscribeButton,
@@ -22,13 +22,14 @@ import {
     Sberbank,
     WebMoney,
     Yandex,
-} from "./payment-items";
+} from "../payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
 import {notifyPaymentButtonClicked, notifyPriceButtonClicked} from "ducks/google-analytics";
-import WaitingFrame from "./waiting-frame";
-import EmailField from "./email-field";
-import PromoField from "./promo-field";
-import {getCurrencySign} from "../../../tools/page-tools";
+import WaitingFrame from "../waiting-frame";
+import EmailField from "../email-field";
+import PromoField from "../promo-field";
+import {getCurrencySign} from "tools/page-tools";
+import './payment-form.sass'
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -135,6 +136,7 @@ class PaymentForm extends React.Component {
                     {
                         ProductId: this.props.selectedSubscription.Id,
                         Price: this.props.price,
+                        GenPromo: !!selectedSubscription.buyAsGift
                     }
                 ]
             }
@@ -215,7 +217,12 @@ class PaymentForm extends React.Component {
         }
 
         const _isFullDiscount = !this.props.price,
-            _currency = getCurrencySign()
+            _currency = getCurrencySign(),
+            _buyAsGift = selectedSubscription.buyAsGift,
+            _title = _buyAsGift ?
+                "Купить в подарок"
+                :
+                _isFullDiscount ? "Получить" : "Купить"
 
         return <div className="billing-steps__item js-billing-step active">
             <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
@@ -230,7 +237,7 @@ class PaymentForm extends React.Component {
                         </button>
                     </React.Fragment>
                     :
-                    <p className="modal__headline">{(_isFullDiscount ? "Получить " : "Купить ") + "«" + selectedSubscription.Title + "»"}</p>
+                    <p className="modal__headline">{`${_title} «${selectedSubscription.Title}»`}</p>
                 }
             </div>
             <div className="modal__body payment-methods">
@@ -252,8 +259,11 @@ class PaymentForm extends React.Component {
                         </ul>
                     </div>
                     <div className="payment-form__footer-wrapper">
-                        <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
-                        <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/>
+                        <div className="fields-editors__block">
+                            { _buyAsGift && <div className="font-universal__body-small">Промокод будет отправлен вам на почту, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
+                            <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
+                            {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
+                        </div>
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton
                                 visible={this.state.showSaveMethodButton}

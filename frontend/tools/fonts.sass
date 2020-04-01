@@ -1,86 +1,6 @@
 @import "./variables.sass"
 
-.vp1-universal__title-large
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 48px
-  line-height: 105%
-  letter-spacing: -1px
-  color: $color-main-dark
-
-.vp3-universal__title-large
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 26px
-  line-height: 105%
-  letter-spacing: -1px
-  color: $color-main-dark
-
-
-.vp1-universal__title-largex
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 58px
-  line-height: 110%
-  letter-spacing: -1px
-  color: $color-main-dark
-
-.vp3-universal__title-largex
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 32px
-  line-height: 110%
-  letter-spacing: -1px
-  color: $color-main-dark
-
-
-.vp1-universal__body-medium
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 14px
-  line-height: 130%
-  color: $color-main-dark
-
-.vp3-universal__body-large
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 14px
-  line-height: 130%
-  color: $color-main-dark
-
-
-.vp1-universal__body-small
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 12px
-  line-height: 140%
-  color: $color-main-dark
-
-.vp3-universal__body-medium
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 12px
-  line-height: 130%
-  color: $color-main-dark
-
-.vp1-universal__body-large
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 17px
-  line-height: 20px
-  color: $color-main-dark
-
-
-.vp3-universal__body-largex
+.font-universal__body-largex
   font-family: $font-fira
   font-style: normal
   font-weight: normal
@@ -88,126 +8,149 @@
   line-height: 19px
   color: $color-main-dark
 
-.vp1-universal__button-default
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 17px
-  line-height: 120%
-  color: $color-main-dark
-
-
-.vp3-universal__button-default
+.font-universal__body-large
   font-family: $font-fira
   font-style: normal
   font-weight: normal
   font-size: 17px
   line-height: 20px
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 14px
+    line-height: 130%
 
-
-.vp1-universal__button-small
+.font-universal__body-medium
   font-family: $font-fira
   font-style: normal
   font-weight: normal
   font-size: 14px
-  line-height: 17px
+  line-height: 130%
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 12px
+    line-height: 130%
 
-
-.vp3-universal__button-small
+.font-universal__body-small
   font-family: $font-fira
   font-style: normal
   font-weight: normal
-  font-size: 14px
-  line-height: 17px
+  font-size: 12px
+  line-height: 140%
   color: $color-main-dark
 
 
-.vp1-universal__book-large
+.font-universal__title-largex
   font-family: $font-pt
   font-style: normal
   font-weight: normal
-  font-size: 20px
-  line-height: 150%
+  font-size: 58px
+  line-height: 110%
+  letter-spacing: -1px
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 32px
+    line-height: 110%
+    letter-spacing: -1px
 
-
-.vp3-universal__book-large
+.font-universal__title-large
   font-family: $font-pt
   font-style: normal
   font-weight: normal
-  font-size: 16px
-  line-height: 130%
+  font-size: 48px
+  line-height: 105%
+  letter-spacing: -1px
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 26px
+    line-height: 105%
+    letter-spacing: -1px
 
-
-.vp1-universal__book-medium
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 17px
-  line-height: 130%
-  color: $color-main-dark
-
-
-.vp3-universal__book-medium
-  font-family: $font-pt
-  font-style: normal
-  font-weight: normal
-  font-size: 14px
-  line-height: 130%
-  color: $color-main-dark
-
-
-.vp1-universal__title-smallx
-  font-family: $font-pt
-  font-style: normal
-  font-weight: bold
-  font-size: 17px
-  line-height: 130%
-  color: $color-main-dark
-
-
-.vp3-universal__title-smallx
-  font-family: $font-pt
-  font-style: normal
-  font-weight: bold
-  font-size: 14px
-  line-height: 130%
-  color: $color-main-dark
-
-
-.vp1-universal__title-medium
+.font-universal__title-medium
   font-family: $font-fira
   font-style: normal
   font-weight: normal
   font-size: 28px
   line-height: 120%
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 120%
 
-.vp3-universal__title-medium
-  font-family: $font-fira
-  font-style: normal
-  font-weight: normal
-  font-size: 20px
-  line-height: 120%
-  color: $color-main-dark
-
-
-.vp1-universal__title-small
+.font-universal__title-small
   font-family: $font-pt
   font-style: normal
   font-weight: bold
   font-size: 20px
   line-height: 150%
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 17px
+    line-height: 150%
 
-
-.vp3-universal__title-small
+.font-universal__title-smallx
   font-family: $font-pt
   font-style: normal
   font-weight: bold
   font-size: 17px
+  line-height: 130%
+  color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 14px
+    line-height: 130%
+
+
+.font-universal__button-default
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 120%
+  color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 17px
+    line-height: 20px
+
+.font-universal__button-small
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 14px
+  line-height: 17px
+  color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 14px
+    line-height: 17px
+
+
+.font-universal__book-large
+  font-family: $font-pt
+  font-style: normal
+  font-weight: normal
+  font-size: 20px
   line-height: 150%
   color: $color-main-dark
+  @media (max-width: 899px)
+    font-size: 16px
+    line-height: 130%
+
+.font-universal__book-medium
+  font-family: $font-pt
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  color: $color-main-dark
+  @media (max-width: 899px)
+    font-family: $font-pt
+    font-style: normal
+    font-weight: normal
+    font-size: 14px
+    line-height: 130%
+    color: $color-main-dark
+
+
+
+
+
+
+

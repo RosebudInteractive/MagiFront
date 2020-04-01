@@ -11,7 +11,7 @@ export const Card = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="card"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="card" className="payment-form__text">
-            <span>Банковская карта</span>
+            <span className="font-universal__body-large">Банковская карта</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/visa.png" width="25" height="25" alt=""/>
@@ -29,7 +29,7 @@ export const Yandex = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="yad"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="yad" className="payment-form__text">
-            <span>Яндекс Деньги</span>
+            <span className="font-universal__body-large">Яндекс Деньги</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/yad.png" width="15" height="19" alt=""/>
@@ -44,7 +44,7 @@ export const Sberbank = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="sber"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="sber" className="payment-form__text">
-            <span>Сбербанк онлайн</span>
+            <span className="font-universal__body-large">Сбербанк онлайн</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/sber.png" width="18" height="18" alt=""/>
@@ -59,7 +59,7 @@ export const Alfa = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="alfa"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="alfa" className="payment-form__text">
-            <span>Альфа-клик</span>
+            <span className="font-universal__body-large">Альфа-клик</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/alfa.png" width="12" height="18" alt=""/>
@@ -74,7 +74,7 @@ export const Qiwi = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="qiwi"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="qiwi" className="payment-form__text">
-            <span>QIWI Кошелек</span>
+            <span className="font-universal__body-large">QIWI Кошелек</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/qiwi.png" width="16" height="16" alt=""/>
@@ -89,7 +89,7 @@ export const WebMoney = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="webmoney"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="webmoney" className="payment-form__text">
-            <span>Webmoney</span>
+            <span className="font-universal__body-large">Webmoney</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
                     <img src="/assets/images/webmoney.png" width="19" height="18" alt=""/>
@@ -104,7 +104,7 @@ export const Mobile = (props) => {
         <input type="radio" className="payment-form__option" name="payment-type" id="mobile"
                onClick={props.onClick} checked={props.checked}/>
         <label htmlFor="mobile" className="payment-form__text">
-            <span>Баланс мобильного телефона</span>
+            <span className="font-universal__body-large">Баланс мобильного телефона</span>
         </label>
     </li>
 }
@@ -124,8 +124,8 @@ export const AutosubscribeButton = (props) => {
 }
 
 export const OfferMessage = (props) => {
-    return <div className="subscription-form__offer">
+    return <div className="font-universal__body-small subscription-form__offer secondary-dark">
         {"Нажимая на кнопку «" + (props.isGift ? "Получить" : "Оплатить") + "» вы принимаете условия "}
-        <Link to={"/doc/oferta.pdf"} target="_blank">договора-оферты</Link>
+        <Link to={"/doc/oferta.pdf"} className="main-dark" target="_blank">договора-оферты</Link>
     </div>
 }
