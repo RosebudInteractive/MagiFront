@@ -6123,8 +6123,8 @@ ul.user-tooltip {
     -ms-flex-direction: column;
     flex-direction: column;
     border-bottom: none; }
-    .course-module--extended .course-module__price-block {
-      margin-bottom: 20px; }
+    /*.course-module--extended .course-module__price-block {*/
+    /*  margin-bottom: 20px; }*/
     .course-module--extended .course-module__info-block {
       padding: 0;
       width: 50%; }
@@ -6259,11 +6259,11 @@ ul.user-tooltip {
         min-height: 38px; } }
     @media (max-width: 1023px) {
       .course-module--extended .course-module__price-btn {
-        padding: 16px 42px;
+        /*padding: 16px 42px;*/
         font-size: 17px; } }
     @media (max-width: 899px) {
       .course-module--extended .course-module__price-btn {
-        padding: 14px 31px;
+        /*padding: 14px 31px;*/
         font-size: 15px; } }
     @media (max-width: 1023px) {
       .course-module--extended .course-module__price {
@@ -16688,7 +16688,8 @@ ul.lectures-tab {
       transform: translateX(-50%) } }
   @media (max-width: 767px) {
     .modal._billing {
-      max-height: calc(100% - 50px); } }
+      overflow-y: auto;
+      max-height: calc(100% - 40px); } }
   .modal__close {
     z-index: 10;
     padding: 0;
@@ -19914,14 +19915,14 @@ ul.lectures-tab {
 
 @media(max-width: 767px) {
   .payment-form__footer-wrapper {
-    position: -webkit-sticky;
-    position: sticky;
+    /*position: -webkit-sticky;*/
+    /*position: sticky;*/
     bottom: -30px;
     left: 0;
     right: 0; } }
 .payment-form__footer {
-  position: -webkit-sticky;
-  position: sticky;
+  /*position: -webkit-sticky;*/
+  /*position: sticky;*/
   bottom: -30px;
   left: 0;
   right: 0;

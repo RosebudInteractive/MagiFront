@@ -265,7 +265,7 @@ class PaymentForm extends React.Component {
                     </div>
                     <div className="payment-form__footer-wrapper">
                         <div className="fields-editors__block">
-                            { _buyAsGift && <div className="font-universal__body-small">Промокод со скидкой 100% будет отправлен на Ваш электронный адрес, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
+                            { _buyAsGift && <div className="font-universal__title-small">Введите e-mail для получения подарочного промокода и фискального чека</div> }
                             <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
                             {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
                         </div>

@@ -207,7 +207,7 @@ class PaymentForm extends React.Component {
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
-        let {selectedSubscription, user} = this.props;
+        let {selectedSubscription, paymentType, user} = this.props;
 
         if (!selectedSubscription) {
             return null
@@ -217,13 +217,29 @@ class PaymentForm extends React.Component {
             _currency = getCurrencySign(),
             _buyAsGift = selectedSubscription.buyAsGift,
             _title = _buyAsGift ?
-                "Купить в подарок"
+                "Купить в подарок курс"
                 :
-                _isFullDiscount ? "Получить" : "Купить"
+                _isFullDiscount ? "Получить курс" : "Купить курс",
+            _name = selectedSubscription.Title && (selectedSubscription.Title.toUpperCase().indexOf("КУРС:") === 0)
+                ?
+                selectedSubscription.Title.substr(5).trim()
+                :
+                selectedSubscription.Title
 
         return <div className="billing-steps__item js-billing-step active">
             <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
-            <div className="font-universal__title-medium">{`${_title} «${selectedSubscription.Title}»`}</div>
+            {paymentType === PAYMENT_TYPE.BILLING ?
+                <div className="modal__header">
+                    <p className="modal__headline">Оформить подписку <span className="js-subcribe-period">   </span>
+                    </p>
+                    <button className="billing-steps__back js-billing-back" type="button"
+                            onClick={::this.props.switchToSubscription}>
+                        ← Выбрать другой вариант подписки
+                    </button>
+                </div>
+                :
+                <div className="font-universal__title-medium">{`${_title}: «${_name}»`}</div>
+            }
             <div className="modal__body payment-methods">
                 <div className="font-universal__title-small title-2">Выберите способ оплаты</div>
                 <form action="#" method="post" className="payment-form">
@@ -240,9 +256,11 @@ class PaymentForm extends React.Component {
                         </ul>
                     </div>
                     <div className="payment-form__footer-wrapper">
-                        { _buyAsGift && <div className="font-universal__body-small">Промокод будет отправлен вам на почту, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
-                        <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={!_buyAsGift}/>
-                        {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
+                        <div className="fields-editors__block">
+                            { _buyAsGift && <div className="font-universal__title-small">Введите e-mail для получения подарочного промокода и фискального чека</div> }
+                            <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
+                            {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
+                        </div>
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton
                                 visible={this.state.showSaveMethodButton}

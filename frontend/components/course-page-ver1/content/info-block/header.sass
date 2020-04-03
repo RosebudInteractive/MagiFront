@@ -1,0 +1,48 @@
+@import "~tools/variables"
+
+.header__button-block
+  display: flex
+  margin-bottom: 20px
+  justify-content: space-between
+
+  .btn
+    padding: 16px 0
+    min-width: 130px
+    max-width: 214px
+    width: 100%
+    @media (max-width: 899px)
+      padding: 14px 0
+
+  .btn--brown
+    border: $border-orange
+
+  .course-module__price-block
+    margin: 0
+    display: flex
+    padding-left: 10px
+    padding-right: 20px
+    flex: 1 1 calc(66% - 25px)
+    @media (max-width: 819px)
+      padding-left: 0
+    @media (max-width: 639px)
+      padding-left: 10px
+      @media (max-width: 399px)
+        padding-left: 0
+
+  .course-module__price-block-wrapper
+    width: 100%
+
+  .course-module__gift-button
+    max-width: 214px
+    display: block
+    flex: 1 1 33%
+    padding-right: 10px
+    @media (max-width: 819px)
+      display: none
+    @media (max-width: 639px)
+      display: block
+    @media (max-width: 399px)
+      display: none
+
+  .course-module__price-btn
+    width: 55%

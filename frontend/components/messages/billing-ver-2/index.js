@@ -78,10 +78,14 @@ class CoursePaymentWrapper extends React.Component {
         return (showWindow && enabledPaidCourses && !showSignInForm) ?
             <div className={_className}>
                 <div className="modal _billing billing-ver-2 is-opened" id="billing">
-                    <button type="button" className="modal__close js-modal-close" data-target="billing"
-                            onClick={::this._onCloseClick} disabled={fetching}>Закрыть
-                    </button>
-                    <Payment paymentType={PAYMENT_TYPE.COURSE}/>
+                    <div>
+                    {/*    <div>*/}
+                            <button type="button" className="modal__close js-modal-close" data-target="billing"
+                                    onClick={::this._onCloseClick} disabled={fetching}>Закрыть
+                            </button>
+                            <Payment paymentType={PAYMENT_TYPE.COURSE}/>
+                        {/*</div>*/}
+                    </div>
                 </div>
             </div>
             :
