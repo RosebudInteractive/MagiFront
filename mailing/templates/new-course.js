@@ -1,16 +1,17 @@
 import React from "react"
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {getCourse} from '../frontend/actions/courses-page-actions';
+import {getCourse} from 'actions/courses-page-actions';
 
-import {STYLES} from "./styles";
-import Logo from "./components/logo";
-import Header from "./components/header";
-import Footer from "./components/footer";
-import Description from "./components/description";
-import PriceButton from "./components/price-button";
-import Statistic from "./components/statistic";
-import Scheme from "./components/scheme";
+import {STYLES} from "../styles";
+import Logo from "../components/common/logo";
+import Header from "../components/common/header";
+import Footer from "../components/common/footer";
+import Description from "../components/description";
+import PriceButton from "../components/price-button";
+import Statistic from "../components/statistic";
+import Scheme from "../components/scheme";
+import LearnLessonButton from "../components/new-course/learn-course-button";
 
 const STYLE = {
     COLUMN: {
@@ -25,7 +26,7 @@ const STYLE = {
     }
 }
 
-class EmailTemplate extends React.Component {
+class NewCourse extends React.Component {
 
     constructor(props) {
         super(props)
@@ -47,7 +48,8 @@ class EmailTemplate extends React.Component {
                     <Description course={course}/>
                     <Statistic course={course}/>
                     <Scheme course={course}/>
-                    <Footer course={course}/>
+                    <LearnLessonButton course={course}/>
+                    <Footer/>
                 </tbody>
             </table>
     }
@@ -64,7 +66,7 @@ const mapDispatchToProps = dispatch => (
     bindActionCreators({getCourse}, dispatch)
 )
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmailTemplate)
+export default connect(mapStateToProps, mapDispatchToProps)(NewCourse)
 
 
 
