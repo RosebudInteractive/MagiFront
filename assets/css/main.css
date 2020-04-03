@@ -20434,6 +20434,7 @@ ul.lectures-tab {
     width: 80px;
     padding: 8px; }
   .subscription-history__transaction {
+      user-select: text;
     -webkit-box-flex: 1;
     -webkit-flex-grow: 1;
     -moz-box-flex: 1;
