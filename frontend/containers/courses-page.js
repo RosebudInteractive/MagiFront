@@ -73,6 +73,7 @@ class CoursesPage extends React.Component {
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
                 this.props.applyExternalFilter(filterType, externalFilter)
+                return
             }
         }
 
@@ -80,7 +81,7 @@ class CoursesPage extends React.Component {
             (prevProps.filterMainType !== filterMainType) ||
             (!prevProps.filterCourseType.equals(filterCourseType))
 
-        if (_filterChanged) {
+        if (_filterChanged && !loadingFilters) {
             document.title = this._getTitle()
 
             this.props.enableScrollGuard()
