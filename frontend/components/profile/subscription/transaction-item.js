@@ -21,8 +21,10 @@ class Item extends React.Component {
             item
                 ?
                 <li className="subscription-history__item">
-                    <p className="subscription-history__transaction">{this._getName()}<span
-                        className="subscription-history__date">{this._getDate()}</span></p>
+                    <div className="subscription-history__transaction">
+                        <span className="subscription-history__name">{this._getName()}</span>
+                        <span className="subscription-history__date">{this._getDate()}</span>
+                    </div>
                     <p className="subscription-history__total">
                         {item.Sum + _currency}
                         {this._getRefundButton()}

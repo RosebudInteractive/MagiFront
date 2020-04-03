@@ -20434,7 +20434,6 @@ ul.lectures-tab {
     width: 80px;
     padding: 8px; }
   .subscription-history__transaction {
-      user-select: text;
     -webkit-box-flex: 1;
     -webkit-flex-grow: 1;
     -moz-box-flex: 1;
@@ -20466,15 +20465,22 @@ ul.lectures-tab {
         overflow: hidden;
         text-overflow: ellipsis; } }
   .subscription-history__date {
+    flex: 0 0 auto;
     margin-left: auto;
+    padding-left: 16px;
     font-size: 14px;
     line-height: 21px;
     color: rgba(47, 47, 47, 0.6); }
     @media (max-width: 899px) {
       .subscription-history__date {
         margin-left: 0;
+        padding-left: 0;
         display: block;
         font-size: 12px; } }
+  .subscription-history__name {
+    user-select: text;
+    flex: 1 1 auto;
+  }
   .subscription-history__btn {
     margin: 0 auto;
     min-width: 240px;
