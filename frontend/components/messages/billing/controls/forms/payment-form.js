@@ -220,9 +220,14 @@ class PaymentForm extends React.Component {
             _currency = getCurrencySign(),
             _buyAsGift = selectedSubscription.buyAsGift,
             _title = _buyAsGift ?
-                "Купить в подарок"
+                "Купить в подарок курс"
                 :
-                _isFullDiscount ? "Получить" : "Купить"
+                _isFullDiscount ? "Получить курс" : "Купить курс",
+            _name = selectedSubscription.Title && (selectedSubscription.Title.toUpperCase().indexOf("КУРС:") === 0)
+                ?
+                selectedSubscription.Title.substr(5).trim()
+                :
+                selectedSubscription.Title
 
         return <div className="billing-steps__item js-billing-step active">
             <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
@@ -237,7 +242,7 @@ class PaymentForm extends React.Component {
                         </button>
                     </React.Fragment>
                     :
-                    <p className="modal__headline">{`${_title} «${selectedSubscription.Title}»`}</p>
+                    <p className="modal__headline">{`${_title} «${_name}»`}</p>
                 }
             </div>
             <div className="modal__body payment-methods">
@@ -260,7 +265,7 @@ class PaymentForm extends React.Component {
                     </div>
                     <div className="payment-form__footer-wrapper">
                         <div className="fields-editors__block">
-                            { _buyAsGift && <div className="font-universal__body-small">Промокод будет отправлен вам на почту, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
+                            { _buyAsGift && <div className="font-universal__body-small">Промокод со скидкой 100% будет отправлен на Ваш электронный адрес, а также доступен в разделе "Платежи" Вашего личного кабинета</div> }
                             <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
                             {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
                         </div>
