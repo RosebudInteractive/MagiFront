@@ -57,7 +57,7 @@ class PurchaseCourse extends React.Component {
                 <tbody>
                     <Logo/>
                     <CourseCover course={course}/>
-                    <div>
+                    <tr>
                         <td>
                             <tr>
                                 <td style={STYLE.PARAGRAPH}>
@@ -92,7 +92,7 @@ class PurchaseCourse extends React.Component {
                                 <td style={STYLE.PARAGRAPH}>С наилучшими пожеланиями, Магистерия.</td>
                             </tr>
                         </td>
-                    </div>
+                    </tr>
                     <Social/>
                 </tbody>
             </table>
