@@ -72,7 +72,7 @@ class PurchasePromo extends React.Component {
                             </tr>
                             <td style={STYLE.PARAGRAPH}>
                                 <tr>Для активации промокода необходимо:</tr>
-                                <tr>1) авторизоваться на сайте Магистерии (название ссылкой)</tr>
+                                <tr>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></tr>
                                 <tr>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></tr>
                                 <tr>3) нажать на кнопку  "Купить"</tr>
                                 <tr>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></tr>
