@@ -182,7 +182,22 @@ module.exports = {
         promoCourse: {
             type: "smtp",
             template: "./templates/mail/promo-course.tmpl",
-            subject: "Промо-код на приобретение курса \"<%= course %>\".",
+            subject: "Промо-код на активацию курса \"<%= course %>\".",
+            sender: '"Magisteria" <test@magisteria.ru>',
+            options: {
+                disableUrlAccess: false,
+                host: "smtp.yandex.ru",
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: "test@magisteria.ru",
+                    pass: "S4zf4ckK"
+                }
+            }
+        },
+        purchaseCourse: {
+            type: "smtp",
+            subject: "Вы приобрели курс \"<%= course %>\".",
             sender: '"Magisteria" <test@magisteria.ru>',
             options: {
                 disableUrlAccess: false,

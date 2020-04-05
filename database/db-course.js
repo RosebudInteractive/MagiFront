@@ -1,3 +1,4 @@
+const querystring = require('querystring');
 const _ = require('lodash');
 const config = require('config');
 const striptags = require('striptags');
@@ -531,7 +532,7 @@ const { PrerenderCache } = require('../prerender/prerender-cache');
 const { URL, URLSearchParams } = require('url');
 
 const URL_PREFIX = "category";
-const MAILING_PREFIX = "mailing";
+const MAILING_PREFIX = "mailing/new-course";
 
 const DbCourse = class DbCourse extends DbObject {
 
@@ -654,6 +655,39 @@ const DbCourse = class DbCourse extends DbObject {
                 }
                 return rc;
             });
+    }
+
+    async coursePurchaseMailData(id, path, options) {
+        let result = {};
+        let opts = options || {};
+        let dbOpts = opts.dbOpts ? opts.dbOpts : {};
+        let course_info = await $data.execSql({
+            cmd: `select l.Name, c.URL from Course c join CourseLng l on c.Id = l.CourseId where c.Id = ${id}`
+        }, dbOpts);
+        if (course_info && course_info.detail && (course_info.detail.length !== 1))
+            throw new Error(`Course Id=${id} doesn't exist.`);
+        if (opts.mailCfg && opts.mailCfg.subject)
+            result.subject = _.template(opts.mailCfg.subject)({ course: course_info.detail[0].Name });
+        let host = config.proxyServer.siteHost;
+        let render_path = `/${path}/${id}`;
+        if (opts.params) {
+            let query = null;
+            for (let param in opts.params) {
+                let val = opts.params[param];
+                if (val) {
+                    if (!query)
+                        query = {};
+                    query[param] = val;
+                }
+            }
+            if(query)
+                render_path += `?${querystring.stringify(query)}`;
+        }
+        let { statusCode, body: html } = await this._prerenderCache.prerender(render_path, false, null, { host: host, response: true });
+        if (statusCode !== HttpCode.OK)
+            throw new HttpError(statusCode, `HTTP error "${statusCode}" accessing "${host + render_path}".`);
+        result.body = html;
+        return result;
     }
 
     async courseMailing(id, options) {
