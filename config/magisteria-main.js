@@ -191,7 +191,22 @@ module.exports = {
         promoCourse: {
             type: "smtp",
             template: "./templates/mail/promo-course.tmpl",
-            subject: "Промо-код на приобретение курса \"<%= course %>\".",
+            subject: "Промо-код на активацию курса \"<%= course %>\".",
+            sender: pk.mail.pwdRecovery.sender,
+            options: {
+                disableUrlAccess: false,
+                host: "smtp.yandex.ru",
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: pk.mail.pwdRecovery.user,
+                    pass: pk.mail.pwdRecovery.pass
+                }
+            }
+        },
+        purchaseCourse: {
+            type: "smtp",
+            subject: "Вы приобрели курс \"<%= course %>\".",
             sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,

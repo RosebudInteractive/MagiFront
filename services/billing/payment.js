@@ -5,7 +5,7 @@ const readFileAsync = promisify(fs.readFile);
 const _ = require('lodash');
 const config = require('config');
 const randomstring = require('randomstring');
-const { buildLogString } = require('../../utils');
+const { buildLogString, validateEmail } = require('../../utils');
 const { SendMail } = require('../../mail');
 const { DbObject } = require('../../database/db-object');
 const { ProductService } = require('../../database/db-product');
@@ -20,7 +20,12 @@ const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
+const PURCHASE_MAILING_PATH = "mailing/purchase-course";
+const PROMO_MAILING_PATH = "mailing/purchase-promo";
+
 const PROMO_MAIL_CFG_NAME = "promoCourse";
+const PURCHASE_MAIL_CFG_NAME = "purchaseCourse";
+const PROMO_CODE_LENGTH = 13;
 
 const CHEQUE_REQ_TREE = {
     expr: {
@@ -139,40 +144,75 @@ exports.Payment = class Payment extends DbObject {
         })
     }
 
-    async _sendPromoCodeViaEmail(email, promo_product) {
+    async _sendEmailPurchaseNotification(email, course_id, options) {
+        let result = null;
         try {
-            if (config.has(`mail.${PROMO_MAIL_CFG_NAME}.template`)) {
-                if(promo_product){}
-                let fn = config.mail[PROMO_MAIL_CFG_NAME].template;
-                if (!path.isAbsolute(fn))
-                    fn = path.join(config.root, fn);
-                let template = await readFileAsync(fn, "utf8");
-                let body = _.template(template)(
-                    {
-                        promo_code: promo_product.promoCode,
-                        course_name: promo_product.courseName
-                    });
+            if (config.has(`mail.${PURCHASE_MAIL_CFG_NAME}`)) {
+                let opts = options || {};
+                let dbOpts = opts.dbOpts ? opts.dbOpts : {};
+                let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
+                let courseService = this.getService("courses");
+                let { body, subject } = await courseService.coursePurchaseMailData(course_id, PURCHASE_MAILING_PATH, {
+                    params: { username: user_name },
+                    mailCfg: config.get(`mail.${PURCHASE_MAIL_CFG_NAME}`),
+                    dbOpts: dbOpts
+                });
+                let mailOptions = {
+                    disableUrlAccess: false,
+                    from: config.mail[PURCHASE_MAIL_CFG_NAME].sender, // sender address
+                    to: email, // list of receivers
+                    subject: subject, // Subject line
+                    html: body // html body
+                };
+                let mailResult = await SendMail(PURCHASE_MAIL_CFG_NAME, mailOptions);
+                if (mailResult && mailResult.msgUrl)
+                    console.error(buildLogString(`### Course purchase email: ${mailResult.msgUrl}`));
+                result = mailResult;
+            }
+        }
+        catch (err) {
+            console.error(buildLogString(`Payment::_sendEmailPurchaseNotification: ${err}`));
+            result = err;
+        }
+        return result;
+    }
+    
+    async _sendPromoCodeViaEmail(email, promo_product, options) {
+        let result = null;
+        try {
+            if (config.has(`mail.${PROMO_MAIL_CFG_NAME}`)) {
+                let opts = options || {};
+                let dbOpts = opts.dbOpts ? opts.dbOpts : {};
+                let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
+                let courseService = this.getService("courses");
+                let { body, subject } = await courseService.coursePurchaseMailData(promo_product.courseId, PROMO_MAILING_PATH, {
+                    params: { username: user_name, promo: promo_product.promoCode },
+                    mailCfg: config.get(`mail.${PROMO_MAIL_CFG_NAME}`),
+                    dbOpts: dbOpts
+                });
                 let mailOptions = {
                     disableUrlAccess: false,
                     from: config.mail[PROMO_MAIL_CFG_NAME].sender, // sender address
                     to: email, // list of receivers
-                    subject: _.template(config.mail[PROMO_MAIL_CFG_NAME].subject)({ course: promo_product.courseName}), // Subject line
+                    subject: subject, // Subject line
                     html: body // html body
                 };
                 let mailResult = await SendMail(PROMO_MAIL_CFG_NAME, mailOptions);
                 if (mailResult && mailResult.msgUrl)
                     console.error(buildLogString(`### Promo-code email: ${mailResult.msgUrl}`));
-                return mailResult;
+                result = mailResult;
             }
         }
         catch (err) {
             console.error(buildLogString(`Payment::_sendPromoCodeViaEmail: ${err}`));
+            result = err;
         }
+        return result;
     }
 
     async _createPromoProduct(orig_product, options) {
         let opts = options || {};
-        let code = randomstring.generate({ length: 20, charset: "alphanumeric", capitalization: "uppercase" });
+        let code = randomstring.generate({ length: PROMO_CODE_LENGTH, charset: "alphanumeric", capitalization: "uppercase" });
 
         let courseData;
         let courseService = this.getService("courses");
@@ -697,12 +737,19 @@ exports.Payment = class Payment extends DbObject {
                             let data = {};
                             data[isRefund ? "deleted" : "added"] = paidCourses;
                             await UsersCache().paidCourses(user.Id, data, dbOpts);
+                            if (!isRefund)
+                                for (let i = 0; i < paidCourses.length; i++) {
+                                    // we shouldn't "await" here !!! we don't care about a result
+                                    self._sendEmailPurchaseNotification(chequeObj.receiptEmail(),
+                                        paidCourses[i], { userName: user.DisplayName, dbOpts: dbOpts });
+                                }
                         }
                         if (promoProducts.length > 0) {
                             if (!isRefund) {
                                 for (let i = 0; i < promoProducts.length; i++)
                                     // we shouldn't "await" here !!! we don't care about a result
-                                    self._sendPromoCodeViaEmail(chequeObj.receiptEmail(), promoProducts[i]);
+                                    self._sendPromoCodeViaEmail(chequeObj.receiptEmail(),
+                                        promoProducts[i], { userName: user.DisplayName, dbOpts: dbOpts });
                             }
                             else {
                                 let promoService = self.getService("promo", true);
