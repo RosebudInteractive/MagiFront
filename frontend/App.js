@@ -133,6 +133,7 @@ class App extends Component {
                     productId: +_params.get('productId'),
                     courseId: +_params.get('courseId'),
                     returnUrl: _params.get('returnUrl'),
+                    buyAsGift: _params.get('buyAsGift') ? _params.get('buyAsGift') === 'true' : false,
                     firedByPlayerBlock: _params.get('firedByPlayerBlock') ? _params.get('firedByPlayerBlock') === 'true' : false
                 }
 
