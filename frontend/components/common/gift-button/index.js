@@ -7,7 +7,6 @@ import {
     loadingSelector,
     loadingCourseIdSelector,
 } from "ducks/billing";
-import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
 import "./gift-button.sass";
@@ -19,19 +18,19 @@ class GiftButton extends React.Component {
     }
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId,} = this.props
+        const {course, enabledPaidCourse, loading, loadingCourseId,} = this.props
 
         if (!enabledPaidCourse) {
             return null
         }
 
-        if (!(course && (course.IsPaid && !course.IsGift && !course.IsBought)) || userPaidCourses.includes(course.Id)) {
+        if (!(course && course.IsPaid)) {
             return null
         }
 
         let _disabled = loading && (+loadingCourseId === course.Id)
 
-        return <div className={"course-module__gift-button"}>
+        return <div className={"course-module__gift-button pay-button"}>
                 <div className={"btn btn-white font-universal__button-default" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>Подарить курс</div>
         </div>
     }
@@ -82,7 +81,6 @@ class GiftButton extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        userPaidCourses : userPaidCoursesSelector(state),
         authorized: !!state.user.user,
         enabledPaidCourse: enabledPaidCoursesSelector(state),
         loading: isRedirectActiveSelector(state) || loadingSelector(state),
