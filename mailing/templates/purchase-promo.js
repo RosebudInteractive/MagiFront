@@ -60,12 +60,12 @@ class PurchasePromo extends React.Component {
                     </tr>
                     <tr>
                         <td style={STYLE.PARAGRAPH}>
-                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a>.
+                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"{course.Name}"</a>.
                         </td>
                     </tr>
                     <tr><td style={STYLE.PARAGRAPH}>Для активации промокода необходимо:</td></tr>
                     <tr><td>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></td></tr>
-                    <tr><td>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></td></tr>
+                    <tr><td>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"{course.Name}"</a></td></tr>
                     <tr><td>3) нажать на кнопку  "Купить"</td></tr>
                     <tr><td>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></td></tr>
                     <tr><td>5) нажать на кнопку "Получить"</td></tr>

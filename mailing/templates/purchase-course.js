@@ -66,7 +66,7 @@ class PurchaseCourse extends React.Component {
                             </tr>
                             <tr>
                                 <td style={STYLE.PARAGRAPH}>
-                                        Мы благодарим Вас за приобретение курса <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a>.
+                                        Мы благодарим Вас за приобретение курса <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"{course.Name}"</a>.
                                 </td>
                             </tr>
                             <tr><td>Вы можете приступить к просмотру и чтению лекций в любое время.</td></tr>
@@ -79,7 +79,7 @@ class PurchaseCourse extends React.Component {
                             </tr>
                             <tr>
                                 <td style={STYLE.PARAGRAPH}>
-                                    Мы надеемся, что курс Вам понравится. И конечно же,  будем благодарны за отзывы и любую обратную связь!
+                                    Мы надеемся, что курс Вам понравится. И конечно же, будем благодарны за отзывы и любую обратную связь!
                                 </td>
                             </tr>
                             <tr>
