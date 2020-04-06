@@ -7,6 +7,7 @@ exports.Import = {
 };
 
 exports.SEO = {
+    NULL_USER_AGENT: "magisteria-null",
     FORCE_RENDER_USER_AGENT: "magisteria-internal",
     BOT_USER_AGENT: "magisteria-bot"
 };

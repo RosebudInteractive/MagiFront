@@ -152,7 +152,7 @@ exports.Payment = class Payment extends DbObject {
                 let dbOpts = opts.dbOpts ? opts.dbOpts : {};
                 let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
                 let courseService = this.getService("courses");
-                let { body, subject } = await courseService.coursePurchaseMailData(course_id, PURCHASE_MAILING_PATH, {
+                let { body, subject } = await courseService.courseMailData(course_id, PURCHASE_MAILING_PATH, {
                     params: { username: user_name },
                     mailCfg: config.get(`mail.${PURCHASE_MAIL_CFG_NAME}`),
                     dbOpts: dbOpts
@@ -185,7 +185,7 @@ exports.Payment = class Payment extends DbObject {
                 let dbOpts = opts.dbOpts ? opts.dbOpts : {};
                 let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
                 let courseService = this.getService("courses");
-                let { body, subject } = await courseService.coursePurchaseMailData(promo_product.courseId, PROMO_MAILING_PATH, {
+                let { body, subject } = await courseService.courseMailData(promo_product.courseId, PROMO_MAILING_PATH, {
                     params: { username: user_name, promo: promo_product.promoCode },
                     mailCfg: config.get(`mail.${PROMO_MAIL_CFG_NAME}`),
                     dbOpts: dbOpts

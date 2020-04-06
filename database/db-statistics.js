@@ -24,8 +24,8 @@ const GET_STAT_MYSQL =
     "call <%= stat_func %>('<%= first_date %>', '<%= last_date %>')";
 
 const GET_USER_PURCHASE_MSSQL =
-    "select c.[ChequeDate], u.[RegDate], c.[UserId], coalesce(upd.[Qty], 0) Qty, u.[DisplayName],\n" +
-    "  u.[Email], ii.[Name] Course, p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price],\n" +
+    "select c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], coalesce(upd.[Qty], 0) Qty, u.[DisplayName],\n" +
+    "  u.[Email], ii.[Name] Course, N''[Подарок], p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price],\n" +
     "  coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign,\n" +
     "  coalesce(gr.[Campaign] + ' (' + gr.[Source] + '+' + gr.[Medium] + ')', '') CampaignReg, coalesce(c.[PromoCode], '') as Promo,\n" +
     "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
@@ -36,30 +36,66 @@ const GET_USER_PURCHASE_MSSQL =
     "  join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
     "  join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
     "  left join[Price] p on p.[ProductId] = ii.[ProductId] and(p.[FirstDate] <= c.[ChequeDate])\n" +
-    "  and((p.[LastDate] is null) or(p.[LastDate] > c.[ChequeDate]))\n" +
+    "    and((p.[LastDate] is null) or(p.[LastDate] > c.[ChequeDate]))\n" +
     "  join[User] u on u.[SysParentId] = c.[UserId]\n" +
     "  left join[Campaign] g on g.[Id] = c.[CampaignId]\n" +
     "  left join[Campaign] gr on gr.[Id] = u.[CampaignId]\n" +
     "  left join[PromoCode] pc on pc.[Id] = c.[PromoCodeId]\n" +
     "  join[Course] cs on cs.[ProductId] = ii.[ProductId]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = cs.[Id]\n" +
-    "  left join (select [UserId], count(*) [Qty] from [UserPaidCourse] group by [UserId]) upd on upd.[UserId] = c.[UserId]\n" +
-    "  join ( select lc.[CourseId], round(sum(coalesce(lg.[Duration], 0)) / 3600.0, 2) Duration from [LessonCourse] lc\n" +
-    "      join [LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
+    "  left join(select[UserId], count(*)[Qty] from[UserPaidCourse] group by[UserId]) upd on upd.[UserId] = c.[UserId]\n" +
+    "  join(select lc.[CourseId], round(sum(coalesce(lg.[Duration], 0)) / 3600.0, 2) Duration from[LessonCourse] lc\n" +
+    "    join[LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
     "    group by lc.[CourseId]) cd on cd.[CourseId] = cs.[Id]\n" +
     "  left join[LsnHistory] h on h.[UserId] = c.[UserId] and h.[LessonId] = lc.[LessonId]\n" +
-    "  left join ( select [UserId], max([FinDate]) FinDate from [LsnHistory]\n" +
-    "    group by [UserId]) hu on hu.[UserId] = c.[UserId]\n" +
+    "  left join(select[UserId], max([FinDate]) FinDate from[LsnHistory]\n" +
+    "    group by[UserId]) hu on hu.[UserId] = c.[UserId]\n" +
     "where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "  and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
-    "group by c.[ChequeDate], u.[RegDate], c.[UserId], upd.[Qty], u.[DisplayName], u.[Email], ii.[Name],\n" +
+    "group by c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], upd.[Qty], u.[DisplayName], u.[Email], ii.[Name],\n" +
     "  p.[Price], ii.[Price], g.[Campaign], g.[Source], g.[Medium], c.[PromoCode], cd.[Duration],\n" +
     "  gr.[Campaign], gr.[Source], gr.[Medium]\n" +
-    "order by c.[ChequeDate] desc";
+    "union all\n" +
+    "select c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], coalesce(upd.[Qty], 0) Qty, u.[DisplayName],\n" +
+    "  u.[Email], N'Курс: ' + cl.[Name] Course, N'да'[Подарок], p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price],\n" +
+    "  coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign,\n" +
+    "  coalesce(gr.[Campaign] + ' (' + gr.[Source] + '+' + gr.[Medium] + ')', '') CampaignReg, coalesce(c.[PromoCode], '') as Promo,\n" +
+    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
+    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0 / cd.[Duration], 2) as LsnPart,\n" +
+    "  max(h.[FinDate]) as ThisLastTime,\n" +
+    "  max(hu.[FinDate]) as LastTime\n" +
+    "from[PromoCode] ppc\n" +
+    "  join[InvoiceItem] ii on ii.[ProductId] = ppc.[PromoProductId]\n" +
+    "  join[Invoice] i on i.[Id] = ii.[InvoiceId]\n" +
+    "  join[Cheque] c on c.[InvoiceId] = i.[Id]\n" +
+    "  join[PromoCodeProduct] pcp on pcp.[PromoCodeId] = ppc.[Id]\n" +
+    "  join[Product] pr on pr.[Id] = pcp.[ProductId]\n" +
+    "  join[Course] cs on cs.[ProductId] = pr.[Id]\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = cs.[Id]\n" +
+    "  left join[Price] p on p.[ProductId] = ii.[ProductId] and(p.[FirstDate] <= c.[ChequeDate])\n" +
+    "    and((p.[LastDate] is null) or(p.[LastDate] > c.[ChequeDate]))\n" +
+    "  join[User] u on u.[SysParentId] = c.[UserId]\n" +
+    "  left join[Campaign] g on g.[Id] = c.[CampaignId]\n" +
+    "  left join[Campaign] gr on gr.[Id] = u.[CampaignId]\n" +
+    "  left join[PromoCode] pc on pc.[Id] = c.[PromoCodeId]\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = cs.[Id]\n" +
+    "  left join(select[UserId], count(*)[Qty] from[UserPaidCourse] group by[UserId]) upd on upd.[UserId] = c.[UserId]\n" +
+    "  join(select lc.[CourseId], round(sum(coalesce(lg.[Duration], 0)) / 3600.0, 2) Duration from[LessonCourse] lc\n" +
+    "    join[LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
+    "    group by lc.[CourseId]) cd on cd.[CourseId] = cs.[Id]\n" +
+    "  left join[LsnHistory] h on h.[UserId] = c.[UserId] and h.[LessonId] = lc.[LessonId]\n" +
+    "  left join(select[UserId], max([FinDate]) FinDate from[LsnHistory]\n" +
+    "    group by[UserId]) hu on hu.[UserId] = c.[UserId]\n" +
+    "where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
+    "  and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
+    "group by c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], upd.[Qty], u.[DisplayName], u.[Email], cl.[Name],\n" +
+    "  p.[Price], ii.[Price], g.[Campaign], g.[Source], g.[Medium], c.[PromoCode], cd.[Duration],\n" +
+    "  gr.[Campaign], gr.[Source], gr.[Medium]\n" +
+    "order by 2 desc";
 
 const GET_USER_PURCHASE_MYSQL =
-    "select c.`ChequeDate`, u.`RegDate`, c.`UserId`, coalesce(upd.`Qty`, 0) Qty, u.`DisplayName`,\n" +
-    "  u.`Email`, ii.`Name` Course, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
+    "select c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, coalesce(upd.`Qty`, 0) Qty, u.`DisplayName`,\n" +
+    "  u.`Email`, ii.`Name` Course, '' `Подарок`, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
     "  coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign,\n" +
     "  coalesce(concat(gr.`Campaign`, ' (', gr.`Source`, '+', gr.`Medium`, ')'), '') CampaignReg, coalesce(c.`PromoCode`, '') as Promo,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
@@ -70,25 +106,62 @@ const GET_USER_PURCHASE_MYSQL =
     "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
     "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
     "  left join`Price` p on p.`ProductId` = ii.`ProductId` and(p.`FirstDate` <= c.`ChequeDate`)\n" +
-    "  and((p.`LastDate` is null) or(p.`LastDate` > c.`ChequeDate`))\n" +
+    "    and((p.`LastDate` is null) or(p.`LastDate` > c.`ChequeDate`))\n" +
     "  join`User` u on u.`SysParentId` = c.`UserId`\n" +
     "  left join`Campaign` g on g.`Id` = c.`CampaignId`\n" +
     "  left join`Campaign` gr on gr.`Id` = u.`CampaignId`\n" +
     "  left join`PromoCode` pc on pc.`Id` = c.`PromoCodeId`\n" +
     "  join`Course` cs on cs.`ProductId` = ii.`ProductId`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = cs.`Id`\n" +
-    "  left join (select `UserId`, count(*) `Qty` from `UserPaidCourse` group by `UserId`) upd on upd.`UserId` = c.`UserId`\n" +
-    "  join ( select lc.`CourseId`, round(sum(coalesce(lg.`Duration`, 0)) / 3600.0, 2) Duration from`LessonCourse` lc\n" +
-    "      join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
-    "    group by lc.`CourseId`) cd on cd.`CourseId` = cs.`Id`\n" +
+    "  left join(select`UserId`, count(*)`Qty` from`UserPaidCourse` group by`UserId`) upd on upd.`UserId` = c.`UserId`\n" +
+    "  join (select lc.`CourseId`, round(sum(coalesce(lg.`Duration`, 0)) / 3600.0, 2) Duration from`LessonCourse` lc\n" +
+    "    join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
+    "  group by lc.`CourseId`) cd on cd.`CourseId` = cs.`Id`\n" +
     "  left join`LsnHistory` h on h.`UserId` = c.`UserId` and h.`LessonId` = lc.`LessonId`\n" +
-    "  left join ( select `UserId`, max(`FinDate`) FinDate from `LsnHistory`\n" +
-    "    group by `UserId`) hu on hu.`UserId` = c.`UserId`\n" +
-    "where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>') and(c.`ChequeDate` < '<%= last_date %>')\n" +
-    "group by c.`ChequeDate`, u.`RegDate`, c.`UserId`, upd.`Qty`, u.`DisplayName`, u.`Email`, ii.`Name`,\n" +
+    "  left join(select`UserId`, max(`FinDate`) FinDate from`LsnHistory`\n" +
+    "    group by`UserId`) hu on hu.`UserId` = c.`UserId`\n" +
+    "where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
+    "  and(c.`ChequeDate` < '<%= last_date %>')\n" +
+    "group by c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, upd.`Qty`, u.`DisplayName`, u.`Email`, ii.`Name`,\n" +
     "  p.`Price`, ii.`Price`, g.`Campaign`, g.`Source`, g.`Medium`, c.`PromoCode`, cd.`Duration`,\n" +
     "  gr.`Campaign`, gr.`Source`, gr.`Medium`\n" +
-    "order by c.`ChequeDate` desc";
+    "union all\n" +
+    "select c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, coalesce(upd.`Qty`, 0) Qty, u.`DisplayName`,\n" +
+    "  u.`Email`, concat('Курс: ', cl.`Name`) Course, 'да' `Подарок`, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
+    "  coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign,\n" +
+    "  coalesce(concat(gr.`Campaign`, ' (', gr.`Source`, '+', gr.`Medium`, ')'), '') CampaignReg, coalesce(c.`PromoCode`, '') as Promo,\n" +
+    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
+    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart,\n" +
+    "  max(h.`FinDate`) as ThisLastTime,\n" +
+    "  max(hu.`FinDate`) as LastTime\n" +
+    "from`PromoCode` ppc\n" +
+    "  join`InvoiceItem` ii on ii.`ProductId` = ppc.`PromoProductId`\n" +
+    "  join`Invoice` i on i.`Id` = ii.`InvoiceId`\n" +
+    "  join`Cheque` c on c.`InvoiceId` = i.`Id`\n" +
+    "  join`PromoCodeProduct` pcp on pcp.`PromoCodeId` = ppc.`Id`\n" +
+    "  join`Product` pr on pr.`Id` = pcp.`ProductId`\n" +
+    "  join`Course` cs on cs.`ProductId` = pr.`Id`\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = cs.`Id`\n" +
+    "  left join`Price` p on p.`ProductId` = ii.`ProductId` and(p.`FirstDate` <= c.`ChequeDate`)\n" +
+    "    and((p.`LastDate` is null) or(p.`LastDate` > c.`ChequeDate`))\n" +
+    "  join`User` u on u.`SysParentId` = c.`UserId`\n" +
+    "  left join`Campaign` g on g.`Id` = c.`CampaignId`\n" +
+    "  left join`Campaign` gr on gr.`Id` = u.`CampaignId`\n" +
+    "  left join`PromoCode` pc on pc.`Id` = c.`PromoCodeId`\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = cs.`Id`\n" +
+    "  left join(select`UserId`, count(*)`Qty` from`UserPaidCourse` group by`UserId`) upd on upd.`UserId` = c.`UserId`\n" +
+    "  join(select lc.`CourseId`, round(sum(coalesce(lg.`Duration`, 0)) / 3600.0, 2) Duration from`LessonCourse` lc\n" +
+    "    join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
+    "    group by lc.`CourseId`) cd on cd.`CourseId` = cs.`Id`\n" +
+    "  left join`LsnHistory` h on h.`UserId` = c.`UserId` and h.`LessonId` = lc.`LessonId`\n" +
+    "  left join(select`UserId`, max(`FinDate`) FinDate from`LsnHistory`\n" +
+    "    group by`UserId`) hu on hu.`UserId` = c.`UserId`\n" +
+    "where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
+    "  and(c.`ChequeDate` < '<%= last_date %>')\n" +
+    "group by c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, upd.`Qty`, u.`DisplayName`, u.`Email`, cl.`Name`,\n" +
+    "  p.`Price`, ii.`Price`, g.`Campaign`, g.`Source`, g.`Medium`, c.`PromoCode`, cd.`Duration`,\n" +
+    "  gr.`Campaign`, gr.`Source`, gr.`Medium`\n" +
+    "order by 2 desc";
 
 const GET_COURSE_PURCHASE_MSSQL =
     "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.GiftQty) GiftQty\n" +
@@ -99,7 +172,19 @@ const GET_COURSE_PURCHASE_MSSQL =
     "    join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
     "    join[Course] cs on cs.[ProductId] = ii.[ProductId]\n" +
     "    join[CourseLng] cl on cl.[CourseId] = cs.[Id]\n" +
-    "    left join[UserGiftCourse] gc on gc.[UserId] = c.[UserId] and gc.[CourseId] = cs.[Id]\n" +
+    "  where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
+    "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
+    "  group by cl.[Name]\n" +
+    "  union all\n" +
+    "  select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, 0 as GiftQty\n" +
+    "  from[PromoCode] ppc\n" +
+    "    join[InvoiceItem] ii on ii.[ProductId] = ppc.[PromoProductId]\n" +
+    "    join[Invoice] i on i.[Id] = ii.[InvoiceId]\n" +
+    "    join[Cheque] c on c.[InvoiceId] = i.[Id]\n" +
+    "    join[PromoCodeProduct] pcp on pcp.[PromoCodeId] = ppc.[Id]\n" +
+    "    join[Product] pr on pr.[Id] = pcp.[ProductId]\n" +
+    "    join[Course] cs on cs.[ProductId] = pr.[Id]\n" +
+    "    join[CourseLng] cl on cl.[CourseId] = cs.[Id]\n" +
     "  where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
     "  group by cl.[Name]\n" +
@@ -122,7 +207,19 @@ const GET_COURSE_PURCHASE_MYSQL =
     "    join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
     "    join`Course` cs on cs.`ProductId` = ii.`ProductId`\n" +
     "    join`CourseLng` cl on cl.`CourseId` = cs.`Id`\n" +
-    "    left join`UserGiftCourse` gc on gc.`UserId` = c.`UserId` and gc.`CourseId` = cs.`Id`\n" +
+    "  where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
+    "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
+    "  group by cl.`Name`\n" +
+    "  union all\n" +
+    "  select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, 0 as GiftQty\n" +
+    "  from`PromoCode` ppc\n" +
+    "    join`InvoiceItem` ii on ii.`ProductId` = ppc.`PromoProductId`\n" +
+    "    join`Invoice` i on i.`Id` = ii.`InvoiceId`\n" +
+    "    join`Cheque` c on c.`InvoiceId` = i.`Id`\n" +
+    "    join`PromoCodeProduct` pcp on pcp.`PromoCodeId` = ppc.`Id`\n" +
+    "    join`Product` pr on pr.`Id` = pcp.`ProductId`\n" +
+    "    join`Course` cs on cs.`ProductId` = pr.`Id`\n" +
+    "    join`CourseLng` cl on cl.`CourseId` = cs.`Id`\n" +
     "  where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
     "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
     "  group by cl.`Name`\n" +
