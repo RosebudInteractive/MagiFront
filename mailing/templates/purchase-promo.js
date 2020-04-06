@@ -10,13 +10,8 @@ import Social from "../components/common/social";
 
 const STYLE = {
     COLUMN: {
-        BORDER: {
-            width: "24px",
-            padding: 0,
-            color: "#FFFFFF"
-        },
-        MAIN: {
-            padding: 0
+        NUMBER: {
+            verticalAlign: "baseline",
         }
     },
     PARAGRAPH: {
@@ -69,11 +64,17 @@ class PurchasePromo extends React.Component {
                         </td>
                     </tr>
                     <tr><td style={STYLE.PARAGRAPH}>Для активации промокода необходимо:</td></tr>
-                    <tr><td>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></td></tr>
-                    <tr><td>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></td></tr>
-                    <tr><td>3) нажать на кнопку  "Купить"</td></tr>
-                    <tr><td>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></td></tr>
-                    <tr><td>5) нажать на кнопку "Получить"</td></tr>
+                    <tr>
+                        <table>
+                            <tbody>
+                                <tr><td style={STYLE.COLUMN.NUMBER}>1. </td><td>авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></td></tr>
+                                <tr><td style={STYLE.COLUMN.NUMBER}>2. </td><td>зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></td></tr>
+                                <tr><td style={STYLE.COLUMN.NUMBER}>3. </td><td>нажать на кнопку  "Купить"</td></tr>
+                                <tr><td style={STYLE.COLUMN.NUMBER}>4. </td><td>на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></td></tr>
+                                <tr><td style={STYLE.COLUMN.NUMBER}>5. </td><td>нажать на кнопку "Получить"</td></tr>
+                            </tbody>
+                        </table>
+                    </tr>
                     <tr><td>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</td></tr>
                     <tr>
                         <td style={STYLE.PARAGRAPH}>С наилучшими пожеланиями, Магистерия.</td>
