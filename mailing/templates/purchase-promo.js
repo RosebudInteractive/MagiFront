@@ -10,13 +10,8 @@ import Social from "../components/common/social";
 
 const STYLE = {
     COLUMN: {
-        BORDER: {
-            width: "24px",
-            padding: 0,
-            color: "#FFFFFF"
-        },
-        MAIN: {
-            padding: 0
+        NUMBER: {
+            verticalAlign: "baseline",
         }
     },
     PARAGRAPH: {
@@ -59,30 +54,24 @@ class PurchasePromo extends React.Component {
                     <Logo/>
                     <CourseCover course={course}/>
                     <tr>
-                        <td>
-                            <tr>
-                                <td style={STYLE.PARAGRAPH}>
-                                    {_message}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style={STYLE.PARAGRAPH}>
-                                    Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a>.
-                                </td>
-                            </tr>
-                            <td style={STYLE.PARAGRAPH}>
-                                <tr>Для активации промокода необходимо:</tr>
-                                <tr>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></tr>
-                                <tr>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></tr>
-                                <tr>3) нажать на кнопку  "Купить"</tr>
-                                <tr>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></tr>
-                                <tr>5) нажать на кнопку "Получить"</tr>
-                                <tr>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</tr>
-                            </td>
-                            <tr>
-                                <td style={STYLE.PARAGRAPH}>С наилучшими пожеланиями, Магистерия.</td>
-                            </tr>
+                        <td style={STYLE.PARAGRAPH}>
+                            {_message}
                         </td>
+                    </tr>
+                    <tr>
+                        <td style={STYLE.PARAGRAPH}>
+                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a>.
+                        </td>
+                    </tr>
+                    <tr><td style={STYLE.PARAGRAPH}>Для активации промокода необходимо:</td></tr>
+                    <tr><td>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></td></tr>
+                    <tr><td>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"Русский канон в эпоху реализма"</a></td></tr>
+                    <tr><td>3) нажать на кнопку  "Купить"</td></tr>
+                    <tr><td>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></td></tr>
+                    <tr><td>5) нажать на кнопку "Получить"</td></tr>
+                    <tr><td>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</td></tr>
+                    <tr>
+                        <td style={STYLE.PARAGRAPH}>С наилучшими пожеланиями, Магистерия.</td>
                     </tr>
                     <Social/>
                 </tbody>

@@ -146,6 +146,7 @@ class PaymentForm extends React.Component {
                 data.Promo = Object.assign({}, selectedSubscription.Promo)
             }
 
+            data.buyAsGift = !!selectedSubscription.buyAsGift
             this.props.sendPayment(data)
             this.props.notifyPaymentButtonClicked({
                 id: selectedSubscription.CourseId,

@@ -41,24 +41,26 @@ class MobileButton extends React.Component {
 
         return <div className="mobile-buttons__block" style={_style}>
             {
-                _showPriceButton ?
-                    <React.Fragment>
-                        <div className="mobile-button_wrapper price-button__wrapper">
-                            <PriceButton course={course}/>
-                            <div className="mobile-button_background"/>
-                        </div>
-                        <div className="mobile-button_wrapper gift-button__wrapper">
-                            <GiftButton course={course}/>
-                            <div className="mobile-button_background"/>
-                        </div>
-                    </React.Fragment>
-                    :
-                    <div className="mobile-button_wrapper">
-                        <PlayButton course={course}/>
+                _showPriceButton
+                    ?
+                    <div className="mobile-button_wrapper price-button__wrapper">
+                        <PriceButton course={course}/>
                         <div className="mobile-button_background"/>
                     </div>
+                    :
+                    null
+                    // <div className="mobile-button_wrapper">
+                    //     <PlayButton course={course}/>
+                    //     <div className="mobile-button_background"/>
+                    // </div>
             }
-
+            {
+                course.IsPaid &&
+                <div className="mobile-button_wrapper gift-button__wrapper">
+                    <GiftButton course={course}/>
+                    <div className="mobile-button_background"/>
+                </div>
+            }
         </div>
     }
 

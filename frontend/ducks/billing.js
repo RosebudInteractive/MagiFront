@@ -441,7 +441,7 @@ function* _getPaidCourseInfoSaga(data) {
             _eventFiredByPlayer = _data && _data.firedByPlayerBlock,
             _needClearAuthWaiting = !_isPaidCourse || (_eventFiredByPlayer && _user.isAdmin)
 
-        if (_needClearAuthWaiting) {
+        if (_needClearAuthWaiting && !(_course.IsPaid && _data.buyAsGift)) {
             yield put({type: CLEAR_WAITING_AUTHORIZE})
             yield put({type: REDIRECT_TO_BOUGHT_COURSE, payload: _data.returnUrl})
         } else {
@@ -490,8 +490,16 @@ function* sendPaymentSaga(data) {
     try {
         if (data.payload.courseId) {
             let _course = yield call(_fetchCoursePriceInfo, {courseId : data.payload.courseId})
-            const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought)
-            if (!_isPaidCourse) {return}
+            const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought),
+                _buyAsGift = (_course.IsPaid && data.payload.buyAsGift)
+
+            console.log(_isPaidCourse, _buyAsGift)
+
+            if (!(_isPaidCourse || _buyAsGift)) {
+                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+                return
+            }
         }
 
         let _data = yield call(_fetchSendPayment, data.payload);
