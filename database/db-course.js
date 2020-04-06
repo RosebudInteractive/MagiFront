@@ -2,6 +2,7 @@ const querystring = require('querystring');
 const _ = require('lodash');
 const config = require('config');
 const striptags = require('striptags');
+const { SEO } = require('../const/common');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { Intervals } = require('../const/common');
@@ -657,7 +658,7 @@ const DbCourse = class DbCourse extends DbObject {
             });
     }
 
-    async coursePurchaseMailData(id, path, options) {
+    async courseMailData(id, path, options) {
         let result = {};
         let opts = options || {};
         let dbOpts = opts.dbOpts ? opts.dbOpts : {};
@@ -683,7 +684,8 @@ const DbCourse = class DbCourse extends DbObject {
             if(query)
                 render_path += `?${querystring.stringify(query)}`;
         }
-        let { statusCode, body: html } = await this._prerenderCache.prerender(render_path, false, null, { host: host, response: true });
+        let { statusCode, body: html } = await this._prerenderCache.prerender(render_path, false,
+            { "User-Agent": SEO.NULL_USER_AGENT }, { host: host, response: true });
         if (statusCode !== HttpCode.OK)
             throw new HttpError(statusCode, `HTTP error "${statusCode}" accessing "${host + render_path}".`);
         result.body = html;
@@ -726,7 +728,8 @@ const DbCourse = class DbCourse extends DbObject {
 
         let host = opts.host ? opts.host : (config.has('mail.mailing.newCourse.host')
             && config.mail.mailing.newCourse.host ? config.mail.mailing.newCourse.host : config.proxyServer.siteHost);
-        let { statusCode, body: html } = await this._prerenderCache.prerender(path, false, null, { host: host, response: true });
+        let { statusCode, body: html } = await this._prerenderCache.prerender(path, false,
+            { "User-Agent": SEO.NULL_USER_AGENT }, { host: host, response: true });
         if (statusCode !== HttpCode.OK)
             throw new HttpError(statusCode, `HTTP error "${statusCode}" accessing "${host + path}".`);
 

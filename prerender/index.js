@@ -16,6 +16,7 @@ let additionalBots = [
     "odklbot",
     "telegrambot",
     "sitereport",
+    SEO.NULL_USER_AGENT,
     SEO.FORCE_RENDER_USER_AGENT,
     SEO.BOT_USER_AGENT
 ];
@@ -119,8 +120,9 @@ exports.PrerenderInit = (app) => {
                     console.log(buildLogString(`Prerender: url:"${req.url}", userAgent:"${userAgent}"`));
                 function cb() {
                     // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
-                    if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
+                    if ((userAgent === SEO.FORCE_RENDER_USER_AGENT) || (userAgent === SEO.NULL_USER_AGENT)) {
                         req.forceRender = true;
+                        req.cacheResponse = (userAgent === SEO.NULL_USER_AGENT) ? false : true;
                         done(null, null);
                     }
                     else
@@ -145,23 +147,24 @@ exports.PrerenderInit = (app) => {
             .set('afterRender', function (err, req, prerender_res) {
                 // do whatever you need to do
                 if (!err) {
-                    (req.forceRender ? Promise.resolve() : prerenderCache.get(req.path))
-                        .then((res) => {
-                            if (prerender_res.statusCode === HttpCode.OK) { // Save only if result is OK.
-                                if (!res) {
-                                    let ttl = expInSec;
-                                    if (ttl) {
-                                        ttl += Math.round((Math.random() - 0.5) * (maxDevSec ? maxDevSec : ttl));
+                    if (req.cacheResponse)
+                        (req.forceRender ? Promise.resolve() : prerenderCache.get(req.path))
+                            .then((res) => {
+                                if (prerender_res.statusCode === HttpCode.OK) { // Save only if result is OK.
+                                    if (!res) {
+                                        let ttl = expInSec;
+                                        if (ttl) {
+                                            ttl += Math.round((Math.random() - 0.5) * (maxDevSec ? maxDevSec : ttl));
+                                        }
+                                        return prerenderCache.set(req.path, prerender_res.body, ttl);
                                     }
-                                    return prerenderCache.set(req.path, prerender_res.body, ttl);
                                 }
-                            }
-                            else
-                                return prerenderCache.delList(req.path);
-                        })
-                        .catch((err) => {
-                            console.error(`prerender:afterRender::${err && err.message ? err.message : JSON.stringify(err)}`);
-                        });
+                                else
+                                    return prerenderCache.delList(req.path);
+                            })
+                            .catch((err) => {
+                                console.error(`prerender:afterRender::${err && err.message ? err.message : JSON.stringify(err)}`);
+                            });
                 }
             });
 
