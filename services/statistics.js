@@ -50,6 +50,17 @@ function setupStatistics(app) {
                 next(err);
             });
     });
+
+    app.get('/api/adm/statistics/course_listen', (req, res, next) => {
+        StatisticsService()
+            .course_listen(req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
 }
 
 exports.setupStatistics = setupStatistics;
