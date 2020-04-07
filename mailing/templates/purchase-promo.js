@@ -22,6 +22,7 @@ const STYLE = {
             paddingTop: "12px",
             fontFamily: "Arial",
             fontSize: "18px",
+            fontWeight: "normal",
             lineHeight: "130%",
         },
         COMMON: {
