@@ -7,27 +7,37 @@ import {STYLES} from "../styles";
 import Logo from "../components/common/logo";
 import CourseCover from "../components/common/course-cover";
 import Social from "../components/common/social";
+import PromoInstruction from "../components/purchase-promo/instruction";
 
 const STYLE = {
-    COLUMN: {
-        NUMBER: {
-            verticalAlign: "baseline",
-        }
+    GREETING: {
+        paddingTop: "30px",
+        fontFamily: "Arial",
+        fontSize: "23px",
+        fontWeight: "bold",
+        lineHeight: "130%",
     },
     PARAGRAPH: {
-        paddingTop: "16px",
-        fontFamily: "Arial",
-        lineHeight: "140%",
+        THANKSGIVING: {
+            paddingTop: "12px",
+            fontFamily: "Arial",
+            fontSize: "18px",
+            lineHeight: "130%",
+        },
+        COMMON: {
+            paddingTop: "15px",
+            fontFamily: "Arial",
+            fontSize: "17px",
+            lineHeight: "130%",
+        },
     },
-    COURSE_LINK: {
+    LINK: {
         fontStyle: "normal",
-        color: "rgb(201, 100, 78)",
+        color: "#C8684C",
         display: "inline",
         textDecoration: "none"
     },
-    PROMO: {
-        fontWeight: "bold"
-    }
+
 }
 
 class PurchasePromo extends React.Component {
@@ -54,24 +64,19 @@ class PurchasePromo extends React.Component {
                     <Logo/>
                     <CourseCover course={course}/>
                     <tr>
-                        <td style={STYLE.PARAGRAPH}>
+                        <td style={STYLE.GREETING}>
                             {_message}
                         </td>
                     </tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH}>
-                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"{course.Name}"</a>.
+                        <td style={STYLE.PARAGRAPH.THANKSGIVING}>
+                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.LINK}>{course.Name}</a>.
                         </td>
                     </tr>
-                    <tr><td style={STYLE.PARAGRAPH}>Для активации промокода необходимо:</td></tr>
-                    <tr><td>1) авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.COURSE_LINK}>Магистерии</a></td></tr>
-                    <tr><td>2) зайти на страницу курса  <a target="_blank" href={course.URL} style={STYLE.COURSE_LINK}>"{course.Name}"</a></td></tr>
-                    <tr><td>3) нажать на кнопку  "Купить"</td></tr>
-                    <tr><td>4) на форме выбора способа оплаты ввести в поле "промокод" следующий код: <span style={STYLE.PROMO}>{_promo}</span></td></tr>
-                    <tr><td>5) нажать на кнопку "Получить"</td></tr>
-                    <tr><td>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</td></tr>
+                    <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
+                    <tr><td style={STYLE.PARAGRAPH.COMMON}>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</td></tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH}>С наилучшими пожеланиями, Магистерия.</td>
+                        <td style={STYLE.PARAGRAPH.COMMON}>С наилучшими пожеланиями, Магистерия.</td>
                     </tr>
                     <Social/>
                 </tbody>
