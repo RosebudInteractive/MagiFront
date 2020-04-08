@@ -15,10 +15,15 @@ class GiftButton extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+        title: PropTypes.string,
+    }
+
+    static defaultProps = {
+        title: 'Подарить курс',
     }
 
     render() {
-        const {course, enabledPaidCourse, loading, loadingCourseId,} = this.props
+        const {course, enabledPaidCourse, loading, loadingCourseId, title} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -31,7 +36,7 @@ class GiftButton extends React.Component {
         let _disabled = loading && (+loadingCourseId === course.Id)
 
         return <div className={"course-module__gift-button pay-button"}>
-                <div className={"btn btn-white font-universal__button-default" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>Подарить курс</div>
+                <div className={"btn btn-white font-universal__button-default" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
         </div>
     }
 

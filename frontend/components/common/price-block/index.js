@@ -10,23 +10,25 @@ import {
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
-import {getCurrencySign} from "../../../tools/page-tools";
+import PriceTitle from "../price-title";
+import DiscountTitle from "../discount-title";
 
 class PriceBlock extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
         title: PropTypes.string,
+        showPrice: PropTypes.bool,
     }
 
     static defaultProps = {
-        title: 'Купить'
+        title: 'Купить',
+        showPrice: true,
     }
 
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title} = this.props,
-            _currency = getCurrencySign()
+        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title, showPrice} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -43,29 +45,9 @@ class PriceBlock extends React.Component {
         return <div className={"course-module__price-block pay-button" + (!_hasDiscountDescr ? " _no-description" : "")}>
             <div className="course-module__price-block-wrapper button-block">
                 <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
-                <div className="course-module__price-block-section">
-                    {
-                        _hasDiscount ?
-                            <React.Fragment>
-                                <p className="course-module__price">{course.DPrice + _currency + " "}<span className="discount">{`-${course.Discount.Perc}%`}</span></p>
-                                <p className="course-module__old-price">{course.Price + _currency}</p>
-                            </React.Fragment>
-                            :
-                            <p className="course-module__price">{course.Price + _currency}</p>
-                    }
-                </div>
+                { showPrice && <PriceTitle course={course}/> }
             </div>
-            {
-                _hasDiscountDescr ?
-                    <div className="course-module__price-block-wrapper">
-                        <p className="course-module__price-block-info">
-                            {/*<span className="label">Персональная скидка.</span>*/}
-                            {" " + course.Discount.Description}
-                        </p>
-                    </div>
-                    :
-                    null
-            }
+            { showPrice && <DiscountTitle course={course}/> }
         </div>
     }
 

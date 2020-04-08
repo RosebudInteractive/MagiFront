@@ -5155,8 +5155,6 @@ ul.user-tooltip {
       letter-spacing: -0.5px; }
     .course-module:not(._small) .course-module__stats {
       margin-top: 11px; }
-    .course-module:not(._small) .course-module__price-block {
-      margin-bottom: 24px; }
     .course-module:not(._small).course-module--extended .course-module__title {
       margin-bottom: 23px;
       font-size: 29px; }
@@ -5175,54 +5173,6 @@ ul.user-tooltip {
       padding-left: 0; }
     .course-module:not(._small).course-module--extended .course-module__info-col {
       padding-top: 5px; } }
-  /*.course-module._small {*/
-  /*  min-height: 0; }*/
-  /*.course-module._small .favourites {*/
-  /*  top: 8px;*/
-  /*  border: none; }*/
-  /*@media (max-width: 1023px) {*/
-  /*  .course-module._small .favourites {*/
-  /*    top: 6px;*/
-  /*    !*left: -28px*!*/
-  /*  } }*/
-  /*@media (max-width: 899px) {*/
-  /*  .course-module._small .favourites {*/
-  /*    left: 0; } }*/
-  /*  @media (max-width: 639px) {*/
-  /*    .course-module._small {*/
-  /*      padding-bottom: 15px; } }*/
-  /*  .course-module._small .course-module__header {*/
-  /*    min-height: 0; }*/
-  /*    @media (max-width: 1279px) {*/
-  /*      .course-module._small .course-module__header {*/
-  /*        padding-right: 40px; } }*/
-  /*    @media (max-width: 1023px) {*/
-  /*      .course-module._small .course-module__header {*/
-  /*        min-height: 0; } }*/
-  /*    @media (max-width: 480px) {*/
-  /*      .course-module._small .course-module__header {*/
-  /*        padding-right: 0; } }*/
-  /*  .course-module._small .course-module__title {*/
-  /*    position: relative;*/
-  /*    margin: 0 0 25px 0;*/
-  /*    font-weight: 400;*/
-  /*    font-size: 40px;*/
-  /*    line-height: 44px;*/
-  /*    letter-spacing: -0.02em; }*/
-  /*    @media (max-width: 1279px) {*/
-  /*      .course-module._small .course-module__title br {*/
-  /*        display: none; } }*/
-  /*    @media (max-width: 1023px) {*/
-  /*      .course-module._small .course-module__title {*/
-  /*        margin-bottom: 13px;*/
-  /*        font-size: 25px;*/
-  /*        line-height: 31px; } }*/
-  /*    @media (max-width: 1023px) {*/
-  /*      .course-module._small .course-module__title span{*/
-  /*        margin-left: 0; } }*/
-  /*    @media (max-width: 639px) {*/
-  /*      .course-module._small .course-module__title {*/
-  /*        letter-spacing: -0.7px; } }*/
   .course-module__sources {
     padding-right: 16.666666%; }
   @media (max-width: 899px) {

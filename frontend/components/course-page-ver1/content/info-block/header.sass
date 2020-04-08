@@ -2,48 +2,62 @@
 
 .header__button-block
   display: flex
+  flex-direction: column
   margin-bottom: 20px
+
+  .course-module__price-block-info
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 14px
+    line-height: 17px
+
+.header__buttons-wrapper
+  display: flex
   justify-content: space-between
 
   .btn
     padding: 16px 0
-    min-width: 130px
-    max-width: 214px
+    min-width: 80px
     width: 100%
     @media (max-width: 899px)
       padding: 14px 0
 
   .btn--brown
     border: $border-orange
+    &:disabled
+      border: $border-gray-06
+
+  .pay-button
+    &:first-child
+      padding-left: 0
+      padding-right: 10px
+    &:nth-child(2)
+      padding-left: 10px
+    &:only-child
+      padding: 0
+      max-width: 214px
 
   .course-module__price-block
     margin: 0
     display: flex
-    padding-left: 10px
-    padding-right: 20px
-    flex: 1 1 calc(66% - 25px)
-    @media (max-width: 819px)
-      padding-left: 0
-    @media (max-width: 639px)
-      padding-left: 10px
-      @media (max-width: 399px)
-        padding-left: 0
+    flex: 1 1 33%
 
   .course-module__price-block-wrapper
     width: 100%
 
   .course-module__gift-button
-    max-width: 214px
     display: block
     flex: 1 1 33%
-    padding-right: 10px
-    &.pay-button:not(:only-child)
-      @media (max-width: 819px)
-        display: none
-      @media (max-width: 639px)
-        display: block
-      @media (max-width: 399px)
-        display: none
 
   .course-module__price-btn
-    width: 55%
+    width: 100%
+
+  .course-module__price-block-section
+    font-family: $font-fira
+    flex: 1 1 33%
+    p
+      margin: 0
+
+
+

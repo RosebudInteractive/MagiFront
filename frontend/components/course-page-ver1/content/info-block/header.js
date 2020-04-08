@@ -5,6 +5,8 @@ import PriceBlock from "../../../common/price-block";
 import GiftBlock from './gift-block'
 import GiftButton from "../../../common/gift-button";
 import "./header.sass"
+import DiscountTitle from "../../../common/discount-title";
+import PriceTitle from "../../../common/price-title";
 
 export default class Header extends React.Component {
 
@@ -15,12 +17,19 @@ export default class Header extends React.Component {
     }
 
     render() {
+        const {course} = this.props,
+            _needShowPrice = course && (course.IsPaid && !course.IsGift && !course.IsBought)
+
         return (
             <div className="course-module__header">
                 <Info authors={this.props.authors} categories={this.props.categories} showPhoto={true}/>
                 <div className="header__button-block">
-                    <GiftButton course={this.props.course}/>
-                    <PriceBlock course={this.props.course}/>
+                    <div className="header__buttons-wrapper">
+                        <PriceBlock course={this.props.course} showPrice={false}/>
+                        <GiftButton course={this.props.course} title={"Подарить"}/>
+                        { _needShowPrice && <PriceTitle course={this.props.course}/> }
+                    </div>
+                    <DiscountTitle course={this.props.course}/>
                 </div>
                 <GiftBlock visible={this.props.course && this.props.course.IsGift}/>
             </div>
