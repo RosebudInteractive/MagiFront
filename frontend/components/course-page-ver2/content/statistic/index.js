@@ -10,7 +10,8 @@ import PriceBlock from "../../../common/price-block";
 import Data from "./data";
 import {connect} from "react-redux";
 import {SocialBlock} from "./social-block";
- import GiftButton from "../../../common/gift-button";
+ import GiftButton from "../../../billing/gift-button";
+ import BillingBlock from "./billing-block";
 
 const FIXED_BLOCK_MARGIN_TOP = 58
 
@@ -138,8 +139,7 @@ class Statistic extends React.Component {
                         </React.Fragment>
                         :
                         <React.Fragment>
-                            <PriceBlock course={course}/>
-                            <GiftButton course={course}/>
+                            <BillingBlock course={course}/>
                             <Data course={course}/>
                             {
                                 _freeLesson ?

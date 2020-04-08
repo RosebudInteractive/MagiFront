@@ -10,8 +10,8 @@ import {
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
-import PriceTitle from "../price-title";
-import DiscountTitle from "../discount-title";
+import PriceTitle from "../../billing/price-title";
+import DiscountTitle from "../../billing/discount-title";
 
 class PriceBlock extends React.Component {
 

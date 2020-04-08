@@ -6,7 +6,7 @@ import PriceButton from "./price-button";
 import PlayButton from "./play-button";
 import './mobile-button.sass'
 import $ from "jquery";
-import GiftButton from "../../common/gift-button";
+import GiftButton from "../../billing/gift-button";
 
 class MobileButton extends React.Component {
 

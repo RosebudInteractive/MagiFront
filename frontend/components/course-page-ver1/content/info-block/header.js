@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import Info from '../../../course/course-module-info';
 import PriceBlock from "../../../common/price-block";
 import GiftBlock from './gift-block'
-import GiftButton from "../../../common/gift-button";
+import GiftButton from "../../../billing/gift-button";
 import "./header.sass"
-import DiscountTitle from "../../../common/discount-title";
-import PriceTitle from "../../../common/price-title";
+import DiscountTitle from "../../../billing/discount-title";
+import PriceTitle from "../../../billing/price-title";
 
 export default class Header extends React.Component {
 
@@ -29,7 +29,7 @@ export default class Header extends React.Component {
                         <GiftButton course={this.props.course} title={"Подарить"}/>
                         { _needShowPrice && <PriceTitle course={this.props.course}/> }
                     </div>
-                    <DiscountTitle course={this.props.course}/>
+                    { _needShowPrice && <DiscountTitle course={this.props.course}/> }
                 </div>
                 <GiftBlock visible={this.props.course && this.props.course.IsGift}/>
             </div>
