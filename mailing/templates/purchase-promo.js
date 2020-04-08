@@ -9,45 +9,6 @@ import CourseCover from "../components/common/course-cover";
 import Social from "../components/common/social";
 import PromoInstruction from "../components/purchase-promo/instruction";
 
-const STYLE = {
-    GREETING: {
-        paddingTop: "30px",
-        fontFamily: "Arial",
-        fontSize: "23px",
-        fontWeight: "bold",
-        lineHeight: "130%",
-    },
-    PARAGRAPH: {
-        THANKSGIVING: {
-            paddingTop: "12px",
-            fontFamily: "Arial",
-            fontSize: "18px",
-            fontWeight: "normal",
-            lineHeight: "130%",
-        },
-        COMMON: {
-            paddingTop: "15px",
-            fontFamily: "Arial",
-            fontSize: "17px",
-            lineHeight: "130%",
-        },
-        LAST: {
-            paddingTop: "15px",
-            paddingBottom: "35px",
-            fontFamily: "Arial",
-            fontSize: "17px",
-            lineHeight: "130%",
-        },
-    },
-    LINK: {
-        fontStyle: "normal",
-        color: "#C8684C",
-        display: "inline",
-        textDecoration: "none"
-    },
-
-}
-
 class PurchasePromo extends React.Component {
 
     constructor(props) {
@@ -72,22 +33,22 @@ class PurchasePromo extends React.Component {
                     <Logo/>
                     <CourseCover course={course}/>
                     <tr>
-                        <td style={STYLE.GREETING}>
+                        <td style={STYLES.PARAGRAPH.GREETING}>
                             {_message}
                         </td>
                     </tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH.THANKSGIVING}>
+                        <td style={STYLES.PARAGRAPH.THANKSGIVING}>
                             Благодарим Вас за покупку подарочного промокода на курс "{course.Name}".
                         </td>
                     </tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому хотите подарить этот курс.</td>
+                        <td style={STYLES.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому хотите подарить этот курс.</td>
                     </tr>
                     <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
-                    <tr><td style={STYLE.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
+                    <tr><td style={STYLES.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH.LAST}>С наилучшими пожеланиями, Магистерия.</td>
+                        <td style={STYLES.PARAGRAPH.LAST}>С наилучшими пожеланиями, Магистерия.</td>
                     </tr>
                     <Social/>
                 </tbody>

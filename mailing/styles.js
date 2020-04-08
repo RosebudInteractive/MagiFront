@@ -22,5 +22,42 @@ export const STYLES = {
 
     LOGO: {
         height: "80px"
-    }
+    },
+
+    LINK: {
+        fontStyle: "normal",
+        color: "#C8684C",
+        display: "inline",
+        textDecoration: "none"
+    },
+
+    PARAGRAPH: {
+        GREETING: {
+            paddingTop: "30px",
+            fontFamily: "Arial",
+            fontSize: "23px",
+            fontWeight: "bold",
+            lineHeight: "130%",
+        },
+        THANKSGIVING: {
+            paddingTop: "12px",
+            fontFamily: "Arial",
+            fontSize: "18px",
+            fontWeight: "normal",
+            lineHeight: "130%",
+        },
+        COMMON: {
+            paddingTop: "15px",
+            fontFamily: "Arial",
+            fontSize: "17px",
+            lineHeight: "130%",
+        },
+        LAST: {
+            paddingTop: "15px",
+            paddingBottom: "35px",
+            fontFamily: "Arial",
+            fontSize: "17px",
+            lineHeight: "130%",
+        },
+    },
 }

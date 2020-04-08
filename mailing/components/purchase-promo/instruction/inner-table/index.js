@@ -1,5 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types";
+import {STYLES} from "../../../../styles";
 
 const STYLE = {
     ROW: {
@@ -12,12 +13,6 @@ const STYLE = {
         paddingTop: "6px",
         width: "100%",
         borderCollapse: "collapse",
-    },
-    LINK: {
-        fontStyle: "normal",
-        color: "#C8684C",
-        display: "inline",
-        textDecoration: "none"
     },
     CELL: {
         NUMBER: {
@@ -70,8 +65,8 @@ export default class InstructionSteps extends React.Component {
             <td>
                 <table style={STYLE.INNER_TABLE}>
                     <tbody style={STYLE.BODY}>
-                        <Row number={1} text={<React.Fragment>Авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLE.LINK}>Магистерии</a></React.Fragment>}/>
-                        <Row number={2} text={<React.Fragment>Зайти на страницу курса  <a target="_blank" href={this.props.URL} style={STYLE.LINK}>"{this.props.name}"</a></React.Fragment>}/>
+                        <Row number={1} text={<React.Fragment>Авторизоваться на сайте <a target="_blank" href={window.location.origin} style={STYLES.LINK}>Магистерии</a></React.Fragment>}/>
+                        <Row number={2} text={<React.Fragment>Зайти на страницу курса  <a target="_blank" href={this.props.URL} style={STYLES.LINK}>"{this.props.name}"</a></React.Fragment>}/>
                         <Row number={3} text={<React.Fragment>Нажать на кнопку <span style={{fontWeight: "bold"}}>Купить</span></React.Fragment>}/>
                         <Row number={4} text={'На форме выбора способа оплаты ввести в поле "промокод" следующий код:'}/>
                         <Row text={<span style={STYLE.PROMO}>{this.props.promo}</span>}/>
