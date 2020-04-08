@@ -78,11 +78,11 @@ class PurchasePromo extends React.Component {
                     </tr>
                     <tr>
                         <td style={STYLE.PARAGRAPH.THANKSGIVING}>
-                            Благодарим Вас за покупку подарочного промокода на курс {course.Name}.
+                            Благодарим Вас за покупку подарочного промокода на курс "{course.Name}".
                         </td>
                     </tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому планируете подарить его.</td>
+                        <td style={STYLE.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому планируете подарить этот курс.</td>
                     </tr>
                     <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
                     <tr><td style={STYLE.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
