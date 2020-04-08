@@ -23,7 +23,7 @@ exports.scriptUpgrade = async (options) => {
             await root_obj.newObject({
                 fields: {
                     Code: "COURSEPROMO",
-                    Name: "Промо-код на курс лекций",
+                    Name: "Промокод на курс лекций",
                     ExtFields: `{"yandexKassa":{"payment_subject":"service"}}`
                 }
             }, {});

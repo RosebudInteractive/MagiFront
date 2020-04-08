@@ -212,7 +212,7 @@ module.exports = {
         promoCourse: {
             type: "test",
             template: "./templates/mail/promo-course.tmpl",
-            subject: "Промо-код на активацию курса \"<%= course %>\".",
+            subject: "Промокод на активацию курса \"<%= course %>\".",
             sender: '"Magisteria" <administrator@magisteria.ru>'
         },
         purchaseCourse: {
