@@ -233,6 +233,40 @@ const GET_COURSE_PURCHASE_MYSQL =
     "group by t.Course\n" +
     "order by 3 desc";
 
+const GET_COURSE_LISTEN_MSSQL =
+    "select cl.[CourseId] Id, cl.[Name] Course,\n" +
+    "  round(sum(h.[LsnTime]) / 3600.0, 2) as LsnTime,\n" +
+    "  round(sum(case when(not lc.[ParentId] is null) then h.[LsnTime] else 0 end) / 3600.0, 2) as ExtLsnTime,\n" +
+    "  round(max(cd.[Duration]) / 3600.0, 2) as Duration,\n" +
+    "  round(sum(h.[LsnTime]) / max(cd.[Duration]), 2) Ratio\n" +
+    "from [LsnHistory] h\n" +
+    "  join [LessonCourse] lc on lc.[LessonId] = h.[LessonId]\n" +
+    "  join [LessonLng] ll on ll.[LessonId] = lc.[LessonId]\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = lc.[CourseId]\n" +
+    "  join (select lc.[CourseId], sum(coalesce(lg.[Duration], 0)) Duration from[LessonCourse] lc\n" +
+    "    join[LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
+    "  group by lc.[CourseId]) cd on cd.[CourseId] = lc.[CourseId]\n" +
+    "where h.[StDate] >= convert(datetime, '<%= first_date %>') and h.[FinDate] < convert(datetime, '<%= last_date %>')\n" +
+    "group by cl.[CourseId], cl.[Name]\n" +
+    "order by 6 desc";
+    
+const GET_COURSE_LISTEN_MYSQL =
+    "select cl.`CourseId` Id, cl.`Name` Course,\n" +
+    "  round(sum(h.`LsnTime`) / 3600.0, 2) as LsnTime,\n" +
+    "  round(sum(case when(not lc.`ParentId` is null) then h.`LsnTime` else 0 end) / 3600.0, 2) as ExtLsnTime,\n" +
+    "  round(max(cd.`Duration`) / 3600.0, 2) as Duration,\n" +
+    "  round(sum(h.`LsnTime`) / max(cd.`Duration`), 2) Ratio\n" +
+    "from `LsnHistory` h\n" +
+    "  join `LessonCourse` lc on lc.`LessonId` = h.`LessonId`\n" +
+    "  join `LessonLng` ll on ll.`LessonId` = lc.`LessonId`\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = lc.`CourseId`\n" +
+    "  join (select lc.`CourseId`, sum(coalesce(lg.`Duration`, 0)) Duration from`LessonCourse` lc\n" +
+    "    join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
+    "  group by lc.`CourseId`) cd on cd.`CourseId` = lc.`CourseId`\n" +
+    "where h.`StDate` >= '<%= first_date %>' and h.`FinDate` < '<%= last_date %>'\n" +
+    "group by cl.`CourseId`, cl.`Name`\n" +
+    "order by 6 desc";
+
 const DEFAULT_FIRST_DATE = new Date("2019-05-08T00:00:00+0300");
 
 const DbStatistics = class DbStatistics extends DbObject {
@@ -285,6 +319,33 @@ const DbStatistics = class DbStatistics extends DbObject {
                     last_date: this._dateToString(lastDate, true, false)
                 }),
                 mssql: _.template(GET_USER_PURCHASE_MSSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                })
+            };
+            let result = await $data.execSql({ dialect: dialect }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0))
+                res_data = result.detail;
+            return res_data;
+        }, opts);
+    }
+
+    async course_listen(options) {
+        let opts = _.cloneDeep(options);
+        let { firsDate, lastDate } = this._getInterval(opts);
+        let caption = `Прослушивание курсов с ` +
+            `${this._dateToString(firsDate, true, false)} по ${this._dateToString(lastDate, true, false)}.`;
+        opts.first_date = firsDate;
+        opts.last_date = lastDate;
+        return this._stat_report(caption, async () => {
+            let dbOpts = opts.dbOptions || {};
+            let res_data = [];
+            let dialect = {
+                mysql: _.template(GET_COURSE_LISTEN_MYSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                }),
+                mssql: _.template(GET_COURSE_LISTEN_MSSQL)({
                     first_date: this._dateToString(firsDate, true, false),
                     last_date: this._dateToString(lastDate, true, false)
                 })
