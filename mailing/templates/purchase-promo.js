@@ -31,6 +31,13 @@ const STYLE = {
             fontSize: "17px",
             lineHeight: "130%",
         },
+        LAST: {
+            paddingTop: "15px",
+            paddingBottom: "35px",
+            fontFamily: "Arial",
+            fontSize: "17px",
+            lineHeight: "130%",
+        },
     },
     LINK: {
         fontStyle: "normal",
@@ -71,13 +78,16 @@ class PurchasePromo extends React.Component {
                     </tr>
                     <tr>
                         <td style={STYLE.PARAGRAPH.THANKSGIVING}>
-                            Благодарим Вас за покупку подарочного промокода на курс <a target="_blank" href={course.URL} style={STYLE.LINK}>{course.Name}</a>.
+                            Благодарим Вас за покупку подарочного промокода на курс {course.Name}.
                         </td>
                     </tr>
-                    <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
-                    <tr><td style={STYLE.PARAGRAPH.COMMON}>Также уведомляем Вас, что промокод может быть применен только один раз и только для данного курса.</td></tr>
                     <tr>
-                        <td style={STYLE.PARAGRAPH.COMMON}>С наилучшими пожеланиями, Магистерия.</td>
+                        <td style={STYLE.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому планируете подарить его.</td>
+                    </tr>
+                    <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
+                    <tr><td style={STYLE.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
+                    <tr>
+                        <td style={STYLE.PARAGRAPH.LAST}>С наилучшими пожеланиями, Магистерия.</td>
                     </tr>
                     <Social/>
                 </tbody>

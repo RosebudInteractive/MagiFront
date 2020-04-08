@@ -29,7 +29,7 @@ const STYLE = {
             lineHeight: "130%",
             fontWeight: "normal",
             color: "#C8684C",
-            verticalAlign: "baseline",
+            verticalAlign: "top",
         },
         TEXT: {
             paddingTop: "13px",
