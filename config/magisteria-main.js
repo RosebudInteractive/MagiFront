@@ -191,7 +191,7 @@ module.exports = {
         promoCourse: {
             type: "smtp",
             template: "./templates/mail/promo-course.tmpl",
-            subject: "Промо-код на активацию курса \"<%= course %>\".",
+            subject: "Промокод на активацию курса \"<%= course %>\".",
             sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,

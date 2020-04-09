@@ -225,7 +225,7 @@ exports.Payment = class Payment extends DbObject {
             ProductTypeId: Product.ProductTypes.CoursePromoCode,
             VATTypeId: orig_product.VATTypeId,
             Code: `PROMO-${code}`,
-            Name: `Промо-код "${code}", курс "${courseData.Name}".`,
+            Name: `Промокод "${code}", курс "${courseData.Name}".`,
             AccName: orig_product.AccName,
             Price: orig_product.Price,
             ExtFields: orig_product.ExtFields
