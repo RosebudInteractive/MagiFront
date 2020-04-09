@@ -116,7 +116,7 @@ class Statistic extends React.Component {
                 {
                     _isBought ?
                         <React.Fragment>
-                            <GiftButton course={course}/>
+                            <GiftButton course={course} alwaysVisible={true}/>
                             <div className="statistic__play-block">
                                 <div className="play-block__wrapper">
                                     <PlayBlock course={course} lesson={_lastListenedLesson} cover={_cover} isAdmin={isAdmin}/>

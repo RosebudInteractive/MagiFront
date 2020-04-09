@@ -17,10 +17,12 @@ class GiftButton extends React.Component {
     static propTypes = {
         course: PropTypes.object,
         title: PropTypes.string,
+        alwaysVisible: PropTypes.bool,
     }
 
     static defaultProps = {
         title: 'Подарить курс',
+        alwaysVisible: false,
     }
 
     constructor(props) {
@@ -30,7 +32,7 @@ class GiftButton extends React.Component {
     }
 
     render() {
-        const {course, enabledPaidCourse, loading, loadingCourseId, title} = this.props
+        const {course, enabledPaidCourse, loading, loadingCourseId, title, alwaysVisible} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -42,7 +44,7 @@ class GiftButton extends React.Component {
 
         let _disabled = loading && (+loadingCourseId === course.Id)
 
-        return <div className={"course-module__gift-button pay-button"}>
+        return <div className={"course-module__gift-button pay-button" + (alwaysVisible ? " _always-visible" : "")}>
                 <div className={"btn btn-white font-universal__button-default" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
         </div>
     }

@@ -39,29 +39,21 @@ class MobileButton extends React.Component {
 
         const _showPriceButton = course.IsPaid && !course.IsGift && !course.IsBought
 
-        return <div className="mobile-buttons__block" style={_style}>
-            {
-                _showPriceButton
-                    ?
-                    <div className="mobile-button_wrapper price-button__wrapper">
-                        <PriceButton course={course}/>
-                        <div className="mobile-button_background"/>
-                    </div>
-                    :
-                    null
-                    // <div className="mobile-button_wrapper">
-                    //     <PlayButton course={course}/>
-                    //     <div className="mobile-button_background"/>
-                    // </div>
-            }
-            {
-                course.IsPaid &&
+        return _showPriceButton &&
+            <div className="mobile-buttons__block" style={_style}>
+                <div className="mobile-button_wrapper price-button__wrapper">
+                    <PriceButton course={course}/>
+                    <div className="mobile-button_background"/>
+                </div>
                 <div className="mobile-button_wrapper gift-button__wrapper">
                     <GiftButton course={course}/>
                     <div className="mobile-button_background"/>
                 </div>
-            }
-        </div>
+                {/*<div className="mobile-button_wrapper">*/}
+                {/*    <PlayButton course={course}/>*/}
+                {/*    <div className="mobile-button_background"/>*/}
+                {/*</div>*/}
+            </div>
     }
 
     _getMarginBottom() {
