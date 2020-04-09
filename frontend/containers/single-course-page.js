@@ -262,8 +262,8 @@ class Main extends React.Component {
 
             // далее вверх поднимаем курсы автора
             if (!_result) {
-                const _hasAuthor1 = course.Authors.some(item => item1.Authors.find(authorId => authorId === item.Id)) ? 1 : 0,
-                    _hasAuthor2 = course.Authors.some(item => item2.Authors.find(authorId => authorId === item.Id)) ? 1 : 0
+                const _hasAuthor1 = course.Authors.some(item => item1.Authors.find(authorId => authorId === item.Id)),
+                    _hasAuthor2 = course.Authors.some(item => item2.Authors.find(authorId => authorId === item.Id))
 
                 _result = _hasAuthor2 - _hasAuthor1
             }
