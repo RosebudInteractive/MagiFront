@@ -262,14 +262,14 @@ class Main extends React.Component {
 
             // далее вверх поднимаем курсы автора
             if (!_result) {
-                const _hasAuthor1 = course.Authors.some(item => item1.Authors.find(authorId => authorId === item.Id)),
-                    _hasAuthor2 = course.Authors.some(item => item2.Authors.find(authorId => authorId === item.Id))
+                const _hasAuthor1 = course.Authors.some(item => item1.Authors.find(authorId => authorId === item.Id)) ? 1 : 0,
+                    _hasAuthor2 = course.Authors.some(item => item2.Authors.find(authorId => authorId === item.Id)) ? 1 : 0
 
                 _result = _hasAuthor2 - _hasAuthor1
             }
 
             // Среди бесплатных приоритезируем те, которые еще не слушались данным пользователем
-            if (!item2.IsPaid && !item1.IsPaid) {
+            if (!_result && !item2.IsPaid && !item1.IsPaid) {
                 const _hasListened1 = item1.statistics && item1.statistics.lessons.hasListened,
                     _hasListened2 = item2.statistics && item2.statistics.lessons.hasListened
 
