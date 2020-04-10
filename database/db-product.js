@@ -120,6 +120,7 @@ const DbProduct = class DbProduct extends DbObject {
                         throw new Error(`Invalid date format: "${opts.date}".`);
                     dt = new Date(ms);
                 }
+                dt = new Date(Math.round((dt - 0) / 1000) * 1000); // round ms
             }
             always_show_discount = ((opts.AlwaysShowDiscount === "true") || (opts.AlwaysShowDiscount === "1")
                 || (opts.AlwaysShowDiscount === true) || (opts.AlwaysShowDiscount === 1)) ? 1 : 0;
@@ -199,7 +200,7 @@ const DbProduct = class DbProduct extends DbObject {
                     field: field,
                     cond: cond,
                     priceList: priceList,
-                    dt: this._dateToString(dt, true)
+                    dt: this._dateToString(dt, true, false)
                 } :
                 { discontinued: discontinued, alias: alias, field: field, cond: cond };
             let sql = dt ?

@@ -1018,6 +1018,13 @@ exports.Payment = class Payment extends DbObject {
                                 await UsersService().insBookmark(invoiceData.UserId, giftCourses[i]);
                             await UsersCache().giftCourses(invoiceData.UserId,
                                 { added: giftCourses }, data.Promo.Id, data.Promo.PromoSum, dbOpts);
+                            if (opts.user){
+                                for (let i = 0; i < giftCourses.length; i++) {
+                                    // we shouldn't "await" here !!! we don't care about a result
+                                    this._sendEmailPurchaseNotification(data.Payment && data.Payment.email ? data.Payment.email : opts.user.Email,
+                                        giftCourses[i], { userName: opts.user.DisplayName, dbOpts: dbOpts });
+                                }
+                            }
                         }
                             
                         return { result: { isGift: true } };

@@ -68,7 +68,7 @@ exports.SetupRoute = (app) => {
                 if (req.user) {
                     if (req.body && req.campaignId)
                         req.body.campaignId = req.campaignId;
-                    paymentObject.insert(req.body, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
+                    paymentObject.insert(req.body, { user: req.user, debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
                         .then(result => {
                             if (result && result.confirmationUrl)
                                 // res.redirect(result.confirmationUrl)
