@@ -15,26 +15,31 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "sales2020": DEFAULT_TITLE,
         "sales2020-1": "Праздник, который останется с вами",
         "robinson2020": "Пока все дома",
-    },
-    OG_IMAGE = {
-        "sales2020": DEFAULT_OG_IMAGE,
-        "sales2020-1": "2020/01/fb-2020-sale.jpg",
-        "robinson2020": "2020/03/fb-Eastman-Johnson_Reading-Boy_1863.jpg",
-    },
-    TW_IMAGE = {
-        "sales2020": DEFAULT_TW_IMAGE,
-        "sales2020-1": "2020/01/tw-2020-sale.jpg",
-        "robinson2020": "2020/03/tw-Eastman-Johnson_Reading-Boy_1863.jpg",
+        "giftcode": "Глубоких знаний хватит надолго",
     },
     DESCRIPTION = {
         "sales2020": DEFAULT_DESCRIPTION,
         "sales2020-1": DEFAULT_DESCRIPTION,
         "robinson2020": "Слушай, смотри, думай, читай!",
+        "giftcode": "«послушает мудрый, и умножит познания»",
+    },
+    OG_IMAGE = {
+        "sales2020": DEFAULT_OG_IMAGE,
+        "sales2020-1": "2020/01/fb-2020-sale.jpg",
+        "robinson2020": "2020/03/fb-Eastman-Johnson_Reading-Boy_1863.jpg",
+        "giftcode": "2020/04/fb-gift.jpg",
+    },
+    TW_IMAGE = {
+        "sales2020": DEFAULT_TW_IMAGE,
+        "sales2020-1": "2020/01/tw-2020-sale.jpg",
+        "robinson2020": "2020/03/tw-Eastman-Johnson_Reading-Boy_1863.jpg",
+        "giftcode": "2020/04/tw-gift.jpg",
     },
     URL = {
         "sales2020": ROOT_URL,
         "sales2020-1": ROOT_URL,
         "robinson2020": "/razdel/literature",
+        "giftcode": ROOT_URL,
     }
 
 
