@@ -785,6 +785,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             SubsAutoPay: true,
                             PData: JSON.stringify({ isAdmin: false, roles: { s: 1 } }) // Role: "subscriber"
                         };
+                        if (providerId)
+                            fields.RegProviderId = providerId;
                         if (profile.CampaignId)
                             fields.CampaignId = profile.CampaignId;
                         return $dbUser.getPwdHash(randomstring.generate(15))

@@ -135,7 +135,7 @@ const GET_QUESTION_IDS_MYSQL =
 const TEST_MSSQL_PUBLIC_REQ =
     "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method], t.[IsAuthRequired],\n" +
     "  t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited], t.[Status], t.[Cover], t.[CoverMeta], t.[URL],\n" +
-    "  t.[SnPost], t.[SnDescription], t.[SnName], q.[AnswTime], c.[URL] CourseURL, cl.[Name] CourseName,\n" +
+    "  t.[SnPost], t.[SnDescription], t.[SnName], t.[Description], q.[AnswTime], c.[URL] CourseURL, cl.[Name] CourseName,\n" +
     "  l.[URL] LsnURL, ll.[Name] LsnName\n" +
     "from [Test] t\n" +
     "  join [Question] q on q.[TestId] = t.[Id]\n" +
@@ -156,7 +156,7 @@ const TEST_MSSQL_IMG_REQ =
 const TEST_MYSQL_PUBLIC_REQ =
     "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`, t.`IsAuthRequired`,\n" +
     "  t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`, t.`Status`, t.`Cover`, t.`CoverMeta`, t.`URL`,\n" +
-    "  t.`SnPost`, t.`SnDescription`, t.`SnName`, q.`AnswTime`, c.`URL` CourseURL, cl.`Name` CourseName,\n" +
+    "  t.`SnPost`, t.`SnDescription`, t.`SnName`, t.`Description`, q.`AnswTime`, c.`URL` CourseURL, cl.`Name` CourseName,\n" +
     "  l.`URL` LsnURL, ll.`Name` LsnName\n" +
     "from `Test` t\n" +
     "  join `Question` q on q.`TestId` = t.`Id`\n" +
@@ -726,6 +726,7 @@ const DbTest = class DbTest extends DbObject {
                     testData.SnPost = testObj.snPost();
                     testData.SnName = testObj.snName();
                     testData.SnDescription = testObj.snDescription();
+                    testData.Description = testObj.description();
 
                     let root_img = testObj.getDataRoot("TestMetaImage");
                     col = root_img.getCol("DataElements");
@@ -763,6 +764,7 @@ const DbTest = class DbTest extends DbObject {
                                 AnswText: obj.answText(),
                                 CorrectAnswResp: obj.correctAnswResp(),
                                 WrongAnswResp: obj.wrongAnswResp(),
+                                Comment: obj.comment(),
                                 Answers: []
                             };
                             testData.Questions[obj.number() - 1] = q;
@@ -820,6 +822,7 @@ const DbTest = class DbTest extends DbObject {
                             AnswText: obj.answText(),
                             CorrectAnswResp: obj.correctAnswResp(),
                             WrongAnswResp: obj.wrongAnswResp(),
+                            Comment: obj.comment(),
                             Answers: []
                         };
                         questions[q.Id] = q;
