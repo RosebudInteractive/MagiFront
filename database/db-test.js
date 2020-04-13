@@ -184,7 +184,7 @@ const TEST_BY_COURSE_MSSQL =
     "order by t.[Id]";
 
 const INST_BY_COURSE_MSSQL =
-    "select i.[Id], i.[TestId], i.[IsFinished]\n" +
+    "select i.[Id], i.[TestId], i.[IsFinished], i.[Score], i.[MaxScore]\n" +
     "from [TestInstance] i\n" +
     "  join [Test] t on t.[Id] = i.[TestId]\n" +
     "where t.[CourseId] = <%= course_id %> and i.[UserId] = <%= user_id %>\n" +
@@ -214,7 +214,7 @@ const TEST_BY_COURSE_MYSQL =
     "order by t.`Id`";
 
 const INST_BY_COURSE_MYSQL =
-    "select i.`Id`, i.`TestId`, i.`IsFinished`\n" +
+    "select i.`Id`, i.`TestId`, i.`IsFinished`, i.`Score`, i.`MaxScore`\n" +
     "from `TestInstance` i\n" +
     "  join `Test` t on t.`Id` = i.`TestId`\n" +
     "where t.`CourseId` = <%= course_id %> and i.`UserId` = <%= user_id %>\n" +
@@ -590,6 +590,8 @@ const DbTest = class DbTest extends DbObject {
                                 currTest.Instance = {
                                     Id: elem.Id,
                                     URL: isAbsPath ? `${this._absTestInstUrl}${elem.Id}` : `${elem.Id}`,
+                                    Score: elem.Score,
+                                    MaxScore: elem.MaxScore,
                                     IsFinished: elem.IsFinished
                                 };
                         }
