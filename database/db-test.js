@@ -184,10 +184,13 @@ const TEST_BY_COURSE_MSSQL =
     "order by t.[Id]";
 
 const INST_BY_COURSE_MSSQL =
-    "select i.[Id], i.[TestId], i.[IsFinished], i.[Score], i.[MaxScore]\n" +
+    "select i.[Id], i.[TestId], i.[IsFinished], i.[Score], i.[MaxScore],\n" +
+    "  sum(case when tq.[Answer] is NULL then 0 else 1 end) AnswNum, count(*) AnswTot\n" +
     "from [TestInstance] i\n" +
     "  join [Test] t on t.[Id] = i.[TestId]\n" +
+    "  join [InstanceQuestion] tq on tq.[TestInstanceId] = i.[Id]\n" +
     "where t.[CourseId] = <%= course_id %> and i.[UserId] = <%= user_id %>\n" +
+    "group by i.[Id], i.[TestId], i.[IsFinished], i.[Score], i.[MaxScore]\n" +
     "order by i.[TestId], i.[Id] desc";
 
 const SHARED_INSTANCE_MSSQL =
@@ -214,10 +217,13 @@ const TEST_BY_COURSE_MYSQL =
     "order by t.`Id`";
 
 const INST_BY_COURSE_MYSQL =
-    "select i.`Id`, i.`TestId`, i.`IsFinished`, i.`Score`, i.`MaxScore`\n" +
+    "select i.`Id`, i.`TestId`, i.`IsFinished`, i.`Score`, i.`MaxScore`,\n" +
+    "  sum(case when tq.`Answer` is NULL then 0 else 1 end) AnswNum, count(*) AnswTot\n" +
     "from `TestInstance` i\n" +
     "  join `Test` t on t.`Id` = i.`TestId`\n" +
+    "  join `InstanceQuestion` tq on tq.`TestInstanceId` = i.`Id`\n" +
     "where t.`CourseId` = <%= course_id %> and i.`UserId` = <%= user_id %>\n" +
+    "group by i.`Id`, i.`TestId`, i.`IsFinished`, i.`Score`, i.`MaxScore`\n" +
     "order by i.`TestId`, i.`Id` desc";
 
 const TEST_SHARE_COUNTERS_MSSQL_REQ =
@@ -592,6 +598,8 @@ const DbTest = class DbTest extends DbObject {
                                     URL: isAbsPath ? `${this._absTestInstUrl}${elem.Id}` : `${elem.Id}`,
                                     Score: elem.Score,
                                     MaxScore: elem.MaxScore,
+                                    AnswNum: elem.AnswNum,
+                                    AnswTot: elem.AnswTot,
                                     IsFinished: elem.IsFinished
                                 };
                         }
