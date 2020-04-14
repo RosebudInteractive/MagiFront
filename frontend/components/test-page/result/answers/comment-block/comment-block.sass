@@ -1,0 +1,89 @@
+@import "~tools/variables.sass"
+
+.comment-block
+  margin-bottom: 12px
+  border: $border-orange
+  border-bottom-right-radius: 4px
+  border-bottom-left-radius: 4px
+  border-top-right-radius: 4px
+  position: relative
+
+  .inner
+    color: $color-white!important
+    margin: 10px 15px 15px
+
+    &._short
+      .text
+        overflow: hidden
+        text-overflow: ellipsis
+        display: -webkit-box
+        -webkit-box-orient: vertical
+        -webkit-line-clamp: 3 /* number of lines to show */
+        line-height: 17px        /* fallback */
+        max-height: 51px       /* fallback */
+
+    .text
+      max-height: 1000px
+      -webkit-transition: all 0.3s ease
+      transition: all 0.3s ease
+      *
+        color: $color-white !important
+        line-height: 17px !important
+        font-size: 12px !important
+        margin: 0 !important
+
+      a
+        color: $color-orange !important
+        border-bottom: $border-hidden-link
+        -webkit-transition: all 0.3s ease
+        transition: all 0.3s ease
+        &:hover
+          border-bottom: $border-orange-03
+
+
+    &.hack
+      z-index: -100
+      position: absolute
+      top: 0
+      *
+        color: transparent !important
+      a
+        color: transparent !important
+
+  .more-trigger
+    color: $color-orange
+    position: relative
+    display: inline-block
+    float: right
+    margin: 6px 0 8px
+    cursor: pointer
+
+  .triangle
+    width: 0
+    height: 0
+    display: block
+    position: absolute
+    top: -1px
+    left: -10px
+    border-bottom: 10px solid $color-main-dark
+    border-left: 10px solid transparent
+
+    &:before
+      content: ""
+      width: 14px
+      display: block
+      position: absolute
+      top: 5px
+      left: -12px
+      border-top: $border-orange
+      -webkit-transform: rotate(45deg)
+      transform: rotate(45deg)
+
+    &:after
+      content: ""
+      width: 10px
+      display: block
+      position: absolute
+      top: 0
+      left: -10px
+      border-top: $border-orange

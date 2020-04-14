@@ -16,6 +16,7 @@ const NEW_TEST = {
     CourseId: null,
     LessonId: null,
     Name: null,
+    Description: null,
     Method: 1,
     MaxQ: 0,
     FromLesson: false,

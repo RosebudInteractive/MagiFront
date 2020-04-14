@@ -110,6 +110,7 @@ class TestEditorForm extends React.Component {
                 courseId: test.CourseId,
                 lessonId: test.LessonId ? test.LessonId : -1,
                 name: test.Name,
+                description: test.Description,
                 isAuthRequired: test.IsAuthRequired,
                 method: test.Method,
                 maxQ: test.MaxQ,
@@ -175,6 +176,7 @@ class TestEditorForm extends React.Component {
             CourseId: editorValues.courseId ? +editorValues.courseId : null,
             LessonId: (editorValues.lessonId && (+editorValues.lessonId > 0)) ? +editorValues.lessonId : null,
             Name: editorValues.name,
+            Description: editorValues.description,
             IsAuthRequired: editorValues.isAuthRequired,
             Method: +editorValues.method,
             MaxQ: +editorValues.maxQ,
@@ -241,6 +243,7 @@ class TestEditorForm extends React.Component {
                 AnswBool: null,
                 AnswInt: null,
                 AnswText: null,
+                Comment: question.Comment,
                 Answers: [],
             }
 

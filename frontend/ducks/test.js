@@ -30,6 +30,7 @@ const TestRecord = Record({
     LsnName: null,
     LsnURL: null,
     Name: null,
+    Description: null,
     Status: null,
     Cover: null,
     CoverMeta: null,

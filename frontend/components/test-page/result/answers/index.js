@@ -5,6 +5,7 @@ import {questionsSelector,} from "ducks/test-instance";
 import AnswerBlock from "./answer-block";
 
 import "./answers.sass"
+import CommentBlock from "./comment-block";
 
 class Answers extends React.Component {
     static propTypes = {
@@ -50,6 +51,7 @@ class Answers extends React.Component {
                     {item.Question.Text}
                     <span className={"answer__hint " + (item.IsCorrect ? "correct" : item.IsPartCorrect ? "part-correct" : "wrong") }>{item.IsCorrect ? "Правильный ответ" : item.IsPartCorrect ? "Неполный  ответ" : "Ошибка"}</span>
                 </h3>
+                <CommentBlock question={item.Question}/>
                 <AnswerBlock question={item.Question} answer={item.Answer}/>
             </React.Fragment>
         })
