@@ -833,16 +833,19 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    async createFbPriceList() {
+    async createFbPriceList(options) {
         const CURRENCY_CODE = "RUB";
         const URL_PARAMS = "?utm_source=facebook&utm_medium=social&utm_campaign=catalog";
         const CATEGORY = "543542"; // Media > Books > E-books
 
-        if (!(config.has("pricelist.fb.path") && config.has("pricelist.fb.file")))
+        let opts = options || {};
+        if (!((opts.path || config.has("pricelist.fb.path")) && (opts.file || config.has("pricelist.fb.file"))))
             throw new Error(`DbCourse::createFbPriceList: Undefined pricelist file path!`);
-        let fileName = path.join(config.get("pricelist.fb.path"), config.get("pricelist.fb.file"));
+        let fileName = path.join(opts.path ? opts.path : config.get("pricelist.fb.path"),
+            opts.file ? opts.file : config.get("pricelist.fb.file"));
 
-        let baseUrl = config.has("pricelist.fb.baseUrl") ? config.get("pricelist.fb.baseUrl") : this._baseUrl;
+        let baseUrl = opts.baseUrl ? opts.baseUrl :
+            (config.has("pricelist.fb.baseUrl") ? config.get("pricelist.fb.baseUrl") : this._baseUrl);
         let absDataUrl = this._getAbsDataUrl(baseUrl);
         let absCourseUrl = this._getAbsCourseUrl(baseUrl);
 
@@ -868,7 +871,7 @@ const DbCourse = class DbCourse extends DbObject {
             }
         }
 
-        let data = await this.getAllPublic(null, { price_list: true });
+        let data = await this.getAllPublic(null, { show_paid: true, price_list: true });
         let authors = {};
         for (let i = 0; i < data.Authors.length; i++) {
             let elem = data.Authors[i];
@@ -924,7 +927,7 @@ const DbCourse = class DbCourse extends DbObject {
         let productList = {};
         let pendingCourses = {};
         let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
-        show_paid = show_paid || (!isBillingTest);
+        show_paid = show_paid || (!isBillingTest) || opts.show_paid;
 
         return new Promise((resolve, reject) => {
             baseUrl = config.proxyServer.siteHost + "/";
