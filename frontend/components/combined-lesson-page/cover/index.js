@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import * as playerStartActions from '../../actions/player-start-actions'
+import * as playerStartActions from 'actions/player-start-actions'
 import {bindActionCreators} from 'redux';
 import $ from 'jquery'
-import * as userActions from "../../actions/user-actions";
+import * as userActions from "actions/user-actions";
 import {
     addLessonToBookmarks,
     userBookmarksSelector,
     getUserBookmarks,
     removeLessonFromBookmarks
-} from "../../ducks/profile";
+} from "ducks/profile";
 import {
     FacebookShareButton,
     TwitterShareButton,
@@ -19,14 +19,16 @@ import {
     OKShareButton,
 } from 'react-share';
 
-import {setScrollTop} from "../../containers/combined-lesson-page";
-import {getLessonNumber} from "../../tools/page-tools";
-import {FINISH_DELTA_TIME} from "../../constants/player";
+import {setScrollTop} from "../../../containers/combined-lesson-page";
+import {getLessonNumber} from "tools/page-tools";
+import {FINISH_DELTA_TIME} from "../../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {unlockLesson,} from "ducks/player";
-import {CONTENT_TYPE} from "../../constants/common-consts";
+import {CONTENT_TYPE} from "../../../constants/common-consts";
+import TestButtons from "../test-buttons";
+import "./cover.sass"
 
-class LessonFrame extends React.Component {
+class Cover extends React.Component {
     static propTypes = {
         courseUrl: PropTypes.string,
         lesson: PropTypes.object,
@@ -84,6 +86,60 @@ class LessonFrame extends React.Component {
 
     componentWillUnmount() {
         this._removeListeners();
+    }
+
+    render() {
+        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
+
+        let {lesson} = this.props;
+        let _number = getLessonNumber(lesson);
+        _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
+
+        let {isFinished: _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
+            _playPercent = playedPart * 100,
+            _inFavorites = this._isLessonInBookmarks();
+
+        return <React.Fragment>
+            <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
+                <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
+            </button>
+            <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
+                <div className="lecture-frame__header">
+                    <div className="lecture-frame__play-link">
+                        { !this.props.isMain &&
+                            <button type="button" className="lecture-frame__plus">
+                                <span className="lecture-frame__plus-icon">
+                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _plus}}/>
+                                </span>
+                                <span className="lecture-frame__plus-text">Доп. эпизод</span>
+                            </button>}
+                        <h2 className="lecture-frame__title">
+                            <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
+                            {this._getButton(_isFinished)}
+                            <p className="title-paragraph">
+                                <span className="title-text font-universal__title-large">
+                                    <span className="number">{_number}</span>
+                                    {lesson.Name + '\n'}
+                                </span>
+                            </p>
+                        </h2>
+                        <div className="lecture-frame__text-block">
+                            <p className="lecture-frame__descr font-universal__book-large">{lesson.ShortDescription}</p>
+                            <Link to={'/autor/' + lesson.Author.URL}>
+                                <p className="lecture-frame__author font-universal__title-small">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                            </Link>
+                        </div>
+                    </div>
+                    <TestButtons lessonId={lesson.Id}/>
+                    <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
+                </div>
+                <div className="progress-bar">
+                    <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
+                </div>
+            </div>
+        </React.Fragment>
     }
 
     _removeListeners() {
@@ -203,58 +259,7 @@ class LessonFrame extends React.Component {
         })
     }
 
-    render() {
-        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
-        let {lesson} = this.props;
-        let _number = getLessonNumber(lesson);
-        _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
-
-        let {isFinished: _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
-            _playPercent = playedPart * 100,
-            _inFavorites = this._isLessonInBookmarks();
-
-        return [
-            <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
-                <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
-            </button>,
-            <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
-                <div className="lecture-frame__header">
-                    <div className="lecture-frame__play-link">
-                        {this.props.isMain ? null :
-                            <button type="button" className="lecture-frame__plus">
-                                <span className="lecture-frame__plus-icon">
-                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _plus}}/>
-                                </span>
-                                <span className="lecture-frame__plus-text">Доп. эпизод</span>
-                            </button>}
-                        <h2 className="lecture-frame__title">
-                            <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            {this._getButton(_isFinished)}
-                            <p className="title-paragraph">
-                                <span className="title-text">
-                                    <span className="number">{_number}</span>
-                                    {lesson.Name + '\n'}
-                                </span>
-                            </p>
-                        </h2>
-                        <div className="lecture-frame__text-block">
-                            <p className="lecture-frame__descr">{lesson.ShortDescription}</p>
-                            <Link to={'/autor/' + lesson.Author.URL}>
-                                <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
-                            </Link>
-                        </div>
-                    </div>
-                    <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                </div>
-                <div className="progress-bar">
-                    <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
-                </div>
-            </div>
-        ]
-    }
 
     _calcIsFinishedAndPlayedPart(lesson) {
         let {lessonInfoStorage,} = this.props,
@@ -345,4 +350,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LessonFrame);
+export default connect(mapStateToProps, mapDispatchToProps)(Cover);
