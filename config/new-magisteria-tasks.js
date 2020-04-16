@@ -7,6 +7,20 @@ const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitema
 module.exports = {
     tasks: [
         {
+            name: "Price List update",
+            module: "./price-list",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 56 * * * *", // run every hour
+            options: {
+                fb: {
+                    path: path.normalize(path.join(process.cwd(), "..", "..", "pricelist", "fb")),
+                    file: "products.tsv",
+                    baseUrl: "https://magisteria.ru"
+                }
+            }
+        },
+        {
             name: "Receipt collection",
             module: "./receipt-collection",
             type: "scheduled-task",

@@ -19,6 +19,20 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Price List update",
+            module: "./price-list",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                fb: {
+                    path: path.normalize(path.join(process.cwd(), "..", "..", "pricelist", "fb")),
+                    file: "products.tsv",
+                    baseUrl: "https://magisteria.ru"
+                }
+            }
+        },
+        {
             name: "Receipt collection",
             module: "./receipt-collection",
             type: "scheduled-task",
