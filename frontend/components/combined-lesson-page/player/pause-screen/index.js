@@ -5,6 +5,7 @@ import {bindActionCreators} from "redux";
 import {lessonsSelector} from "ducks/lesson-menu";
 import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
+import LessonTooltip from "../../lesson-tooltip";
 
 const TIMEOUT = 2000
 
@@ -12,7 +13,9 @@ class PauseScreen extends React.Component {
     static propTypes = {
         lesson: PropTypes.object,
         finished: PropTypes.bool,
-        paused: PropTypes.bool
+        paused: PropTypes.bool,
+        course: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     }
 
     constructor(props) {
@@ -23,13 +26,11 @@ class PauseScreen extends React.Component {
         }
 
         this._timer = null
+        this._handlerBinded = false
     }
 
     componentDidMount() {
-        $(".js-pause-screen").on('mousemove', () => {
-            if (this.state.fade) { this.setState({fade : false}) }
-            this._startTimer()
-        });
+        this._bindHandler()
     }
 
     componentDidUpdate(prevProps) {
@@ -37,7 +38,11 @@ class PauseScreen extends React.Component {
             _currentVisible = this.props.finished || this.props.paused
 
         if (!_prevVisible && _currentVisible) {
-            this._startTimer();
+            if (!this._handlerBinded) {
+                this._bindHandler()
+            } else {
+                this._startTimer();
+            }
         }
 
         if (_prevVisible && !_currentVisible) {
@@ -46,28 +51,45 @@ class PauseScreen extends React.Component {
         }
     }
 
-    render() {
-        const {lesson, finished, paused, starting} = this.props
-
-        if (starting) return null
-
-        const _lesson = this._getLesson(),
-            _tests = _lesson.Tests,
-            _hidden = !(finished || paused)
-
-        return _tests && (_tests.length > 0) ?
-            <div className={"player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") + (this.state.fade ? " _fade" : "")}>
-                <div className="pause-screen__content-wrapper">
-                    <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div>
-                    <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div>
-                    <TestButtons lessonId={lesson.Id}/>
-                </div>
-            </div>
-            :
-            <div className={"player-frame__screen" + (finished ? " finished" : "") + (paused ? "" : " hide")}/>
+    componentWillUnmount() {
+        $(".js-pause-screen").unbind('mousemove');
     }
 
-    _getLesson() {
+    render() {
+        const {lesson, finished, paused, starting, course, isPaidCourse} = this.props
+
+        const {current, next} = this._getLessons(),
+            _tests = current.Tests,
+            _hidden = !(finished || paused)
+
+        let _className = "player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") + (this.state.fade ? " _fade" : "") + (finished ? " _finished" : "")
+
+        return <div className={_className}>
+            {
+                (!starting || finished) &&
+                <div className="pause-screen__content-wrapper">
+                    { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
+                    { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
+                    { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
+                    { finished && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse}/> }
+                </div>
+            }
+        </div>
+    }
+
+    _bindHandler() {
+        let _screen = $(".js-pause-screen")
+
+        if (_screen && (_screen.length > 0)) {
+            _screen.on('mousemove', () => {
+                if (this.state.fade) { this.setState({fade : false}) }
+                this._handlerBinded = true
+                this._startTimer()
+            });
+        }
+    }
+
+    _getLessons() {
         const {lessonList} = this.props
 
         let _lessons = []
@@ -78,9 +100,14 @@ class PauseScreen extends React.Component {
             }
         })
 
-        return _lessons.find((lesson) => {
+        let _index = _lessons.findIndex((lesson) => {
             return lesson.Id === this.props.lesson.Id
         })
+
+        return {
+            current: (_index >= 0) ? _lessons[_index] : null,
+            next: (_index < _lessons.length - 2) ? _lessons[_index + 1] : null
+        }
     }
 
     _startTimer() {
@@ -98,7 +125,7 @@ class PauseScreen extends React.Component {
             clearTimeout(this._timer);
         }
 
-        this.setState({fade: true})
+        // this.setState({fade: true})
     }
 }
 

@@ -221,7 +221,7 @@ class PlayerFrame extends Component {
                 {
                     visible &&
                         <React.Fragment>
-                            <PauseScreen finished={_isFinished || canNotPlay} paused={paused} lesson={this.props.lesson}/>
+                            <PauseScreen finished={_isFinished || canNotPlay} paused={paused} lesson={this.props.lesson} course={this.props.course} isPaidCourse={this.props.isPaidCourse}/>
                             <Titles/>
                             <div className="player-frame">
                                 <div className="player-block desktop">
@@ -265,7 +265,6 @@ function mapStateToProps(state) {
     return {
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
-        course: state.singleLesson.course,
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,

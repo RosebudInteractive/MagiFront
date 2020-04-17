@@ -1,14 +1,19 @@
 @import "~tools/variables.sass"
 
 .lecture-frame
+  .lecture-frame__text-block
+    margin-bottom: 38px
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      margin-bottom: 5px
+
   .progress-bar
-    @media (max-width: $mobile-phone-width)
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       margin-top: 5px
 
   .test-buttons-block
     flex-wrap: wrap
     margin-bottom: 27px
-    @media (max-width: $mobile-phone-width)
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       margin-bottom: 15px
 
   .social-block
@@ -16,9 +21,13 @@
 
   .lecture-frame__descr
     color: $color-white
+    //@media (max-width: $mobile-phone-width)
+      font-size: 14px
+
 
   .lecture-frame__author
     color: $color-white
+    margin: 0
 
   .title-text
     color: $color-white

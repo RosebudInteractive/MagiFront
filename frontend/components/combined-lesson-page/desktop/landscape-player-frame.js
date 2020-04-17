@@ -261,7 +261,11 @@ class Frame extends Component {
                 {
                     visible &&
                         <React.Fragment>
-                            <PauseScreen finished={_isFinished || canNotPlay} paused={paused} lesson={this.props.lesson}/>
+                            <PauseScreen finished={_isFinished || canNotPlay}
+                                         paused={paused}
+                                         lesson={this.props.lesson}
+                                         course={this.props.course}
+                                         isPaidCourse={this.props.isPaidCourse}/>
                             <Titles/>
                             <div className="player-frame">
                                 <div className="player-block">
