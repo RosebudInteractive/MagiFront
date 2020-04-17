@@ -61,7 +61,8 @@ class PlayerFrame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button')),
-                _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.js-pause-screen') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button'));
+                // _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.js-pause-screen') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button'));
+                _isPauseFrame = e.target.closest('.js-pause-screen') && !e.target.closest('.lesson-tooltip') && !e.target.closest('.test-buttons-block')
 
             if (_isContent || _isRate) {
                 return

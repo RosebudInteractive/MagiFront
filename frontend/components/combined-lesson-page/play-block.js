@@ -19,6 +19,8 @@ class PlayBlock extends React.Component {
         course: PropTypes.object,
         extClass: PropTypes.string,
         isPaidCourse: PropTypes.bool,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
     };
 
     constructor(props) {

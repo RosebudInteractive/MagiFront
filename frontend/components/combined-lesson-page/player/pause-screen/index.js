@@ -53,6 +53,7 @@ class PauseScreen extends React.Component {
 
     componentWillUnmount() {
         $(".js-pause-screen").unbind('mousemove');
+        $(".js-pause-screen").unbind('touchend');
     }
 
     render() {
@@ -71,7 +72,7 @@ class PauseScreen extends React.Component {
                     { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
                     { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
-                    { finished && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse}/> }
+                    { finished && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }
                 </div>
             }
         </div>
@@ -85,7 +86,22 @@ class PauseScreen extends React.Component {
                 if (this.state.fade) { this.setState({fade : false}) }
                 this._handlerBinded = true
                 this._startTimer()
-            });
+            })
+
+            _screen.on('touchend', (e) => {
+                const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+
+                if (_isPhone) return
+
+                if (this.state.fade) {
+                    this.setState({fade : false})
+                    e.preventDefault()
+                    e.stopPropagation()
+                }
+
+                this._handlerBinded = true
+                this._startTimer()
+            })
         }
     }
 
@@ -125,7 +141,7 @@ class PauseScreen extends React.Component {
             clearTimeout(this._timer);
         }
 
-        // this.setState({fade: true})
+        this.setState({fade: true})
     }
 }
 

@@ -51,7 +51,8 @@ class PlayerFrame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container') || e.target.closest('.lecture-frame__play-block-wrapper') || e.target.closest('.player-frame__video-cap'),
-                _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.lecture-frame__play-block-wrapper');
+                // _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.lecture-frame__play-block-wrapper');
+                _isPauseFrame = e.target.closest('.js-pause-screen') && !e.target.closest('.lesson-tooltip') && !e.target.closest('.test-buttons-block')
 
             if (_isContent || _isRate) {
                 return
@@ -221,7 +222,11 @@ class PlayerFrame extends Component {
                 {
                     visible &&
                         <React.Fragment>
-                            <PauseScreen finished={_isFinished || canNotPlay} paused={paused} lesson={this.props.lesson} course={this.props.course} isPaidCourse={this.props.isPaidCourse}/>
+                            <PauseScreen finished={_isFinished || canNotPlay}
+                                         paused={paused}
+                                         lesson={this.props.lesson}
+                                         course={this.props.course}
+                                         isPaidCourse={this.props.isPaidCourse}/>
                             <Titles/>
                             <div className="player-frame">
                                 <div className="player-block desktop">
