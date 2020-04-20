@@ -39,7 +39,7 @@ export default class Wrapper extends React.Component {
         this.state = {wrapperHeight: null};
 
         this._resizeHandler = () => {
-            let _control = $('.lesson-player');
+            let _control = $('.js-player');
 
             if (isLandscape()) {
                 _control.removeClass('added')
@@ -68,7 +68,10 @@ export default class Wrapper extends React.Component {
         }
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prev) {
+        if (prev.isPlayer !== this.props.isPlayer) {
+            this._resizeHandler();
+        }
     }
 
     componentWillUnmount() {
@@ -89,7 +92,7 @@ export default class Wrapper extends React.Component {
             _coverStyle.height = this.state.wrapperHeight;
         }
 
-        let _sectionClassName = 'lecture-wrapper lesson-player js-player mobile' + (singleLesson ? ' _single' : '')
+        let _sectionClassName = "lecture-wrapper " + (isPlayer ? "lesson-player " : "") + "js-player mobile" + (singleLesson ? ' _single' : '')
 
         return (
             <section

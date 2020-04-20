@@ -32,6 +32,8 @@ import {notifyLessonShowed,} from "ducks/google-analytics";
 import {getLessonsAll, loadingSelector as menuDataLoading} from "ducks/lesson-menu";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
+import "../components/combined-lesson-page/lesson-page.sass"
+
 let _scrollTop = 0;
 
 export const setScrollTop = (value) => {

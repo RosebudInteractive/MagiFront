@@ -1,0 +1,87 @@
+@import "~tools/variables.sass"
+
+.lecture-wrapper
+  @media (max-width: $mobile-phone-width)
+    height: calc(100vh - 53px)
+    margin-top: 53px
+
+.lecture-frame
+  .title-text
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-family: $font-fira
+      font-style: normal
+      font-weight: bold
+      font-size: 17px
+      line-height: 130%
+  .lecture-frame__title .number
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-family: $font-fira
+      font-style: normal
+      font-weight: bold
+      font-size: 17px
+      line-height: 130%
+
+  .lecture-frame__descr
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-family: $font-fira
+      font-style: normal
+      font-weight: normal
+      font-size: 12px
+      line-height: 130%
+  .lecture-frame__author
+    font-size: 12px
+    line-height: 130%
+
+.lesson-player
+
+  &.added
+    @media (max-width: $mobile-phone-width)
+      height: calc(100vh - 120px)
+
+    .player-frame__poster
+      @media (max-width: $mobile-phone-width)
+        height: calc(100vh - 250px)
+
+.lecture-wrapper
+  .play-btn-big
+    //top: 0
+    &:after
+      @media (max-width: $mobile-phone-width)
+        border-width: 26px 0 26px 58px
+  //      top: -50px
+
+  .cover .lecture-frame__play-btn
+    @media (max-width: $mobile-phone-width)
+      top: -25px
+
+  .lecture-frame__duration
+    position: relative
+    @media (max-width: $mobile-phone-width)
+      position: absolute
+      top: -55px
+
+  .title-paragraph
+    @media (max-width: $mobile-phone-width)
+      text-indent: 0
+
+
+
+  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    .social-btn
+      border-color: transparent
+      border-radius: 50px
+      background: $color-white-02
+      min-width: 48px
+      justify-content: center
+
+    .social-btn__icon svg
+      width: 18px
+      height: 18px
+
+    .social-btn._active
+      border-right: none
+      margin-right: 6px
+      min-width: 58px
+
+      .social-btn__actions
+        min-width: auto

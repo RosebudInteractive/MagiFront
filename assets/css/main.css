@@ -17711,8 +17711,9 @@ ul.lectures-tab {
   background-size: cover;
   background-position: center top; }
   .lesson-player.added {
-    height: calc(56.25vw + 160px);
+    height: calc(56.25vw + 300px);
   }
+
   .lesson-player.added .lecture-frame__play-block {
     margin-bottom: 100px;
   }
@@ -17731,7 +17732,7 @@ ul.lectures-tab {
     transform: none;
     left: 0;
     top: 0;
-    height: 56.25vw;
+    height: calc(56.25vw + 150px);
   }
   .lesson-player.added .player-frame__poster-text {
     position: static;
