@@ -54,6 +54,7 @@ const TestRecord = Record({
     LessonId: null,
     IsAuthRequired: null,
     Name: null,
+    Description: null,
     Method: null,
     MaxQ: 0,
     FromLesson: false,
@@ -100,6 +101,7 @@ const QuestionRecord = Record({
     AnswText: null,
     CorrectAnswResp: null,
     WrongAnswResp: null,
+    Comment: null,
     Answers: [],
 })
 

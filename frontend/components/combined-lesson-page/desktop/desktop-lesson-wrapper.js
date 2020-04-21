@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Menu from '../../header-lesson-page/';
 import LandscapePlayerFrame from './landscape-player-frame'
 import PortraitPlayerFrame from './portrait-player-frame'
-import LessonFrame from '../lesson-frame';
+import Cover from '../cover';
 
 import $ from 'jquery'
 import {isLandscape} from "./tools";
@@ -102,7 +102,7 @@ export default class Wrapper extends React.Component {
                     <div className={_subwrapperClassName}>
                         <LandscapePlayerFrame {...this.props}
                                               visible={isPlayer}/>
-                        <LessonFrame {...this.props}
+                        <Cover {...this.props}
                                      courseUrl={this.props.courseUrl}
                                      visible={!isPlayer}
                         />
@@ -130,7 +130,7 @@ export default class Wrapper extends React.Component {
                 <div className={_subwrapperClassName}>
                     <PortraitPlayerFrame {...this.props}
                                          visible={this.props.isPlayer}/>
-                    <LessonFrame {...this.props}
+                    <Cover {...this.props}
                                  lesson={this.props.lesson}
                                  isMain={this.props.isMain}
                                  courseUrl={this.props.courseUrl}

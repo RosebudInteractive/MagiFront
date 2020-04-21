@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import $ from "jquery";
 import history from '../../history';
-import {TooltipTitles} from "../../tools/page-tools";
+import {getCoverPath, ImageSize, TooltipTitles} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {_unlock, SVG} from "../common/play-block-functions";
@@ -15,11 +15,12 @@ import LessonPlayBlockSmall from "../common/small-play-block";
 
 class PlayBlock extends React.Component {
     static propTypes = {
-        cover: PropTypes.string,
         lesson: PropTypes.object,
         course: PropTypes.object,
         extClass: PropTypes.string,
         isPaidCourse: PropTypes.bool,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
     };
 
     constructor(props) {
@@ -135,8 +136,7 @@ class PlayBlock extends React.Component {
     }
 
     render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
-            _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
+        const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
         let {playingLesson, paused, lesson, extClass, authorized} = this.props,
@@ -155,10 +155,12 @@ class PlayBlock extends React.Component {
 
         let _tooltipText = this._getTooltip(_isThisLessonPlaying, _isFinished);
 
+        let _cover = getCoverPath(lesson, ImageSize.icon);
+
         return [
             <div className={"play-block" + (extClass ? ' ' + extClass : '')}>
                 <div className="play-block__image-wrapper"
-                     style={{backgroundImage: "url(" + '/data/' + this.props.cover + ")"}}/>
+                     style={{backgroundImage: "url(" + '/data/' + _cover + ")"}}/>
                 {
                     !_lessonLocked ?
                         <div className="play-block__loader">
@@ -192,31 +194,6 @@ class PlayBlock extends React.Component {
 
             <div className="play-block-mobile">
                 <LessonPlayBlockSmall course={this.props.course} lesson={lesson} wrapperClass={"play-block-mobile__play-block"} externalPlayFunction={::this._play}/>
-                {/*<div className="play-block-mobile__play-block">*/}
-                {/*    {*/}
-                {/*        (_isThisLessonPlaying)*/}
-                {/*            ?*/}
-                {/*            (paused)*/}
-                {/*                ?*/}
-                {/*                <button type="button" className="play-btn-small"*/}
-                {/*                        onClick={::this.props.playerStartActions.startPlay}>*/}
-                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                {/*                    <span>Воспроизвести</span>*/}
-                {/*                </button>*/}
-                {/*                :*/}
-                {/*                <button type="button" className="play-btn-small"*/}
-                {/*                        onClick={::this.props.playerStartActions.startPause}>*/}
-                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>*/}
-                {/*                    <span>Воспроизвести</span>*/}
-                {/*                </button>*/}
-                {/*            :*/}
-                {/*            <button type="button" className="play-btn-small" onClick={::this._play}>*/}
-                {/*                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                {/*                <span>Воспроизвести</span>*/}
-                {/*            </button>*/}
-                {/*    }*/}
-                {/*    <span className="play-block-mobile__duration">{_duration}</span>*/}
-                {/*</div>*/}
             </div>
         ]
     }

@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {isLandscape} from "./tools";
 import FadeTimer from '../fade-timer';
 import {showScreenControlsSelector} from "../../../ducks/player-screen";
+import PauseScreen from "../player/pause-screen";
 
 class PlayerFrame extends Component {
 
@@ -60,7 +61,8 @@ class PlayerFrame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button')),
-                _isPauseFrame = e.target.closest('.player-frame__screen') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button'));
+                // _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.js-pause-screen') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button'));
+                _isPauseFrame = e.target.closest('.js-pause-screen') && !e.target.closest('.lesson-tooltip') && !e.target.closest('.test-buttons-block')
 
             if (_isContent || _isRate) {
                 return
@@ -234,11 +236,15 @@ class PlayerFrame extends Component {
                     </div>
                 </div>
                 {
-                    visible ?
-                        [
-                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
-                            starting ? null : <ScreenControls {...this.props}/>,
-                            <Titles/>,
+                    visible &&
+                        <React.Fragment>
+                            <PauseScreen finished={_isFinished || canNotPlay}
+                                         paused={paused}
+                                         lesson={this.props.lesson}
+                                         course={this.props.course}
+                                         isPaidCourse={this.props.isPaidCourse}/>
+                            { starting ? null : <ScreenControls {...this.props}/> }
+                            <Titles/>
                             <div className="player-block">
                                 <Progress id={_id}/>
                                 <div className="player-block__row">
@@ -265,14 +271,11 @@ class PlayerFrame extends Component {
                                             <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                         </button>
                                     </div>
-                                    {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                    {showSpeedTooltip ? <RateTooltip/> : ''}
+                                    { showContentTooltip && <ContentTooltip id={_id}/> }
+                                    { showSpeedTooltip && <RateTooltip/> }
                                 </div>
                             </div>
-
-                        ]
-                        :
-                        null
+                        </React.Fragment>
                 }
             </div>
         )

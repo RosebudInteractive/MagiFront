@@ -3,7 +3,6 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "../../player/progress";
-import ScreenControls from "./screen-controls";
 import Controls from "../desktop/bottom-controls";
 
 import Titles from "../../player/titles";
@@ -17,6 +16,7 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 import $ from 'jquery'
 import FadeTimer from '../fade-timer';
 import {CONTENT_TYPE} from "../../../constants/common-consts";
+import PauseScreen from "../player/pause-screen";
 
 class PlayerFrame extends Component {
 
@@ -51,7 +51,8 @@ class PlayerFrame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container') || e.target.closest('.lecture-frame__play-block-wrapper') || e.target.closest('.player-frame__video-cap'),
-                _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.lecture-frame__play-block-wrapper');
+                // _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.lecture-frame__play-block-wrapper');
+                _isPauseFrame = e.target.closest('.js-pause-screen') && !e.target.closest('.lesson-tooltip') && !e.target.closest('.test-buttons-block')
 
             if (_isContent || _isRate) {
                 return
@@ -207,7 +208,7 @@ class PlayerFrame extends Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let {visible, starting, paused, contentArray, canNotPlay, } = this.props;
+        let {visible, paused, contentArray, canNotPlay, } = this.props;
 
         const _isYoutubeVideo = this.props.lesson.ContentType === CONTENT_TYPE.VIDEO
 
@@ -219,12 +220,14 @@ class PlayerFrame extends Component {
                     </div>
                 </div>
                 {
-                    visible ?
-                        [
-                            <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
-                            starting ? null : <ScreenControls {...this.props}/>,
-                            <Titles/>,
+                    visible &&
+                        <React.Fragment>
+                            <PauseScreen finished={_isFinished || canNotPlay}
+                                         paused={paused}
+                                         lesson={this.props.lesson}
+                                         course={this.props.course}
+                                         isPaidCourse={this.props.isPaidCourse}/>
+                            <Titles/>
                             <div className="player-frame">
                                 <div className="player-block desktop">
                                     <Progress id={_id}/>
@@ -250,14 +253,12 @@ class PlayerFrame extends Component {
                                                     null
                                             }
                                         </div>
-                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                        {showSpeedTooltip ? <RateTooltip/> : ''}
+                                        { showContentTooltip && <ContentTooltip id={_id}/> }
+                                        { showSpeedTooltip && <RateTooltip/> }
                                     </div>
                                 </div>
                             </div>
-                        ]
-                        :
-                        null
+                        </React.Fragment>
                 }
             </div>
         )
@@ -269,12 +270,10 @@ function mapStateToProps(state) {
     return {
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
-        course: state.singleLesson.course,
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
         canNotPlay: state.player.canNotPlay,
-        starting: state.player.starting,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

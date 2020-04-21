@@ -1,0 +1,78 @@
+@import "~tools/variables.sass"
+
+.test-buttons-block
+  display: flex
+  flex-direction: row
+  @media (max-width: $mobile-phone-width)
+    flex-direction: column
+
+.test-button
+  margin-top: 10px
+  display: flex
+  width: fit-content
+  border-radius: 4px
+  background-color: $color-white-02
+  padding: 6px 15px
+  cursor: pointer
+  position: relative
+  min-height: 42px
+  min-width: auto
+  @media (max-width: $mobile-phone-width)
+    width: -webkit-fill-available
+  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    min-height: 30px
+    padding: 3px 15px
+
+
+  .test-button__icon
+    align-self: center
+    margin-right: 15px
+    fill: $color-white-06
+
+  .test-button__caption
+    display: flex
+    flex-direction: column
+    justify-content: center
+
+  .caption__title
+    color: $color-white
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-size: 14px
+      line-height: 17px
+
+  .caption__subtitle
+    font-size: 12px
+    font-family: $font-fira
+    line-height: 120%
+    padding-bottom: 8px
+    color: $color-white-04
+    -webkit-transition: color 0.3s ease
+    transition: color 0.3s ease
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-size: 10px
+      padding-bottom: 4px
+
+  &:hover .caption__subtitle
+    color: $color-white
+
+  .test-button_progress
+    border: 2px solid transparent
+    position: absolute
+    bottom: 0
+    left: 0
+    border-bottom-left-radius: 4px
+    height: 0
+
+    &._completed
+      border-bottom-right-radius: 4px
+      background-color: $color-green
+      width: calc(100% - 4px)
+
+    &._in-progress
+      background-color: $color-orange
+
+
+  &:first-child:not(:only-child)
+    margin-right: 12px
+    @media (max-width: $mobile-phone-width)
+      margin-right: 0

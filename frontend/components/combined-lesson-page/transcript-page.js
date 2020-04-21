@@ -228,8 +228,7 @@ class TextBlock extends React.Component {
     }
 
     render() {
-        let {lesson, isNeedHideRefs, singleLesson, isPaidCourse} = this.props,
-            _cover = getCoverPath(lesson, ImageSize.icon);
+        let {lesson, isNeedHideRefs, singleLesson, isPaidCourse} = this.props
 
         let _number = getLessonNumber(lesson);
         _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
@@ -242,7 +241,7 @@ class TextBlock extends React.Component {
             <div className={_transcriptClassName} id="transcript">
                 <section className="text-block js-social-start">
                     <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}
+                    <PlayBlock {...this.props} lesson={lesson} extClass={'play-btn js-play'}
                                isPaidCourse={isPaidCourse}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>

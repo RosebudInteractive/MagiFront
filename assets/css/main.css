@@ -8858,16 +8858,16 @@ body[data-page="fullpage-player"] .lectures-menu {
           font-size: 23px;
           line-height: 30px; } }
     .lecture-frame__text-block {
-      margin-bottom: 24px;
+      margin-bottom: 14px;
       max-width: 65%; }
   @media (max-width: 899px) {
     .lecture-frame__text-block {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       max-width: 100%; } }
   @media (max-width: 600px) {
     .lecture-frame__text-block {
       line-height: 19px;
-      margin-bottom: 10px; } }
+      margin-bottom: 0; } }
   .lecture-frame__descr {
     margin: 0;
     padding-right: 8px;
@@ -8875,7 +8875,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 23px;
     line-height: 30px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 1);
     display: inline; }
     @media (max-width: 899px) {
       .lecture-frame__descr {
@@ -17711,10 +17711,10 @@ ul.lectures-tab {
   background-size: cover;
   background-position: center top; }
   .lesson-player.added {
-    height: calc(56.25vw + 130px);
+    height: calc(56.25vw + 160px);
   }
   .lesson-player.added .lecture-frame__play-block {
-    margin-bottom: 130px;
+    margin-bottom: 100px;
   }
 
   .lesson-player .player-frame__poster,
