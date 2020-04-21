@@ -283,11 +283,12 @@ const GET_USER_REG_MSSQL =
     "    where c.[ChequeTypeId] = 1 and c.[StateId] = 4\n" +
     "    group by c.[UserId]) uq on uq.[UserId] = u.[SysParentId]\n" +
     "where u.[RegDate] >= convert(datetime, '<%= first_date %>')\n" +
-    "  and u.[RegDate] < convert(datetime, '<%= last_date %>')";
+    "  and u.[RegDate] < convert(datetime, '<%= last_date %>')\n" +
+    "order by 2 desc";
 
 const GET_USER_REG_MYSQL =
     "select u.`SysParentId` as UserId, u.`RegDate`, u.`Email`, u.`DisplayName`, coalesce(p.`Name`, 'Email') Src, pf.`Identifier`,\n" +
-    "  coalesce(gr.`Campaign` + ' (' + gr.`Source` + '+' + gr.`Medium` + ')', '') CampaignReg,\n" +
+    "  coalesce(concat(gr.`Campaign`, ' (', gr.`Source`, '+', gr.`Medium`, ')'), '') CampaignReg,\n" +
     "  coalesce(uq.`Qty`, 0) as Qty\n" +
     "from `User` u\n" +
     "  left join `SNetProvider` p on p.`Id` = u.`RegProviderId`\n" +
@@ -300,7 +301,8 @@ const GET_USER_REG_MYSQL =
     "    where c.`ChequeTypeId` = 1 and c.`StateId` = 4\n" +
     "    group by c.`UserId`) uq on uq.`UserId` = u.`SysParentId`\n" +
     "where u.`RegDate` >= '<%= first_date %>'\n" +
-    "  and u.`RegDate` < '<%= last_date %>'";
+    "  and u.`RegDate` < '<%= last_date %>'\n" +
+    "order by 2 desc";
 
 const DEFAULT_FIRST_DATE = new Date("2019-05-08T00:00:00+0300");
 
