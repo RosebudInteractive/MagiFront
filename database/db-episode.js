@@ -457,6 +457,36 @@ const DbEpisode = class DbEpisode extends DbObject {
         })
     }
 
+    _checkContent(content) {
+        let tracks = {};
+        content.forEach((elem) => {
+            let track = 1;
+            if (elem.Content) {
+                let content = JSON.parse(elem.Content)
+                if (content.track)
+                    track = content.track;
+            }
+            let elems = tracks[track];
+            if (!elems)
+                elems = tracks[track] = [];
+            elems.push(elem);
+        });
+        let tkeys = Object.keys(tracks);
+        tkeys.forEach(key => {
+            tracks[key].sort((a, b) => {
+                return (a.StartTime ? a.StartTime : 0) - (b.StartTime ? b.StartTime : 0);
+            });
+            let curr_time = 0;
+            tracks[key].forEach(elem => {
+                if ((!elem.Duration) || (elem.Duration <= 0))
+                    throw new Error(`Недопустимое зачение поля "Duration": ${elem.Duration}`);
+                if ((elem.StartTime ? elem.StartTime : 0) < curr_time)
+                    throw new Error(`Перекрытие элементов на дорожке [${key}]: ${JSON.stringify(elem)}`);
+                curr_time = (elem.StartTime ? elem.StartTime : 0) + elem.Duration;
+            })
+        });
+    }
+
     update(id, lesson_id, data, options) {
         return new Promise((resolve, reject) => {
             let epi_obj;
@@ -549,6 +579,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                     .then(() => {
                         if (inpFields.Content && (typeof (inpFields.Content.length) === "number")) {
                             let episode_lng_id = epi_lng_obj.id();
+                            this._checkContent(inpFields.Content);
                             return this._getObjects(EPISODE_CONTENT_TREE, { field: "EpisodeLngId", op: "=", value: episode_lng_id })
                                 .then((result) => {
                                     root_content = result;
