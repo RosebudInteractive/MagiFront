@@ -187,7 +187,7 @@ class TestPage extends React.Component {
                 <div className={_className}>
                     {this._getMetaTags()}
                     <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/>
-                    <div className="test-page__content">
+                    <div className={ "test-page__content" + ((this._getPageType(this.props) === TEST_PAGE_TYPE.RESULT) ? " _result" : "") }>
                         <div className="content-wrapper">
                             {this._getContent()}
                         </div>

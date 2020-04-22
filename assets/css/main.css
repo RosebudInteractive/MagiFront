@@ -7575,6 +7575,10 @@ ul.user-tooltip {
     @media (max-width: 1023px) {
       .lectures-menu.opened .lectures-list-wrapper {
         z-index: 2; } }
+  .lectures-menu._hiding .lectures-list-wrapper {
+    opacity: 0;
+    z-index: 1;
+    visibility: visible; }
   .lectures-menu__section {
     display: -webkit-box;
     display: -webkit-flex;
@@ -17727,7 +17731,7 @@ ul.lectures-tab {
     width: 100%;
   }
   .lesson-player.added .player-frame__poster{
-    margin-top: 2px;
+    margin-top: 14px;
     position: relative;
     transform: none;
     left: 0;

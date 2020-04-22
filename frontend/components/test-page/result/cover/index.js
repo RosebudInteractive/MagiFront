@@ -51,7 +51,8 @@ class Cover extends React.Component {
 
         const _percent = Math.round((result.CorrectCount / result.TotalCount) * 100)
 
-        let _nextLessonUrl = this._getNextLessonUrl()
+        let _nextLessonUrl = this._getNextLessonUrl(),
+            _isLessonStartTest = !!test.LessonId && (test.TestTypeId === TEST_TYPE.STARTED)
 
         _nextLessonUrl = _nextLessonUrl ? `/${course.URL}/${_nextLessonUrl}` : null
 
@@ -76,7 +77,7 @@ class Cover extends React.Component {
                         _nextLessonUrl &&
                         <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
                             <div className="button btn--brown next-lesson-button">
-                                Следующая лекция
+                                { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
                             </div>
                         </Link>
                     }
@@ -118,15 +119,19 @@ class Cover extends React.Component {
             _isLessonTest = !!test.LessonId
 
         if (_isLessonTest) {
-            const _lessons = this._convertLessonList(),
-                _index = _lessons.findIndex(item => item.Id === test.LessonId)
+            if (test.TestTypeId === TEST_TYPE.STARTED) {
+                return test.LsnURL
+            } else {
+                const _lessons = this._convertLessonList(),
+                    _index = _lessons.findIndex(item => item.Id === test.LessonId)
 
-            if (_index === (_lessons.length - 1)) return null
+                if (_index === (_lessons.length - 1)) return null
 
-            const _cutArray = _lessons.slice(_index + 1),
-                _nextLesson = _cutArray.find(item => item.State === LESSON_STATE.READY)
+                const _cutArray = _lessons.slice(_index + 1),
+                    _nextLesson = _cutArray.find(item => item.State === LESSON_STATE.READY)
 
-            return _nextLesson ? _nextLesson.URL : null
+                return _nextLesson ? _nextLesson.URL : null
+            }
         }
         else {
             if (test.TestTypeId === TEST_TYPE.STARTED) {

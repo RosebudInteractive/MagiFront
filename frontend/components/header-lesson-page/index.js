@@ -24,6 +24,21 @@ class HeaderWrapper extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this.state = {
+            hiding: false
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.isLessonMenuOpened && !this.props.isLessonMenuOpened) {
+            this.setState({hiding : true})
+            setTimeout(() => {
+                this.setState({
+                    hiding : false
+                })
+            }, 700)
+        }
     }
 
     _getMenuType() {
@@ -53,7 +68,8 @@ class HeaderWrapper extends React.Component {
             _singleLesson = course ? !!course.OneLesson : false,
             _type = this._getMenuType(),
             _menuClassName = "new-header lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
-                (isLessonMenuOpened ? ' opened' : '') +
+                (isLessonMenuOpened && !this.state.hiding ? ' opened' : '') +
+                (this.state.hiding ? ' _hiding' : '') +
                 (isMobileApp ? ' mobile' : ' desktop') +
                 (extClass ? ' ' + extClass : '') +
                 (_singleLesson ? ' ' + '_single' : '')

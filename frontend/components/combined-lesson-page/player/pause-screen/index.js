@@ -7,7 +7,7 @@ import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
 import LessonTooltip from "../../lesson-tooltip";
 
-const TIMEOUT = 2000
+const TIMEOUT = 5000
 
 class PauseScreen extends React.Component {
     static propTypes = {
@@ -22,7 +22,8 @@ class PauseScreen extends React.Component {
         super(props)
 
         this.state = {
-            fade: false
+            fade: false,
+            hiding: false,
         }
 
         this._timer = null
@@ -47,7 +48,17 @@ class PauseScreen extends React.Component {
 
         if (_prevVisible && !_currentVisible) {
             clearTimeout(this._timer)
-            if (this.state.fade) { this.setState({fade : false}) }
+            if (this.state.fade) {
+                this.setState({fade : false})
+            } else {
+                this.setState({hiding : true})
+                setTimeout(() => {
+                    this.setState({
+                        fade : false,
+                        hiding : false
+                    })
+                }, 700)
+            }
         }
     }
 
@@ -61,9 +72,12 @@ class PauseScreen extends React.Component {
 
         const {current, next} = this._getLessons(),
             _tests = current.Tests,
-            _hidden = !(finished || paused)
+            _hidden = !(finished || paused || this.state.hiding)
 
-        let _className = "player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") + (this.state.fade ? " _fade" : "") + (finished ? " _finished" : "")
+        let _className = "player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") +
+            (this.state.hiding ? " _hiding" : "") +
+            (this.state.fade ? " _fade" : "") +
+            (finished ? " _finished" : "")
 
         return <div className={_className}>
             {

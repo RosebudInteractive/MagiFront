@@ -21,6 +21,7 @@ class Controls extends React.Component {
         if (this.props.showScreenControls) {
             let _newPosition = (this.props.currentTime < 10) ? 0 : (this.props.currentTime - 10);
             this.props.playerStartActions.startSetCurrentTime(_newPosition);
+            this._timer.restart()
         } else {
             this._timer.restart()
         }
@@ -30,6 +31,7 @@ class Controls extends React.Component {
         if (this.props.showScreenControls) {
             let _newPosition = (this.props.totalDuration - this.props.currentTime < 10) ? 0 : (this.props.currentTime + 10);
             this.props.playerStartActions.startSetCurrentTime(_newPosition);
+            this._timer.restart()
         } else {
             this._timer.restart()
         }
