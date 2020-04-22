@@ -84,24 +84,20 @@ class PauseScreen extends React.Component {
         if (_screen && (_screen.length > 0)) {
             _screen.on('mousemove', () => {
                 if (this.state.fade) { this.setState({fade : false}) }
-                this._handlerBinded = true
                 this._startTimer()
             })
 
             _screen.on('touchend', (e) => {
-                const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
-
-                if (_isPhone) return
-
                 if (this.state.fade) {
                     this.setState({fade : false})
                     e.preventDefault()
                     e.stopPropagation()
                 }
 
-                this._handlerBinded = true
                 this._startTimer()
             })
+
+            this._handlerBinded = true
         }
     }
 

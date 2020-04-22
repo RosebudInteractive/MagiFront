@@ -2,9 +2,9 @@
 
 .lecture-frame
   .lecture-frame__text-block
-    margin-bottom: 38px
+    margin: 20px 0 38px
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      margin-bottom: 10px
+      margin: 15px 0 10px
 
   .progress-bar
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
@@ -12,18 +12,13 @@
 
   .test-buttons-block
     flex-wrap: wrap
-    margin-bottom: 27px
-    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      margin-bottom: 15px
+    //margin-bottom: 30px
 
   .social-block
-    margin-top: 10px
+    margin-top: 30px
 
   .lecture-frame__descr
     color: $color-white
-    //@media (max-width: $mobile-phone-width)
-      font-size: 14px
-
 
   .lecture-frame__author
     color: $color-white
@@ -31,3 +26,23 @@
 
   .title-text
     color: $color-white
+
+  @media (max-width: $tablet-width)
+    .lecture-frame__play-btn svg
+      width: 57px
+      height: 52px
+
+  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    .title-paragraph
+      line-height: 100%
+    .title-text
+      line-height: 120%
+    .lecture-frame__title .number
+      font-family: $font-fira
+      font-style: normal
+      font-weight: bold
+      font-size: 17px
+      line-height: 130%
+    .lecture-frame__author
+      font-size: 14px
+      line-height: 130%

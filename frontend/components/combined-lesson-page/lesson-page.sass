@@ -1,72 +1,67 @@
 @import "~tools/variables.sass"
 
-.lecture-wrapper
-  @media (max-width: $mobile-phone-width)
-    height: calc(100vh - 53px)
-    margin-top: 53px
-
-.lecture-frame
-  .title-text
+.lecture-wrapper.mobile
+  //@media (max-width: $tablet-width)
+  height: calc(100vh - 103px)
+  margin-top: 53px
+  .lecture-frame__fav
+    top: 73px
+    @media (max-width: $tablet-width)
+      top: 20px
+      right: 20px
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      font-family: $font-fira
-      font-style: normal
-      font-weight: bold
-      font-size: 17px
-      line-height: 130%
-  .lecture-frame__title .number
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      font-family: $font-fira
-      font-style: normal
-      font-weight: bold
-      font-size: 17px
-      line-height: 130%
+      top: 10px
+      right: 10px
 
-  .lecture-frame__descr
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      font-family: $font-fira
-      font-style: normal
-      font-weight: normal
-      font-size: 12px
-      line-height: 130%
-  .lecture-frame__author
-    font-size: 12px
-    line-height: 130%
+  //.lecture-frame__play-block-wrapper
+    top: 0
+    height: 100%
+    left: 0
+    width: 100%
+    transform: none
+    //display: flex
+  //.lecture-frame__play-block
+    margin: 50% auto auto
 
-.lesson-player
+
+.lesson-player.mobile
 
   &.added
-    @media (max-width: $mobile-phone-width)
-      height: calc(100vh - 120px)
+    @media (max-width: $tablet-width)
+      height: calc(100vh - 110px)
 
     .player-frame__poster
-      @media (max-width: $mobile-phone-width)
-        height: calc(100vh - 250px)
+      //@media (max-width: $tablet-width)
+      height: calc(100vh - 250px)
 
 .lecture-wrapper
   .play-btn-big
-    //top: 0
     &:after
-      @media (max-width: $mobile-phone-width)
+      @media (max-width: $tablet-width)
         border-width: 26px 0 26px 58px
-  //      top: -50px
 
   .cover .lecture-frame__play-btn
+    @media (max-width: $tablet-width)
+      top: 19px
     @media (max-width: $mobile-phone-width)
       top: -25px
 
   .lecture-frame__duration
-    position: relative
+    @media (max-width: $tablet-width)
+      top: -25px
     @media (max-width: $mobile-phone-width)
-      position: absolute
-      top: -55px
+      //position: absolute
+      top: -63px
 
   .title-paragraph
+    @media (max-width: $tablet-width)
+      text-indent: 75px
     @media (max-width: $mobile-phone-width)
       text-indent: 0
 
 
 
-  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+  @media (max-width: $tablet-width), (max-height: $tablet-width)
     .social-btn
       border-color: transparent
       border-radius: 50px
