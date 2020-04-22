@@ -45,43 +45,58 @@ class Cover extends React.Component {
         super(props)
         this._touchMoved = false;
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+
+        this._resizeHandler = () => {
+            const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+            if (_isPhone !== this._isPhone) {
+                this._isPhone = _isPhone
+                this.forceUpdate()
+            }
+        }
     }
 
     componentDidMount() {
-        let that = this,
-            _player = $('.js-player');
+        this._isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
 
-        _player.on(this._touchEventName, (e) => {
-            if (this._touchMoved) {
-                return
-            }
+        let _player = $('.js-player');
 
-            let _isLessonScreen = e.target.closest('#lesson-' + that.props.lesson.Id),
-                _isMenu = e.target.closest('.lectures-menu'),
-                _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
-                _isSocialBlock = e.target.closest('.social-block'),
-                _isTranscriptLink = e.target.closest('.link-to-transcript'),
-                _isPlayerBlock = e.target.closest('.player-frame'),
-                _isFavoritesButton = e.target.closest('.lecture-frame__fav'),
-                _isAuthorLink = e.target.closest('.lecture-frame__author');
+        _player
+            .on(this._touchEventName, (e) => {
+                if (this._touchMoved) {
+                    return
+                }
 
-            if (
-                _isLessonScreen &&
-                !_isButtonTarget &&
-                !_isSocialBlock &&
-                !_isPlayerBlock &&
-                !_isTranscriptLink &&
-                !_isMenu &&
-                !_isFavoritesButton &&
-                !_isAuthorLink
-            ) {
-                that._play()
-            }
-        }).on('touchmove', () => {
-            this._touchMoved = true;
-        }).on('touchstart', () => {
-            this._touchMoved = false;
-        });
+                let _isLessonScreen = e.target.closest('#lesson-' + this.props.lesson.Id),
+                    _isMenu = e.target.closest('.lectures-menu'),
+                    _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
+                    _isSocialBlock = e.target.closest('.social-block'),
+                    _isTranscriptLink = e.target.closest('.link-to-transcript'),
+                    _isPlayerBlock = e.target.closest('.player-frame'),
+                    _isFavoritesButton = e.target.closest('.lecture-frame__fav'),
+                    _isAuthorLink = e.target.closest('.lecture-frame__author');
+
+                if (
+                    _isLessonScreen &&
+                    !_isButtonTarget &&
+                    !_isSocialBlock &&
+                    !_isPlayerBlock &&
+                    !_isTranscriptLink &&
+                    !_isMenu &&
+                    !_isFavoritesButton &&
+                    !_isAuthorLink
+                ) {
+                    this._play()
+                }
+            })
+            .on('touchmove', () => {
+                this._touchMoved = true;
+            })
+            .on('touchstart', () => {
+                this._touchMoved = false;
+            })
+
+
+        $(window).on('resize', this._resizeHandler)
     }
 
     componentWillUnmount() {
@@ -99,7 +114,8 @@ class Cover extends React.Component {
 
         let {isFinished: _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
             _playPercent = playedPart * 100,
-            _inFavorites = this._isLessonInBookmarks();
+            _inFavorites = this._isLessonInBookmarks(),
+            _fonts = this._getFonts()
 
         return <React.Fragment>
             <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
@@ -119,16 +135,16 @@ class Cover extends React.Component {
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                             {this._getButton(_isFinished)}
                             <p className="title-paragraph">
-                                <span className="title-text font-universal__title-large">
+                                <span className={"title-text " + _fonts.title}>
                                     <span className="number">{_number}</span>
                                     {lesson.Name + '\n'}
                                 </span>
                             </p>
                         </h2>
                         <div className="lecture-frame__text-block">
-                            <p className="lecture-frame__descr font-universal__book-large">{lesson.ShortDescription}</p>
+                            <p className={"lecture-frame__descr " + _fonts.descr}>{lesson.ShortDescription}</p>
                             <Link to={'/autor/' + lesson.Author.URL}>
-                                <p className="lecture-frame__author font-universal__title-small">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                                <p className={"lecture-frame__author " + _fonts.descr}>{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                             </Link>
                         </div>
                     </div>
@@ -146,6 +162,7 @@ class Cover extends React.Component {
         $('.js-player').unbind(this._touchEventName);
         $('.js-player').unbind('touchmove');
         $('.js-player').unbind('touchstart');
+        $(window).unbind('resize', this._resizeHandler);
     }
 
     _play() {
@@ -277,6 +294,20 @@ class Cover extends React.Component {
         result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
 
         return result
+    }
+
+    _getFonts() {
+        const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+
+        return _isPhone ?
+            {
+                title: "font-universal__title-medium",
+                descr: "font-universal__body-large"
+            } :
+            {
+                title: "font-universal__title-large",
+                descr: "font-universal__book-large"
+            }
     }
 }
 

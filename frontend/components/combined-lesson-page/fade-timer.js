@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import {store} from '../../store/configureStore';
-import {hideScreenControls, showScreenControls, clearAll, setFade, clearFade} from '../../ducks/player-screen'
+import {hideScreenControls, showScreenControls, clearAll, setFade, clearFade} from 'ducks/player-screen'
 
 const _timeout = 5000;
 

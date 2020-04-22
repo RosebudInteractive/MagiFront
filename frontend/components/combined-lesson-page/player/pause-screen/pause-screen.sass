@@ -5,6 +5,11 @@
   @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
     display: block
 
+.player__pause-screen._fade + .lecture-frame__play-block-wrapper
+  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    opacity: 0
+    z-index: 0
+
 .added .player__pause-screen
   transform: translate(-50%, -50%)
   left: 50%
@@ -77,9 +82,9 @@
     .pause-screen__content-wrapper
       margin: auto
       @media (max-width: 539px)
-        margin: 10% 8.3% auto
+        margin: auto 8.3%
       @media (max-width: $mobile-phone-width)
-        margin: 10% 20px auto
+        margin: auto 20px
 
     .lesson-tooltip
       position: absolute

@@ -17711,10 +17711,11 @@ ul.lectures-tab {
   background-size: cover;
   background-position: center top; }
   .lesson-player.added {
-    height: calc(56.25vw + 160px);
+    height: calc(56.25vw + 130px);
   }
+
   .lesson-player.added .lecture-frame__play-block {
-    margin-bottom: 100px;
+    margin-bottom: 130px;
   }
 
   .lesson-player .player-frame__poster,
