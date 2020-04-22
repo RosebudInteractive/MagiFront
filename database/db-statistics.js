@@ -268,6 +268,42 @@ const GET_COURSE_LISTEN_MYSQL =
     "group by cl.`CourseId`, cl.`Name`\n" +
     "order by 6 desc";
 
+const GET_USER_REG_MSSQL =
+    "select u.[SysParentId] as UserId, u.[RegDate], u.[Email], u.[DisplayName], coalesce(p.[Name], 'Email') Src, pf.[Identifier],\n" +
+    "  coalesce(gr.[Campaign] + ' (' + gr.[Source] + '+' + gr.[Medium] + ')', '') CampaignReg,\n" +
+    "  coalesce(uq.[Qty], 0) as Qty\n" +
+    "from [User] u\n" +
+    "  left join [SNetProvider] p on p.[Id] = u.[RegProviderId]\n" +
+    "  left join [SNetProfile] pf on pf.[UserId] = u.[SysParentId] and pf.[ProviderId] = p.[Id]\n" +
+    "  left join [Campaign] gr on gr.[Id] = u.[CampaignId]\n" +
+    "  left join (select c.[UserId], sum(ii.[Qty]) Qty from[Cheque] c\n" +
+    "      join [InvoiceItem] ii on ii.[InvoiceId] = c.[InvoiceId]\n" +
+    "      join [Product] p on p.[Id] = ii.[ProductId]\n" +
+    "      join [ProductType] pt on pt.[Id] = p.[ProductTypeId] and(pt.[Id] in (5, 6))\n" +
+    "    where c.[ChequeTypeId] = 1 and c.[StateId] = 4\n" +
+    "    group by c.[UserId]) uq on uq.[UserId] = u.[SysParentId]\n" +
+    "where u.[RegDate] >= convert(datetime, '<%= first_date %>')\n" +
+    "  and u.[RegDate] < convert(datetime, '<%= last_date %>')\n" +
+    "order by 2 desc";
+
+const GET_USER_REG_MYSQL =
+    "select u.`SysParentId` as UserId, u.`RegDate`, u.`Email`, u.`DisplayName`, coalesce(p.`Name`, 'Email') Src, pf.`Identifier`,\n" +
+    "  coalesce(concat(gr.`Campaign`, ' (', gr.`Source`, '+', gr.`Medium`, ')'), '') CampaignReg,\n" +
+    "  coalesce(uq.`Qty`, 0) as Qty\n" +
+    "from `User` u\n" +
+    "  left join `SNetProvider` p on p.`Id` = u.`RegProviderId`\n" +
+    "  left join `SNetProfile` pf on pf.`UserId` = u.`SysParentId` and pf.`ProviderId` = p.`Id`\n" +
+    "  left join `Campaign` gr on gr.`Id` = u.`CampaignId`\n" +
+    "  left join (select c.`UserId`, sum(ii.`Qty`) Qty from`Cheque` c\n" +
+    "      join `InvoiceItem` ii on ii.`InvoiceId` = c.`InvoiceId`\n" +
+    "      join `Product` p on p.`Id` = ii.`ProductId`\n" +
+    "      join `ProductType` pt on pt.`Id` = p.`ProductTypeId` and(pt.`Id` in (5, 6))\n" +
+    "    where c.`ChequeTypeId` = 1 and c.`StateId` = 4\n" +
+    "    group by c.`UserId`) uq on uq.`UserId` = u.`SysParentId`\n" +
+    "where u.`RegDate` >= '<%= first_date %>'\n" +
+    "  and u.`RegDate` < '<%= last_date %>'\n" +
+    "order by 2 desc";
+
 const DEFAULT_FIRST_DATE = new Date("2019-05-08T00:00:00+0300");
 
 const DbStatistics = class DbStatistics extends DbObject {
@@ -298,6 +334,37 @@ const DbStatistics = class DbStatistics extends DbObject {
         opts.first_date = firsDate;
         opts.last_date = lastDate;
         return this._stat_report(caption, "stat_report_by_campaign", opts);
+    }
+
+    async user_register(options) {
+        let opts = _.cloneDeep(options);
+        opts.exclude = {
+            st_date: true,
+            fin_date: true
+        }
+        let { firsDate, lastDate } = this._getInterval(opts);
+        let caption = `Регистрация пользователей с ` +
+            `${this._dateToString(firsDate, true, false)} по ${this._dateToString(lastDate, true, false)}.`;
+        opts.first_date = firsDate;
+        opts.last_date = lastDate;
+        return this._stat_report(caption, async () => {
+            let dbOpts = opts.dbOptions || {};
+            let res_data = [];
+            let dialect = {
+                mysql: _.template(GET_USER_REG_MYSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                }),
+                mssql: _.template(GET_USER_REG_MSSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                })
+            };
+            let result = await $data.execSql({ dialect: dialect }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0))
+                res_data = result.detail;
+            return res_data;
+        }, opts);
     }
 
     async user_course_purchase(options) {

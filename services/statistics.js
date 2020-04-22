@@ -61,6 +61,17 @@ function setupStatistics(app) {
                 next(err);
             });
     });
+
+    app.get('/api/adm/statistics/user_reg', (req, res, next) => {
+        StatisticsService()
+            .user_register(req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
 }
 
 exports.setupStatistics = setupStatistics;
