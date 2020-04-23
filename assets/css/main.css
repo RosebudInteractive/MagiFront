@@ -13048,6 +13048,7 @@ ul.lectures-tab {
       /*left: -webkit-calc(100% - 100px);*/
       /*left: calc(100% - 100px); } }*/
   .player-block .backwards,
+  .player-block .forward,
   .player-block .play-button,
   .player-block .sound-button,
   .player-block .speed-button,
@@ -13079,6 +13080,7 @@ ul.lectures-tab {
     width: 40px;
     height: 30px; }
     .player-block .backwards:focus,
+    .player-block .forward:focus,
     .player-block .play-button:focus,
     .player-block .sound-button:focus,
     .player-block .speed-button:focus,
@@ -13088,6 +13090,7 @@ ul.lectures-tab {
     .player-block .fullscreen-button:focus {
       outline: none; }
     .player-block .backwards:hover,
+    .player-block .forward:hover,
     .player-block .play-button:hover,
     .player-block .sound-button:hover,
     .player-block .speed-button:hover,
@@ -13107,6 +13110,7 @@ ul.lectures-tab {
       display: block;
       max-width: 20px; }
     .player-block .backwards:hover svg, .player-block .backwards:active svg, .player-block .backwards.active svg,
+    .player-block .forward:hover svg, .player-block .forward:active svg, .player-block .forward.active svg,
     .player-block .play-button:hover svg,
     .player-block .play-button:active svg,
     .player-block .play-button.active svg,
@@ -13131,7 +13135,8 @@ ul.lectures-tab {
       -webkit-filter: drop-shadow(0 0 6px #c8684c);
       filter: drop-shadow(0 0 6px #c8684c); }
   .player-block .fullscreen-button,
-  .player-block .backwards {
+  .player-block .backwards,
+  .player-block .forward  {
     width: 32px; }
   .player-block .backwards {
     -webkit-box-pack: start;
@@ -13139,6 +13144,12 @@ ul.lectures-tab {
     -moz-box-pack: start;
     -ms-flex-pack: start;
     justify-content: flex-start; }
+  .player-block .forward {
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -moz-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end; }
     /*@media (max-width: 600px) {*/
       /*.player-block .backwards {*/
         /*margin: 0;*/
