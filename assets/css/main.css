@@ -17742,7 +17742,7 @@ ul.lectures-tab {
     width: 100%;
   }
   .lesson-player.added .player-frame__poster{
-    margin-top: 14px;
+    margin-top: 0;
     position: relative;
     transform: none;
     left: 0;

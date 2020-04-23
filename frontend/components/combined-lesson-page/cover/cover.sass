@@ -12,7 +12,14 @@
 
   .test-buttons-block
     flex-wrap: wrap
-    //margin-bottom: 30px
+    @media (max-width: 499px)
+      flex-direction: column
+  .test-button
+    @media (max-width: 499px)
+      width: -webkit-fill-available
+
+      &:first-child:not(:only-child)
+        margin-right: 0
 
   .social-block
     margin-top: 30px
@@ -23,14 +30,10 @@
   .lecture-frame__author
     color: $color-white
     margin: 0
+    font-weight: bold
 
   .title-text
     color: $color-white
-
-  @media (max-width: $tablet-width)
-    .lecture-frame__play-btn svg
-      width: 57px
-      height: 52px
 
   @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
     .title-paragraph
@@ -46,3 +49,10 @@
     .lecture-frame__author
       font-size: 14px
       line-height: 130%
+
+.mobile
+  .lecture-frame
+    @media (max-width: $tablet-width)
+      .lecture-frame__play-btn svg
+        width: 57px
+        height: 52px

@@ -86,7 +86,7 @@ class PauseScreen extends React.Component {
                     { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
                     { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
-                    { finished && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }
+                    { finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }
                 </div>
             }
         </div>
@@ -132,7 +132,7 @@ class PauseScreen extends React.Component {
 
         return {
             current: (_index >= 0) ? _lessons[_index] : null,
-            next: (_index < _lessons.length - 2) ? _lessons[_index + 1] : null
+            next: (_index < _lessons.length - 1) ? _lessons[_index + 1] : null
         }
     }
 

@@ -24,44 +24,53 @@
     margin: 50% auto auto
 
 
-.lesson-player.mobile
+.lesson-player
+  &.mobile
+    &.added
+      @media (max-width: $tablet-width)
+        height: calc(100vh - 120px)
 
-  &.added
-    @media (max-width: $tablet-width)
-      height: calc(100vh - 120px)
+      .player-frame__poster
+        height: calc(100vh - 270px)
 
-    .player-frame__poster
+  &.desktop
+    &.added
       //@media (max-width: $tablet-width)
-      height: calc(100vh - 260px)
+      height: calc(100vh - 53px)
 
-    .lesson-navigate-block
-      .lesson-tooltip
-        left: 0
+      .player-frame__poster
+        height: calc(100vh - 220px)
+
 
 .lecture-wrapper
-  .play-btn-big
-    &:after
+  .ws-container
+    margin-top: 14px
+    height: calc(100% - 13px)
+
+  &.mobile
+    .play-btn-big
+      &:after
+        @media (max-width: $tablet-width)
+          border-width: 26px 0 26px 58px
+
+    .cover .lecture-frame__play-btn
       @media (max-width: $tablet-width)
-        border-width: 26px 0 26px 58px
+        top: 19px
+      @media (max-width: $mobile-phone-width)
+        top: -25px
 
-  .cover .lecture-frame__play-btn
-    @media (max-width: $tablet-width)
-      top: 19px
-    @media (max-width: $mobile-phone-width)
-      top: -25px
+    .lecture-frame__duration
+      @media (max-width: $tablet-width)
+        top: -25px
+      @media (max-width: $mobile-phone-width)
+        //position: absolute
+        top: -63px
 
-  .lecture-frame__duration
-    @media (max-width: $tablet-width)
-      top: -25px
-    @media (max-width: $mobile-phone-width)
-      //position: absolute
-      top: -63px
-
-  .title-paragraph
-    @media (max-width: $tablet-width)
-      text-indent: 75px
-    @media (max-width: $mobile-phone-width)
-      text-indent: 0
+    .title-paragraph
+      @media (max-width: $tablet-width)
+        text-indent: 75px
+      @media (max-width: $mobile-phone-width)
+        text-indent: 0
 
 
 
@@ -93,7 +102,7 @@
       .lesson-tooltip
         left: 0
 
-        
+
 .lesson-navigate-block
   display: flex
   margin-left: 28px
