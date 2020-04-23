@@ -6,6 +6,7 @@ import {lessonsSelector} from "ducks/lesson-menu";
 import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
 import LessonTooltip from "../../lesson-tooltip";
+import {getSiblingsLessons} from "tools/player/functions";
 
 const TIMEOUT = 5000
 
@@ -68,9 +69,9 @@ class PauseScreen extends React.Component {
     }
 
     render() {
-        const {lesson, finished, paused, starting, course, isPaidCourse} = this.props
+        const {lesson, finished, paused, starting, course, isPaidCourse, lessonList} = this.props
 
-        const {current, next} = this._getLessons(),
+        const {current, next} = getSiblingsLessons(lessonList, lesson.Id),
             _tests = current.Tests,
             _hidden = !(finished || paused || this.state.hiding)
 
@@ -112,27 +113,6 @@ class PauseScreen extends React.Component {
             })
 
             this._handlerBinded = true
-        }
-    }
-
-    _getLessons() {
-        const {lessonList} = this.props
-
-        let _lessons = []
-        lessonList.forEach((lesson) => {
-            _lessons.push(lesson)
-            if (lesson.Lessons && (lesson.Lessons.length > 0)) {
-                lesson.Lessons.forEach((sublesson) => {_lessons.push(sublesson)})
-            }
-        })
-
-        let _index = _lessons.findIndex((lesson) => {
-            return lesson.Id === this.props.lesson.Id
-        })
-
-        return {
-            current: (_index >= 0) ? _lessons[_index] : null,
-            next: (_index < _lessons.length - 1) ? _lessons[_index + 1] : null
         }
     }
 

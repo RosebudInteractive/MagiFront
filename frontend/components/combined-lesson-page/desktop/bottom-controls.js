@@ -8,6 +8,7 @@ import {isMobileAppleDevice} from "tools/page-tools";
 import LessonTooltip from "../lesson-tooltip";
 import {lessonsSelector} from "ducks/lesson-menu";
 import {Link} from "react-router-dom";
+import {getSiblingsLessons} from "tools/player/functions";
 
 const SVG = {
     BACKWARD: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
@@ -33,12 +34,12 @@ class Controls extends React.Component {
     }
 
     render() {
-        let {lesson, course, isPaidCourse} = this.props,
+        let {lesson, course, isPaidCourse, lessonList} = this.props,
             _id = lesson ? lesson.Id : '',
             _isIOS = isMobileAppleDevice(),
             _needHideSoundControl = (this.props.muted || _isIOS)
 
-        let {prev, next} = this._getSiblingsLessons()
+        let {prev, next} = getSiblingsLessons(lessonList, _id)
 
         return (
             <div className="player-block__controls">
@@ -127,27 +128,6 @@ class Controls extends React.Component {
     _startPlay() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
-    }
-
-    _getSiblingsLessons() {
-        const {lessonList} = this.props
-
-        let _lessons = []
-        lessonList.forEach((lesson) => {
-            _lessons.push(lesson)
-            if (lesson.Lessons && (lesson.Lessons.length > 0)) {
-                lesson.Lessons.forEach((sublesson) => {_lessons.push(sublesson)})
-            }
-        })
-
-        let _index = _lessons.findIndex((lesson) => {
-            return lesson.Id === this.props.lesson.Id
-        })
-
-        return {
-            prev: (_index > 0) ? _lessons[_index - 1] : null,
-            next: (_index < _lessons.length - 2) ? _lessons[_index + 1] : null
-        }
     }
 }
 
