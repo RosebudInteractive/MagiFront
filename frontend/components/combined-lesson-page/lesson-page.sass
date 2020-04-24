@@ -1,7 +1,6 @@
 @import "~tools/variables.sass"
 
 .lecture-wrapper.mobile
-  //@media (max-width: $tablet-width)
   height: calc(100vh - 103px)
   margin-top: 53px
   .lecture-frame__fav
@@ -12,16 +11,6 @@
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       top: 10px
       right: 10px
-
-  //.lecture-frame__play-block-wrapper
-    top: 0
-    height: 100%
-    left: 0
-    width: 100%
-    transform: none
-    //display: flex
-  //.lecture-frame__play-block
-    margin: 50% auto auto
 
 
 .lesson-player
@@ -47,6 +36,25 @@
     margin-top: 14px
     height: calc(100% - 13px)
 
+  .social-btn
+    border-color: transparent
+    border-radius: 50px
+    background: $color-white-02
+    min-width: 48px
+    justify-content: center
+
+  .social-btn__icon svg
+    width: 18px
+    height: 18px
+
+  .social-btn._active
+    border-right: none
+    margin-right: 6px
+    min-width: 58px
+
+    .social-btn__actions
+      min-width: auto
+
   &.mobile
     .play-btn-big
       &:after
@@ -71,28 +79,6 @@
         text-indent: 75px
       @media (max-width: $mobile-phone-width)
         text-indent: 0
-
-
-
-  @media (max-width: $tablet-width), (max-height: $tablet-width)
-    .social-btn
-      border-color: transparent
-      border-radius: 50px
-      background: $color-white-02
-      min-width: 48px
-      justify-content: center
-
-    .social-btn__icon svg
-      width: 18px
-      height: 18px
-
-    .social-btn._active
-      border-right: none
-      margin-right: 6px
-      min-width: 58px
-
-      .social-btn__actions
-        min-width: auto
 
 
 .lesson-player

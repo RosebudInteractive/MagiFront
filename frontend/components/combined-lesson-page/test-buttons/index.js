@@ -13,12 +13,15 @@ class TestButtons extends React.Component {
     }
 
     render() {
-        let _tests = this._getTests()
+        let _tests = this._getTests(),
+            _started = this._getStartedTest(_tests),
+            _finished = this._getFinishedTest(_tests),
+            _subsRequired = (_started && _finished) && (_started.Instance || _finished.Instance)
 
         return _tests && (_tests.length > 0) &&
             <div className="test-buttons-block">
-                <TestButton test={this._getStartedTest(_tests)}/>
-                <TestButton test={this._getFinishedTest(_tests)}/>
+                <TestButton test={_started} subtitleRequired={_subsRequired}/>
+                <TestButton test={_finished} subtitleRequired={_subsRequired}/>
             </div>
     }
 

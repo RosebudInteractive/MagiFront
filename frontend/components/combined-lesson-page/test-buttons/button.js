@@ -13,7 +13,8 @@ const TITLE = {
 export default class TestButton extends React.Component {
 
     static propTypes = {
-        test: PropTypes.object
+        test: PropTypes.object,
+        subtitleRequired: PropTypes.bool,
     }
 
     render() {
@@ -53,7 +54,7 @@ export default class TestButton extends React.Component {
 
     _getHint(test) {
         if (!test.Instance) {
-            return null
+            return this.props.subtitleRequired ? "Пройти" : null
         } else {
             return test.Instance.IsFinished ? `${test.Instance.Score} из ${test.Instance.MaxScore} Пройти заново` : "Продолжить"
         }

@@ -23,36 +23,36 @@ export default class LessonFull extends React.Component{
         lesson.courseUrl = this.props.courseUrl;
 
         return <React.Fragment>
-                <li className="lessons-list__item">
-                    <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
-                    <div className="lessons-list__item-info">
-                        <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
-                        <Link to={url}>
-                            <span className="item-info__name">{_title}</span>
-                            <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
-                        </Link>
-                        <div className="item-info__duration">
-                            <span >{lesson.DurationFmt}</span>
-                            {
-                                _multiAuthors ?
-                                    <span>{' • '}
-                                        {this._getLinkToAuthor()}
-                                    </span>
-                                    :
-                                    null
-                            }
+            <li className="lessons-list__item">
+                <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
+                <div className="lessons-list__item-info">
+                    <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
+                    <Link to={url}>
+                        <span className="item-info__name">{_title}</span>
+                        <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
+                    </Link>
+                    <div className="item-info__duration">
+                        <span >{lesson.DurationFmt}</span>
+                        {
+                            _multiAuthors ?
+                                <span>{' • '}
+                                    {this._getLinkToAuthor()}
+                                </span>
+                                :
+                                null
+                        }
 
-                        </div>
                     </div>
-                    <div className="item-info__ext">
-                        <PlayBlock lesson={lesson} course={course} wrapperClass={"lessons-list__item__play-block"}/>
-                    </div>
-                </li>
-                <ol className="course-scheme__lessons-list _sublessons">
-                    {this._getSublessons()}
-                </ol>
+                </div>
+                <div className="item-info__ext">
+                    <PlayBlock lesson={lesson} course={course} wrapperClass={"lessons-list__item__play-block"}/>
+                </div>
+            </li>
             <LessonTests tests={lesson.Tests}/>
-            </React.Fragment>
+            <ol className="course-scheme__lessons-list _sublessons">
+                {this._getSublessons()}
+            </ol>
+        </React.Fragment>
     }
 
     _getLinkToAuthor() {
