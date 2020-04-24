@@ -33,7 +33,7 @@ class PlayerFrame extends Component {
         super(props)
         this._lessonId = this.props.lesson.Id;
 
-        this._fadeTimer = new FadeTimer()
+        this._fadeTimer = FadeTimer.getInstance()
 
         this.state = {
             fullScreen: document.fullscreen,
@@ -75,6 +75,7 @@ class PlayerFrame extends Component {
                     that._fadeTimer.restart()
                 } else {
                     that.props.playerStartActions.startPause()
+                    this._fadeTimer.stop()
                 }
             }
 

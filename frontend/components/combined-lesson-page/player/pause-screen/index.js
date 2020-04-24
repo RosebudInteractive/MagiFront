@@ -7,6 +7,7 @@ import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
 import LessonTooltip from "../../lesson-tooltip";
 import {getSiblingsLessons} from "tools/player/functions";
+import {isMobileAppleDevice} from "tools/page-tools";
 
 const TIMEOUT = 5000
 
@@ -49,6 +50,7 @@ class PauseScreen extends React.Component {
 
         if (_prevVisible && !_currentVisible) {
             clearTimeout(this._timer)
+
             if (this.state.fade) {
                 this.setState({fade : false})
             } else {
@@ -97,20 +99,24 @@ class PauseScreen extends React.Component {
         let _screen = $(".js-pause-screen")
 
         if (_screen && (_screen.length > 0)) {
-            _screen.on('mousemove', () => {
-                if (this.state.fade) { this.setState({fade : false}) }
-                this._startTimer()
-            })
 
-            _screen.on('touchend', (e) => {
-                if (this.state.fade) {
-                    this.setState({fade : false})
-                    e.preventDefault()
-                    e.stopPropagation()
-                }
+            if (isMobileAppleDevice()) {
+                _screen.on('touchend', (e) => {
+                    if (this.state.fade) {
+                        this.setState({fade : false})
+                        e.preventDefault()
+                        e.stopPropagation()
+                    }
 
-                this._startTimer()
-            })
+                    this._startTimer()
+                })
+            } else {
+                _screen.on('mousemove', () => {
+                    if (this.state.fade) { this.setState({fade : false}) }
+
+                    this._startTimer()
+                })
+            }
 
             this._handlerBinded = true
         }

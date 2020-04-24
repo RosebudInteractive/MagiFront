@@ -73,7 +73,8 @@ class Cover extends React.Component {
                     _isTranscriptLink = e.target.closest('.link-to-transcript'),
                     _isPlayerBlock = e.target.closest('.player-frame'),
                     _isFavoritesButton = e.target.closest('.lecture-frame__fav'),
-                    _isAuthorLink = e.target.closest('.lecture-frame__author');
+                    _isAuthorLink = e.target.closest('.lecture-frame__author'),
+                    _isTestButton = e.target.closest('.test-button')
 
                 if (
                     _isLessonScreen &&
@@ -83,7 +84,8 @@ class Cover extends React.Component {
                     !_isTranscriptLink &&
                     !_isMenu &&
                     !_isFavoritesButton &&
-                    !_isAuthorLink
+                    !_isAuthorLink &&
+                    !_isTestButton
                 ) {
                     this._play()
                 }

@@ -43,6 +43,8 @@ export const isAnswerPartCorrect = (question, answer) => {
             })
             .map(item => item.Id)
 
+        if (!(answer && Array.isArray(answer))) return false
+
         const _firstStepCheck = answer.every(item => _correctAnswers.includes(item))
 
         const _secondStepCheck = !_correctAnswers.every(item => answer.includes(item))

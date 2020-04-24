@@ -10,7 +10,7 @@ class Controls extends React.Component {
 
     constructor(props) {
         super(props)
-        this._timer = new FadeTimer()
+        this._timer = FadeTimer.getInstance()
     }
 
     componentDidMount() {
@@ -45,11 +45,13 @@ class Controls extends React.Component {
     _startPlay() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
+        this._timer.restart()
     }
 
     _startPause() {
         if (this.props.showScreenControls) {
             this.props.playerStartActions.startPause()
+            this._timer.stop()
         } else {
             this._timer.restart()
         }

@@ -1,10 +1,27 @@
 import $ from 'jquery'
 import {store} from '../../store/configureStore';
-import {hideScreenControls, showScreenControls, clearAll, setFade, clearFade} from 'ducks/player-screen'
+import {
+    hideScreenControls,
+    showScreenControls,
+    clearAll,
+    setFade,
+    clearFade,
+    showScreenControlsSelector
+} from 'ducks/player-screen'
 
 const _timeout = 5000;
 
+let _instance = null
+
 export default class FadeTimer {
+
+    static getInstance() {
+        if (!_instance) {
+            _instance = new FadeTimer()
+        }
+
+        return _instance
+    }
 
     constructor() {
         this._timer = null;
@@ -14,6 +31,11 @@ export default class FadeTimer {
     start() {
         let _state = store.getState(),
             _paused = _state.player.paused;
+
+        if (this._timer) {
+            clearTimeout(this._timer);
+            this._timer = null
+        }
 
         if (!_paused) {
             this._timer = setTimeout(() => {
@@ -45,6 +67,7 @@ export default class FadeTimer {
     stop() {
         if (this._timer) {
             clearTimeout(this._timer);
+            this._timer = null
         }
         this.showScreenContols();
         this.clearFade();
@@ -68,8 +91,9 @@ export default class FadeTimer {
     }
 
     hideScreenControls() {
-        let _state = store.getState();
-        if (!_state.player.paused) {
+        let _state = store.getState(),
+            controlsVisible = showScreenControlsSelector(_state)
+        if (!_state.player.paused && controlsVisible) {
             store.dispatch(hideScreenControls())
             $('.player-block__controls').removeClass('show')
             $('.lecture-frame__play-block-wrapper').addClass('fade');
