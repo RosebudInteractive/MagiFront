@@ -46,8 +46,8 @@ export default class MenuItem extends React.Component {
                     <ItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} isPaidCourse={this.props.isPaidCourse}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active} onLinkClick={this.props.onLinkClick}/>
                 <LessonTests tests={lesson.Tests} activeTestId={this.props.activeTestId}/>
+                <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active} onLinkClick={this.props.onLinkClick}/>
             </li>
         )
     }

@@ -120,7 +120,7 @@ class CombineLessonPage extends React.Component {
 
                 _height = _menu.hasClass('desktop') ? _height - _menu.height() : _height;
 
-                if (st > _height) {
+                if (st > (_height + 63)) {
                     _menu.removeClass('_dark');
                     _menu.addClass('_fixed');
                     if (this.props.galleryIsOpen) {

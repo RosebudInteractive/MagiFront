@@ -28,13 +28,14 @@ export default class CommentBlock extends React.Component {
                 _container = $(`#q${id}`)
 
             if (_container && (_container.length > 0)) {
-                const _height = _container.height()
+                const _height = _container.height(),
+                    _maxHeight = this._getMaxHeight()
 
-                if ((_height > 51) && (!this.state.short) && (!this.state.showAll)) {
+                if ((_height > _maxHeight) && (!this.state.short) && (!this.state.showAll)) {
                     this.setState({ short: true, triggerVisible: true })
                 }
 
-                if (this.state.short && (_height <= 51)) {
+                if (this.state.short && (_height <= _maxHeight)) {
                     this.setState({ short: false, triggerVisible: false })
                 }
             }
@@ -63,12 +64,12 @@ export default class CommentBlock extends React.Component {
         return text &&
             <div className="comment-block">
                 <div className={"inner" + (short ? " _short" : "")}>
-                    <div className="text font-universal__body-small" dangerouslySetInnerHTML={{__html: text}}/>
-                    { triggerVisible && <span className="more-trigger font-universal__body-small" onClick={::this._toggle}>{_title}</span> }
+                    <div className="text font-universal__body-medium" dangerouslySetInnerHTML={{__html: text}}/>
+                    { triggerVisible && <span className="more-trigger font-universal__body-medium" onClick={::this._toggle}>{_title}</span> }
                 </div>
                 <span className="triangle"/>
                 <div className="inner hack">
-                    <div className="text font-universal__body-small" dangerouslySetInnerHTML={{__html: text}} id={id}/>
+                    <div className="text font-universal__body-medium" dangerouslySetInnerHTML={{__html: text}} id={id}/>
                 </div>
             </div>
     }
@@ -80,18 +81,7 @@ export default class CommentBlock extends React.Component {
             })
     }
 
-    _getHeight(container) {
-        if (container.children.length > 0) {
-            let _result = container.offsetHeight,
-                _children = container.children
-            for (let i = 0; i < _children.length; i++) {
-                let _height = this._getHeight(_children[i])
-                _result = _result < _height ? _height : _result
-            }
-
-            return _result
-        } else {
-            return container.offsetTop + container.offsetHeight
-        }
+    _getMaxHeight() {
+        return $(window).width() > 414 ? 68 : 153
     }
 }

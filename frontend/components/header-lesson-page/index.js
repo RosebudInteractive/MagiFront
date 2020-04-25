@@ -44,7 +44,7 @@ class HeaderWrapper extends React.Component {
     _getMenuType() {
         let _scrollTop = $(window).scrollTop();
 
-        return (_scrollTop > ($('.js-player').outerHeight() - 53)) ? '_fixed' : '_dark';
+        return (_scrollTop > ($('.js-player').outerHeight() - 73)) ? '_fixed' : '_dark';
     }
 
     _onFullScreenClick() {

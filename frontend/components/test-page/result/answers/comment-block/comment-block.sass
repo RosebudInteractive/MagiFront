@@ -18,9 +18,14 @@
         text-overflow: ellipsis
         display: -webkit-box
         -webkit-box-orient: vertical
-        -webkit-line-clamp: 3 /* number of lines to show */
-        line-height: 17px        /* fallback */
-        max-height: 51px       /* fallback */
+        -webkit-line-clamp: 4 /* number of lines to show */
+        line-height: 18px        /* fallback */
+        max-height: 68px       /* fallback */
+        @media (max-width: $mobile-phone-width)
+          -webkit-line-clamp: 9 /* number of lines to show */
+          line-height: 17px        /* fallback */
+          max-height: 153px       /* fallback */
+
 
     .text
       max-height: 1000px

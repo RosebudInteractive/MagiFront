@@ -76,7 +76,7 @@ export class SocialBlock extends React.Component {
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
                         <span
-                            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : ""}</span>
+                            className="social-btn__actions font-universal__body-medium">{counter && counter.facebook ? counter.facebook : 0}</span>
                     </FacebookShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setVkRef}>
@@ -86,7 +86,7 @@ export class SocialBlock extends React.Component {
                             <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
                         <span
-                            className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : ""}</span>
+                            className="social-btn__actions font-universal__body-medium">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
                     </VKShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setOkRef}>
@@ -96,7 +96,7 @@ export class SocialBlock extends React.Component {
                             <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                         </div>
                         <span
-                            className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : ""}</span>
+                            className="social-btn__actions font-universal__body-medium">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
                     </OKShareButton>
                 </div>
                 <div className='social-button-wrapper' ref={this.setTwRef}>
