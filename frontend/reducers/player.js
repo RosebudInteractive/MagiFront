@@ -38,6 +38,7 @@ const initialState = {
     currentContent: null,
 
     starting: false,
+    started: false,
     canNotPlay: false,
     paused: true,
     ended: false,
@@ -83,7 +84,7 @@ export default function player(state = initialState, action) {
         }
 
         case PLAYER_PLAYED:
-            return {...state, paused: false, ended: false, stopped: false, starting: false, canNotPlay: false,};
+            return {...state, paused: false, ended: false, stopped: false, starting: false, canNotPlay: false, started: true,};
 
         case PLAYER_PAUSED:
             return {...state, paused: true, starting: false,};

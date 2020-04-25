@@ -15,6 +15,10 @@
 
 .lesson-player
   &.mobile
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      .pause-screen__play-button
+        display: none
+
     &.added
       @media (max-width: $tablet-width)
         height: calc(100vh - 120px)

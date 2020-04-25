@@ -37,8 +37,8 @@ class PauseScreen extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const _prevVisible = prevProps.finished || prevProps.paused,
-            _currentVisible = this.props.finished || this.props.paused
+        const _prevVisible = prevProps.started && (prevProps.finished || prevProps.paused),
+            _currentVisible = this.props.started && (this.props.finished || this.props.paused)
 
         if (!_prevVisible && _currentVisible) {
             if (!this._handlerBinded) {
@@ -71,7 +71,7 @@ class PauseScreen extends React.Component {
     }
 
     render() {
-        const {lesson, finished, paused, starting, course, isPaidCourse, lessonList} = this.props
+        const {lesson, finished, paused, started, course, isPaidCourse, lessonList} = this.props
 
         const {current, next} = getSiblingsLessons(lessonList, lesson.Id),
             _tests = current.Tests,
@@ -84,7 +84,7 @@ class PauseScreen extends React.Component {
 
         return <div className={_className}>
             {
-                (!starting || finished) &&
+                (started || finished) &&
                 <div className="pause-screen__content-wrapper">
                     { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
                     { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
@@ -138,14 +138,14 @@ class PauseScreen extends React.Component {
             clearTimeout(this._timer);
         }
 
-        // this.setState({fade: true})
+        this.setState({fade: true})
     }
 }
 
 const mapStateToProps = (state) => {
     return {
         lessonList: lessonsSelector(state),
-        starting: state.player.starting,
+        started: state.player.started,
     }
 }
 
