@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import ListItem from "./item"
 
 import * as lessonActions from 'actions/lesson-actions';
-import {OverflowHandler} from 'tools/page-tools'
+import {OverflowHandler} from 'tools/overflow-handler'
 import $ from 'jquery'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {notifyLessonLinkClicked} from "ducks/google-analytics";
@@ -36,7 +36,7 @@ class LessonsListWrapper extends React.Component {
 
     componentDidUpdate(prevProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
-            OverflowHandler.turnOn()
+            OverflowHandler.turnOnOverflow()
 
             let _selector = this._isLessonActive ? `#lesson-${this._activeLessonId}` : `#test-${this._activeTestId}`,
                 _control = $(_selector);

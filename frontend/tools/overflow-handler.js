@@ -18,7 +18,7 @@ export class OverflowHandler {
         _scrollPos = getScrollPage()
     }
 
-    static turnOn() {
+    static turnOnOverflowFixed() {
         if (!_isOverflowEnable || !$('body').hasClass('overflow')) {
             _internalPos = getScrollPage()
             $('body').addClass('overflow');
@@ -27,7 +27,15 @@ export class OverflowHandler {
         }
     }
 
-    static turnOnWithPause() {
+    static turnOnOverflow() {
+        if (!_isOverflowEnable || !$('body').hasClass('overflow')) {
+            _internalPos = getScrollPage()
+            $('body').addClass('overflow');
+            _isOverflowEnable = true;
+        }
+    }
+
+    static turnOnOverflowFixedWithPause() {
         if (!_isOverflowEnable || !$('body').hasClass('overflow')) {
             _internalPos = getScrollPage()
             $('body').addClass('overflow');

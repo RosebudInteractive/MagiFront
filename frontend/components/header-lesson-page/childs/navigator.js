@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import $ from "jquery";
-import {OverflowHandler} from "tools/page-tools";
+import {OverflowHandler} from "tools/overflow-handler";
 
 export default class Navigator extends React.Component {
 
@@ -176,7 +176,7 @@ export default class Navigator extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if ((prevState.showToc !== this.state.showToc) || (prevState.expanded !== this.state.expanded)) {
-            this._toggleScrollableStyle()
+            setTimeout(() => this._toggleScrollableStyle(), 100)
         }
     }
 
@@ -186,7 +186,6 @@ export default class Navigator extends React.Component {
 
         if (_isMobile && !this.state.expanded) {
             OverflowHandler.turnOff();
-            // $('body').removeClass('overflow');
             _menu.removeClass('scroll');
             return
         }
@@ -198,12 +197,11 @@ export default class Navigator extends React.Component {
             if (_menuBottom > window.innerHeight) {
                 OverflowHandler.rememberScrollPos();
                 if (this.state.expanded) {
-                    OverflowHandler.turnOn();
+                    OverflowHandler.turnOnOverflow();
                 }
                 _menu.addClass('scroll');
             } else {
                 OverflowHandler.turnOff();
-                // $('body').removeClass('overflow');
                 _menu.removeClass('scroll');
             }
         }
