@@ -29,8 +29,7 @@
     fill: $color-yellow
 
   &._gray
-    fill: $color-white-06
-
+    fill: $color-dark-04
 
 .test__info-wrapper
   display: flex
@@ -44,7 +43,7 @@
   font-weight: normal
   font-size: 17px
   line-height: 24px
-  color: $color-white
+  color: $color-main-dark
   span
     border-bottom: $border-hidden-link
     -webkit-transition: border-color 0.3s ease
@@ -61,5 +60,13 @@
   font-size: 14px
   line-height: 18px
   letter-spacing: 0.01em
-  color: $color-white-06
+  color: $color-dark-06
   align-self: center
+
+._dark
+  .test__complete-status._gray
+    fill: $color-white-06
+  .test__name
+    color: $color-white
+  .test__time
+    color: $color-white-06
