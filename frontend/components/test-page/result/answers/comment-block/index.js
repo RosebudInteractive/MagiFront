@@ -82,6 +82,6 @@ export default class CommentBlock extends React.Component {
     }
 
     _getMaxHeight() {
-        return $(window).width() > 414 ? 68 : 153
+        return $(window).width() > 414 ? 68 : 160
     }
 }
