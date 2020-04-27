@@ -1,2 +1,50 @@
+@import "~tools/variables"
+
 .new-header
   position: relative
+
+  .lectures-menu__section
+    flex: 1 1 auto
+
+  .lectures-list-trigger
+    .num
+      overflow: hidden
+      text-overflow: ellipsis
+    .current
+      white-space: nowrap
+
+  .header__tooltip
+    display: none
+    position: absolute
+    font-family: $font-fira
+    font-size: 13px
+    color: $color-main-dark
+    background-color: $color-white
+    top: 63px
+    left: 20px
+    max-width: 260px
+    padding: 5px 10px
+    border: $border-dark-04
+    border-radius: 4px
+    
+    &:after
+      content: ""
+      position: absolute
+      top: -8px
+      left: 50px
+      width: 0
+      height: 0
+      border-style: solid
+      border-width: 0 4px 7px 4px
+      border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) $color-dark-04 rgba(255, 255, 255, 0)
+
+
+  .lectures-menu__link-back:hover + .header__tooltip
+    @media (max-width: $tablet-width)
+      display: block
+
+._dark .header__tooltip
+  color: $color-white
+  background-color: $color-main-dark
+  &:after
+    border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #2f2f2f rgba(255, 255, 255, 0)

@@ -44,6 +44,7 @@ class LogoAndTitle extends React.Component {
                     </div>
                     <span><span className="label">{_backLink.label}</span>{' ' + _backLink.title}</span>
                 </Link>
+                <div className="header__tooltip">{`${_backLink.label} ${_backLink.title}`}</div>
             </div>
         )
     }

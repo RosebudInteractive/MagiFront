@@ -16,15 +16,18 @@
   .margin-block
     height: 100%
     margin: 0 8.333%
-    @media(max-width: 899px)
-      margin: 0 36px
-    @media(max-width: 639px)
+    @media(max-width: $tablet-width)
+      margin: 0 18.75%
+    @media(max-width: $mobile-phone-width)
       margin: 0 20px
 
   .flex-column-block
     display: flex
     flex-direction: column
     justify-content: flex-end
+    @media(max-width: $tablet-width)
+      justify-content: center
+      align-items: center
 
 
   .test-result__info
@@ -36,31 +39,22 @@
     margin-bottom: 21px
     color: $color-white
     @media(max-width: 899px)
-      width: 75%
-    @media(max-width: 639px)
       width: 100%
+      align-items: center
 
     .title
-      font-family: $font-pt
-      font-weight: normal
-      font-size: 52px
-      line-height: 57px
       color: $color-white
       margin: 0 0 36px 0
-      letter-spacing: -0.02em
-      @media(max-width: 899px)
-        font-size: 29px
-        line-height: 33px
-        letter-spacing: -0.01em
-        margin-bottom: 24px
+      @media(max-width: $tablet-width)
+        margin-bottom: 15px
+
 
     .message
-      font-family: $font-fira
-      font-size: 30px
-      line-height: 36px
-      @media(max-width: 899px)
-        font-size: 20px
-        line-height: 24px
+      color: $color-white
+      @media(max-width: $tablet-width)
+        text-align: center
+      @media(max-width: $mobile-phone-width)
+        text-align: left
 
   .title__course-pay-status
     margin-right: 13px
@@ -105,20 +99,20 @@
     flex-direction: row
     @media(max-width: 899px)
       margin-bottom: 13px
-    @media(max-width: 639px)
+    @media(max-width: $mobile-phone-width)
       margin-bottom: 21px
 
     .reinit-button
       display: block
       margin-left: 25px
-      @media(max-width: 639px)
+      @media(max-width: $tablet-width)
         display: none
 
   .social-block
     flex-basis: auto
     @media(max-width: 899px)
       flex-basis: 50%
-    @media(max-width: 639px)
+    @media(max-width: $mobile-phone-width)
       flex-basis: 100%
 
   .social-button-wrapper
@@ -161,17 +155,21 @@
   .next-lesson__buttons-block
     margin: 0 0 21px
     display: flex
+    flex-direction: column
     width: auto
-    @media (max-width: 639px)
+    @media (max-width: $tablet-width)
+      margin: 0 0 28px
+      width: 58%
+      min-width: 230px
+    @media (max-width: $mobile-phone-width)
       width: 100%
 
     .next-lesson-button__wrapper
       width: auto
       flex-grow: 0
-      @media(max-width: 899px)
-        width: 50%
-      @media(max-width: 639px)
-        flex-grow: 1
+      @media(max-width: $tablet-width)
+        width: 100%
+        margin-bottom: 10px
 
     .next-lesson-button
       padding-left: 0
@@ -184,7 +182,9 @@
 
     .reinit-button
       display: none
-      width: 64px
-      margin-right: 20px
-      @media (max-width: 639px)
+      width: 100%
+      @media (max-width: $tablet-width)
         display: block
+
+    .button
+      height: 32px

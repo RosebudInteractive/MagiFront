@@ -62,6 +62,7 @@ import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
 import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
 import {callbackPayment} from "./tools/payments-checker"
 import "./tools/fonts.sass"
+import "./tools/system.sass"
 
 Polyfill.registry();
 

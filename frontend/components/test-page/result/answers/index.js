@@ -48,7 +48,7 @@ class Answers extends React.Component {
                 <h3 className="question-title">
                     <span className="current">{index + 1}</span>
                     <span className="total">{"/" + _total + ": "}</span>
-                    {item.Question.Text}
+                    <span className="text">{item.Question.Text}</span>
                     <span className={"answer__hint " + (item.IsCorrect ? "correct" : item.IsPartCorrect ? "part-correct" : "wrong") }>{item.IsCorrect ? "Правильный ответ" : item.IsPartCorrect ? "Неполный  ответ" : "Ошибка"}</span>
                 </h3>
                 <CommentBlock question={item.Question}/>

@@ -59,28 +59,25 @@ class Cover extends React.Component {
         return <div className="test-result__cover js-test-content" style={_coverStyle}>
             <div className="margin-block flex-column-block">
                 <div className="test-result__info">
-                        <h1 className="title">
+                        <h1 className="title font-universal__title-large">
                             {`Верно ${result.CorrectCount} из ${result.TotalCount}`}
                         </h1>
-                        <div className="message">
+                        <div className="message font-universal__title-medium">
                             {`Вы ответили правильно на ${_percent}% вопросов теста «${test.Name}»`}
                         </div>
                 </div>
                 <div className="next-lesson__buttons-block">
-                    <div className="reinit-button" onClick={::this._createInstance}>
-                        <span>
-                            <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
-                        </span>
-                        Пройти заново
-                    </div>
                     {
                         _nextLessonUrl &&
                         <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
-                            <div className="button btn--brown next-lesson-button">
+                            <div className="button _brown next-lesson-button">
                                 { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
                             </div>
                         </Link>
                     }
+                    <div className="reinit-button" onClick={::this._createInstance}>
+                        <div className="button _white">Пройти заново</div>
+                    </div>
                 </div>
 
                 <div className="social-block__title">Поделиться результатом с друзьями</div>
