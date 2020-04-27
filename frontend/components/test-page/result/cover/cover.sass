@@ -11,7 +11,7 @@
   @media(max-width: 1679px)
     height: 512px
   @media(max-width: 899px)
-    height: 420px
+    height: 100%
 
   .margin-block
     height: 100%
@@ -174,7 +174,6 @@
     .next-lesson-button
       padding-left: 0
       padding-right: 0
-      height: 26px
       width: 216px
       cursor: pointer
       @media(max-width: 899px)
@@ -188,3 +187,5 @@
 
     .button
       height: 32px
+      @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+        height: 18px
