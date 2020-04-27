@@ -26,7 +26,6 @@
     flex-direction: column
     justify-content: flex-end
     @media(max-width: $tablet-width)
-      justify-content: center
       align-items: center
 
 
@@ -38,9 +37,11 @@
     width: 90%
     margin-bottom: 21px
     color: $color-white
-    @media(max-width: 899px)
+    @media(max-width: $tablet-width)
       width: 100%
       align-items: center
+    @media(max-width: $mobile-phone-width)
+      align-items: flex-start
 
     .title
       color: $color-white
@@ -97,10 +98,10 @@
     margin-bottom: 21px
     display: flex
     flex-direction: row
-    @media(max-width: 899px)
-      margin-bottom: 13px
+    @media(max-width: $tablet-width)
+      margin-bottom: 39px
     @media(max-width: $mobile-phone-width)
-      margin-bottom: 21px
+      margin-bottom: 43px
 
     .reinit-button
       display: block

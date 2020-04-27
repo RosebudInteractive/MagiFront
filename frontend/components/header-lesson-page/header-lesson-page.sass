@@ -4,13 +4,13 @@
   position: relative
 
   .lectures-menu__section
-    flex: 1 1 auto
+    @media (max-width: $tablet-width)
+      flex: 1 1 auto
 
   .lectures-list-trigger
-    .num
+    .title
       overflow: hidden
       text-overflow: ellipsis
-    .current
       white-space: nowrap
 
   .header__tooltip

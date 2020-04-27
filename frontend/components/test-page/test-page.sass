@@ -19,9 +19,9 @@
   .test-page__content
     position: relative
     &._result
-      height: 686px
+      height: 633px
       @media(max-width: 1679px)
-        height: 565px
+        height: 512px
       @media(max-width: 899px)
         height: 473px
 
@@ -54,14 +54,19 @@
   &._mobile
     .test-page__content:not(._result)
       height: calc(100vh - 103px)
-
+    .test-page__content._result
+      height: 512px
+      @media(max-width: $tablet-width)
+        height: 473px
 
   &.added
     .test-page__content._result
       height: 633px
       @media(max-width: 1679px)
         height: 512px
-      @media(max-width: 899px)
+      @media(max-width: $tablet-width)
+        height: 473px
+      @media(max-width: $mobile-phone-width)
         height: 75vh
     .lectures-menu._plain-menu
       position: relative

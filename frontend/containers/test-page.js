@@ -120,6 +120,8 @@ class TestPage extends React.Component {
             _nextType = this._getPageType(nextProps)
 
         if ((_currentType !== _nextType) || (this.props.testUrl !== nextProps.testUrl)) {
+            window.scrollTo(0, 0)
+
             switch (_nextType) {
                 case TEST_PAGE_TYPE.TEST: {
                     this._clearLocalInstance();

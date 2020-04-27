@@ -34,7 +34,7 @@ class Answers extends React.Component {
 
     render() {
         return <div className="question-wrapper">
-            <h2 className="result-header">Ваши ответы:</h2>
+            <h2 className="result-header">Проверка ответов:</h2>
             {this._getAnswers()}
         </div>
     }

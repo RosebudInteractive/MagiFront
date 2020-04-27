@@ -38,6 +38,14 @@ class Instance extends React.Component {
         if (_index !== this.state.currentIndex) {
             this.setState({currentIndex: _index})
         }
+
+        window.scrollTo(0, 0)
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.currentIndex !== this.state.currentIndex) {
+            window.scrollTo(0, 0)
+        }
     }
 
     render() {

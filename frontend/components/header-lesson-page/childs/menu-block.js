@@ -38,12 +38,14 @@ class MenuBlock extends React.Component {
 
         return (
             <div className="lectures-menu__section lectures-list-block">
-                <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
-                        onClick={::this._switchMenu}><span className='caption'>{_title}</span>
-                    <span className="num">
-                        <span className="current">{test ? `"${test.Name}"` : _number}</span>
-                        {test ? "" : ('/' + _total)}
-                    </span>
+                <button type="button" className="lectures-list-trigger js-lectures-list-trigger" onClick={::this._switchMenu}>
+                    <div className="title">
+                        <span className='caption'>{_title}</span>
+                        <span className="num">
+                            <span className="current">{test ? `"${test.Name}"` : _number}</span>
+                            {test ? "" : ('/' + _total)}
+                        </span>
+                    </div>
                 </button>
                 <LessonsList {...this.props}/>
             </div>
