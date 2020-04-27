@@ -31,7 +31,7 @@ class Instance extends React.Component {
     }
 
     componentDidMount() {
-        let _index = this.props.questions.findIndex(item => !item.Answer)
+        let _index = this.props.questions.findIndex(item => (item.Answer === null) )
 
         _index = _index === -1 ? this.props.questions.length - 1 : _index
 
