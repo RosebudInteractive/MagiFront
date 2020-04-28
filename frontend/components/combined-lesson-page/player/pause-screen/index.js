@@ -92,8 +92,8 @@ class PauseScreen extends React.Component {
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
-                    <div className={_paddingBlockClassName}/>
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
+                    <div className={_paddingBlockClassName}/>
                     {/*{ finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }*/}
                 </div>
             }

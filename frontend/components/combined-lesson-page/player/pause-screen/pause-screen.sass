@@ -2,13 +2,6 @@
 
 .player__pause-screen:not(._hidden) + .lecture-frame__play-block-wrapper
   display: none
-  //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-    display: block
-
-//.player__pause-screen._fade + .lecture-frame__play-block-wrapper
-  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-    opacity: 0
-    z-index: 0
 
 .added .player__pause-screen
   top: 0
@@ -114,13 +107,14 @@
         border-width: 33px 0 33px 61px
 
   .padding-block
-    height: 0
+    padding: 0
     &._single
-      height: 64px
-    &._double
-      height: 64px
       @media (max-width: $tablet-width)
-        height: 128px
+        padding: 64px 0 0
+    &._double
+      padding: 64px 0 0
+      @media (max-width: $tablet-width)
+        padding: 64px 0
   .test-buttons-block
     margin: 0
     @media (max-width: 899px)
