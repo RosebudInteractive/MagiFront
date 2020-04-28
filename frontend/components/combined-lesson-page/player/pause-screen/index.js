@@ -88,7 +88,9 @@ class PauseScreen extends React.Component {
                 <div className="pause-screen__content-wrapper">
                     { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
                     { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
-                    <div className="pause-screen__play-button"/>
+                    <div className="pause-screen__play-button-wrapper">
+                        <div className="pause-screen__play-button"/>
+                    </div>
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
                     { finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }
                 </div>
