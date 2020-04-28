@@ -2,22 +2,21 @@
 
 .player__pause-screen:not(._hidden) + .lecture-frame__play-block-wrapper
   display: none
-  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+  //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
     display: block
 
-.player__pause-screen._fade + .lecture-frame__play-block-wrapper
+//.player__pause-screen._fade + .lecture-frame__play-block-wrapper
   @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
     opacity: 0
     z-index: 0
 
 .added .player__pause-screen
   top: 0
-  padding: 8% 0
-  //height: 100%
+  padding: 8% 0 16%
 
 .mobile .player__pause-screen
   height: 100%
-  padding: 8% 0
+  padding: 8% 0 calc(16% + 70px)
 
 .overflow .player__pause-screen
   opacity: 1
@@ -25,7 +24,7 @@
     display: none
 
 .player__pause-screen
-  padding: calc(8% + 53px) 0 8%
+  padding: calc(8% + 53px) 0 16%
   width: 100%
   height: calc(100% - 60px)
   //padding-top: 53px
@@ -57,9 +56,9 @@
     display: flex
     flex-direction: column
     align-items: center
-    @media (max-width: 899px)
+    @media (max-width: $tablet-width)
       margin: auto 8.3%
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       margin: auto
 
 
@@ -67,7 +66,7 @@
     text-align: center
     color: $color-white
     display: block
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       display: none
 
 
@@ -76,7 +75,7 @@
     margin: 40px 0 0
     color: $color-white
     display: block
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       display: none
 
   .pause-screen__play-button-wrapper
@@ -84,7 +83,7 @@
     flex: 1 1 auto
     max-height: 240px
     display: flex
-    @media (max-width: $mobile-phone-width)
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       padding: 15px 0
   .pause-screen__play-button
     width: 140px
@@ -105,10 +104,7 @@
     &:hover
       &:after
         border-color: transparent transparent transparent $color-white
-    @media (max-width: $tablet-width)
-      //margin: 6.9vh 0 10.7vh
-    @media (max-width: $mobile-phone-width)
-      //margin: 40px 0 50px
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       width: 61px
       height: 66px
       &:after
@@ -120,7 +116,7 @@
     margin: 0
     @media (max-width: 899px)
       flex-direction: column
-    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       margin: 0
       display: none
 
@@ -149,7 +145,6 @@
       @media (max-width: $tablet-width)
         width: 100%
         position: relative
-        //width: auto
         order: 1
         bottom: 0
         right: 0

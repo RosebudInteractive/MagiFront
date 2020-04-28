@@ -5,7 +5,7 @@ import {bindActionCreators} from "redux";
 import {lessonsSelector} from "ducks/lesson-menu";
 import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
-import LessonTooltip from "../../lesson-tooltip";
+// import LessonTooltip from "../../lesson-tooltip";
 import {getSiblingsLessons} from "tools/player/functions";
 import {isMobileAppleDevice} from "tools/page-tools";
 
@@ -14,7 +14,7 @@ const TIMEOUT = 5000
 class PauseScreen extends React.Component {
     static propTypes = {
         lesson: PropTypes.object,
-        finished: PropTypes.bool,
+        // finished: PropTypes.bool,
         paused: PropTypes.bool,
         course: PropTypes.object,
         isPaidCourse: PropTypes.bool,
@@ -37,8 +37,8 @@ class PauseScreen extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const _prevVisible = prevProps.started && (prevProps.finished || prevProps.paused),
-            _currentVisible = this.props.started && (this.props.finished || this.props.paused)
+        const _prevVisible = prevProps.started && prevProps.paused,
+            _currentVisible = this.props.started && this.props.paused
 
         if (!_prevVisible && _currentVisible) {
             if (!this._handlerBinded) {
@@ -71,28 +71,27 @@ class PauseScreen extends React.Component {
     }
 
     render() {
-        const {lesson, finished, paused, started, course, isPaidCourse, lessonList} = this.props
+        const {lesson, paused, started, course, isPaidCourse, lessonList} = this.props
 
         const {current, next} = getSiblingsLessons(lessonList, lesson.Id),
             _tests = current.Tests,
-            _hidden = !(finished || paused || this.state.hiding)
+            _hidden = !(paused || this.state.hiding)
 
         let _className = "player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") +
             (this.state.hiding ? " _hiding" : "") +
-            (this.state.fade ? " _fade" : "") +
-            (finished ? " _finished" : "")
+            (this.state.fade ? " _fade" : "")
 
         return <div className={_className}>
             {
-                (started || finished) &&
+                started &&
                 <div className="pause-screen__content-wrapper">
-                    { !finished && <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div> }
-                    { !finished && <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div> }
+                    <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div>
+                    <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div>
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
-                    { finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }
+                    {/*{ finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }*/}
                 </div>
             }
         </div>

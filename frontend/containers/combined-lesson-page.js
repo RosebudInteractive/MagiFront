@@ -394,7 +394,7 @@ class CombineLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course, } = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, canNotPlay, course, } = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
@@ -407,7 +407,7 @@ class CombineLessonPage extends React.Component {
                                  course={course}
                                  courseUrl={this.props.courseUrl}
                                  lessonUrl={lesson.URL}
-                                 isPlayer={(_playingLessonUrl || _lessonInPlayer) && !lessonEnded}
+                                 isPlayer={(_playingLessonUrl || _lessonInPlayer) && !(lessonEnded || canNotPlay)}
                                  audios={_audios}
                                  history={this.props.history}
                                  isMain={this._isMainLesson()}
@@ -425,7 +425,7 @@ class CombineLessonPage extends React.Component {
                                   active={lesson.Id}
                                   courseUrl={this.props.courseUrl}
                                   lessonUrl={lesson.URL}
-                                  isPlayer={(_playingLessonUrl || _lessonInPlayer) && !lessonEnded}
+                                  isPlayer={(_playingLessonUrl || _lessonInPlayer) && !(lessonEnded || canNotPlay)}
                                   audios={_audios}
                                   history={this.props.history}
                                   isMain={this._isMainLesson()}
@@ -670,6 +670,7 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.lessonPlayInfo.playInfo,
         playingLesson: state.player.playingLesson,
         lessonEnded: state.player.ended,
+        canNotPlay: state.player.canNotPlay,
         galleryIsOpen: state.app.galleryIsOpen,
 
         facebookAppID: facebookAppIdSelector(state),
