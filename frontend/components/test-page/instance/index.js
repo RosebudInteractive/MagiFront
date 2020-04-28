@@ -28,6 +28,14 @@ class Instance extends React.Component {
             hasAnswer: false,
             answer: null,
         }
+
+        this._enterHandler = (e) => {
+            if (e.keyCode === 13) {
+                if (this.state.hasAnswer) {
+                    this._onForward()
+                }
+            }
+        }
     }
 
     componentDidMount() {
@@ -40,12 +48,17 @@ class Instance extends React.Component {
         }
 
         window.scrollTo(0, 0)
+        $(window).bind("keyup", this._enterHandler)
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.currentIndex !== this.state.currentIndex) {
             window.scrollTo(0, 0)
         }
+    }
+
+    componentWillUnmount() {
+        $(window).unbind("keyup", this._enterHandler)
     }
 
     render() {

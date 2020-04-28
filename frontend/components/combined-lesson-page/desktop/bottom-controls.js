@@ -66,7 +66,7 @@ class Controls extends React.Component {
                                 <button type="button" className="forward">
                                     <svg width="32" height="26" dangerouslySetInnerHTML={{__html: SVG.PREV}}/>
                                 </button>
-                                <LessonTooltip currentLessonUrl={lesson.URL} isPaidCourse={isPaidCourse} course={course} lesson={prev} title={"Предыдущий эпизод"}/>
+                                <LessonTooltip currentLessonUrl={lesson.URL} isPaidCourse={isPaidCourse} course={course} lesson={prev} title={"Предыдущая лекция"}/>
                             </Link>
                             :
                             <button type="button" className="forward _disabled">

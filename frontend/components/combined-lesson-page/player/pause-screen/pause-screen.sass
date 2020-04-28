@@ -85,6 +85,7 @@
     display: flex
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       padding: 15px 0
+      max-height: 160px
   .pause-screen__play-button
     width: 140px
     height: 140px
@@ -112,6 +113,14 @@
         left: 0
         border-width: 33px 0 33px 61px
 
+  .padding-block
+    height: 0
+    &._single
+      height: 64px
+    &._double
+      height: 64px
+      @media (max-width: $tablet-width)
+        height: 128px
   .test-buttons-block
     margin: 0
     @media (max-width: 899px)

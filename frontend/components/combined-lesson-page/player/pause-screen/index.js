@@ -81,6 +81,8 @@ class PauseScreen extends React.Component {
             (this.state.hiding ? " _hiding" : "") +
             (this.state.fade ? " _fade" : "")
 
+        let _paddingBlockClassName = "padding-block" + ( _tests && (_tests.length > 0) ? ((_tests.length === 1) ? " _single" : "") : " _double")
+
         return <div className={_className}>
             {
                 started &&
@@ -90,6 +92,7 @@ class PauseScreen extends React.Component {
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
+                    <div className={_paddingBlockClassName}/>
                     { _tests && (_tests.length > 0) && <TestButtons lessonId={lesson.Id}/> }
                     {/*{ finished && next && <LessonTooltip lesson={next} course={course} isPaidCourse={isPaidCourse} currentLessonUrl={current.URL}/> }*/}
                 </div>

@@ -15,7 +15,7 @@ export default class LessonTooltip extends React.Component {
     }
 
     static defaultProps = {
-        title: "Следующий эпизод"
+        title: "Следующая лекция"
     };
 
     render() {
