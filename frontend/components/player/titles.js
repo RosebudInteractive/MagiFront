@@ -4,20 +4,21 @@ import {connect} from 'react-redux';
 class Titles extends React.Component {
 
     render() {
-        let _onlyTitle = !this.props.subTitle || (this.props.subTitle === '')
+        const {subTitle} = this.props
 
-        // return !this.props.paused ?
+        let _onlyTitle = !subTitle || (subTitle === '')
+
         return (
             <div className="player-frame__poster-text">
                 <span className={"player-frame__poster-title" + (_onlyTitle ? ' single' : '')}>{this.props.title}</span>
-                <p>
-                    <span className="player-frame__poster-subtitle">{this.props.subTitle}</span>
-                </p>
+                {
+                    subTitle &&
+                    <p>
+                        <span className="player-frame__poster-subtitle">{subTitle}</span>
+                    </p>
+                }
             </div>
         )
-        // :
-        // null
-
     }
 }
 

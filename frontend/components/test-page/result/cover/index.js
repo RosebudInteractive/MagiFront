@@ -76,7 +76,7 @@ class Cover extends React.Component {
                         </Link>
                     }
                     <div className="reinit-button" onClick={::this._createInstance}>
-                        <div className="button _white">Пройти заново</div>
+                        <div className="button _white">Пройти тест заново</div>
                     </div>
                 </div>
 
@@ -87,7 +87,7 @@ class Cover extends React.Component {
                         <span>
                             <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
                         </span>
-                        Пройти заново
+                        Пройти тест заново
                     </div>
                 </div>
             </div>

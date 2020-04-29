@@ -56,7 +56,7 @@ export default class TestButton extends React.Component {
         if (!test.Instance) {
             return this.props.subtitleRequired ? "Пройти" : null
         } else {
-            return test.Instance.IsFinished ? `${test.Instance.Score} из ${test.Instance.MaxScore} Пройти заново` : "Продолжить"
+            return test.Instance.IsFinished ? `${test.Instance.Score} из ${test.Instance.MaxScore} Пройти тест заново` : "Продолжить"
         }
     }
 

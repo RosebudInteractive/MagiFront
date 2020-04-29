@@ -158,7 +158,9 @@ class PauseScreen extends React.Component {
             clearTimeout(this._timer);
         }
 
-        this.setState({fade: true})
+        if (this.props.started && this.props.paused) {
+            this.setState({fade: true})
+        }
     }
 
     _getFonts() {
