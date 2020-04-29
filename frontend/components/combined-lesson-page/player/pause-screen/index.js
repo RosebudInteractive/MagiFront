@@ -7,7 +7,7 @@ import "./pause-screen.sass"
 import TestButtons from "../../test-buttons";
 // import LessonTooltip from "../../lesson-tooltip";
 import {getSiblingsLessons} from "tools/player/functions";
-import {isMobileAppleDevice} from "tools/page-tools";
+import {isMobileAppleDevice, isMobilePlatform} from "tools/page-tools";
 import $ from "jquery";
 
 const TIMEOUT = 5000
@@ -33,18 +33,20 @@ class PauseScreen extends React.Component {
         this._handlerBinded = false
 
         this._resizeHandler = () => {
-            const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
-            if (_isPhone !== this._isPhone) {
-                this._isPhone = _isPhone
+            const _needShowSmallFont = this._needShowSmallFont()
+
+            if (_needShowSmallFont !== this._showSmallFont) {
+                this._showSmallFont = _needShowSmallFont
                 this.forceUpdate()
             }
         }
     }
 
     componentDidMount() {
-        this._isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+        this._showSmallFont = this._needShowSmallFont()
 
         this._bindHandler()
+        $(window).on('resize', this._resizeHandler)
     }
 
     componentDidUpdate(prevProps) {
@@ -79,6 +81,7 @@ class PauseScreen extends React.Component {
     componentWillUnmount() {
         $(".js-pause-screen").unbind('mousemove');
         $(".js-pause-screen").unbind('touchend');
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
@@ -100,7 +103,7 @@ class PauseScreen extends React.Component {
                 started &&
                 <div className="pause-screen__content-wrapper">
                     <div className="pause-screen_lesson-title">{lesson.Name}</div>
-                    <div className={"pause-screen_lesson-descr " + _fonts.descr}>{lesson.ShortDescription}</div>
+                    <div className={"pause-screen_lesson-descr " + _fonts.descr}>{this._getContent()}</div>
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
@@ -158,9 +161,7 @@ class PauseScreen extends React.Component {
     }
 
     _getFonts() {
-        const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
-
-        return _isPhone ?
+        return this._showSmallFont ?
             {
                 descr: "font-universal__body-small"
             } :
@@ -168,12 +169,29 @@ class PauseScreen extends React.Component {
                 descr: "font-universal__book-large"
             }
     }
+
+    _getContent() {
+        const {currentContent, contentArray} = this.props
+
+        let _index = contentArray.findIndex(item => {
+            return currentContent && currentContent.id ? item.id ===  currentContent.id : null
+        })
+
+        return _index >= 0 ? `${_index + 1}. ${contentArray[_index].title}` : null
+    }
+
+    _needShowSmallFont() {
+        return (isMobilePlatform() && (($(window).height() <= 414) || ($(window).width() <= 414)))
+            || ($(window).width() <= 414)
+    }
 }
 
 const mapStateToProps = (state) => {
     return {
         lessonList: lessonsSelector(state),
         started: state.player.started,
+        contentArray: state.player.contentArray,
+        currentContent: state.player.currentContent,
     }
 }
 
