@@ -58,18 +58,26 @@
   .pause-screen_lesson-title
     text-align: center
     color: $color-white
+    font-family: $font-pt
+    font-style: normal
+    font-weight: normal
+    font-size: 37px
+    line-height: 105%
+    letter-spacing: -1px
     display: block
-    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      display: none
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      font-size: 21px
 
 
   .pause-screen_lesson-descr
     text-align: center
-    margin: 40px 0 0
+    margin: 19px 0 0
     color: $color-white
     display: block
-    //@media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-      display: none
+    @media (max-width: $tablet-width)
+      margin: 26px 0 0
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      margin: 14px 0 0
 
   .pause-screen__play-button-wrapper
     padding: 0

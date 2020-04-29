@@ -8,6 +8,7 @@ import TestButtons from "../../test-buttons";
 // import LessonTooltip from "../../lesson-tooltip";
 import {getSiblingsLessons} from "tools/player/functions";
 import {isMobileAppleDevice} from "tools/page-tools";
+import $ from "jquery";
 
 const TIMEOUT = 5000
 
@@ -30,9 +31,19 @@ class PauseScreen extends React.Component {
 
         this._timer = null
         this._handlerBinded = false
+
+        this._resizeHandler = () => {
+            const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+            if (_isPhone !== this._isPhone) {
+                this._isPhone = _isPhone
+                this.forceUpdate()
+            }
+        }
     }
 
     componentDidMount() {
+        this._isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+
         this._bindHandler()
     }
 
@@ -81,14 +92,15 @@ class PauseScreen extends React.Component {
             (this.state.hiding ? " _hiding" : "") +
             (this.state.fade ? " _fade" : "")
 
-        let _paddingBlockClassName = "padding-block" + ( _tests && (_tests.length > 0) ? ((_tests.length === 1) ? " _single" : "") : " _double")
+        let _paddingBlockClassName = "padding-block" + ( _tests && (_tests.length > 0) ? ((_tests.length === 1) ? " _single" : "") : " _double"),
+            _fonts = this._getFonts()
 
         return <div className={_className}>
             {
                 started &&
                 <div className="pause-screen__content-wrapper">
-                    <div className="pause-screen_lesson-title font-universal__title-large">{lesson.Name}</div>
-                    <div className="pause-screen_lesson-descr font-universal__book-large">{lesson.ShortDescription}</div>
+                    <div className="pause-screen_lesson-title">{lesson.Name}</div>
+                    <div className={"pause-screen_lesson-descr " + _fonts.descr}>{lesson.ShortDescription}</div>
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
@@ -143,6 +155,18 @@ class PauseScreen extends React.Component {
         }
 
         this.setState({fade: true})
+    }
+
+    _getFonts() {
+        const _isPhone = (($(window).height() <= 414) || ($(window).width() <= 414))
+
+        return _isPhone ?
+            {
+                descr: "font-universal__body-small"
+            } :
+            {
+                descr: "font-universal__book-large"
+            }
     }
 }
 
