@@ -1,12 +1,13 @@
 @import "~tools/variables.sass"
 
 .lecture-wrapper.mobile
+  position: relative
   height: calc(100vh - 103px)
   margin-top: 53px
   .lecture-frame__fav
-    top: 73px
+    top: 20px
     @media (max-width: $tablet-width)
-      top: 20px
+      //top: 20px
       right: 20px
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       top: 10px
