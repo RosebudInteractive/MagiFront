@@ -89,7 +89,8 @@ class PauseScreen extends React.Component {
 
         const {current, next} = getSiblingsLessons(lessonList, lesson.Id),
             _tests = current.Tests,
-            _hidden = !(paused || this.state.hiding)
+            _hidden = !(paused || this.state.hiding),
+            _content = this._getContent()
 
         let _className = "player__pause-screen js-pause-screen" + (_hidden ? " _hidden" : "") +
             (this.state.hiding ? " _hiding" : "") +
@@ -103,7 +104,7 @@ class PauseScreen extends React.Component {
                 started &&
                 <div className="pause-screen__content-wrapper">
                     <div className="pause-screen_lesson-title">{lesson.Name}</div>
-                    <div className={"pause-screen_lesson-descr " + _fonts.descr}>{this._getContent()}</div>
+                    { _content && <div className={"pause-screen_lesson-descr " + _fonts.descr}>{_content}</div> }
                     <div className="pause-screen__play-button-wrapper">
                         <div className="pause-screen__play-button"/>
                     </div>
