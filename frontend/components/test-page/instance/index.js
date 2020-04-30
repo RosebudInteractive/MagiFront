@@ -66,8 +66,6 @@ class Instance extends React.Component {
 
         if (fetching || (!questions.length)) { return null }
 
-        console.log("RENDER TEST: ", questions)
-
         const _total = questions.length,
             _question = questions[this.state.currentIndex].Question,
             _needHint = _question.AnswType === ANSWER_TYPES.MULTI_SELECT,
