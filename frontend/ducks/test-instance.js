@@ -1,6 +1,6 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Map, Record,} from 'immutable'
+import {Map, Record, List} from 'immutable'
 import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, loadTestData, testSelector} from "ducks/test";
@@ -72,7 +72,7 @@ const ReducerRecord = Record({
     saving: false,
     loaded: false,
     testInstance: new InstanceRecord(),
-    questions: new Map([]),
+    questions: new List([]),
     lastSuccessTime: null,
     blocked: false,
     notFound: false,
@@ -176,8 +176,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 const dataToEntries = (values, DataRecord) => {
     return values.reduce(
-        (acc, value) => acc.set(value.Question.Id, new DataRecord(value)),
-        new Map({})
+        (acc, value) => acc.push(new DataRecord(value)),
+        new List([])
     )
 }
 
@@ -423,22 +423,23 @@ function* setAnswerSaga(data) {
 
     let _instance = yield select(testInstanceSelector),
         _questions = _state.questions,
-        _question = _questions.get(_answer.questionId)
+        _index = _questions.findIndex( item => item.Question.Id === _answer.questionId),
+        _question = _questions.get(_index)
 
     if (isAnswerCorrect(_question.Question, _answer.value)) {
         _questions = _questions
-            .setIn([_answer.questionId, 'Score'], _question.Question.Score * 10)
-            .setIn([_answer.questionId, 'IsCorrect'], true)
+            .setIn([_index, 'Score'], _question.Question.Score * 10)
+            .setIn([_index, 'IsCorrect'], true)
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     } else if (isAnswerPartCorrect(_question.Question, _answer.value)) {
         _questions = _questions
-            .setIn([_answer.questionId, 'Score'], _question.Question.Score * 5)
-            .setIn([_answer.questionId, 'IsCorrect'], false)
-            .setIn([_answer.questionId, 'IsPartCorrect'], true)
+            .setIn([_index, 'Score'], _question.Question.Score * 5)
+            .setIn([_index, 'IsCorrect'], false)
+            .setIn([_index, 'IsPartCorrect'], true)
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     }
 
-    _questions = _questions.setIn([_answer.questionId, 'Answer'], _answer.value)
+    _questions = _questions.setIn([_index, 'Answer'], _answer.value)
 
     yield put({type: SET_ANSWER_SUCCESS, payload: {instance: _instance, questions: _questions}})
 }

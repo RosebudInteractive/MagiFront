@@ -57,7 +57,7 @@ class Controls extends React.Component {
                     </button>
                 }
                 <button type="button" className="forward" onClick={::this._onForward}>
-                    <svg width="19" height="16" dangerouslySetInnerHTML={{__html: SVG.FORWARD}}/>
+                    <svg width="18" height="16" dangerouslySetInnerHTML={{__html: SVG.FORWARD}}/>
                 </button>
                 <div className="lesson-navigate-block">
                     {

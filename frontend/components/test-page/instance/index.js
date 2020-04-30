@@ -66,6 +66,8 @@ class Instance extends React.Component {
 
         if (fetching || (!questions.length)) { return null }
 
+        console.log("RENDER TEST: ", questions)
+
         const _total = questions.length,
             _question = questions[this.state.currentIndex].Question,
             _needHint = _question.AnswType === ANSWER_TYPES.MULTI_SELECT,
@@ -74,7 +76,7 @@ class Instance extends React.Component {
         return <div className="question-wrapper js-test-content">
             <h3 className="question-title">
                 <span className="current">{this.state.currentIndex + 1}</span>
-                <span className="total">{"/" + _total + ": "}</span>
+                <span className="total">{`/${_total} `}</span>
                 {_text}
                 {_needHint && <div className="hint">На этот вопрос возможно несколько правильных ответов</div>}
             </h3>

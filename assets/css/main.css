@@ -8676,8 +8676,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     @media (max-width: 899px) {
       .lecture-frame__header {
         width: 50%;
-        min-width: 280px;
-        max-width: 460px; }
+        min-width: 280px; }
       ._player .lecture-frame__header {
         padding-left: 0 } }
     @media (max-width: 767px) {
@@ -18549,6 +18548,9 @@ ul.lectures-tab {
   .lectures-menu._single .lectures-menu__link-back {
     visibility: hidden; }
   .lectures-menu._plain-menu .lectures-menu__link-back {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     margin-left: 16px; }
     @media (max-width: 899px) {
       .lectures-menu._plain-menu .lectures-menu__link-back {
