@@ -23,6 +23,13 @@ import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
 import $ from "jquery";
+import {
+    resizeHandler,
+    restoreGridPosition,
+    saveGridScrollPos,
+    selectGridItem,
+    selectItemWithNoRefresh
+} from "../../tools/grid-common-functions";
 
 const TIMEOUT = 500;
 
@@ -41,17 +48,15 @@ class BooksPage extends React.Component {
 
         this._timer = null
 
-        this._resizeHandler = () => {
-            const _main = $('.main-area'),
-                _height = _main.height(),
-                _width = _main.width()
+        this._resizeHandler = resizeHandler.bind(this)
+        this._restoreGridPosition = restoreGridPosition.bind(this)
+        this._saveScrollPos = saveGridScrollPos.bind(this)
+        this._select = selectGridItem.bind(this)
+        this._selectNoRefresh = selectItemWithNoRefresh.bind(this)
+    }
 
-            if (window.$$('books-grid')) {
-                const _headerHeight = window.$$('books-grid').config.headerRowHeight
-
-                window.$$('books-grid').$setSize(_width, _height - _headerHeight)
-            }
-        }
+    get tableId() {
+        return "books-grid"
     }
 
     componentWillMount() {
@@ -71,49 +76,6 @@ class BooksPage extends React.Component {
         $(window).on('resize', this._resizeHandler);
     }
 
-    componentWillUnmount() {
-        this.props.actions.saveChanges()
-        $(window).unbind('resize', this._resizeHandler)
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.loading && !this.props.loading) {
-            this._resizeHandler();
-        }
-    }
-
-    _onAddBtnClick() {
-        this.props.actions.createBook();
-    }
-
-    _onEditBtnClick() {
-        this.props.actions.editCurrentBook(this._selected);
-    }
-
-    _deleteBook() {
-        this.props.actions.deleteBook(this._selected)
-    }
-
-    _confirmDelete() {
-        this.props.actions.showDeleteConfirmation(this._selected)
-    }
-
-    _cancelDelete() {
-        this.props.actions.cancelDelete()
-    }
-
-    _select(selectedObj) {
-        let _needForceUpdate = (this._selected !== +selectedObj.id) || (this._isFirstSelected !== selectedObj.isFirst) || (this._isLastSelected !== selectedObj.isLast);
-
-        this._isFirstSelected = selectedObj.isFirst;
-        this._isLastSelected = selectedObj.isLast;
-        this._selected = +selectedObj.id;
-
-        if (_needForceUpdate) {
-            this.forceUpdate()
-        }
-    }
-
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
@@ -128,6 +90,21 @@ class BooksPage extends React.Component {
 
             this._isFirstSelected = !!this._selected
         }
+
+        this._saveScrollPos()
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.loading && !this.props.loading) {
+            this._resizeHandler();
+        }
+
+        this._restoreGridPosition()
+    }
+
+    componentWillUnmount() {
+        this.props.actions.saveChanges()
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
@@ -185,13 +162,33 @@ class BooksPage extends React.Component {
             <LoadingPage/>
     }
 
+    _onAddBtnClick() {
+        this.props.actions.createBook();
+    }
+
+    _onEditBtnClick() {
+        this.props.actions.editCurrentBook(this._selected);
+    }
+
+    _deleteBook() {
+        this.props.actions.deleteBook(this._selected)
+    }
+
+    _confirmDelete() {
+        this.props.actions.showDeleteConfirmation(this._selected)
+    }
+
+    _cancelDelete() {
+        this.props.actions.cancelDelete()
+    }
+
     _onEditPrev() {
         const _index = this.props.books.findIndex((item) => {
             return item.id === this.props.bookId
         })
 
         if (_index > 0) {
-            window.$$("books-grid").select(this.props.books[_index - 1].id)
+            window.$$(this.tableId).select(this.props.books[_index - 1].id)
         }
 
         this._onEditBtnClick()
@@ -203,7 +200,7 @@ class BooksPage extends React.Component {
         })
 
         if (_index < this.props.books.length - 1) {
-            window.$$("books-grid").select(this.props.books[_index + 1].id)
+            window.$$(this.tableId).select(this.props.books[_index + 1].id)
         }
 
         this._onEditBtnClick()
@@ -247,7 +244,7 @@ class BooksPage extends React.Component {
 
         return {
             view: "datatable",
-            id: 'books-grid',
+            id: this.tableId,
             scroll: 'y',
             height: 500,
             select: 'row',
@@ -258,12 +255,15 @@ class BooksPage extends React.Component {
             ],
             on: {
                 onAfterSelect: function (selObj) {
-                    let _obj = {
-                        isFirst: this.getFirstId() === +selObj.id,
-                        isLast: this.getLastId() === +selObj.id,
-                        id: +selObj.id,
-                    };
-                    that._select(_obj);
+                    if ((parseInt(selObj.id) !== that._selected) && this.getItem(selObj.id)) {
+                        that._selected = null;
+                        let _obj = {
+                            isFirst: this.getFirstId() === selObj.id,
+                            isLast: this.getLastId() === selObj.id,
+                            id: +selObj.id,
+                        };
+                        that._select(_obj);
+                    }
                 },
                 onAfterRender: function () {
                     if ((that._selected) && this.getItem(that._selected)) {
@@ -272,6 +272,14 @@ class BooksPage extends React.Component {
                         if (!_selectedItem || (_selectedItem.Id !== that._selected)) {
                             this.select(that._selected)
                         }
+
+                        let _obj = {
+                            isFirst: this.getFirstId() === that._selected,
+                            isLast: this.getLastId() === that._selected,
+                            id: that._selected,
+                        };
+
+                        that._selectNoRefresh(_obj);
                     }
                 }
             }

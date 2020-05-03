@@ -21,6 +21,13 @@ import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
 import $ from "jquery";
+import {
+    resizeHandler,
+    restoreGridPosition,
+    saveGridScrollPos,
+    selectGridItem,
+    selectItemWithNoRefresh
+} from "../../tools/grid-common-functions";
 
 class PromosPage extends React.Component {
 
@@ -35,17 +42,15 @@ class PromosPage extends React.Component {
         this._isFirstSelected = false;
         this._isLastSelected = false;
 
-        this._resizeHandler = () => {
-            const _main = $('.main-area'),
-                _height = _main.height(),
-                _width = _main.width()
+        this._resizeHandler = resizeHandler.bind(this)
+        this._restoreGridPosition = restoreGridPosition.bind(this)
+        this._saveScrollPos = saveGridScrollPos.bind(this)
+        this._select = selectGridItem.bind(this)
+        this._selectNoRefresh = selectItemWithNoRefresh.bind(this)
+    }
 
-            if (window.$$('promos-grid')) {
-                const _headerHeight = window.$$('promos-grid').config.headerRowHeight
-
-                window.$$('promos-grid').$setSize(_width, _height - _headerHeight)
-            }
-        }
+    get tableId() {
+        return "promos-grid"
     }
 
     componentWillMount() {
@@ -55,7 +60,6 @@ class PromosPage extends React.Component {
             } else {
                 this.props.createPromo();
             }
-
         }
 
         this.props.getPromoCodes();
@@ -65,44 +69,6 @@ class PromosPage extends React.Component {
     componentDidMount() {
         $(window).on('resize', this._resizeHandler);
         this._resizeHandler();
-    }
-
-    componentWillUnmount() {
-        $(window).unbind('resize', this._resizeHandler)
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.loading && !this.props.loading) {
-            this._resizeHandler();
-        }
-    }
-
-    _onEditBtnClick() {
-        this.props.editCurrentPromo(this._selected);
-    }
-
-    _deletePromo() {
-        this.props.deletePromo(this._selected)
-    }
-
-    _confirmDelete() {
-        this.props.showDeleteConfirmation()
-    }
-
-    _cancelDelete() {
-        this.props.cancelDelete()
-    }
-
-    _select(selectedObj) {
-        let _needForceUpdate = (this._selected !== +selectedObj.id) || (this._isFirstSelected !== selectedObj.isFirst) || (this._isLastSelected !== selectedObj.isLast);
-
-        this._isFirstSelected = selectedObj.isFirst;
-        this._isLastSelected = selectedObj.isLast;
-        this._selected = +selectedObj.id;
-
-        if (_needForceUpdate) {
-            this.forceUpdate()
-        }
     }
 
     componentWillReceiveProps(nextProps,) {
@@ -118,6 +84,20 @@ class PromosPage extends React.Component {
 
             this._isFirstSelected = !!this._selected
         }
+
+        this._saveScrollPos()
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.loading && !this.props.loading) {
+            this._resizeHandler();
+        }
+
+        this._restoreGridPosition()
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
@@ -170,13 +150,29 @@ class PromosPage extends React.Component {
             <LoadingPage/>
     }
 
+    _onEditBtnClick() {
+        this.props.editCurrentPromo(this._selected);
+    }
+
+    _deletePromo() {
+        this.props.deletePromo(this._selected)
+    }
+
+    _confirmDelete() {
+        this.props.showDeleteConfirmation()
+    }
+
+    _cancelDelete() {
+        this.props.cancelDelete()
+    }
+
     _onEditPrev() {
         const _index = this.props.promos.findIndex((item) => {
             return item.id === this.props.promoId
         })
 
         if (_index > 0) {
-            window.$$("promos-grid").select(this.props.promos[_index - 1].id)
+            window.$$(this.tableId).select(this.props.promos[_index - 1].id)
         }
 
         this._onEditBtnClick()
@@ -188,7 +184,7 @@ class PromosPage extends React.Component {
         })
 
         if (_index < this.props.promos.length - 1) {
-            window.$$("promos-grid").select(this.props.promos[_index + 1].id)
+            window.$$(this.tableId).select(this.props.promos[_index + 1].id)
         }
 
         this._onEditBtnClick()
@@ -221,7 +217,7 @@ class PromosPage extends React.Component {
 
         return {
             view: "datatable",
-            id: 'promos-grid',
+            id: this.tableId,
             scroll: 'y',
             height: 500,
             select: 'row',
@@ -233,12 +229,15 @@ class PromosPage extends React.Component {
             ],
             on: {
                 onAfterSelect: function (selObj) {
-                    let _obj = {
-                        isFirst: this.getFirstId() === +selObj.id,
-                        isLast: this.getLastId() === +selObj.id,
-                        id: +selObj.id,
-                    };
-                    that._select(_obj);
+                    if ((parseInt(selObj.id) !== that._selected) && this.getItem(selObj.id)) {
+                        that._selected = null;
+                        let _obj = {
+                            isFirst: this.getFirstId() === selObj.id,
+                            isLast: this.getLastId() === selObj.id,
+                            id: +selObj.id,
+                        };
+                        that._select(_obj);
+                    }
                 },
                 onAfterRender: function () {
                     if ((that._selected) && this.getItem(that._selected)) {
@@ -247,6 +246,14 @@ class PromosPage extends React.Component {
                         if (!_selectedItem || (_selectedItem.Id !== that._selected)) {
                             this.select(that._selected)
                         }
+
+                        let _obj = {
+                            isFirst: this.getFirstId() === that._selected,
+                            isLast: this.getLastId() === that._selected,
+                            id: that._selected,
+                        };
+
+                        that._selectNoRefresh(_obj);
                     }
                 },
             }

@@ -116,13 +116,11 @@ class Courses extends React.Component {
                     <button className='tool-btn new'
                             onClick={::this.onAddBtnClick}
                     />
-                    {' '}
                     <button
                         className={'tool-btn edit' + (this._selected === null ? " disabled" : "")}
                         onClick={::this.onEditBtnClick}
                         disabled={(this._selected === null)}
                     />
-                    {' '}
                     <button
                         className={'tool-btn delete' + (this._selected === null ? " disabled" : "")}
                         onClick={::this.confirmDeleteCourse}
