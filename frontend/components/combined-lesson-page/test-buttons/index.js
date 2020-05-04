@@ -40,7 +40,7 @@ class TestButtons extends React.Component {
             return lesson.Id === lessonId
         })
 
-        return _lesson.Tests
+        return _lesson ? _lesson.Tests : null
     }
 
     _getStartedTest(tests) {

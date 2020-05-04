@@ -88,7 +88,7 @@ class PauseScreen extends React.Component {
         const {lesson, paused, started, course, isPaidCourse, lessonList} = this.props
 
         const {current, next} = getSiblingsLessons(lessonList, lesson.Id),
-            _tests = current.Tests,
+            _tests = current && current.Tests,
             _hidden = !(paused || this.state.hiding),
             _content = this._getContent()
 
