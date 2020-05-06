@@ -254,6 +254,15 @@
                 "mysql": "./build_30/upgrade_30_mysql.sql"
             },
             "upgrader": "./build_30"
+        },
+        "31": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_31/upgrade_31_mssql.sql",
+                "mysql": "./build_31/upgrade_31_mysql.sql"
+            },
+            "upgrader": "./build_31"
         }
     }
 }

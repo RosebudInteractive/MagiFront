@@ -900,6 +900,22 @@ const DbUser = class DbUser extends DbObject {
         })
     }
 
+    async getUserInfo(options) {
+        let opts = options || {};
+        let user;
+        if (opts.id) {
+            user = await this._usersCache.getUserInfoById(+opts.id);
+        }
+        else
+            if (opts.email) {
+                let condition = { field: "Email", op: "=", value: opts.email }
+                user = await this._usersCache.getUserInfo(condition, false);
+            }
+            else
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid or missig parameters: ${JSON.stringify(opts)}.`);
+        return user;
+    }
+
     async getPaidCourses(user_or_id, isDetailed, options) {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
