@@ -33,6 +33,7 @@ const { setupTests } = require('./tests');
 const { setupInvoices } = require('./invoices');
 const { setupBooks } = require('./books');
 const { setupPromoCodes } = require('./promo-codes');
+const { setupReviews } = require('./reviews');
 const { setupStatistics } = require('./statistics');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
@@ -187,6 +188,7 @@ function setupAPI(express, app) {
     setupInvoices(app);
     setupBooks(app);
     setupPromoCodes(app);
+    setupReviews(app);
     setupStatistics(app);
     setupEpisodes(app);
     setupUsers(app);

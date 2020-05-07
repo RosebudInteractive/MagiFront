@@ -255,6 +255,16 @@ function setupUsers(app) {
                 });
     });
 
+    app.get('/api/adm/users/info', async (req, res, next) => {
+        try {
+            let rows = await UsersService().getUserInfo(req.query);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/users', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })

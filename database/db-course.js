@@ -349,6 +349,12 @@ const COURSE_SHARE_COUNTERS_MSSQL_REQ =
     "select sp.[Code], cs.[Counter] from [CrsShareCounter] cs\n" +
     "  join[SNetProvider] sp on sp.[Id] = cs.[SNetProviderId]\n" +
     "where[CourseId] = <%= courseId %>";
+const COURSE_REVIEW_MSSQL_REQ =
+    "select r.[Id], r.[ReviewDate], r.[UserId], r.[Status], r.[UserName], r.[ProfileUrl],\n" +
+    "  r.[Photo], r.[PhotoMeta], r.[Title], r.[ReviewPub]\n" +
+    "from [CourseReview] r\n" +
+    "where r.[CourseId] = <%= courseId %> and r.[Status] = 1\n" +
+    "order by r.[ReviewDate] desc";
 const COURSE_BOOKS_MSSQL_REQ =
     "select b.[Order], b.[Id], b.[Name], b.[Description], b.[CourseId], b.[OtherAuthors], b.[OtherCAuthors],\n" +
     "  b.[Cover], b.[CoverMeta], b.[ExtLinks], ba.[AuthorId], ba.[Tp], ba.[TpView],\n" +
@@ -433,6 +439,12 @@ const COURSE_SHARE_COUNTERS_MYSQL_REQ =
     "select sp.`Code`, cs.`Counter` from `CrsShareCounter` cs\n" +
     "  join`SNetProvider` sp on sp.`Id` = cs.`SNetProviderId`\n" +
     "where`CourseId` = <%= courseId %>";
+const COURSE_REVIEW_MYSQL_REQ =
+    "select r.`Id`, r.`ReviewDate`, r.`UserId`, r.`Status`, r.`UserName`, r.`ProfileUrl`,\n" +
+    "  r.`Photo`, r.`PhotoMeta`, r.`Title`, r.`ReviewPub`\n" +
+    "from `CourseReview` r\n" +
+    "where r.`CourseId` = <%= courseId %> and r.`Status` = 1\n" +
+    "order by r.`ReviewDate` desc";
 const COURSE_BOOKS_MYSQL_REQ =
     "select b.`Order`, b.`Id`, b.`Name`, b.`Description`, b.`CourseId`, b.`OtherAuthors`, b.`OtherCAuthors`,\n" +
     "  b.`Cover`, b.`CoverMeta`, b.`ExtLinks`, ba.`AuthorId`, ba.`Tp`, ba.`TpView`,\n" +
@@ -1600,6 +1612,18 @@ const DbCourse = class DbCourse extends DbObject {
                             //         };
                             //     })
                             // }
+                            let result = await $data.execSql({
+                                dialect: {
+                                    mysql: _.template(COURSE_REVIEW_MYSQL_REQ)({ courseId: courseId }),
+                                    mssql: _.template(COURSE_REVIEW_MSSQL_REQ)({ courseId: courseId })
+                                }
+                            }, {});
+                            course.Reviews = [];
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                result.detail.forEach(elem => {
+                                    course.Reviews.push(elem);
+                                });
+                            }
                         }
                         return course;
                     })
