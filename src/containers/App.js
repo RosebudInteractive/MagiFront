@@ -117,6 +117,9 @@ class App extends Component {
                             <Route path={_homePath + '/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
                             <Route path={_homePath + '/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
                             <Route path={_homePath + '/promos'} component={PromosPage}/>
+                            <Route path={_homePath + '/reviews/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
+                            <Route path={_homePath + '/reviews/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
+                            <Route path={_homePath + '/reviews'} component={PromosPage}/>
                         </Switch>
                     </div>
                 </div>
@@ -131,7 +134,6 @@ class App extends Component {
 function mapStateToProps(state, ownProps) {
     return {
         user: state.user,
-        page: state.page,
         menu: state.menu,
         workShopVisible: state.workShop.visible,
         isUserAuthorized: userAuthSelector(state),

@@ -1,7 +1,6 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux';
 
-import page from "./page"
 import user from "./user"
 import commonDlg from './commonDlg';
 import author from './author';
@@ -47,7 +46,6 @@ import courseVer2Reducer, {moduleName as courseVer2Module} from 'adm-ducks/cours
 import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
-    page,
     user,
     commonDlg,
     author,
