@@ -36,6 +36,7 @@ const TestRecord = Record({
     CoverMeta: null,
     URL: null,
     Images: [],
+    ShareCounters: null,
     SnName: null,
     SnDescription: null,
     SnPost: null,

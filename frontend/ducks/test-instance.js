@@ -427,16 +427,18 @@ function* setAnswerSaga(data) {
         _question = _questions.get(_index)
 
     if (isAnswerCorrect(_question.Question, _answer.value)) {
+        let _score = _question.Question.Score * 10
         _questions = _questions
-            .setIn([_index, 'Score'], _question.Question.Score * 10)
+            .setIn([_index, 'Score'], _score)
             .setIn([_index, 'IsCorrect'], true)
-        _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
+        _instance = _instance.set("Score", +_instance.Score + _score)
     } else if (isAnswerPartCorrect(_question.Question, _answer.value)) {
+        let _score = _question.Question.Score * 5
         _questions = _questions
-            .setIn([_index, 'Score'], _question.Question.Score * 5)
+            .setIn([_index, 'Score'], _score)
             .setIn([_index, 'IsCorrect'], false)
             .setIn([_index, 'IsPartCorrect'], true)
-        _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
+        _instance = _instance.set("Score", +_instance.Score + _score)
     }
 
     _questions = _questions.setIn([_index, 'Answer'], _answer.value)
