@@ -351,7 +351,7 @@ const COURSE_SHARE_COUNTERS_MSSQL_REQ =
     "where[CourseId] = <%= courseId %>";
 const COURSE_REVIEW_MSSQL_REQ =
     "select r.[Id], r.[ReviewDate], r.[UserId], r.[Status], r.[UserName], r.[ProfileUrl],\n" +
-    "  r.[Photo], r.[PhotoMeta], r.[Title], r.[ReviewPub]\n" +
+    "  r.[Title], r.[ReviewPub]\n" +
     "from [CourseReview] r\n" +
     "where r.[CourseId] = <%= courseId %> and r.[Status] = 1\n" +
     "order by r.[ReviewDate] desc";
@@ -441,7 +441,7 @@ const COURSE_SHARE_COUNTERS_MYSQL_REQ =
     "where`CourseId` = <%= courseId %>";
 const COURSE_REVIEW_MYSQL_REQ =
     "select r.`Id`, r.`ReviewDate`, r.`UserId`, r.`Status`, r.`UserName`, r.`ProfileUrl`,\n" +
-    "  r.`Photo`, r.`PhotoMeta`, r.`Title`, r.`ReviewPub`\n" +
+    "  r.`Title`, r.`ReviewPub`\n" +
     "from `CourseReview` r\n" +
     "where r.`CourseId` = <%= courseId %> and r.`Status` = 1\n" +
     "order by r.`ReviewDate` desc";
