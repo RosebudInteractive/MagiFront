@@ -10,8 +10,6 @@ exports.upgradeDb = async (schema) => {
         .addField("Status", { type: "int", allowNull: false }) // 1- published, 2- draft, 3- archive 
         .addField("UserName", { type: "string", length: 255, allowNull: false })
         .addField("ProfileUrl", { type: "string", length: 255, allowNull: true })
-        .addField("Photo", { type: "string", length: 255, allowNull: true })
-        .addField("PhotoMeta", { type: "string", allowNull: true })
         .addField("Title", { type: "string", length: 255, allowNull: true })
         .addField("Review", { type: "string", allowNull: false })
         .addField("ReviewPub", { type: "string", allowNull: true });

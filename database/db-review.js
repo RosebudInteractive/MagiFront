@@ -19,13 +19,13 @@ const REVIEW_REQ_TREE = {
 
 const GET_REVIEW_MSSQL =
     "select r.[Id], r.[ReviewDate], r.[UserId], r.[CourseId], r.[Status], r.[UserName], r.[ProfileUrl],\n" +
-    "  r.[Photo], r.[PhotoMeta], r.[Title], r.[Review], r.[ReviewPub]\n" +
+    "  r.[Title], r.[Review], r.[ReviewPub]\n" +
     "from [CourseReview] r<%= where %>\n" +
     "order by r.[ReviewDate] desc";
 
 const GET_REVIEW_MYSQL =
     "select r.`Id`, r.`ReviewDate`, r.`UserId`, r.`CourseId`, r.`Status`, r.`UserName`, r.`ProfileUrl`,\n" +
-    "  r.`Photo`, r.`PhotoMeta`, r.`Title`, r.`Review`, r.`ReviewPub`\n" +
+    "  r.`Title`, r.`Review`, r.`ReviewPub`\n" +
     "from `CourseReview` r<%= where %>\n" +
     "order by r.`ReviewDate` desc";
 
