@@ -144,16 +144,80 @@ exports.Payment = class Payment extends DbObject {
         })
     }
 
-    async _sendEmailPurchaseNotification(email, course_id, options) {
+    async _createStrikePromo(chequeObj) {
+        let result = {};
+        if (config.has("billing.strikePromo")) {
+            let opts = config.get("billing.strikePromo");
+            let promoService = this.getService("promo");
+            if (promoService && Array.isArray(opts.values) && (opts.values.length > 0)) {
+                let prefix = opts.prefix ? opts.prefix : "STP";
+                let key = opts.key ? opts.key : "STRIKE_PROMO";
+                let durationInHours = opts.durationInHours ? opts.durationInHours : 49;
+
+                let curr_idx = 0;
+                let promo_id = chequeObj.promoCodeId();
+                if (promo_id) {
+                    let promo = await promoService.get({ id: promo_id });
+                    if (promo.length === 1) {
+                        let data = promo[0];
+                        if (data.Description === key) {
+                            curr_idx = -1;
+                            for (let i = 0; i < opts.values.length; i++){
+                                if (data.Perc === opts.values[i]) {
+                                    curr_idx = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((curr_idx >= 0) && (curr_idx < opts.values.length)) {
+                    if ((PROMO_CODE_LENGTH - prefix.length) > 0) {
+                        let code = `${prefix}` +
+                            `${randomstring.generate({
+                                length: (PROMO_CODE_LENGTH - prefix.length),
+                                charset: "alphanumeric",
+                                capitalization: "uppercase"
+                            })}`;
+                        let first_date = new Date();
+                        let last_date = new Date(first_date);
+                        last_date.setHours(last_date.getHours() + durationInHours);
+                        let promo_data = {
+                            Code: code,
+                            Perc: opts.values[curr_idx],
+                            Counter: 1,
+                            Description: key,
+                            FirstDate: first_date,
+                            LastDate: last_date,
+                            IsVisible: false
+                        };
+
+                        let promo_res = await promoService.insert(promo_data, opts);
+                        result.promo = promo_res.Code;
+                        result.lvl = curr_idx + 1;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    async _sendEmailPurchaseNotification(dataObj, is_gift, course_id, options) {
         let result = null;
         try {
+            let email = typeof (dataObj) === "string" ? dataObj : dataObj.receiptEmail();
             if (config.has(`mail.${PURCHASE_MAIL_CFG_NAME}`)) {
                 let opts = options || {};
                 let dbOpts = opts.dbOpts ? opts.dbOpts : {};
                 let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
+                let params = { username: user_name };
+                if ((!is_gift) && (typeof (dataObj.promoCode) === "function")) {
+                    let promo_params = await this._createStrikePromo(dataObj);
+                    params = _.defaultsDeep(params, promo_params);
+                }
                 let courseService = this.getService("courses");
                 let { body, subject } = await courseService.courseMailData(course_id, PURCHASE_MAILING_PATH, {
-                    params: { username: user_name },
+                    params: params,
                     mailCfg: config.get(`mail.${PURCHASE_MAIL_CFG_NAME}`),
                     dbOpts: dbOpts
                 });
@@ -740,7 +804,7 @@ exports.Payment = class Payment extends DbObject {
                             if (!isRefund)
                                 for (let i = 0; i < paidCourses.length; i++) {
                                     // we shouldn't "await" here !!! we don't care about a result
-                                    self._sendEmailPurchaseNotification(chequeObj.receiptEmail(),
+                                    self._sendEmailPurchaseNotification(chequeObj, false,
                                         paidCourses[i], { userName: user.DisplayName, dbOpts: dbOpts });
                                 }
                         }
@@ -1022,7 +1086,7 @@ exports.Payment = class Payment extends DbObject {
                                 for (let i = 0; i < giftCourses.length; i++) {
                                     // we shouldn't "await" here !!! we don't care about a result
                                     this._sendEmailPurchaseNotification(data.Payment && data.Payment.email ? data.Payment.email : opts.user.Email,
-                                        giftCourses[i], { userName: opts.user.DisplayName, dbOpts: dbOpts });
+                                        true, giftCourses[i], { userName: opts.user.DisplayName, dbOpts: dbOpts });
                                 }
                             }
                         }

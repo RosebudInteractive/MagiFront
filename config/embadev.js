@@ -98,6 +98,12 @@ let options = {
             returnUrl: "/",
             payment_mode: "full_payment",
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
+        },
+        strikePromo: {
+            prefix: "STP",
+            key: "STRIKE_PROMO",
+            values: [20, 30],
+            durationInHours: 49
         }
     },
     authentication: {

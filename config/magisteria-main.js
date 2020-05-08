@@ -104,6 +104,12 @@ module.exports = {
             returnUrl: "/",
             payment_mode: "full_payment",
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
+        },
+        strikePromo: {
+            prefix: "STP",
+            key: "STRIKE_PROMO",
+            values: [20, 30, 35, 40, 45, 50],
+            durationInHours: 49
         }
     },
     authentication: {

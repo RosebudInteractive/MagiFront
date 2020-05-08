@@ -23,6 +23,12 @@ module.exports = {
             secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
             callBack: "/api/yandex-kassa/callback",
             returnUrl: "/"
+        },
+        strikePromo: {
+            prefix: "STP",
+            key: "STRIKE_PROMO",
+            values: [20, 30, 35, 40, 45, 50],
+            durationInHours: 49
         }
     },
     server: {
