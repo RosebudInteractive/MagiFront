@@ -5,12 +5,12 @@ import {STYLES} from "../../styles";
 import LinkedButton from "../common/linked-button";
 
 const DISCOUNT = [
-    {level: 1, value: 20, descr: "Хотим порадовать Вас скидкой! При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду"},
-    {level: 2, value: 30, descr: "Скидки растут! Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду"},
-    {level: 3, value: 35, descr: "Скидки не заканчиваются!  на  очередной курс, приобретенный сегодня  или завтра Вы получаете скидку 35% по промокоду"},
-    {level: 4, value: 40, descr: "Мы повышаем ставку! Теперь Вы получите скидку 40%, если купите один из  курсов Магистерии не позднее завтрашнего вечера - используйте промокод"},
+    {level: 1, value: 20, descr: "При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду"},
+    {level: 2, value: 30, descr: "Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду"},
+    {level: 3, value: 35, descr: "На очередной курс, приобретенный сегодня или завтра Вы получаете скидку 35% по промокоду"},
+    {level: 4, value: 40, descr: "Теперь Вы получите скидку 40%, если купите один из курсов Магистерии не позднее завтрашнего вечера - используйте промокод"},
     {level: 5, value: 45, descr: "А теперь скидка выросла еще на 5%. Купите в течение 2 дней еще 1 курс с дисконтом 45% по промокоду"},
-    {level: 6, value: 50, descr: "Вы достигли суперскидки  и можете купить любой наш курс в 2 раза дешевле,  используйте для этого ограниченный  по времени (2 суток) промокод"},
+    {level: 6, value: 50, descr: "Вы достигли суперскидки и можете купить любой наш курс в 2 раза дешевле, используйте для этого ограниченный по времени (2 суток) промокод"},
 ]
 
 
@@ -53,6 +53,15 @@ const STYLE = {
     },
     MOBILE: {
         DISCOUNT: {
+            TABLE: {
+                borderSpacing:0,
+                fontFamily: "arial,helvetica,sans-serif",
+                background: "#FFFFFF",
+                borderCollapse: "collapse",
+                margin: "0 auto",
+                border: "none",
+                msoHide: "all",
+            },
             PROMO: {
                 display: "block",
                 paddingTop: "9px",
@@ -113,7 +122,7 @@ export default class CourseDiscountBlock extends React.Component {
                         </tr>
                         <tr>
                             <td>
-                                <table style={STYLES.MAIN_TABLE} className="course-promo__value-mobile-row">
+                                <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
                                     <tbody style={{display: "block", paddingTop: "8px"}}>
                                         <tr style={{display: "block"}}>
                                             <td style={STYLE.DISCOUNT.PROMO_ROW}>
