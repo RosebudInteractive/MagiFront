@@ -27,6 +27,7 @@ import Toolbar from "../components/app/toolbar";
 import * as appActions from '../actions/app-actions'
 import './app.sass'
 import UserConfirmation from "../components/dialog/confirm";
+import ReviewsPage from "./lists/reviews";
 
 class App extends Component {
 
@@ -117,9 +118,9 @@ class App extends Component {
                             <Route path={_homePath + '/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
                             <Route path={_homePath + '/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
                             <Route path={_homePath + '/promos'} component={PromosPage}/>
-                            <Route path={_homePath + '/reviews/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
-                            <Route path={_homePath + '/reviews/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
-                            <Route path={_homePath + '/reviews'} component={PromosPage}/>
+                            <Route path={_homePath + '/reviews/new'} render={(props) => <ReviewsPage {...props} showEditor={true} editMode={false}/>}/>
+                            <Route path={_homePath + '/reviews/edit/:id'} render={(props) => <ReviewsPage {...props} showEditor={true} editMode={true}/>}/>
+                            <Route path={_homePath + '/reviews'} component={ReviewsPage}/>
                         </Switch>
                     </div>
                 </div>

@@ -223,8 +223,6 @@ function* editPromoRequestSaga(action) {
     if (_editorOpened) {
         const _hasChanges = yield select(isDirty('PromoEditor'))
 
-        console.log(_hasChanges)
-
         if (_hasChanges) {
             const _confirmed = yield call(confirmCloseEditorSaga);
 

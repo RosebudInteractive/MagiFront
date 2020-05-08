@@ -43,6 +43,7 @@ import messagesReducer, {moduleName as messagesModule} from '../ducks/messages'
 import testListReducer, {moduleName as testListModule} from '../ducks/test-list'
 import singleTestReducer, {moduleName as singleTestModule} from '../ducks/single-test'
 import courseVer2Reducer, {moduleName as courseVer2Module} from 'adm-ducks/course'
+import reviewsReducer, {moduleName as reviewsModule} from 'adm-ducks/reviews'
 import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
@@ -84,6 +85,7 @@ export default combineReducers({
     [testListModule]: testListReducer,
     [singleTestModule]: singleTestReducer,
     [courseVer2Module]: courseVer2Reducer,
+    [reviewsModule]: reviewsReducer,
     routing: routerReducer,
     form: formReducer,
 })
