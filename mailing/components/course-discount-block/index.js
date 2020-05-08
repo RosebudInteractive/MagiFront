@@ -60,7 +60,6 @@ const STYLE = {
                 borderCollapse: "collapse",
                 margin: "0 auto",
                 border: "none",
-                msoHide: "all",
             },
             PROMO: {
                 display: "block",
