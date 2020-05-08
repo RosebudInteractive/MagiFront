@@ -36,6 +36,15 @@ module.exports = {
         address: '0.0.0.0',
         port: 3000,
         corsEnabled: true,
+        prerender: {
+            usePrerender: true,
+            // useRedis: false,
+            // redisPrefix: "pg:",
+            // expInSec: 14 * 24 * 60 * 60,
+            // maxDevSec: 7 * 24 * 60 * 60,
+            // url: 'http://127.0.0.1:8000',
+            // logRequest: false
+        },
     },
     dbProvider: 'mssql',
     trace: {

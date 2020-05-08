@@ -5,7 +5,7 @@ import {STYLES} from "../../styles";
 import LinkedButton from "../common/linked-button";
 
 const DISCOUNT = [
-    {level: 1, value: 20, descr: "Хотим порадовать Вас скидкой!  При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду"},
+    {level: 1, value: 20, descr: "Хотим порадовать Вас скидкой! При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду"},
     {level: 2, value: 30, descr: "Скидки растут! Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду"},
     {level: 3, value: 35, descr: "Скидки не заканчиваются!  на  очередной курс, приобретенный сегодня  или завтра Вы получаете скидку 35% по промокоду"},
     {level: 4, value: 40, descr: "Мы повышаем ставку! Теперь Вы получите скидку 40%, если купите один из  курсов Магистерии не позднее завтрашнего вечера - используйте промокод"},
@@ -94,32 +94,40 @@ export default class CourseDiscountBlock extends React.Component {
                     <tbody style={STYLE.BODY}>
                         <tr>
                             <td className={"course-promo__descr-column"}>
-                                <tr style={STYLE.DISCOUNT.HEADER}>{`Получите скудку ${_discount.value}%`}</tr>
-                                <tr style={STYLE.DISCOUNT.DESCR}>{_discount.descr}</tr>
+                                <table style={STYLES.MAIN_TABLE}>
+                                    <tr style={STYLE.DISCOUNT.HEADER}>{`Получите скидку ${_discount.value}%`}</tr>
+                                    <tr style={STYLE.DISCOUNT.DESCR}>{_discount.descr}</tr>
+                                </table>
                             </td>
                             <td className={"course-promo__value-column"}>
-                                <tr>
-                                    <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                        <div style={STYLES.PROMO}>{_discount.promo}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
-                                </tr>
-                            </td>
-                        </tr>
-                        <table style={STYLES.MAIN_TABLE} className="course-promo__value-mobile-row">
-                            <tbody style={{display: "block", paddingTop: "8px"}}>
+                                <table style={STYLES.MAIN_TABLE}>
                                 <tr style={{display: "block"}}>
                                     <td style={STYLE.DISCOUNT.PROMO_ROW}>
                                         <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
                                     </td>
                                 </tr>
-                                <tr style={{display: "block"}}>
+                                <tr>
                                     <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
                                 </tr>
-                            </tbody>
-                        </table>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table style={STYLES.MAIN_TABLE} className="course-promo__value-mobile-row">
+                                    <tbody style={{display: "block", paddingTop: "8px"}}>
+                                        <tr style={{display: "block"}}>
+                                            <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                            </td>
+                                        </tr>
+                                        <tr style={{display: "block"}}>
+                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </td>
