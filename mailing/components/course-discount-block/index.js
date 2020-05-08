@@ -90,8 +90,12 @@ export default class CourseDiscountBlock extends React.Component {
                         <tr>
                             <td className={"course-promo__descr-column"}>
                                 <table style={STYLES.MAIN_TABLE}>
-                                    <tr style={STYLE.DISCOUNT.HEADER}>{`Получите скидку ${_discount.value}%`}</tr>
-                                    <tr style={STYLE.DISCOUNT.DESCR}>{_discount.descr}</tr>
+                                    <tr style={STYLE.DISCOUNT.HEADER}>
+                                        <td>{`Получите скидку ${_discount.value}%`}</td>
+                                    </tr>
+                                    <tr style={STYLE.DISCOUNT.DESCR}>
+                                        <td>{_discount.descr}</td>
+                                    </tr>
                                 </table>
                             </td>
                             <td className={"course-promo__value-column"}>
