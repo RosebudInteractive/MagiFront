@@ -7,11 +7,12 @@ import {STYLES} from "../styles";
 import Logo from "../components/common/logo";
 import CourseCover from "../components/common/course-cover";
 import Social from "../components/common/social";
+import CourseDiscountBlock from "../components/course-discount-block";
 
 const STYLE = {
     TEXT: {
         fontFamily: "Arial",
-        fontSize: "17px",
+        fontSize: "18px",
         lineHeight: "130%",
     },
 }
@@ -52,6 +53,7 @@ class PurchaseCourse extends React.Component {
                             </tr>
                             <tr><td style={STYLES.PARAGRAPH.COMMON}>Вы можете приступить к просмотру и чтению лекций в любое время.</td></tr>
                             <tr><td style={STYLE.TEXT}>Для просмотра авторизуйтесь на Магистерии под той учетной записью, в которой Вы оплатили этот курс.</td></tr>
+                            <CourseDiscountBlock search={this.props.location.search}/>
                             <tr>
                                 <td style={STYLES.PARAGRAPH.COMMON}>
                                     Доступ к курсу не ограничивается по времени. Вы можете изучать его в своем ритме, прерывать прослушивание в любом месте,

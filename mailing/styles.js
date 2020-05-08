@@ -49,15 +49,29 @@ export const STYLES = {
         COMMON: {
             paddingTop: "15px",
             fontFamily: "Arial",
-            fontSize: "17px",
+            fontSize: "18px",
             lineHeight: "130%",
         },
         LAST: {
             paddingTop: "15px",
             paddingBottom: "35px",
             fontFamily: "Arial",
-            fontSize: "17px",
+            fontSize: "18px",
             lineHeight: "130%",
         },
+    },
+
+    PROMO: {
+        display: "inline",
+        paddingTop: "9px",
+        paddingRight: "11px",
+        paddingBottom: "9px",
+        paddingLeft: "11px",
+        fontFamily: "Arial",
+        fontSize: "20px",
+        lineHeight: "130%",
+        fontWeight: "bold",
+        color: "#2B2B2B",
+        backgroundColor: "rgba(0, 0, 0, 0.05)"
     },
 }

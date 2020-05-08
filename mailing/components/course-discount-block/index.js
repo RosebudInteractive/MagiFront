@@ -1,0 +1,138 @@
+import React from "react"
+import PropTypes from 'prop-types'
+import "./course-discount-block.sass"
+import {STYLES} from "../../styles";
+import LinkedButton from "../common/linked-button";
+
+const DISCOUNT = [
+    {level: 1, value: 20, descr: "Хотим порадовать Вас скидкой!  При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду"},
+    {level: 2, value: 30, descr: "Скидки растут! Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду"},
+    {level: 3, value: 35, descr: "Скидки не заканчиваются!  на  очередной курс, приобретенный сегодня  или завтра Вы получаете скидку 35% по промокоду"},
+    {level: 4, value: 40, descr: "Мы повышаем ставку! Теперь Вы получите скидку 40%, если купите один из  курсов Магистерии не позднее завтрашнего вечера - используйте промокод"},
+    {level: 5, value: 45, descr: "А теперь скидка выросла еще на 5%. Купите в течение 2 дней еще 1 курс с дисконтом 45% по промокоду"},
+    {level: 6, value: 50, descr: "Вы достигли суперскидки  и можете купить любой наш курс в 2 раза дешевле,  используйте для этого ограниченный  по времени (2 суток) промокод"},
+]
+
+
+const STYLE = {
+    TABLE_ROW: {
+        paddingTop: "15px",
+        paddingBottom: "15px",
+    },
+    TABLE: {
+        border: "1px solid #C8684C",
+        borderRadius: "3px",
+        padding: "26px 24px",
+    },
+    HEADER: {
+        paddingTop: "18px",
+        fontFamily: "Arial",
+        fontSize: "18px",
+        lineHeight: "130%",
+        fontWeight: "bold",
+    },
+    DISCOUNT: {
+        HEADER: {
+            fontFamily: "Arial",
+            fontStyle: "normal",
+            fontWeight: "bold",
+            fontSize: "23px",
+            lineHeight: "130%",
+            color: "#2F2F2F",
+        },
+        DESCR: {
+            fontFamily: "Arial",
+            fontStyle: "normal",
+            fontWeight: "normal",
+            fontSize: "18px",
+            lineHeight: "130%",
+            color: "#000000",
+            paddingTop: "6px",
+        },
+        PROMO_ROW: {
+            paddingTop: "4px",
+            paddingBottom: "15px",
+            display: "block",
+            width: "100%"
+        }
+    },
+    MOBILE: {
+        DISCOUNT: {
+            PROMO: {
+                display: "block",
+                paddingTop: "9px",
+                paddingRight: "11px",
+                paddingBottom: "9px",
+                paddingLeft: "11px",
+                fontFamily: "Arial",
+                fontSize: "20px",
+                lineHeight: "130%",
+                fontWeight: "bold",
+                color: "#2B2B2B",
+                backgroundColor: "rgba(0, 0, 0, 0.05)",
+                textAlign: "center"
+            },
+        }
+    }
+
+}
+
+
+export default class CourseDiscountBlock extends React.Component {
+    static propTypes = {
+        search: PropTypes.string,
+    }
+
+    render() {
+        const _discount = this._getDiscount()
+
+        if (!_discount) return null
+
+        return <tr>
+            <td style={STYLE.TABLE_ROW}>
+                <table style={STYLE.TABLE}>
+                    <tbody style={STYLE.BODY}>
+                        <tr>
+                            <td className={"course-promo__descr-column"}>
+                                <tr style={STYLE.DISCOUNT.HEADER}>{`Получите скудку ${_discount.value}%`}</tr>
+                                <tr style={STYLE.DISCOUNT.DESCR}>{_discount.descr}</tr>
+                            </td>
+                            <td className={"course-promo__value-column"}>
+                                <tr>
+                                    <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                        <div style={STYLES.PROMO}>{_discount.promo}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                </tr>
+                            </td>
+                        </tr>
+                        <table style={STYLES.MAIN_TABLE} className="course-promo__value-mobile-row">
+                            <tbody style={{display: "block", paddingTop: "8px"}}>
+                                <tr style={{display: "block"}}>
+                                    <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                        <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                    </td>
+                                </tr>
+                                <tr style={{display: "block"}}>
+                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </tbody>
+                </table>
+            </td>
+            </tr>
+    }
+
+    _getDiscount() {
+        const _params = new URLSearchParams(this.props.search),
+            _promo = _params.get('promo'),
+            _level = _params.get('lvl'),
+            _discount = _level && DISCOUNT.find(item => item.level === +_level)
+
+        return _discount && {promo : _promo, value: _discount.value, descr: _discount.descr}
+    }
+}
+

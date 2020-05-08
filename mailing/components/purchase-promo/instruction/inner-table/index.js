@@ -37,19 +37,7 @@ const STYLE = {
             color: "#2B2B2B",
         },
     },
-    PROMO: {
-        display: "inline",
-        paddingTop: "9px",
-        paddingRight: "11px",
-        paddingBottom: "9px",
-        paddingLeft: "11px",
-        fontFamily: "Arial",
-        fontSize: "20px",
-        lineHeight: "130%",
-        fontWeight: "bold",
-        color: "#2B2B2B",
-        backgroundColor: "rgba(0, 0, 0, 0.05)"
-    }
+
 }
 
 export default class InstructionSteps extends React.Component {
@@ -69,7 +57,7 @@ export default class InstructionSteps extends React.Component {
                         <Row number={2} text={<React.Fragment>Зайти на страницу курса  <a target="_blank" href={this.props.URL} style={STYLES.LINK}>"{this.props.name}"</a></React.Fragment>}/>
                         <Row number={3} text={<React.Fragment>Нажать на кнопку <span style={{fontWeight: "bold"}}>Купить</span></React.Fragment>}/>
                         <Row number={4} text={'На форме выбора способа оплаты ввести в поле "промокод" следующий код:'}/>
-                        <Row text={<span style={STYLE.PROMO}>{this.props.promo}</span>}/>
+                        <Row text={<span style={STYLES.PROMO}>{this.props.promo}</span>}/>
                         <Row number={5} text={<React.Fragment>Нажать на кнопку <span style={{fontWeight: "bold"}}>Получить</span></React.Fragment>}/>
                     </tbody>
                 </table>
