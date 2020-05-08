@@ -19,11 +19,6 @@ const STYLE = {
         paddingTop: "15px",
         paddingBottom: "15px",
     },
-    TABLE: {
-        border: "1px solid #C8684C",
-        borderRadius: "3px",
-        padding: "26px 24px",
-    },
     HEADER: {
         paddingTop: "18px",
         fontFamily: "Arial",
@@ -90,7 +85,7 @@ export default class CourseDiscountBlock extends React.Component {
 
         return <tr>
             <td style={STYLE.TABLE_ROW}>
-                <table style={STYLE.TABLE}>
+                <table className="course-promo__table">
                     <tbody style={STYLE.BODY}>
                         <tr>
                             <td className={"course-promo__descr-column"}>
