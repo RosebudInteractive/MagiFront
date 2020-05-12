@@ -194,6 +194,7 @@ exports.Payment = class Payment extends DbObject {
 
                         let promo_res = await promoService.insert(promo_data, opts);
                         result.promo = promo_res.Code;
+                        result.subject = `Вы получили скидку ${promo_res.Perc}% на следующий курс`;
                         result.lvl = curr_idx + 1;
                     }
                 }
@@ -211,12 +212,17 @@ exports.Payment = class Payment extends DbObject {
                 let dbOpts = opts.dbOpts ? opts.dbOpts : {};
                 let user_name = opts.userName && (!validateEmail(opts.userName)) ? opts.userName : null;
                 let params = { username: user_name };
+                let subject;
                 if ((!is_gift) && (typeof (dataObj.promoCode) === "function")) {
                     let promo_params = await this._createStrikePromo(dataObj);
+                    if (promo_params.subject) {
+                        subject = promo_params.subject;
+                        delete promo_params.subject;
+                    }
                     params = _.defaultsDeep(params, promo_params);
                 }
                 let courseService = this.getService("courses");
-                let { body, subject } = await courseService.courseMailData(course_id, PURCHASE_MAILING_PATH, {
+                let { body, subject: crs_subject } = await courseService.courseMailData(course_id, PURCHASE_MAILING_PATH, {
                     params: params,
                     mailCfg: config.get(`mail.${PURCHASE_MAIL_CFG_NAME}`),
                     dbOpts: dbOpts
@@ -225,7 +231,7 @@ exports.Payment = class Payment extends DbObject {
                     disableUrlAccess: false,
                     from: config.mail[PURCHASE_MAIL_CFG_NAME].sender, // sender address
                     to: email, // list of receivers
-                    subject: subject, // Subject line
+                    subject: subject ? subject:crs_subject, // Subject line
                     html: body // html body
                 };
                 let mailResult = await SendMail(PURCHASE_MAIL_CFG_NAME, mailOptions);
