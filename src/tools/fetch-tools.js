@@ -73,9 +73,6 @@ export const parseJSON = (response) => {
 };
 
 export function* getErrorMessage(error) {
-
-    console.log(error)
-
     let _message
     if (error.response) {
         _message = yield handleJsonError(error)

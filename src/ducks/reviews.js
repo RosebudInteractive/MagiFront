@@ -8,7 +8,7 @@ import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select, race, take} from 'redux-saga/effects'
 import {confirmCloseEditorSaga, queryUserConfirmationSaga} from "adm-ducks/messages";
 import {GET_COURSES_FAIL, GET_COURSES_SUCCESS, getCourses} from "adm-ducks/course";
-import {isDirty, reset, change,} from "redux-form";
+import {isDirty, reset, change, startAsyncValidation} from "redux-form";
 import $ from "jquery";
 
 
@@ -71,8 +71,8 @@ const ReducerRecord = Record({
     editMode: true,
     selected: null,
     entries: new OrderedMap([]),
-    checkUserError: false,
-    userErrorMessage: null,
+    // checkUserError: false,
+    // userErrorMessage: null,
 })
 
 const ReviewRecord = Record({
@@ -128,8 +128,8 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLOSE_EDITOR:
             return state
                 .set('showEditor', false)
-                .set('checkUserError', false)
-                .set('userErrorMessage', null)
+                // .set('checkUserError', false)
+                // .set('userErrorMessage', null)
 
         case INSERT_REVIEW_START:
         case UPDATE_REVIEW_START:
@@ -146,16 +146,16 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_REVIEW_USER_EMAIL:
             return state.setIn(['entries', payload.reviewId, 'UserEmail'], payload.user)
 
-        case CHECK_USER_EMAIL_FAIL:
-            return state
-                .set('checkUserError', true)
-                .set('userErrorMessage', payload)
+        // case CHECK_USER_EMAIL_FAIL:
+        //     return state
+        //         .set('checkUserError', true)
+        //         .set('userErrorMessage', payload)
 
 
-        case CLEAR_CHECK_USER_ERROR:
-            return state
-                .set('checkUserError', false)
-                .set('userErrorMessage', null)
+        // case CLEAR_CHECK_USER_ERROR:
+        //     return state
+        //         .set('checkUserError', false)
+        //         .set('userErrorMessage', null)
 
         default:
             return state
@@ -185,8 +185,8 @@ export const reviewsSelector = createSelector(entriesSelector, (entries) => {
 export const showEditorSelector = createSelector(stateSelector, state => state.showEditor)
 export const editModeSelector = createSelector(stateSelector, state => state.editMode)
 export const selectedIdSelector = createSelector(stateSelector, state => state.selected)
-export const checkUserErrorSelector = createSelector(stateSelector, state => state.checkUserError)
-export const userErrorMessageSelector = createSelector(stateSelector, state => state.userErrorMessage)
+// export const checkUserErrorSelector = createSelector(stateSelector, state => state.checkUserError)
+// export const userErrorMessageSelector = createSelector(stateSelector, state => state.userErrorMessage)
 
 /**
  * Action Creators
@@ -195,13 +195,13 @@ export const getReviews = (params) => {
     return {type: GET_REVIEWS_REQUEST, payload: params}
 }
 
-export const checkUser = (data) => {
-    return {type: CHECK_USER_EMAIL_REQUEST, payload: data}
-}
+// export const checkUser = (data) => {
+//     return {type: CHECK_USER_EMAIL_REQUEST, payload: data}
+// }
 
-export const clearCheckUserError = () => {
-    return {type: CLEAR_CHECK_USER_ERROR}
-}
+// export const clearCheckUserError = () => {
+//     return {type: CLEAR_CHECK_USER_ERROR}
+// }
 
 export const createNewReview = (params) => {
     return {type: CREATE_NEW_REVIEW_REQUEST, payload: params}
@@ -489,8 +489,6 @@ function* checkUserSaga(data) {
             yield put({type: CHECK_USER_EMAIL_SUCCESS, payload: _userInfo})
             yield put(change('ReviewEditor', 'userId', _userInfo.Id))
 
-            console.log(_userInfo)
-
             if (_options.needUpdateUserName) {
                 yield put(change('ReviewEditor', 'userName', _userInfo.DisplayName))
             }
@@ -501,7 +499,7 @@ function* checkUserSaga(data) {
         switch (+error.status) {
             case 404 : {
                 yield put({type: CHECK_USER_EMAIL_FAIL, payload: USER_NOT_FOUND})
-                return 
+                break
             }
 
             default: {
@@ -509,6 +507,9 @@ function* checkUserSaga(data) {
                 yield put({type: CHECK_USER_EMAIL_FAIL, payload: _message})
             }
         }
+
+        yield put(startAsyncValidation('ReviewEditor', 'userEmail'))
+
     }
 
 }
@@ -543,4 +544,28 @@ const dataToEntries = (values, DataRecord) => {
         (acc, value) => acc.set(value.Id, new DataRecord(value)),
         new OrderedMap({})
     )
+}
+
+export const checkUser = (data) => {
+    return _getUserInfo(data)
+        .catch((error) => {
+            switch (+error.status) {
+                case 404 : {
+                    throw new Error(USER_NOT_FOUND)
+                }
+
+                default: {
+                    new Promise((resolve) => {
+                        if (error.response) {
+                            return handleJsonError(error)
+                        } else {
+                            resolve(error.message ? error.message : "unknown error")
+                        }
+                    })
+                        .then((message) => {
+                            throw new Error(message)
+                        })
+                }
+            }
+        })
 }

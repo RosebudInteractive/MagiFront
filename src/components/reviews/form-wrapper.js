@@ -6,7 +6,7 @@ import {
     reset,
     isDirty,
     getFormValues,
-    isValid, Field, formValueSelector,
+    isValid, Field, formValueSelector, change,
 } from 'redux-form'
 import '../common/form.sass'
 import BottomControls from "../bottom-contols/buttons";
@@ -24,13 +24,14 @@ import {
     closeEditor,
     raiseNotExistReviewError,
     checkUser,
-    clearCheckUserError,
-    checkUserErrorSelector,
-    userErrorMessageSelector
+    // clearCheckUserError,
+    // checkUserErrorSelector,
+    // userErrorMessageSelector
 
 } from "adm-ducks/reviews";
 import Select from "../common/select-control";
 import {coursesSelector} from "adm-ducks/course";
+import {put} from "@redux-saga/core/effects";
 
 const STATE_OPTIONS = [
     {id: 1, value: 'Опубликованный'},
@@ -107,7 +108,7 @@ class ReviewEditorForm extends React.Component {
                             <Field component={Select} name="courseId" label="Курс" placeholder="Выберите курс" options={this._getCourses()}/>
                             <Field component={Select} name="status" label="Состояние" placeholder="Выберите состояние" options={STATE_OPTIONS}/>
                             <Field component={Datepicker} name="reviewDate" label="Дата начала" showTime={false}/>
-                            <Field component={TextBox} name="userEmail" label="Email пользователя" placeholder="Введите email пользователя" onChange={::this._onEmailChange}/>
+                            <Field component={TextBox} name="userEmail" label="Email пользователя" placeholder="Введите email пользователя"/>
                             <Field component={TextBox} name="userName" label="Отображаемое имя" placeholder="Введите имя пользователя"/>
                             <Field component={TextBox} name="profileUrl" label="Ссылка на профиль" placeholder="Ссылка на профиль в любой соцсети"/>
 
@@ -124,26 +125,26 @@ class ReviewEditorForm extends React.Component {
         </div>
     }
 
-    _onEmailChange(e) {
-        const {checkUserError,} = this.props,
-            _value = e.target.value
-
-        if (checkUserError) {
-            this.props.clearCheckUserError()
-        }
-
-        if (this._changeUserTimer) {
-            clearTimeout(this._changeUserTimer)
-        }
-
-        this._changeUserTimer = setTimeout(() => {
-            if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(_value)) {
-                this.props.checkUser({email: e.target.value, needUpdateUserName: true})
-            } else {
-
-            }
-        }, 500)
-    }
+    // _onEmailChange(e) {
+    //     const {checkUserError,} = this.props,
+    //         _value = e.target.value
+    //
+    //     if (checkUserError) {
+    //         this.props.clearCheckUserError()
+    //     }
+    //
+    //     if (this._changeUserTimer) {
+    //         clearTimeout(this._changeUserTimer)
+    //     }
+    //
+    //     this._changeUserTimer = setTimeout(() => {
+    //         if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(_value)) {
+    //             this.props.checkUser({email: e.target.value, needUpdateUserName: true})
+    //         } else {
+    //
+    //         }
+    //     }, 500)
+    // }
 
     _getCourses() {
         let {courses} = this.props;
@@ -187,7 +188,7 @@ class ReviewEditorForm extends React.Component {
     }
 }
 
-const validate = (values, props) => {
+const validate = (values,) => {
 
     const errors = {}
 
@@ -203,8 +204,6 @@ const validate = (values, props) => {
         errors.userEmail = 'Значение не может быть пустым'
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.userEmail)) {
         errors.userEmail = 'Недопустимый email'
-    } else if (props.checkUserError) {
-        errors.userEmail = props.userErrorMessage
     }
 
     if (!values.review) {
@@ -218,9 +217,27 @@ const validate = (values, props) => {
     return errors
 }
 
+const asyncValidate = (values, dispacth,) => {
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.userEmail)) {
+        return Promise.reject({userEmail: 'Недопустимый email'})
+    } else {
+        return checkUser({email: values.userEmail})
+            .then((userInfo) => {
+                if (userInfo && userInfo.Id) {
+                    dispacth(change('ReviewEditor', 'userId', userInfo.Id))
+                    dispacth(change('ReviewEditor', 'userName', userInfo.DisplayName))
+                }
+            }).catch((error) => {
+                throw {userEmail: error.message}
+            })
+    }
+}
+
 let ReviewEditorWrapper = reduxForm({
     form: 'ReviewEditor',
     validate,
+    asyncValidate,
+    asyncChangeFields: ['userEmail'],
 })(ReviewEditorForm);
 
 const selector = formValueSelector('ReviewEditor')
@@ -237,8 +254,8 @@ function mapStateToProps(state) {
         reviews: reviewsSelector(state),
         reviewId: selectedIdSelector(state),
         editMode: editModeSelector(state),
-        checkUserError: checkUserErrorSelector(state),
-        userErrorMessage: userErrorMessageSelector(state),
+        // checkUserError: checkUserErrorSelector(state),
+        // userErrorMessage: userErrorMessageSelector(state),
 
         courses: coursesSelector(state),
     }
@@ -253,7 +270,7 @@ function mapDispatchToProps(dispatch) {
         showErrorDialog,
         raiseNotExistReviewError,
         checkUser,
-        clearCheckUserError,
+        // clearCheckUserError,
     }, dispatch);
 }
 
