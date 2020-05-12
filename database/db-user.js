@@ -905,11 +905,15 @@ const DbUser = class DbUser extends DbObject {
         let user;
         if (opts.id) {
             user = await this._usersCache.getUserInfoById(+opts.id);
+            if (!user)
+                throw new HttpError(HttpCode.ERR_NOT_FOUND, `User [id] = ${opts.id} not found.`);
         }
         else
             if (opts.email) {
                 let condition = { field: "Email", op: "=", value: opts.email }
                 user = await this._usersCache.getUserInfo(condition, false);
+                if (!user)
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND, `User [email] = "${opts.email}" not found.`);
             }
             else
                 throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid or missig parameters: ${JSON.stringify(opts)}.`);
