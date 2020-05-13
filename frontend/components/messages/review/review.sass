@@ -1,0 +1,84 @@
+@import "~tools/variables.sass"
+
+.review-window
+  .modal__header
+    min-height: auto
+    padding: 0
+    margin-bottom: 20px
+    @media(max-width: 767px)
+      margin-bottom: 15px
+
+  .form__field, .form__message
+    border-radius: 3px
+
+  .form__field.name
+    margin-bottom: 20px
+    @media(max-width: 767px)
+      margin-bottom: 12px
+
+  .letters-counter
+    color: #000000
+    margin: 10px 0 24px
+    font-weight: normal
+    &._warning
+      font-weight: bold
+      color: red
+    @media(max-width: 767px)
+      margin-bottom: 15px
+
+
+  .social-network__hint
+    color: #000000
+    font-weight: bold
+    margin-bottom: 14px
+
+  .submit-button__block
+    .warning
+      color: $color-dark-06
+
+  .btn--brown.disabled
+    background-color: rgba(47, 47, 47, .08)
+
+
+.modal.review-window
+  margin-top: auto
+  @media (max-width: 767px)
+    padding: 20px 15px 12px
+  .modal-form
+    max-width: 100%
+
+  .modal__close
+    position: absolute
+    top: -24px
+    right: -24px
+
+.review-result__message
+  position: relative
+  max-width: 750px
+  display: flex
+  flex-direction: column
+  align-items: center
+
+  .svg-header
+    margin-top: 137px
+    display: flex
+
+  .message
+    margin: 32px 5% 76px
+    text-align: center
+    @media (max-width: $mobile-phone-width)
+      margin-bottom: 138px
+
+  .button
+    max-width: 194px
+    padding: 16px 10px
+    width: -webkit-fill-available
+    margin-bottom: 138px
+    @media (max-width: $mobile-phone-width)
+      margin-bottom: 0
+
+
+.modal.review-result__message
+  margin-top: auto
+  @media (max-width: $mobile-phone-width)
+    padding: 0 16px 21px

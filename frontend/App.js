@@ -63,6 +63,8 @@ import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
 import {callbackPayment} from "./tools/payments-checker"
 import "./tools/fonts.sass"
 import "./tools/system.sass"
+import ReviewWindow from "./components/messages/review";
+import ReviewResultMessage from "./components/messages/review/result-message";
 
 Polyfill.registry();
 
@@ -350,6 +352,8 @@ class App extends Component {
                 {showSizeInfo ? <SizeInfo/> : null}
                 {showFeedbackWindow ? <FeedbackMessageBox/> : null}
                 {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
+                <ReviewWindow/>
+                <ReviewResultMessage/>
                 <BillingWrapper/>
                 <CoursePaymentWrapper/>
                 <CookiesMessage/>

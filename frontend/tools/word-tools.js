@@ -18,6 +18,10 @@ export const getCountSubsTitle = (count) => {
     return getCounterTitle(count, {single: 'доп.эпизод', twice: 'доп.эпизода', many: 'доп.эпизодов'})
 }
 
+export const getCountSimbolsTitle = (count) => {
+    return getCounterTitle(count, {single: 'символ', twice: 'символа', many: 'символов'})
+}
+
 const getCounterTitle = (count, {single, twice, many}) => {
     switch (count % 10) {
         case 1: {
