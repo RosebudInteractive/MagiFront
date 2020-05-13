@@ -1077,6 +1077,7 @@ const DbTest = class DbTest extends DbObject {
 
         for (let i = 0; i < testInstanse.Questions.length; i++)
             testInstanse.MaxScore += testInstanse.Questions[i].Score ? testInstanse.Questions[i].Score : 1;
+        testInstanse.MaxScore *= 10;
         
         let metod_result = { result: "OK", test: testInstanse };
         if (!user_id) {
