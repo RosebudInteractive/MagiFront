@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import {SocialBlock} from "./social-block";
  import GiftButton from "../../../billing/gift-button";
  import BillingBlock from "./billing-block";
+ import ReviewButton from "./review-button";
 
 const FIXED_BLOCK_MARGIN_TOP = 58
 
@@ -116,7 +117,10 @@ class Statistic extends React.Component {
                 {
                     _isBought ?
                         <React.Fragment>
-                            <GiftButton course={course} alwaysVisible={true}/>
+                            <div className="bought-course__buttons-block">
+                                <ReviewButton course={course}/>
+                                <GiftButton course={course} alwaysVisible={true}/>
+                            </div>
                             <div className="statistic__play-block">
                                 <div className="play-block__wrapper">
                                     <PlayBlock course={course} lesson={_lastListenedLesson} cover={_cover} isAdmin={isAdmin}/>

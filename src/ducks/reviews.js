@@ -6,9 +6,9 @@ import 'whatwg-fetch';
 import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select, race, take} from 'redux-saga/effects'
-import {CANCEL_RESULT, CONFIRM_RESULT, confirmCloseEditorSaga, queryUserConfirmationSaga} from "adm-ducks/messages";
+import {confirmCloseEditorSaga, queryUserConfirmationSaga} from "adm-ducks/messages";
 import {GET_COURSES_FAIL, GET_COURSES_SUCCESS, getCourses} from "adm-ducks/course";
-import {isDirty, reset} from "redux-form";
+import {isDirty, reset, change, startAsyncValidation} from "redux-form";
 import $ from "jquery";
 
 
@@ -48,6 +48,12 @@ const SHOW_EDITOR = `${prefix}/SHOW_EDITOR`
 const CLOSE_EDITOR_REQUEST = `${prefix}/CLOSE_EDITOR_REQUEST`
 const CLOSE_EDITOR = `${prefix}/CLOSE_EDITOR`
 
+const CHECK_USER_EMAIL_REQUEST = `${prefix}/CHECK_USER_EMAIL_REQUEST`
+const CHECK_USER_EMAIL_START = `${prefix}/CHECK_USER_EMAIL_START`
+const CHECK_USER_EMAIL_SUCCESS = `${prefix}/CHECK_USER_EMAIL_SUCCESS`
+const CHECK_USER_EMAIL_FAIL = `${prefix}/CHECK_USER_EMAIL_FAIL`
+
+const CLEAR_CHECK_USER_ERROR = `${prefix}/CLEAR_CHECK_USER_ERROR`
 const SET_REVIEW_USER_EMAIL = `${prefix}/SET_REVIEW_USER_EMAIL`
 
 const RAISE_ERROR_REQUEST = `${prefix}/RAISE_ERROR_REQUEST`
@@ -64,7 +70,9 @@ const ReducerRecord = Record({
     showEditor: false,
     editMode: true,
     selected: null,
-    entries: new OrderedMap([])
+    entries: new OrderedMap([]),
+    // checkUserError: false,
+    // userErrorMessage: null,
 })
 
 const ReviewRecord = Record({
@@ -74,7 +82,7 @@ const ReviewRecord = Record({
     Status: null,
     ReviewDate: null,
     UserId: null,
-    User: null,
+    UserEmail: null,
     UserName: null,
     ProfileUrl: null,
     Review: null,
@@ -118,7 +126,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('showEditor', true)
 
         case CLOSE_EDITOR:
-            return state.set('showEditor', false)
+            return state
+                .set('showEditor', false)
+                // .set('checkUserError', false)
+                // .set('userErrorMessage', null)
 
         case INSERT_REVIEW_START:
         case UPDATE_REVIEW_START:
@@ -133,7 +144,18 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('loading', false)
 
         case SET_REVIEW_USER_EMAIL:
-            return state.setIn(['entries', payload.reviewId, 'User'], payload.user)
+            return state.setIn(['entries', payload.reviewId, 'UserEmail'], payload.user)
+
+        // case CHECK_USER_EMAIL_FAIL:
+        //     return state
+        //         .set('checkUserError', true)
+        //         .set('userErrorMessage', payload)
+
+
+        // case CLEAR_CHECK_USER_ERROR:
+        //     return state
+        //         .set('checkUserError', false)
+        //         .set('userErrorMessage', null)
 
         default:
             return state
@@ -163,6 +185,8 @@ export const reviewsSelector = createSelector(entriesSelector, (entries) => {
 export const showEditorSelector = createSelector(stateSelector, state => state.showEditor)
 export const editModeSelector = createSelector(stateSelector, state => state.editMode)
 export const selectedIdSelector = createSelector(stateSelector, state => state.selected)
+// export const checkUserErrorSelector = createSelector(stateSelector, state => state.checkUserError)
+// export const userErrorMessageSelector = createSelector(stateSelector, state => state.userErrorMessage)
 
 /**
  * Action Creators
@@ -170,6 +194,14 @@ export const selectedIdSelector = createSelector(stateSelector, state => state.s
 export const getReviews = (params) => {
     return {type: GET_REVIEWS_REQUEST, payload: params}
 }
+
+// export const checkUser = (data) => {
+//     return {type: CHECK_USER_EMAIL_REQUEST, payload: data}
+// }
+
+// export const clearCheckUserError = () => {
+//     return {type: CLEAR_CHECK_USER_ERROR}
+// }
 
 export const createNewReview = (params) => {
     return {type: CREATE_NEW_REVIEW_REQUEST, payload: params}
@@ -273,10 +305,25 @@ function* editReviewRequestSaga(action) {
 
 function* editReviewSaga(data) {
     const {reviewId,} = data,
-        _reviews = yield select(entriesSelector),
+        _loaded = yield select(loadedSelector)
+
+    let _needLoadUserInfo = false
+
+    if (!_loaded) {
+        const {success} = yield race({
+            success: take(GET_REVIEWS_SUCCESS),
+            fail: take(GET_REVIEWS_FAIL)
+        })
+
+        _needLoadUserInfo = !!success
+    } else {
+        _needLoadUserInfo = true
+    }
+
+    const _reviews = yield select(entriesSelector),
         _selectedReview = _reviews.get(reviewId)
 
-    if (_selectedReview && !_selectedReview.User) {
+    if (_needLoadUserInfo && _selectedReview && !_selectedReview.UserEmail) {
         const _userInfo = yield _getUserInfo({id: _selectedReview.UserId})
 
         if (_userInfo && _userInfo.Email) {
@@ -295,19 +342,14 @@ function* insertReviewSaga(action) {
     yield put({type: INSERT_REVIEW_START})
 
     try {
-        let _data = {...action.payload},
-            _userInfo = yield _getUserInfo({email: _data.user})
-
-        if (!_userInfo || !_userInfo.Id) {
-            throw new Error(USER_NOT_FOUND)
-        }
+        let _data = {...action.payload}
 
         let _payload = {
             Title: _data.title,
             CourseId: _data.courseId,
             Status: _data.status,
             ReviewDate: _data.reviewDate,
-            UserId: _userInfo.Id,
+            UserId: _data.userId,
             UserName: _data.userName,
             ProfileUrl: _data.profileUrl,
             Review: _data.review,
@@ -348,12 +390,7 @@ function* updateReviewSaga(action) {
     yield put({type: UPDATE_REVIEW_START})
 
     try {
-        let _data = {...action.payload},
-            _userInfo = yield _getUserInfo({email: _data.user})
-
-        if (!_userInfo || !_userInfo.Id) {
-            throw new Error(USER_NOT_FOUND)
-        }
+        let _data = {...action.payload}
 
         let _payload = {
             Id: _data.Id,
@@ -361,7 +398,7 @@ function* updateReviewSaga(action) {
             CourseId: _data.courseId,
             Status: _data.status,
             ReviewDate: _data.reviewDate,
-            UserId: _userInfo.Id,
+            UserId: _data.userId,
             UserName: _data.userName,
             ProfileUrl: _data.profileUrl,
             Review: _data.review,
@@ -394,16 +431,6 @@ const _putPromo = (data) => {
         body: JSON.stringify(data),
         credentials: 'include'
     })
-        .then(checkStatus)
-        .then(parseJSON)
-}
-
-const _getUserInfo = (user) => {
-    const _params = $.param(user)
-
-    const _url = '/api/adm/users/info' + (_params ? `?${_params}` : "")
-
-    return fetch(_url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -447,6 +474,56 @@ function* raiseNotExistBookErrorSaga() {
     yield put({type: SHOW_ERROR_DIALOG, payload: NOT_EXIST_REVIEW_ERROR})
 }
 
+function* checkUserSaga(data) {
+    yield put({type: CHECK_USER_EMAIL_START})
+    try {
+        let _options = data.payload,
+            _user = {}
+
+        if (_options.id) { _user.id = _options.id }
+        if (_options.email) { _user.email = _options.email }
+
+        const _userInfo = yield _getUserInfo(_user)
+
+        if (_userInfo && _userInfo.Id) {
+            yield put({type: CHECK_USER_EMAIL_SUCCESS, payload: _userInfo})
+            yield put(change('ReviewEditor', 'userId', _userInfo.Id))
+
+            if (_options.needUpdateUserName) {
+                yield put(change('ReviewEditor', 'userName', _userInfo.DisplayName))
+            }
+        } else {
+            yield put({type: CHECK_USER_EMAIL_FAIL, payload: USER_NOT_FOUND})
+        }
+    } catch (error) {
+        switch (+error.status) {
+            case 404 : {
+                yield put({type: CHECK_USER_EMAIL_FAIL, payload: USER_NOT_FOUND})
+                break
+            }
+
+            default: {
+                const _message = yield call(getErrorMessage, error)
+                yield put({type: CHECK_USER_EMAIL_FAIL, payload: _message})
+            }
+        }
+
+        yield put(startAsyncValidation('ReviewEditor', 'userEmail'))
+
+    }
+
+}
+
+const _getUserInfo = (user) => {
+    const _params = $.param(user)
+
+    const _url = '/api/adm/users/info' + (_params ? `?${_params}` : "")
+
+    return fetch(_url, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_REVIEWS_REQUEST, getReviewsSaga),
@@ -457,7 +534,7 @@ export const saga = function* () {
         takeEvery(DELETE_REVIEW_REQUEST, deleteReviewSaga),
         takeEvery(RAISE_ERROR_REQUEST, raiseNotExistBookErrorSaga),
         takeEvery(CLOSE_EDITOR_REQUEST, closeEditorSaga),
-
+        takeEvery(CHECK_USER_EMAIL_REQUEST, checkUserSaga),
     ])
 }
 
@@ -467,4 +544,28 @@ const dataToEntries = (values, DataRecord) => {
         (acc, value) => acc.set(value.Id, new DataRecord(value)),
         new OrderedMap({})
     )
+}
+
+export const checkUser = (data) => {
+    return _getUserInfo(data)
+        .catch((error) => {
+            switch (+error.status) {
+                case 404 : {
+                    throw new Error(USER_NOT_FOUND)
+                }
+
+                default: {
+                    new Promise((resolve) => {
+                        if (error.response) {
+                            return handleJsonError(error)
+                        } else {
+                            resolve(error.message ? error.message : "unknown error")
+                        }
+                    })
+                        .then((message) => {
+                            throw new Error(message)
+                        })
+                }
+            }
+        })
 }

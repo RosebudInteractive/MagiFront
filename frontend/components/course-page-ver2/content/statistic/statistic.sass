@@ -176,3 +176,27 @@
 
   .svg-loader circle
     stroke-width: 6px
+
+  .bought-course__buttons-block
+    position: relative
+    display: flex
+    flex-direction: column
+    @media (max-width: $tablet-width)
+      flex-direction: row
+
+      div
+        margin: 0
+        flex: 1 1 50%
+
+      div:first-child:not(:only-child)
+        margin-right: 10px
+
+      div:nth-child(2)
+        margin-left: 10px
+
+    @media (max-width: $mobile-phone-width)
+      div:first-child:not(:only-child)
+        margin-right: 4px
+
+      div:nth-child(2)
+        margin-left: 4px

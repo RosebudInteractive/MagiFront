@@ -8,6 +8,7 @@ import Books from "../../../books";
 import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
 import VideoBlock from "./video-block";
 import MoreCourses from "./more-courses";
+import Reviews from "./reviews";
 
 export default class CourseWrapper extends React.Component {
 
@@ -55,6 +56,7 @@ export default class CourseWrapper extends React.Component {
                         {this.state.showMore ? " ↑ " : " ↓ "}
                     </div>
             }
+            <Reviews reviews={course.Reviews}/>
             <Scheme course={course}/>
             <Books books={this.props.course.Books}
                    titleClassName={"course-wrapper__title"}
