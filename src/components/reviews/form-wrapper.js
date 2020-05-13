@@ -192,10 +192,6 @@ const validate = (values,) => {
 
     const errors = {}
 
-    if (!values.title) {
-        errors.title = 'Значение не может быть пустым'
-    }
-
     if (!values.courseId) {
         errors.courseId = 'Значение не может быть пустым'
     }
