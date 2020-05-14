@@ -4,10 +4,11 @@
   margin-left: 17px
   margin-top: 8px
   color: #666
-  &__editor-wrapper
-    width: calc(100% - 240px)
+
+  .field-wrapper__editor-wrapper
     display: flex
     flex-direction: column
+    flex: 1 1 auto
 
 .grid-label
   font-family: 'PT Sans',Tahoma
@@ -29,7 +30,7 @@
 
 .field-label
   font-family: 'PT Sans',Tahoma
-  width: 240px
+  min-width: 240px
   font-size: 15px
   text-align: left
   line-height: 32px

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Recaptcha from './g-recaptcha';
 import {connect} from "react-redux";
-import {reCaptureSelector} from "../../ducks/app";
+import {reCaptureSelector} from "adm-ducks/app";
 
 let recaptchaInstance;
 

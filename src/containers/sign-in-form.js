@@ -48,7 +48,7 @@ let SignInForm = class SignInForm extends React.Component {
         if (values.login && values.password) {
             this.setState({
                 login: values.login,
-                    password: values.password,
+                password: values.password,
             })
             this.recaptcha.execute();
         } else {

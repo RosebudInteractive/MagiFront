@@ -105,7 +105,7 @@ class ReviewsPage extends React.Component {
         const {
             loading,
             loaded,
-            deleteDlgShown,
+            // deleteDlgShown,
             showReviewEditor,
         } = this.props;
 
@@ -121,7 +121,7 @@ class ReviewsPage extends React.Component {
                         />
                         <button
                             className={'tool-btn delete' + (this._selected === null ? " disabled" : "")}
-                            onClick={::this._confirmDelete}
+                            onClick={::this._onDeleteReview}
                             disabled={(this._selected === null)}
                         />
                     </div>
@@ -131,16 +131,16 @@ class ReviewsPage extends React.Component {
                         </div>
                     </div>
                 </div>
-                {
-                    (deleteDlgShown && !showReviewEditor)?
-                        <YesNoDialog
-                            yesAction={::this._deleteReview}
-                            noAction={::this._cancelDelete}
-                            message={"Удалить отзыв" + this._getSelectedReviewDescr() + "?"}
-                        />
-                        :
-                        null
-                }
+                {/*{*/}
+                {/*    (deleteDlgShown && !showReviewEditor)?*/}
+                {/*        <YesNoDialog*/}
+                {/*            yesAction={::this._deleteReview}*/}
+                {/*            noAction={::this._cancelDelete}*/}
+                {/*            message={"Удалить отзыв" + this._getSelectedReviewDescr() + "?"}*/}
+                {/*        />*/}
+                {/*        :*/}
+                {/*        null*/}
+                {/*}*/}
                 { !showReviewEditor ? <ErrorDialog/> : null }
                 <ReviewEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}
                              onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
@@ -153,17 +153,24 @@ class ReviewsPage extends React.Component {
         this.props.editReview(this._selected);
     }
 
-    _deleteReview() {
-        this.props.deleteReview(this._selected)
+    _onDeleteReview() {
+        if (this._selected) {
+            const _review = this.props.reviews.find((item) => {
+                return item.id === this._selected
+            })
+
+            this.props.deleteReview(_review)
+        }
+
     }
 
     _confirmDelete() {
         this.props.showDeleteConfirmation()
     }
 
-    _cancelDelete() {
-        this.props.cancelDelete()
-    }
+    // _cancelDelete() {
+    //     this.props.cancelDelete()
+    // }
 
     _onEditPrev() {
         const _index = this.props.reviews.findIndex((item) => {
@@ -195,17 +202,17 @@ class ReviewsPage extends React.Component {
         })
     }
 
-    _getSelectedReviewDescr() {
-        let _review = null;
-
-        if (this._selected) {
-            _review = this.props.reviews.find((item) => {
-                return item.id === this._selected
-            })
-        }
-
-        return _review ? ` пользователя "${_review.UserName}"` : ''
-    }
+    // _getSelectedReviewDescr() {
+    //     let _review = null;
+    //
+    //     if (this._selected) {
+    //         _review = this.props.reviews.find((item) => {
+    //             return item.id === this._selected
+    //         })
+    //     }
+    //
+    //     return _review ? ` пользователя "${_review.UserName}"` : ''
+    // }
 
     _getCourses() {
         let {courses} = this.props;

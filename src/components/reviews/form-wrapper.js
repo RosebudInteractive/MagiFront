@@ -198,9 +198,7 @@ const validate = (values,) => {
 
     if (!values.userEmail) {
         errors.userEmail = 'Значение не может быть пустым'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.userEmail)) {
-        errors.userEmail = 'Недопустимый email'
-    }
+    } 
 
     if (!values.review) {
         errors.review = 'Значение не может быть пустым'
@@ -215,7 +213,7 @@ const validate = (values,) => {
 
 const asyncValidate = (values, dispacth,) => {
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.userEmail)) {
-        return Promise.reject({userEmail: 'Недопустимый email'})
+        return new Promise(() => {throw {userEmail: 'Недопустимый email'}})
     } else {
         return checkUser({email: values.userEmail})
             .then((userInfo) => {

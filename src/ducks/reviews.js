@@ -436,8 +436,7 @@ const _putPromo = (data) => {
 }
 
 function* deleteReviewSaga(data) {
-
-    const _confirmed = yield queryUserConfirmationSaga(`Удалить отзыв "${data.payload.Name}"?`)
+    const _confirmed = yield queryUserConfirmationSaga(`Удалить отзыв пользователя "${data.payload.UserName}"?`)
 
     if (_confirmed) {
         yield put({type: DELETE_REVIEW_START})
@@ -455,7 +454,7 @@ function* deleteReviewSaga(data) {
 }
 
 const _deleteReview = (id) => {
-    return fetch(`/api/adm/tests/${id}`,
+    return fetch(`/api/adm/reviews/${id}`,
         {
             method: "DELETE",
             credentials: 'include'
