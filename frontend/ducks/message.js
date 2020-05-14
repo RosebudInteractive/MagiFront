@@ -65,6 +65,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     switch (type) {
         case MAIL_SUBSCRIBE_START:
         case SEND_FEEDBACK_START:
+        case SEND_REVIEW_START:
             return state
                 .set('error', null)
                 .set('fetching', true)
@@ -80,9 +81,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case MAIL_SUBSCRIBE_SUCCESS:
             return state
                 .set('fetching', false)
-                // .set('showFeedbackWindow', false)
-                // .set('showFeedbackResultMessage', true)
-                // .set('successMessage', 'Подписка успешно добавлена')
 
         case MAIL_SUBSCRIBE_ERROR:
         case SEND_FEEDBACK_ERROR:
@@ -292,6 +290,9 @@ function* sendReviewSaga(data) {
 
         _fields.CourseId = yield select(reviewCourseIdSelector)
         yield call(_postReview, _fields)
+
+
+
         yield put({type: SEND_REVIEW_SUCCESS})
     } catch (error) {
         yield put({type: SEND_REVIEW_FAIL, payload: {error}});
@@ -299,7 +300,7 @@ function* sendReviewSaga(data) {
 }
 
 const _postReview = (values) => {
-    fetch('/api/reviews', {
+    return fetch('/api/reviews', {
         method: 'POST',
         headers: {
             "Content-type": "application/json"

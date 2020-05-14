@@ -5,6 +5,8 @@ import {hideReviewWindow, sendReview, loadingSelector, showReviewWindowSelector}
 import Platform from "platform";
 import "./review.sass"
 import {getCountSimbolsTitle} from "tools/word-tools";
+import Recaptcha from "react-google-invisible-recaptcha";
+import {reCaptureSelector} from "ducks/app";
 
 const MAX_REVIEW_LENGTH = 600
 
@@ -18,7 +20,7 @@ class ReviewWindow extends React.Component {
     componentDidMount() {
         if (this.props.user) {
             this.setState({
-                sender: this.props.user.Email
+                sender: this.props.user.DisplayName
             })
         }
     }
@@ -26,19 +28,6 @@ class ReviewWindow extends React.Component {
     _close() {
         this.props.close()
     }
-
-    _handleSubmit() {
-        if (this._isSendingEnable()) {
-
-            this.props.send({
-                UserId: this.props.user.Id,
-                UserName: this.state.sender,
-                Review: this.state.message,
-                ProfileUrl: this.state.profile
-            })
-        }
-    }
-
 
     _changeMessage(e) {
         let _message = e.target.value,
@@ -73,7 +62,7 @@ class ReviewWindow extends React.Component {
         if (!this.props.visible && next.visible) {
             let _state = this._getInitState()
 
-            _state.sender = next.user && next.user.Email,
+            _state.sender = next.user && next.user.DisplayName,
             this.setState(_state)
         }
     }
@@ -94,6 +83,9 @@ class ReviewWindow extends React.Component {
         const _isIE = Platform.name === 'IE',
             _className = "modal-overlay modal-wrapper js-modal-wrapper" + (_isIE ? ' ms-based' : '')
 
+        const _captchaError = this.state.captchaError &&
+            <p className="form__error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
+
         return <div className={_className} data-name="donation">
             <div className="review-window modal">
                 <button type="button" className="modal__close js-modal-close" onClick={::this._close}>Закрыть</button>
@@ -106,21 +98,62 @@ class ReviewWindow extends React.Component {
                                placeholder="Ваше имя" defaultValue={user ? user.DisplayName : ''}/>
 
                         <textarea onChange={::this._changeMessage} onPaste={::this._pasteHandler} name="message" id="message" className="form__message font-universal__body-medium"
-                                  placeholder="Ваше сообщение"/>
+                                  placeholder="Ваш отзыв"/>
 
                         <div className={"letters-counter font-universal__body-small" + (!this.state.count ? " _warning" : "")}>{_counterText}</div>
-                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль в любой соцсети (необязательно)</div>
-                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="www.facebook.com/user/..."/>
-
+                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль</div>
+                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль"/>
+                        <Recaptcha
+                            ref={ ref => this.recaptcha = ref }
+                            sitekey={this.props.reCapture}
+                            onResolved={ ::this._onCaptchaResolved }
+                            onError={::this._onCaptchaError}/>
+                        {_captchaError}
 
                         <div className="modal-form__row submit-button__block">
-                            <div className="warning font-universal__body-small">Все отзывы проходят модерацию. Редакция оставляет за собой право  не публиковать отзыв без объяснения причин</div>
-                            <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} onClick={::this._handleSubmit}>Отправить сообщение</button>
+                            <div className="warning font-universal__body-small">Все отзывы проходят модерацию. Редакция оставляет за собой право  не публиковать отзыв без объяснения причин.</div>
+                            <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} onClick={::this._handleSubmit}>Отправить отзыв</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    }
+
+    _handleSubmit() {
+        if (this._isSendingEnable()) {
+
+            if (this.state.captchaError) {
+                this.recaptcha.reset();
+
+                this.setState({
+                    captchaError: false,
+                    captchaReloading: true
+                })
+            }
+
+            this.recaptcha.execute();
+        }
+    }
+
+    _onCaptchaResolved() {
+        this.setState({
+            captchaError: false,
+            captchaReloading: false
+        })
+
+        this.props.send({
+            UserId: this.props.user.Id,
+            UserName: this.state.sender,
+            Review: this.state.message,
+            ProfileUrl: this.state.profile
+        })
+    }
+
+    _onCaptchaError() {
+        this.setState({
+            captchaError: true
+        })
     }
 
     _pasteHandler(e) {
@@ -149,11 +182,14 @@ class ReviewWindow extends React.Component {
     }
 
     _getInitState() {
-         return {
+        return {
             message: null,
             sender: null,
             profile: null,
-            count: MAX_REVIEW_LENGTH
+            count: MAX_REVIEW_LENGTH,
+            captcha: null,
+            captchaError: false,
+            captchaReloading: false
         }
     }
 }
@@ -162,6 +198,7 @@ function mapStateToProps(state) {
     return {
         visible: showReviewWindowSelector(state),
         loading: loadingSelector(state),
+        reCapture: reCaptureSelector(state),
         user: state.user.user
     }
 }
