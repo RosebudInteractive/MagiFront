@@ -75,7 +75,11 @@ class ReviewWindow extends React.Component {
         let _disabledBtn = !this._isSendingEnable(),
             _counterText = this.state.count > 0
                 ?
-                `не более ${this.state.count} ${getCountSimbolsTitle(this.state.count)}`
+                this.state.count === MAX_REVIEW_LENGTH
+                    ?
+                    `не более ${this.state.count} ${getCountSimbolsTitle(this.state.count)}`
+                        :
+                    `осталось ${this.state.count} ${getCountSimbolsTitle(this.state.count)}`
                 :
                 "Вы достигли максимального размера отзыва"
 
@@ -101,7 +105,7 @@ class ReviewWindow extends React.Component {
                                   placeholder="Ваш отзыв"/>
 
                         <div className={"letters-counter font-universal__body-small" + (!this.state.count ? " _warning" : "")}>{_counterText}</div>
-                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль</div>
+                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль в одной из социальных сетей</div>
                         <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль"/>
                         <Recaptcha
                             ref={ ref => this.recaptcha = ref }

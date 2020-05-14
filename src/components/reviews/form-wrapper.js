@@ -198,7 +198,7 @@ const validate = (values,) => {
 
     if (!values.userEmail) {
         errors.userEmail = 'Значение не может быть пустым'
-    } 
+    }
 
     if (!values.review) {
         errors.review = 'Значение не может быть пустым'
