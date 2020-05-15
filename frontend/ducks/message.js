@@ -1,7 +1,7 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record} from 'immutable'
-import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/effects";
+import {all, call, put, takeEvery, select,} from "@redux-saga/core/effects";
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {reset} from "redux-form";
@@ -48,8 +48,6 @@ const ReviewRecord = Record({
 export const ReducerRecord = Record({
     showFeedbackWindow: false,
     showFeedbackResultMessage: false,
-    // showReviewWindow: false,
-    // showReviewResultMessage: false,
     review: new ReviewRecord(),
     fetching: false,
     successMessage: null,

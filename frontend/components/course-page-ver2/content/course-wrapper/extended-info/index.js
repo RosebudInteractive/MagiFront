@@ -4,6 +4,7 @@ import './extended-info.sass'
 import AuthorsBlock from "./authors-block/authors-block";
 import VideoBlock from "../video-block";
 import {COURSE_VIDEO_TYPE} from "../../../../../constants/common-consts";
+import Reviews from "./reviews";
 
 export default class ExtendedInfo extends React.Component {
 
@@ -24,6 +25,7 @@ export default class ExtendedInfo extends React.Component {
             <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.PREVIEW}/>
             <TargetAudience targetAudience={course.TargetAudience}/>
             <Aims aims={course.Aims}/>
+            <Reviews reviews={course.Reviews}/>
         </div>
     }
 }

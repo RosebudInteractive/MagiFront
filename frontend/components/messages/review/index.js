@@ -105,8 +105,7 @@ class ReviewWindow extends React.Component {
                                   placeholder="Ваш отзыв"/>
 
                         <div className={"letters-counter font-universal__body-small" + (!this.state.count ? " _warning" : "")}>{_counterText}</div>
-                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль в одной из социальных сетей</div>
-                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль"/>
+                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль в одной из социальных сетей"/>
                         <Recaptcha
                             ref={ ref => this.recaptcha = ref }
                             sitekey={this.props.reCapture}
