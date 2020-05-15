@@ -108,7 +108,7 @@ module.exports = {
         strikePromo: {
             prefix: "STP",
             key: "STRIKE_PROMO",
-            values: [20, 30, 35, 40, 45, 50],
+            values: [25, 30, 35, 40, 45, 50],
             durationInHours: 49
         }
     },
