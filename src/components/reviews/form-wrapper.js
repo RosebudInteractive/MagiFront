@@ -107,7 +107,7 @@ class ReviewEditorForm extends React.Component {
                             <Field component={TextBox} name="title" label="Название" placeholder="Введите название"/>
                             <Field component={Select} name="courseId" label="Курс" placeholder="Выберите курс" options={this._getCourses()}/>
                             <Field component={Select} name="status" label="Состояние" placeholder="Выберите состояние" options={STATE_OPTIONS}/>
-                            <Field component={Datepicker} name="reviewDate" label="Дата начала" showTime={false}/>
+                            <Field component={Datepicker} name="reviewDate" label="Дата отзыва" showTime={false}/>
                             <Field component={TextBox} name="userEmail" label="Email пользователя" placeholder="Введите email пользователя"/>
                             <Field component={TextBox} name="userName" label="Отображаемое имя" placeholder="Введите имя пользователя"/>
                             <Field component={TextBox} name="profileUrl" label="Ссылка на профиль" placeholder="Ссылка на профиль в любой соцсети"/>
@@ -248,8 +248,6 @@ function mapStateToProps(state) {
         reviews: reviewsSelector(state),
         reviewId: selectedIdSelector(state),
         editMode: editModeSelector(state),
-        // checkUserError: checkUserErrorSelector(state),
-        // userErrorMessage: userErrorMessageSelector(state),
 
         courses: coursesSelector(state),
     }
@@ -264,7 +262,6 @@ function mapDispatchToProps(dispatch) {
         showErrorDialog,
         raiseNotExistReviewError,
         checkUser,
-        // clearCheckUserError,
     }, dispatch);
 }
 

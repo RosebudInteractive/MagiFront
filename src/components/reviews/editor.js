@@ -16,15 +16,10 @@ class PromoEditor extends React.Component {
         onNextClick: PropTypes.func,
     };
 
-    componentWillMount() {
-        // this.props.getProducts()
-        // this.props.actions.getAuthors()
-    }
 
     componentWillReceiveProps(nextProps) {
         if (!this.props.showEditor && nextProps.showEditor) {
             this.props.getCourses()
-            // this.props.actions.getAuthors()
         }
     }
 
