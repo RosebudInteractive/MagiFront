@@ -18,16 +18,17 @@
   @media only screen and (max-device-width: 414px)
     display: none
 
-//.course-promo__value-mobile-row
-//  mso-hide: all
-//  //display: none
-//  //max-height: 0
-//  //overflow: hidden
-//  @media only screen and (max-device-width: 414px)
-//    display: block !important
-//    mso-hide: none !important
-//    max-height: none !important
-//    overflow: auto !important
+.course-promo__value-mobile-row
+  mso-hide: all
+  //display: none
+  //max-height: 0
+  //overflow: hidden
+  @media only screen and (max-device-width: 414px)
+    display: block !important
+    mso-hide: none !important
+    max-height: none !important
+    height: auto !important
+    overflow: auto !important
 
 .only-mobile-block
   display: none
@@ -40,9 +41,9 @@
   line-height: 0
   margin: 0 auto
   @media only screen and (max-device-width: 414px)
-    display: block
-    width: auto
-    max-height: none
-    overflow: auto
-    mso-hide: all
-    height: auto
+    display: inline !important
+    width: auto !important
+    max-height: none !important
+    overflow: auto !important
+    mso-hide: all !important
+    height: auto !important
