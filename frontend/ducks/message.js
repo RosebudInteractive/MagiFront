@@ -42,7 +42,8 @@ export const SHOW_MODAL_MESSAGE_ERROR = `${prefix}/SHOW_MODAL_MESSAGE_ERROR`
 const ReviewRecord = Record({
     showWindow: false,
     showResultMessage: false,
-    courseId: null
+    courseId: null,
+    courseName: null,
 })
 
 export const ReducerRecord = Record({
@@ -112,7 +113,8 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SHOW_REVIEW_WINDOW:
             return state
                 .setIn(['review', 'showWindow'], true)
-                .setIn(['review', 'courseId'], payload)
+                .setIn(['review', 'courseId'], payload.courseId)
+                .setIn(['review', 'courseName'], payload.courseName)
 
         case HIDE_REVIEW_WINDOW:
             return state
@@ -138,6 +140,7 @@ export const showFeedbackWindowSelector = createSelector(stateSelector, state =>
 export const showFeedbackResultMessageSelector = createSelector(stateSelector, state => state.showFeedbackResultMessage)
 const reviewSelector = createSelector(stateSelector, state => state.review)
 const reviewCourseIdSelector = createSelector(reviewSelector, review => review.courseId)
+export const reviewCourseNameSelector = createSelector(reviewSelector, review => review.courseName)
 export const showReviewWindowSelector = createSelector(reviewSelector, review => review.showWindow)
 export const showReviewResultMessageSelector = createSelector(reviewSelector, review => review.showResultMessage)
 export const errorMessageSelector = createSelector(stateSelector, state => state.error)
@@ -245,8 +248,8 @@ export const hideFeedbackResultMessage = () => {
     }
 }
 
-export const showReviewWindow = ({courseId}) => {
-    return { type: SHOW_REVIEW_WINDOW_REQUEST, payload: courseId }
+export const showReviewWindow = (data) => {
+    return { type: SHOW_REVIEW_WINDOW_REQUEST, payload: data }
 }
 
 export const hideReviewWindow = () => {
