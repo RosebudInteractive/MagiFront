@@ -13,6 +13,11 @@ const STYLE = {
             borderCollapse: "collapse",
             height: "43px"
         },
+        MOBILE_CELL: {
+            padding: "0",
+            width: "100%",
+            display: "none",
+        },
         CELL: {
             padding: "0",
             width: "100%",
@@ -46,10 +51,11 @@ export default class LinkedButton extends React.Component {
     static propTypes = {
         link: PropTypes.object,
         caption: PropTypes.string,
+        isMobile: PropTypes.bool,
     }
 
     render() {
-        return <td style={STYLE.BUTTON.CELL}>
+        return <td style={ this.props.isMobile ? STYLE.BUTTON.MOBILE_CELL : STYLE.BUTTON.CELL } className={this.props.isMobile ? "only-mobile-block" : ""}>
             <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
                 <table style={STYLE.BUTTON.TABLE}>
                     <tbody>

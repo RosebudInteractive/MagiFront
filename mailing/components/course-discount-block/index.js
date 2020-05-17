@@ -162,12 +162,7 @@ export default class CourseDiscountBlock extends React.Component {
                                             </td>
                                         </tr>
                                         <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                            <td style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                                TEST
-                                            </td>
-                                        </tr>
-                                        <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={true}/>
                                         </tr>
                                     </tbody>
                                 </table>
