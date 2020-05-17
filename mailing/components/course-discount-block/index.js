@@ -49,7 +49,21 @@ const STYLE = {
             paddingBottom: "15px",
             display: "block",
             width: "100%"
-        }
+        },
+        PROMO: {
+            display: "block",
+            paddingTop: "9px",
+            paddingRight: "11px",
+            paddingBottom: "9px",
+            paddingLeft: "11px",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "130%",
+            fontWeight: "bold",
+            color: "#2B2B2B",
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            textAlign: "center"
+        },
     },
     MOBILE: {
         ROW: {
@@ -81,7 +95,7 @@ const STYLE = {
                 overflow: "hidden",
             },
             PROMO: {
-                display: "block",
+                display: "none",
                 paddingTop: "9px",
                 paddingRight: "11px",
                 paddingBottom: "9px",
@@ -129,7 +143,7 @@ export default class CourseDiscountBlock extends React.Component {
                                 <table style={STYLES.MAIN_TABLE}>
                                 <tr style={{display: "block"}}>
                                     <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                        <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                        <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -144,7 +158,12 @@ export default class CourseDiscountBlock extends React.Component {
                                     <tbody style={STYLE.MOBILE.DISCOUNT.BODY} className="only-mobile-block">
                                         <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
                                             <td style={STYLE.DISCOUNT.PROMO_ROW} className="only-mobile-block">
-                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO} className="only-mobile-block">{_discount.promo}</div>
+                                            </td>
+                                        </tr>
+                                        <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
+                                            <td style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
+                                                TEST
                                             </td>
                                         </tr>
                                         <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
