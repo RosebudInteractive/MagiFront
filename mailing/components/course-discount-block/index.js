@@ -60,6 +60,9 @@ const STYLE = {
                 borderCollapse: "collapse",
                 margin: "0 auto",
                 border: "none",
+                display: "none",
+                maxHeight: 0,
+                overflow: "hidden",
             },
             PROMO: {
                 display: "block",
@@ -106,18 +109,18 @@ export default class CourseDiscountBlock extends React.Component {
                                     </tr>
                                 </table>
                             </td>
-                            {/*<td className={"course-promo__value-column"}>*/}
-                            {/*    <table style={STYLES.MAIN_TABLE}>*/}
-                            {/*    <tr style={{display: "block"}}>*/}
-                            {/*        <td style={STYLE.DISCOUNT.PROMO_ROW}>*/}
-                            {/*            <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>*/}
-                            {/*        </td>*/}
-                            {/*    </tr>*/}
-                            {/*    <tr>*/}
-                            {/*        <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>*/}
-                            {/*    </tr>*/}
-                            {/*    </table>*/}
-                            {/*</td>*/}
+                            <td className={"course-promo__value-column"}>
+                                <table style={STYLES.MAIN_TABLE}>
+                                <tr style={{display: "block"}}>
+                                    <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                        <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                </tr>
+                                </table>
+                            </td>
                         </tr>
                         <tr>
                             <td>
