@@ -3,7 +3,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {
     reduxForm,
-    reset,
     isDirty,
     getFormValues,
     isValid, Field, formValueSelector, change,
@@ -24,14 +23,9 @@ import {
     closeEditor,
     raiseNotExistReviewError,
     checkUser,
-    // clearCheckUserError,
-    // checkUserErrorSelector,
-    // userErrorMessageSelector
-
 } from "adm-ducks/reviews";
 import Select from "../common/select-control";
 import {coursesSelector} from "adm-ducks/course";
-import {put} from "@redux-saga/core/effects";
 
 const STATE_OPTIONS = [
     {id: 1, value: 'Опубликованный'},
@@ -48,8 +42,6 @@ class ReviewEditorForm extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this._changeUserTimer = null
     }
 
     componentDidMount() {
@@ -112,8 +104,8 @@ class ReviewEditorForm extends React.Component {
                             <Field component={TextBox} name="userName" label="Отображаемое имя" placeholder="Введите имя пользователя"/>
                             <Field component={TextBox} name="profileUrl" label="Ссылка на профиль" placeholder="Ссылка на профиль в любой соцсети"/>
 
-                            <Field component={TextArea} name="review" label="Текст отзыва" enableHtml={false}/>
-                            <Field component={TextArea} name="reviewPub" label="Публекуемый отзыв" enableHtml={false}/>
+                            <Field component={TextArea} name="review" label="Текст отзыва" enableHtml={false} id={"review"}/>
+                            <Field component={TextArea} name="reviewPub" label="Публекуемый отзыв" enableHtml={false} id={"pub-review"}/>
                         </div>
                     </form>
                 </div>
@@ -124,27 +116,6 @@ class ReviewEditorForm extends React.Component {
             </div>
         </div>
     }
-
-    // _onEmailChange(e) {
-    //     const {checkUserError,} = this.props,
-    //         _value = e.target.value
-    //
-    //     if (checkUserError) {
-    //         this.props.clearCheckUserError()
-    //     }
-    //
-    //     if (this._changeUserTimer) {
-    //         clearTimeout(this._changeUserTimer)
-    //     }
-    //
-    //     this._changeUserTimer = setTimeout(() => {
-    //         if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(_value)) {
-    //             this.props.checkUser({email: e.target.value, needUpdateUserName: true})
-    //         } else {
-    //
-    //         }
-    //     }, 500)
-    // }
 
     _getCourses() {
         let {courses} = this.props;
@@ -180,7 +151,7 @@ class ReviewEditorForm extends React.Component {
     }
 
     _cancel() {
-        this.props.resetReduxForm('ReviewEditor')
+        this.props.reset('ReviewEditor')
     }
 
     _enableApplyChanges() {
@@ -232,6 +203,7 @@ let ReviewEditorWrapper = reduxForm({
     validate,
     asyncValidate,
     asyncChangeFields: ['userEmail'],
+    asyncBlurFields: ['userEmail'],
 })(ReviewEditorForm);
 
 const selector = formValueSelector('ReviewEditor')
@@ -258,7 +230,6 @@ function mapDispatchToProps(dispatch) {
         closeEditor,
         insertReview,
         updateReview,
-        resetReduxForm: reset,
         showErrorDialog,
         raiseNotExistReviewError,
         checkUser,
