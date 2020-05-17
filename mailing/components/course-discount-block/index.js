@@ -94,6 +94,14 @@ const STYLE = {
                 height: 0,
                 overflow: "hidden",
             },
+            PROMO_ROW: {
+                paddingTop: "4px",
+                paddingBottom: "15px",
+                display: "none",
+                width: "100%",
+                height: 0,
+                overflow: "hidden",
+            },
             PROMO: {
                 display: "none",
                 paddingTop: "9px",
@@ -147,7 +155,7 @@ export default class CourseDiscountBlock extends React.Component {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={true}/>
+                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
                                 </tr>
                                 </table>
                             </td>
@@ -157,7 +165,7 @@ export default class CourseDiscountBlock extends React.Component {
                                 <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
                                     <tbody style={STYLE.MOBILE.DISCOUNT.BODY} className="only-mobile-block">
                                         <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                            <td style={STYLE.DISCOUNT.PROMO_ROW} className="only-mobile-block">
+                                            <td style={STYLE.MOBILE.DISCOUNT.PROMO_ROW} className="only-mobile-block">
                                                 <div style={STYLE.MOBILE.DISCOUNT.PROMO} className="only-mobile-block">{_discount.promo}</div>
                                             </td>
                                         </tr>
