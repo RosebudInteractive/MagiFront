@@ -60,9 +60,9 @@ const STYLE = {
                 borderCollapse: "collapse",
                 margin: "0 auto",
                 border: "none",
-                display: "block",
-                maxHeight: 0,
-                overflow: "hidden",
+                display: "inline",
+                // maxHeight: 0,
+                // overflow: "hidden",
             },
             PROMO: {
                 display: "block",
@@ -123,19 +123,21 @@ export default class CourseDiscountBlock extends React.Component {
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
-                                    <tbody style={{display: "block", paddingTop: "8px"}}>
-                                        <tr style={{display: "block"}}>
-                                            <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
-                                            </td>
-                                        </tr>
-                                        <tr style={{display: "block"}}>
-                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <td style={{display: "inline"}}>
+                                <div className="only-mobile-block">
+                                    <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
+                                        <tbody style={{display: "block", paddingTop: "8px"}}>
+                                            <tr style={{display: "block"}}>
+                                                <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                                    <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                                </td>
+                                            </tr>
+                                            <tr style={{display: "block"}}>
+                                                <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
