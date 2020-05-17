@@ -60,7 +60,7 @@ const STYLE = {
                 borderCollapse: "collapse",
                 margin: "0 auto",
                 border: "none",
-                display: "none",
+                display: "block",
                 maxHeight: 0,
                 overflow: "hidden",
             },
