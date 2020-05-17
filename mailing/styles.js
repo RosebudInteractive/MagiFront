@@ -39,6 +39,9 @@ export const STYLES = {
             fontSize: "23px",
             fontWeight: "bold",
             lineHeight: "130%",
+            display: "none",
+            overflow: "hidden",
+            height: 0
         },
         THANKSGIVING: {
             paddingTop: "12px",
