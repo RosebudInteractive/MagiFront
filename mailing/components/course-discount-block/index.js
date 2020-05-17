@@ -152,7 +152,7 @@ export default class CourseDiscountBlock extends React.Component {
                                 </table>
                             </td>
                         </tr>
-                        <tr>
+                        <tr style={STYLE.MOBILE.ROW} className="only-mobile-block">
                             <td style={STYLE.MOBILE.ROW} className="only-mobile-block">
                                 <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
                                     <tbody style={STYLE.MOBILE.DISCOUNT.BODY} className="only-mobile-block">
