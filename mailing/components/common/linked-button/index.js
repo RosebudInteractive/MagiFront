@@ -1,5 +1,6 @@
 import React from "react"
 import PropTypes from 'prop-types'
+import "./linked-button.sass"
 
 
 const STYLE = {
@@ -17,6 +18,9 @@ const STYLE = {
             padding: "0",
             width: "100%",
             display: "none",
+            height: 0,
+            maxHeight: 0,
+            overflow: "hidden"
         },
         CELL: {
             padding: "0",
@@ -56,13 +60,13 @@ export default class LinkedButton extends React.Component {
 
     render() {
         return <td style={ this.props.isMobile ? STYLE.BUTTON.MOBILE_CELL : STYLE.BUTTON.CELL } className={this.props.isMobile ? "only-mobile-block" : ""}>
-            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
-                <table style={STYLE.BUTTON.TABLE}>
-                    <tbody>
-                    <tr>
-                        <td style={STYLE.BUTTON.ITEM}>
-                            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
-                                <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
+            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK} className={this.props.isMobile ? "only-mobile-block" : ""}>
+                <table style={STYLE.BUTTON.TABLE} className={this.props.isMobile ? "only-mobile-block linked-button" : ""}>
+                    <tbody className={this.props.isMobile ? "only-mobile-block linked-button" : ""}>
+                    <tr className={this.props.isMobile ? "only-mobile-block linked-button" : ""}>
+                        <td style={STYLE.BUTTON.ITEM} className={this.props.isMobile ? "only-mobile-block linked-button" : ""}>
+                            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK} className={this.props.isMobile ? "only-mobile-block" : ""}>
+                                <span style={STYLE.BUTTON.LINK} className={this.props.isMobile ? "only-mobile-block" : ""}>{this.props.caption}</span>
                             </a>
                         </td>
                     </tr>

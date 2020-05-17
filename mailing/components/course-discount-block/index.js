@@ -147,7 +147,7 @@ export default class CourseDiscountBlock extends React.Component {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
+                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={true}/>
                                 </tr>
                                 </table>
                             </td>
