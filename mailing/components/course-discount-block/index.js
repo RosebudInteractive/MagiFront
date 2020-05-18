@@ -146,7 +146,7 @@ export default class CourseDiscountBlock extends React.Component {
                     <tbody style={STYLE.BODY}>
                         <tr>
                             <td>
-                                <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
+                                <table style={STYLE.TABLE} align="left" width="55%" className="column-table _left">
                                     <tr style={STYLE.DISCOUNT.HEADER}>
                                         <td>{`Получите скидку ${_discount.value}%`}</td>
                                     </tr>
