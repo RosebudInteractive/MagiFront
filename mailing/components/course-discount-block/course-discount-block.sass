@@ -5,6 +5,21 @@
   @media only screen and (max-device-width: 414px)
     padding: 16px
 
+  .spacer-table
+    width: 20px
+    height: 12px
+
+  .column-table
+    &._left
+      width: calc(60% - 30px)
+
+    &._right
+      width: 40%
+
+  @media only screen and (max-width: 480px)
+    .column-table
+      width: 100%!important
+
 .course-promo__descr-column
   width: 65%
   padding-right: 20px
@@ -26,3 +41,8 @@
     max-height: none !important
     height: auto !important
     overflow: auto !important
+
+
+@media only screen and (max-width: 480px)
+  table[class="column-table"]
+    width: 100%!important

@@ -15,6 +15,15 @@ const DISCOUNT = [
 
 
 const STYLE = {
+    TABLE: {
+        borderSpacing:0,
+        fontFamily: "arial,helvetica,sans-serif",
+        background: "#FFFFFF",
+        borderCollapse: "collapse",
+        maxWidth: "600px",
+        border: "none",
+        verticalAlign: "top",
+    },
     TABLE_ROW: {
         paddingTop: "15px",
         paddingBottom: "15px",
@@ -137,8 +146,8 @@ export default class CourseDiscountBlock extends React.Component {
                 <table className="course-promo__table">
                     <tbody style={STYLE.BODY}>
                         <tr>
-                            <td className={"course-promo__descr-column"}>
-                                <table style={STYLES.MAIN_TABLE}>
+                            <td>
+                                <table style={STYLE.TABLE} align="left" className="column-table _left">
                                     <tr style={STYLE.DISCOUNT.HEADER}>
                                         <td>{`Получите скидку ${_discount.value}%`}</td>
                                     </tr>
@@ -146,33 +155,22 @@ export default class CourseDiscountBlock extends React.Component {
                                         <td>{_discount.descr}</td>
                                     </tr>
                                 </table>
-                            </td>
-                            <td className={"course-promo__value-column"}>
-                                <table style={STYLES.MAIN_TABLE}>
-                                <tr style={{display: "block"}}>
-                                    <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                        <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
-                                </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr style={STYLE.MOBILE.ROW} className="only-mobile-block">
-                            <td style={STYLE.MOBILE.ROW} className="only-mobile-block">
-                                <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
-                                    <tbody style={STYLE.MOBILE.DISCOUNT.BODY} className="only-mobile-block">
-                                        <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                            <td style={STYLE.MOBILE.DISCOUNT.PROMO_ROW} className="only-mobile-block">
-                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO} className="only-mobile-block">{_discount.promo}</div>
-                                            </td>
-                                        </tr>
-                                        <tr style={STYLE.MOBILE.DISCOUNT.ROW} className="only-mobile-block">
-                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={true}/>
-                                        </tr>
+                                <table width="20" align="left" border="0" cellPadding="0" cellSpacing="0" className="spacer-table">
+                                    <tbody>
+                                    <tr>
+                                        <td width="100%" height="12">&nbsp;</td>
+                                    </tr>
                                     </tbody>
+                                </table>
+                                <table style={STYLE.TABLE} align="left" className="column-table _right">
+                                    <tr style={{display: "block"}}>
+                                        <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                            <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
+                                    </tr>
                                 </table>
                             </td>
                         </tr>
