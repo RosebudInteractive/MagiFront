@@ -146,7 +146,7 @@ export default class CourseDiscountBlock extends React.Component {
                     <tbody style={STYLE.BODY}>
                         <tr>
                             <td>
-                                <table style={STYLE.TABLE} align="left" width="265" className="column-table _left">
+                                <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
                                     <tr style={STYLE.DISCOUNT.HEADER}>
                                         <td>{`Получите скидку ${_discount.value}%`}</td>
                                     </tr>
@@ -154,14 +154,14 @@ export default class CourseDiscountBlock extends React.Component {
                                         <td>{_discount.descr}</td>
                                     </tr>
                                 </table>
-                                <table align="left" border="0" cellPadding="0" cellSpacing="0" className="spacer-table">
+                                <table align="left" border="0" cellPadding="0" cellSpacing="0" width="4%" className="spacer-table">
                                     <tbody>
                                     <tr>
                                         <td width="100%" height="12" bgcolor="#E59EDF">&nbsp;</td>
                                     </tr>
                                     </tbody>
                                 </table>
-                                <table style={STYLE.TABLE} align="left" width="196" className="column-table _right">
+                                <table style={STYLE.TABLE} align="left" width="40%" className="column-table _right">
                                     <tr style={{display: "block"}}>
                                         <td style={STYLE.DISCOUNT.PROMO_ROW}>
                                             <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
