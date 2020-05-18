@@ -50,57 +50,8 @@ const STYLE = {
             width: "100%"
         }
     },
-},
-
-    MOBILE_STYLE = {
-    BUTTON: {
-        TABLE: {
-            width: "100%",
-            callSpacing: 0,
-            borderCollapse: "collapse",
-            height: "43px",
-            display: "none",
-            maxHeight: 0,
-            overflow: "hidden",
-        },
-        CELL: {
-            padding: "0",
-            width: "100%",
-            display: "none",
-            height: 0,
-            maxHeight: 0,
-            overflow: "hidden",
-        },
-        ITEM: {
-            padding: "11px 0",
-            width: "100%",
-            background: "#C8684C",
-            fontFamily: "Arial",
-            fontStyle: "normal",
-            fontWeight: "bold",
-            fontSize: "15px",
-            lineHeight: "140%",
-            textAlign: "center",
-            letterSpacing: "0.1em",
-            color: "#FFFFFF",
-            borderRadius: "4px",
-            cursor: "pointer",
-            display: "none",
-            height: 0,
-            maxHeight: 0,
-            overflow: "hidden",
-        },
-        LINK: {
-            textDecoration: "none",
-            textTransform: "uppercase",
-            color: "#FFFFFF",
-            display: "none",
-            height: 0,
-            maxHeight: 0,
-            overflow: "hidden",
-        }
-    },
 }
+
 
 export default class LinkedButton extends React.Component {
 
@@ -111,19 +62,17 @@ export default class LinkedButton extends React.Component {
     }
 
     render() {
-        let _STYLE = this.props.isMobile ? MOBILE_STYLE : STYLE,
-            _className = this.props.isMobile ? "only-mobile-block" : "",
-            _buttonClassName = this.props.isMobile ? "only-mobile-block linked-button" : ""
-
-        return <td style={ _STYLE.BUTTON.CELL } className={_className}>
-            <a target="_blank" href={this.props.link} style={_STYLE.BUTTON.LINK} className={_className}>
-                <table style={_STYLE.BUTTON.TABLE} className={_buttonClassName}>
-                    <tbody className={_buttonClassName}>
-                    <tr className={_buttonClassName}>
-                        <td style={_STYLE.BUTTON.ITEM} className={_buttonClassName}>
-                            <a target="_blank" href={this.props.link} style={_STYLE.BUTTON.LINK} className={_className}>
-                                <span style={_STYLE.BUTTON.LINK} className={_className}>{this.props.caption}</span>
-                            </a>
+        return <td style={ STYLE.BUTTON.CELL }>
+            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
+                <table style={STYLE.BUTTON.TABLE}>
+                    <tbody >
+                    <tr>
+                        <td>
+                            <button style={STYLE.BUTTON.ITEM} className="linked-button">
+                                <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
+                                    <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
+                                </a>
+                            </button>
                         </td>
                     </tr>
                     </tbody>

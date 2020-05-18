@@ -16,7 +16,7 @@ const DISCOUNT = [
 
 const STYLE = {
     TABLE: {
-        borderSpacing:0,
+        borderSpacing: "0",
         fontFamily: "arial,helvetica,sans-serif",
         background: "#FFFFFF",
         borderCollapse: "collapse",

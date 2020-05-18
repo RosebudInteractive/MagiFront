@@ -1,3 +1,5 @@
+@import "../variables"
+
 .only-mobile-block
   display: none
   width: 0
@@ -17,3 +19,10 @@
     height: auto !important
     font-size: 17px
     line-height: 130%
+
+
+.font__main-text
+  @include font-arial(18px, normal, 130%)
+
+  &._dark
+    color: $color-main-dark
