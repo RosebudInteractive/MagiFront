@@ -46,6 +46,8 @@ const STYLE = {
             textDecoration: "none",
             textTransform: "uppercase",
             color: "#FFFFFF",
+            display: "inline-block",
+            width: "100%"
         }
     },
 },
