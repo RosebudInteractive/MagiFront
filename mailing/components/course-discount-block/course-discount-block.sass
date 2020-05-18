@@ -1,9 +1,11 @@
+@import "../variables"
+
 .course-promo__table
   border: 1px solid #C8684C
   border-radius: 3px
   padding: 26px 24px
   width: 100%
-  @media only screen and (max-device-width: 414px)
+  @media only screen and (max-device-width: $mobile-phone-width)
     padding: 16px
 
   .spacer-table
@@ -17,7 +19,7 @@
     &._right
       width: 40%
 
-  @media only screen and (max-width: 480px)
+  @media only screen and (max-width: $mobile-phone-width)
     .column-table
       width: 100%!important
       max-width: 100%!important

@@ -67,12 +67,10 @@ export default class LinkedButton extends React.Component {
                 <table style={STYLE.BUTTON.TABLE}>
                     <tbody >
                     <tr>
-                        <td>
-                            <button style={STYLE.BUTTON.ITEM} className="linked-button">
-                                <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
-                                    <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
-                                </a>
-                            </button>
+                        <td style={STYLE.BUTTON.ITEM} className="linked-button">
+                            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
+                                <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
+                            </a>
                         </td>
                     </tr>
                     </tbody>

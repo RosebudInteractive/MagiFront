@@ -45,7 +45,7 @@ export default class Registration extends React.Component {
                         </tr>
                         <tr>
                             <td style={STYLES.PARAGRAPH.THANKSGIVING}>
-                                <table style={STYLE.TABLE} align="left" width="50%" className="column-table _left">
+                                <table style={STYLE.TABLE} align="left" width="50%" className="adaptive-column-block">
                                     <tr>
                                         <td className="font__main-text _dark">
                                             Мы очень рады, что Вы решили присоединиться к сообществу пользователей Magisteria.ru.
@@ -56,7 +56,7 @@ export default class Registration extends React.Component {
                                         </td>
                                     </tr>
                                 </table>
-                                <table style={STYLE.TABLE} align="right" width="50%" className="column-table _left">
+                                <table style={STYLE.TABLE} align="right" width="50%" className="adaptive-column-block">
                                     <tr>
                                         <td>
                                             <img src={window.location.origin + "/data/2016/08/unnamed-2-768x768.jpg"} width="100%" height="auto" alt=""/>
@@ -66,7 +66,7 @@ export default class Registration extends React.Component {
                             </td>
                         </tr>
                         <tr>
-                            <td style={STYLES.PARAGRAPH.COMMON}>
+                            <td style={STYLES.PARAGRAPH.COMMON} className="font__main-text _dark">
                                 Главная фигура в этом деле – это автор. Мы приглашаем в проект лучших специалистов,
                                 которые хорошо знают свой предмет и могут интересно о нем рассказать.
                                 Каждая запись проходит тщательную обработку и готовится к выпуску силами
@@ -75,7 +75,7 @@ export default class Registration extends React.Component {
                         </tr>
 
                         <tr>
-                            <td style={STYLES.PARAGRAPH.COMMON} className="paragraph-with-spacing">
+                            <td style={STYLES.PARAGRAPH.COMMON} className="font__main-text _dark">
                                 <p>
                                     Проект постоянно развивается в двух магистральных направлениях: содержание и средства
                                     для работы с контентом. Мы постоянно ищем и приглашаем новых интересных авторов,
