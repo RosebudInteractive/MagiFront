@@ -20,7 +20,6 @@ const STYLE = {
         fontFamily: "arial,helvetica,sans-serif",
         background: "#FFFFFF",
         borderCollapse: "collapse",
-        maxWidth: "600px",
         border: "none",
         verticalAlign: "top",
     },
