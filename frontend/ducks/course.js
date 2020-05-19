@@ -94,7 +94,7 @@ function* getCourseDiscountsSaga() {
     try {
         yield put({type: GET_COURSE_DISCOUNTS_START})
 
-        let _discounts = call(_fetchDiscounts)
+        let _discounts = yield call(_fetchDiscounts)
         yield put({type: GET_COURSE_DISCOUNTS_SUCCESS, payload: _discounts})
     } catch (e) {
         yield put({type: GET_COURSE_DISCOUNTS_FAIL, payload: {e}})
