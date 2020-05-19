@@ -94,9 +94,9 @@ export default class Registration extends React.Component {
                         </tr>
                         <tr>
                             <td style={STYLES.PARAGRAPH.LAST} className="paragraph-with-spacing">
-                                Искренне Ваш, Главный редактор Magisteria.ru<br/>
-                                Андрей Борейко<br/>
-                                P.S.: По всем вопросам Вы можете писать ….
+                                <p>Искренне Ваш, Главный редактор Magisteria.ru</p>
+                                <p>Андрей Борейко</p>
+                                <p>P.S.: По всем вопросам Вы можете писать ….</p>
                             </td>
                         </tr>
                     </td>
