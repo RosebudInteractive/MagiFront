@@ -1,29 +1,25 @@
+@import "../variables"
+
 .course-promo__table
   border: 1px solid #C8684C
   border-radius: 3px
   padding: 26px 24px
-  @media only screen and (max-device-width: 414px)
+  width: 100%
+  @media only screen and (max-device-width: $mobile-phone-width)
     padding: 16px
 
-.course-promo__descr-column
-  //width: 65%
-  width: 100%
-  //padding-right: 20px
-  //@media only screen and (max-device-width: 414px)
-    width: 100%
-    padding-right: 0
+  .spacer-table
+    width: 4%
+    height: 12px
 
-.course-promo__value-column
-  display: block
-  //@media only screen and (max-device-width: 414px)
-    display: none
+  .column-table
+    &._left
+      width: 56%
 
-.course-promo__value-mobile-row
-  //mso-hide: all
-  display: block
-  //max-height: 0
-  //overflow: hidden
-  //@media only screen and (max-device-width: 414px)
-    mso-hide: none
-    max-height: none
-    overflow: auto
+    &._right
+      width: 40%
+
+  @media only screen and (max-width: $mobile-phone-width)
+    .column-table
+      width: 100%!important
+      max-width: 100%!important

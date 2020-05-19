@@ -1,5 +1,6 @@
 import React from "react"
 import PropTypes from 'prop-types'
+import "./linked-button.sass"
 
 
 const STYLE = {
@@ -12,6 +13,14 @@ const STYLE = {
             callSpacing: 0,
             borderCollapse: "collapse",
             height: "43px"
+        },
+        MOBILE_CELL: {
+            padding: "0",
+            width: "100%",
+            display: "none",
+            height: 0,
+            maxHeight: 0,
+            overflow: "hidden"
         },
         CELL: {
             padding: "0",
@@ -37,24 +46,28 @@ const STYLE = {
             textDecoration: "none",
             textTransform: "uppercase",
             color: "#FFFFFF",
+            display: "inline-block",
+            width: "100%"
         }
     },
 }
+
 
 export default class LinkedButton extends React.Component {
 
     static propTypes = {
         link: PropTypes.object,
         caption: PropTypes.string,
+        isMobile: PropTypes.bool,
     }
 
     render() {
-        return <td style={STYLE.BUTTON.CELL}>
+        return <td style={ STYLE.BUTTON.CELL }>
             <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
                 <table style={STYLE.BUTTON.TABLE}>
-                    <tbody>
+                    <tbody >
                     <tr>
-                        <td style={STYLE.BUTTON.ITEM}>
+                        <td style={STYLE.BUTTON.ITEM} className="linked-button">
                             <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
                                 <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
                             </a>

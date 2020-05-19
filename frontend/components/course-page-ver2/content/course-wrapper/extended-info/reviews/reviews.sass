@@ -1,12 +1,7 @@
 @import "~tools/variables.sass"
 
-.course-wrapper__reviews
-  margin-top: 48px
-
-  //.course-wrapper__more-button span
-    border: none
-
 .reviews__list
+  margin-top: 37px
   border-left: 2px solid rgba(47, 47, 47, 0.08)
   -webkit-transition: max-height 0.5s ease
   transition: max-height 0.5s ease
@@ -15,17 +10,17 @@
     max-height: 10000px
 
   .reviews__list-item
-    margin: 19px 0 0 32px
+    margin: 0 0 0 32px
     @media(max-width: $mobile-phone-width)
       margin: 10px 0 0 20px
     &:not(:first-child)
-      margin-top: 25px
+      margin-top: 39px
 
   .list-item__header
     display: flex
     flex-direction: row
     align-items: center
-    margin-bottom: 24px
+    margin-bottom: 23px
     @media(max-width: $mobile-phone-width)
       align-items: flex-start
       flex-direction: column
@@ -53,20 +48,6 @@
       -webkit-transition: max-height 0.5s ease
       transition: max-height 0.5s ease
       font-family: $font-fira !important
-      //&._short
-        overflow: hidden
-        text-overflow: ellipsis
-        display: -webkit-box
-        -webkit-box-orient: vertical
-        -webkit-line-clamp: 7 /* number of lines to show */
-        line-height: 18px        /* fallback */
-        max-height: 126px       /* fallback */
-
-    //.hack
-      opacity: 0
-      z-index: -100
-      position: absolute
-      top: 0
 
     .more-trigger
       color: $color-orange

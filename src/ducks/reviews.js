@@ -53,7 +53,6 @@ const CHECK_USER_EMAIL_START = `${prefix}/CHECK_USER_EMAIL_START`
 const CHECK_USER_EMAIL_SUCCESS = `${prefix}/CHECK_USER_EMAIL_SUCCESS`
 const CHECK_USER_EMAIL_FAIL = `${prefix}/CHECK_USER_EMAIL_FAIL`
 
-const CLEAR_CHECK_USER_ERROR = `${prefix}/CLEAR_CHECK_USER_ERROR`
 const SET_REVIEW_USER_EMAIL = `${prefix}/SET_REVIEW_USER_EMAIL`
 
 const RAISE_ERROR_REQUEST = `${prefix}/RAISE_ERROR_REQUEST`
@@ -71,8 +70,6 @@ const ReducerRecord = Record({
     editMode: true,
     selected: null,
     entries: new OrderedMap([]),
-    // checkUserError: false,
-    // userErrorMessage: null,
 })
 
 const ReviewRecord = Record({
@@ -128,8 +125,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLOSE_EDITOR:
             return state
                 .set('showEditor', false)
-                // .set('checkUserError', false)
-                // .set('userErrorMessage', null)
 
         case INSERT_REVIEW_START:
         case UPDATE_REVIEW_START:
@@ -145,17 +140,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case SET_REVIEW_USER_EMAIL:
             return state.setIn(['entries', payload.reviewId, 'UserEmail'], payload.user)
-
-        // case CHECK_USER_EMAIL_FAIL:
-        //     return state
-        //         .set('checkUserError', true)
-        //         .set('userErrorMessage', payload)
-
-
-        // case CLEAR_CHECK_USER_ERROR:
-        //     return state
-        //         .set('checkUserError', false)
-        //         .set('userErrorMessage', null)
 
         default:
             return state
@@ -185,8 +169,6 @@ export const reviewsSelector = createSelector(entriesSelector, (entries) => {
 export const showEditorSelector = createSelector(stateSelector, state => state.showEditor)
 export const editModeSelector = createSelector(stateSelector, state => state.editMode)
 export const selectedIdSelector = createSelector(stateSelector, state => state.selected)
-// export const checkUserErrorSelector = createSelector(stateSelector, state => state.checkUserError)
-// export const userErrorMessageSelector = createSelector(stateSelector, state => state.userErrorMessage)
 
 /**
  * Action Creators
@@ -194,14 +176,6 @@ export const selectedIdSelector = createSelector(stateSelector, state => state.s
 export const getReviews = (params) => {
     return {type: GET_REVIEWS_REQUEST, payload: params}
 }
-
-// export const checkUser = (data) => {
-//     return {type: CHECK_USER_EMAIL_REQUEST, payload: data}
-// }
-
-// export const clearCheckUserError = () => {
-//     return {type: CLEAR_CHECK_USER_ERROR}
-// }
 
 export const createNewReview = (params) => {
     return {type: CREATE_NEW_REVIEW_REQUEST, payload: params}
@@ -268,7 +242,6 @@ function* getReviewsSaga(data) {
 }
 
 const _fetchReviews = (params) => {
-    // const _url = '/api/reviews' + (courseId ? `?course_id=${courseId}` : "")
     const _url = '/api/reviews'
 
     return fetch(_url, {method: 'GET', credentials: 'include'})
@@ -276,7 +249,7 @@ const _fetchReviews = (params) => {
         .then(parseJSON)
 }
 
-function* createReviewSaga(data) {
+function* createReviewSaga() {
     yield put(replace(`/adm/reviews/new`))
 
     yield put({type: CREATE_NEW_REVIEW_START})

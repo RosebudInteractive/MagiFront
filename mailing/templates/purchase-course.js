@@ -8,6 +8,7 @@ import Logo from "../components/common/logo";
 import CourseCover from "../components/common/course-cover";
 import Social from "../components/common/social";
 import CourseDiscountBlock from "../components/course-discount-block";
+import "../components/common/common.sass"
 
 const STYLE = {
     TEXT: {

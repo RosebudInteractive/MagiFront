@@ -15,6 +15,14 @@ const DISCOUNT = [
 
 
 const STYLE = {
+    TABLE: {
+        borderSpacing: "0",
+        fontFamily: "arial,helvetica,sans-serif",
+        background: "#FFFFFF",
+        borderCollapse: "collapse",
+        border: "none",
+        verticalAlign: "top",
+    },
     TABLE_ROW: {
         paddingTop: "15px",
         paddingBottom: "15px",
@@ -49,9 +57,28 @@ const STYLE = {
             paddingBottom: "15px",
             display: "block",
             width: "100%"
-        }
+        },
+        PROMO: {
+            display: "block",
+            paddingTop: "9px",
+            paddingRight: "11px",
+            paddingBottom: "9px",
+            paddingLeft: "11px",
+            fontFamily: "Arial",
+            fontSize: "20px",
+            lineHeight: "130%",
+            fontWeight: "bold",
+            color: "#2B2B2B",
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            textAlign: "center"
+        },
     },
     MOBILE: {
+        ROW: {
+            display: "none",
+            height: 0,
+            overflow: "hidden",
+        },
         DISCOUNT: {
             TABLE: {
                 borderSpacing:0,
@@ -60,9 +87,31 @@ const STYLE = {
                 borderCollapse: "collapse",
                 margin: "0 auto",
                 border: "none",
+                display: "none",
+                height: 0,
+                overflow: "hidden",
+            },
+            BODY: {
+                paddingTop: "8px",
+                display: "none",
+                height: 0,
+                overflow: "hidden",
+            },
+            RECORD: {
+                display: "none",
+                height: 0,
+                overflow: "hidden",
+            },
+            PROMO_ROW: {
+                paddingTop: "4px",
+                paddingBottom: "15px",
+                display: "none",
+                width: "100%",
+                height: 0,
+                overflow: "hidden",
             },
             PROMO: {
-                display: "block",
+                display: "none",
                 paddingTop: "9px",
                 paddingRight: "11px",
                 paddingBottom: "9px",
@@ -96,8 +145,8 @@ export default class CourseDiscountBlock extends React.Component {
                 <table className="course-promo__table">
                     <tbody style={STYLE.BODY}>
                         <tr>
-                            <td className={"course-promo__descr-column"}>
-                                <table style={STYLES.MAIN_TABLE}>
+                            <td>
+                                <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
                                     <tr style={STYLE.DISCOUNT.HEADER}>
                                         <td>{`Получите скидку ${_discount.value}%`}</td>
                                     </tr>
@@ -105,33 +154,22 @@ export default class CourseDiscountBlock extends React.Component {
                                         <td>{_discount.descr}</td>
                                     </tr>
                                 </table>
-                            </td>
-                            {/*<td className={"course-promo__value-column"}>*/}
-                            {/*    <table style={STYLES.MAIN_TABLE}>*/}
-                            {/*    <tr style={{display: "block"}}>*/}
-                            {/*        <td style={STYLE.DISCOUNT.PROMO_ROW}>*/}
-                            {/*            <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>*/}
-                            {/*        </td>*/}
-                            {/*    </tr>*/}
-                            {/*    <tr>*/}
-                            {/*        <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>*/}
-                            {/*    </tr>*/}
-                            {/*    </table>*/}
-                            {/*</td>*/}
-                        </tr>
-                        <tr>
-                            <td>
-                                <table style={STYLE.MOBILE.DISCOUNT.TABLE} className="course-promo__value-mobile-row">
-                                    <tbody style={{display: "block", paddingTop: "8px"}}>
-                                        <tr style={{display: "block"}}>
-                                            <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                                <div style={STYLE.MOBILE.DISCOUNT.PROMO}>{_discount.promo}</div>
-                                            </td>
-                                        </tr>
-                                        <tr style={{display: "block"}}>
-                                            <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
-                                        </tr>
-                                    </tbody>
+                                {/*<table align="left" border="0" cellPadding="0" cellSpacing="0" width="4%" className="spacer-table">*/}
+                                {/*    <tbody>*/}
+                                {/*    <tr>*/}
+                                {/*        <td width="100%" height="12" bgcolor="#E59EDF">&nbsp;</td>*/}
+                                {/*    </tr>*/}
+                                {/*    </tbody>*/}
+                                {/*</table>*/}
+                                <table style={STYLE.TABLE} align="right" width="40%" className="column-table _right">
+                                    <tr style={{display: "block"}}>
+                                        <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                                            <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
+                                    </tr>
                                 </table>
                             </td>
                         </tr>

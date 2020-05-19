@@ -65,7 +65,7 @@ class ReviewButton extends React.Component {
     }
 
     _showReview() {
-        this.props.showReviewWindow({courseId: this.props.course.Id})
+        this.props.showReviewWindow({courseId: this.props.course.Id, courseName: this.props.course.Name})
     }
 
     _addEventListeners() {

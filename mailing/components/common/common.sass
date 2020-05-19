@@ -1,0 +1,32 @@
+@import "../variables"
+
+.only-mobile-block
+  display: none
+  width: 0
+  max-height: 0
+  overflow: hidden
+  mso-hide: all
+  height: 0
+  font-size: 0
+  line-height: 0
+  margin: 0 auto
+  @media only screen and (max-device-width: 414px)
+    display: block !important
+    width: auto !important
+    max-height: none !important
+    overflow: auto !important
+    mso-hide: all !important
+    height: auto !important
+    font-size: 17px
+    line-height: 130%
+
+
+.font__main-text
+  @include font-arial(18px, normal, 130%)
+
+  &._dark
+    color: $color-main-dark
+
+@media only screen and (max-width: $mobile-phone-width)
+  .adaptive-column-block
+    width: 100%!important

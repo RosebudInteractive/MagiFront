@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './reviews.sass'
 import ReviewItem from "./review-item";
+import {getCountReviewsTitle} from "tools/word-tools";
 
 export default class Reviews extends React.Component {
 
@@ -23,9 +24,10 @@ export default class Reviews extends React.Component {
 
         if (!(reviews && Array.isArray(reviews) && (reviews.length > 0))) { return null }
 
-        const _needShowMoreButton = reviews.length > 1
+        const _needShowMoreButton = reviews.length > 1,
+            _showMoreTitle = _needShowMoreButton ? `Еще ${reviews.length - 1} ${getCountReviewsTitle(reviews.length - 1)}` : null
 
-        return <div className="course-wrapper__reviews wrapper-item">
+        return <div className="course-wrapper__reviews block-wrapper">
             <div className="reviews__title block-title">Отзывы</div>
             <div className={"reviews__list" + (this.state.expanded ? " _expanded" : "")}>
                 {
@@ -39,7 +41,7 @@ export default class Reviews extends React.Component {
             {
                 _needShowMoreButton &&
                     <div className={"course-wrapper__more-button wrapper-item"}>
-                        <span onClick={::this._switchShowMore}>{this.state.showAll ? "Скрыть" : "Далее"}</span>
+                        <span onClick={::this._switchShowMore}>{this.state.showAll ? "Скрыть" : _showMoreTitle}</span>
                     </div>
             }
         </div>

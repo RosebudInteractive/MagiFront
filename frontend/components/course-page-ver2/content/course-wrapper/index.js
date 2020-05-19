@@ -8,7 +8,6 @@ import Books from "../../../books";
 import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
 import VideoBlock from "./video-block";
 import MoreCourses from "./more-courses";
-import Reviews from "./reviews";
 
 export default class CourseWrapper extends React.Component {
 
@@ -56,7 +55,6 @@ export default class CourseWrapper extends React.Component {
                         {this.state.showMore ? " ↑ " : " ↓ "}
                     </div>
             }
-            <Reviews reviews={course.Reviews}/>
             <Scheme course={course}/>
             <Books books={this.props.course.Books}
                    titleClassName={"course-wrapper__title"}
@@ -65,13 +63,6 @@ export default class CourseWrapper extends React.Component {
                    title={"Книга по курсу"}/>
             <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.INTERVIEW}/>
             <MoreCourses courses={moreCourses}/>
-            {/*<div className="course-wrapper__about">*/}
-            {/*    <div className="course-wrapper__about-title">О магистерии</div>*/}
-            {/*    Истина, полагает он, начинается с отказа от заблуждения. Поэтому в начале своего трактата "О душе" он*/}
-            {/*    последовательно излагает, а затем критикует все основные распространенные в его время учения о природе*/}
-            {/*    души. Уже в этом обзоре и в этой критике ярко выступает эмпирический характер психологии Аристотеля,*/}
-            {/*    его убеждение в тесной связи между душевными и телесными явлениями.*/}
-            {/*</div>*/}
         </div>
     }
 

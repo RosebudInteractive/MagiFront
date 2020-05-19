@@ -16,7 +16,6 @@ import {cancelDelete, showDeleteConfirmation} from '../../actions/CommonDlgActio
 import ReviewEditor from '../../components/reviews/editor'
 
 import Webix from '../../components/Webix';
-import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
@@ -105,7 +104,6 @@ class ReviewsPage extends React.Component {
         const {
             loading,
             loaded,
-            // deleteDlgShown,
             showReviewEditor,
         } = this.props;
 
@@ -131,16 +129,6 @@ class ReviewsPage extends React.Component {
                         </div>
                     </div>
                 </div>
-                {/*{*/}
-                {/*    (deleteDlgShown && !showReviewEditor)?*/}
-                {/*        <YesNoDialog*/}
-                {/*            yesAction={::this._deleteReview}*/}
-                {/*            noAction={::this._cancelDelete}*/}
-                {/*            message={"Удалить отзыв" + this._getSelectedReviewDescr() + "?"}*/}
-                {/*        />*/}
-                {/*        :*/}
-                {/*        null*/}
-                {/*}*/}
                 { !showReviewEditor ? <ErrorDialog/> : null }
                 <ReviewEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}
                              onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
@@ -163,14 +151,6 @@ class ReviewsPage extends React.Component {
         }
 
     }
-
-    _confirmDelete() {
-        this.props.showDeleteConfirmation()
-    }
-
-    // _cancelDelete() {
-    //     this.props.cancelDelete()
-    // }
 
     _onEditPrev() {
         const _index = this.props.reviews.findIndex((item) => {
@@ -201,18 +181,6 @@ class ReviewsPage extends React.Component {
             return Object.assign({}, item)
         })
     }
-
-    // _getSelectedReviewDescr() {
-    //     let _review = null;
-    //
-    //     if (this._selected) {
-    //         _review = this.props.reviews.find((item) => {
-    //             return item.id === this._selected
-    //         })
-    //     }
-    //
-    //     return _review ? ` пользователя "${_review.UserName}"` : ''
-    // }
 
     _getCourses() {
         let {courses} = this.props;

@@ -18,6 +18,7 @@ export const STYLES = {
         width: "100%",
         maxWidth: "600px",
         border: "none",
+        verticalAlign: "top",
     },
 
     LOGO: {

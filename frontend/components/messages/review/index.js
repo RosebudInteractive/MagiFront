@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {hideReviewWindow, sendReview, loadingSelector, showReviewWindowSelector} from "ducks/message";
+import {hideReviewWindow, sendReview, loadingSelector, showReviewWindowSelector, reviewCourseNameSelector} from "ducks/message";
 import Platform from "platform";
 import "./review.sass"
 import {getCountSimbolsTitle} from "tools/word-tools";
@@ -68,7 +68,7 @@ class ReviewWindow extends React.Component {
     }
 
     render() {
-        const {user, visible} = this.props
+        const {user, visible, courseName} = this.props
 
         if (!visible) return null
 
@@ -94,7 +94,7 @@ class ReviewWindow extends React.Component {
             <div className="review-window modal">
                 <button type="button" className="modal__close js-modal-close" onClick={::this._close}>Закрыть</button>
                 <div className="modal__header font-universal__title-medium">
-                    <p className="modal__headline">Напишите ваш отзыв</p>
+                    <p className="modal__headline">{`Отзыв на курс "${courseName}"`}</p>
                 </div>
                 <div className="modal__body">
                     <div className="form modal-form">
@@ -102,11 +102,10 @@ class ReviewWindow extends React.Component {
                                placeholder="Ваше имя" defaultValue={user ? user.DisplayName : ''}/>
 
                         <textarea onChange={::this._changeMessage} onPaste={::this._pasteHandler} name="message" id="message" className="form__message font-universal__body-medium"
-                                  placeholder="Ваш отзыв"/>
+                                  placeholder="Ваш отзыв" autoFocus={true}/>
 
                         <div className={"letters-counter font-universal__body-small" + (!this.state.count ? " _warning" : "")}>{_counterText}</div>
-                        <div className="social-network__hint font-universal__title-smallx">Ссылка на ваш профиль в одной из социальных сетей</div>
-                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль"/>
+                        <input onChange={::this._changeProfile} type="text" id="social-network" className="form__field social-network" placeholder="Ссылка на ваш профиль в одной из социальных сетей"/>
                         <Recaptcha
                             ref={ ref => this.recaptcha = ref }
                             sitekey={this.props.reCapture}
@@ -201,6 +200,7 @@ class ReviewWindow extends React.Component {
 function mapStateToProps(state) {
     return {
         visible: showReviewWindowSelector(state),
+        courseName: reviewCourseNameSelector(state),
         loading: loadingSelector(state),
         reCapture: reCaptureSelector(state),
         user: state.user.user

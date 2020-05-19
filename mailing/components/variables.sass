@@ -1,0 +1,15 @@
+$mobile-phone-width: 480px
+
+$color-main-dark: #2B2B2B
+
+@mixin font-arial($size: false, $weight: false,  $lh: false, $color: false)
+  font-family: Arial, sans-serif, Helvetica
+
+  @if $size
+    font-size: $size
+  @if $color
+    color: $color
+  @if $weight
+    font-weight: $weight
+  @if $lh
+    line-height: $lh
