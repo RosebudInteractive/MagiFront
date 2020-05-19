@@ -1,5 +1,6 @@
 //let { CoursesService } = require('./../database/courses');
 const _ = require('lodash');
+const config = require('config');
 const { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
@@ -9,6 +10,18 @@ function setupCourses(app) {
     global.$Services.courses = CoursesService;
     
     if (app) {
+        app.get('/api/courses/discounts', async (req, res, next) => {
+            try {
+                let result = [];
+                if (config.has('billing.strikePromo.values'))
+                    result = config.get('billing.strikePromo.values');
+                res.send(result);
+            }
+            catch (err) {
+                next(err);
+            };
+        });
+
         app.get('/api/courses/price-info/:url', async (req, res, next) => {
             try {
                 let rows = await CoursesService()

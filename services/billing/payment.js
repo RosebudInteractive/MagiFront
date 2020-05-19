@@ -163,7 +163,7 @@ exports.Payment = class Payment extends DbObject {
                         if (data.Description === key) {
                             curr_idx = -1;
                             for (let i = 0; i < opts.values.length; i++){
-                                if (data.Perc === opts.values[i]) {
+                                if (data.Perc === opts.values[i].value) {
                                     curr_idx = i + 1;
                                     break;
                                 }
@@ -184,7 +184,7 @@ exports.Payment = class Payment extends DbObject {
                         last_date.setHours(last_date.getHours() + durationInHours);
                         let promo_data = {
                             Code: code,
-                            Perc: opts.values[curr_idx],
+                            Perc: opts.values[curr_idx].value,
                             Counter: 1,
                             Description: key,
                             FirstDate: first_date,
