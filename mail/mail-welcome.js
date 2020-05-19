@@ -4,7 +4,7 @@ const { RenderMailHTML } = require('./utils');
 const { SendMail } = require('./index');
 const { buildLogString, validateEmail } = require('../utils');
 
-const WELCOME_MAILING_PATH = "/mailing/registration";
+const WELCOME_MAILING_PATH = "mailing/registration";
 const WELCOME_MAIL_CFG_NAME = "userWelcome";
 
 exports.SendWelcomeMail = async (user) => {

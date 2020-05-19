@@ -1,6 +1,7 @@
 'use strict';
 const querystring = require('querystring');
 const config = require('config');
+const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { SEO } = require('../const/common');
 const { PrerenderCache } = require('../prerender/prerender-cache');
