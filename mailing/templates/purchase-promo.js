@@ -30,27 +30,37 @@ class PurchasePromo extends React.Component {
             :
             <table align="center" style={STYLES.MAIN_TABLE}>
                 <tbody>
-                    <Logo/>
-                    <CourseCover course={course}/>
-                    <tr>
-                        <td style={STYLES.PARAGRAPH.GREETING}>
-                            {_message}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={STYLES.PARAGRAPH.THANKSGIVING}>
-                            Благодарим Вас за покупку подарочного промокода на курс "{course.Name}".
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={STYLES.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому хотите подарить этот курс.</td>
-                    </tr>
-                    <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
-                    <tr><td style={STYLES.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
-                    <tr>
-                        <td style={STYLES.PARAGRAPH.LAST}>С наилучшими пожеланиями, Магистерия.</td>
-                    </tr>
-                    <Social/>
+                <tr>
+                    <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
+                    <td style={STYLES.CONTENT_TABLE}>
+                        <table align="center" style={STYLES.MAIN_TABLE}>
+                            <tbody>
+                                <Logo/>
+                                <CourseCover course={course}/>
+                                <tr>
+                                    <td style={STYLES.PARAGRAPH.GREETING}>
+                                        {_message}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style={STYLES.PARAGRAPH.THANKSGIVING}>
+                                        Благодарим Вас за покупку подарочного промокода на курс "{course.Name}".
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style={STYLES.PARAGRAPH.COMMON}>Вы можете просто переслать указанный ниже промокод вместе с инструкцией активации человеку, которому хотите подарить этот курс.</td>
+                                </tr>
+                                <PromoInstruction URL={course.URL} name={course.Name} promo={_promo}/>
+                                <tr><td style={STYLES.PARAGRAPH.COMMON}>Также уточняем, что промокод может быть применен только один раз и только для данного курса.</td></tr>
+                                <tr>
+                                    <td style={STYLES.PARAGRAPH.LAST}>С наилучшими пожеланиями, Магистерия.</td>
+                                </tr>
+                                <Social/>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
+                </tr>
                 </tbody>
             </table>
     }

@@ -24,8 +24,11 @@
 .font__main-text
   @include font-arial(18px, normal, 130%)
 
-  &._dark
-    color: $color-main-dark
+.font-universal__header
+  @include font-arial(23px, bold, 130%)
+
+._dark
+  color: $color-main-dark
 
 @media only screen and (max-width: $mobile-phone-width)
   .adaptive-column-block

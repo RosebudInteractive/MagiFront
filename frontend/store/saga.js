@@ -10,7 +10,7 @@ import {saga as testResultSaga} from 'ducks/test-result'
 import {saga as testShareResultSaga} from 'ducks/test-share-result'
 import {saga as filtersSaga} from 'ducks/filters'
 // пока костыль
-import {saga as coursesSaga} from 'actions/courses-page-actions'
+import {saga as courseSaga} from 'ducks/course'
 import {saga as lessonMenuSaga} from 'ducks/lesson-menu'
 import {saga as messagesSaga} from 'ducks/message'
 
@@ -25,7 +25,7 @@ export default function* rootSaga() {
         testInstanceSaga(),
         testResultSaga(),
         testShareResultSaga(),
-        coursesSaga(),
+        courseSaga(),
         lessonMenuSaga(),
         filtersSaga(),
         messagesSaga(),

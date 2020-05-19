@@ -20,6 +20,14 @@ export const STYLES = {
         border: "none",
         verticalAlign: "top",
     },
+    SPACE_TABLE: {
+        width: "24px",
+        padding: "0px",
+        color: "rgb(255, 255, 255)"
+    },
+    CONTENT_TABLE: {
+        padding: "0px",
+    },
 
     LOGO: {
         height: "80px"

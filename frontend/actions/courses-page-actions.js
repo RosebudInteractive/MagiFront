@@ -12,21 +12,11 @@ import {
 } from '../constants/filters'
 
 import 'whatwg-fetch';
-import {getTimeFmt, parseReadyDate} from "../tools/time-tools";
+import {parseReadyDate} from "../tools/time-tools";
 import {DATA_EXPIRATION_TIME, LESSON_STATE} from "../constants/common-consts";
 
-
-import {appName} from '../config'
-import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 
-/**
- * Constants
- * */
-export const moduleName = 'courses'
-const prefix = `${appName}/${moduleName}`
-
-export const GET_CONCRETE_COURSE_REQUEST = `${prefix}/GET_CONCRETE_COURSE_REQUEST`
 
 export const getCourses = () => {
     return (dispatch, getState) => {
@@ -306,53 +296,4 @@ const getLastListenedLesson = (lessons, state) => {
     })
 
     return {lesson: lessons[_lesson.index], hasListened: (_lesson.index !== 0) || (_lesson.info && _lesson.info.ts)}
-}
-
-
-/**
- * Sagas
- */
-export const saga = function* () {
-    yield all([
-        takeEvery(GET_CONCRETE_COURSE_REQUEST, getCourseSaga),
-    ])
-}
-
-function* getCourseSaga(data) {
-
-
-    console.log(data)
-
-    yield put({type: GET_SINGLE_COURSE_REQUEST})
-
-    try {
-        const _course = yield call(_fetchCourse, data.payload),
-            _state = yield select(state => state)
-
-        handleCourse(_course, _state);
-
-        yield put({type: GET_SINGLE_COURSE_SUCCESS, payload: _course})
-    } catch (err) {
-
-        console.error(err)
-
-        if (err.status === 404) {
-            yield put({type: SET_COURSE_NOT_FOUND})
-        } else {
-            yield put({type: GET_SINGLE_COURSE_FAIL, payload: err})
-        }
-    }
-}
-
-function _fetchCourse(url, options) {
-    const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
-
-    return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
-        .then(checkStatus)
-        .then(parseJSON)
-        .then((data) => {
-            console.log(data)
-
-            return data
-        })
 }

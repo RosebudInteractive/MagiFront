@@ -1,5 +1,30 @@
-.registration-block
-  //@media only screen and (max-width: $mobile-phone-width)
-  //  .column-table
-  //    width: 100%!important
-  //    max-width: 100%!important
+@import "../variables"
+
+.registration-block__top-block
+  padding-bottom: 22px
+
+.registration-block__central-block
+  background: rgba(0, 0, 0, .05)
+  padding: 62px 6% 45px
+
+  .header
+    text-align: center
+    padding: 0 14%
+
+  .image-row
+    text-align: center
+    display: block
+    padding: 37px 0 46px
+
+  .image-button
+    display: inline-block
+    text-align: center
+
+    &._central
+      padding: 0 15%
+
+  .text
+    text-align: center
+
+.font-registration__central-block
+  @include font-arial(15px, normal, 130%, $color-main-dark)
