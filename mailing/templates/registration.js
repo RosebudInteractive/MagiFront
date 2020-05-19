@@ -29,11 +29,8 @@ export default class Registration extends React.Component {
     }
 
     render() {
-        const _params = new URLSearchParams(this.props.location.search),
-            _userName = _params.get('username')
-
         return <React.Fragment>
-                <TopBlock userName={_userName}/>
+                <TopBlock/>
                 <MiddleBlock/>
                 <BottomBlock/>
             </React.Fragment>

@@ -35,17 +35,11 @@ const STYLE = {
 
 export default class TopBlock extends React.Component {
 
-    static propTypes = {
-        userName: PropTypes.string,
-    }
-
     constructor(props) {
         super(props)
     }
 
     render() {
-        const _message = "Здравствуйте" + (this.props.userName ? `, ${this.props.userName}.` : ".")
-
         return <table align="center" style={STYLES.MAIN_TABLE}>
             <tbody>
             <tr>
@@ -56,11 +50,7 @@ export default class TopBlock extends React.Component {
                         <Logo/>
                         <tr>
                             <td>
-                                <tr>
-                                    <td style={STYLES.PARAGRAPH.GREETING}>
-                                        {_message}
-                                    </td>
-                                </tr>
+                                <tr><td style={STYLES.PARAGRAPH.GREETING}>Дорогой подписчик!</td></tr>
                                 <tr>
                                     <td style={STYLES.PARAGRAPH.THANKSGIVING}>
                                         <table style={STYLE.TABLE} align="left" width="50%" className="adaptive-column-block">
@@ -70,9 +60,11 @@ export default class TopBlock extends React.Component {
                                                     Magisteria.ru.
                                                     Меня зовут Андрей Борейко. Я – главный редактор «Магистерии».
                                                     Позвольте коротко рассказать Вам о нашем проекте.
+                                                    <div style={{paddingTop: "8px"}}>
                                                     Наша цель – сохранение, развитие и популяризация качественного гуманитарного
                                                     знания,
                                                     а также формирование полезных навыков в разных прикладных областях.
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </table>
