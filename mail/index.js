@@ -2,6 +2,7 @@
 const config = require('config');
 const nodemailer = require('nodemailer');
 const htmlToText = require('nodemailer-html-to-text').htmlToText;
+const { SendPulseMail } = require('./sendpulse');
 
 let transporters = {};
 
@@ -36,6 +37,9 @@ function getTransporter(transporter) {
                                 }
                             });
                         });
+                        break;
+                    case "sendpulse":
+                        result = SendPulseMail();
                         break;
                     default:
                         throw new Error("Invalid EMail transporter type: \"" + type + "\" (mail." + transporter + ").");

@@ -2,32 +2,33 @@
 const _ = require('lodash');
 const config = require('config');
 const { HttpCode } = require("../../const/http-codes");
-const { MailSubscription } = require('./mail-subscription');
+const { SendPulseService } = require('./sp-service');
 const { UsersCache } = require('../../security/users-cache');
+const { SendWelcomeMail } = require('../../mail/mail-welcome');
 
-let mailSubscription = null;
-let subscriptionService = () => {
-    if (!mailSubscription)
-        mailSubscription = new MailSubscription();
-    return mailSubscription;
-}
+let subscriptionService = SendPulseService;
 
+let need_to_send_welcome = config.has("mail.userWelcome");
+let subsService = null;
+let mailList = null;
 if (config.has("mail.autosubscribe.enabled") && config.mail.autosubscribe.enabled
     && config.has("mail.autosubscribe.mailList")) {
-    let subsService = subscriptionService();
-    let mailList = config.mail.autosubscribe.mailList;
-    UsersCache().setAfterUserCreateEvent(userData => {
-        return subsService.addEmailToAddressBook(mailList, userData.Email, userData.DisplayName)
+    subsService = subscriptionService();
+    mailList = config.mail.autosubscribe.mailList;
+}
+if (mailList || need_to_send_welcome)
+    UsersCache().setAfterUserCreateEvent(async (userData) => {
+        await subsService.addEmailToAddressBook(mailList, userData.Email, userData.DisplayName)
             .then(result => {
                 if (result === false)
                     console.error(`addEmailToAddressBook: Failed to add email "${userData.Email}" to mailing list: "${mailList}".`)
             }, err => {
                 console.error(`addEmailToAddressBook: Failed to add email "${userData.Email}" to mailing list: "${mailList}".` +
                     ` Error: ${err && err.message ? err.message : JSON.stringify(err)}`);
-                })
-            .then(() => userData);
-    })
-}
+            });
+        SendWelcomeMail(userData); // we don't need to wait here !!!
+        return userData;
+    });
 
 exports.SubscriptionService = subscriptionService;
 exports.SetupRoute = (app) => {

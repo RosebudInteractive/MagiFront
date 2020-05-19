@@ -3,7 +3,7 @@ const config = require('config');
 // const sendpulse = require("sendpulse-api");
 const sendpulse = require("./sp-magisteria"); // Patched version of "sendpulse-api".
 
-exports.MailSubscription = class MailSubscription {
+let SendPulseService = class SendPulseService {
     constructor() {
         sendpulse.init(config.mail.sendPulse.apiUserId, config.mail.sendPulse.apiSecret, config.mail.sendPulse.tmpPath);
     }
@@ -72,4 +72,33 @@ exports.MailSubscription = class MailSubscription {
                 })
             });
     }
+
+    smtpListAllowedDomains() {
+        return new Promise(resolve => {
+            sendpulse.smtpListAllowedDomains(result => {
+                resolve(result);
+            })
+        })
+    }
+
+    smtpAddDomain(domain) {
+        return new Promise(resolve => {
+            sendpulse.smtpAddDomain(result => {
+                resolve(result);
+            }, domain);
+        })
+    }
+
+    smtpSendMail(mail) {
+        return new Promise(resolve => {
+            sendpulse.smtpSendMail(result => {
+                resolve(result);
+            }, mail);
+        })
+    }
+}
+
+let sendPulseService = null;
+exports.SendPulseService = () => {
+    return sendPulseService ? sendPulseService : sendPulseService = new SendPulseService();
 }
