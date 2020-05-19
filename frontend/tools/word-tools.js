@@ -26,6 +26,10 @@ export const getCountReviewsTitle = (count) => {
     return getCounterTitle(count, {single: 'отзыв', twice: 'отзыва', many: 'отзывов'})
 }
 
+export const getCountTestTitle = (count) => {
+    return getCounterTitle(count, {single: 'тест', twice: 'теста', many: 'тестов'})
+}
+
 const getCounterTitle = (count, {single, twice, many}) => {
     switch (count % 10) {
         case 1: {

@@ -40,6 +40,8 @@ class Statistic extends React.Component {
                     })
                 }
 
+                _resetPlayBlockSize()
+
                 return
             }
 
@@ -112,7 +114,7 @@ class Statistic extends React.Component {
             _freeLessonCover = _freeLesson ? getCoverPath(_freeLesson, ImageSize.small) : null,
             _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
 
-        return <div className="course-page__statistic">
+        return <div className={"course-page__statistic" + (_isBought ? " _bought" : "")}>
             <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "") + (this.state.onBottom ? " _bottom" : "")}>
                 {
                     _isBought ?
@@ -177,7 +179,7 @@ class Statistic extends React.Component {
     }
 }
 
-function _setPlayBlockSize(){
+function _setPlayBlockSize() {
     const _wrapper = $('.statistic__play-block'),
         _playBlockWrapper = $('.play-block__wrapper'),
         _playBlock = $('.play-block'),
@@ -188,7 +190,19 @@ function _setPlayBlockSize(){
     _playBlockWrapper.width(_size).height(_size)
     _playBlock.width(_size).height(_size)
     _image.width(_size).height(_size)
+
+
 }
+
+ function _resetPlayBlockSize() {
+     const _playBlockWrapper = $('.play-block__wrapper'),
+         _playBlock = $('.play-block'),
+         _image = $('.play-block__image-wrapper')
+
+     _playBlockWrapper.width("").height("")
+     _playBlock.width("").height("")
+     _image.width("").height("")
+ }
 
 function mapStateToProps(state,) {
     return {

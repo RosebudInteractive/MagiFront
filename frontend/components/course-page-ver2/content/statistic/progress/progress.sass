@@ -26,11 +26,6 @@
 .progress__completed-wrapper
   display: flex
   flex-direction: column
-  @media (max-width: 899px)
-    flex-direction: row
-  @media (max-width: 639px)
-    flex-direction: column
-
 
 .progress__lessons-block, .progress__tests-block
   padding: 18.5px 0
@@ -44,12 +39,10 @@
   color: $color-main-dark
   margin: 0
   @media (max-width: 899px)
-    // Пока нет тестов можно убрать
-    //flex-basis: 50%
     flex-basis: 100%
     font-size: 15px
     line-height: 18px
-    padding: 7.5px 0
+    padding: 15.5px 0
 
   .progress-bar
     border-bottom: 7px solid $color-orange
@@ -93,7 +86,11 @@
     display: block
     @media (max-width: 1199px)
       display: none
+    @media (max-width: $tablet-width)
+      display: block
   &._short
     display: none
     @media (max-width: 1199px)
       display: block
+    @media (max-width: $tablet-width)
+      display: none
