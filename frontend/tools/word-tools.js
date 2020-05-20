@@ -1,7 +1,3 @@
-export const getCountLessonTitle = (count) => {
-    return getCounterTitle(count, {single: 'лекция', twice: 'лекции', many: 'лекций'})
-}
-
 export const getCountHoursTitle = (count) => {
     return getCounterTitle(count, {single: 'час', twice: 'часа', many: 'часов'})
 }
@@ -26,8 +22,24 @@ export const getCountReviewsTitle = (count) => {
     return getCounterTitle(count, {single: 'отзыв', twice: 'отзыва', many: 'отзывов'})
 }
 
-export const getCountTestTitle = (count) => {
-    return getCounterTitle(count, {single: 'тест', twice: 'теста', many: 'тестов'})
+export const Tests = {
+    getCountTitle: (count) => {
+        return getCounterTitle(count, {single: 'тест', twice: 'теста', many: 'тестов'})
+    },
+
+    getCompletedTitle: (count) => {
+        return getCounterTitle(count, {single: 'пройден', twice: 'пройдено', many: 'пройдено'})
+    }
+}
+
+export const Lessons = {
+    getCountTitle: (count) => {
+        return getCounterTitle(count, {single: 'лекция', twice: 'лекции', many: 'лекций'})
+    },
+
+    getListenedTitle: (count) => {
+        return getCounterTitle(count, {single: 'просмотрена', twice: 'просмотрено', many: 'просмотрено'})
+    }
 }
 
 const getCounterTitle = (count, {single, twice, many}) => {
@@ -45,8 +57,4 @@ const getCounterTitle = (count, {single, twice, many}) => {
         default:
             return many
     }
-}
-
-export const getCountListenedTitle = (count) => {
-    return getCounterTitle(count, {single: 'прослушана', twice: 'прослушаны', many: 'прослушано'})
 }
