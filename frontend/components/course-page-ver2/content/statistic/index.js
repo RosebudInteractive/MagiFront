@@ -112,7 +112,8 @@ class Statistic extends React.Component {
 
         const _cover = getCoverPath(_lastListenedLesson, ImageSize.small),
             _freeLessonCover = _freeLesson ? getCoverPath(_freeLesson, ImageSize.small) : null,
-            _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
+            _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought),
+            _showProgress = _isBought && (course.statistics.lessons.finishedLessons || course.statistics.tests.completed)
 
         return <div className={"course-page__statistic" + (_isBought ? " _bought" : "")}>
             <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "") + (this.state.onBottom ? " _bottom" : "")}>
@@ -140,7 +141,12 @@ class Statistic extends React.Component {
                                         </div>
                                 }
                             </div>
-                            <Progress course={course}/>
+                            {
+                                _showProgress ?
+                                    <Progress course={course}/>
+                                    :
+                                    <Data course={course}/>
+                            }
                             <SocialBlock shareUrl={shareUrl} counter={course.ShareCounters}/>
                         </React.Fragment>
                         :
