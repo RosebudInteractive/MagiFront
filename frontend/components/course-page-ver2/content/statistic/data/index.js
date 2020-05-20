@@ -61,7 +61,7 @@ function TotalTestsCounter(props) {
         <div className="statistic__data-block">
             <div className="data__header-block">
                 <span className="progress__completed">{data.total}</span>
-                <span className="data__text">{` ${getCountTestTitle(data.total)}`}</span>
+                <span className="data__text">{getCountTestTitle(data.total)}</span>
             </div>
         </div>
         :
