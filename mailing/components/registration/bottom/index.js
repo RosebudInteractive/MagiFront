@@ -28,7 +28,7 @@ export default class BottomBlock extends React.Component {
     }
 
     render() {
-        return <table align="center" style={STYLES.MAIN_TABLE}>
+        return <table align="center" style={STYLES.MAIN_TABLE_EXT}>
             <tbody>
             <tr>
                 <td style={STYLES.SPACE_TABLE}>&nbsp;</td>

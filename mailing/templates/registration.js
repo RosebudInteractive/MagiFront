@@ -30,9 +30,15 @@ export default class Registration extends React.Component {
 
     render() {
         return <React.Fragment>
+            <div style={{maxWidth: "640px"}}>
                 <TopBlock/>
+            </div>
+            <div style={{maxWidth: "100%", backgroundColor: "rgba(0, 0, 0, 0.05)"}}>
                 <MiddleBlock/>
+            </div>
+            <div style={{maxWidth: "640px"}}>
                 <BottomBlock/>
+            </div>
             </React.Fragment>
 
 

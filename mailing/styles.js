@@ -20,7 +20,18 @@ export const STYLES = {
         border: "none",
         verticalAlign: "top",
     },
-    SPACE_TABLE: {
+    MAIN_TABLE_EXT: {
+        borderSpacing:0,
+        fontFamily: "arial,helvetica,sans-serif",
+        background: "#FFFFFF",
+        borderCollapse: "collapse",
+        margin: "0 auto",
+        width: "100%",
+        maxWidth: "640px",
+        border: "none",
+        verticalAlign: "top",
+    },
+        SPACE_TABLE: {
         width: "24px",
         padding: "0px",
         color: "rgb(255, 255, 255)"

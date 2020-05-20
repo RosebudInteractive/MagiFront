@@ -4,7 +4,6 @@ import {STYLES} from "../../../styles";
 import Logo from "../../common/logo";
 import "../../common/common.sass"
 import "../../registration/registration.sass"
-import PropTypes from "prop-types";
 
 const STYLE = {
     TEXT: {
@@ -40,7 +39,7 @@ export default class TopBlock extends React.Component {
     }
 
     render() {
-        return <table align="center" style={STYLES.MAIN_TABLE}>
+        return <table align="center" style={STYLES.MAIN_TABLE_EXT}>
             <tbody>
             <tr>
                 <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
@@ -53,7 +52,7 @@ export default class TopBlock extends React.Component {
                                 <tr><td style={STYLES.PARAGRAPH.GREETING}>Дорогой подписчик!</td></tr>
                                 <tr>
                                     <td style={STYLES.PARAGRAPH.THANKSGIVING}>
-                                        <table style={STYLE.TABLE} align="left" width="50%" className="adaptive-column-block">
+                                        <table style={STYLE.TABLE} align="left" width="48.1%" className="adaptive-column-block">
                                             <tr>
                                                 <td className="font__main-text _dark">
                                                     Мы очень рады, что Вы решили присоединиться к сообществу пользователей
@@ -68,7 +67,7 @@ export default class TopBlock extends React.Component {
                                                 </td>
                                             </tr>
                                         </table>
-                                        <table style={STYLE.TABLE} align="right" width="50%" className="adaptive-column-block">
+                                        <table style={STYLE.TABLE} align="right" width="50.4%" className="adaptive-column-block">
                                             <tr>
                                                 <td>
                                                     <img src={window.location.origin + "/data/2016/08/unnamed-2-768x768.jpg"}
