@@ -12,6 +12,20 @@ const STYLE = {
         width: "100%",
         maxWidth: "640px",
     },
+    IMAGE_ROW: {
+        textAlign: "center",
+        display: "block",
+        padding: "37px 0 46px"
+    },
+    IMAGE_BUTTON: {
+        display: "inline-block",
+        textAlign: "center",
+    },
+    IMAGE_BUTTON_CENTRAL: {
+        display: "inline-block",
+        textAlign: "center",
+    },
+
 }
 
 
@@ -28,14 +42,14 @@ export default class MiddleBlock extends React.Component {
                     Смотрите. Слушайте. Читайте.
                 </td>
             </tr>
-            <tr className="image-row">
-                <td className="image-button">
+            <tr className="image-row" style={STYLE.IMAGE_ROW}>
+                <td className="image-button" style={STYLE.IMAGE_BUTTON}>
                     <img src={window.location.origin + "/images/mail/play.png"} alt="Смотрите"/>
                 </td>
-                <td className="image-button _central">
+                <td className="image-button _central" style={STYLE.IMAGE_BUTTON_CENTRAL}>
                     <img src={window.location.origin + "/images/mail/sound.png"} alt="Слушайте"/>
                 </td>
-                <td className="image-button">
+                <td className="image-button" style={STYLE.IMAGE_BUTTON}>
                     <img src={window.location.origin + "/images/mail/glasses.png"} alt="Читайте"/>
                 </td>
             </tr>
