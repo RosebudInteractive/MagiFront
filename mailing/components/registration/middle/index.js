@@ -106,7 +106,7 @@ export default class MiddleBlock extends React.Component {
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style={STYLE.SPACE}><p style={{height: "62px", marginBottom: "0", marginTop: "0", padding:"0"}}>&nbsp;</p></td>
+                                            <td style={STYLE.SPACE}><p style={{height: "45px", marginBottom: "0", marginTop: "0", padding:"0"}}>&nbsp;</p></td>
                                         </tr>
                                         </tbody>
                                     </table>
