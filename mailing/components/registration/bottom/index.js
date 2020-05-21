@@ -59,7 +59,6 @@ export default class BottomBlock extends React.Component {
                             <td style={STYLES.PARAGRAPH.LAST} className="paragraph-with-spacing">
                                 <p>Искренне Ваш, Главный редактор Magisteria.ru</p>
                                 <p>Андрей Борейко</p>
-                                <p>P.S.: По всем вопросам Вы можете писать ….</p>
                             </td>
                         </tr>
                         <Social/>

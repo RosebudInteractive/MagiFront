@@ -22,9 +22,7 @@ export default class Registration extends React.Component {
                 </tr>
                 <tr>
                     <td>
-                        <div style={{maxWidth: "100%", backgroundColor: "rgba(0, 0, 0, 0.05)"}}>
-                            <MiddleBlock/>
-                        </div>
+                        <MiddleBlock/>
                     </td>
                 </tr>
                 <tr>
