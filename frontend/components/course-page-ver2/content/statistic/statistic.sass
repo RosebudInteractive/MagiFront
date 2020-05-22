@@ -94,12 +94,18 @@
         display: block
         @media (max-width: 1199px)
           display: none
+        @media (max-width: $tablet-width)
+          display: block
+        @media (max-width: $mobile-phone-width)
+          display: none
       &._short
         display: none
         @media (max-width: 1199px)
           display: block
         @media (max-width: 899px)
           display: none
+        @media (max-width: $mobile-phone-width)
+          display: block
 
     .info-wrapper__lesson
       color: $color-main-dark
@@ -110,6 +116,10 @@
       display: -webkit-box
       -webkit-box-orient: vertical
       @media (max-width: 1199px)
+        display: none
+      @media (max-width: $tablet-width)
+        display: block
+      @media (max-width: $mobile-phone-width)
         display: none
 
   .course-module__price-block-info

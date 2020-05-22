@@ -35,7 +35,8 @@ function LessonCompleted(props) {
         _percent = (data.finishedLessons / data.total) * 100,
         _style = {width : `${_percent}%`}
 
-    return <div className="progress__lessons-block statistic-block">
+    return data.finishedLessons ?
+        <div className="progress__lessons-block statistic-block">
             <span className="progress__completed">{data.finishedLessons}</span>
             <span className="statistic-separator"> / </span>
             <span className="progress__total">{`${data.total} `}</span>
@@ -43,6 +44,12 @@ function LessonCompleted(props) {
             <span className="progress__text _short">{` ${Lessons.getCountTitle(data.finishedLessons)}`}</span>
             <div className="progress-bar" style={_style}/>
         </div>
+        :
+        <div className="progress__lessons-block statistic-block">
+            <span className="progress__completed">{data.total}</span>
+            <span className="progress__text">{` ${Lessons.getCountTitle(data.total)}`}</span>
+        </div>
+
 }
 
 /**
@@ -68,7 +75,7 @@ function TestsCompleted(props) {
         :
         <div className="progress__tests-block statistic-block">
             <span className="progress__completed">{tests.total}</span>
-            <span className="progress__text"> тестов</span>
+            <span className="progress__text">{` ${Tests.getCountTitle(tests.total)}`}</span>
         </div>
 }
 

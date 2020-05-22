@@ -17,14 +17,15 @@ export default class Data extends React.Component {
         const {course} = this.props
 
         return <div className="statistic__data-wrapper">
-                <div className="data__first-block statistic__data-block">
-                    <TotalLessonCounter data={course.statistics.lessons}/>
+                <div className="data__first-block">
                     <ReadyDate data={course.statistics.lessons}/>
-                </div>
-                <TotalTestsCounter data={course.statistics.tests}/>
-                <div className="data__counters-wrapper">
-                    <VideoCounter duration={course.statistics.lessons.duration}/>
-                    <SublessonsCounter count={course.statistics.lessons.sublessonsCount}/>
+                    <TotalLessonCounter data={course.statistics.lessons}/>
+                    <div className="data__counters-wrapper">
+                        <SublessonsCounter count={course.statistics.lessons.sublessonsCount}/>
+                        <VideoCounter duration={course.statistics.lessons.duration} inLine={true}/>
+                    </div>
+                    <TotalTestsCounter data={course.statistics.tests}/>
+                    <VideoCounter duration={course.statistics.lessons.duration} inLine={false}/>
                 </div>
             </div>
     }
@@ -37,7 +38,7 @@ export default class Data extends React.Component {
 function TotalLessonCounter(props) {
     const {data} = props
 
-    return <div className="data__header-block">
+    return <div className="data__header-block statistic__data-block">
         <span className="progress__completed">{data.published}</span>
         { !data.allPublished ?
             <React.Fragment>
@@ -92,9 +93,9 @@ function ReadyDate(props) {
  * @return {null}
  */
 function VideoCounter(props) {
-    const {duration} = props
+    const {duration, inLine} = props
 
-    return <div className="data__info-block statistic__data-block video-data">
+    return <div className={"data__info-block statistic__data-block video-data" + (inLine ? " _inline" : " _column")}>
         <span className="progress__completed">{duration.hours}</span>
         <span className="data__text">{'ч'}</span>
         <span className="data_separator"/>
