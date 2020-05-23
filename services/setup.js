@@ -30,6 +30,7 @@ const { setupLessons } = require('./lessons');
 const { setupParameters } = require('./parameters');
 const { setupProducts } = require('./products');
 const { setupTests } = require('./tests');
+const { setupSearch } = require('./search');
 const { setupInvoices } = require('./invoices');
 const { setupBooks } = require('./books');
 const { setupPromoCodes } = require('./promo-codes');
@@ -200,6 +201,7 @@ function setupAPI(express, app) {
     setupParameters(app);
     setupSessions(app);
     setupTests(app);
+    setupSearch(app);
     
     //
     // Common API options
