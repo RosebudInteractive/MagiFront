@@ -13,7 +13,7 @@ import {
 
 import 'whatwg-fetch';
 import {parseReadyDate} from "../tools/time-tools";
-import {DATA_EXPIRATION_TIME, LESSON_STATE} from "../constants/common-consts";
+import {DATA_EXPIRATION_TIME, LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
 
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 
@@ -219,6 +219,7 @@ const handleCourse = (data, state) => {
         data.readyLessonCount = _readyLessonCount;
 
         calcStatistics(data, state)
+        calcTestsData(data)
     }
     catch (err) {
         console.error('ERR: ' + err.message);
@@ -275,6 +276,7 @@ const calcStatistics = (course, state) => {
         hasListened: !!hasListened,
         freeLesson: course.Lessons.find((item) => {return item.IsFreeInPaidCourse})
     }
+
 }
 
 const getLastListenedLesson = (lessons, state) => {
@@ -296,4 +298,41 @@ const getLastListenedLesson = (lessons, state) => {
     })
 
     return {lesson: lessons[_lesson.index], hasListened: (_lesson.index !== 0) || (_lesson.info && _lesson.info.ts)}
+}
+
+const calcTestsData = (course) => {
+    if (!course.statistics) {
+        course.statistics = {}
+    }
+
+    let _tests = []
+
+    course.Tests.forEach((item) => {
+        if ((item.TestTypeId === TEST_TYPE.STARTED) || (item.TestTypeId === TEST_TYPE.FINISHED)) {
+            _tests.push(item)
+        }
+    })
+
+    course.Lessons.forEach((lesson) => {
+        if (lesson.Tests) {
+            lesson.Tests.forEach((item) => {
+                if ((item.TestTypeId === TEST_TYPE.STARTED) || (item.TestTypeId === TEST_TYPE.FINISHED)) {
+                    _tests.push(item)
+                }
+            })
+        }
+    })
+
+    let _total = _tests.length,
+        _completed = _tests.filter(item => item.Instance && item.Instance.IsFinished).length,
+        _percent = _completed ?
+            _tests
+                .filter(item => item.Instance && item.Instance.IsFinished)
+                .reduce((acc, value) => {
+                    return acc + (value.Instance.Score > value.Instance.MaxScore ? 0 :  value.Instance.Score / value.Instance.MaxScore)
+                }, 0) / _completed
+            :
+            0
+
+    course.statistics.tests = {total: _total, completed: _completed, percent: Math.round(_percent * 100)}
 }

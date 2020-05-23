@@ -15,6 +15,8 @@
     margin-right: 20px
 
   .course-page__statistic-wrapper
+    display: flex
+    flex-direction: column
     margin-top: 2px
     width: calc(25% - 48px)
     position: absolute
@@ -36,7 +38,7 @@
 
   .statistic__play-block
     display: flex
-    @media (max-width: 899px)
+    //@media (max-width: 899px)
       display: none
 
     &._free-lesson
@@ -49,14 +51,28 @@
     @media (max-width: 1679px)
       width: 79px
       height: 79px
-    @media (max-width: 899px)
-      display: none
+    @media (max-width: $tablet-width)
+      width: 84px
+      height: 84px
+    @media (max-width: $mobile-phone-width)
+      width: 56px
+      height: 56px
 
   .play-block
-    @media (max-width: 1679px)
-      width: 79px
-      height: 79px
-      min-width: 79px
+    margin: 0
+    padding: 0
+    width: 79px
+    height: 79px
+    min-width: auto
+    @media (max-width: $tablet-width)
+      width: 84px
+      height: 84px
+      min-width: 84px
+    @media (max-width: $mobile-phone-width)
+      width: 56px
+      height: 56px
+      min-width: 56px
+
   .play-block__btn svg
     width: auto
     @media (max-width: 1679px)
@@ -107,16 +123,6 @@
 
   .lecture-full__play-block
     padding: 0
-
-  .play-block
-    margin: 0
-    padding: 0
-    height: 126px
-    width: 126px
-    min-width: auto
-    @media (max-width: 1679px)
-      width: 79px
-      height: 79px
 
   .play-block__loader, .play-block__loader:after, .svg-loader
     margin: 0
@@ -200,3 +206,25 @@
 
       div:nth-child(2)
         margin-left: 4px
+
+  &._bought
+    .statistic__play-block
+      order: 1
+
+    .course-statistic__progress
+      order: 2
+      margin-top: 5.5px
+
+    .statistic__data-wrapper
+      order: 2
+      margin-top: 20px
+
+    .bought-course__buttons-block
+      order: 3
+      margin-top: 28px
+
+    .social-block
+      order: 4
+
+    .data__info-block, .data__header-block
+      padding: 15.5px 0

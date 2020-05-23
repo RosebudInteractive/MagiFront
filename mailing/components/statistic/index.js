@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from 'prop-types'
-import {getCountLessonTitle, getCountSubsTitle} from "tools/word-tools";
+import {getCountSubsTitle, Lessons} from "tools/word-tools";
 
 
 const STYLE = {
@@ -105,7 +105,7 @@ export default class Statistic extends React.Component {
                         <td style={STYLE.CELL.LEFT}>
                             <div style={STYLE.CELL.WRAPPER}>
                                 <span style={STYLE.TEXT.COUNTER}>{_totalCount + ' '}</span>
-                                <span style={STYLE.TEXT.DESCRIPTION}>{getCountLessonTitle(_totalCount)}</span>
+                                <span style={STYLE.TEXT.DESCRIPTION}>{Lessons.getCountTitle(_totalCount)}</span>
                             </div>
                         </td>
                         <td style={STYLE.CELL.RIGHT}>

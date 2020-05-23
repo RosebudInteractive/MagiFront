@@ -4,7 +4,6 @@ import {STYLES} from "../../../styles";
 import Logo from "../../common/logo";
 import "../../common/common.sass"
 import "../../registration/registration.sass"
-import PropTypes from "prop-types";
 
 const STYLE = {
     TEXT: {
@@ -35,18 +34,12 @@ const STYLE = {
 
 export default class TopBlock extends React.Component {
 
-    static propTypes = {
-        userName: PropTypes.string,
-    }
-
     constructor(props) {
         super(props)
     }
 
     render() {
-        const _message = "Здравствуйте" + (this.props.userName ? `, ${this.props.userName}.` : ".")
-
-        return <table align="center" style={STYLES.MAIN_TABLE}>
+        return <table align="center" style={STYLES.MAIN_TABLE_EXT}>
             <tbody>
             <tr>
                 <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
@@ -56,27 +49,25 @@ export default class TopBlock extends React.Component {
                         <Logo/>
                         <tr>
                             <td>
-                                <tr>
-                                    <td style={STYLES.PARAGRAPH.GREETING}>
-                                        {_message}
-                                    </td>
-                                </tr>
+                                <tr><td style={STYLES.PARAGRAPH.GREETING}>Дорогой подписчик!</td></tr>
                                 <tr>
                                     <td style={STYLES.PARAGRAPH.THANKSGIVING}>
-                                        <table style={STYLE.TABLE} align="left" width="50%" className="adaptive-column-block">
+                                        <table style={STYLE.TABLE} align="left" width="48.1%" className="adaptive-column-block">
                                             <tr>
                                                 <td className="font__main-text _dark">
                                                     Мы очень рады, что Вы решили присоединиться к сообществу пользователей
                                                     Magisteria.ru.
                                                     Меня зовут Андрей Борейко. Я – главный редактор «Магистерии».
                                                     Позвольте коротко рассказать Вам о нашем проекте.
+                                                    <div style={{paddingTop: "8px"}}>
                                                     Наша цель – сохранение, развитие и популяризация качественного гуманитарного
                                                     знания,
                                                     а также формирование полезных навыков в разных прикладных областях.
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </table>
-                                        <table style={STYLE.TABLE} align="right" width="50%" className="adaptive-column-block">
+                                        <table style={STYLE.TABLE} align="right" width="50.4%" className="adaptive-column-block">
                                             <tr>
                                                 <td>
                                                     <img src={window.location.origin + "/data/2016/08/unnamed-2-768x768.jpg"}

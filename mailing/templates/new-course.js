@@ -40,28 +40,30 @@ class NewCourse extends React.Component {
         return fetching || !course ?
             null
             :
-            <table align="center" style={STYLES.MAIN_TABLE}>
-                <tbody>
-                <tr>
-                    <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
-                    <td style={STYLES.CONTENT_TABLE}>
-                        <table align="center" style={STYLES.MAIN_TABLE}>
-                            <tbody>
-                                <Logo/>
-                                <Header course={course}/>
-                                <PriceButton course={course}/>
-                                <Description course={course}/>
-                                <Statistic course={course}/>
-                                <Scheme course={course}/>
-                                <LearnLessonButton course={course}/>
-                                <Footer/>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
-                </tr>
-                </tbody>
-            </table>
+            <div style={{maxWidth: "600px"}}>
+                <table align="center" style={STYLES.MAIN_TABLE}>
+                    <tbody>
+                    <tr>
+                        <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
+                        <td style={STYLES.CONTENT_TABLE}>
+                            <table align="center" style={STYLES.MAIN_TABLE}>
+                                <tbody>
+                                    <Logo/>
+                                    <Header course={course}/>
+                                    <PriceButton course={course}/>
+                                    <Description course={course}/>
+                                    <Statistic course={course}/>
+                                    <Scheme course={course}/>
+                                    <LearnLessonButton course={course}/>
+                                    <Footer/>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td style={STYLES.SPACE_TABLE}>&nbsp;</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
     }
 }
 

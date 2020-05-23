@@ -1,123 +1,69 @@
 import React from "react"
 import PropTypes from 'prop-types'
-import {STYLES} from "../../../styles";
+import ImageRow from "./image-row";
 
 const STYLE = {
-    TABLE: {
+    TOP_TABLE: {
+        borderSpacing: "0",
+        borderCollapse: "separate",
+        border: "none",
+        width: "100%",
+        maxWidth: "100%",
+    },
+    PADDING_TABLE: {
         borderSpacing: "0",
         fontFamily: "arial, helvetica, sans-serif",
-        background: "rgba(0, 0, 0, 0.05)",
         borderCollapse: "separate",
         border: "none",
         verticalAlign: "top",
         margin: "0 auto",
         width: "100%",
-        maxWidth: "600px",
-    },
-    TABLE_ROW: {
-        paddingTop: "15px",
-        paddingBottom: "15px",
+        maxWidth: "640px",
+    }
+    ,TABLE: {
+        borderSpacing: "0",
+        fontFamily: "arial, helvetica, sans-serif",
+        borderCollapse: "collapse",
+        border: "none",
+        verticalAlign: "top",
+        margin: "0 auto",
+        width: "100%",
+        maxWidth: "640px",
+        borderColor: "none",
     },
     HEADER: {
-        paddingTop: "18px",
-        fontFamily: "Arial",
-        fontSize: "18px",
-        lineHeight: "130%",
+        color: "#2b2b2b",
+        fontFamily: "arial, helvetica, sans-serif",
+        fontSize: "23px",
         fontWeight: "bold",
+        lineHeight: "130%",
+        padding: "0 14% 0 14%",
+        textAlign: "center",
     },
-    DISCOUNT: {
-        HEADER: {
-            fontFamily: "Arial",
-            fontStyle: "normal",
-            fontWeight: "bold",
-            fontSize: "23px",
-            lineHeight: "130%",
-            color: "#2F2F2F",
-        },
-        DESCR: {
-            fontFamily: "Arial",
-            fontStyle: "normal",
-            fontWeight: "normal",
-            fontSize: "18px",
-            lineHeight: "130%",
-            color: "#000000",
-            paddingTop: "6px",
-        },
-        PROMO_ROW: {
-            paddingTop: "4px",
-            paddingBottom: "15px",
-            display: "block",
-            width: "100%"
-        },
-        PROMO: {
-            display: "block",
-            paddingTop: "9px",
-            paddingRight: "11px",
-            paddingBottom: "9px",
-            paddingLeft: "11px",
-            fontFamily: "Arial",
-            fontSize: "20px",
-            lineHeight: "130%",
-            fontWeight: "bold",
-            color: "#2B2B2B",
-            backgroundColor: "rgba(0, 0, 0, 0.05)",
-            textAlign: "center"
-        },
+    IMAGE_TABLE: {
+        borderSpacing: "0",
+        fontFamily: "arial, helvetica, sans-serif",
+        borderCollapse: "separate",
+        border: "none",
+        verticalAlign: "top",
+        margin: "0 auto",
+        width: "100%",
+        maxWidth: "640px",
+        textAlign: "center",
     },
-    MOBILE: {
-        ROW: {
-            display: "none",
-            height: 0,
-            overflow: "hidden",
-        },
-        DISCOUNT: {
-            TABLE: {
-                borderSpacing: 0,
-                fontFamily: "arial,helvetica,sans-serif",
-                background: "#FFFFFF",
-                borderCollapse: "collapse",
-                margin: "0 auto",
-                border: "none",
-                display: "none",
-                height: 0,
-                overflow: "hidden",
-            },
-            BODY: {
-                paddingTop: "8px",
-                display: "none",
-                height: 0,
-                overflow: "hidden",
-            },
-            RECORD: {
-                display: "none",
-                height: 0,
-                overflow: "hidden",
-            },
-            PROMO_ROW: {
-                paddingTop: "4px",
-                paddingBottom: "15px",
-                display: "none",
-                width: "100%",
-                height: 0,
-                overflow: "hidden",
-            },
-            PROMO: {
-                display: "none",
-                paddingTop: "9px",
-                paddingRight: "11px",
-                paddingBottom: "9px",
-                paddingLeft: "11px",
-                fontFamily: "Arial",
-                fontSize: "20px",
-                lineHeight: "130%",
-                fontWeight: "bold",
-                color: "#2B2B2B",
-                backgroundColor: "rgba(0, 0, 0, 0.05)",
-                textAlign: "center"
-            },
-        }
+    SPACE: {
+        fontSize: "15px",
+        lineHeight: "115%"
+    },
+    TEXT: {
+        fontFamily: "arial, helvetica, sans-serif",
+        fontSize: "15px",
+        color: "#2B2B2B",
+        fontWeight: "normal",
+        lineHeight: "130%",
+        textAlign: "center",
+        border: "none",
     }
-
 }
 
 
@@ -127,29 +73,49 @@ export default class MiddleBlock extends React.Component {
     }
 
     render() {
-        return <table style={STYLE.TABLE} className="registration-block__central-block">
-            <tbody style={STYLE.BODY}>
+        return <table align="center" width="100%" style={STYLE.TOP_TABLE} bgcolor="#EBEBEB">
+            <tbody>
             <tr>
-                <td className="header font-universal__header _dark">
-                    Смотрите. Слушайте. Читайте.
-                </td>
-            </tr>
-            <tr className="image-row">
-                <td className="image-button">
-                    <img src={window.location.origin + "/images/mail/play.png"} alt="Смотрите"/>
-                </td>
-                <td className="image-button _central">
-                    <img src={window.location.origin + "/images/mail/sound.png"} alt="Слушайте"/>
-                </td>
-                <td className="image-button">
-                    <img src={window.location.origin + "/images/mail/glasses.png"} alt="Читайте"/>
-                </td>
-            </tr>
-            <tr>
-                <td className="text font-registration__central-block">
-                    Лекции на Магистерии можно смотреть, слушать и читать.<br/>Галерея с иллюстрациями, задания и тесты,
-                    рекомендуемая литература и другие вспомогательные материалы помогают закрепить знания и наметить
-                    направления для самостоятельной работы.
+                <td>
+                    <center>
+                        <table style={STYLE.PADDING_TABLE} className="registration-block__central-block">
+                            <tbody style={STYLE.BODY}>
+                            <tr>
+                                <td width="6%" style={STYLE.SPACE}>&nbsp;</td>
+                                <td>
+                                    <table style={STYLE.TABLE}>
+                                        <tbody>
+                                        <tr>
+                                            <td style={STYLE.SPACE}><p style={{height: "62px", marginBottom: "0", marginTop: "0", padding:"0"}}>&nbsp;</p></td>
+                                        </tr>
+                                        <tr>
+                                            <td className="header font-universal__header _dark" style={STYLE.HEADER}>
+                                                Смотрите. Слушайте. Читайте.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <ImageRow/>
+                                        </tr>
+                                        <tr>
+                                            <td style={STYLE.TEXT} className="text font-registration__central-block">
+                                                Лекции на Магистерии можно смотреть, слушать и читать.<br/>Галерея с
+                                                иллюстрациями, задания и тесты,
+                                                рекомендуемая литература и другие вспомогательные материалы помогают
+                                                закрепить знания и наметить
+                                                направления для самостоятельной работы.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={STYLE.SPACE}><p style={{height: "62px", marginBottom: "0", marginTop: "0", padding:"0"}}>&nbsp;</p></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td width="6%" style={STYLE.SPACE}>&nbsp;</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </center>
                 </td>
             </tr>
             </tbody>

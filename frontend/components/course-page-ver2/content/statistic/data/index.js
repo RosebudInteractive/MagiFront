@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import "./statistic-data.sass"
-import {getCountLessonTitle, getCountSubsTitle} from "tools/word-tools";
+import {getCountSubsTitle, Lessons, Tests,} from "tools/word-tools";
 
 export default class Data extends React.Component {
 
@@ -21,6 +21,7 @@ export default class Data extends React.Component {
                     <TotalLessonCounter data={course.statistics.lessons}/>
                     <ReadyDate data={course.statistics.lessons}/>
                 </div>
+                <TotalTestsCounter data={course.statistics.tests}/>
                 <div className="data__counters-wrapper">
                     <VideoCounter duration={course.statistics.lessons.duration}/>
                     <SublessonsCounter count={course.statistics.lessons.sublessonsCount}/>
@@ -46,8 +47,25 @@ function TotalLessonCounter(props) {
             :
             null
         }
-        <span className="data__text">{`${getCountLessonTitle(data.total)}`}</span>
+        <span className="data__text">{`${Lessons.getCountTitle(data.total)}`}</span>
     </div>
+}
+
+/**
+ * @return {null}
+ */
+function TotalTestsCounter(props) {
+    const {data} = props
+
+    return data.total ?
+        <div className="statistic__data-block">
+            <div className="data__header-block">
+                <span className="progress__completed">{data.total}</span>
+                <span className="data__text">{Tests.getCountTitle(data.total)}</span>
+            </div>
+        </div>
+        :
+        null
 }
 
 /**
