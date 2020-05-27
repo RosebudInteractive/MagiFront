@@ -595,21 +595,8 @@ class CombineLessonPage extends React.Component {
                             {this._getLessonsBundles()}
                             <Sources lesson={_lesson}/>
                             <LessonInfo lesson={_lesson} course={course}/>
-                            <TranscriptPage episodes={lessonText.episodes}
-                                            refs={lessonText.refs}
-                                            gallery={lessonText.gallery}
-                                            isNeedHideGallery={_isNeedHideGallery}
-                                            isNeedHideRefs={_isNeedHideRefs}
-                                            lesson={_lesson}
-                                            history={this.props.history}
-                                            courseUrl={this.props.courseUrl}
-                                            lessonUrl={this.props.lessonUrl}
-                                            shareUrl={this._getShareUrl()}
-                                            counter={_lesson.ShareCounters}
-                                            singleLesson={course.OneLesson}
-                                            isPaidCourse={this._isPaidCourse}
-                                            needLockLessonAsPaid={this._needLockLessonAsPaid(_lesson)}
-                                            course={course}/>
+                            <TranscriptPage transcriptData={lessonText}
+                            course={course} lesson={_lesson} isNeedHideGallery={_isNeedHideGallery} isPaidCourse={this._isPaidCourse} lessonUrl={this.props.lessonUrl} courseUrl={this.props.courseUrl}/>
                         </React.Fragment>
                         :
                         null
@@ -624,6 +611,11 @@ class CombineLessonPage extends React.Component {
 
     _needLockLessonAsPaid(lesson) {
         return this._isPaidCourse && !(lesson.IsFreeInPaidCourse || this.props.isAdmin)
+    }
+
+    _isPlayerActive(lesson) {
+        // let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
+        //     _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
     }
 }
 

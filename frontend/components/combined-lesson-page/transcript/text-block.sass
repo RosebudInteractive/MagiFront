@@ -1,0 +1,57 @@
+@import "~tools/variables.sass"
+
+.text-block
+  display: flex
+
+  .left-block
+    position: relative
+    flex: 0 1 18.75%
+
+
+  .right-block
+    flex: 1 1 auto
+    //position: relative
+    //width: calc(81.25% - 795px)
+    ////max-width: 270px
+    //bottom: auto
+    //top: 10px
+    //display: flex
+    //right: 16px
+    position: relative
+    padding: 0 20px 0 30px
+    flex-direction: column
+    align-items: flex-end
+    //top: 0;
+    //right: 16px;
+    //margin-top: 5px
+    //@media(max-width: 1500px)
+      width: calc(31.25% - 45px)
+
+    &._fixed
+      position: fixed
+      margin-top: 58px
+
+
+      //.play-block,
+      //.play-block__image-wrapper,
+      //.play-block__image-wrapper:after,
+      //.play-block__loader,
+      //.play-block__loader:after,
+      //.svg-loader
+        width: 80px
+        height: 80px
+
+  .play-btn
+    position: absolute
+    top: 70px !important
+    left: 9px
+    margin-top: 0
+
+  .social-block-vertical
+    padding-top: 260px
+
+  .text-block__wrapper
+    margin: 0
+    flex: 1 1 50%
+
+
