@@ -1,7 +1,7 @@
 'use strict';
 const striptags = require('striptags');
 const _ = require('lodash');
-const { ImportBase } = require('./import-base');
+const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
 
 const MAX_IDS_PER_REQ = 5;
@@ -48,7 +48,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 150
+                    ignore_above: 255
                 }
             }
         },
@@ -65,10 +65,66 @@ const mapping = {
     }
 };
 
-class ImportAuthor extends ImportBase{
+class IdxAuthor extends IdxBase{
+
+    static get sortFields() {
+        return [
+            "createDate",
+            "modifyDate",
+            "pubDate",
+            "auName.key"
+        ];
+    }
+
+    static get analyzerFields() {
+        return [
+            { name: "auShortDescription" },
+            { name: "auDescription" },
+            { name: "auName", boost: 10 }
+
+        ];
+    }
+
+    static get highlightFields() {
+        return [
+            "auName",
+            "auShortDescription",
+            "auDescription"
+        ];
+    }
+
+    static get dataFields() {
+        return [
+            "auName",
+            "auInfo",
+            "pubDate"
+        ];
+    }
+
+    static get highlightMapping() {
+        return {
+            auName: "Name",
+            auShortDescription: "ShortDescription",
+            auDescription: "Description"
+        };
+    }
 
     constructor() {
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
+    }
+
+    async processHit(hit, baseUrl) {
+        let base_url = baseUrl ? baseUrl : this._baseUrl;
+        let result = { Id: hit["_id"], Name: hit["_source"].auName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        result.Portrait = this._convertDataUrl(hit["_source"].auInfo.Portrait, true, false, base_url);
+        result.PortraitMeta = this._convertMeta(hit["_source"].auInfo.PortraitMeta, true, false, base_url);
+        result.URL = this._getAbsAuthorUrl(base_url) + hit["_source"].auInfo.URL;
+        result.highlight = {};
+        for (let fld in hit.highlight) {
+            let fld_orig = IdxAuthor.highlightMapping[fld] ? IdxAuthor.highlightMapping[fld] : fld;
+            result.highlight[fld_orig] = hit.highlight[fld];
+        }
+        return result;
     }
 
     async _getData(store_func, opts) {
@@ -124,7 +180,7 @@ class ImportAuthor extends ImportBase{
                                 createDate: ts,
                                 modifyDate: ts,
                                 pubDate: elem.PubDate,
-                                csInfo: {
+                                auInfo: {
                                     URL: elem.AuthorURL,
                                     Portrait: elem.Portrait,
                                     PortraitMeta: elem.PortraitMeta
@@ -144,7 +200,8 @@ class ImportAuthor extends ImportBase{
     }
 }
 
-let importAuthor = null;
-exports.ImportAuthorService = () => {
-    return importAuthor ? importAuthor : importAuthor = new ImportAuthor();
+let idxAuthor = null;
+exports.IdxAuthor = IdxAuthor;
+exports.IdxAuthorService = () => {
+    return idxAuthor ? idxAuthor : idxAuthor = new IdxAuthor();
 }

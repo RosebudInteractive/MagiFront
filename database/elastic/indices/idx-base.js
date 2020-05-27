@@ -1,5 +1,6 @@
 'use strict';
 const _ = require('lodash');
+const { DbObject } = require('../../db-object');
 
 const DFLT_OPTIONS = {
     index: null,
@@ -11,7 +12,7 @@ const DFLT_OPTIONS = {
     }
 };
 
-exports.ImportBase = class ImportBase {
+exports.IdxBase = class IdxBase extends DbObject {
 
     get indexName() {
         return this._options.index;
@@ -26,12 +27,17 @@ exports.ImportBase = class ImportBase {
     }
 
     constructor(options) {
+        super(options);
         this._options = _.defaultsDeep(options, DFLT_OPTIONS);
         if (!this._options.index)
             throw new Error(`Missing index name.`);
     }
 
     async _getData(store_func, opts) {
+    }
+
+    async processHit(hit, baseUrl) {
+        return hit;    
     }
 
     async importData(conn, options) {

@@ -1,7 +1,7 @@
 'use strict';
 const striptags = require('striptags');
 const _ = require('lodash');
-const { ImportBase } = require('./import-base');
+const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
 
 const MAX_IDS_PER_REQ = 5;
@@ -74,7 +74,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 100
+                    ignore_above: 255
                 }
             }
         },
@@ -84,7 +84,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 150
+                    ignore_above: 255
                 }
             }
         },
@@ -94,7 +94,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 150
+                    ignore_above: 255
                 }
             }
         },
@@ -121,10 +121,90 @@ const mapping = {
     }
 };
 
-class ImportCourse extends ImportBase {
+class IdxCourse extends IdxBase {
+
+    static get sortFields() {
+        return [
+            "createDate",
+            "modifyDate",
+            "pubDate",
+            "csAuthor.key",
+            "csCategory.key",
+            "csName.key"
+        ];
+    }
+
+    static get analyzerFields() {
+        return [
+            { name: "csShortDescription" },
+            { name: "csTargetAudience" },
+            { name: "csDescription" },
+            { name: "csAims" },
+            { name: "csAuthor", boost: 10 },
+            { name: "csName", boost: 5 },
+            { name: "csCategory", boost: 10 }
+
+        ];
+    }
+
+    static get highlightFields() {
+        return [
+            "csShortDescription",
+            "csTargetAudience",
+            "csDescription",
+            "csAims",
+            "csAuthor",
+            "csName",
+            "csCategory"
+        ];
+    }
+
+    static get dataFields() {
+        return [
+            "csName",
+            "csInfo",
+            "pubDate"
+        ];
+    }
+
+    static get highlightMapping() {
+        return {
+            csShortDescription: "ShortDescription",
+            csTargetAudience: "TargetAudience",
+            csDescription: "Description",
+            csAims: "Aims",
+            csAuthor: "Author",
+            csName: "Name",
+            csCategory: "Category"
+        };
+    }
 
     constructor() {
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
+    }
+
+    async processHit(hit, baseUrl) {
+        let base_url = baseUrl ? baseUrl : this._baseUrl;
+        let result = { Id: hit["_id"], Name: hit["_source"].csName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        result.Cover = this._convertDataUrl(hit["_source"].csInfo.Cover, true, false, base_url);
+        result.CoverMeta = this._convertMeta(hit["_source"].csInfo.CoverMeta, true, false, base_url);
+        result.URL = this._getAbsCourseUrl(base_url) + hit["_source"].csInfo.URL;
+        result.Authors = _.cloneDeep(hit["_source"].csInfo.Authors);
+        for (let key in result.Authors) {
+            let elem = result.Authors[key];
+            elem.URL = this._getAbsAuthorUrl(base_url) + elem.URL;
+        }
+        result.Categories = _.cloneDeep(hit["_source"].csInfo.Categories);
+        for (let key in result.Categories) {
+            let elem = result.Categories[key];
+            elem.URL = this._getAbsCategoryUrl(base_url) + elem.URL;
+        }
+        result.highlight = {};
+        for (let fld in hit.highlight) {
+            let fld_orig = IdxCourse.highlightMapping[fld] ? IdxCourse.highlightMapping[fld] : fld;
+            result.highlight[fld_orig] = hit.highlight[fld];
+        }
+        return result;
     }
 
     async _getData(store_func, opts) {
@@ -207,9 +287,9 @@ class ImportCourse extends ImportBase {
                             currCrs.csAuthor.push(elem.Author);
                             currCrs.csInfo.Authors[elem.Author] = {
                                 Id: elem.AuthorId,
-                                URL: elem.AuthorURL,
-                                Portrait: elem.Portrait,
-                                PortraitMeta: elem.PortraitMeta
+                                URL: elem.AuthorURL
+                                // Portrait: elem.Portrait,
+                                // PortraitMeta: elem.PortraitMeta
                             }
                         }
                         if (!categories[elem.Category]) {
@@ -229,7 +309,8 @@ class ImportCourse extends ImportBase {
     }
 }
 
-let importCourse = null;
-exports.ImportCourseService = () => {
-    return importCourse ? importCourse : importCourse = new ImportCourse();
+let idxCourse = null;
+exports.IdxCourse = IdxCourse;
+exports.IdxCourseService = () => {
+    return idxCourse ? idxCourse : idxCourse = new IdxCourse();
 }

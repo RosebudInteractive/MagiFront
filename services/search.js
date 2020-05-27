@@ -14,6 +14,15 @@ function setupSearch(app) {
         }
     });
 
+    app.post('/api/adm/search', async (req, res, next) => {
+        try {
+            let rows = await ElasticService().search(req.body);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
 }
 
 exports.setupSearch = setupSearch;

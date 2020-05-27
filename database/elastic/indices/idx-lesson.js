@@ -1,7 +1,7 @@
 'use strict';
 const striptags = require('striptags');
 const _ = require('lodash');
-const { ImportBase } = require('./import-base');
+const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
 
 const MAX_IDS_PER_REQ = 5;
@@ -66,7 +66,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 100
+                    ignore_above: 255
                 }
             }
         },
@@ -76,7 +76,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 150
+                    ignore_above: 255
                 }
             }
         },
@@ -86,7 +86,7 @@ const mapping = {
             fields: {
                 key: {
                     type: "keyword",
-                    ignore_above: 150
+                    ignore_above: 255
                 }
             }
         },
@@ -108,10 +108,89 @@ const mapping = {
     }
 };
 
-class ImportLesson extends ImportBase{
+class IdxLesson extends IdxBase{
+
+    static get sortFields() {
+        return [
+            "createDate",
+            "modifyDate",
+            "pubDate",
+            "lsAuthor.key",
+            "lsCourse.key",
+            "lsName.key"
+        ];
+    }
+
+    static get analyzerFields() {
+        return [
+            { name: "lsTranscript" },
+            { name: "lsShortDescription" },
+            { name: "lsFullDescription" },
+            { name: "lsName", boost: 2 },
+            { name: "lsAuthor", boost: 7 },
+            { name: "lsCourse", boost: 5 }
+
+        ];
+    }
+
+    static get highlightFields() {
+        return [
+            "lsTranscript",
+            "lsShortDescription",
+            "lsFullDescription",
+            "lsName",
+            "lsAuthor",
+            "lsCourse"
+        ];
+    }
+
+    static get dataFields() {
+        return [
+            "lsName",
+            "lsAuthor",
+            "lsCourse",
+            "lsInfo",
+            "pubDate"
+        ];
+    }
+
+    static get highlightMapping() {
+        return {
+            lsTranscript: "Transcript",
+            lsShortDescription: "ShortDescription",
+            lsFullDescription: "FullDescription",
+            lsName: "Name",
+            lsAuthor: "Author",
+            lsCourse: "Course"
+        };
+    }
 
     constructor() {
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
+    }
+
+    async processHit(hit, baseUrl) {
+        let base_url = baseUrl ? baseUrl : this._baseUrl;
+        let result = { Id: hit["_id"], Name: hit["_source"].lsName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        result.Cover = this._convertDataUrl(hit["_source"].lsInfo.Cover, true, false, base_url);
+        result.CoverMeta = this._convertMeta(hit["_source"].lsInfo.CoverMeta, true, false, base_url);
+        result.URL = this._removeTrailingSlash(base_url) + '/' + hit["_source"].lsInfo.CourseURL + '/' + hit["_source"].lsInfo.URL;
+        result.Author = {
+            Id: hit["_source"].lsInfo.AuthorId,
+            Name: hit["_source"].lsAuthor,
+            URL: this._getAbsAuthorUrl(base_url) + hit["_source"].lsInfo.AuthorURL
+        }
+        result.Course = {
+            Id: hit["_source"].lsInfo.CourseId,
+            Name: hit["_source"].lsCourse,
+            URL: this._getAbsCourseUrl(base_url) + hit["_source"].lsInfo.CourseURL
+        }
+        result.highlight = {};
+        for (let fld in hit.highlight) {
+            let fld_orig = IdxLesson.highlightMapping[fld] ? IdxLesson.highlightMapping[fld] : fld;
+            result.highlight[fld_orig] = hit.highlight[fld];
+        }
+        return result;
     }
 
     async _getData(store_func, opts) {
@@ -196,7 +275,8 @@ class ImportLesson extends ImportBase{
     }
 }
 
-let importLesson = null;
-exports.ImportLessonService = () => {
-    return importLesson ? importLesson : importLesson = new ImportLesson();
+let idxLesson = null;
+exports.IdxLesson = IdxLesson;
+exports.IdxLessonService = () => {
+    return idxLesson ? idxLesson : idxLesson = new IdxLesson();
 }
