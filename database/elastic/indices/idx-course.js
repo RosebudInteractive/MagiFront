@@ -186,6 +186,7 @@ class IdxCourse extends IdxBase {
     async processHit(hit, baseUrl) {
         let base_url = baseUrl ? baseUrl : this._baseUrl;
         let result = { Id: hit["_id"], Name: hit["_source"].csName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        result.IsPaid = hit["_source"].csInfo.IsPaid;
         result.Cover = this._convertDataUrl(hit["_source"].csInfo.Cover, true, false, base_url);
         result.CoverMeta = this._convertMeta(hit["_source"].csInfo.CoverMeta, true, false, base_url);
         result.URL = this._getAbsCourseUrl(base_url) + hit["_source"].csInfo.URL;
