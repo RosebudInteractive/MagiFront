@@ -33,7 +33,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SEARCH_START:
             return state
                 .set('fetching', true)
-                .set('result', [])
 
         case SEARCH_SUCCESS:
             return state
@@ -84,12 +83,10 @@ function* searchSaga(data) {
     yield put({type: SEARCH_START})
 
     try {
-
-        console.log(data.payload)
-
         let _result = yield call(_postSearch, data.payload)
 
         yield put({type: SEARCH_SUCCESS, payload: _result})
+        // yield put({type: SEARCH_SUCCESS, payload: MOCK_DATA.COMMON_RESULTS})
 
     } catch (e) {
         yield put({ type: SEARCH_FAIL, payload: {e} })

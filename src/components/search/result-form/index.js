@@ -19,6 +19,7 @@ export default class ResultForm extends React.Component {
 
     render() {
         return <div className="search-result">
+            <div className="result-title">{`Результатов: ${this.props.result.length}`}</div>
             {this._getList()}
         </div>
     }

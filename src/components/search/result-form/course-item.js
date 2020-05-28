@@ -19,7 +19,7 @@ export default class CourseItem extends React.Component {
         return item && <div className="search-result__item course-item">
             <div className="image" style={_style}/>
             <div className="info">
-                <div className="header">Курс: <Link to={item.URL} className="name result-link header">{item.Name}</Link></div>
+                <div className="header">Курс: <Link to={item.URL} className="name result-link">{item.Name}</Link></div>
                 <div className="authors">{this._getAuthors()}</div>
                 <div className="categories">{this._getCategories()}</div>
                 <div className="pub-date">{item.PubDate}</div>
