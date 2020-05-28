@@ -90,14 +90,18 @@ exports.DbObject = class DbObject extends CacheableObject {
         return result;
     }
 
-    _convertDataUrl(url, isAbsPath, dLink) {
-        let rc = (isAbsPath || dLink) ? (url ? ((dLink ? this._absDownLoadUrl : this._absDataUrl) + url) : null) : url;
+    _convertDataUrl(url, isAbsPath, dLink, baseUrl) {
+        let absDataUrl = baseUrl ? this._getAbsDataUrl(baseUrl) : this._absDataUrl;
+        let absDownLoadUrl = baseUrl ? this._getAbsDownLoadUrl(baseUrl) : this._absDownLoadUrl;
+        let rc = (isAbsPath || dLink) ? (url ? ((dLink ? absDownLoadUrl : absDataUrl) + url) : null) : url;
         return rc;
     }
 
-    _convertMeta(metaStr, isAbsPath, dLink) {
+    _convertMeta(metaStr, isAbsPath, dLink, baseUrl) {
         let rc = metaStr;
         if (metaStr && (isAbsPath || dLink)) {
+            let absDataUrl = baseUrl ? this._getAbsDataUrl(baseUrl) : this._absDataUrl;
+            let absDownLoadUrl = baseUrl ? this._getAbsDownLoadUrl(baseUrl) : this._absDownLoadUrl;
             try {
                 rc = JSON.parse(metaStr);
             }
@@ -105,7 +109,7 @@ exports.DbObject = class DbObject extends CacheableObject {
                 rc = null;
             }
             if (rc) {
-                let path = (dLink ? this._absDownLoadUrl : this._absDataUrl) + rc.path;
+                let path = (dLink ? absDownLoadUrl : absDataUrl) + rc.path;
                 if (rc.content) {
                     if (rc.content.l)
                         rc.content.l = path + rc.content.l;

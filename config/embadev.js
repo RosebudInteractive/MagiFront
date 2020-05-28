@@ -227,6 +227,17 @@ let options = {
         }
     },
     connections: {
+        elastic: {
+            connection_options: {
+                node: 'http://dragonegg:9200',
+                log: 'trace'
+            },
+            pool: {
+                max: 5,
+                min: 0,
+                idle: 10000
+            }
+        },
         redis: {
             host: "dragonegg",
             port: 6379,

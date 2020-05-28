@@ -80,6 +80,9 @@ module.exports = {
         serverTimeout: 30, // 30 sec
         clientTimeout: 60, // 60 sec
     },
+    search: {
+        baseURL: "https://new.magisteria.ru"
+    },
     billing: {
         module: "./yandex-kassa",
         enabled: true,
@@ -262,6 +265,17 @@ module.exports = {
         }
     },
     connections: {
+        elastic: {
+            connection_options: {
+                node: 'http://localhost:9200',
+                log: 'trace'
+            },
+            pool: {
+                max: 5,
+                min: 0,
+                idle: 10000
+            }
+        },
         redis: {
             host: "localhost",
             port: 6379,
