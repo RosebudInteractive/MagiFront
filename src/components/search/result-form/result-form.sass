@@ -1,0 +1,58 @@
+
+
+.search-result__item
+  display: flex
+  margin: 10px 0 0 10px
+  padding-bottom: 10px
+  border-bottom: 1px solid rgba(47, 47, 47, 0.2)
+
+  .image
+    height: 150px
+    width: 150px
+    background-size: cover
+    background-origin: border-box
+    background-position: top center
+
+  .info
+    display: flex
+    flex-direction: column
+    margin-left: 10px
+
+  .highlights__item
+    em
+      background-color: yellow
+
+  .result-link
+    width: fit-content
+    text-decoration: none
+    color: #0d95e8
+    border-bottom: 1px solid rgba(13, 149, 232, 0)
+    transition: border 300ms ease
+    margin-bottom: 5px
+    &:hover
+      border-bottom: 1px solid rgba(13, 149, 232, 0.8)
+
+  .header
+    font-size: 18px
+    font-weight: bolder
+    margin-bottom: 5px
+
+  .highlights__category-group
+    &:not(:last-child)
+      margin: 8px 0
+    &:last-child
+      margin: 8px 0 0
+
+  .highlights__title
+    font-size: 14px
+    font-weight: bolder
+    color: rgba(47, 47, 47, 0.6)
+
+  .highlights__item
+    margin-left: 8px
+
+  .separator
+    padding: 0 7px 0 1px
+
+  .authors, .categories
+    display: flex

@@ -57,7 +57,7 @@ class App extends Component {
                     <UserConfirmation/>
                     <div className="left bar-bgcolor">
                         <div className="toolbar top-bar-size">
-                            <Link to={'/'}>
+                            <Link to={'/adm/'}>
                                 <div className="logo-sidebar">
                                     <div>Magisteria</div>
                                 </div>

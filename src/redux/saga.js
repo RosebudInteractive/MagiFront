@@ -6,6 +6,7 @@ import {saga as testListSaga} from '../ducks/test-list'
 import {saga as singleTestSaga} from '../ducks/single-test'
 import {saga as courseSaga} from '../ducks/course'
 import {saga as reviewsSaga} from '../ducks/reviews'
+import {saga as searchSaga} from 'adm-ducks/search'
 
 export default function* rootSaga() {
     yield all([
@@ -16,5 +17,6 @@ export default function* rootSaga() {
         singleTestSaga(),
         courseSaga(),
         reviewsSaga(),
+        searchSaga(),
     ])
 }
