@@ -18,7 +18,7 @@ export default class QueryForm extends React.Component {
 
     render() {
         return <div className={"query-control" + (this.props.isEmpty ? " _empty" : "")}>
-            <input ref={e => this.input = e} className="query-control_input" placeholder="Введите запрос" autoFocus={true}/>
+            <input ref={e => this.input = e} className="query-control_input" placeholder="Введите запрос" autoFocus={true} onKeyUp={::this._onKeyUp}/>
             <button className="query-control_search-button" onClick={::this._onSearch}>
                 <img className="search-logo" src={SearchLogo}/>Найти
             </button>
@@ -29,5 +29,9 @@ export default class QueryForm extends React.Component {
         if (this.props.onSearch && this.input && this.input.value) {
             this.props.onSearch(this.input.value)
         }
+    }
+
+    _onKeyUp(e) {
+        if (e.keyCode === 13) this._onSearch()
     }
 }
