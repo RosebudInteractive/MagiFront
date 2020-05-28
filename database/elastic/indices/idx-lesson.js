@@ -126,7 +126,7 @@ class IdxLesson extends IdxBase{
             { name: "lsTranscript" },
             { name: "lsShortDescription" },
             { name: "lsFullDescription" },
-            { name: "lsName", boost: 20 },
+            { name: "lsName", boost: 100 },
             { name: "lsAuthor", boost: 5 },
             { name: "lsCourse", boost: 2 }
         ];

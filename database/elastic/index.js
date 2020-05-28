@@ -47,10 +47,21 @@ const DbElastic = class DbElastic extends DbObject {
             let search_body = {
                 query: {
                     bool: {
-                        must: [
+                        should: [
                             {
                                 multi_match: {
                                     // query: "συλλογισμός",
+                                    query: req.query,
+                                    type: "phrase_prefix",
+                                    // type: "phrase",
+                                    slop: 3,
+                                    boost: 100,
+                                    analyzer: "russian",
+                                    fields: fields_analyzer
+                                }
+                            },
+                            {
+                                multi_match: {
                                     query: req.query,
                                     analyzer: "russian",
                                     fields: fields_analyzer
