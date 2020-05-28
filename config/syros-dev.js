@@ -144,7 +144,21 @@ module.exports = {
             }
         }
     },
+    search: {
+        baseURL: "https://new.magisteria.ru"
+    },
     connections: {
+        elastic: {
+            connection_options: {
+                node: 'http://10.1.0.35:9200',
+                log: 'trace'
+            },
+            pool: {
+                max: 5,
+                min: 0,
+                idle: 10000
+            }
+        },
         redis: null,
         mssql: {
             host: 'localhost',

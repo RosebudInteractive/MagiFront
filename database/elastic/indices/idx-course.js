@@ -140,10 +140,9 @@ class IdxCourse extends IdxBase {
             { name: "csTargetAudience" },
             { name: "csDescription" },
             { name: "csAims" },
-            { name: "csAuthor", boost: 10 },
-            { name: "csName", boost: 5 },
-            { name: "csCategory", boost: 10 }
-
+            { name: "csAuthor", boost: 5 },
+            { name: "csName", boost: 20 },
+            { name: "csCategory", boost: 5 }
         ];
     }
 
