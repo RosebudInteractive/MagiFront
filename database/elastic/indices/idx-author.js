@@ -80,7 +80,7 @@ class IdxAuthor extends IdxBase{
         return [
             { name: "auShortDescription" },
             { name: "auDescription" },
-            { name: "auName", boost: 100 }
+            { name: "auName", boost: 200 }
         ];
     }
 

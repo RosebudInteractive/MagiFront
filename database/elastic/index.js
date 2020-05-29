@@ -52,10 +52,10 @@ const DbElastic = class DbElastic extends DbObject {
                                 multi_match: {
                                     // query: "συλλογισμός",
                                     query: req.query,
-                                    type: "phrase_prefix",
-                                    // type: "phrase",
+                                    // type: "phrase_prefix",
+                                    type: "phrase",
                                     slop: 3,
-                                    boost: 100,
+                                    boost: 500,
                                     analyzer: "russian",
                                     fields: fields_analyzer
                                 }
