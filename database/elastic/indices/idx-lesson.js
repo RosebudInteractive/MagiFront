@@ -1,5 +1,4 @@
 'use strict';
-const striptags = require('striptags');
 const _ = require('lodash');
 const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
@@ -257,14 +256,14 @@ class IdxLesson extends IdxBase{
                                 lsAuthor: elem.Author,
                                 lsCourse: elem.Course,
                                 lsName: elem.Name,
-                                lsShortDescription: striptags(elem.ShortDescription),
-                                lsFullDescription: striptags(elem.FullDescription),
+                                lsShortDescription: this._striptags(elem.ShortDescription),
+                                lsFullDescription: this._striptags(elem.FullDescription),
                                 lsTranscript: ""
                             };
                             lessons.push(currLsn);
                         }
                         let filtered = elem.Transcript.replace(/<b><u>ts:\{.*?\}<\/u><\/b>/gim, ''); // remove time labels
-                        currLsn.lsTranscript += striptags(filtered);
+                        currLsn.lsTranscript += this._striptags(filtered);
                     });
                 }
 
