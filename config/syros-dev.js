@@ -145,7 +145,7 @@ module.exports = {
         }
     },
     search: {
-        baseURL: "https://new.magisteria.ru"
+        baseURL: "https://magisteria.ru"
     },
     connections: {
         elastic: {
