@@ -172,7 +172,8 @@ export default class TranscriptParser {
 
                     this.timeStamps.push(_milliseconds)
 
-                    paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}">asset-${this.timeStamps.length}</div>`)
+                    // paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}">asset-${this.timeStamps.length}</div>`)
+                    paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
                 }
             })
         }

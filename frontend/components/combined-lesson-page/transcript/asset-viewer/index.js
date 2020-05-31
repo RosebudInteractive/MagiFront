@@ -27,8 +27,6 @@ class AssetBlock extends React.Component{
             } else {
                 this._oldTypeHandleScroll()
             }
-
-
         }
 
         this._resizeHandler = () => {
@@ -62,8 +60,8 @@ class AssetBlock extends React.Component{
             _block.height(_height)
         }
 
-        $(window).bind('resize scroll', ::this._scrollHandler)
-        $(window).bind('resize scroll', ::this._resizeHandler)
+        $(window).bind('resize scroll', this._scrollHandler)
+        $(window).bind('resize scroll', this._resizeHandler)
     }
 
     componentDidMount() {
@@ -145,18 +143,22 @@ class AssetBlock extends React.Component{
 
             return _asset ? {
                 start: item.start * 1000,
-                end: (index === (array.length - 1) ? lessonPlayInfo.episodes[0].audio.info.length : array[index + 1].start) * 1000,
-                image: _asset.file
+                end: (index === (array.length - 1) ?
+                    lessonPlayInfo.episodes[0].audio ? lessonPlayInfo.episodes[0].audio.info.length : array[index].start
+                    :
+                    array[index + 1].start) * 1000,
+                asset: _asset
             } : null
         })
 
-        let _visibleImage = _assets.find((item) => {
+        let _current = _assets.find((item) => {
             return (item.start >= _visible[0].time) && (_visible[0].time < item.end)
         })
 
-        if (_visibleImage && (_visibleImage.image !== this.state.image)) {
+        if (_current &&  (!this.state.asset || (_current.asset.id !== this.state.asset.id))) {
             this.setState({
-                image: _visibleImage.image
+                asset: _current.asset,
+                imageLoaded: false,
             })
         }
     }
