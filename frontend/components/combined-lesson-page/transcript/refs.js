@@ -18,13 +18,13 @@ export default class Refs extends React.Component {
 
 
     render() {
-        return (
+        return this.props.refs && (this.props.refs.length > 0) &&
             <div className="literature-sources" id="recommend">
                 <h3 className="literature-sources__title">Литература</h3>
                 <ol className="sources-list">
                     {this._getList()}
                 </ol>
             </div>
-        )
+
     }
 }

@@ -5,53 +5,63 @@
 
   .left-block
     position: relative
-    flex: 0 1 18.75%
+    flex-basis: 18.75%
 
+
+    .fixed-container
+      position: relative
+      width: 100%
+      padding-left: 14px
+      padding-top: 90px
+      &._fixed
+        position: fixed
+        left: 0
+        top: 0
+        padding-top: 78px
 
   .right-block
-    flex: 1 1 auto
-    //position: relative
-    //width: calc(81.25% - 795px)
-    ////max-width: 270px
-    //bottom: auto
-    //top: 10px
-    //display: flex
-    //right: 16px
+    flex: 1 1 31.25%
+    padding: 9px 20px 0 30px
     position: relative
-    padding: 0 20px 0 30px
     flex-direction: column
     align-items: flex-end
-    //top: 0;
-    //right: 16px;
-    //margin-top: 5px
-    //@media(max-width: 1500px)
-      width: calc(31.25% - 45px)
-
     &._fixed
-      position: fixed
-      margin-top: 58px
+      padding-top: 0
+      width: calc(81.25% - 750px)
+      @media(max-width: 1500px)
+        width: 31.25%
 
+    .fixed-container
+      position: relative
+      width: 100%
+      &._fixed
+        position: fixed
+        margin-top: 78px
+        width: calc(81.25% - 800px)
+        right: 20px
+        top: 0
+        @media(max-width: 1500px)
+          width: calc(31.25% - 16px)
 
-      //.play-block,
-      //.play-block__image-wrapper,
-      //.play-block__image-wrapper:after,
-      //.play-block__loader,
-      //.play-block__loader:after,
-      //.svg-loader
-        width: 80px
-        height: 80px
 
   .play-btn
-    position: absolute
-    top: 70px !important
-    left: 9px
-    margin-top: 0
+    position: relative
+    top: 0
+    left: 0
+    right: auto
+    margin: 0 0 191px 11px
 
   .social-block-vertical
-    padding-top: 260px
+    width: fit-content
+    padding: 0
+    position: relative
+    left: 0
+
+  .social-button-wrapper
+    width: fit-content
 
   .text-block__wrapper
     margin: 0
-    flex: 1 1 50%
+    flex: 0 1 50%
 
 

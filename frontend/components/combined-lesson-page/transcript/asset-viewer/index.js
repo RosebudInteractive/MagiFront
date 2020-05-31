@@ -1,22 +1,21 @@
 import React from "react";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 import $ from "jquery";
 import {connect} from "react-redux";
 import "./asset-viewer.sass"
+import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
+
+const IMAGE_MAX_HEIGHT = 400
 
 
 class AssetBlock extends React.Component{
-
-    static propTypes = {
-        timeStamps: PropTypes.array.isRequired,
-        episodesTimes: PropTypes.array.isRequired,
-    };
 
     constructor(props) {
         super(props)
 
         this.state = {
-            asset: null
+            asset: null,
+            imageLoaded: true,
         }
 
         this._scrollHandler = () => {
@@ -32,7 +31,39 @@ class AssetBlock extends React.Component{
 
         }
 
+        this._resizeHandler = () => {
+            const {asset} = this.state
+
+            if (!asset) return
+
+            const _block = $(".image-block"),
+                _image = $(".image-block img"),
+                _ratio = asset.info.size.width / asset.info.size.height,
+                _vertical = _ratio < 1
+
+            let _width = _block.width(),
+                _height = _vertical ? _width : _width / _ratio
+
+
+            if (_height > IMAGE_MAX_HEIGHT) {
+
+                _width = (IMAGE_MAX_HEIGHT / _height) * 100
+                _height = IMAGE_MAX_HEIGHT
+
+                if (_vertical) {
+                    _image.css("width", "")
+                } else {
+                    _image.width(_width + "%")
+                }
+            } else {
+                _image.css("width", "")
+            }
+
+            _block.height(_height)
+        }
+
         $(window).bind('resize scroll', ::this._scrollHandler)
+        $(window).bind('resize scroll', ::this._resizeHandler)
     }
 
     componentDidMount() {
@@ -41,12 +72,14 @@ class AssetBlock extends React.Component{
 
     componentWillUnmount() {
         $(window).unbind('resize scroll', this._scrollHandler);
+        $(window).unbind('resize scroll', this._resizeHandler);
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (!this.props.lessonPlayInfo && nextProps.lessonPlayInfo) {
-            const {lessonPlayInfo} = nextProps,
-                _firstElem = lessonPlayInfo && lessonPlayInfo.episodes[0] ? lessonPlayInfo.episodes[0].elements[0] : null,
+    componentWillMount() {
+        const {lessonPlayInfo} = this.props
+
+        if (lessonPlayInfo) {
+            const _firstElem = lessonPlayInfo && lessonPlayInfo.episodes[0] ? lessonPlayInfo.episodes[0].elements[0] : null,
                 _asset = _firstElem ? lessonPlayInfo.assets.find(asset => asset.id === _firstElem.assetId) : null
 
             this.setState({
@@ -55,17 +88,32 @@ class AssetBlock extends React.Component{
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.imageLoaded && !this.state.imageLoaded) {
+            setTimeout(() => {
+                this.setState({
+                    imageLoaded: true
+                })
+            }, 300)
+        }
+
+    }
+
     render() {
-        const {asset} = this.state
+        const {asset, imageLoaded} = this.state
+
+        if (!asset) {return null}
+
+        const _orientation = asset.info.size && ( (asset.info.size.width / asset.info.size.height) < 1 ) ?  "_vertical" : "_horizontal",
+            _imageClassName = _orientation + (!imageLoaded ? " _hidden" : "")
 
         return asset &&
             <div className="asset-block">
-                <div className="image-wrapper">
-                    {/*<div className="image-block">*/}
-                        <img src={`/data/${asset.file}`}/>
-                    {/*</div>*/}
+                <div className="image-block">
+                    <img className={_imageClassName} src={`/data/${asset.file}`} />
                 </div>
-                <div className="asset-title font-universal__body-medium ">{asset.title}</div>
+                { asset.title && <div className="asset-title font-universal__body-medium ">{asset.title}</div> }
+                { asset.title2 && <div className="asset-title font-universal__body-medium ">{asset.title2}</div> }
             </div>
     }
 
@@ -128,7 +176,10 @@ class AssetBlock extends React.Component{
 
         _anchors.each(function() {
             let _current = $(this),
-                id = _current.attr("id").replace("toc", "")
+                id = _current.attr("id")
+
+            if (!id) {return}
+            id = id.replace("toc", "")
 
             id = +id
 
@@ -189,7 +240,8 @@ class AssetBlock extends React.Component{
 
         if (_asset && (!this.state.asset || (_asset.id !== this.state.asset.id))) {
             this.setState({
-                asset: _asset
+                asset: _asset,
+                imageLoaded: false,
             })
         }
 
@@ -201,11 +253,19 @@ class AssetBlock extends React.Component{
 
         return _firstElem ? lessonPlayInfo.assets.find(asset => asset.id === _firstElem.assetId) : null
     }
+
+    // _onLoadImage() {
+    //     this.setState({
+    //         imageLoaded: true
+    //     })
+    // }
 }
 
 const mapStateToProps = (state) => {
     return {
-        lessonPlayInfo: state.lessonPlayInfo.playInfo
+        episodesTimes: episodesTimesSelector(state),
+        timeStamps: timeStampsSelector(state),
+        lessonPlayInfo: assetsSelector(state),
     }
 }
 

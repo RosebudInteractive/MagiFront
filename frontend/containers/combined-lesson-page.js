@@ -8,7 +8,7 @@ import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper
 import MobileLessonWrapper from '../components/combined-lesson-page/mobile/mobile-lesson-wrapper';
 import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
-import TranscriptPage from '../components/combined-lesson-page/transcript-page';
+import Transcript from '../components/combined-lesson-page/transcript';
 import NotFoundPage from '../components/not-found';
 import LoadingFrame from '../components/loading-frame';
 import GalleryButtons from '../components/combined-lesson-page/gallery-button'
@@ -51,6 +51,7 @@ export const scroll = () => {
 }
 
 class CombineLessonPage extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -82,33 +83,47 @@ class CombineLessonPage extends React.Component {
 
                 let _socialStart = $('.js-social-start');
 
-                if (st < _socialStart.offset().top + 147) {
-                    $('.js-social').removeClass('_fixed');
-                    $('.js-social').css('top', '0').css('bottom', 'auto');
+                // if (st < _socialStart.offset().top + 147) {
+
+                    // $('.js-social').css('top', '0').css('bottom', 'auto');
+                if (st < _socialStart.offset().top + 60) {
+                    $('.js-container').removeClass('_fixed');
+                    $('.js-container').css('top', '0').css('bottom', 'auto');
                 }
 
-                if (st > _socialStart.offset().top + 147) {
-                    $('.js-social').addClass('_fixed');
-                    $('.js-social').css('bottom', 'auto').css('top', '0');
+                // if (st > _socialStart.offset().top + 147) {
+                    // $('.js-social').addClass('_fixed');
+                    // $('.js-social').css('bottom', 'auto').css('top', '0');
+
+                if (st > _socialStart.offset().top + 60) {
+                    $('.js-container').addClass('_fixed');
+                    $('.js-container').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
-                    $('.js-social').removeClass('_fixed');
-                    $('.js-social').css('top', 'auto').css('bottom', '0');
+                // if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
+                    // $('.js-social').removeClass('_fixed');
+                    // $('.js-social').css('top', 'auto').css('bottom', '0');
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-container').outerHeight())) {
+                    $('.js-container').removeClass('_fixed');
+                    // $('.js-container').css('top', 'auto').css('bottom', '0');
+                    $('.js-container').css('bottom', '0');
                 }
 
-                if (st < _socialStart.offset().top - 63) {
+                if (st < _socialStart.offset().top - 69) {
                     $('.js-play').removeClass('_fixed');
-                    $('.js-play').css('bottom', 'auto').css('top', '10px');
+                    // $('.right-block').removeClass('_fixed');
+                    $('.js-play').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                if (st > _socialStart.offset().top - 63) {
+                if (st > _socialStart.offset().top - 69) {
                     $('.js-play').addClass('_fixed');
-                    $('.js-play').css('bottom', 'auto').css('top', '10px');
+                    // $('.right-block').addClass('_fixed');
+                    $('.js-play').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 98)) {
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 78)) {
                     $('.js-play').removeClass('_fixed');
+                    $('.right-block').removeClass('_fixed');
                     $('.js-play').css('bottom', '0').css('top', 'auto');
                 }
             }
@@ -351,6 +366,61 @@ class CombineLessonPage extends React.Component {
         return !_needSkipRedirect
     }
 
+    render() {
+        let {
+            lesson,
+            lessonText,
+            fetching,
+            authorized,
+            isMobileApp,
+            notFound,
+            course,
+        } = this.props;
+
+        let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
+            _lesson = lesson ? this._getLesson() : null,
+            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized),
+            _galleryHasItems = lessonText && lessonText.gallery && Array.isArray(lessonText.gallery) && (lessonText.gallery.length > 0)
+
+        if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+        }
+
+        return (
+            fetching ?
+                <LoadingFrame/>
+                :
+                notFound ?
+                    <NotFoundPage/>
+                    :
+                    (lesson && _lesson && lessonText.loaded) ?
+                        <React.Fragment>
+                            {this._getMetaTags()}
+                            <Menu lesson={_lesson}
+                                  isNeedHideRefs={_isNeedHideRefs}
+                                  episodes={lessonText.episodes}
+                                  active={_lesson.Id}
+                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
+                            {
+                                _galleryHasItems &&
+                                    <React.Fragment>
+                                        <GalleryButtons isLocked={!authorized}/>
+                                        {lessonText.loaded && <GalleryWrapper gallery={lessonText.gallery}/>}
+                                    </React.Fragment>
+                            }
+                            {this._getLessonsBundles()}
+                            <Sources lesson={_lesson}/>
+                            <LessonInfo lesson={_lesson} course={course}/>
+                            <Transcript current={{courseUrl: this.props.courseUrl, lessonUrl: this.props.lessonUrl}}
+                                        course={course} lesson={_lesson}
+                                        isNeedHideGallery={_isNeedHideGallery}
+                                        isPaidCourse={this._isPaidCourse}/>
+                        </React.Fragment>
+                        :
+                        null
+        )
+    }
+
     _getLessonsBundles() {
         let lesson = this._getLesson();
 
@@ -548,61 +618,6 @@ class CombineLessonPage extends React.Component {
         $('meta[name="prerender-status-code"]').remove();
     }
 
-    render() {
-        let {
-            lesson,
-            lessonText,
-            fetching,
-            authorized,
-            isMobileApp,
-            notFound,
-            course,
-        } = this.props;
-
-        let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
-            _lesson = lesson ? this._getLesson() : null,
-            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized),
-            _galleryHasItems = lessonText && lessonText.gallery && Array.isArray(lessonText.gallery) && (lessonText.gallery.length > 0)
-
-        if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
-        }
-
-        return (
-            fetching ?
-                <LoadingFrame/>
-                :
-                notFound ?
-                    <NotFoundPage/>
-                    :
-                    (lesson && _lesson && lessonText.loaded) ?
-                        <React.Fragment>
-                            {this._getMetaTags()}
-                            <Menu lesson={_lesson}
-                                  isNeedHideRefs={_isNeedHideRefs}
-                                  episodes={lessonText.episodes}
-                                  active={_lesson.Id}
-                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
-                            {
-                                _galleryHasItems ?
-                                    <React.Fragment>
-                                        <GalleryButtons isLocked={!authorized}/>
-                                        {lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null}
-                                    </React.Fragment>
-                                    :
-                                    null
-                            }
-                            {this._getLessonsBundles()}
-                            <Sources lesson={_lesson}/>
-                            <LessonInfo lesson={_lesson} course={course}/>
-                            <TranscriptPage transcriptData={lessonText}
-                            course={course} lesson={_lesson} isNeedHideGallery={_isNeedHideGallery} isPaidCourse={this._isPaidCourse} lessonUrl={this.props.lessonUrl} courseUrl={this.props.courseUrl}/>
-                        </React.Fragment>
-                        :
-                        null
-        )
-    }
-
     get _isPaidCourse() {
         let {course, userPaidCourses,} = this.props;
 
@@ -611,11 +626,6 @@ class CombineLessonPage extends React.Component {
 
     _needLockLessonAsPaid(lesson) {
         return this._isPaidCourse && !(lesson.IsFreeInPaidCourse || this.props.isAdmin)
-    }
-
-    _isPlayerActive(lesson) {
-        // let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
-        //     _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
     }
 }
 

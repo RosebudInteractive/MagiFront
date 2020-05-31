@@ -1,3 +1,5 @@
+import 'whatwg-fetch';
+
 export function readResponseBody(response) {
     let _reader = response.body.getReader();
     let _data = '';
@@ -56,6 +58,12 @@ export const parseJSON = (response) => {
     return response.json()
 };
 
+
+export const commonGetQuery = (url) => {
+    return fetch(url, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
 
 export const mockFetch = (resultData) => {
     return new Promise((resolve) => {

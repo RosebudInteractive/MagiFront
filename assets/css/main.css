@@ -7172,9 +7172,9 @@ ul.user-tooltip {
   min-width: 126px;
   height: 126px;
   border-radius: 50%; }
-  .transcript-page._nested .text-block .play-block {
-    top: 10px;
-  }
+  /*.transcript-page._nested .text-block .play-block {*/
+  /*  top: 10px;*/
+  /*}*/
   .play-block:hover .play-block__action {
     opacity: 1;
     z-index: initial;
