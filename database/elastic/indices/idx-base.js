@@ -1,5 +1,6 @@
 'use strict';
 const _ = require('lodash');
+const striptags = require('striptags');
 const { DbObject } = require('../../db-object');
 
 const DFLT_OPTIONS = {
@@ -31,6 +32,11 @@ exports.IdxBase = class IdxBase extends DbObject {
         this._options = _.defaultsDeep(options, DFLT_OPTIONS);
         if (!this._options.index)
             throw new Error(`Missing index name.`);
+    }
+
+    _striptags(data) {
+        let res = striptags(data, ['p', 'br', 'h1', 'h2', 'h3', 'h4']); // preserve some tags
+        return striptags(res, [], '\n'); // replace them by LF
     }
 
     async _getData(store_func, opts) {

@@ -1,5 +1,4 @@
 'use strict';
-const striptags = require('striptags');
 const _ = require('lodash');
 const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
@@ -80,7 +79,7 @@ class IdxAuthor extends IdxBase{
         return [
             { name: "auShortDescription" },
             { name: "auDescription" },
-            { name: "auName", boost: 20 }
+            { name: "auName", boost: 200 }
         ];
     }
 
@@ -185,8 +184,8 @@ class IdxAuthor extends IdxBase{
                                     PortraitMeta: elem.PortraitMeta
                                 },
                                 auName: elem.Name,
-                                auShortDescription: striptags(elem.ShortDescription),
-                                auDescription: striptags(elem.Description)
+                                auShortDescription: this._striptags(elem.ShortDescription),
+                                auDescription: this._striptags(elem.Description)
                             };
                             authors.push(currAuthor);
                         }

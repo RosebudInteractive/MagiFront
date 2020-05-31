@@ -1,5 +1,4 @@
 'use strict';
-const striptags = require('striptags');
 const _ = require('lodash');
 const { IdxBase } = require('./idx-base');
 const { splitArray } = require('../../../utils');
@@ -141,7 +140,7 @@ class IdxCourse extends IdxBase {
             { name: "csDescription" },
             { name: "csAims" },
             { name: "csAuthor", boost: 5 },
-            { name: "csName", boost: 20 },
+            { name: "csName", boost: 200 },
             { name: "csCategory", boost: 5 }
         ];
     }
@@ -273,10 +272,10 @@ class IdxCourse extends IdxBase {
                                 csAuthor: [],
                                 csCategory: [],
                                 csName: elem.Name,
-                                csShortDescription: striptags(elem.ShortDescription),
-                                csDescription: striptags(elem.Description),
-                                csTargetAudience: striptags(elem.TargetAudience),
-                                csAims: striptags(elem.Aims)
+                                csShortDescription: this._striptags(elem.ShortDescription),
+                                csDescription: this._striptags(elem.Description),
+                                csTargetAudience: this._striptags(elem.TargetAudience),
+                                csAims: this._striptags(elem.Aims)
                             };
                             courses.push(currCrs);
                             authors = {};
