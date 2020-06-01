@@ -6,6 +6,9 @@
   .left-block
     position: relative
     flex-basis: 18.75%
+    align-self: flex-start
+    &._ended
+      align-self: flex-end
 
 
     .fixed-container
@@ -24,12 +27,16 @@
     padding: 9px 20px 0 30px
     position: relative
     flex-direction: column
-    align-items: flex-end
+    //align-items: flex-end
+    align-self: flex-start
     &._fixed
       padding-top: 0
       width: calc(81.25% - 750px)
       @media(max-width: 1500px)
         width: 31.25%
+
+    &._ended
+      align-self: flex-end
 
     .fixed-container
       position: relative
@@ -49,7 +56,7 @@
     top: 0
     left: 0
     right: auto
-    margin: 0 0 191px 11px
+    margin: 0 0 131px 11px
 
   .social-block-vertical
     width: fit-content
