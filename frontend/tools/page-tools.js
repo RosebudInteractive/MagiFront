@@ -11,6 +11,10 @@ const addDevWarn = (text) => {
     }
 }
 
+export const getShareURL = () => {
+    return window.location.protocol + '//' + window.location.host + window.location.pathname;
+}
+
 export function isMobile() {
     return window.matchMedia("(max-width: 899px)").matches
 }
@@ -20,11 +24,13 @@ export function isPhoneViewPort() {
 }
 
 export const isInViewport = (selector, margin) => {
+    let _margin = margin ? +margin : 0
+
     let _this = $(selector);
     if (!_this || !_this.length) { return }
 
     let elementTop = _this.offset().top;
-    let elementBottom = elementTop + _this.outerHeight() - +margin;
+    let elementBottom = elementTop + _this.outerHeight() - _margin;
 
     let viewportTop = $(window).scrollTop();
     let viewportBottom = viewportTop + $(window).height();

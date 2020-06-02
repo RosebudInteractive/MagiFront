@@ -1,0 +1,74 @@
+@import "~tools/variables.sass"
+
+.text-block
+  display: flex
+
+  .left-block
+    position: relative
+    flex-basis: 18.75%
+    align-self: flex-start
+    &._ended
+      align-self: flex-end
+
+
+    .fixed-container
+      position: relative
+      width: 100%
+      padding-left: 14px
+      padding-top: 90px
+      &._fixed
+        position: fixed
+        left: 0
+        top: 0
+        padding-top: 78px
+
+  .right-block
+    flex: 1 1 31.25%
+    padding: 9px 20px 0 30px
+    position: relative
+    flex-direction: column
+    //align-items: flex-end
+    align-self: stretch
+    &._fixed
+      padding-top: 0
+      width: calc(81.25% - 750px)
+      @media(max-width: 1500px)
+        width: 31.25%
+
+    &._ended
+      align-self: flex-end
+
+    .fixed-container
+      position: relative
+      width: 100%
+      &._fixed
+        position: fixed
+        margin-top: 78px
+        width: calc(81.25% - 800px)
+        right: 20px
+        top: 0
+        @media(max-width: 1500px)
+          width: calc(31.25% - 16px)
+
+
+  .play-btn
+    position: relative
+    top: 0
+    left: 0
+    right: auto
+    margin: 0 0 131px 11px
+
+  .social-block-vertical
+    width: fit-content
+    padding: 0
+    position: relative
+    left: 0
+
+  .social-button-wrapper
+    width: fit-content
+
+  .text-block__wrapper
+    margin: 0
+    flex: 0 1 50%
+
+

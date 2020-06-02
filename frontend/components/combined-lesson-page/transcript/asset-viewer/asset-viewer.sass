@@ -1,0 +1,50 @@
+@import "~tools/variables.sass"
+
+//.asset-anchor
+  display: block
+  visibility: hidden
+
+.asset-block
+  width: 100%
+  position: relative
+  display: block
+  z-index: 100
+
+  .image-wrapper
+    height: 300px
+    position: relative
+    display: flex
+
+  .image-block
+    width: 100%
+    overflow: hidden
+    position: relative
+
+  img
+    position: absolute
+    transform: translate(-50%, -50%)
+    top: 50%
+    left: 50%
+    opacity: 1
+    transition: opacity 400ms ease
+    //transition: opacity 200ms linear 200ms
+
+
+    &._vertical
+      height: 100%
+
+    &._horizontal
+      width: 100%
+
+    &._hidden
+      opacity: 0
+
+
+
+  .asset-title
+    margin-top: 12px
+    color: $color-dark-06
+    text-align: center
+
+  @media (max-width: $tablet-width)
+    display: none
