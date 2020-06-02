@@ -6,7 +6,8 @@ import "./asset-viewer.sass"
 import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
 
 const IMAGE_MAX_HEIGHT = 400,
-    FADE_TIMEOUT = 400
+    FADE_TIMEOUT = 400,
+    SCROLL_TIMEOUT = 200
 
 
 class AssetBlock extends React.Component{
@@ -21,15 +22,22 @@ class AssetBlock extends React.Component{
             fading: false,
         }
 
-        this._scrollHandler = () => {
-            const {timeStamps} = this.props,
-                _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+        this._scrollTimer = null
 
-            if (_newType) {
-                this._handleScrollNewType()
-            } else {
-                this._oldTypeHandleScroll()
+        this._scrollHandler = () => {
+            if(this._scrollTimer) {
+                clearTimeout(this._scrollTimer);
             }
+            this._scrollTimer = setTimeout(() => {
+                const {timeStamps} = this.props,
+                    _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+
+                if (_newType) {
+                    this._handleScrollNewType()
+                } else {
+                    this._oldTypeHandleScroll()
+                }
+            }, SCROLL_TIMEOUT);
         }
 
         this._resizeHandler = () => {
@@ -40,7 +48,13 @@ class AssetBlock extends React.Component{
             const _block = $(".image-block"),
                 _image = $(".image-block img"),
                 _ratio = asset.info.size.width / asset.info.size.height,
-                _vertical = _ratio < 1
+                _vertical = _ratio < 1,
+                _fixedBlock = $(".js-play._fixed"),
+                _rightBlock = $(".right-block")
+
+            if (_fixedBlock && (_fixedBlock.length > 0)) {
+                _fixedBlock.width(_rightBlock.width())
+            }
 
             let _width = _block.width(),
                 _height = _vertical ? _width : _width / _ratio
