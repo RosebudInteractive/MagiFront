@@ -5,7 +5,9 @@ import {connect} from "react-redux";
 import "./asset-viewer.sass"
 import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
 
-const IMAGE_MAX_HEIGHT = 400
+const IMAGE_MAX_HEIGHT = 400,
+    FADE_TIMEOUT = 400,
+    SCROLL_TIMEOUT = 200
 
 
 class AssetBlock extends React.Component{
@@ -16,17 +18,26 @@ class AssetBlock extends React.Component{
         this.state = {
             asset: null,
             imageLoaded: true,
+            imageClear: false,
+            fading: false,
         }
 
-        this._scrollHandler = () => {
-            const {timeStamps} = this.props,
-                _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+        this._scrollTimer = null
 
-            if (_newType) {
-                this._handleScrollNewType()
-            } else {
-                this._oldTypeHandleScroll()
+        this._scrollHandler = () => {
+            if(this._scrollTimer) {
+                clearTimeout(this._scrollTimer);
             }
+            this._scrollTimer = setTimeout(() => {
+                const {timeStamps} = this.props,
+                    _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+
+                if (_newType) {
+                    this._handleScrollNewType()
+                } else {
+                    this._oldTypeHandleScroll()
+                }
+            }, SCROLL_TIMEOUT);
         }
 
         this._resizeHandler = () => {
@@ -37,7 +48,13 @@ class AssetBlock extends React.Component{
             const _block = $(".image-block"),
                 _image = $(".image-block img"),
                 _ratio = asset.info.size.width / asset.info.size.height,
-                _vertical = _ratio < 1
+                _vertical = _ratio < 1,
+                _fixedBlock = $(".js-play._fixed"),
+                _rightBlock = $(".right-block")
+
+            if (_fixedBlock && (_fixedBlock.length > 0)) {
+                _fixedBlock.width(_rightBlock.width())
+            }
 
             let _width = _block.width(),
                 _height = _vertical ? _width : _width / _ratio
@@ -87,31 +104,27 @@ class AssetBlock extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.imageLoaded && !this.state.imageLoaded) {
-            setTimeout(() => {
-                this.setState({
-                    imageLoaded: true
-                })
-            }, 300)
+        if (this.state.asset && (!prevState.asset || (prevState.asset.id !== this.state.asset.id))) {
+            setTimeout(() => this._resizeHandler(), 0)
         }
 
     }
 
     render() {
-        const {asset, imageLoaded} = this.state
+        const {asset, imageLoaded, fading, imageClear} = this.state
 
         if (!asset) {return null}
 
         const _orientation = asset.info.size && ( (asset.info.size.width / asset.info.size.height) < 1 ) ?  "_vertical" : "_horizontal",
-            _imageClassName = _orientation + (!imageLoaded ? " _hidden" : "")
+            _imageClassName = _orientation + (fading || !imageLoaded ? " _hidden" : "")
 
         return asset &&
             <div className="asset-block">
                 <div className="image-block">
-                    <img className={_imageClassName} src={`/data/${asset.file}`} />
+                    <img className={_imageClassName} src={imageClear ? null : `/data/${asset.file}`} onLoad={::this._onLoadImage}/>
                 </div>
-                { asset.title && <div className="asset-title font-universal__body-medium ">{asset.title}</div> }
-                { asset.title2 && <div className="asset-title font-universal__body-medium ">{asset.title2}</div> }
+                { asset.title && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title}</div> }
+                { asset.title2 && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title2}</div> }
             </div>
     }
 
@@ -155,12 +168,7 @@ class AssetBlock extends React.Component{
             return (item.start >= _visible[0].time) && (_visible[0].time < item.end)
         })
 
-        if (_current &&  (!this.state.asset || (_current.asset.id !== this.state.asset.id))) {
-            this.setState({
-                asset: _current.asset,
-                imageLoaded: false,
-            })
-        }
+        if (_current) this._applyNewAsset(_current.asset)
     }
 
     _oldTypeHandleScroll() {
@@ -240,27 +248,52 @@ class AssetBlock extends React.Component{
             // _image = _asset ? _asset.file : null
 
 
-        if (_asset && (!this.state.asset || (_asset.id !== this.state.asset.id))) {
+        this._applyNewAsset(_asset)
+
+        // if (_asset && (!this.state.asset || (_asset.id !== this.state.asset.id))) {
+        //     this.setState({
+        //         asset: _asset,
+        //         imageLoaded: false,
+        //     })
+        // }
+
+    }
+
+    _onLoadImage() {
+        this.setState({
+            imageLoaded: true,
+            imageClear: false,
+        })
+    }
+
+    _applyNewAsset(asset) {
+        if (asset && (!this.state.asset || (asset.id !== this.state.asset.id))) {
+
             this.setState({
-                asset: _asset,
-                imageLoaded: false,
+                fading: true
             })
+
+            setTimeout(() => {
+                this.setState({
+                    imageClear: true,
+                    imageLoaded: false,
+                })
+
+                setTimeout(() => {
+                    this.setState({
+                        asset: asset,
+                        fading: false,
+                        imageClear: false,
+                    })
+                }, 0)
+
+            }, FADE_TIMEOUT)
+
+
+
+
         }
-
     }
-
-    _getFirstAsset() {
-        const {lessonPlayInfo} = this.props,
-            _firstElem = lessonPlayInfo && lessonPlayInfo.episodes[0] ? lessonPlayInfo.episodes[0].elements[0] : null
-
-        return _firstElem ? lessonPlayInfo.assets.find(asset => asset.id === _firstElem.assetId) : null
-    }
-
-    // _onLoadImage() {
-    //     this.setState({
-    //         imageLoaded: true
-    //     })
-    // }
 }
 
 const mapStateToProps = (state) => {

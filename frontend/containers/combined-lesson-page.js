@@ -97,6 +97,7 @@ class CombineLessonPage extends React.Component {
 
                 if (st > _blockStart.offset().top + 60) {
                     $('.js-container').addClass('_fixed');
+                    $('.left-block').removeClass('_ended');
                     $('.js-container').css('bottom', 'auto')//.css('top', '10px');
                 }
 
@@ -104,7 +105,9 @@ class CombineLessonPage extends React.Component {
                     // $('.js-social').removeClass('_fixed');
                     // $('.js-social').css('top', 'auto').css('bottom', '0');
                 if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-container').outerHeight())) {
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - ($('.js-container').outerHeight() + 79) )) {
                     $('.js-container').removeClass('_fixed');
+                    $('.left-block').addClass('_ended');
                     // $('.js-container').css('top', 'auto').css('bottom', '0');
                     $('.js-container').css('bottom', '0');
                 }
@@ -117,14 +120,17 @@ class CombineLessonPage extends React.Component {
 
                 if (st > _blockStart.offset().top - 69) {
                     $('.js-play').addClass('_fixed');
-                    // $('.right-block').addClass('_fixed');
+                    $('.right-block').removeClass('_ended');
+
                     $('.js-play').css('bottom', 'auto')//.css('top', '10px');
                 }
 
                 if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-play').outerHeight() - 78)) {
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - ($('.js-play').outerHeight() + 78 + 79))) {
                     $('.js-play').removeClass('_fixed');
-                    $('.right-block').removeClass('_fixed');
-                    $('.js-play').css('bottom', '0').css('top', 'auto');
+                    $('.right-block').addClass('_ended');
+
+                    $('.js-play').css('bottom', '0')//.css('top', 'auto');
                 }
             }
 

@@ -317,7 +317,7 @@ let chechRecapture = (hasCapture, req, res, processor) => {
         });
 }
 
-const AuthRedirectParam = config.has('config.authentication.redirectParam') ? config.authentication.redirectParam : "redirect";
+const AuthRedirectParam = config.has('authentication.redirectParam') ? config.authentication.redirectParam : "redirect";
 
 const AuthRedirectWrapper = (processor) => {
     return (req, res, next) => {
