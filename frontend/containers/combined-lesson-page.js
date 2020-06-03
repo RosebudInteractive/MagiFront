@@ -79,49 +79,49 @@ class CombineLessonPage extends React.Component {
 
             let st = $(window).scrollTop();
 
-            if ($('.js-social-start').length) {
+            if ($('.js-text-block-start').length) {
 
-                let _socialStart = $('.js-social-start');
+                let _blockStart = $('.js-text-block-start');
 
-                // if (st < _socialStart.offset().top + 147) {
+                // if (st < _blockStart.offset().top + 147) {
 
                     // $('.js-social').css('top', '0').css('bottom', 'auto');
-                if (st < _socialStart.offset().top + 60) {
+                if (st < _blockStart.offset().top + 60) {
                     $('.js-container').removeClass('_fixed');
                     $('.js-container').css('top', '0').css('bottom', 'auto');
                 }
 
-                // if (st > _socialStart.offset().top + 147) {
+                // if (st > _blockStart.offset().top + 147) {
                     // $('.js-social').addClass('_fixed');
                     // $('.js-social').css('bottom', 'auto').css('top', '0');
 
-                if (st > _socialStart.offset().top + 60) {
+                if (st > _blockStart.offset().top + 60) {
                     $('.js-container').addClass('_fixed');
                     $('.js-container').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                // if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
+                // if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-social').outerHeight())) {
                     // $('.js-social').removeClass('_fixed');
                     // $('.js-social').css('top', 'auto').css('bottom', '0');
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-container').outerHeight())) {
+                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-container').outerHeight())) {
                     $('.js-container').removeClass('_fixed');
                     // $('.js-container').css('top', 'auto').css('bottom', '0');
                     $('.js-container').css('bottom', '0');
                 }
 
-                if (st < _socialStart.offset().top - 69) {
+                if (st < _blockStart.offset().top - 69) {
                     $('.js-play').removeClass('_fixed');
                     // $('.right-block').removeClass('_fixed');
                     $('.js-play').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                if (st > _socialStart.offset().top - 69) {
+                if (st > _blockStart.offset().top - 69) {
                     $('.js-play').addClass('_fixed');
                     // $('.right-block').addClass('_fixed');
                     $('.js-play').css('bottom', 'auto')//.css('top', '10px');
                 }
 
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 78)) {
+                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-play').outerHeight() - 78)) {
                     $('.js-play').removeClass('_fixed');
                     $('.right-block').removeClass('_fixed');
                     $('.js-play').css('bottom', '0').css('top', 'auto');

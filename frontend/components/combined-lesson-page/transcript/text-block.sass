@@ -3,65 +3,108 @@
 .text-block
   display: flex
 
+  .text-container
+    display: flex
+
   .left-block
     position: relative
-    flex-basis: 18.75%
-
-
-    .fixed-container
-      position: relative
-      width: 100%
-      padding-left: 14px
-      padding-top: 90px
-      &._fixed
-        position: fixed
-        left: 0
-        top: 0
-        padding-top: 78px
-
-  .right-block
-    flex: 1 1 31.25%
-    padding: 9px 20px 0 30px
-    position: relative
-    flex-direction: column
-    align-items: flex-end
-    &._fixed
-      padding-top: 0
-      width: calc(81.25% - 750px)
-      @media(max-width: 1500px)
-        width: 31.25%
-
-    .fixed-container
-      position: relative
-      width: 100%
-      &._fixed
-        position: fixed
-        margin-top: 78px
-        width: calc(81.25% - 800px)
-        right: 20px
-        top: 0
-        @media(max-width: 1500px)
-          width: calc(31.25% - 16px)
-
-
-  .play-btn
-    position: relative
-    top: 0
-    left: 0
-    right: auto
-    margin: 0 0 191px 11px
-
-  .social-block-vertical
-    width: fit-content
-    padding: 0
-    position: relative
-    left: 0
-
-  .social-button-wrapper
-    width: fit-content
+    padding-left: 14px
+    padding-top: 90px
 
   .text-block__wrapper
     margin: 0
-    flex: 0 1 50%
+    flex: 0 1 33.4vw
+
+  .right-block
+    position: relative
+
+  &._only-text
+    .left-block
+      flex: 1 1 33.3vw
+
+    .right-block
+      flex: 1 1 33.3vw
+
+  &._with-assets
+
+    .left-block
+      flex: 0 1 18.75vw
+      .fixed-container
+        position: relative
+        width: 100%
+        padding-left: 14px
+        padding-top: 90px
+        &._fixed
+          position: fixed
+          left: 0
+          top: 0
+          padding-top: 78px
+
+    .right-block
+      flex: 1 1 31.25%
+      padding: 9px 20px 0 30px
+      flex-direction: column
+      align-items: flex-end
+      &._fixed
+        padding-top: 0
+        width: calc(81.25% - 750px)
+        @media(max-width: 1500px)
+          width: 31.25%
+
+      .fixed-container
+        position: relative
+        width: 100%
+        &._fixed
+          position: fixed
+          margin-top: 78px
+          width: calc(81.25% - 800px)
+          right: 20px
+          top: 0
+          @media(max-width: 1500px)
+            width: calc(31.25% - 16px)
+
+
+    .play-btn
+      position: relative
+      top: 0
+      left: 0
+      right: auto
+      margin: 0 0 191px 11px
+
+    .social-block-vertical
+      width: fit-content
+      padding: 0
+      position: relative
+      left: 0
+
+    .social-button-wrapper
+      width: fit-content
+
+
+
+    @media (max-width: 1279px)
+      .play-block,
+      .play-block__image-wrapper,
+      .play-block__loader,
+      .play-block__loader:after
+        width: 80px
+        height: 80px
+
+      .play-block
+        min-width: 80px
+        .svg-loader
+          width: 80px
+        height: 80px
+        .lecture__btn svg
+          width: 22px
+          height: 22px
+
+      //.left-block
+        .fixed-container
+          padding-top: 67px
+
+
+
+
 
 
