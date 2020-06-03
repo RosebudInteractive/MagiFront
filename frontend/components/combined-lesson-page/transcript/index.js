@@ -28,15 +28,16 @@ class Transcript extends React.Component {
     constructor(props) {
         super(props)
 
-        const {course, lesson} = this.props
+        const {course, lesson, authorized} = this.props
 
-        this._hideAssets = !course.IsPaid
+        this._hideAssets = !course.IsPaid && lesson.IsAuthRequired && !authorized
     }
 
     componentWillMount(){
         this.props.actions.loadTranscript({
             ...this.props.current,
-            requestAssets: !this._needLockLessonAsPaid(),
+            requestAssets: !this._hideAssets,
+            // requestAssets: !this._needLockLessonAsPaid(),
             lessonId: this.props.lesson.Id
         })
     }

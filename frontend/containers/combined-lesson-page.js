@@ -81,56 +81,44 @@ class CombineLessonPage extends React.Component {
 
             if ($('.js-text-block-start').length) {
 
-                let _blockStart = $('.js-text-block-start');
+                let _blockStart = $('.js-text-block-start'),
+                    _paddingBottom = _blockStart.css('padding-bottom')
 
-                // if (st < _blockStart.offset().top + 147) {
+                _paddingBottom = _paddingBottom.match(/px$/) ? +_paddingBottom.replace("px" , "") : 0
 
-                    // $('.js-social').css('top', '0').css('bottom', 'auto');
-                if (st < _blockStart.offset().top + 60) {
+                if (st < _blockStart.offset().top + 148) {
                     $('.js-container').removeClass('_fixed');
                     $('.js-container').css('top', '0').css('bottom', 'auto');
                 }
 
-                // if (st > _blockStart.offset().top + 147) {
-                    // $('.js-social').addClass('_fixed');
-                    // $('.js-social').css('bottom', 'auto').css('top', '0');
-
-                if (st > _blockStart.offset().top + 60) {
+                if (st > _blockStart.offset().top + 48) {
                     $('.js-container').addClass('_fixed');
                     $('.left-block').removeClass('_ended');
-                    $('.js-container').css('bottom', 'auto')//.css('top', '10px');
+                    $('.js-container').css('bottom', 'auto')
                 }
 
-                // if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-social').outerHeight())) {
-                    // $('.js-social').removeClass('_fixed');
-                    // $('.js-social').css('top', 'auto').css('bottom', '0');
-                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-container').outerHeight())) {
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - ($('.js-container').outerHeight() + 79) )) {
+                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - ($('.js-container').outerHeight() + 78 + _paddingBottom) )) {
                     $('.js-container').removeClass('_fixed');
                     $('.left-block').addClass('_ended');
-                    // $('.js-container').css('top', 'auto').css('bottom', '0');
                     $('.js-container').css('bottom', '0');
                 }
 
                 if (st < _blockStart.offset().top - 69) {
                     $('.js-play').removeClass('_fixed');
-                    // $('.right-block').removeClass('_fixed');
-                    $('.js-play').css('bottom', 'auto')//.css('top', '10px');
+                    $('.js-play').css('bottom', 'auto')
                 }
 
                 if (st > _blockStart.offset().top - 69) {
                     $('.js-play').addClass('_fixed');
                     $('.right-block').removeClass('_ended');
-
-                    $('.js-play').css('bottom', 'auto')//.css('top', '10px');
+                    $('.js-play').css('bottom', 'auto')
                 }
 
-                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - $('.js-play').outerHeight() - 78)) {
-                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - ($('.js-play').outerHeight() + 78 + 79))) {
+                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - ($('.js-play').outerHeight() + 78 + _paddingBottom))) {
                     $('.js-play').removeClass('_fixed');
                     $('.right-block').addClass('_ended');
 
-                    $('.js-play').css('bottom', '0')//.css('top', 'auto');
+                    $('.js-play').css('bottom', '0')
                 }
             }
 

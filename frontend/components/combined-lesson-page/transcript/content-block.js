@@ -67,10 +67,9 @@ class ContentBlock extends React.Component {
 
         const _authorName = lesson.Author.FirstName + ' ' + lesson.Author.LastName
 
-        return <div className="content-block">
-                    <p className="text-block__label">Транскрипт</p>
-                    <div className="text-container">
-                        <div className="left-block">
+        return <React.Fragment>
+                    {/*<div className="text-container">*/}
+                        <div className="white-block left-block">
                             <div className="fixed-container js-container">
                                 <PlayBlock course={course}
                                            lesson={lesson}
@@ -100,8 +99,8 @@ class ContentBlock extends React.Component {
                             }
                             {<Refs refs={refs}/>}
                         </div>
-                    </div>
-                </div>
+                    {/*</div>*/}
+                </React.Fragment>
     }
 }
 

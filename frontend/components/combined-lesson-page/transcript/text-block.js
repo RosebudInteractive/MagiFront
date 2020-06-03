@@ -54,10 +54,13 @@ class TextBlock extends React.Component {
 
         return <div className={_transcriptClassName} id="transcript">
                 <section className={"text-block js-text-block-start" + (showAssets ? " _with-assets" : " _only-text")}>
+                    <p className="text-block__label">Транскрипт</p>
+                    <div className="content-block">
                     <ContentBlock course={course} lesson={lesson} courseUrl={courseUrl} lessonUrl={lessonUrl} isPaidCourse={isPaidCourse}/>
-                    <div className="right-block">
-                        <div className="fixed-container js-play">
-                            { showAssets && <AssetBlock/> }
+                        <div className="right-block white-block">
+                            <div className="fixed-container js-play">
+                                { showAssets && <AssetBlock/> }
+                            </div>
                         </div>
                     </div>
                 </section>

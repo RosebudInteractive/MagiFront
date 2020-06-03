@@ -1,76 +1,78 @@
 @import "~tools/variables.sass"
 
 .text-block
-  display: flex
+
+  .content-block
+    display: flex
 
   .text-container
     display: flex
 
-  .left-block
+  .white-block
     position: relative
-    flex-basis: 18.75%
-    align-self: flex-start
+    align-self: stretch
+    @media(max-width: 599px)
+      display: none
     &._ended
       align-self: flex-end
+
+  .left-block
     padding-left: 14px
     padding-top: 90px
+    @media (max-width: $tablet-width)
+      padding-left: 9px
 
   .text-block__wrapper
     margin: 0
-    flex: 0 1 33.4vw
+    flex: 1 0 750px
+    @media(max-width: 1500px)
+      flex-shrink: 1
 
-  .right-block
+  .fixed-container
     position: relative
+    width: inherit
+    &._fixed
+      position: fixed
+      top: 0
+      margin-top: 78px
 
   &._only-text
-    .left-block
-      flex: 1 1 33.3vw
-
-    .right-block
-      flex: 1 1 33.3vw
+    .white-block
+      flex: 0 1 33.3%
 
   &._with-assets
-
     .left-block
-      flex: 0 1 18.75vw
+      flex: 0 0 18.75%
+      width: 18.75%
+      @media(max-width: $tablet-width)
+        flex: 0 1 33.3%
+        width: inherit
       .fixed-container
-        position: relative
-        width: 100%
-        padding-left: 14px
-        padding-top: 90px
         &._fixed
-          position: fixed
           left: 0
-          top: 0
-          padding-top: 78px
+          padding-left: 14px
+          @media (max-width: $tablet-width)
+            padding-left: 9px
 
-  .right-block
-    flex: 1 1 31.25%
-    padding: 9px 20px 0 30px
-    position: relative
-    flex-direction: column
-    //align-items: flex-end
-    align-self: stretch
-    &._fixed
-      padding-top: 0
-      width: calc(81.25% - 750px)
-      @media(max-width: 1500px)
-        width: 31.25%
-
-    &._ended
-      align-self: flex-end
-
-    .fixed-container
-      position: relative
-      width: 100%
+    .right-block
+      top: -58px
+      flex: 1 1 31.25%
+      padding: 9px 20px 0 30px
+      flex-direction: column
+      @media(max-width: $tablet-width)
+        flex: 0 1 33.3%
+        width: inherit
+        padding: 0
       &._fixed
-        position: fixed
-        margin-top: 78px
-        width: calc(81.25% - 800px)
-        right: 20px
+        padding-top: 0
+      .fixed-container
+        @media(max-width: $tablet-width)
+          width: auto !important
+        &._fixed
+          right: 20px
+          top: 0
+      &._ended
         top: 0
-        @media(max-width: 1500px)
-          width: calc(31.25% - 16px)
 
 
   .play-btn
@@ -80,37 +82,36 @@
     right: auto
     margin: 0 0 131px 11px
 
-    .social-block-vertical
-      width: fit-content
-      padding: 0
-      position: relative
-      left: 0
+  .social-block-vertical
+    width: fit-content
+    padding: 0
+    position: relative
+    left: 0
 
-    .social-button-wrapper
-      width: fit-content
+  .social-button-wrapper
+    width: fit-content
 
 
+  @media (max-width: 1023px)
+    .play-block,
+    .play-block__image-wrapper,
+    .play-block__loader,
+    .play-block__loader:after
+      width: 80px
+      height: 80px
 
-    @media (max-width: 1279px)
-      .play-block,
-      .play-block__image-wrapper,
-      .play-block__loader,
-      .play-block__loader:after
+    .play-block
+      min-width: 80px
+      .svg-loader
         width: 80px
-        height: 80px
+      height: 80px
+      .lecture__btn svg
+        width: 22px
+        height: 22px
 
-      .play-block
-        min-width: 80px
-        .svg-loader
-          width: 80px
-        height: 80px
-        .lecture__btn svg
-          width: 22px
-          height: 22px
-
-      //.left-block
-        .fixed-container
-          padding-top: 67px
+    //.left-block
+      .fixed-container
+        padding-top: 67px
 
 
 
