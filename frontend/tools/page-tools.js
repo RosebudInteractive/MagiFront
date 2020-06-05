@@ -52,6 +52,7 @@ export const pages = {
     test: {name: 'test', url: null},
     notFound: {name: 'not-found', url: null},
     about: {name: 'about', url: null},
+    search: {name: 'search', url: null},
 }
 
 export const ImageSize = {

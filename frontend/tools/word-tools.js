@@ -42,7 +42,7 @@ export const Lessons = {
     }
 }
 
-const getCounterTitle = (count, {single, twice, many}) => {
+export const getCounterTitle = (count, {single, twice, many}) => {
     switch (count % 10) {
         case 1: {
             return count !== 11 ? single : many
@@ -57,4 +57,8 @@ const getCounterTitle = (count, {single, twice, many}) => {
         default:
             return many
     }
+}
+
+export function replaceAll(string, search, replace) {
+    return string.split(search).join(replace);
 }

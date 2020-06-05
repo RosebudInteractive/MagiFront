@@ -15,6 +15,7 @@ import PurchasesPage from './containers/purchases-page'
 import ProjectPage from './containers/project-page'
 import TestPage from './containers/test-page'
 import TestResultPreview from './containers/test-result-preview'
+import SearchPage from './containers/search-page'
 import EmptyPromoPage from './components/empty-promo-page'
 import TestResultSharePage from './components/test-result-share-page'
 
@@ -329,6 +330,7 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
+                <Route path={`${_homePath}search`} component={SearchPage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )

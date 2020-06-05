@@ -1,0 +1,113 @@
+@import "~tools/variables.sass"
+
+.search-result
+  padding-top: 72px
+  max-width: 800px
+  margin: auto
+
+  .result-title
+    color: $color-dark-06
+    margin: 50px 0 21px
+
+.search-result__item
+  display: flex
+  padding: 25px 0
+  border-bottom: 1px solid rgba(47, 47, 47, 0.2)
+
+  em
+    background-color: $color-orange-03
+    font-style: normal
+
+  .image
+    height: 113px
+    width: 113px
+    min-width: 113px
+    background-size: cover
+    background-repeat: no-repeat
+    background-origin: border-box
+    background-position: top center
+    flex-shrink: 1
+
+
+  .content
+    width: 100%
+    display: flex
+    flex-direction: column
+    margin-left: 15px
+    justify-content: space-between
+
+    .text-wrapper
+      display: flex
+
+    .text
+      padding-bottom: 10px
+
+
+    .title
+      color: $color-orange
+      padding-right: 5px
+
+    .name
+      color: $color-main-dark
+
+    .crown
+      flex: 1 0 37px
+      display: flex
+      justify-content: flex-end
+
+
+
+  .highlights__item
+    display: inline
+
+  .footer
+    display: flex
+    margin-bottom: 5px
+    .course
+      display: flex
+      flex: 1 1 auto
+      justify-content: flex-end
+    .course-name
+      color: $color-dark-06
+
+
+
+  .result-link
+    width: fit-content
+    display: inline
+    text-decoration: none
+    border-bottom: $border-hidden-link
+    transition: border 300ms ease
+    &:hover
+      border-bottom: $border-orange-03
+
+    &._orange
+      color: $color-orange
+
+  .highlights__category-group
+    &:not(:last-child)
+      margin: 8px 0
+    &:last-child
+      margin: 8px 0 0
+
+  .highlights__title
+    font-size: 14px
+    font-weight: bolder
+    color: rgba(47, 47, 47, 0.6)
+
+  .highlights__item
+    margin-left: 8px
+
+  .separator
+    padding: 0 7px 0 1px
+
+  .authors, .categories
+    display: flex
+
+  .authors
+    margin-left: 10px
+
+  .author-name
+    color: $color-dark-06
+
+

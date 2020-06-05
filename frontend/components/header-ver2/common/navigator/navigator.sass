@@ -2,10 +2,15 @@
 
 .header-ver2
   .navigation
+    position: relative
     display: block !important
     padding-top: 7px
+    flex: 1 1 100%
     ul a
       padding: 0
+
+    &._search-mode
+        padding-top: 0
 
   .header-menu
     align-items: center
@@ -42,6 +47,12 @@
       display: flex
       align-items: center
 
+    .link-block
+      display: flex
+      align-items: center
+      cursor: pointer
+      padding: 0
+
     svg
       padding: 7px 12px 6px 0
       opacity: 0.4
@@ -70,6 +81,53 @@
     position: relative
     font-weight: normal
 
+
+  .search-string
+    max-width: 0
+    right: 0
+    transition: max-width 300ms ease
+    border: $border-dark-02
+    border-radius: 3px
+    background-color: $color-white
+    margin-right: 19px
+
+    .wrapper
+      width: auto
+      height: 100%
+      display: flex
+      align-items: center
+      visibility: hidden
+      transition: visibility 300ms step-end
+
+    input
+      flex: 1 1 auto
+      border: none
+      outline: none
+      height: calc(100% - 2px)
+
+    .svg-icon
+      fill-opacity: 0.3
+      display: none
+      padding: 0 8px
+      &._pointer
+        cursor: pointer
+
+
+    &._visible
+      position: absolute
+      max-width: 100%
+      width: calc(100% - 19px)
+      height: 40px
+
+      .wrapper
+        visibility: visible
+
+
+      .svg-icon
+        display: flex
+
+
+
   &.opened
     .header-menu
       color: $color-white
@@ -81,5 +139,7 @@
       &.active
         .item__title::after
           border-color: $color-white
+
+
 
 

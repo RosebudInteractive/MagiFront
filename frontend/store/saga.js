@@ -14,6 +14,7 @@ import {saga as courseSaga} from 'ducks/course'
 import {saga as lessonMenuSaga} from 'ducks/lesson-menu'
 import {saga as messagesSaga} from 'ducks/message'
 import {saga as transcriptSaga} from 'ducks/transcript'
+import {saga as searchSaga} from 'ducks/search'
 
 export default function* rootSaga() {
     yield all([
@@ -31,5 +32,6 @@ export default function* rootSaga() {
         filtersSaga(),
         messagesSaga(),
         transcriptSaga(),
+        searchSaga(),
     ])
 }

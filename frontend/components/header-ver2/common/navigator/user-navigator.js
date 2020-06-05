@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {pages} from "tools/page-tools";
 import PropTypes from "prop-types";
+import SearchItem from "./search-item";
 
 class UserNavigator extends React.Component {
 
