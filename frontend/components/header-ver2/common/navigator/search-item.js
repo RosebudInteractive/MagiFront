@@ -1,8 +1,7 @@
 import React from "react"
-import {resultSelector, isEmptySelector, fetchingSelector, search} from "ducks/search";
+import {querySelector, search} from "ducks/search";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import body from "../../../course-page-ver1/content/info-block/body";
 import {pages} from "tools/page-tools";
 // import {Link} from "react-router-dom";
 
@@ -47,6 +46,11 @@ class SearchItem extends React.Component{
 
         if (this.state.visible && !prevState.visible) {
             $(".navigation").addClass("_search-mode")
+
+            if (this.input && !this.input.value && this.props.query) {
+                this.input.value = this.props.query
+            }
+
             setTimeout(() => {
                 document.getElementById("search-input").focus()
             }, 500)
@@ -56,13 +60,21 @@ class SearchItem extends React.Component{
             $(".navigation").removeClass("_search-mode")
             this.input = null
         }
+
+        if ((this.props.currentPage !== pages.search) && (prevProps.currentPage === pages.search)) {
+            this._hideSearchString()
+        }
+
+        if ((this.props.currentPage === pages.search) && (prevProps.currentPage !== pages.search)) {
+            this.setState({active : true, visible: true})
+        }
     }
 
     render() {
 
         return this.state.active ?
             <div className={"search-string" + (this.state.visible ? " _visible" : "")}>
-                <div className="wrapper" autoFocus={true}>
+                <div className="wrapper">
                     <div className="svg-icon">
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
                     </div>
@@ -98,7 +110,7 @@ class SearchItem extends React.Component{
 
     _search() {
         if (this.input && this.input.value) {
-            this.props.actions.search(this.input.value)
+            this.props.actions.search({query: this.input.value})
         }
     }
 }
@@ -106,6 +118,7 @@ class SearchItem extends React.Component{
 const mapState2Props = (state) => {
     return {
         currentPage: state.pageHeader.currentPage,
+        query: querySelector(state),
     }
 }
 

@@ -99,17 +99,17 @@ export default class LessonItem extends React.Component {
             item.highlight.Transcript.map((item) => {
                 return <span><div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/></span>
             })
+            // :
+            // item.highlight.Name && item.highlight.Name.length ?
+            //     <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
+            //     :
+            //     item.highlight.Course && item.highlight.Course.length ?
+            //         <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Course[0]}}/>
+            //         :
+            //         item.highlight.Author && item.highlight.Author.length ?
+            //             <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Author[0]}}/>
             :
-            item.highlight.Name && item.highlight.Name.length ?
-                <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
-                :
-                item.highlight.Course && item.highlight.Course.length ?
-                    <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Course[0]}}/>
-                    :
-                    item.highlight.Author && item.highlight.Author.length ?
-                        <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Author[0]}}/>
-                        :
-                        null
+            null
 
     }
 

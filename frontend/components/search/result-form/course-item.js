@@ -110,12 +110,12 @@ export default class CourseItem extends React.Component {
                                 return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
                             })
             :
-            item.highlight.Name && item.highlight.Name.length ?
-                <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
-                :
-                item.highlight.Author && item.highlight.Author.length ?
-                    <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Author[0]}}/>
-                    :
+            // item.highlight.Name && item.highlight.Name.length ?
+            //     <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
+            //     :
+            //     item.highlight.Author && item.highlight.Author.length ?
+            //         <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Author[0]}}/>
+            //         :
                     null
     }
 }

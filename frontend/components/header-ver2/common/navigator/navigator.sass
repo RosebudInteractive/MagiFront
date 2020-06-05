@@ -10,7 +10,8 @@
       padding: 0
 
     &._search-mode
-        padding-top: 0
+      .item__title::after
+        display: none //!important
 
   .header-menu
     align-items: center
@@ -83,6 +84,7 @@
 
 
   .search-string
+    top: -3px
     max-width: 0
     right: 0
     transition: max-width 300ms ease
@@ -103,7 +105,7 @@
       flex: 1 1 auto
       border: none
       outline: none
-      height: calc(100% - 2px)
+      height: calc(100% - 12px)
 
     .svg-icon
       fill-opacity: 0.3
