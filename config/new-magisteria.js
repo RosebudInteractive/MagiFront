@@ -255,7 +255,7 @@ module.exports = {
             appId: '6400839',
             appSecret: 'LsrNgANtMnP0ofdT4dKB',
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
-            apiVersion: '5.17',
+            apiVersion: '5.107',
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/vk/oauth',
             passportOptions: {
