@@ -4,6 +4,7 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import "./asset-viewer.sass"
 import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
+import {isInViewport} from "tools/page-tools";
 
 const IMAGE_MAX_HEIGHT = 400,
     FADE_TIMEOUT = 400,
@@ -28,6 +29,9 @@ class AssetBlock extends React.Component{
             if(this._scrollTimer) {
                 clearTimeout(this._scrollTimer);
             }
+
+            if (!isInViewport('.text-block__content', $(window).height() / 3)) return
+
             this._scrollTimer = setTimeout(() => {
                 const {timeStamps} = this.props,
                     _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
@@ -49,7 +53,8 @@ class AssetBlock extends React.Component{
                 _image = $(".image-block img"),
                 _ratio = asset.info.size.width / asset.info.size.height,
                 _vertical = _ratio < 1,
-                _fixedBlock = $(".js-play._fixed"),
+                // _fixedBlock = $(".js-play._fixed"),
+                _fixedBlock = $(".js-play"),
                 _rightBlock = $(".right-block")
 
             if (_fixedBlock && (_fixedBlock.length > 0)) {
