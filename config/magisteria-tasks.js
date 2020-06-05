@@ -26,11 +26,11 @@ module.exports = {
             module: "./receipt-collection",
             type: "scheduled-task",
             disabled: false,
-            schedule: "0 44 * * * *", // run every hour
+            schedule: "0 44 0,2,4,6,8,10,12,14,16,18,20,22 * * *", // run every 2 hours
             options: {
                 maxRecNum: 100,
-                maxTrial: 5,
-                startDate: "2019-12-23 00:00:00"
+                maxTrial: 24,
+                startDate: "2020-04-30 00:00:00"
             }
         },
         {
