@@ -263,8 +263,8 @@ class IdxCourse extends IdxBase {
                                 pubDate: elem.PubDate,
                                 csInfo: {
                                     URL: elem.CourseURL,
-                                    Cover: elem.IsLandingPage ? elem.LandCover : elem.Cover,
-                                    CoverMeta: elem.IsLandingPage ? elem.LandCoverMeta : elem.CoverMeta,
+                                    Cover: (elem.IsLandingPage && elem.LandCover) ? elem.LandCover : elem.Cover,
+                                    CoverMeta: (elem.IsLandingPage && elem.LandCoverMeta) ? elem.LandCoverMeta : elem.CoverMeta,
                                     IsPaid: elem.IsPaid ? true : false,
                                     Authors: {},
                                     Categories: {}

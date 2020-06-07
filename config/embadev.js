@@ -226,10 +226,14 @@ let options = {
             baseUrl: "https://magisteria.ru"
         }
     },
+    search: {
+        baseURL: "https://magisteria.ru"
+    },
     connections: {
         elastic: {
             connection_options: {
                 node: 'http://dragonegg:9200',
+                // node: 'http://10.1.0.35:9200',
                 log: 'trace'
             },
             pool: {
