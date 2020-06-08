@@ -81,7 +81,7 @@ module.exports = {
         clientTimeout: 60, // 60 sec
     },
     search: {
-        baseURL: "https://new.magisteria.ru"
+        baseURL: "https://magisteria.ru"
     },
     billing: {
         module: "./yandex-kassa",
