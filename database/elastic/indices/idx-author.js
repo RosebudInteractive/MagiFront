@@ -85,9 +85,9 @@ class IdxAuthor extends IdxBase{
 
     static get highlightFields() {
         return [
-            "auName",
-            "auShortDescription",
-            "auDescription"
+            { name: "auName", number_of_fragments: 0 },
+            { name: "auShortDescription", fragment_size: 200 },
+            { name: "auDescription", fragment_size: 200 }
         ];
     }
 
@@ -95,6 +95,8 @@ class IdxAuthor extends IdxBase{
         return [
             "auName",
             "auInfo",
+            "auShortDescription",
+            "auDescription",
             "pubDate"
         ];
     }
@@ -113,7 +115,14 @@ class IdxAuthor extends IdxBase{
 
     async processHit(hit, baseUrl) {
         let base_url = baseUrl ? baseUrl : this._baseUrl;
-        let result = { Id: hit["_id"], Name: hit["_source"].auName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        let result = {
+            Id: hit["_id"],
+            Name: hit["_source"].auName,
+            ShortDescription: hit["_source"].auShortDescription,
+            Description: hit["_source"].auDescription,
+            PubDate: hit["_source"].pubDate,
+            "_score": hit["_score"]
+        };
         result.Portrait = this._convertDataUrl(hit["_source"].auInfo.Portrait, true, false, base_url);
         result.PortraitMeta = this._convertMeta(hit["_source"].auInfo.PortraitMeta, true, false, base_url);
         result.URL = this._getAbsAuthorUrl(base_url) + hit["_source"].auInfo.URL;

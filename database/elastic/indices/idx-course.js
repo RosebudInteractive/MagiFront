@@ -147,13 +147,13 @@ class IdxCourse extends IdxBase {
 
     static get highlightFields() {
         return [
-            "csShortDescription",
-            "csTargetAudience",
-            "csDescription",
-            "csAims",
-            "csAuthor",
-            "csName",
-            "csCategory"
+            { name: "csShortDescription", fragment_size: 200 },
+            { name: "csTargetAudience", fragment_size: 200 },
+            { name: "csDescription", fragment_size: 200 },
+            { name: "csAims", fragment_size: 200 },
+            { name: "csAuthor", number_of_fragments: 0 },
+            { name: "csName", number_of_fragments: 0 },
+            { name: "csCategory", number_of_fragments: 0 }
         ];
     }
 
@@ -161,6 +161,8 @@ class IdxCourse extends IdxBase {
         return [
             "csName",
             "csInfo",
+            "csDescription",
+            "csShortDescription",
             "pubDate"
         ];
     }
@@ -183,7 +185,14 @@ class IdxCourse extends IdxBase {
 
     async processHit(hit, baseUrl) {
         let base_url = baseUrl ? baseUrl : this._baseUrl;
-        let result = { Id: hit["_id"], Name: hit["_source"].csName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        let result = {
+            Id: hit["_id"],
+            Name: hit["_source"].csName,
+            Description: hit["_source"].csDescription,
+            ShortDescription: hit["_source"].csShortDescription,
+            PubDate: hit["_source"].pubDate,
+            "_score": hit["_score"]
+        };
         result.IsPaid = hit["_source"].csInfo.IsPaid;
         result.Cover = this._convertDataUrl(hit["_source"].csInfo.Cover, true, false, base_url);
         result.CoverMeta = this._convertMeta(hit["_source"].csInfo.CoverMeta, true, false, base_url);
