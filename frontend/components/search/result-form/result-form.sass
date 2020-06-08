@@ -4,29 +4,47 @@
   padding-top: 72px
   max-width: 800px
   margin: auto
+  @media (max-width: $tablet-width)
+    padding-top: 64px
+    margin: 0 15px
+    width: auto
 
   .search-result__header
     margin: 50px 0 21px
     display: flex
     width: 100%
+    flex-direction: row
+    @media (max-width: $tablet-width)
+      margin: 15px 0 0
+      flex-direction: column
 
   .result-title
     flex: 1 1 auto
     color: $color-dark-06
     justify-content: space-between
 
-  .sort-type
-    margin-left: 15px
+  .sort-type__block
+    margin: 0 0 0 15px
     color: $color-main-dark
-    cursor: pointer
-    &._active
-      color: $color-orange
+    @media (max-width: $tablet-width)
+      margin: 10px 0 0
+
+    .sort-type__item
+      margin-left: 15px
+      color: $color-main-dark
+      cursor: pointer
+      @media (max-width: $tablet-width)
+        margin-left: 7px
+      &._active
+        color: $color-orange
 
 .search-result__item
   display: flex
   padding: 25px 0
   &:not(:last-child)
     border-bottom: 1px solid rgba(47, 47, 47, 0.2)
+    @media (max-width: $tablet-width)
+      padding: 15px 0 20px
 
   em
     background-color: $color-orange-03
@@ -41,13 +59,22 @@
     background-origin: border-box
     background-position: top center
     flex-shrink: 1
+    margin-right: 15px
+    &._mobile
+      display: none
+      float: left
+      @media (max-width: $tablet-width)
+        display: block
+    &._desktop
+      display: block
+      @media (max-width: $tablet-width)
+        display: none
 
 
   .content
     width: 100%
     display: flex
     flex-direction: column
-    margin-left: 15px
     justify-content: space-between
 
     .text-wrapper
@@ -55,6 +82,10 @@
 
     .text
       padding-bottom: 10px
+      &:hover
+        .result-link
+          border-bottom: $border-orange-03
+          color: $color-orange
 
 
     .title
@@ -76,6 +107,7 @@
 
   .footer
     display: flex
+    flex-direction: row
     margin-bottom: 5px
     .course
       display: flex
@@ -83,6 +115,13 @@
       justify-content: flex-end
     .course-name
       color: $color-dark-06
+
+    &._lesson
+      @media (max-width: $tablet-width)
+        flex-direction: column
+        .course
+          justify-content: flex-start
+          margin-top: 10px
 
 
 
@@ -129,15 +168,21 @@
 .search-result__pages
   width: 100%
   display: flex
-  justify-content: center
+  justify-content: flex-start
   margin-top: 39px
 
   .page-button
+    font-family: Roboto
+    font-size: 17px
+    font-weight: normal
+    line-height: 130%
     outline: none
     border: $border-dark-02
     width: 40px
     height: 40px
     margin-right: 10px
+    &._brown
+      border-color: $color-orange
 
     &._next
       width: auto

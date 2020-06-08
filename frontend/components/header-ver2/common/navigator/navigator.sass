@@ -1,5 +1,10 @@
 @import "~tools/variables.sass"
 
+._search-mode
+  .item__title::after
+    display: none
+
+
 .header-ver2
   .navigation
     position: relative
@@ -9,9 +14,7 @@
     ul a
       padding: 0
 
-    &._search-mode
-      .item__title::after
-        display: none //!important
+
 
   .header-menu
     align-items: center
@@ -92,6 +95,8 @@
     border-radius: 3px
     background-color: $color-white
     margin-right: 19px
+    @media (max-width: $tablet-width)
+      margin: 0
 
     .wrapper
       width: auto
@@ -114,12 +119,17 @@
       &._pointer
         cursor: pointer
 
+    .close
+      width: 12px
+
 
     &._visible
       position: absolute
       max-width: 100%
       width: calc(100% - 19px)
       height: 40px
+      @media (max-width: $tablet-width)
+        width: 100%
 
       .wrapper
         visibility: visible
