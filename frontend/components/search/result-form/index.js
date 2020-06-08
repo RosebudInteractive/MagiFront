@@ -28,10 +28,10 @@ export default class ResultForm extends React.Component {
                 <div className="font-universal__body-large result-title">{`Всего найдено: ${_count} ${getPageCountTitle(+_count)}`}</div>
                 {
                     _count ?
-                        <div className="sort-type">
+                        <div className="sort-type__block">
                             <span className="font-universal__body-medium">Сортировать:</span>
-                            <span className="font-universal__body-medium sort-type">По релевантности</span>
-                            <span className="font-universal__body-medium sort-type _active">По дате</span>
+                            <span className="font-universal__body-medium sort-type__item">По релевантности</span>
+                            <span className="font-universal__body-medium sort-type__item _active">По дате</span>
                         </div>
                         :
                         null

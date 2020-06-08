@@ -21,16 +21,17 @@ export default class CourseItem extends React.Component {
             _style = {backgroundImage: `url("${_cover}")`}
 
         return item && <div className="search-result__item course-item">
-            <div className="image" style={_style}/>
+            <Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>
             <div className="content font-universal__title-smallx">
                 <div className="text-wrapper">
-                    <div className="text">
+                    <Link to={item.URL} target="_blank" className="text">
+                        <Link to={item.URL} target="_blank" className="image _mobile" style={_style}/>
                         <span className="header">
                             <span className="title">Курс</span>
                             <Link to={item.URL} target="_blank" className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
                         </span>
                         <span className="highlights font-universal__book-medium">{this._getHighlights()}</span>
-                    </div>
+                    </Link>
                     {
                         item.IsPaid &&
                         <div className="crown">

@@ -19,9 +19,10 @@ export default class AuthorItem extends React.Component {
             _style = {backgroundImage: `url("${_portrait}")`}
 
         return item && <div className="search-result__item author-item">
-            <div className="image" style={_style}/>
+            <div className="image _desktop" style={_style}/>
             <div className="content font-universal__title-smallx">
                 <div className="text">
+                    <div className="image _mobile" style={_style}/>
                     <span className="header">
                         <span className="title">Автор</span>
                         <Link to={item.URL} target="_blank" className="name result-link header" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>

@@ -6,7 +6,8 @@ import {pages} from "tools/page-tools";
 // import {Link} from "react-router-dom";
 
 const SEARCH = '<use xlink:href="#search"/>',
-    ARROW = '<use xlink:href="#next"/>'
+    ARROW = '<use xlink:href="#next"/>',
+    CLOSE = '<use xlink:href="#close-no-color"/>'
 
 class SearchItem extends React.Component{
 
@@ -35,17 +36,17 @@ class SearchItem extends React.Component{
 
     componentWillUnmount() {
         document.body.removeEventListener("mouseup", this._handler)
-        $(".navigation").removeClass("_search-mode")
+        $(".page-header__row").removeClass("_search-mode")
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.active && !prevState.active) {
             setTimeout(() => {this.setState({visible: true})}, 100)
-            $(".navigation").addClass("_search-mode")
+            $(".page-header__row").addClass("_search-mode")
         }
 
         if (this.state.visible && !prevState.visible) {
-            $(".navigation").addClass("_search-mode")
+            $(".page-header__row").addClass("_search-mode")
 
             if (this.input && !this.input.value && this.props.query) {
                 this.input.value = this.props.query
@@ -57,7 +58,7 @@ class SearchItem extends React.Component{
         }
 
         if (!this.state.active && prevState.active) {
-            $(".navigation").removeClass("_search-mode")
+            $(".page-header__row").removeClass("_search-mode")
             this.input = null
         }
 
@@ -79,8 +80,11 @@ class SearchItem extends React.Component{
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
                     </div>
                     <input ref={e => this.input = e} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
+                    <div className="svg-icon _pointer close" onClick={::this._close}>
+                        <svg width="18" height="18" dangerouslySetInnerHTML={{__html: CLOSE}}/>
+                    </div>
                     <div className="svg-icon _pointer" onClick={::this._search}>
-                        <svg width="16" height="16" dangerouslySetInnerHTML={{__html: ARROW}}/>
+                        <svg width="18" height="18" dangerouslySetInnerHTML={{__html: ARROW}}/>
                     </div>
                 </div>
             </div>
@@ -112,6 +116,13 @@ class SearchItem extends React.Component{
         if (this.input && this.input.value) {
             this.props.actions.search({query: this.input.value})
         }
+    }
+
+    _close() {
+        this.setState({
+            active: false,
+            visible: false,
+        })
     }
 }
 

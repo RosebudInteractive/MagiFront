@@ -24,7 +24,7 @@ export default class Item extends React.Component {
     render() {
         let {course, isMobile} = this.props;
 
-        return <LazyLoad height={this._getHeight()} unmountIfInvisible={true} resize={true}>
+        return <LazyLoad height={this._getHeight()} unmountIfInvisible={false} resize={true}>
             {
                 course.OneLesson ?
                     <SingleLesson course={course} needShowAuthors={true}/>
@@ -38,7 +38,7 @@ export default class Item extends React.Component {
         const _value = ScrollMemoryStorage.getInstance().getCourseBundleHeight(this.props.index)
 
         return _value ?
-            _value 
+            _value
             :
             this.props.course.OneLesson ? DEFAULT_LESSON_HEIGHT : DEFAULT_COURSE_HEIGHT;
     }
