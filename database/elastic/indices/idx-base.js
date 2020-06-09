@@ -39,11 +39,12 @@ exports.IdxBase = class IdxBase extends DbObject {
         return striptags(res, [], '\n'); // replace them by LF
     }
 
-    async _getData(store_func, opts) {
+    async _getData(store_func, delete_func, opts) {
+        throw new Error(`IdxBase::_getData: Should be implemented in descendant!`)
     }
 
     async processHit(hit, baseUrl) {
-        return hit;    
+        throw new Error(`IdxBase::processHit: Should be implemented in descendant!`)
     }
 
     async importData(conn, options) {
@@ -102,6 +103,12 @@ exports.IdxBase = class IdxBase extends DbObject {
                     rows_inserted++;
                 }
             }
+        }, async (id) => {
+                return conn.delete({
+                    index: this.indexName,
+                    id: id,
+                    refresh: 'true'
+                });
         }, opts);
 
         return {

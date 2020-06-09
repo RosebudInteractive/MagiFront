@@ -24,6 +24,8 @@ const DbElastic = class DbElastic extends DbObject {
     }
 
     async search(options) {
+        const DFLT_RESULT_SIZE = 100;
+
         let result = ElasticConWrapper(async conn => {
             let req = options || {};
             if (!req.query)
@@ -41,7 +43,12 @@ const DbElastic = class DbElastic extends DbObject {
 
             let fields_highlight = {};
             fields.highlight.forEach(elem => {
-                fields_highlight[elem] = { type: "unified" };
+                let opts = _.cloneDeep(typeof (elem) === "string" ? { name: elem } : elem);
+                let helem = fields_highlight[opts.name] = { type: opts.type ? opts.type : "unified" };
+                delete opts.name;
+                delete opts.type;
+                for (let key in opts)
+                    helem[key] = opts[key];
             });
 
             let search_body = {
@@ -50,7 +57,6 @@ const DbElastic = class DbElastic extends DbObject {
                         should: [
                             {
                                 multi_match: {
-                                    // query: "συλλογισμός",
                                     query: req.query,
                                     // type: "phrase_prefix",
                                     type: "phrase",
@@ -117,15 +123,34 @@ const DbElastic = class DbElastic extends DbObject {
                     search_body.highlight.number_of_fragments = req.highlight.number_of_fragments;
             }
 
-            let search_res = await conn.search({
+            let search_options = {
                 index: fields.index,
-                size: 100,
+                size: req.size ? req.size : DFLT_RESULT_SIZE,
                 _source: fields.source,
                 body: search_body
-            });
+            };
+            if (typeof (req.from) === "number")
+                search_options.from = req.from;
+            
+            let search_res = await conn.search(search_options);
 
             let { body: { hits: { hits } } } = search_res;
-            return processHits(hits ? hits : null, this._resBaseUrl);
+            let result = {
+                hits: await processHits(hits ? hits : null, this._resBaseUrl)
+            }
+
+            if (req.withCount) {
+                let count_body = _.cloneDeep(search_body);
+                delete count_body.highlight;
+                delete count_body.sort;
+                let { body: { count } } = await conn.count({
+                    index: fields.index,
+                    body: count_body
+                });
+                result.count = count;
+            }
+
+            return result;
         }, true);
         return result;
         

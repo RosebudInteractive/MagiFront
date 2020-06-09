@@ -133,18 +133,20 @@ class IdxLesson extends IdxBase{
 
     static get highlightFields() {
         return [
-            "lsTranscript",
-            "lsShortDescription",
-            "lsFullDescription",
-            "lsName",
-            "lsAuthor",
-            "lsCourse"
+            { name: "lsTranscript", fragment_size: 200 },
+            { name: "lsShortDescription", fragment_size: 200 },
+            { name: "lsFullDescription", fragment_size: 200 },
+            { name: "lsName", number_of_fragments: 0 },
+            { name: "lsAuthor", number_of_fragments: 0 },
+            { name: "lsCourse", number_of_fragments: 0 }
         ];
     }
 
     static get dataFields() {
         return [
             "lsName",
+            "lsShortDescription",
+            "lsFullDescription",
             "lsAuthor",
             "lsCourse",
             "lsInfo",
@@ -169,7 +171,14 @@ class IdxLesson extends IdxBase{
 
     async processHit(hit, baseUrl) {
         let base_url = baseUrl ? baseUrl : this._baseUrl;
-        let result = { Id: hit["_id"], Name: hit["_source"].lsName, PubDate: hit["_source"].pubDate, "_score": hit["_score"] };
+        let result = {
+            Id: hit["_id"],
+            Name: hit["_source"].lsName,
+            ShortDescription: hit["_source"].lsShortDescription,
+            FullDescription: hit["_source"].lsFullDescription,
+            PubDate: hit["_source"].pubDate,
+            "_score": hit["_score"]
+        };
         result.Cover = this._convertDataUrl(hit["_source"].lsInfo.Cover, true, false, base_url);
         result.CoverMeta = this._convertMeta(hit["_source"].lsInfo.CoverMeta, true, false, base_url);
         result.URL = this._removeTrailingSlash(base_url) + '/' + hit["_source"].lsInfo.CourseURL + '/' + hit["_source"].lsInfo.URL;
@@ -191,7 +200,7 @@ class IdxLesson extends IdxBase{
         return result;
     }
 
-    async _getData(store_func, opts) {
+    async _getData(store_func, delete_func, opts) {
         let all_ids = [];
 
         let ds_ids = await $data.execSql({
