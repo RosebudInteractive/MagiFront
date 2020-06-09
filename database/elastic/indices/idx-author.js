@@ -10,7 +10,7 @@ const AUTHORS_FLDS_MSSQL =
     "  a.[URL] as [AuthorURL], a.[Portrait], a.[PortraitMeta], a.[TimeCr] as [PubDate]\n";
 
 const AUTHORS_FLDS_ID_MSSQL = "<%= limit %> a.[Id]\n";
-
+const AUTHORS_WHERE_ID_MSSQL = "\n  where a.[Id] = <%= id %>";
 const AUTHORS_WHERE_MSSQL = "\n  where a.[Id] in (<%= ids %>)";
 
 const AUTHORS_MSSQL =
@@ -24,7 +24,7 @@ const AUTHORS_FLDS_MYSQL =
     "  a.`URL` as `AuthorURL`, a.`Portrait`, a.`PortraitMeta`, a.`TimeCr` as `PubDate`\n";
 
 const AUTHORS_FLDS_ID_MYSQL = "a.`Id`\n";
-
+const AUTHORS_WHERE_ID_MYSQL = "\n  where a.`Id` = <%= id %>";
 const AUTHORS_WHERE_MYSQL = "\n  where a.`Id` in (<%= ids %>)";
 
 const AUTHORS_MYSQL =
@@ -137,16 +137,27 @@ class IdxAuthor extends IdxBase{
     async _getData(store_func, delete_func, opts) {
         let all_ids = [];
 
+        let mssql_where = ``;
+        let mysql_where = ``;
+        let delete_id;
+
+        if (typeof (opts.id) === "number") {
+            mssql_where = _.template(AUTHORS_WHERE_ID_MSSQL)({ id: opts.id });
+            mysql_where = _.template(AUTHORS_WHERE_ID_MYSQL)({ id: opts.id });
+            if ((typeof (opts.deleteIfNotExists) === "boolean") && opts.deleteIfNotExists)
+                delete_id = opts.id;
+        }
+
         let ds_ids = await $data.execSql({
             dialect: {
                 mysql: _.template(AUTHORS_MYSQL)({
                     fields: AUTHORS_FLDS_ID_MYSQL,
-                    where: ``,
+                    where: mysql_where,
                     limit: opts.limit ? ` limit ${opts.limit}` : ``
                 }),
                 mssql: _.template(AUTHORS_MSSQL)({
                     fields: _.template(AUTHORS_FLDS_ID_MSSQL)({ limit: opts.limit ? ` top ${opts.limit}` : `` }),
-                    where: ``
+                    where: mssql_where
                 })
             }
         }, {});
@@ -204,6 +215,11 @@ class IdxAuthor extends IdxBase{
                 await store_func(authors, { createDateField: "createDate" });
             }
         }
+        else
+            if (delete_id && delete_func) {
+                await delete_func(delete_id);
+            }
+
     }
 }
 

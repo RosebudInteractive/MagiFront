@@ -189,6 +189,11 @@ const GET_AUTHOR_FOR_PRERENDER_BY_URL_MYSQL =
     "select `URL` from `Author`\n" +
     "where `URL` = '<%= url %>'";
 
+const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
+const { IdxLessonService } = require('./elastic/indices/idx-lesson');
+const { IdxAuthorService } = require('./elastic/indices/idx-author');
+const { IdxCourseService } = require('./elastic/indices/idx-course');
+
 const { PrerenderCache } = require('../prerender/prerender-cache');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
@@ -200,6 +205,27 @@ const DbAuthor = class DbAuthor extends DbObject {
         super(options);
         this._prerenderCache = PrerenderCache();
         this._coursesService = CoursesService();
+    }
+
+    async _updateSearchIndex(id, affected_list) {
+        let _affected = affected_list ? affected_list : [];
+        let result = ElasticConWrapper(async conn => {
+            await IdxAuthorService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+            for (let i = 0; i < _affected.length; i++) {
+                let service = _affected[i];
+                switch (service) {
+                    case "course":
+                        await IdxCourseService().importData(conn, { authorId: id, page: 10, refresh: "true" });
+                        break;
+                    case "lesson":
+                        await IdxLessonService().importData(conn, { authorId: id, page: 5, refresh: "true" });
+                        break;
+                    default:
+                        throw new Error(`DbAuthor::_updateSearchIndex: Unknown service name: "${service}".`);
+                }
+            }
+        }, true);
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -650,6 +676,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return this.clearCache(url)
                             .then(() => result);
                     })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id, ["course", "lesson"]);
+                        return result;
+                    })
             );
         })
     }
@@ -659,10 +689,14 @@ const DbAuthor = class DbAuthor extends DbObject {
             let auth_obj;
             let auth_lng_obj;
             let opts = options || {};
-            let newId = null;
             let inpFields = data || {};
             let isModified = false;
             let old_url;
+            let old_name;
+            let affected = [];
+            let make_name = () => {
+                return `${auth_lng_obj.firstName()} ${auth_lng_obj.lastName()}`
+            };
             resolve(
                 this._getObjById(id)
                     .then((result) => {
@@ -672,10 +706,12 @@ const DbAuthor = class DbAuthor extends DbObject {
                             throw new Error("Author (Id = " + id + ") doesn't exist.");
                         auth_obj = collection.get(0);
                         old_url = auth_obj.uRL();
+                        
                         collection = auth_obj.getDataRoot("AuthorLng").getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Author (Id = " + id + ") has inconsistent \"LNG\" part.");
                         auth_lng_obj = collection.get(0);
+                        old_name = make_name();
                         return auth_obj.edit()
                     })
                     .then(() => {
@@ -697,6 +733,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                             auth_lng_obj.employment(inpFields["Employment"]);
                         if (typeof (inpFields["ShortDescription"]) !== "undefined")
                             auth_lng_obj.shortDescription(inpFields["ShortDescription"]);
+                        if (old_name !== make_name())
+                            affected = ["course", "lesson"];
                         return auth_obj.save(opts)
                             .then((result) => {
                                 isModified = isModified || (result && result.detail && (result.detail.length > 0));
@@ -720,6 +758,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                             rc = this.prerender(id, false, old_url)
                                 .then(() => result);
                         return rc;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id, affected);
+                        return result;
                     })
             );
         })
@@ -792,6 +834,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                     .then((result) => {
                         return this.prerender(newId)
                             .then(() => result);
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(newId, []);
+                        return result;
                     })
             );
         })
