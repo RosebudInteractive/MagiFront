@@ -135,7 +135,22 @@ const DbElastic = class DbElastic extends DbObject {
             let search_res = await conn.search(search_options);
 
             let { body: { hits: { hits } } } = search_res;
-            return processHits(hits ? hits : null, this._resBaseUrl);
+            let result = {
+                hits: await processHits(hits ? hits : null, this._resBaseUrl)
+            }
+
+            if (req.withCount) {
+                let count_body = _.cloneDeep(search_body);
+                delete count_body.highlight;
+                delete count_body.sort;
+                let { body: { count } } = await conn.count({
+                    index: fields.index,
+                    body: count_body
+                });
+                result.count = count;
+            }
+
+            return result;
         }, true);
         return result;
         

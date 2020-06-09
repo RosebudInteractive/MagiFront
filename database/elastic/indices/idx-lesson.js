@@ -200,7 +200,7 @@ class IdxLesson extends IdxBase{
         return result;
     }
 
-    async _getData(store_func, opts) {
+    async _getData(store_func, delete_func, opts) {
         let all_ids = [];
 
         let ds_ids = await $data.execSql({
