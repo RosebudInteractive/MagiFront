@@ -140,7 +140,8 @@ function* searchSaga(data) {
 
         yield put(push(`/search?${_params}`))
 
-        let _result = yield call(_postSearch, data.payload.q),
+        let _q = yield call(_postSearch, data.payload.q),
+            _result = _q.hits,
             _pageCount = Math.ceil(_result.length / ITEMS_ON_PAGE),
             _current = data.payload.p <= _pageCount ? data.payload.p : 1
 
