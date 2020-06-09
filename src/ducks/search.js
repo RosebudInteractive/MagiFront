@@ -85,7 +85,7 @@ function* searchSaga(data) {
     try {
         let _result = yield call(_postSearch, data.payload)
 
-        yield put({type: SEARCH_SUCCESS, payload: _result})
+        yield put({type: SEARCH_SUCCESS, payload: _result.hits})
         // yield put({type: SEARCH_SUCCESS, payload: MOCK_DATA.COMMON_RESULTS})
 
     } catch (e) {
