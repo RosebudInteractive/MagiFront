@@ -1,0 +1,27 @@
+@import "./variables.sass"
+
+@mixin font-arial($size: false, $weight: false,  $lh: false, $color: false)
+  font-family: Arial, sans-serif, Helvetica
+
+  @if $size
+    font-size: $size
+  @if $color
+    color: $color
+  @if $weight
+    font-weight: $weight
+  @if $lh
+    line-height: $lh
+
+@mixin line-count($count: false, $line-height: false, $max-height: false)
+  overflow: hidden
+  text-overflow: ellipsis
+  display: -webkit-box
+  -webkit-box-orient: vertical
+  -webkit-line-clamp: $count      /* number of lines to show */
+  line-height: $line-height
+  @if $max-height
+    max-height: $max-height
+  @else
+    max-height: $count * $line-height
+
+

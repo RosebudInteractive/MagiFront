@@ -2,7 +2,6 @@ import React from "react"
 import PropTypes from "prop-types"
 import "./result-form.sass"
 import {Link} from "react-router-dom";
-import {getCoverPath, ImageSize} from "tools/page-tools";
 import {replaceAll} from "tools/word-tools";
 
 export default class LessonItem extends React.Component {
@@ -36,8 +35,6 @@ export default class LessonItem extends React.Component {
                         <span className="title">Курс:</span>
                         <Link to={item.Course.URL} target="_blank" className="course-name result-link" dangerouslySetInnerHTML={{__html: this._getCourseText()}}/>
                     </div>
-
-
                 </div>
             </div>
         </div>

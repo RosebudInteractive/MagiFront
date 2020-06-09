@@ -1,4 +1,5 @@
 @import "~tools/variables.sass"
+@import "~tools/mixins.sass"
 
 .search-result
   padding-top: 72px
@@ -82,10 +83,14 @@
 
     .text
       padding-bottom: 10px
+      @include line-count(3, 22px, 56px)
       &:hover
         .result-link
           border-bottom: $border-orange-03
           color: $color-orange
+
+      @media (max-width: $tablet-width)
+        @include line-count(8, 14px, 142px)
 
 
     .title
