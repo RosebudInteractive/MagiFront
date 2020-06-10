@@ -695,7 +695,7 @@ const DbAuthor = class DbAuthor extends DbObject {
             let old_name;
             let affected = [];
             let make_name = () => {
-                return `${auth_lng_obj.firstName()} ${auth_lng_obj.lastName()}`
+                return `${auth_lng_obj.firstName()}|${auth_lng_obj.lastName()}|${auth_obj.uRL()}`
             };
             resolve(
                 this._getObjById(id)

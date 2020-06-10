@@ -49,10 +49,20 @@ const CATEGORY_MSSQL_ID_REQ = CATEGORY_MSSQL_ALL_REQ + " and c.[Id] = <%= id %>"
 const CATEGORY_MYSQL_ID_REQ = CATEGORY_MYSQL_ALL_REQ + " and c.`Id` = <%= id %>";
 const MAX_COURSES_REQ_NUM = 10;
 
+const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
+const { IdxCourseService } = require('./elastic/indices/idx-course');
+
 const DbCategory = class DbCategory extends DbObject {
 
     constructor(options) {
         super(options);
+    }
+
+    async _updateSearchIndex(id) {
+        let result = ElasticConWrapper(async conn => {
+            await IdxCourseService().importData(conn, { categoryId: id, page: 10, refresh: "true" });
+        }, true);
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -167,8 +177,11 @@ const DbCategory = class DbCategory extends DbObject {
             let ctg_obj;
             let ctg_lng_obj;
             let opts = options || {};
-            let newId = null;
             let inpFields = data || {};
+            let isNameChanged = false;
+            let make_name = () => {
+                return `${ctg_lng_obj.name()}|${ctg_obj.uRL()}`
+            };
             resolve(
                 this._getObjById(id)
                     .then((result) => {
@@ -184,12 +197,14 @@ const DbCategory = class DbCategory extends DbObject {
                         return ctg_obj.edit()
                     })
                     .then(() => {
+                        let old_name = make_name();
                         if (typeof (inpFields["ParentId"]) !== "undefined")
                             ctg_obj.parentId(inpFields["ParentId"]);
                         if (typeof (inpFields["URL"]) !== "undefined")
                             ctg_obj.uRL(inpFields["URL"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
                             ctg_lng_obj.name(inpFields["Name"]);
+                        isNameChanged = old_name !== make_name();
                         return ctg_obj.save(opts);
                     })
                     .then(() => {
@@ -203,6 +218,11 @@ const DbCategory = class DbCategory extends DbObject {
                         if (isErr)
                             throw res;
                         return res;
+                    })
+                    .then(async (result) => {
+                        if (isNameChanged)
+                            await this._updateSearchIndex(id);
+                        return result;
                     })
             );
         })

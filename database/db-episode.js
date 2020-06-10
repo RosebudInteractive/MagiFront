@@ -192,10 +192,20 @@ const GET_LESSON_LANG_MYSQL =
 
 const DFLT_CONTENT_TYPE = EpisodeContentType.AUDIO;
 
+const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
+const { IdxLessonService } = require('./elastic/indices/idx-lesson');
+
 const DbEpisode = class DbEpisode extends DbObject {
 
     constructor(options) {
         super(options);
+    }
+
+    async _updateSearchIndex(id) {
+        let result = ElasticConWrapper(async conn => {
+            await IdxLessonService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+        }, true);
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -318,7 +328,6 @@ const DbEpisode = class DbEpisode extends DbObject {
         return new Promise((resolve, reject) => {
             let root_obj;
             let opts = {};
-            let newId = null;
             let collection = null;
             let lesson_obj = null;
             let ep_lesson_collection = null;
@@ -447,6 +456,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                         }
                         else
                             result = result.then(() => { return res; })
+                        return result;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(lesson_id);
                         return result;
                     })
                     .then((result) => {
@@ -746,6 +759,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                             result = result.then(() => { return res;})    
                         return result;
                     })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(lesson_id);
+                        return result;
+                    })
                     .then((result) => {
                         let rc = result;
                         if (isModified)
@@ -944,6 +961,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                         }
                         else
                             result = result.then(() => { return res; })
+                        return result;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(lesson_id);
                         return result;
                     })
                     .then((result) => {

@@ -541,6 +541,10 @@ const COURSE_MYSQL_LSN_COVER_REQ =
 const DFLT_ADDRESS_BOOK = "Магистерия";
 const DFLT_SENDER_NAME = "Magisteria.ru";
 
+const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
+const { IdxLessonService } = require('./elastic/indices/idx-lesson');
+const { IdxCourseService } = require('./elastic/indices/idx-course');
+
 const { PrerenderCache } = require('../prerender/prerender-cache');
 const { URL, URLSearchParams } = require('url');
 
@@ -554,6 +558,27 @@ const DbCourse = class DbCourse extends DbObject {
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
         this._productService = ProductService();
+    }
+
+    async _updateSearchIndex(id, affected_list) {
+        let _affected = affected_list ? affected_list : [];
+        let result = ElasticConWrapper(async conn => {
+            let { deleted } = await IdxCourseService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+            for (let i = 0; i < _affected.length; i++) {
+                let service = _affected[i];
+                switch (service) {
+                    case "lesson":
+                        if (deleted > 0)
+                            await IdxLessonService().delete(conn, { courseId: id, refresh: "true" })
+                        else
+                            await IdxLessonService().importData(conn, { courseId: id, page: 5, refresh: "true" });
+                        break;
+                    default:
+                        throw new Error(`DbCourse::_updateSearchIndex: Unknown service name: "${service}".`);
+                }
+            }
+        }, true);
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -1897,6 +1922,10 @@ const DbCourse = class DbCourse extends DbObject {
                             result = result.then(() => { return res; })
                         return result;
                     })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id);
+                        return result;
+                    })
                     .then((result) => {
                         return this.clearCache(course_url)
                             .then(() => {
@@ -1995,6 +2024,11 @@ const DbCourse = class DbCourse extends DbObject {
             let languageId;
             let req;
             let isOneLessonCourse;
+            let affected = [];
+            let old_name;
+            let make_name = () => {
+                return `${crs_lng_obj.name()}|${crs_obj.state()}|${crs_obj.uRL()}`
+            };
 
             if (opts.byUrl && (typeof (opts.byUrl) === "string"))
                 req = this._getObjects(COURSE_REQ_TREE, { field: "URL", op: "=", value: opts.byUrl })
@@ -2136,6 +2170,7 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(async () => {
 
+                        old_name = make_name();
                         if (typeof (inpFields["Color"]) !== "undefined")
                             crs_obj.color(inpFields["Color"]);
                         if (typeof (inpFields["Mask"]) !== "undefined")
@@ -2198,6 +2233,8 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
                             crs_lng_obj.name(inpFields["Name"]);
+                        if (old_name !== make_name())
+                            affected.push("lesson");
                         if (typeof (inpFields["Description"]) !== "undefined")
                             crs_lng_obj.description(inpFields["Description"]);
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
@@ -2399,6 +2436,10 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                         else
                             result = result.then(() => { return res; })
+                        return result;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id, affected);
                         return result;
                     })
                     .then((result) => {
@@ -2647,6 +2688,10 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                         else
                             result = result.then(() => { return res; })
+                        return result;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(newId);
                         return result;
                     })
                     .then((result) => {

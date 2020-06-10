@@ -756,6 +756,9 @@ const CHECK_IF_CAN_DEL_EPI_MYSQL =
     "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
     "where (e.`Id` = <%= id %>) and (eln.`State` = 'R')";
 
+const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
+const { IdxLessonService } = require('./elastic/indices/idx-lesson');
+
 const { PrerenderCache } = require('../prerender/prerender-cache');
 
 const DbLesson = class DbLesson extends DbObject {
@@ -764,6 +767,13 @@ const DbLesson = class DbLesson extends DbObject {
         super(options);
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
+    }
+
+    async _updateSearchIndex(id) {
+        let result = ElasticConWrapper(async conn => {
+            await IdxLessonService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+        }, true);
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -2132,6 +2142,10 @@ const DbLesson = class DbLesson extends DbObject {
                             result = result.then(() => { return res; })
                         return result;
                     })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id);
+                        return result;
+                    })
                     .then((result) => {
                         let rc = Promise.resolve(result);
                         if (urls_to_clear.length > 0) {
@@ -2714,6 +2728,10 @@ const DbLesson = class DbLesson extends DbObject {
                             result = result.then(() => { return res;})    
                         return result;
                     })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(id);
+                        return result;
+                    })
                     .then((result) => {
                         let rc = result;
                         if (isModified)
@@ -3030,6 +3048,10 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                         else
                             result = result.then(() => { return res; })
+                        return result;
+                    })
+                    .then(async (result) => {
+                        await this._updateSearchIndex(newId);
                         return result;
                     })
                     .then((result) => {
