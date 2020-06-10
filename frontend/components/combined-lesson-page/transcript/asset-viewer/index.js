@@ -30,7 +30,18 @@ class AssetBlock extends React.Component{
                 clearTimeout(this._scrollTimer);
             }
 
-            if (!isInViewport('.text-block__content', $(window).height() / 3)) return
+            const _readLineTop = this._getReadLineTop(),
+                _textBlockElem = $(".text-block__wrapper"),
+                _textBlockTop = _textBlockElem.offset().top,
+                _textBlockBottom = _textBlockTop + _textBlockElem.height()
+
+            if (_readLineTop < _textBlockTop) {
+                this._applyFirstAsset()
+                return;
+            } else if (_textBlockBottom < _readLineTop) {
+                this._applyLastAsset()
+                return;
+            }
 
             this._scrollTimer = setTimeout(() => {
                 const {timeStamps} = this.props,
@@ -53,7 +64,6 @@ class AssetBlock extends React.Component{
                 _image = $(".image-block img"),
                 _ratio = asset.info.size.width / asset.info.size.height,
                 _vertical = _ratio < 1,
-                // _fixedBlock = $(".js-play._fixed"),
                 _fixedBlock = $(".js-play"),
                 _rightBlock = $(".right-block")
 
@@ -139,15 +149,12 @@ class AssetBlock extends React.Component{
 
         if (!(lessonPlayInfo && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
 
-
         let _visible = timeStamps
             .map((item, index) => {
-                // return isInViewport(`#asset-${index + 1}`) ? {time: item, top: $(`#asset-${index + 1}`).offset().top} : null
                 return {time: item, top: $(`#asset-${index + 1}`).offset().top}
             })
-            // .filter(item => !!item)
             .sort((a, b) => {
-                const _readLineTop =  $(window).scrollTop() + ($(window).height() / 3),
+                const _readLineTop =  this._getReadLineTop(),
                     _inReadLineA = (_readLineTop - a.top) >= 0,
                     _inReadLineB = (_readLineTop - b.top) >= 0
 
@@ -181,37 +188,48 @@ class AssetBlock extends React.Component{
 
         if (!(lessonPlayInfo && episodesTimes && Array.isArray(episodesTimes) && (episodesTimes.length > 0))) return
 
-        const _readLineTop =  $(window).scrollTop() + ($(window).height() / 3)
+        const _readLineTop = this._getReadLineTop(),
+            _textBlockElem = $(".text-block__wrapper"),
+            _textBlockTop = _textBlockElem.offset().top,
+            _textBlockBottom = _textBlockTop + _textBlockElem.height()
 
         let _anchors = $(".toc-anchor")
 
-        if (_anchors.length === 0) return;
+        if (_anchors.length !== 0) {
+            _anchors.each(function() {
+                let _current = $(this),
+                    id = _current.attr("id")
 
-        // let that = this
-
-        _anchors.each(function() {
-            let _current = $(this),
-                id = _current.attr("id")
-
-            if (!id) {return}
-            id = id.replace("toc", "")
-
-            id = +id
-
-            if (id) {
-                let _item = episodesTimes.find(item => item.id === id)
-
-                if (_item) {
-                    _item.top = _current.offset().top
+                if (!id) {
+                    if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
+                        episodesTimes[0].top = _current.offset().top
+                        return
+                    } else {
+                        return
+                    }
                 }
-            }
-        })
+                id = id.replace("toc", "")
+
+                id = +id
+
+                if (id) {
+                    let _item = episodesTimes.find(item => item.id === id)
+
+                    if (_item) {
+                        _item.top = _current.offset().top
+                    }
+                }
+            })
+        } else if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
+            episodesTimes[0].top = _textBlockTop
+        } else {
+            return
+        }
 
         let _visible = episodesTimes
             .filter(item => !!item.top)
             .map((item, index, array) => {
-                let _blockElem = $(".text-block__wrapper"),
-                    _bottom = index === (array.length - 1) ? _blockElem.offset().top + _blockElem.height() : array[index + 1].top,
+                let _bottom = index === (array.length - 1) ? _textBlockBottom : array[index + 1].top,
                     _height = _bottom - item.top
 
                 item.bottom = _bottom
@@ -236,7 +254,7 @@ class AssetBlock extends React.Component{
         if (_visible.length === 0) return;
 
         const _current = _visible[0],
-            _assetsInCurrent = lessonPlayInfo.episodes[0].elements
+            _assetsInCurrent = lessonPlayInfo.episodes[_current.episodeIndex].elements
                 .map((item) => {
                     let _length = _current.end - _current.start
                     if (((item.start * 1000) >= _current.start) && ((item.start * 1000) < (_current.start + _length * _current.percent))) {
@@ -250,18 +268,8 @@ class AssetBlock extends React.Component{
 
         const _visibleElem = _assetsInCurrent.length ? _assetsInCurrent[_assetsInCurrent.length - 1] : null,
             _asset = _visibleElem ? lessonPlayInfo.assets.find(asset => asset.id === _visibleElem.assetId) : null
-            // _image = _asset ? _asset.file : null
-
 
         this._applyNewAsset(_asset)
-
-        // if (_asset && (!this.state.asset || (_asset.id !== this.state.asset.id))) {
-        //     this.setState({
-        //         asset: _asset,
-        //         imageLoaded: false,
-        //     })
-        // }
-
     }
 
     _onLoadImage() {
@@ -269,6 +277,25 @@ class AssetBlock extends React.Component{
             imageLoaded: true,
             imageClear: false,
         })
+    }
+
+    _applyFirstAsset() {
+        const {lessonPlayInfo} = this.props
+
+        const _firstElem = lessonPlayInfo && lessonPlayInfo.episodes[0] ? lessonPlayInfo.episodes[0].elements[0] : null,
+            _asset = _firstElem ? lessonPlayInfo.assets.find(asset => asset.id === _firstElem.assetId) : null
+
+        this._applyNewAsset(_asset)
+    }
+
+    _applyLastAsset() {
+        const {lessonPlayInfo} = this.props
+
+        const _episode = lessonPlayInfo && lessonPlayInfo.episodes[lessonPlayInfo.episodes.length - 1],
+            _elem = _episode  ? _episode.elements[_episode.elements.length - 1] : null,
+            _asset = _elem ? lessonPlayInfo.assets.find(asset => asset.id === _elem.assetId) : null
+
+        this._applyNewAsset(_asset)
     }
 
     _applyNewAsset(asset) {
@@ -293,11 +320,11 @@ class AssetBlock extends React.Component{
                 }, 0)
 
             }, FADE_TIMEOUT)
-
-
-
-
         }
+    }
+
+    _getReadLineTop() {
+        return $(window).scrollTop() + ($(window).height() / 3)
     }
 }
 

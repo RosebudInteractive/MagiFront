@@ -1,19 +1,23 @@
 import React from "react"
+import {CONTENT_TYPE} from "../constants/common-consts";
 
 export default class TranscriptParser {
 
     constructor(data) {
         this.timeStamps = []
         this.episodesTimes = []
+        this._currentEpisodeFinishTime = 0
 
         this.html = this._handleTranscript(data)
     }
 
-    _handleTranscript(data) {
+    _handleTranscript({transcript, playInfo}) {
         let html = [];
 
-        data.Episodes.forEach((episode) => {
-            let _html = this._parseTranscript(episode)
+        transcript.Episodes.forEach((episode, index) => {
+            const _playInfo = playInfo && playInfo.episodes && Array.isArray(playInfo.episodes) && playInfo.episodes[index]
+
+            let _html = this._parseTranscript({episode: episode, playInfo: _playInfo, episodeIndex: index})
 
             if (_html) { html = html.concat(_html) }
         });
@@ -21,9 +25,9 @@ export default class TranscriptParser {
         return (html.length > 0) ? html : null;
     }
 
-    _parseTranscript(episode) {
+    _parseTranscript({episode, playInfo, episodeIndex}) {
         this.timeStamps.length = 0
-        this._calcEpisodesTimes(episode)
+        this._calcEpisodesTimes({episode: episode, playInfo: playInfo, episodeIndex: episodeIndex})
 
         let _div = [];
         const _re = /<h2>(.*?)<\/h2>/gim;
@@ -74,14 +78,41 @@ export default class TranscriptParser {
         return (_div.length > 0) ? _div : null
     }
 
-    _calcEpisodesTimes(episode) {
-        this.episodesTimes = episode.Toc.map((item, index, array) => {
-            return {
-                id: item.Id,
-                start: item.StartTime,
-                end: index === (array.length - 1) ? null : array[index + 1].StartTime
-            }
-        })
+    _calcEpisodesTimes({episode, playInfo, episodeIndex}) {
+        const _episodeEnd = playInfo ?
+            (playInfo.contentType === CONTENT_TYPE.AUDIO) ?
+                playInfo.audio && playInfo.audio.info && playInfo.audio.info.length ? (playInfo.audio.info.length * 1000) : 0
+                :
+                (playInfo.contentType === CONTENT_TYPE.VIDEO) ?
+                    playInfo.video && playInfo.video.duration * 1000
+                    :
+                    null
+            :
+            null
+
+        let _times = []
+        if (episode.Toc.length) {
+            _times = episode.Toc.map((item, index, array) => {
+                const _startTime = item.StartTime,
+                    _finishTime = (index === (array.length - 1) ? _episodeEnd ? _episodeEnd : null : array[index + 1].StartTime)
+
+                return {
+                    id: item.Id,
+                    episodeIndex: episodeIndex,
+                    start: _startTime,
+                    end: _finishTime,
+                }
+            })
+        } else {
+            _times.push({
+                id: null,
+                episodeIndex: episodeIndex,
+                start: 0,
+                end: _episodeEnd,
+            })
+        }
+
+        this.episodesTimes = this.episodesTimes.concat(_times)
     }
 
     _parseChapter(data) {

@@ -108,7 +108,7 @@ function* getTranscriptSaga(data) {
 
 
 
-        let _transcriptData = new TranscriptParser(_transcript),
+        let _transcriptData = new TranscriptParser({transcript: _transcript, playInfo: _assets}),
             _payload = {
                 transcript: _transcript,
                 html: _transcriptData.html && (_transcriptData.html.length > 0) ? _transcriptData.html : null,
@@ -130,5 +130,5 @@ function* getTranscriptSaga(data) {
 // /api/lessons/play/
 
 function* loadAssetsInfoSaga() {
-    
+
 }
