@@ -11,7 +11,9 @@ const LESSONS_FLDS_MSSQL =
     "  c.[Id] as [CourseId], c.[URL] as [CourseURL], a.[Id] as [AuthorId], a.[URL] as [AuthorURL], lc.[ReadyDate]\n";
 
 const LESSONS_FLDS_ID_MSSQL = "distinct<%= limit %> l.[Id]\n";
-
+const LESSONS_WHERE_ID_MSSQL = "\n  where l.[Id] = <%= id %>";
+const LESSONS_WHERE_AU_MSSQL = "\n  where a.[Id] = <%= author_id %>";
+const LESSONS_WHERE_CS_MSSQL = "\n  where c.[Id] = <%= course_id %>";
 const LESSONS_WHERE_MSSQL = "\n  where l.[Id] in (<%= ids %>)";
 
 const LESSONS_MSSQL =
@@ -34,7 +36,9 @@ const LESSONS_FLDS_MYSQL =
     "  c.`Id` as `CourseId`, c.`URL` as `CourseURL`, a.`Id` as `AuthorId`, a.`URL` as `AuthorURL`, lc.`ReadyDate`\n";
 
 const LESSONS_FLDS_ID_MYSQL = "distinct l.`Id`\n";
-
+const LESSONS_WHERE_ID_MYSQL = "\n  where l.`Id` = <%= id %>";
+const LESSONS_WHERE_AU_MYSQL = "\n  where a.`Id` = <%= author_id %>";
+const LESSONS_WHERE_CS_MYSQL = "\n  where c.`Id` = <%= course_id %>";
 const LESSONS_WHERE_MYSQL = "\n  where l.`Id` in (<%= ids %>)";
 
 const LESSONS_MYSQL =
@@ -203,16 +207,37 @@ class IdxLesson extends IdxBase{
     async _getData(store_func, delete_func, opts) {
         let all_ids = [];
 
+        let mssql_where = ``;
+        let mysql_where = ``;
+        let delete_id;
+
+        if (typeof (opts.id) === "number") {
+            mssql_where = _.template(LESSONS_WHERE_ID_MSSQL)({ id: opts.id });
+            mysql_where = _.template(LESSONS_WHERE_ID_MYSQL)({ id: opts.id });
+            if ((typeof (opts.deleteIfNotExists) === "boolean") && opts.deleteIfNotExists)
+                delete_id = opts.id;
+        }
+        else
+            if (typeof (opts.authorId) === "number") {
+                mssql_where = _.template(LESSONS_WHERE_AU_MSSQL)({ author_id: opts.authorId });
+                mysql_where = _.template(LESSONS_WHERE_AU_MYSQL)({ author_id: opts.authorId });
+            }
+            else
+                if (typeof (opts.courseId) === "number") {
+                    mssql_where = _.template(LESSONS_WHERE_CS_MSSQL)({ course_id: opts.courseId });
+                    mysql_where = _.template(LESSONS_WHERE_CS_MYSQL)({ course_id: opts.courseId });
+                }
+
         let ds_ids = await $data.execSql({
             dialect: {
                 mysql: _.template(LESSONS_MYSQL)({
                     fields: LESSONS_FLDS_ID_MYSQL,
-                    where: ``,
+                    where: mysql_where,
                     limit: opts.limit ? ` limit ${opts.limit}` : ``
                 }),
                 mssql: _.template(LESSONS_MSSQL)({
                     fields: _.template(LESSONS_FLDS_ID_MSSQL)({ limit: opts.limit ? ` top ${opts.limit}` : `` }),
-                    where: ``
+                    where: mssql_where
                 })
             }
         }, {});
@@ -279,6 +304,10 @@ class IdxLesson extends IdxBase{
                 await store_func(lessons, { createDateField: "createDate" });
             }
         }
+        else
+            if (delete_id && delete_func) {
+                await delete_func(delete_id);
+            }
     }
 }
 

@@ -88,7 +88,8 @@ exports.IdxBase = class IdxBase extends DbObject {
                     res = await conn.update({
                         index: this.indexName,
                         id: id,
-                        body: { doc: body }
+                        body: { doc: body },
+                        refresh: opts.refresh ? opts.refresh: 'false'
                     });
                     rows_updated++
                 }
@@ -98,7 +99,8 @@ exports.IdxBase = class IdxBase extends DbObject {
                     res = await conn.create({
                         index: this.indexName,
                         id: id,
-                        body: body
+                        body: body,
+                        refresh: opts.refresh ? opts.refresh : 'false'
                     });
                     rows_inserted++;
                 }
@@ -107,7 +109,7 @@ exports.IdxBase = class IdxBase extends DbObject {
                 return conn.delete({
                     index: this.indexName,
                     id: id,
-                    refresh: 'true'
+                    refresh: opts.refresh ? opts.refresh : 'false'
                 });
         }, opts);
 
