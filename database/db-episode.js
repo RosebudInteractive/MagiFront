@@ -202,9 +202,12 @@ const DbEpisode = class DbEpisode extends DbObject {
     }
 
     async _updateSearchIndex(id) {
-        let result = ElasticConWrapper(async conn => {
-            await IdxLessonService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
-        }, true);
+        let result = null;
+        if (config.has('search.keep_up_to_date') && config.get('search.keep_up_to_date')) {
+            result = ElasticConWrapper(async conn => {
+                await IdxLessonService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+            }, true);
+        }
         return result;
     }
 

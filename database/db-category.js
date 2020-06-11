@@ -59,9 +59,12 @@ const DbCategory = class DbCategory extends DbObject {
     }
 
     async _updateSearchIndex(id) {
-        let result = ElasticConWrapper(async conn => {
-            await IdxCourseService().importData(conn, { categoryId: id, page: 10, refresh: "true" });
-        }, true);
+        let result = null;
+        if (config.has('search.keep_up_to_date') && config.get('search.keep_up_to_date')) {
+            result = ElasticConWrapper(async conn => {
+                await IdxCourseService().importData(conn, { categoryId: id, page: 10, refresh: "true" });
+            }, true);
+        }
         return result;
     }
 

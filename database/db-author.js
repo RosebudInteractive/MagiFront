@@ -208,23 +208,26 @@ const DbAuthor = class DbAuthor extends DbObject {
     }
 
     async _updateSearchIndex(id, affected_list) {
-        let _affected = affected_list ? affected_list : [];
-        let result = ElasticConWrapper(async conn => {
-            await IdxAuthorService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
-            for (let i = 0; i < _affected.length; i++) {
-                let service = _affected[i];
-                switch (service) {
-                    case "course":
-                        await IdxCourseService().importData(conn, { authorId: id, page: 10, refresh: "true" });
-                        break;
-                    case "lesson":
-                        await IdxLessonService().importData(conn, { authorId: id, page: 5, refresh: "true" });
-                        break;
-                    default:
-                        throw new Error(`DbAuthor::_updateSearchIndex: Unknown service name: "${service}".`);
+        let result = null;
+        if (config.has('search.keep_up_to_date') && config.get('search.keep_up_to_date')) {
+            let _affected = affected_list ? affected_list : [];
+            result = ElasticConWrapper(async conn => {
+                await IdxAuthorService().importData(conn, { id: id, deleteIfNotExists: true, refresh: "true" });
+                for (let i = 0; i < _affected.length; i++) {
+                    let service = _affected[i];
+                    switch (service) {
+                        case "course":
+                            await IdxCourseService().importData(conn, { authorId: id, page: 10, refresh: "true" });
+                            break;
+                        case "lesson":
+                            await IdxLessonService().importData(conn, { authorId: id, page: 5, refresh: "true" });
+                            break;
+                        default:
+                            throw new Error(`DbAuthor::_updateSearchIndex: Unknown service name: "${service}".`);
+                    }
                 }
-            }
-        }, true);
+            }, true);
+        }
         return result;
     }
 

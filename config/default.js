@@ -285,6 +285,9 @@ module.exports = {
             file: "products.tsv",
         }  
     },
+    search: {
+        keep_up_to_date: false
+    },
     connections: {
         redis: {
             host: "localhost",
