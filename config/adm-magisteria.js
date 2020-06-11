@@ -229,7 +229,22 @@ module.exports = {
             baseUrl: "https://magisteria.ru"
         }
     },
+    search: {
+        baseURL: "https://magisteria.ru",
+        keep_up_to_date: false
+    },
     connections: {
+        elastic: {
+            connection_options: {
+                node: 'http://localhost:9200',
+                log: 'trace'
+            },
+            pool: {
+                max: 5,
+                min: 0,
+                idle: 10000
+            }
+        },
         redis: {
             host: "localhost",
             port: 6379,
