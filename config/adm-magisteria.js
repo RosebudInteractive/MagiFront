@@ -231,7 +231,7 @@ module.exports = {
     },
     search: {
         baseURL: "https://magisteria.ru",
-        keep_up_to_date: false
+        keep_up_to_date: true
     },
     connections: {
         elastic: {
