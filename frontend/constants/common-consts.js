@@ -44,3 +44,9 @@ export const FILTER_TYPE = {
     KNOWHOW: "KNOWHOW",
     EMPTY: "EMPTY",
 }
+
+export const SEARCH_SORT_TYPE = {
+    BY_RELEVANCY: {name: "by_relevancy", value: null},
+    BY_DATE: {name: "by_date", value: {"pubDate":"desc"}},
+    BY_DATE_ASC: {name: "by_date_asc", value: {"pubDate":"asc"}},
+}

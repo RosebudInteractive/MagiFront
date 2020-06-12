@@ -7,8 +7,6 @@ import "./result-form.sass"
 
 class Pages extends React.Component {
 
-
-
     render() {
         const {count, currentPage} = this.props.pages
 

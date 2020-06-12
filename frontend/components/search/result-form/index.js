@@ -6,6 +6,8 @@ import LessonItem from "./lesson-item";
 import CourseItem from "./course-item";
 import {getCounterTitle} from "tools/word-tools";
 import Pages from "./pages";
+import SortBlock from "./sort-block";
+import SearchEmpty from "./search-result-empty";
 
 const RESULT_TYPE = {
     AUTHOR: "author",
@@ -21,36 +23,39 @@ export default class ResultForm extends React.Component {
     }
 
     render() {
-        const _count = this.props.count
+        const {count} = this.props
 
         return <div className="search-result">
             <div className="search-result__header">
-                <div className="font-universal__body-large result-title">{`Всего найдено: ${_count} ${getPageCountTitle(+_count)}`}</div>
-                {
-                    _count ?
-                        <div className="sort-type__block">
-                            <span className="font-universal__body-medium">Сортировать:</span>
-                            <span className="font-universal__body-medium sort-type__item">По релевантности</span>
-                            <span className="font-universal__body-medium sort-type__item _active">По дате</span>
+                <div
+                    className="font-universal__body-large result-title">{`Всего найдено: ${count} ${getPageCountTitle(+count)}`}</div>
+                <SortBlock/>
+            </div>
+            {
+                count ?
+                    <React.Fragment>
+                        <div className="search-result__items">
+                            {this._getList()}
                         </div>
-                        :
-                        null
-                }
-            </div>
-            <div className="search-result__items">
-                {this._getList()}
-            </div>
-            <Pages/>
+                        <Pages/>
+                    </React.Fragment>
+                    :
+                    <SearchEmpty/>
+            }
         </div>
     }
 
     _getList() {
         return this.props.result.map((item) => {
             switch (item.type) {
-                case RESULT_TYPE.AUTHOR: return <AuthorItem item={item}/>
-                case RESULT_TYPE.COURSE: return <CourseItem item={item}/>
-                case RESULT_TYPE.LESSON: return <LessonItem item={item}/>
-                default: return null
+                case RESULT_TYPE.AUTHOR:
+                    return <AuthorItem item={item}/>
+                case RESULT_TYPE.COURSE:
+                    return <CourseItem item={item}/>
+                case RESULT_TYPE.LESSON:
+                    return <LessonItem item={item}/>
+                default:
+                    return null
             }
         })
     }

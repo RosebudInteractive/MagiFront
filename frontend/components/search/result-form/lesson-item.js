@@ -22,7 +22,7 @@ export default class LessonItem extends React.Component {
             <Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>
             <div className="content">
                 <Link to={item.URL} target="_blank" className="text">
-                    <Link to={item.URL} target="_blank" className="image _mobile" style={_style}/>
+                    <div className="image _mobile" style={_style}/>
                     <span className="header font-universal__title-smallx">
                         <span className="title">Лекция</span>
                         <div className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
@@ -80,34 +80,23 @@ export default class LessonItem extends React.Component {
     }
 
     _getHighlights() {
-        // return Object.keys(this.props.item.highlight).map((key) => {
-        //     return <div className="highlights__category-group">
-        //         <div className="highlights__title">{key}</div>
-        //         {
-        //             this.props.item.highlight[key].map((item) => {
-        //                 return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
-        //             })
-        //         }
-        //     </div>
-        // })
-
         const {item} = this.props
 
         return item.highlight.Transcript && item.highlight.Transcript.length ?
             item.highlight.Transcript.map((item) => {
                 return <span><div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/></span>
             })
-            // :
-            // item.highlight.Name && item.highlight.Name.length ?
-            //     <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
-            //     :
-            //     item.highlight.Course && item.highlight.Course.length ?
-            //         <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Course[0]}}/>
-            //         :
-            //         item.highlight.Author && item.highlight.Author.length ?
-            //             <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Author[0]}}/>
             :
-            null
+            item.highlight.ShortDescription && item.highlight.ShortDescription.length ?
+                <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+                :
+                item.FullDescription ?
+                    <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.FullDescription}}/>
+                    :
+                    item.ShortDescription ?
+                        <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.ShortDescription}}/>
+                        :
+                        null
 
     }
 

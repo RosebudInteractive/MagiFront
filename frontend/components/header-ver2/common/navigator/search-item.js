@@ -80,9 +80,12 @@ class SearchItem extends React.Component{
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
                     </div>
                     <input ref={e => this.input = e} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
-                    <div className="svg-icon _pointer close" onClick={::this._close}>
-                        <svg width="18" height="18" dangerouslySetInnerHTML={{__html: CLOSE}}/>
-                    </div>
+                    {
+                        this.input && this.input.value &&
+                            <div className="svg-icon _pointer clear" onClick={::this._clear}>
+                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: CLOSE}}/>
+                            </div>
+                    }
                     <div className="svg-icon _pointer" onClick={::this._search}>
                         <svg width="18" height="18" dangerouslySetInnerHTML={{__html: ARROW}}/>
                     </div>
@@ -109,7 +112,11 @@ class SearchItem extends React.Component{
     }
 
     _onKeyUp(e) {
-        if (e.keyCode === 13) this._search()
+        if (e.keyCode === 13) {
+            this._search()
+        } else {
+            this.forceUpdate()
+        }
     }
 
     _search() {
@@ -118,11 +125,11 @@ class SearchItem extends React.Component{
         }
     }
 
-    _close() {
-        this.setState({
-            active: false,
-            visible: false,
-        })
+    _clear() {
+        if (this.input) {
+            this.input.value = ""
+            this.forceUpdate()
+        }
     }
 }
 

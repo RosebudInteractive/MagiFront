@@ -47,22 +47,14 @@ export default class AuthorItem extends React.Component {
     }
 
     _getHighlights() {
-        // return Object.keys(this.props.item.highlight).map((key) => {
-        //     return <div className="highlights__category-group">
-        //         <div className="highlights__title">{key}</div>
-        //         {
-        //             this.props.item.highlight[key].map((item) => {
-        //                 return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
-        //             })
-        //         }
-        //     </div>
-        // })
-
         const {item} = this.props
 
-        return item.highlight.Name && item.highlight.Name.length ?
-            <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.highlight.Name[0]}}/>
+        return item.Description ?
+            <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.Description}}/>
             :
-            null
+            item.ShortDescription ?
+                <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.ShortDescription}}/>
+                :
+                null
     }
 }

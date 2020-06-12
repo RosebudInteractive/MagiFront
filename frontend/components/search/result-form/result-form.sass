@@ -39,6 +39,9 @@
       &._active
         color: $color-orange
 
+    &._disabled
+      opacity: 0.2
+
 .search-result__item
   display: flex
   padding: 25px 0
@@ -65,7 +68,7 @@
       display: none
       float: left
       @media (max-width: $tablet-width)
-        display: block
+        display: inline-flex
     &._desktop
       display: block
       @media (max-width: $tablet-width)
@@ -82,6 +85,7 @@
       display: flex
 
     .text
+      color: $color-main-dark
       padding-bottom: 10px
       @include line-count(3, 22px, 56px)
       &:hover
@@ -90,7 +94,7 @@
           color: $color-orange
 
       @media (max-width: $tablet-width)
-        @include line-count(8, 14px, 142px)
+        @include line-count(8, 14px, 132px)
 
 
     .title
@@ -114,6 +118,7 @@
     display: flex
     flex-direction: row
     margin-bottom: 5px
+    margin-top: 10px
     .course
       display: flex
       flex: 1 1 auto
@@ -191,3 +196,18 @@
 
     &._next
       width: auto
+
+.search-result__empty-block
+  margin-top: 74px
+  display: flex
+  flex-direction: column
+  align-items: center
+  width: 800px
+  @media (max-width: $tablet-width)
+    width: auto
+
+  .empty-block__title
+    margin: 27px 0 10px
+
+  .empty-block__subtitle
+    color: $color-dark-06

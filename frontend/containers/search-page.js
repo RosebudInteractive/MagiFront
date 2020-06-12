@@ -7,6 +7,8 @@ import LoadingFrame from "../components/loading-frame";
 import {pages as PAGES} from "tools/page-tools";
 import {whoAmI} from "actions/user-actions";
 import {setCurrentPage} from "actions/page-header-actions";
+import {SEARCH_SORT_TYPE} from "../constants/common-consts";
+import NotFoundPage from "../components/not-found";
 
 class SearchPage extends Component {
 
@@ -15,12 +17,23 @@ class SearchPage extends Component {
         this.props.actions.whoAmI()
         this.props.actions.setCurrentPage(PAGES.search);
 
+        if (window.prerenderEnable) return
+
         if (!this.props.query) {
             const _params = new URLSearchParams(this.props.location.search),
                 _query = _params.get('q'),
-                _page = _params.get('p') ? +_params.get('p') : null
+                _page = _params.get('p') ? +_params.get('p') : null,
+                _sort = _params.get('s') ? _params.get('s').toUpperCase() : null
 
-            if (_query) {this.props.actions.search({query: _query, page: _page ? _page : 1})}
+            if (_query) {
+                const _searchQuery = {query: _query, page: _page ? _page : 1}
+
+                if (_sort && SEARCH_SORT_TYPE[_sort]) {
+                    _searchQuery.sort = SEARCH_SORT_TYPE[_sort]
+                }
+
+                this.props.actions.search(_searchQuery)
+            }
         }
 
     }
@@ -37,6 +50,8 @@ class SearchPage extends Component {
     }
 
     render() {
+        if (window.prerenderEnable) { return <NotFoundPage/> }
+
         const {fetching, result, count} = this.props
 
         return fetching ?
@@ -53,8 +68,6 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         count: countSelector(state),
         pages: pagesSelector(state),
-        // errorDlgShown: state.commonDlg.errorDlgShown,
-        // errorMessage: state.commonDlg.message
     }
 }
 
