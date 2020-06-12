@@ -63,6 +63,12 @@ const mapping = {
         modifyDate: { type: "date" },
         pubDate: { type: "date" },
         lsInfo: { type: "object" },
+        idAuthor: {
+            type: "long"
+        },
+        idCourse: {
+            type: "long"
+        },
         lsAuthor: {
             type: "text",
             analyzer: "russian",
@@ -171,6 +177,35 @@ class IdxLesson extends IdxBase{
 
     constructor() {
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
+    }
+
+    async delete(conn, options) {
+        let opts = options || {};
+        let search_body = {
+            query: {
+                bool: {
+                    must: {
+                        match_all: {}
+                    },
+                    filter: {}
+                }
+            }
+        };
+        if ((typeof (opts.id) === "number") || Array.isArray(opts.id)) {
+            let ids = (typeof (opts.id) === "number") ? [opts.id] : opts.id;
+            search_body.query.bool.filter.ids = { values: ids };
+        }
+        else
+            if (typeof (opts.authorId) === "number") {
+                search_body.query.bool.filter.term = { idAuthor: opts.authorId }
+            }
+            else
+                if (typeof (opts.courseId) === "number") {
+                    search_body.query.bool.filter.term = { idCourse: opts.courseId }
+                }
+                else
+                    throw new Exception(`Missing filter parameter.`)
+        return this._delete(conn, search_body, opts);
     }
 
     async processHit(hit, baseUrl) {
@@ -287,6 +322,8 @@ class IdxLesson extends IdxBase{
                                     AuthorId: elem.AuthorId,
                                     AuthorURL: elem.AuthorURL
                                 },
+                                idAuthor: elem.AuthorId,
+                                idCourse: elem.CourseId,
                                 lsAuthor: elem.Author,
                                 lsCourse: elem.Course,
                                 lsName: elem.Name,

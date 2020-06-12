@@ -113,6 +113,27 @@ class IdxAuthor extends IdxBase{
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
     }
 
+    async delete(conn, options) {
+        let opts = options || {};
+        let search_body = {
+            query: {
+                bool: {
+                    must: {
+                        match_all: {}
+                    },
+                    filter: {}
+                }
+            }
+        };
+        if ((typeof (opts.id) === "number") || Array.isArray(opts.id)) {
+            let ids = (typeof (opts.id) === "number") ? [opts.id] : opts.id;
+            search_body.query.bool.filter.ids = { values: ids };
+        }
+        else
+            throw new Exception(`Missing filter parameter.`)
+        return this._delete(conn, search_body, opts);
+    }
+
     async processHit(hit, baseUrl) {
         let base_url = baseUrl ? baseUrl : this._baseUrl;
         let result = {

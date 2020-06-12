@@ -1,6 +1,7 @@
 'use strict';
 const _ = require('lodash');
 const striptags = require('striptags');
+const { HttpCode } = require("../../../const/http-codes");
 const { DbObject } = require('../../db-object');
 
 const DFLT_OPTIONS = {
@@ -43,6 +44,39 @@ exports.IdxBase = class IdxBase extends DbObject {
         throw new Error(`IdxBase::_getData: Should be implemented in descendant!`)
     }
 
+    async _delete(conn, query, options) {
+        let opts = options || {};
+        let result = 0;
+        let { body: { count } } = await conn.count({
+            index: this.indexName,
+            body: query
+        });
+        if (count > 0) {
+            let search_res = await conn.search({
+                index: this.indexName,
+                size: count,
+                _source: false,
+                body: query
+            });
+            let { body: { hits: { hits } } } = search_res;
+            for (let i = 0; i < hits.length; i++) {
+                try {
+                    await conn.delete({
+                        index: this.indexName,
+                        id: hits[i]._id,
+                        refresh: opts.refresh ? opts.refresh : 'false'
+                    });
+                    result++;
+                }
+                catch (err) {
+                    if (err.statusCode !== HttpCode.ERR_NOT_FOUND) // Ignore 404 error
+                        throw err;
+                }
+            }
+        }
+        return result;
+    }
+
     async processHit(hit, baseUrl) {
         throw new Error(`IdxBase::processHit: Should be implemented in descendant!`)
     }
@@ -53,6 +87,7 @@ exports.IdxBase = class IdxBase extends DbObject {
         let opts = _.defaultsDeep(options, {});
         let rows_inserted = 0;
         let rows_updated = 0;
+        let rows_deleted = 0;
         let is_created = false;
         let is_deleted = false;
 
@@ -106,11 +141,18 @@ exports.IdxBase = class IdxBase extends DbObject {
                 }
             }
         }, async (id) => {
-                return conn.delete({
-                    index: this.indexName,
-                    id: id,
-                    refresh: opts.refresh ? opts.refresh : 'false'
-                });
+                try {
+                    await conn.delete({
+                        index: this.indexName,
+                        id: id,
+                        refresh: opts.refresh ? opts.refresh : 'false'
+                    });
+                    rows_deleted++;
+                }
+                catch (err) {
+                    if (err.statusCode !== HttpCode.ERR_NOT_FOUND) // Ignore 404 error
+                        throw err;
+                }
         }, opts);
 
         return {
@@ -119,6 +161,7 @@ exports.IdxBase = class IdxBase extends DbObject {
             is_deleted: is_deleted,
             inserted: rows_inserted,
             updated: rows_updated,
+            deleted: rows_deleted,
             total: rows_inserted + rows_updated,
             time: (new Date()) - start_ts
         };

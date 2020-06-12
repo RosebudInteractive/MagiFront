@@ -227,7 +227,8 @@ let options = {
         }
     },
     search: {
-        baseURL: "https://magisteria.ru"
+        // baseURL: "https://magisteria.ru"
+        keep_up_to_date: true
     },
     connections: {
         elastic: {

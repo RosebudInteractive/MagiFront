@@ -73,6 +73,12 @@ const mapping = {
         modifyDate: { type: "date" },
         pubDate: { type: "date" },
         csInfo: { type: "object" },
+        idAuthor: {
+            type: "long"
+        },
+        idCategory: {
+            type: "long"
+        },
         tgAuthor: {
             type: "keyword",
             ignore_above: 255
@@ -181,6 +187,35 @@ class IdxCourse extends IdxBase {
 
     constructor() {
         super({ index: DFLT_INDEX_NAME, mappings: mapping });
+    }
+
+    async delete(conn, options) {
+        let opts = options || {};
+        let search_body = {
+            query: {
+                bool: {
+                    must: {
+                        match_all: {}
+                    },
+                    filter: {}
+                }
+            }
+        };
+        if ((typeof (opts.id) === "number") || Array.isArray(opts.id)) {
+            let ids = (typeof (opts.id) === "number") ? [opts.id] : opts.id;
+            search_body.query.bool.filter.ids = { values: ids };
+        }
+        else
+            if (typeof (opts.authorId) === "number") {
+                search_body.query.bool.filter.term = { idAuthor: opts.authorId }
+            }
+            else
+                if (typeof (opts.categoryId) === "number") {
+                    search_body.query.bool.filter.term = { idCategory: opts.categoryId }
+                }
+                else
+                    throw new Exception(`Missing filter parameter.`)
+        return this._delete(conn, search_body, opts);
     }
 
     async processHit(hit, baseUrl) {
@@ -316,6 +351,8 @@ class IdxCourse extends IdxBase {
                                 },
                                 csAuthor: "",
                                 csCategory: "",
+                                idAuthor: [],
+                                idCategory: [],
                                 tgAuthor: [],
                                 tgCategory: [],
                                 csName: elem.Name,
@@ -330,6 +367,7 @@ class IdxCourse extends IdxBase {
                         }
                         if (!authors[elem.Author]) {
                             authors[elem.Author] = true;
+                            currCrs.idAuthor.push(elem.AuthorId);
                             currCrs.tgAuthor.push(elem.Author);
                             currCrs.csAuthor += (currCrs.csAuthor.length > 0 ? '\t' : '') + elem.Author;
                             currCrs.csInfo.Authors.push({
@@ -342,6 +380,7 @@ class IdxCourse extends IdxBase {
                         }
                         if (!categories[elem.Category]) {
                             categories[elem.Category] = true;
+                            currCrs.idCategory.push(elem.CategoryId);
                             currCrs.tgCategory.push(elem.Category);
                             currCrs.csCategory += (currCrs.csCategory.length > 0 ? '\t' : '') + elem.Category;
                             currCrs.csInfo.Categories.push({

@@ -80,9 +80,6 @@ module.exports = {
         serverTimeout: 30, // 30 sec
         clientTimeout: 60, // 60 sec
     },
-    search: {
-        baseURL: "https://magisteria.ru"
-    },
     billing: {
         module: "./yandex-kassa",
         enabled: true,
@@ -263,6 +260,10 @@ module.exports = {
                 scope: ['status', 'email', 'friends']
             }
         }
+    },
+    search: {
+        baseURL: "https://magisteria.ru",
+        keep_up_to_date: false
     },
     connections: {
         elastic: {
