@@ -14,12 +14,15 @@ class SearchItem extends React.Component{
     constructor(props) {
         super(props)
 
+        this._queryActive = !!this.props.query
+
         this.state = {
-            active: false,
-            visible: false,
+            active: this._queryActive,
+            visible: this._queryActive,
         }
 
         this.input = null
+        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
 
         this._handler = (e) => {
             const _isSearch = e.target.closest('.search-string')
@@ -31,11 +34,20 @@ class SearchItem extends React.Component{
     }
 
     componentDidMount() {
-        document.body.addEventListener("mouseup", this._handler)
+        document.body.addEventListener(this._touchEventName, this._handler)
+
+        if (this.state.active) {
+            if (this.input && !this.input.value && this.props.query) {
+                this.input.value = this.props.query
+                this.forceUpdate()
+            }
+
+            $(".page-header__row").addClass("_search-mode")
+        }
     }
 
     componentWillUnmount() {
-        document.body.removeEventListener("mouseup", this._handler)
+        document.body.removeEventListener(this._touchEventName, this._handler)
         $(".page-header__row").removeClass("_search-mode")
     }
 
@@ -50,6 +62,7 @@ class SearchItem extends React.Component{
 
             if (this.input && !this.input.value && this.props.query) {
                 this.input.value = this.props.query
+                this.forceUpdate()
             }
 
             setTimeout(() => {
@@ -103,7 +116,7 @@ class SearchItem extends React.Component{
     _hideSearchString() {
         const _isSearchPage = this.props.currentPage === pages.search
 
-        if (!_isSearchPage) {
+        if (!_isSearchPage || ($(window).width() < 900)) {
             this.setState({
                 active: false,
                 visible: false,
@@ -137,6 +150,7 @@ const mapState2Props = (state) => {
     return {
         currentPage: state.pageHeader.currentPage,
         query: querySelector(state),
+        isMobileApp: state.app.isMobileApp,
     }
 }
 

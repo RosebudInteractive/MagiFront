@@ -164,7 +164,7 @@ export default class CourseItem extends React.Component {
     }
 
     _calcTextLength(html) {
-        const _lineCount = $(window).width() < 899 ? 8 : 3
+        const _lineCount = $(window).width() < 900 ? 8 : 3
 
         if (this.highlight.innerHTML !== html) {
             this.highlight.innerHTML = html

@@ -12,6 +12,14 @@ import NotFoundPage from "../components/not-found";
 
 class SearchPage extends Component {
 
+    constructor(props) {
+        super(props)
+
+        this._onBackHandler = () => {
+            this._execQueryFromUrl()
+        }
+    }
+
     componentWillMount() {
         window.scrollTo(0, 0)
         this.props.actions.whoAmI()
@@ -20,27 +28,17 @@ class SearchPage extends Component {
         if (window.prerenderEnable) return
 
         if (!this.props.query) {
-            const _params = new URLSearchParams(this.props.location.search),
-                _query = _params.get('q'),
-                _page = _params.get('p') ? +_params.get('p') : null,
-                _sort = _params.get('s') ? _params.get('s').toUpperCase() : null
-
-            if (_query) {
-                const _searchQuery = {query: _query, page: _page ? _page : 1}
-
-                if (_sort && SEARCH_SORT_TYPE[_sort]) {
-                    _searchQuery.sort = SEARCH_SORT_TYPE[_sort]
-                }
-
-                this.props.actions.search(_searchQuery)
-            }
+            this._execQueryFromUrl()
         }
 
+        window.addEventListener("popstate", this._onBackHandler);
     }
+
 
 
     componentWillUnmount() {
         this.props.actions.clear()
+        window.removeEventListener("popstate", this._onBackHandler);
     }
 
     componentDidUpdate(prevProps) {
@@ -58,6 +56,23 @@ class SearchPage extends Component {
             <LoadingFrame visible={fetching} title={"Идет поиск..."}/>
             :
             <ResultForm result={result} count={count}/>
+    }
+
+    _execQueryFromUrl() {
+        const _params = new URLSearchParams(this.props.location.search),
+            _query = _params.get('q'),
+            _page = _params.get('p') ? +_params.get('p') : null,
+            _sort = _params.get('s') ? _params.get('s').toUpperCase() : null
+
+        if (_query) {
+            const _searchQuery = {query: _query, page: _page ? _page : 1}
+
+            if (_sort && SEARCH_SORT_TYPE[_sort]) {
+                _searchQuery.sort = SEARCH_SORT_TYPE[_sort]
+            }
+
+            this.props.actions.search(_searchQuery)
+        }
     }
 }
 
