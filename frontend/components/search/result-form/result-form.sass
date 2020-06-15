@@ -64,11 +64,12 @@
     background-position: top center
     flex-shrink: 1
     margin-right: 15px
+    float: left
     &._mobile
       display: none
       float: left
       @media (max-width: $tablet-width)
-        display: inline-flex
+        display: block
     &._desktop
       display: block
       @media (max-width: $tablet-width)
@@ -87,14 +88,11 @@
     .text
       color: $color-main-dark
       padding-bottom: 10px
-      @include line-count(3, 22px, 56px)
+      //@include line-count(3, 22px, 56px)
       &:hover
         .result-link
           border-bottom: $border-orange-03
           color: $color-orange
-
-      @media (max-width: $tablet-width)
-        @include line-count(8, 14px, 132px)
 
 
     .title
@@ -110,7 +108,6 @@
       justify-content: flex-end
 
 
-
   .highlights__item
     display: inline
 
@@ -118,16 +115,22 @@
     display: flex
     flex-direction: row
     margin-bottom: 5px
-    margin-top: 10px
+
     .course
       display: flex
-      flex: 1 1 auto
-      justify-content: flex-end
+      flex: 0 1 auto
+      justify-content: flex-start
     .course-name
       color: $color-dark-06
 
     &._lesson
-      @media (max-width: $tablet-width)
+      flex-wrap: wrap
+      .author-name
+        flex: 1 0 auto
+
+    & > *
+      margin-top: 10px
+      //@media (max-width: $tablet-width)
         flex-direction: column
         .course
           justify-content: flex-start

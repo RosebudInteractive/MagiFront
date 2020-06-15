@@ -3,12 +3,34 @@ import PropTypes from "prop-types"
 import "./result-form.sass"
 import {Link} from "react-router-dom";
 import {replaceAll} from "tools/word-tools";
+import {ellipsisHighlightItem, trimHighlight} from "./tools";
 
 export default class LessonItem extends React.Component {
 
     static propTypes = {
         item: PropTypes.object
     }
+
+    constructor(props) {
+        super(props)
+
+        this.wrapper = null
+        this.highlight = null
+
+        this._resizeHandler = () => { this._calcTextLength(this._highlightHTML) }
+    }
+
+    componentDidMount() {
+        this._highlightHTML = this.highlight.innerHTML
+
+        $(window).bind('resize', this._resizeHandler)
+        this._calcTextLength(this._highlightHTML)
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
+    }
+
 
     render() {
         const {item} = this.props
@@ -23,11 +45,13 @@ export default class LessonItem extends React.Component {
             <div className="content">
                 <Link to={item.URL} target="_blank" className="text">
                     <div className="image _mobile" style={_style}/>
-                    <span className="header font-universal__title-smallx">
-                        <span className="title">Лекция</span>
-                        <div className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
+                    <span className="item__text-block" ref={e => this.wrapper = e}>
+                        <span className="header font-universal__title-smallx">
+                            <span className="title">Лекция</span>
+                            <div className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
+                        </span>
+                        <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                     </span>
-                    <span className="highlights font-universal__book-medium">{this._getHighlights()}</span>
                 </Link>
                 <div className="footer _lesson">
                     <Link to={item.Author.URL} target="_blank" className="author-name font-universal__body-medium result-link" dangerouslySetInnerHTML={{__html: this._getAuthorText()}}/>
@@ -83,33 +107,45 @@ export default class LessonItem extends React.Component {
         const {item} = this.props
 
         return item.highlight.Transcript && item.highlight.Transcript.length ?
-            item.highlight.Transcript.map((item) => {
-                return <span><div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/></span>
+            item.highlight.Transcript.map((transcript, index, array) => {
+                const _text = ellipsisHighlightItem({item: transcript, isLastItem: index === (array.length - 1)})
+
+                return <span className="highlights__item" dangerouslySetInnerHTML={{__html: _text}}/>
             })
             :
             item.highlight.ShortDescription && item.highlight.ShortDescription.length ?
-                <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+                item.highlight.ShortDescription.map((desc, index, array) => {
+                    const _text = ellipsisHighlightItem({item: desc, fullText: item.ShortDescription, isLastItem: index === (array.length - 1)})
+
+                    return <span className="highlights__item" dangerouslySetInnerHTML={{__html: _text}}/>
+                })
                 :
                 item.FullDescription ?
-                    <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.FullDescription}}/>
+                    <span className="highlights__item" dangerouslySetInnerHTML={{__html: item.FullDescription}}/>
                     :
                     item.ShortDescription ?
-                        <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.ShortDescription}}/>
+                        <span className="highlights__item" dangerouslySetInnerHTML={{__html: item.ShortDescription}}/>
                         :
                         null
 
     }
 
     _getCategories() {
-        // return Object.entries(this.props.item.Categories).map(([key, value], index, array) => {
-        //     return <React.Fragment>
-        //         <Link to={value.URL} className="category-name result-link">{key}</Link>
-        //         { (index !== (array.length - 1)) && <div className="separator">, </div> }
-        //     </React.Fragment>
-        // })
-
         return <div className="categories">
             <Link to={"#"} className="category-name font-universal__body-medium result-link _orange">#Ссылка на категрию</Link>
         </div>
+    }
+
+    _calcTextLength(html) {
+        const _lineCount = $(window).width() < 899 ? 8 : 3
+
+        if (this.highlight.innerHTML !== html) {
+            this.highlight.innerHTML = html
+        }
+
+        while (this.wrapper.getClientRects().length > _lineCount) {
+            let _text = trimHighlight(this.highlight.innerHTML)
+            this.highlight.innerHTML = _text
+        }
     }
 }

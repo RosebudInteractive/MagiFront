@@ -142,7 +142,7 @@ export const resultSelector = createSelector(stateSelector, (state) => {
     let _start = (_currentPage - 1) * ITEMS_PER_PAGE - _partition.first,
         _end = (_currentPage * ITEMS_PER_PAGE)
 
-    _end = (_end <= _partition.last) ? _end - _partition.first : _partition.last - _partition.first
+    _end = (_end <= (_partition.last + 1)) ? _end - _partition.first : (_partition.last + 1) - _partition.first
 
     return state.result.slice(_start, _end)
 })
@@ -206,6 +206,7 @@ function* searchSaga(data) {
         yield put(push(`/search?${addressBar}`))
 
         const _q = yield call(_postSearch, query),
+        // const _q = MOCK_DATA.COURSE,
             _resultObject = {
                 result: _q.hits,
                 first: query.from,

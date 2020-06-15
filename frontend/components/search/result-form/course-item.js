@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import "./result-form.sass"
 import {Link} from "react-router-dom";
 import {replaceAll} from "tools/word-tools";
+import {ellipsisHighlightItem, trimHighlight} from "./tools";
 
 const CROWN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
 
@@ -10,6 +11,26 @@ export default class CourseItem extends React.Component {
 
     static propTypes = {
         item: PropTypes.object
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.wrapper = null
+        this.highlight = null
+
+        this._resizeHandler = () => { this._calcTextLength(this._highlightHTML) }
+    }
+
+    componentDidMount() {
+        this._highlightHTML = this.highlight.innerHTML
+
+        $(window).bind('resize', this._resizeHandler)
+        this._calcTextLength(this._highlightHTML)
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
@@ -33,16 +54,16 @@ export default class CourseItem extends React.Component {
 
         return item && <div className="search-result__item course-item">
             <Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>
-            <div className="content font-universal__title-smallx">
+            <div className="content">
                 <div className="text-wrapper">
                     <Link to={item.URL} target="_blank" className="text">
                         <div to={item.URL} target="_blank" className="image _mobile" style={_style}/>
-                        <span className="item__text-block">
-                            <span className="header">
+                        <span className="item__text-block" ref={e => this.wrapper = e}>
+                            <span className="header font-universal__title-smallx">
                                 <span className="title">Курс</span>
                                 <Link to={item.URL} target="_blank" className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
                             </span>
-                            <span className="highlights font-universal__book-medium">{this._getHighlights()}</span>
+                            <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                         </span>
                     </Link>
                     {
@@ -110,32 +131,47 @@ export default class CourseItem extends React.Component {
         const {item} = this.props
 
         return item.highlight.Description && item.highlight.Description.length ?
-            item.highlight.Description.map((item) => {
-                return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+            item.highlight.Description.map((desc, index, array) => {
+                const _text = ellipsisHighlightItem({item: desc, fullText: item.Description, isLastItem: index === (array.length - 1)})
+                return <span className="highlights__item" dangerouslySetInnerHTML={{__html: _text}}/>
             })
             :
             item.highlight.ShortDescription && item.highlight.ShortDescription.length ?
-                item.highlight.ShortDescription.map((item) => {
-                    return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+                item.highlight.ShortDescription.map((desc, index, array) => {
+                    const _text = ellipsisHighlightItem({item: desc, fullText: item.ShortDescription, isLastItem: index === (array.length - 1)})
+                    return <span className="highlights__item" dangerouslySetInnerHTML={{__html: _text}}/>
                 })
                 :
                 item.highlight.Aims && item.highlight.Aims.length ?
                     item.highlight.Aims.map((item) => {
-                        return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+                        return <span className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
                     })
                     :
                     item.highlight.TargetAudience && item.highlight.TargetAudience.length ?
                         item.highlight.TargetAudience.map((item) => {
-                            return <div className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
+                            return <span className="highlights__item" dangerouslySetInnerHTML={{__html: item}}/>
                         })
                         :
                         item.Description ?
-                            <div className="highlights__item" dangerouslySetInnerHTML={{__html: item.Description}}/>
+                            <span className="highlights__item" dangerouslySetInnerHTML={{__html: item.Description}}/>
                             :
                             item.ShortDescription ?
-                                <div className="highlights__item"
+                                <span className="highlights__item"
                                      dangerouslySetInnerHTML={{__html: item.ShortDescription}}/>
                                 :
                                 null
+    }
+
+    _calcTextLength(html) {
+        const _lineCount = $(window).width() < 899 ? 8 : 3
+
+        if (this.highlight.innerHTML !== html) {
+            this.highlight.innerHTML = html
+        }
+
+        while (this.wrapper.getClientRects().length > _lineCount) {
+            let _text = trimHighlight(this.highlight.innerHTML)
+            this.highlight.innerHTML = _text
+        }
     }
 }

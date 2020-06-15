@@ -62,3 +62,5 @@ export const getCounterTitle = (count, {single, twice, many}) => {
 export function replaceAll(string, search, replace) {
     return string.split(search).join(replace);
 }
+
+
