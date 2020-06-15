@@ -21,19 +21,20 @@ export const ellipsisHighlightItem = ({item, fullText, isLastItem}) => {
 }
 
 export const trimHighlight = (html) => {
-    const _highlightBlock = html.match(/<em>.*?<\/em>/gim)
+    const _html = html.replace(/\n/gi, ""),
+        _highlightBlock = _html.match(/<em>.*?<\/em>/gim)
 
     if (_highlightBlock && _highlightBlock.length) {
-        const _pos = html.indexOf(_highlightBlock[0])
+        const _pos = _html.indexOf(_highlightBlock[0])
 
-        if (_pos < (html.length / 2)) {
+        if (_pos < (_html.length / 2)) {
             // return _trimLeft(html)
-            return _trimRight(html)
+            return _trimRight(_html)
         } else {
-            return _trimLeft(html)
+            return _trimLeft(_html)
         }
     } else {
-        return _trimRight(html)
+        return _trimRight(_html)
     }
 }
 

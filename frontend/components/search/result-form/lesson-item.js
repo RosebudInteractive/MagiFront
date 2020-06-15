@@ -41,10 +41,9 @@ export default class LessonItem extends React.Component {
             _style = {backgroundImage: `url("${_cover}")`}
 
         return item && <div className="search-result__item lesson-item">
-            <Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>
             <div className="content">
                 <Link to={item.URL} target="_blank" className="text">
-                    <div className="image _mobile" style={_style}/>
+                    <div className="image" style={_style}/>
                     <span className="item__text-block" ref={e => this.wrapper = e}>
                         <span className="header font-universal__title-smallx">
                             <span className="title">Лекция</span>
@@ -54,7 +53,9 @@ export default class LessonItem extends React.Component {
                     </span>
                 </Link>
                 <div className="footer _lesson">
-                    <Link to={item.Author.URL} target="_blank" className="author-name font-universal__body-medium result-link" dangerouslySetInnerHTML={{__html: this._getAuthorText()}}/>
+                    <div className="author-name">
+                        <Link to={item.Author.URL} target="_blank" className="font-universal__body-medium result-link" dangerouslySetInnerHTML={{__html: this._getAuthorText()}}/>
+                    </div>
                     <div className="course font-universal__body-medium">
                         <span className="title">Курс:</span>
                         <Link to={item.Course.URL} target="_blank" className="course-name result-link" dangerouslySetInnerHTML={{__html: this._getCourseText()}}/>

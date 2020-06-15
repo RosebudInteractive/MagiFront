@@ -65,22 +65,15 @@
     flex-shrink: 1
     margin-right: 15px
     float: left
-    &._mobile
-      display: none
-      float: left
-      @media (max-width: $tablet-width)
-        display: block
-    &._desktop
-      display: block
-      @media (max-width: $tablet-width)
-        display: none
-
+    display: block
 
   .content
     width: 100%
-    display: flex
-    flex-direction: column
-    justify-content: space-between
+    display: block
+    @media (max-width: $mobile-phone-width)
+      display: flex
+      flex-direction: column
+      justify-content: space-between
 
     .text-wrapper
       display: flex
@@ -88,7 +81,6 @@
     .text
       color: $color-main-dark
       padding-bottom: 10px
-      //@include line-count(3, 22px, 56px)
       &:hover
         .result-link
           border-bottom: $border-orange-03
@@ -127,14 +119,13 @@
       flex-wrap: wrap
       .author-name
         flex: 1 0 auto
+        display: flex
+        a
+          color: $color-dark-06
 
     & > *
       margin-top: 10px
-      //@media (max-width: $tablet-width)
-        flex-direction: column
-        .course
-          justify-content: flex-start
-          margin-top: 10px
+
 
 
 
@@ -173,6 +164,8 @@
 
   .authors
     margin-left: 10px
+    white-space: pre-line
+    display: inline-block
 
   .author-name
     color: $color-dark-06

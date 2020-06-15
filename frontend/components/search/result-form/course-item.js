@@ -53,11 +53,11 @@ export default class CourseItem extends React.Component {
         }
 
         return item && <div className="search-result__item course-item">
-            <Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>
+            {/*<Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>*/}
             <div className="content">
                 <div className="text-wrapper">
                     <Link to={item.URL} target="_blank" className="text">
-                        <div to={item.URL} target="_blank" className="image _mobile" style={_style}/>
+                        <div className="image" style={_style}/>
                         <span className="item__text-block" ref={e => this.wrapper = e}>
                             <span className="header font-universal__title-smallx">
                                 <span className="title">Курс</span>
@@ -98,14 +98,15 @@ export default class CourseItem extends React.Component {
 
     _getAuthors() {
         return this.props.item.Authors.map((item, index, array) => {
+            const _needSeparator = (index !== (array.length - 1))
+
             return <React.Fragment>
                 {
                     item.Highlight ?
-                        <Link to={item.URL} target="_blank" className="author-name  result-link" dangerouslySetInnerHTML={{__html: item.Highlight}}/>
+                        <Link to={item.URL} target="_blank" className="author-name  result-link" dangerouslySetInnerHTML={{__html: item.Highlight + (_needSeparator ? ", " : "")}}/>
                         :
-                        <Link to={item.URL} target="_blank" className="author-name  result-link">{item.Name}</Link>
+                        <Link to={item.URL} target="_blank" className="author-name  result-link">{item.Name + (_needSeparator ? ", " : "")}</Link>
                 }
-                { (index !== (array.length - 1)) && <div className="separator">, </div> }
             </React.Fragment>
         })
     }
