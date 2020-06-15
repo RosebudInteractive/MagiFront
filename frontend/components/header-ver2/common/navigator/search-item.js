@@ -82,6 +82,18 @@ class SearchItem extends React.Component{
         if ((this.props.currentPage === pages.search) && (prevProps.currentPage !== pages.search)) {
             this.setState({active : true, visible: true})
         }
+
+        if (this.props.query !== prevProps.query) {
+
+            if (this.input) {
+                this.input.value = this.props.query
+                this.forceUpdate()
+            }
+
+            setTimeout(() => {
+                document.getElementById("search-input").focus()
+            }, 0)
+        }
     }
 
     render() {
