@@ -18,8 +18,16 @@ export default class CourseItem extends React.Component {
 
         this.wrapper = null
         this.highlight = null
+        this.footer = null
 
-        this._resizeHandler = () => { this._calcTextLength(this._highlightHTML) }
+        this.state = {
+            fixedFooter: false
+        }
+
+        this._resizeHandler = () => {
+            this._calcTextLength(this._highlightHTML)
+            this._checkFooter()
+        }
     }
 
     componentDidMount() {
@@ -55,9 +63,16 @@ export default class CourseItem extends React.Component {
         return item && <div className="search-result__item course-item">
             {/*<Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>*/}
             <div className="content">
-                <div className="text-wrapper">
+                {/*<div className="text-wrapper">*/}
                     <Link to={item.URL} target="_blank" className="text">
                         <div className="image" style={_style}/>
+                        {
+                            item.IsPaid &&
+                            <div className="crown">
+                                <svg className="course-module__label-icon" width="18" height="18" fill={"#C8684C"}
+                                     dangerouslySetInnerHTML={{__html: CROWN}}/>
+                            </div>
+                        }
                         <span className="item__text-block" ref={e => this.wrapper = e}>
                             <span className="header font-universal__title-smallx">
                                 <span className="title">Курс</span>
@@ -66,15 +81,15 @@ export default class CourseItem extends React.Component {
                             <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                         </span>
                     </Link>
-                    {
-                        item.IsPaid &&
-                        <div className="crown">
-                            <svg className="course-module__label-icon" width="18" height="18" fill={"#C8684C"}
-                                 dangerouslySetInnerHTML={{__html: CROWN}}/>
-                        </div>
-                    }
-                </div>
-                <div className="footer">
+                    {/*{*/}
+                    {/*    item.IsPaid &&*/}
+                    {/*    <div className="crown">*/}
+                    {/*        <svg className="course-module__label-icon" width="18" height="18" fill={"#C8684C"}*/}
+                    {/*             dangerouslySetInnerHTML={{__html: CROWN}}/>*/}
+                    {/*    </div>*/}
+                    {/*}*/}
+                {/*</div>*/}
+                <div className={"footer" + (this.state.fixedFooter ? " _fixed" : "")} ref={e => this.footer = e}>
                     <div className="categories font-universal__body-medium">{this._getCategories()}</div>
                     <div className="authors font-universal__body-medium">{this._getAuthors()}</div>
 
@@ -171,8 +186,17 @@ export default class CourseItem extends React.Component {
         }
 
         while (this.wrapper.getClientRects().length > _lineCount) {
-            let _text = trimHighlight(this.highlight.innerHTML)
-            this.highlight.innerHTML = _text
+            this.highlight.innerHTML = trimHighlight(this.highlight.innerHTML)
+        }
+    }
+
+    _checkFooter() {
+        if (!(this.footer && this.wrapper)) return
+
+        if ((this.footer.offsetHeight + this.wrapper.offsetHeight + 10) >= 113) {
+            if (this.state.fixedFooter) { this.setState({fixedFooter: false})}
+        } else {
+            if (!this.state.fixedFooter) { this.setState({fixedFooter: true})}
         }
     }
 }

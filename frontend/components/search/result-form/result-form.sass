@@ -62,7 +62,6 @@
     background-repeat: no-repeat
     background-origin: border-box
     background-position: top center
-    flex-shrink: 1
     margin-right: 15px
     float: left
     display: block
@@ -70,6 +69,7 @@
   .content
     width: 100%
     display: block
+    position: relative
     @media (max-width: $mobile-phone-width)
       display: flex
       flex-direction: column
@@ -95,10 +95,9 @@
       color: $color-main-dark
 
     .crown
-      flex: 1 0 37px
-      display: flex
-      justify-content: flex-end
-
+      display: block
+      float: right
+      padding: 0 0 15px 15px
 
   .highlights__item
     display: inline
@@ -126,6 +125,11 @@
     & > *
       margin-top: 10px
 
+    &._fixed
+      position: absolute
+      bottom: 0
+      right: 0
+      width: calc(100% - 128px)
 
 
 

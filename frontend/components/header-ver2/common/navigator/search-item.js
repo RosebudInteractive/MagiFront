@@ -161,7 +161,7 @@ class SearchItem extends React.Component{
     _clear() {
         if (this.input) {
             this.input.value = ""
-            this.forceUpdate(() => {this.input.focus()})
+            this.forceUpdate(() => { if (this.input) this.input.focus()})
         }
     }
 }
