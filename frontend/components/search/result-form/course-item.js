@@ -34,7 +34,7 @@ export default class CourseItem extends React.Component {
         this._highlightHTML = this.highlight.innerHTML
 
         $(window).bind('resize', this._resizeHandler)
-        this._calcTextLength(this._highlightHTML)
+        this._resizeHandler()
     }
 
     componentWillUnmount() {
@@ -61,9 +61,7 @@ export default class CourseItem extends React.Component {
         }
 
         return item && <div className="search-result__item course-item">
-            {/*<Link to={item.URL} target="_blank" className="image _desktop" style={_style}/>*/}
             <div className="content">
-                {/*<div className="text-wrapper">*/}
                     <Link to={item.URL} target="_blank" className="text">
                         <div className="image" style={_style}/>
                         {
@@ -81,14 +79,6 @@ export default class CourseItem extends React.Component {
                             <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                         </span>
                     </Link>
-                    {/*{*/}
-                    {/*    item.IsPaid &&*/}
-                    {/*    <div className="crown">*/}
-                    {/*        <svg className="course-module__label-icon" width="18" height="18" fill={"#C8684C"}*/}
-                    {/*             dangerouslySetInnerHTML={{__html: CROWN}}/>*/}
-                    {/*    </div>*/}
-                    {/*}*/}
-                {/*</div>*/}
                 <div className={"footer" + (this.state.fixedFooter ? " _fixed" : "")} ref={e => this.footer = e}>
                     <div className="categories font-universal__body-medium">{this._getCategories()}</div>
                     <div className="authors font-universal__body-medium">{this._getAuthors()}</div>
