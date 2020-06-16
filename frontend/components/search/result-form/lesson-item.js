@@ -140,7 +140,7 @@ export default class LessonItem extends React.Component {
     }
 
     _calcTextLength(html) {
-        const _lineCount = $(window).width() < 900 ? 8 : 3
+        const _lineCount = $(window).outerWidth() < 900 ? 8 : 3
 
         if (this.highlight.innerHTML !== html) {
             this.highlight.innerHTML = html
