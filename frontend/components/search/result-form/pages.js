@@ -10,7 +10,7 @@ class Pages extends React.Component {
     render() {
         const {count, currentPage} = this.props.pages
 
-        if (count === 0) return null
+        if (count <= 1) return null
 
         const _showNext = currentPage !== count
 

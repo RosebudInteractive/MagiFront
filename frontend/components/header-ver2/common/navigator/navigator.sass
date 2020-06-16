@@ -90,11 +90,13 @@
     top: -3px
     max-width: 0
     right: 0
-    transition: max-width 300ms ease
+    transition: max-width 300ms linear
     border: $border-dark-02
     border-radius: 3px
     background-color: $color-white
     margin-right: 19px
+    height: 40px
+    position: absolute
     @media (max-width: $tablet-width)
       margin: 0
 
@@ -124,10 +126,8 @@
 
 
     &._visible
-      position: absolute
       max-width: 100%
       width: calc(100% - 19px)
-      height: 40px
       @media (max-width: $tablet-width)
         width: 100%
 
@@ -137,6 +137,14 @@
 
       .svg-icon
         display: flex
+
+    &._hiding
+      max-width: 0 !important
+      width: calc(100% - 19px)
+      .wrapper
+        transition: none
+        visibility: hidden !important
+
 
 
 

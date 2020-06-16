@@ -5,7 +5,7 @@ import 'whatwg-fetch';
 import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
 import {MOCK_DATA} from "../mock-data/search/result"
-import {push} from 'react-router-redux'
+import {push, } from 'react-router-redux'
 import $ from "jquery";
 import {SEARCH_SORT_TYPE} from "../constants/common-consts";
 
@@ -163,6 +163,7 @@ export const search = (data) => {
         const _params = {
             query: _query,
             page: data.page ? data.page : 1,
+            skipChangeHistory: !!data.skipChangeHistory
         }
 
         if (data.sort && (data.sort !== SEARCH_SORT_TYPE.BY_RELEVANCY)) {
@@ -203,7 +204,7 @@ function* searchSaga(data) {
     try {
         const {addressBar, query, currentPage, currentSort} = yield call(_createQuery, data.payload)
 
-        yield put(push(`/search?${addressBar}`))
+        if (!data.payload.skipChangeHistory) { yield put(push(`/search?${addressBar}`)) }
 
         const _q = yield call(_postSearch, query),
         // const _q = MOCK_DATA.COURSE,

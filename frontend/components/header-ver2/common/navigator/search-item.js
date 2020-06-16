@@ -19,6 +19,7 @@ class SearchItem extends React.Component{
         this.state = {
             active: this._queryActive,
             visible: this._queryActive,
+            hiding: false,
         }
 
         this.input = null
@@ -99,7 +100,7 @@ class SearchItem extends React.Component{
     render() {
 
         return this.state.active ?
-            <div className={"search-string" + (this.state.visible ? " _visible" : "")}>
+            <div className={"search-string" + (this.state.visible ? " _visible" : "") + (this.state.hiding ? " _hiding" : "")}>
                 <div className="wrapper">
                     <div className="svg-icon">
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
@@ -130,9 +131,16 @@ class SearchItem extends React.Component{
 
         if (!_isSearchPage || ($(window).width() < 900)) {
             this.setState({
-                active: false,
                 visible: false,
+                hiding: true,
             })
+
+            setTimeout(() => {
+                this.setState({
+                    active: false,
+                    hiding: false,
+                })
+            }, 300)
         }
     }
 

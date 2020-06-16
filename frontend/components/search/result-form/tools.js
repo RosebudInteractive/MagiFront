@@ -21,7 +21,7 @@ export const ellipsisHighlightItem = ({item, fullText, isLastItem}) => {
 }
 
 export const trimHighlight = (html) => {
-    const _html = html.replace(/\n/gi, ""),
+    const _html = html.replace(/\n/gi, " "),
         _highlightBlock = _html.match(/<em>.*?<\/em>/gim)
 
     if (_highlightBlock && _highlightBlock.length) {
