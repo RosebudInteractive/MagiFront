@@ -105,7 +105,7 @@ class SearchItem extends React.Component{
                     <div className="svg-icon">
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
                     </div>
-                    <input ref={e => this.input = e} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
+                    <input ref={e => this.input = e} autoFocus={true} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
                     {
                         this.input && this.input.value &&
                             <div className="svg-icon _pointer clear" onClick={::this._clear}>
@@ -161,7 +161,7 @@ class SearchItem extends React.Component{
     _clear() {
         if (this.input) {
             this.input.value = ""
-            this.forceUpdate()
+            this.forceUpdate(() => {this.input.focus()})
         }
     }
 }
