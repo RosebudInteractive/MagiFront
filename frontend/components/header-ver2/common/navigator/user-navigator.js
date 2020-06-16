@@ -1,9 +1,10 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import {pages} from "tools/page-tools";
+import {OverflowHandler, pages} from "tools/page-tools";
 import PropTypes from "prop-types";
-import SearchItem from "./search-item";
+import {bindActionCreators} from "redux";
+import {hideMenu} from "actions/page-header-actions";
 
 class UserNavigator extends React.Component {
 
@@ -20,26 +21,31 @@ class UserNavigator extends React.Component {
         return authorized && (
                 isPhoneViewPort ?
                     <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
-                        <Link to={'/favorites'}>
+                        <Link to={'/favorites'} onClick={::this._onLinkClick}>
                             <svg width="14" height="23" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
                         </Link>
                     </li>
                     :
                     <React.Fragment>
                         <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
-                            <Link to={'/favorites'}>
+                            <Link to={'/favorites'} onClick={::this._onLinkClick}>
                                 <svg width="10" height="16" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
                                 {!isPhoneViewPort && <span className="item__title">Закладки</span>}
                             </Link>
                         </li>
                         <li className={"header-menu__item" + (currentPage === pages.history ? ' active' : '')}>
-                            <Link to={'/history'}>
+                            <Link to={'/history'} onClick={::this._onLinkClick}>
                                 <svg width="16" height="16" dangerouslySetInnerHTML={{__html: HISTORY}}/>
                                 <span className="item__title">История</span>
                             </Link>
                         </li>
                     </React.Fragment>
                 )
+    }
+
+    _onLinkClick() {
+        this.props.hideMenu()
+        OverflowHandler.turnOff();
     }
 }
 
@@ -50,4 +56,8 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps,)(UserNavigator)
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({hideMenu}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserNavigator)

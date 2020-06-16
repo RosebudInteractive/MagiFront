@@ -1,11 +1,12 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import {pages} from "tools/page-tools";
+import {OverflowHandler, pages} from "tools/page-tools";
 import "./phone-navigator-block.sass"
 import {FILTER_COURSE_TYPE} from "../../../../../constants/filters";
 import {filterMainTypeSelector, setFilterCourseType} from "ducks/filters";
 import {bindActionCreators} from "redux";
+import {hideMenu} from "actions/page-header-actions";
 
 class PhoneUserNavigator extends React.Component {
 
@@ -40,7 +41,7 @@ class PhoneUserNavigator extends React.Component {
             }
             {
                 authorized &&
-                    <Link to={'/history'} className="menu-item__wrapper">
+                    <Link to={'/history'} className="menu-item__wrapper" onClick={::this._onHistoryClick}>
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: HISTORY}}/>
                         <div
                             className={"menu-item history-item" + (currentPage === pages.history ? ' active' : '')}>
@@ -49,6 +50,11 @@ class PhoneUserNavigator extends React.Component {
                     </Link>
             }
         </div>
+    }
+
+    _onHistoryClick() {
+        this.props.hideMenu()
+        OverflowHandler.turnOff();
     }
 }
 
@@ -61,7 +67,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({setFilterCourseType}, dispatch)
+    return bindActionCreators({setFilterCourseType, hideMenu}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PhoneUserNavigator)

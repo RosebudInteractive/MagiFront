@@ -2,8 +2,8 @@ import React from "react"
 import {querySelector, search} from "ducks/search";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {pages} from "tools/page-tools";
-// import {Link} from "react-router-dom";
+import {OverflowHandler, pages} from "tools/page-tools";
+import {hideMenu} from "actions/page-header-actions";
 
 const SEARCH = '<use xlink:href="#search"/>',
     ARROW = '<use xlink:href="#next"/>',
@@ -121,7 +121,7 @@ class SearchItem extends React.Component{
             <li className={"header-menu__item"}>
             <div className="link-block" onClick={() => {this.setState({active: true})}}>
                 <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
-                <span className="item__title">Поиск</span>
+                { !this.props.isPhoneViewPort && <span className="item__title">Поиск</span> }
             </div>
         </li>
     }
@@ -155,6 +155,8 @@ class SearchItem extends React.Component{
     _search() {
         if (this.input && this.input.value) {
             this.props.actions.search({query: this.input.value})
+            this.props.actions.hideMenu()
+            OverflowHandler.turnOff();
         }
     }
 
@@ -176,7 +178,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({search}, dispatch)
+        actions: bindActionCreators({search, hideMenu}, dispatch)
     }
 }
 
