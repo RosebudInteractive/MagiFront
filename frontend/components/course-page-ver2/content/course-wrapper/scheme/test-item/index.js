@@ -29,7 +29,7 @@ export default class TestItem extends React.Component {
                          dangerouslySetInnerHTML={{__html: COMPLETE_STATUS}}/>
                 </div>
                 <div className="test__info-wrapper">
-                    <div className="test__name"><span>{test.Name}</span></div>
+                    <div className="test__name"><span>Тест: {test.Name}</span></div>
                     <div className="test__time">{`${_preTimeChar} ${_time} ${_title}`}</div>
                 </div>
             </Link>
