@@ -108,7 +108,7 @@ class CombineLessonPage extends React.Component {
                     $('.js-play').css('bottom', 'auto')
                 }
 
-                if (st > _blockStart.offset().top - 149) {
+                if (st > _blockStart.offset().top - 69) {
                     $('.js-play').addClass('_fixed');
                     $('.right-block').removeClass('_ended');
                     $('.js-play').css('bottom', 'auto')
