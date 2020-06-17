@@ -1663,6 +1663,286 @@ export const MOCK_DATA = {
             }
         ],
         "count": 161
+    },
+    COVER: {
+        "hits": [{
+            "Id": "57",
+            "Name": "Лермонтов – боренье дум",
+            "Description": "Задача курса – ввести\nслушателя в мир Лермонтова, углубиться в его поэтику, охватить все жанры и\nтемы, представленные творчестве классика. Первые семь лекций посвящены лирике. Сначала\nбеседа о поэтических принципах Лермонтова, потом шесть разговоров об основных\nтемах его лирических стихотворений: поэт и поэзия, стихи о любви, природа,\nистория и философские размышления. Замыкает эту часть цикла разговор о\nстихотворном стиле. От лирики мы переходим к обсуждению главных поэм\nвеличайшего русского романтика – «Песне о купце Калашникове», «Мцыри», «Демон».\nДалее последует разбор стихотворной драмы Лермонтова – «Маскарад». Завершает курс\nпристальное чтение лермонтовской прозы – от незаконченной новеллы «Штосс» до произведения,\nставшего одним из лучших образцов европейского психологического романа – «Герой\nнашего времени».",
+            "ShortDescription": "Задача курса – ввести\nслушателя в мир Лермонтова, углубиться в его поэтику, охватить все жанры и\nтемы, представленные творчестве классика. Первые семь лекций посвящены лирике. Сначала\nбеседа о поэтических принципах Лермонтова, потом шесть разговоров об основных\nтемах его лирических стихотворений: поэт и поэзия, стихи о любви, природа,\nистория и философские размышления. Замыкает эту часть цикла разговор о\nстихотворном стиле. От лирики мы переходим к обсуждению главных поэм\nвеличайшего русского романтика – «Песне о купце Калашникове», «Мцыри», «Демон».\nДалее последует разбор стихотворной драмы Лермонтова – «Маскарад». Завершает курс\nпристальное чтение лермонтовской прозы – от незаконченной новеллы «Штосс» до произведения,\nставшего одним из лучших образцов европейского психологического романа – «Герой\nнашего времени». \n",
+            "PubDate": "2020-03-23T21:00:00.000Z",
+            "_score": 324202.28,
+            "IsPaid": true,
+            "Cover": "https://magisteria.ru/data/2020/03/Oblozhka-Morskoy-vid-s-parusnoy-lodkoy-1828-1831-gg-Mihail-Lermontov.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/03/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/03/Oblozhka-Morskoy-vid-s-parusnoy-lodkoy-1828-1831-gg-Mihail-Lermontov-360x155.jpg",
+                    "m": "https://magisteria.ru/data/2020/03/Oblozhka-Morskoy-vid-s-parusnoy-lodkoy-1828-1831-gg-Mihail-Lermontov-768x330.jpg"
+                },
+                "name": "(Обложка) Морской вид с парусной лодкой. 1828–1831 гг. Михаил Лермонтов",
+                "size": {"width": 1024, "height": 440},
+                "icon": "https://magisteria.ru/data/2020/03/Oblozhka-Morskoy-vid-s-parusnoy-lodkoy-1828-1831-gg-Mihail-Lermontov-150x64.jpg",
+                "backgroundPosition": {
+                    "absolute": {"top": 90.3323974609375, "left": 106.571044921875},
+                    "percent": {"top": 0.5839651263248442, "left": 0.2960306803385417}
+                }
+            },
+            "URL": "https://magisteria.ru/category/lermontov",
+            "Authors": [{"Id": 22, "URL": "https://magisteria.ru/autor/mikhail-sverdlov", "Name": "Михаил Свердлов"}],
+            "Categories": [{"Id": 5, "URL": "https://magisteria.ru/razdel/literature", "Name": "Литература"}],
+            "highlight": {"Name": ["<em>Лермонтов</em> – боренье дум"]},
+            "type": "course"
+        }, {
+            "Id": "828",
+            "Name": "Огонь в крови и тайный холод",
+            "ShortDescription": "О двух магистральных противоборствующих направлениях поэтической мысли в творчестве М.Ю. Лермонтова.",
+            "FullDescription": "",
+            "PubDate": "2020-03-23T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/03/Oblozhka-Dzhon-Faed-Mechta-poeta-Ok-1901.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/03/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/03/Oblozhka-Dzhon-Faed-Mechta-poeta-Ok-1901-360x205.jpg",
+                    "m": "https://magisteria.ru/data/2020/03/Oblozhka-Dzhon-Faed-Mechta-poeta-Ok-1901-768x437.jpg"
+                },
+                "name": "(Обложка) Джон Фаед. Мечта поэта. Ок. 1901",
+                "size": {"width": 1200, "height": 683},
+                "icon": "https://magisteria.ru/data/2020/03/Oblozhka-Dzhon-Faed-Mechta-poeta-Ok-1901-150x85.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/principles",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["Этот патологический анализ <em>Лермонтов</em> разворачивает вместо привычных формул небесного, божественного вдохновения.", "«В своем уме я создал мир иной», — говорит <em>Лермонтов</em> в ранней лирике."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "829",
+            "Name": "Венец певца, венец терновый",
+            "ShortDescription": "О высшем предназначении поэта и его бескомпромиссной войне с современниками.",
+            "FullDescription": "",
+            "PubDate": "2020-03-23T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/03/Oblozhka-Venec-ternovyy-1584980843080.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/03/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/03/Oblozhka-Venec-ternovyy-1584980843080-360x225.jpg",
+                    "m": "https://magisteria.ru/data/2020/03/Oblozhka-Venec-ternovyy-1584980843080-768x480.jpg"
+                },
+                "name": "(Обложка) Венец терновый",
+                "size": {"width": 800, "height": 500},
+                "icon": "https://magisteria.ru/data/2020/03/Oblozhka-Venec-ternovyy-1584980843080-150x94.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/crown-of-thorns",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["<em>Лермонтов</em> ставит совершенно другие акценты.", "Вот как остро и едко разворачивает тему пророка <em>Лермонтов</em>."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "830",
+            "Name": "Любовь не здесь и не сейчас",
+            "ShortDescription": "Развитие темы любви и ее законов в раннем и позднем творчестве поэта.",
+            "FullDescription": "",
+            "PubDate": "2020-03-23T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/03/Oblozhka-Lui-Zhanmo-Proshchanie-1861.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/03/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/03/Oblozhka-Lui-Zhanmo-Proshchanie-1861-360x225.jpg",
+                    "m": "https://magisteria.ru/data/2020/03/Oblozhka-Lui-Zhanmo-Proshchanie-1861-768x481.jpg",
+                    "l": "https://magisteria.ru/data/2020/03/Oblozhka-Lui-Zhanmo-Proshchanie-1861-1366x855.jpg"
+                },
+                "name": "(Обложка) Луи Жанмо. Прощание. 1861",
+                "size": {"width": 1387, "height": 868},
+                "icon": "https://magisteria.ru/data/2020/03/Oblozhka-Lui-Zhanmo-Proshchanie-1861-150x94.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/love-lyrics",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["Романтик-экстремист\n\nТрудно найти не только в русской, но и в мировой любовной лирике большего романтика-экстремиста, чем <em>Лермонтов</em>.", "От страстных, предельных переживаний и эффектных слов <em>Лермонтов</em> переходит к изучению законов бытия. Лирика Лермонтова становится философской, обобщающей."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "831",
+            "Name": "Роман с природой",
+            "ShortDescription": "Особенности пейзажной лирики М.Ю. Лермонтова.",
+            "FullDescription": "",
+            "PubDate": "2020-04-06T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/04/Oblozhka-Albert-Birshtadt-Burya-v-Skalistyh-gorah.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/04/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/04/Oblozhka-Albert-Birshtadt-Burya-v-Skalistyh-gorah-360x173.jpg",
+                    "m": "https://magisteria.ru/data/2020/04/Oblozhka-Albert-Birshtadt-Burya-v-Skalistyh-gorah-768x368.jpg"
+                },
+                "name": "(Обложка) Альберт Бирштадт. Буря в Скалистых горах",
+                "size": {"width": 1280, "height": 614},
+                "icon": "https://magisteria.ru/data/2020/04/Oblozhka-Albert-Birshtadt-Burya-v-Skalistyh-gorah-150x72.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/nature-lyrics",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["Новый путь к иному миру\n\nПо сути, поздний <em>Лермонтов</em> только ищет новый путь к иному миру. Да, он становится другим – <em>Лермонтов</em>-наблюдатель, <em>Лермонтов</em>, разворачивающий описательную поэзию.", "<em>Лермонтов</em> освоил, если можно так сказать, манеру роскошного письма.\n\nКартины его драгоценны."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "832",
+            "Name": "Дряхлеющий мир",
+            "ShortDescription": "Исторические мотивы и историософские прогнозы в лирике М.Ю. Лермонтова.",
+            "FullDescription": "",
+            "PubDate": "2020-04-20T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/04/Oblozhka-Filippoto-Perenesenie-praha-Napoleona-s-ostrova-Sv-Eleny-1867.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/04/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/04/Oblozhka-Filippoto-Perenesenie-praha-Napoleona-s-ostrova-Sv-Eleny-1867-360x172.jpg",
+                    "m": "https://magisteria.ru/data/2020/04/Oblozhka-Filippoto-Perenesenie-praha-Napoleona-s-ostrova-Sv-Eleny-1867-768x367.jpg",
+                    "l": "https://magisteria.ru/data/2020/04/Oblozhka-Filippoto-Perenesenie-praha-Napoleona-s-ostrova-Sv-Eleny-1867-1366x654.jpg"
+                },
+                "name": "(Обложка) Филиппото. Перенесение праха Наполеона с острова Св. Елены. 1867",
+                "size": {"width": 1392, "height": 666},
+                "icon": "https://magisteria.ru/data/2020/04/Oblozhka-Filippoto-Perenesenie-praha-Napoleona-s-ostrova-Sv-Eleny-1867-150x72.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/historical-lyrics",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["И в том, и в другом случае <em>Лермонтов</em> выступает верным учеником Пушкина, прежде всего гениальной батальной сцены из «Полтавы».", "Ну и <em>Лермонтов</em> уже почти играет штампом, не боясь впасть в банальность. Он идет на гиперболу."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "833",
+            "Name": "Диалектика личности",
+            "ShortDescription": "О трех стадиях развития лирического героя в философской лирике М.Ю. Лермонтова.",
+            "FullDescription": "",
+            "PubDate": "2020-05-04T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/05/Oblozhka-Dzhon-Martin-1843-Odinochestvo.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/05/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/05/Oblozhka-Dzhon-Martin-1843-Odinochestvo-360x164.jpg",
+                    "m": "https://magisteria.ru/data/2020/05/Oblozhka-Dzhon-Martin-1843-Odinochestvo-768x349.jpg"
+                },
+                "name": "(Обложка) Джон Мартин. 1843. Одиночество",
+                "size": {"width": 1200, "height": 546},
+                "icon": "https://magisteria.ru/data/2020/05/Oblozhka-Dzhon-Martin-1843-Odinochestvo-150x68.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/philosophical-lyrics",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["Чем отличается поздний <em>Лермонтов</em> от раннего? Ранний <em>Лермонтов</em> риторичен и эмоции вкладывает в готовые риторические формулы. Поздний <em>Лермонтов</em> систематичен, он выводит законы бытия.", "Цена борьбы\n\nНо <em>Лермонтов</em> как автор философских стихотворений на этом, конечно, не останавливается. <em>Лермонтов</em> — диалектик, поэтому следующая стадия в развитии его мысли — это стадия борьбы."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "834",
+            "Name": "Поэзия в бездне динамики",
+            "ShortDescription": "Карта стилевого разнообразия поэтики М.Ю. Лермонтова.",
+            "FullDescription": "",
+            "PubDate": "2020-05-18T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/05/Oblozhka-Ayvazovskiy-Burya-na-more.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/05/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/05/Oblozhka-Ayvazovskiy-Burya-na-more-360x189.jpg",
+                    "m": "https://magisteria.ru/data/2020/05/Oblozhka-Ayvazovskiy-Burya-na-more-768x404.jpg",
+                    "l": "https://magisteria.ru/data/2020/05/Oblozhka-Ayvazovskiy-Burya-na-more-1366x718.jpg"
+                },
+                "name": "(Обложка) Айвазовский. Буря на море",
+                "size": {"width": 1525, "height": 802},
+                "icon": "https://magisteria.ru/data/2020/05/Oblozhka-Ayvazovskiy-Burya-na-more-150x79.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/poetry-in-dynamics",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["<em>Лермонтов</em> — поэт не одного стиля и не двух стилей.", "Именно с этой установкой <em>Лермонтов</em> и ищет приемы."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "835",
+            "Name": "Порыв и безнадежность: поэма «Мцыри»",
+            "ShortDescription": "Философский итог романтической поэтики и идея трагического познания в поэме «Мцыри».",
+            "FullDescription": "",
+            "PubDate": "2020-06-01T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/05/Oblozhka-Monastyr-Dzhvari-1590693925353.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/05/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/05/Oblozhka-Monastyr-Dzhvari-1590693925353-360x169.jpg",
+                    "m": "https://magisteria.ru/data/2020/05/Oblozhka-Monastyr-Dzhvari-1590693925353-768x360.jpg",
+                    "l": "https://magisteria.ru/data/2020/05/Oblozhka-Monastyr-Dzhvari-1590693925353-1366x640.jpg"
+                },
+                "name": "(Обложка) Монастырь Джвари",
+                "size": {"width": 3858, "height": 1807},
+                "icon": "https://magisteria.ru/data/2020/05/Oblozhka-Monastyr-Dzhvari-1590693925353-150x70.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/mtsyri",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["Всю свою жизнь, пока <em>Лермонтов</em> писал стихи, он искал своего Демона.", "<em>Лермонтов</em> искал интонацию, сюжет, искал идею «Мцыри».\n\nИ, очевидно, начало этих поисков – это напряженное чтение, потому что прежде всего <em>Лермонтов</em> очень пытливый, яростный читатель."]
+            },
+            "type": "lesson"
+        }, {
+            "Id": "893",
+            "Name": "Тупик мистического экстремизма",
+            "ShortDescription": "Сравнительный анализ двух лирических стихотворений – М.Ю. Лермонтова и А.К. Толстого.",
+            "FullDescription": "",
+            "PubDate": "2020-06-01T21:00:00.000Z",
+            "_score": 4254.921,
+            "Cover": "https://magisteria.ru/data/2020/05/Oblozhka-Bal-abb4f06e-0b66-47d1-a137-b4cb9f637872.jpg",
+            "CoverMeta": {
+                "mime-type": "image/jpeg",
+                "path": "2020/05/",
+                "content": {
+                    "s": "https://magisteria.ru/data/2020/05/Oblozhka-Bal-abb4f06e-0b66-47d1-a137-b4cb9f637872-360x263.jpg",
+                    "m": "https://magisteria.ru/data/2020/05/Oblozhka-Bal-abb4f06e-0b66-47d1-a137-b4cb9f637872-768x561.jpg",
+                    "l": "https://magisteria.ru/data/2020/05/Oblozhka-Bal-abb4f06e-0b66-47d1-a137-b4cb9f637872-1366x997.jpg"
+                },
+                "name": "(Обложка) Бал",
+                "size": {"width": 1479, "height": 1080},
+                "icon": "https://magisteria.ru/data/2020/05/Oblozhka-Bal-abb4f06e-0b66-47d1-a137-b4cb9f637872-150x110.jpg"
+            },
+            "URL": "https://magisteria.ru/lermontov/dead-end-of-mystical-extremism",
+            "Author": {"Id": 22, "Name": "Михаил Свердлов", "URL": "https://magisteria.ru/autor/mikhail-sverdlov"},
+            "Course": {"Id": 57, "Name": "Лермонтов – боренье дум", "URL": "https://magisteria.ru/category/lermontov"},
+            "highlight": {
+                "Course": ["<em>Лермонтов</em> – боренье дум"],
+                "Transcript": ["<em>Лермонтов</em> — безусловно, один из самых влиятельных поэтов в истории русской поэзии.", "<em>Лермонтов</em>:\n\nИз-под таинственной, холодной полумаски\nЗвучал мне голос твой отрадный, как мечта,\nСветили мне твои пленительные глазки\nИ улыбалися лукавые уста."]
+            },
+            "type": "lesson"
+        }], "count": 19
     }
 }
 

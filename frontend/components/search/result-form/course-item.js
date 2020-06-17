@@ -47,10 +47,10 @@ export default class CourseItem extends React.Component {
         if (!item) return null
 
         const _cover = item.CoverMeta && item.CoverMeta.icon ? item.CoverMeta.icon : item.Cover,
-            _backgroundPosition = item.backgroundPosition  &&
+            _backgroundPosition = item.CoverMeta && item.CoverMeta.backgroundPosition  &&
                 {
-                    top: item.backgroundPosition.percent.top * 100 + "%",
-                    left: item.backgroundPosition.percent.left * 100 + "%",
+                    top: item.CoverMeta.backgroundPosition.percent.top * 100 + "%",
+                    left: item.CoverMeta.backgroundPosition.percent.left * 100 + "%",
                 },
 
             _style = {backgroundImage: `url("${_cover}")`}
