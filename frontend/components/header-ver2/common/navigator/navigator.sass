@@ -87,7 +87,7 @@
 
 
   .search-string
-    top: -3px
+    top: -1px
     max-width: 0
     right: 0
     transition: max-width 300ms linear
@@ -99,6 +99,7 @@
     position: absolute
     @media (max-width: $tablet-width)
       margin: 0
+      right: 33px
 
     .wrapper
       width: auto
@@ -121,6 +122,9 @@
       &._pointer
         cursor: pointer
 
+    svg
+      fill: $color-main-dark
+
     .clear
       width: 12px
 
@@ -129,7 +133,8 @@
       max-width: 100%
       width: calc(100% - 19px)
       @media (max-width: $tablet-width)
-        width: 100%
+        width: calc(100% - 33px)
+
 
       .wrapper
         visibility: visible

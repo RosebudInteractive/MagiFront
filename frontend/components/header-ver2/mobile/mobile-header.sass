@@ -2,10 +2,9 @@
 
 ._search-mode
   .page-header__menu-mobile
-    .logo-mobile
-      display: none
-    .button-wrapper
-      display: none
+    @media (max-width: 639px)
+      .logo-mobile
+        display: none
 
 .page-header__menu-mobile
   display: none
@@ -19,7 +18,7 @@
     -webkit-box-sizing: border-box
     -moz-box-sizing: border-box
     box-sizing: border-box
-    padding: 15px 20px 11px
+    padding: 12px 20px 14px
     //height: 64px
     -webkit-transition: background-color 0.3s ease
     transition: background-color 0.3s ease
@@ -42,7 +41,7 @@
     height: 100%
     button
       position: relative
-      margin: 30px 0 17px
+      margin: 23px 0 17px
       width: 18px
       height: 17px
       top: 0

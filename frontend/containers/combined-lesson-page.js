@@ -108,13 +108,13 @@ class CombineLessonPage extends React.Component {
                     $('.js-play').css('bottom', 'auto')
                 }
 
-                if (st > _blockStart.offset().top - 69) {
+                if (st > _blockStart.offset().top - 149) {
                     $('.js-play').addClass('_fixed');
                     $('.right-block').removeClass('_ended');
                     $('.js-play').css('bottom', 'auto')
                 }
 
-                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - ($('.js-play').outerHeight() + 78 + _paddingBottom))) {
+                if (st > (_blockStart.offset().top + _blockStart.outerHeight() - ($('.js-play').outerHeight() - 80 + _paddingBottom))) {
                     $('.js-play').removeClass('_fixed');
                     $('.right-block').addClass('_ended');
 

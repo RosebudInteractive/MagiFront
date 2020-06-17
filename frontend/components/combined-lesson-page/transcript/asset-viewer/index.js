@@ -324,7 +324,7 @@ class AssetBlock extends React.Component{
     }
 
     _getReadLineTop() {
-        return $(window).scrollTop() + ($(window).height() / 3)
+        return $(window).scrollTop() + ($(window).height() / 2)
     }
 }
 

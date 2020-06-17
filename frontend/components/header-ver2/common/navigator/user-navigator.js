@@ -20,11 +20,18 @@ class UserNavigator extends React.Component {
 
         return authorized && (
                 isPhoneViewPort ?
-                    <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
-                        <Link to={'/favorites'} onClick={::this._onLinkClick}>
-                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
-                        </Link>
-                    </li>
+                    <React.Fragment>
+                        <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
+                            <Link to={'/favorites'} onClick={::this._onLinkClick}>
+                                <svg width="14" height="17" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
+                            </Link>
+                        </li>
+                        <li className={"header-menu__item" + (currentPage === pages.history ? ' active' : '')}>
+                            <Link to={'/history'} onClick={::this._onLinkClick}>
+                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: HISTORY}}/>
+                            </Link>
+                        </li>
+                    </React.Fragment>
                     :
                     <React.Fragment>
                         <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
