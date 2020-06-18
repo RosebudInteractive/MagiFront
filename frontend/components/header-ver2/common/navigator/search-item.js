@@ -2,8 +2,8 @@ import React from "react"
 import {querySelector, search} from "ducks/search";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {pages} from "tools/page-tools";
-// import {Link} from "react-router-dom";
+import {OverflowHandler, pages} from "tools/page-tools";
+import {hideMenu} from "actions/page-header-actions";
 
 const SEARCH = '<use xlink:href="#search"/>',
     ARROW = '<use xlink:href="#next"/>',
@@ -19,6 +19,7 @@ class SearchItem extends React.Component{
         this.state = {
             active: this._queryActive,
             visible: this._queryActive,
+            hiding: false,
         }
 
         this.input = null
@@ -99,12 +100,12 @@ class SearchItem extends React.Component{
     render() {
 
         return this.state.active ?
-            <div className={"search-string" + (this.state.visible ? " _visible" : "")}>
+            <div className={"search-string" + (this.state.visible ? " _visible" : "") + (this.state.hiding ? " _hiding" : "")}>
                 <div className="wrapper">
                     <div className="svg-icon">
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
                     </div>
-                    <input ref={e => this.input = e} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
+                    <input ref={e => this.input = e} autoFocus={true} className="font-universal__body-medium" id="search-input" placeholder="Поиск по Магистерии" onKeyUp={::this._onKeyUp}/>
                     {
                         this.input && this.input.value &&
                             <div className="svg-icon _pointer clear" onClick={::this._clear}>
@@ -120,7 +121,7 @@ class SearchItem extends React.Component{
             <li className={"header-menu__item"}>
             <div className="link-block" onClick={() => {this.setState({active: true})}}>
                 <svg width="16" height="16" dangerouslySetInnerHTML={{__html: SEARCH}}/>
-                <span className="item__title">Поиск</span>
+                { !this.props.isPhoneViewPort && <span className="item__title">Поиск</span> }
             </div>
         </li>
     }
@@ -130,9 +131,16 @@ class SearchItem extends React.Component{
 
         if (!_isSearchPage || ($(window).width() < 900)) {
             this.setState({
-                active: false,
                 visible: false,
+                hiding: true,
             })
+
+            setTimeout(() => {
+                this.setState({
+                    active: false,
+                    hiding: false,
+                })
+            }, 300)
         }
     }
 
@@ -147,13 +155,15 @@ class SearchItem extends React.Component{
     _search() {
         if (this.input && this.input.value) {
             this.props.actions.search({query: this.input.value})
+            this.props.actions.hideMenu()
+            OverflowHandler.turnOff();
         }
     }
 
     _clear() {
         if (this.input) {
             this.input.value = ""
-            this.forceUpdate()
+            this.forceUpdate(() => { if (this.input) this.input.focus()})
         }
     }
 }
@@ -168,7 +178,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({search}, dispatch)
+        actions: bindActionCreators({search, hideMenu}, dispatch)
     }
 }
 

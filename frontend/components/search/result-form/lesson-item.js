@@ -16,15 +16,23 @@ export default class LessonItem extends React.Component {
 
         this.wrapper = null
         this.highlight = null
+        this.footer = null
 
-        this._resizeHandler = () => { this._calcTextLength(this._highlightHTML) }
+        this.state = {
+            fixedFooter: false
+        }
+
+        this._resizeHandler = () => {
+            this._calcTextLength(this._highlightHTML)
+            this._checkFooter()
+        }
     }
 
     componentDidMount() {
         this._highlightHTML = this.highlight.innerHTML
 
         $(window).bind('resize', this._resizeHandler)
-        this._calcTextLength(this._highlightHTML)
+        this._resizeHandler()
     }
 
     componentWillUnmount() {
@@ -52,7 +60,7 @@ export default class LessonItem extends React.Component {
                         <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                     </span>
                 </Link>
-                <div className="footer _lesson">
+                <div className={"footer _lesson" + (this.state.fixedFooter ? " _fixed" : "")} ref={e => this.footer = e}>
                     <div className="author-name">
                         <Link to={item.Author.URL} target="_blank" className="font-universal__body-medium result-link" dangerouslySetInnerHTML={{__html: this._getAuthorText()}}/>
                     </div>
@@ -131,22 +139,25 @@ export default class LessonItem extends React.Component {
 
     }
 
-    _getCategories() {
-        return <div className="categories">
-            <Link to={"#"} className="category-name font-universal__body-medium result-link _orange">#Ссылка на категрию</Link>
-        </div>
-    }
-
     _calcTextLength(html) {
-        const _lineCount = $(window).width() < 900 ? 8 : 3
+        const _lineCount = $(window).outerWidth() < 900 ? 8 : 3
 
         if (this.highlight.innerHTML !== html) {
             this.highlight.innerHTML = html
         }
 
         while (this.wrapper.getClientRects().length > _lineCount) {
-            let _text = trimHighlight(this.highlight.innerHTML)
-            this.highlight.innerHTML = _text
+            this.highlight.innerHTML = trimHighlight(this.highlight.innerHTML)
+        }
+    }
+
+    _checkFooter() {
+        if (!(this.footer && this.wrapper)) return
+
+        if ((this.footer.offsetHeight + this.wrapper.offsetHeight + 10) >= 113) {
+            if (this.state.fixedFooter) { this.setState({fixedFooter: false})}
+        } else {
+            if (!this.state.fixedFooter) { this.setState({fixedFooter: true})}
         }
     }
 }

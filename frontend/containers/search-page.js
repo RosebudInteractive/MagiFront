@@ -10,14 +10,19 @@ import {setCurrentPage} from "actions/page-header-actions";
 import {SEARCH_SORT_TYPE} from "../constants/common-consts";
 import NotFoundPage from "../components/not-found";
 
+let LastQueryString = null
+
 class SearchPage extends Component {
 
     constructor(props) {
         super(props)
 
-        this._onBackHandler = () => {
-            this._execQueryFromUrl()
+        this._onBackHandler = (e) => {
+            console.log(e)
+            this._execQueryFromUrl({skipChangeHistory: true})
         }
+
+        window.addEventListener("popstate", this._onBackHandler);
     }
 
     componentWillMount() {
@@ -28,10 +33,10 @@ class SearchPage extends Component {
         if (window.prerenderEnable) return
 
         if (!this.props.query) {
-            this._execQueryFromUrl()
+            this._execQueryFromUrl({skipChangeHistory: (LastQueryString === this.props.location.search)})
         }
 
-        window.addEventListener("popstate", this._onBackHandler);
+        document.title = `Магистерия - поиск - ${this.props.query}`
     }
 
 
@@ -44,6 +49,7 @@ class SearchPage extends Component {
     componentDidUpdate(prevProps) {
         if ((prevProps.query !== this.props.query) || (prevProps.pages.currentPage !== this.props.pages.currentPage)) {
             window.scrollTo(0, 0)
+            document.title = `Магистерия - поиск - ${this.props.query}`
         }
     }
 
@@ -58,19 +64,20 @@ class SearchPage extends Component {
             <ResultForm result={result} count={count}/>
     }
 
-    _execQueryFromUrl() {
+    _execQueryFromUrl({skipChangeHistory}) {
         const _params = new URLSearchParams(this.props.location.search),
             _query = _params.get('q'),
             _page = _params.get('p') ? +_params.get('p') : null,
             _sort = _params.get('s') ? _params.get('s').toUpperCase() : null
 
         if (_query) {
-            const _searchQuery = {query: _query, page: _page ? _page : 1}
+            const _searchQuery = {query: _query, page: _page ? _page : 1, skipChangeHistory: skipChangeHistory}
 
             if (_sort && SEARCH_SORT_TYPE[_sort]) {
                 _searchQuery.sort = SEARCH_SORT_TYPE[_sort]
             }
 
+            LastQueryString = this.props.location.search
             this.props.actions.search(_searchQuery)
         }
     }

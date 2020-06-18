@@ -18,7 +18,7 @@ export default class Navigator extends React.Component {
                 <ul className="header-menu">
                     {!isPhoneViewPort && <FilterBlock/>}
                     <UserNavigator isPhoneViewPort={isPhoneViewPort}/>
-                    <SearchItem/>
+                    <SearchItem isPhoneViewPort={isPhoneViewPort}/>
                 </ul>
             </nav>
     }

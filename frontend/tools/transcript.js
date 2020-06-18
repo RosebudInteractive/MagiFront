@@ -187,26 +187,24 @@ export default class TranscriptParser {
     }
 
     _handleParagraph(paragraph) {
-        let _matches = paragraph.match(/<b><u>ts(.*?)<\/u><\/b>/gim);
+        let _re = /<b><u>ts:{(.*?)}<\/u><\/b>/gim,
+            _matches
 
-        if (_matches) {
-            _matches.map((item) => {
-                let _regExp = /ts:\s*{(.+)}/,
-                    _result = _regExp.exec(item)
+        while ((_matches = _re.exec(paragraph)) !== null) {
+            if (_matches[1]) {
+                let _stringTime = _matches[1].split(":"),
+                    _seconds = _stringTime[_stringTime.length - 1] ? _stringTime[_stringTime.length - 1] : 0,
+                    _minutes = _stringTime[_stringTime.length - 2] ? _stringTime[_stringTime.length - 2] : 0,
+                    _hours = _stringTime[_stringTime.length - 3] ? _stringTime[_stringTime.length - 3] : 0,
+                    _milliseconds = (+_seconds + (+_minutes * 60) + (+_hours * 3600)) * 1000
 
-                if (_result && _result[1]) {
-                    let _stringTime = _result[1].split(":"),
-                        _seconds = _stringTime[_stringTime.length - 1] ? _stringTime[_stringTime.length - 1] : 0,
-                        _minutes = _stringTime[_stringTime.length - 2] ? _stringTime[_stringTime.length - 2] : 0,
-                        _hours = _stringTime[_stringTime.length - 3] ? _stringTime[_stringTime.length - 3] : 0,
-                        _milliseconds = (+_seconds + (+_minutes * 60) + (+_hours * 3600)) * 1000
+                this.timeStamps.push(_milliseconds)
 
-                    this.timeStamps.push(_milliseconds)
-
-                    // paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}">asset-${this.timeStamps.length}</div>`)
-                    paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
-                }
-            })
+                paragraph = (_matches.index === 0) ?
+                    paragraph.replace(_matches[0], `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
+                    :
+                    paragraph.replace(_matches[0], `<span class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
+            }
         }
 
         return paragraph

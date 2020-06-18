@@ -8131,7 +8131,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       border-top: 1px solid rgba(255, 255, 255, 0.2); }
     .lectures-sublist__item .sublist-num {
       position: absolute;
-      top: 8px;
+      top: 10px;
       left: 0;
       font-family: "Fira Sans", Arial, sans-serif;
       font-size: 14px;
@@ -8139,7 +8139,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       letter-spacing: 1.5px; }
       @media (max-width: 599px) {
         .lectures-sublist__item .sublist-num {
-          top: 5px; } }
+          top: 7px; } }
     .lectures-sublist__item.active {
       background-color: #d5d5d5; }
       ._dark .lectures-sublist__item.active {
