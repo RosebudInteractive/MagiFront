@@ -19,7 +19,7 @@ const { UsersCache } = require("../../security/users-cache");
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
-
+const { sendEvent: mrktSendEvent } = require('../../database/mrkt-system');
 const PURCHASE_MAILING_PATH = "mailing/purchase-course";
 const PROMO_MAILING_PATH = "mailing/purchase-promo";
 
@@ -199,6 +199,40 @@ exports.Payment = class Payment extends DbObject {
                     }
                 }
             }
+        }
+        return result;
+    }
+
+    async _sendPurchaseEventToMrktSystem(user, course_id, chequeObj, options) {
+        let result = null;
+        try {
+            let opts = options || {};
+            let courseService = this.getService("courses");
+            let course = await courseService.getPublic(course_id);
+            let category = course.Categories && Array.isArray(course.Categories)
+                && (course.Categories.length > 0) ? course.Categories[0].Name : "";
+            let author = course.Authors && Array.isArray(course.Authors)
+                && (course.Authors.length > 0) ? `${course.Authors[0].FirstName} ${course.Authors[0].LastName}` : "";
+            let event = {
+                type: "purchase",
+                id: chequeObj ? chequeObj.id() : 0,
+                user_id: user.Id,
+                revenue: chequeObj ? chequeObj.sum() : 0,
+                coupon: chequeObj && chequeObj.promoCode()? chequeObj.promoCode() : null,
+                products: [
+                    {
+                        id: course_id,
+                        name: course.Name,
+                        category: category,
+                        brand: author
+                    }
+                ]
+            }
+            result = await mrktSendEvent(event, opts);
+        }
+        catch (err) {
+            console.error(buildLogString(`Payment::_sendPurchaseEventToMrktSystem: ${err}`));
+            result = err;
         }
         return result;
     }
@@ -812,6 +846,7 @@ exports.Payment = class Payment extends DbObject {
                                     // we shouldn't "await" here !!! we don't care about a result
                                     self._sendEmailPurchaseNotification(chequeObj, false,
                                         paidCourses[i], { userName: user.DisplayName, dbOpts: dbOpts });
+                                    self._sendPurchaseEventToMrktSystem(user, paidCourses[i], chequeObj, { dbOpts: dbOpts });
                                 }
                         }
                         if (promoProducts.length > 0) {
@@ -1093,6 +1128,7 @@ exports.Payment = class Payment extends DbObject {
                                     // we shouldn't "await" here !!! we don't care about a result
                                     this._sendEmailPurchaseNotification(data.Payment && data.Payment.email ? data.Payment.email : opts.user.Email,
                                         true, giftCourses[i], { userName: opts.user.DisplayName, dbOpts: dbOpts });
+                                    // this._sendPurchaseEventToMrktSystem(opts.user, giftCourses[i], null, { dbOpts: dbOpts });
                                 }
                             }
                         }

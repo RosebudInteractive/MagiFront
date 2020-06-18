@@ -85,9 +85,18 @@ module.exports = {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
     },
     statistics: {
-        srcList: ["fb", "vk", "ya", "gl", "cq", "mt"],
+        srcList: ["fb", "vk", "ya", "gl", "mt"],
         serverTimeout: 60 * 9, // 9 min
         clientTimeout: 60 * 10, // 10 min
+    },
+    mrktSystem: {
+        carrotquest: {
+            enabled: true,
+            auth_token: pk.integration && pk.integration.carrotquest
+                && pk.integration.carrotquest.auth_token ? pk.integration.carrotquest.auth_token : null,
+            urlEvents: "https://api.carrotquest.io/v1/users/<%= user_id %>/events",
+            urlProps: "https://api.carrotquest.io/v1/users/<%= user_id %>/props"
+        }
     },
     billing: {
         module: "./yandex-kassa",
