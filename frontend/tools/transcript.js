@@ -187,15 +187,13 @@ export default class TranscriptParser {
     }
 
     _handleParagraph(paragraph) {
-        let _matches = paragraph.match(/<b><u>ts(.*?)<\/u><\/b>/gim);
+        let _matches = (/<b><u>ts:{(.*?)}<\/u><\/b>/gim).exec(paragraph);
 
         if (_matches) {
             _matches.map((item) => {
-                let _regExp = /ts:\s*{(.+)}/,
-                    _result = _regExp.exec(item)
 
-                if (_result && _result[1]) {
-                    let _stringTime = _result[1].split(":"),
+                if (item[1]) {
+                    let _stringTime = item[1].split(":"),
                         _seconds = _stringTime[_stringTime.length - 1] ? _stringTime[_stringTime.length - 1] : 0,
                         _minutes = _stringTime[_stringTime.length - 2] ? _stringTime[_stringTime.length - 2] : 0,
                         _hours = _stringTime[_stringTime.length - 3] ? _stringTime[_stringTime.length - 3] : 0,
@@ -203,8 +201,10 @@ export default class TranscriptParser {
 
                     this.timeStamps.push(_milliseconds)
 
-                    // paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}">asset-${this.timeStamps.length}</div>`)
-                    paragraph = paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
+                    paragraph = (item.index === 0) ?
+                        paragraph.replace(item, `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
+                        :
+                        paragraph.replace(item, `<span class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
                 }
             })
         }
