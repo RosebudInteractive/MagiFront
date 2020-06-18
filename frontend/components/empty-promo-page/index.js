@@ -16,30 +16,35 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "sales2020-1": "Праздник, который останется с вами",
         "robinson2020": "Пока все дома",
         "giftcode": "Глубоких знаний хватит надолго",
+        "technews062020": "Мы создаем не только контент",
     },
     DESCRIPTION = {
         "sales2020": DEFAULT_DESCRIPTION,
         "sales2020-1": DEFAULT_DESCRIPTION,
         "robinson2020": "Слушай, смотри, думай, читай!",
         "giftcode": "«послушает мудрый, и умножит познания»",
+        "technews062020": "Технологические новости проекта"
     },
     OG_IMAGE = {
         "sales2020": DEFAULT_OG_IMAGE,
         "sales2020-1": "2020/01/fb-2020-sale.jpg",
         "robinson2020": "2020/03/fb-Eastman-Johnson_Reading-Boy_1863.jpg",
         "giftcode": "2020/04/fb-gift.jpg",
+        "technews062020": "2020/06/fb-technews-06-2020.jpg",
     },
     TW_IMAGE = {
         "sales2020": DEFAULT_TW_IMAGE,
         "sales2020-1": "2020/01/tw-2020-sale.jpg",
         "robinson2020": "2020/03/tw-Eastman-Johnson_Reading-Boy_1863.jpg",
         "giftcode": "2020/04/tw-gift.jpg",
+        "technews062020": "2020/06/tw-technews-06-2020.jpg",
     },
     URL = {
         "sales2020": ROOT_URL,
         "sales2020-1": ROOT_URL,
         "robinson2020": "/razdel/literature",
         "giftcode": ROOT_URL,
+        "technews062020": ROOT_URL,
     }
 
 
@@ -66,7 +71,7 @@ class EmptyPromoPage extends React.Component{
         if (this.state.redirect && !window.prerenderEnable) {
             const {ownProps} = this.props,
                 _url = this._getUrl() + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
-            
+
             return <Redirect to={_url}/>
         } else {
             let _url = getPageUrl(),
