@@ -1703,6 +1703,8 @@ const DbCourse = class DbCourse extends DbObject {
         course.DPrice = prod.DPrice;
         if (prod.Discount)
             course.Discount = prod.Discount;
+        if (prod.DynDiscounts)
+            course.DynDiscounts = prod.DynDiscounts;
         if (hasRaw)
             course._rawProduct = prod;
     }
@@ -1971,6 +1973,13 @@ const DbCourse = class DbCourse extends DbObject {
                 prodData.Discount = data.Discount;
                 prodData.Discount.DiscountTypeId = Product.DiscountTypes.CoursePercId;
                 prodData.Discount.PriceListId = Product.DefaultPriceListId;
+            }
+            if (data.DynDiscounts) {
+                prodData.DynDiscounts = data.DynDiscounts;
+                for (let key in prodData.DynDiscounts) {
+                    prodData.DynDiscounts[key].DiscountTypeId = Product.DiscountTypes.DynCoursePercId;
+                    prodData.DynDiscounts[key].PriceListId = Product.DefaultPriceListId;
+                }
             }
             if (crsObj.productId()) {
                 let res = await this._productService.update(crsObj.productId(), prodData, { dbOptions: dbOptions });
@@ -2376,7 +2385,8 @@ const DbCourse = class DbCourse extends DbObject {
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts.transactionId = transactionId;
-                                return this._createOrUpdateProduct(crs_obj, { Price: inpFields.Price, Discount: inpFields.Discount }, opts)
+                                return this._createOrUpdateProduct(crs_obj,
+                                    { Price: inpFields.Price, Discount: inpFields.Discount, DynDiscounts: inpFields.DynDiscounts }, opts)
                                     .then(result => {
                                         isModified = isModified || result.isModified;
                                         if (result.isModified)
@@ -2666,7 +2676,8 @@ const DbCourse = class DbCourse extends DbObject {
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts.transactionId = transactionId;
-                                return this._createOrUpdateProduct(new_obj, { Price: inpFields.Price, Discount: inpFields.Discount }, opts)
+                                return this._createOrUpdateProduct(new_obj,
+                                    { Price: inpFields.Price, Discount: inpFields.Discount, DynDiscounts: inpFields.DynDiscounts }, opts)
                                     .then(result => {
                                         if (result.isModified)
                                             new_obj.productId(result.id);

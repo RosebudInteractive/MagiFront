@@ -17,7 +17,8 @@ exports.Product = {
     },
     DiscountTypes: {
         GeneralPercId: 1,
-        CoursePercId: 2
+        CoursePercId: 2,
+        DynCoursePercId: 3
     },
     ProductReqParams: {
         TypeCode: "SUBS",
