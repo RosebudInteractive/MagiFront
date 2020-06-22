@@ -3,23 +3,21 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hideFeedbackWindow, sendFeedback, loadingSelector} from "ducks/message";
 import Platform from "platform";
+import {Field, getFormValues, isValid, reduxForm} from "redux-form";
 
-class FeedbackMessageBox extends React.Component {
+let FeedbackForm = class FeedbackMessageBox extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
             message: '',
-            sender: ''
         }
     }
 
     componentDidMount() {
-        if (this.props.user) {
-            this.setState({
-                sender: this.props.user.Email
-            })
-        }
+        this.props.initialize({
+            email: this.props.user ? this.props.user.Email : ''
+        })
     }
 
     _close() {
@@ -31,7 +29,7 @@ class FeedbackMessageBox extends React.Component {
 
         if (this._isSendingEnable()) {
             const data = new FormData(event.target);
-            data.sender = this.state.sender;
+            data.sender = this.props.editorValues.email;
             data.message = this.state.message;
 
             this.props.sendFeedback(data)
@@ -43,12 +41,8 @@ class FeedbackMessageBox extends React.Component {
         this.setState({message: e.target.value})
     }
 
-    _changeSender(e) {
-        this.setState({sender: e.target.value})
-    }
-
     _isSendingEnable() {
-        return !this.props.loading && (this.state.message !== '') && (this.state.sender !== '')
+        return !this.props.loading && (this.state.message !== '') && (this.props.editorValid)
     }
 
     render() {
@@ -69,10 +63,9 @@ class FeedbackMessageBox extends React.Component {
                 <div className="modal__body">
                     <form className="form modal-form" onSubmit={::this._handleSubmit}>
                         <textarea onChange={::this._changeMessage} name="message" id="message" className="form__message"
-                                  placeholder="Ваше сообщение"/>
+                                  placeholder="Ваше сообщение" autoFocus={true}/>
                         <div className="modal-form__row">
-                            <input onChange={::this._changeSender} type="text" id="contacts" className="form__field"
-                                   placeholder="Как с вами связаться?" defaultValue={user ? user.Email : ''}/>
+                            <Field name="email" component={EMail}/>
                             <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} type='submit'>Отправить сообщение</button>
                         </div>
                     </form>
@@ -82,10 +75,39 @@ class FeedbackMessageBox extends React.Component {
     }
 }
 
+const EMail = (props) => {
+    const _errorText = props.meta.touched && props.meta.error &&
+        <p className="form__error-message" style={{display: "block"}}>{props.meta.error}</p>
+
+    return <div style={{flexGrow: 1, width: "100%"}}>
+        <input {...props.input} type="text" id="contacts" className="form__field" placeholder="Ваш email"/>
+        {_errorText}
+    </div>
+}
+
+const validate = values => {
+    const errors = {}
+
+    if (!values.email) {
+        errors.email = 'Поле является обязательным для заполнения'
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+        errors.email = 'Некорректный email'
+    }
+    return errors
+}
+
+FeedbackForm = reduxForm({
+    form: 'feedback-form',
+    validate
+})(FeedbackForm);
+
 function mapStateToProps(state) {
     return {
         loading: loadingSelector(state),
-        user: state.user.user
+        user: state.user.user,
+
+        editorValues: getFormValues('feedback-form')(state),
+        editorValid: isValid('feedback-form')(state),
     }
 }
 
@@ -96,4 +118,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FeedbackMessageBox);
+export default connect(mapStateToProps, mapDispatchToProps)(FeedbackForm);
