@@ -10,7 +10,11 @@ export default class DiscountTitle extends React.Component {
     render() {
         const {course,} = this.props,
             _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description
+            _hasDiscountDescr = course.activePersonslDiscount
+                ?
+                "Ваша персональная скидка активна еще "
+                :
+                _hasDiscount && course.Discount.Description
 
         return _hasDiscountDescr ?
                 <div className="course-module__price-block-wrapper">

@@ -16,6 +16,10 @@ import {parseReadyDate} from "../tools/time-tools";
 import {DATA_EXPIRATION_TIME, LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
 
 import {checkStatus, parseJSON} from "tools/fetch-tools";
+import {personalDiscountSelector} from "ducks/billing";
+import CourseDiscountHandler from "tools/course-discount";
+
+import {COURSES} from "../mock-data/course/mock";
 
 
 export const getCourses = () => {
@@ -65,9 +69,15 @@ export const getCourse = (url, options) => {
 
         const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
 
-        fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
-        .then(checkStatus)
-            .then(parseJSON)
+        new Promise((resolve) => {
+            if (url !== "high-renaissance") {
+                return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
+                    .then(checkStatus)
+                    .then(parseJSON)
+            } else {
+                resolve(COURSES.HIGH_RENAISSANCE)
+            }
+        })
             .then(data => {
                 handleCourse(data, getState());
 
@@ -92,21 +102,6 @@ export const getCourse = (url, options) => {
 
     }
 };
-
-// const checkStatus = (response) => {
-//     if (response.status >= 200 && response.status < 300) {
-//         return response
-//     } else {
-//         let error = new Error(response.statusText);
-//         error.status = response.status;
-//         error.response = response;
-//         throw error
-//     }
-// };
-//
-// const parseJSON = (response) => {
-//     return response.json()
-// };
 
 const _getAuthor = (array, id) => {
     return array.find((item) => {
@@ -164,6 +159,11 @@ const handleCourses = (data, state) => {
 };
 
 const handleCourse = (data, state) => {
+    const _handler = new CourseDiscountHandler({code: personalDiscountSelector(state), course: data, user: state.user.user})
+    if (_handler.activePersonalDiscount) {
+        data.activePersonslDiscount = {..._handler.activePersonalDiscount}
+    }
+
     try {
         if (data.CoverMeta && (typeof data.CoverMeta === "string")) {
             data.CoverMeta = JSON.parse(data.CoverMeta)

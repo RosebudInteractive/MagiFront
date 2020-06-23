@@ -73,6 +73,7 @@ export const APPLY_PROMO_ERROR = `${prefix}/APPLY_PROMO_ERROR`
 export const CLEAR_PROMO = `${prefix}/CLEAR_PROMO`
 
 export const SET_PRODUCT_PRICE = `${prefix}/SET_PRODUCT_PRICE`
+export const SET_PERSONAL_DISCOUNT_CODE = `${prefix}/SET_PERSONAL_DISCOUNT_CODE`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -111,7 +112,8 @@ export const ReducerRecord = Record({
     error: null,
     fetchingCourseId: null,
     waiting: new Waiting(),
-    promo: new Promo()
+    promo: new Promo(),
+    personalDiscount: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -263,6 +265,10 @@ export default function reducer(state = new ReducerRecord(), action) {
                     return _new
                 })
 
+        case SET_PERSONAL_DISCOUNT_CODE:
+            return state
+                .set('personalDiscount', payload)
+
         default:
             return state
     }
@@ -306,6 +312,7 @@ export const promoValuesSelector = createSelector(promoSelector, (promo) => {
     }
 })
 export const promoFetchingSelector = createSelector(promoSelector, promo => promo.fetching)
+export const personalDiscountSelector = createSelector(stateSelector, state => state.personalDiscount)
 
 /**
  * Action Creators
@@ -400,6 +407,10 @@ export const applyPromo = (data) => {
 
 export const clearPromo = () => {
     return {type: CLEAR_PROMO}
+}
+
+export const setPersonalDiscount = (code) => {
+    return {type: SET_PERSONAL_DISCOUNT_CODE, payload: code}
 }
 
 /**

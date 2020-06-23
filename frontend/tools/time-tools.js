@@ -11,6 +11,24 @@ export const getTimeFmt = (time) => {
         ss.toString().padStart(2, '0')
 };
 
+export const getMinutesBetween = (date1, date2) => {
+    let _date1 = isDate(date1) ? date1 : new Date(date1),
+        _date2 = isDate(date2) ? date2 : new Date(date2);
+
+    //Get 1 minute in milliseconds
+    let one_minute=1000*60;
+
+    // Convert both dates to milliseconds
+    let date1_ms = _date1.getTime();
+    let date2_ms = _date2.getTime();
+
+    // Calculate the difference in milliseconds
+    let difference_ms = date2_ms - date1_ms;
+
+    // Convert back to days and return
+    return Math.round(difference_ms/one_minute);
+}
+
 export const getDaysBetween = (date1, date2) => {
     let _date1 = isDate(date1) ? date1 : new Date(date1),
         _date2 = isDate(date2) ? date2 : new Date(date2);
