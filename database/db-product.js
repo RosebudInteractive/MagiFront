@@ -40,7 +40,8 @@ const GET_PROD_DETAIL_MSSQL =
     "select p.[Id], p.[Code], p.[Name], p.[AccName], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
     "  p.[ProductTypeId], pt.[Code] as [TypeCode], pt.[ExtFields] as [TpExt], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
-    "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription]\n" +
+    "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription],\n" +
+    "  d.[Id] as [DiscountId], d.[DiscountTypeId], d.[Code] as [DCode], d.[TtlHours]\n" +
     "from[Product] p\n" +
     "  join[ProductType] pt on pt.[Id] = p.[ProductTypeId]\n" +
     "  join[Price] pr on pr.[ProductId] = p.[Id]\n" +
@@ -61,7 +62,8 @@ const GET_PROD_DETAIL_MYSQL =
     "select p.`Id`, p.`Code`, p.`Name`, p.`AccName`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
     "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, pt.`ExtFields` as `TpExt`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
-    "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`\n" +
+    "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`,\n" +
+    "  d.`Id` as `DiscountId`, d.`DiscountTypeId`, d.`Code` as `DCode`, d.`TtlHours`\n" +
     "from`Product` p\n" +
     "  join`ProductType` pt on pt.`Id` = p.`ProductTypeId`\n" +
     "  join`Price` pr on pr.`ProductId` = p.`Id`\n" +
@@ -221,48 +223,74 @@ const DbProduct = class DbProduct extends DbObject {
         })
             .then(result => {
                 if (result && result.detail && (result.detail.length > 0)) {
+                    let prod_list = {};
                     result.detail.forEach(elem => {
-                        if (elem.ExtFields)
-                            elem.ExtFields = JSON.parse(elem.ExtFields);
-                        if (elem.TpExt)
-                            elem.TpExt = JSON.parse(elem.TpExt);
-                        if (elem.VtExt) {
-                            let ext = JSON.parse(elem.VtExt);
-                            delete elem.VtExt;
-                            if (elem.VrExt) {
-                                ext = VatService().mergeVatFields(ext, JSON.parse(elem.VrExt));
-                                delete elem.VrExt;
+                        let curr_prod = prod_list[elem.Id];
+                        if (!curr_prod) {
+                            if (elem.ExtFields)
+                                elem.ExtFields = JSON.parse(elem.ExtFields);
+                            if (elem.TpExt)
+                                elem.TpExt = JSON.parse(elem.TpExt);
+                            if (elem.VtExt) {
+                                let ext = JSON.parse(elem.VtExt);
+                                delete elem.VtExt;
+                                if (elem.VrExt) {
+                                    ext = VatService().mergeVatFields(ext, JSON.parse(elem.VrExt));
+                                    delete elem.VrExt;
+                                }
+                                elem.VatExtFields = ext;
                             }
-                            elem.VatExtFields = ext;
+                            elem.DPrice = elem.Price;
+                            curr_prod = prod_list[elem.Id] = _.clone(elem);
+                            delete curr_prod.Perc;
+                            delete curr_prod.FirstDate;
+                            delete curr_prod.LastDate;
+                            delete curr_prod.DDescription;
+                            delete curr_prod.DiscountId;
+                            delete curr_prod.DiscountTypeId;
+                            delete curr_prod.DCode;
+                            delete curr_prod.TtlHours;
+                            curr_prod.DynDiscounts = {};
+                            products.push(curr_prod);
                         }
-                        elem.DPrice = elem.Price;
                         if (typeof (elem.Perc) === "number") {
-                            let d = elem.Discount = {
-                                Description: elem.DDescription,
-                                Perc: elem.Perc,
-                                FirstDate: elem.FirstDate,
-                                LastDate: elem.LastDate
-                            };
-                            let dprice = elem.Price * (1 - d.Perc / 100);
-                            let prec = Accounting.SumPrecision;
-                            let isDone = false;
-                            if ((opts.Truncate === "true") || (opts.Truncate === true)) {
-                                elem.DPrice = Math.trunc(dprice / 10) * 10;
-                                isDone = true;
+                            if (elem.DiscountTypeId === Product.DiscountTypes.DynCoursePercId) {
+                                if (elem.DCode)
+                                    curr_prod.DynDiscounts[elem.DCode] = {
+                                        Id: elem.DiscountId,
+                                        DiscountTypeId: elem.DiscountTypeId,
+                                        Description: elem.DDescription,
+                                        Perc: elem.Perc,
+                                        TtlHours: elem.TtlHours,
+                                        FirstDate: elem.FirstDate,
+                                        LastDate: elem.LastDate
+                                    }
                             }
                             else {
-                                let p = +opts.Prec;
-                                if ((typeof (p) === "number") && (!isNaN(p)))
-                                    prec = p;
+                                let d = curr_prod.Discount = {
+                                    Id: elem.DiscountId,
+                                    DiscountTypeId: elem.DiscountTypeId,
+                                    Description: elem.DDescription,
+                                    Perc: elem.Perc,
+                                    FirstDate: elem.FirstDate,
+                                    LastDate: elem.LastDate
+                                };
+                                let dprice = elem.Price * (1 - d.Perc / 100);
+                                let prec = Accounting.SumPrecision;
+                                let isDone = false;
+                                if ((opts.Truncate === "true") || (opts.Truncate === true)) {
+                                    curr_prod.DPrice = Math.trunc(dprice / 10) * 10;
+                                    isDone = true;
+                                }
+                                else {
+                                    let p = +opts.Prec;
+                                    if ((typeof (p) === "number") && (!isNaN(p)))
+                                        prec = p;
+                                }
+                                if (!isDone)
+                                    curr_prod.DPrice = roundNumber(dprice, prec);
                             }
-                            if (!isDone)
-                                elem.DPrice = roundNumber(dprice, prec);
                         }
-                        delete elem.Perc;
-                        delete elem.FirstDate;
-                        delete elem.LastDate;
-                        delete elem.DDescription;
-                        products.push(elem);
                     });
                 }
                 return products;
@@ -317,49 +345,65 @@ const DbProduct = class DbProduct extends DbObject {
         return result;
     }
 
-    async _setDiscount(root, discount, dbOpts) {
+    _checkDiscountFields(discount) {
+        let firstDate = null;
+        let lastDate = null;
+        if (!discount.DiscountTypeId)
+            throw new Error(`Invalid or missing DiscountTypeId: "${discount.DiscountTypeId}".`);
+        if (discount.FirstDate) {
+            if (discount.FirstDate instanceof Date)
+                firstDate = discount.FirstDate
+            else
+                if (typeof (discount.FirstDate) === "string")
+                    firstDate = new Date(discount.FirstDate)
+                else
+                    throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
+        }
+        else
+            throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
+        if (discount.LastDate) {
+            if (discount.LastDate instanceof Date)
+                lastDate = discount.LastDate
+            else
+                if (typeof (discount.LastDate) === "string")
+                    lastDate = new Date(discount.LastDate)
+                else
+                    throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
+        }
+        else
+            throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
+
+        if (lastDate && (lastDate <= firstDate))
+            throw new Error(`Invalid date range: ["${firstDate}".."${lastDate}"].`);
+
+        if ((!discount.Perc) || (typeof (discount.Perc) !== "number") || (isNaN(discount.Perc)) || (discount.Perc > 100))
+            throw new Error(`Invalid discount: "${discount.Perc}".`);
+
+        switch (discount.DiscountTypeId) {
+            case Product.DiscountTypes.DynCoursePercId:
+                if ((!discount.TtlHours) || (typeof (discount.TtlHours) !== "number") || (isNaN(discount.TtlHours)) || (discount.TtlHours <= 0))
+                    throw new Error(`Invalid discount: "${discount.TtlHours}".`);
+                break;
+        }
+
+        return { firstDate: firstDate, lastDate: lastDate };
+    }
+
+    async _setDiscount(root, discount, dyn_discount, dbOpts) {
         let result = true;
         let firstDate = null;
         let lastDate = null;
 
         let clearFlag = discount.Perc === null; // if null - remove current discount
         if (!clearFlag) {
-            if (!discount.DiscountTypeId)
-                throw new Error(`Invalid DiscountTypeId: "${discount.DiscountTypeId}".`);
-        
-            if (discount.FirstDate) {
-                if (discount.FirstDate instanceof Date)
-                    firstDate = discount.FirstDate
-                else
-                    if (typeof (discount.FirstDate) === "string")
-                        firstDate = new Date(discount.FirstDate)
-                    else
-                        throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
-            }
-            else
-                throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
-            if (discount.LastDate) {
-                if (discount.LastDate instanceof Date)
-                    lastDate = discount.LastDate
-                else
-                    if (typeof (discount.LastDate) === "string")
-                        lastDate = new Date(discount.LastDate)
-                    else
-                        throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
-            }
-            else
-                throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
-        
-            if (lastDate && (lastDate <= firstDate))
-                throw new Error(`Invalid date range: ["${firstDate}".."${lastDate}"].`);
-        
-            if ((!discount.Perc) || (typeof (discount.Perc) !== "number") || (isNaN(discount.Perc)) || (discount.Perc > 100))
-                throw new Error(`Invalid discount: "${discount.Perc}".`);
+            let dates = this._checkDiscountFields(discount);
+            firstDate = dates.firstDate;
+            lastDate = dates.lastDate;
         }
         let fields = {
             DiscountTypeId: discount.DiscountTypeId,
             PriceListId: discount.PriceListId ? discount.PriceListId : Product.DefaultPriceListId,
-            Description: discount.Description,
+            Description: typeof (discount.Description) === "string" ? discount.Description : null,
             FirstDate: firstDate,
             LastDate: lastDate,
             Perc: discount.Perc
@@ -397,6 +441,59 @@ const DbProduct = class DbProduct extends DbObject {
                     await root.newObject({
                         fields: fields
                     }, dbOpts);
+        }
+        if (dyn_discount) {
+            let items_to_del = [];
+            let dyn_list = {};
+            let dyn_new = [];
+            for (let key in dyn_discount) {
+                let dscnt = _.defaultsDeep(dyn_discount[key], { Code: key, PriceListId: Product.DefaultPriceListId });
+                dscnt.DiscountTypeId = Product.DiscountTypes.DynCoursePercId;
+                dscnt.Description = typeof (dscnt.Description) === "string" ? dscnt.Description : null;
+                let dates = this._checkDiscountFields(dscnt);
+                dscnt.FirstDate = dates.firstDate;
+                dscnt.LastDate = dates.lastDate;
+                if ((typeof (dscnt.Id) === "number") && (dscnt.Id > 0))
+                    dyn_list[dscnt.Id] = dscnt
+                else {
+                    delete dscnt.Id;
+                    dyn_new.push(dscnt);
+                }
+            }
+            let upd_flag = false;
+            for (let i = 0; i < col.count(); i++) {
+                let p = col.get(i);
+                if ((p.discountTypeId() === Product.DiscountTypes.DynCoursePercId) && (!p.productTypeId()) && (!p.userId())) {
+                    let upd_item = dyn_list[p.id()];
+                    if (upd_item) {
+                        if ((p.priceListId() !== upd_item.PriceListId) || (p.perc() !== upd_item.Perc) ||
+                            (p.description() !== upd_item.Description) || (p.code() !== upd_item.Code) || (p.ttlHours() !== upd_item.TtlHours) ||
+                            (Math.abs(p.firstDate() - upd_item.FirstDate) > 500) || (Math.abs(p.lastDate() - upd_item.LastDate) > 500)) {
+                            
+                            p.priceListId(upd_item.PriceListId);
+                            p.perc(upd_item.Perc);
+                            p.description(upd_item.Description);
+                            p.code(upd_item.Code);
+                            p.ttlHours(upd_item.TtlHours);
+                            p.firstDate(upd_item.FirstDate);
+                            p.lastDate(upd_item.LastDate);
+                            upd_flag = true;
+                        }
+                    }
+                    else
+                        items_to_del.push(p);
+                }
+            }
+
+            for (let i = 0; i < items_to_del.length; i++)
+                col._del(items_to_del[i]);
+
+            for (let i = 0; i < dyn_new.length; i++)
+                await root.newObject({
+                    fields: dyn_new[i]
+                }, dbOpts);
+            
+            result = result || upd_flag || (dyn_new.length > 0) || (items_to_del.length > 0);
         }
         return result;
     }
@@ -452,9 +549,9 @@ const DbProduct = class DbProduct extends DbObject {
                         let flag = await this._setPrice(root_price, inpFields.Price, dbOpts);
                         isDetMdf = isDetMdf || flag;
                     }
-                    if (inpFields.Discount) {
+                    if (inpFields.Discount || inpFields.DynDiscounts) {
                         let root_discount = productObj.getDataRoot("Discount");
-                        let flag = await this._setDiscount(root_discount, inpFields.Discount, dbOpts);
+                        let flag = await this._setDiscount(root_discount, inpFields.Discount, inpFields.DynDiscounts, dbOpts);
                         isDetMdf = isDetMdf || flag;
                     }
                     if (isDetMdf)
@@ -533,9 +630,9 @@ const DbProduct = class DbProduct extends DbObject {
                         let root_price = productObj.getDataRoot("Price");
                         await this._setPrice(root_price, inpFields.Price, dbOpts)
                     }
-                    if (inpFields.Discount) {
+                    if (inpFields.Discount || inpFields.DynDiscounts) {
                         let root_discount = productObj.getDataRoot("Discount");
-                        await this._setDiscount(root_discount, inpFields.Discount, dbOpts);
+                        await this._setDiscount(root_discount, inpFields.Discount, inpFields.DynDiscounts, dbOpts);
                     }
                     await root_obj.save(dbOpts);
                     return { result: "OK", id: newId };

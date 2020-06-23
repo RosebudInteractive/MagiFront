@@ -22,7 +22,7 @@ const { getTimeStr, buildLogString } = require('./utils');
 
 const PRODUCT_CODE = "ProtoOne";
 const VERSION_CODE = "1.0.0.1";
-const BUILD_NUM = 32;
+const BUILD_NUM = 33;
 
 //bld.initDatabase()
 Promise.resolve()
