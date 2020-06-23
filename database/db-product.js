@@ -222,6 +222,23 @@ const DbProduct = class DbProduct extends DbObject {
             resolve($data.execSql(sql, dbOpts));
         })
             .then(result => {
+                let calcDPrice = (price, perc) => {
+                    let dprice = price * (1 - perc / 100);
+                    let prec = Accounting.SumPrecision;
+                    let isDone = false;
+                    if ((opts.Truncate === "true") || (opts.Truncate === true)) {
+                        dprice = Math.trunc(dprice / 10) * 10;
+                        isDone = true;
+                    }
+                    else {
+                        let p = +opts.Prec;
+                        if ((typeof (p) === "number") && (!isNaN(p)))
+                            prec = p;
+                    }
+                    if (!isDone)
+                        dprice = roundNumber(dprice, prec);
+                    return dprice;
+                };
                 if (result && result.detail && (result.detail.length > 0)) {
                     let prod_list = {};
                     result.detail.forEach(elem => {
@@ -263,7 +280,8 @@ const DbProduct = class DbProduct extends DbObject {
                                         Perc: elem.Perc,
                                         TtlHours: elem.TtlHours,
                                         FirstDate: elem.FirstDate,
-                                        LastDate: elem.LastDate
+                                        LastDate: elem.LastDate,
+                                        DPrice: calcDPrice(elem.Price, elem.Perc)
                                     }
                             }
                             else {
@@ -275,20 +293,7 @@ const DbProduct = class DbProduct extends DbObject {
                                     FirstDate: elem.FirstDate,
                                     LastDate: elem.LastDate
                                 };
-                                let dprice = elem.Price * (1 - d.Perc / 100);
-                                let prec = Accounting.SumPrecision;
-                                let isDone = false;
-                                if ((opts.Truncate === "true") || (opts.Truncate === true)) {
-                                    curr_prod.DPrice = Math.trunc(dprice / 10) * 10;
-                                    isDone = true;
-                                }
-                                else {
-                                    let p = +opts.Prec;
-                                    if ((typeof (p) === "number") && (!isNaN(p)))
-                                        prec = p;
-                                }
-                                if (!isDone)
-                                    curr_prod.DPrice = roundNumber(dprice, prec);
+                                curr_prod.DPrice = calcDPrice(elem.Price, d.Perc);
                             }
                         }
                     });
