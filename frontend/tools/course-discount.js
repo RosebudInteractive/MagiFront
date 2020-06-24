@@ -1,4 +1,5 @@
 import {getMinutesBetween} from "tools/time-tools";
+import {getCountDaysTitle, getCountHoursTitle, getCountMinutesTitle} from "tools/word-tools";
 
 export default class CourseDiscountHandler {
     constructor(data) {
@@ -10,59 +11,22 @@ export default class CourseDiscountHandler {
         // if (!user) return
         if (!user) {user = {Id: 2}}
 
-        if (course.PersonalDiscounts) {
-            let _savedDisc = localStorage.getItem(`u${user.Id}_disc`),
-                _serverDisc = code && course.PersonalDiscounts[code]
+        if (course.DynDiscounts) {
+            let _discountsInStorage = localStorage.getItem(`u${user.Id}_disc`),
+                _serverDiscount = code && course.DynDiscounts[code],
+                _discounts
 
-            if (!_savedDisc) {
-
-                if (!_serverDisc) return
-
-                const _persDisc = {}
-
-                let _expDate = new Date()
-
-                _expDate = _expDate.setHours(_expDate.getHours() + +_serverDisc.Hours)
-
-                _persDisc[code] = {
-                    perc: _serverDisc.Perc,
-                    price: _serverDisc.Price,
-                    expireDate: _expDate,
-                    lastDate: _serverDisc.LastDate,
-                }
-
-                localStorage.setItem(`u${user.Id}_disc`, JSON.stringify(_persDisc))
-                if (_serverDisc.Price < course.DPrice) { this.activePersonalDiscount = {code: code, expireDate: _expDate} }
+            if (!_discountsInStorage) {
+                _discounts = {}
             } else {
-                _savedDisc = JSON.parse(_savedDisc)
-                let _discounts = this._checkExpireDiscounts(_savedDisc, course.PersonalDiscounts),
-                    _disc = _discounts[code]
-
-                if (!_disc && _serverDisc) {
-                    let _expDate = new Date
-                    _expDate = _expDate.setHours(_expDate.getHours() + +_serverDisc.Hours)
-
-                    _discounts[code] = {
-                        perc: _serverDisc.Perc,
-                        price: _serverDisc.Price,
-                        expireDate: _expDate,
-                        lastDate: _serverDisc.LastDate,
-                    }
-                }
-
-                let _minPrice = course.DPrice,
-                    _currentCode = null
-                Object.entries(_discounts).forEach(([key, value]) => {
-                    if (value.price < _minPrice) {
-                        _currentCode = key
-                        _minPrice = value.price
-                    }
-                })
-
-                if (_currentCode) { this.activePersonalDiscount = {code: _currentCode, expireDate: _discounts[_currentCode].expireDate} }
-
-                localStorage.setItem(`u${user.Id}_disc`, JSON.stringify(_discounts))
+                _discountsInStorage = JSON.parse(_discountsInStorage)
+                _discounts = this._checkExpireDiscounts(_discountsInStorage, course.DynDiscounts)
             }
+
+            this._addDiscount({discounts: _discounts, code: code, serverItem: _serverDiscount})
+            localStorage.setItem(`u${user.Id}_disc`, JSON.stringify(_discounts))
+
+            this._findActiveDiscount({course: course, discounts: _discounts})
         }
     }
 
@@ -77,13 +41,49 @@ export default class CourseDiscountHandler {
 
         return _result
     }
+
+    _addDiscount({discounts, code, serverItem}) {
+        if (!(code && serverItem)) { return }
+
+        let _expDate = new Date()
+
+        _expDate = _expDate.setHours(_expDate.getHours() + +serverItem.TtlHours)
+
+        discounts[code] = {
+            perc: serverItem.Perc,
+            price: serverItem.DPrice,
+            expireDate: _expDate,
+            firstDate: serverItem.FirstDate,
+            lastDate: serverItem.LastDate,
+        }
+    }
+
+    _findActiveDiscount({course, discounts}) {
+        let _minPrice = course.DPrice,
+            _currentCode = null
+
+        Object.entries(discounts).forEach(([key, value]) => {
+            if (value.price < _minPrice) {
+                _currentCode = key
+                _minPrice = value.price
+            }
+        })
+
+        if (_currentCode) { this.activePersonalDiscount = {code: _currentCode, expireDate: discounts[_currentCode].expireDate} }
+    }
 }
 
 export const getExpireTitle = (expireDate) => {
-    let _minutes = getMinutesBetween(new Date(expireDate), Date.now())
+    let _minutes = getMinutesBetween(Date.now(), new Date(expireDate))
 
     if (_minutes > 24 * 60) {
-
+        let _days = Math.round(_minutes / (24 * 60))
+        return _days + " " + getCountDaysTitle(_days)
+    } else if (_minutes > 60) {
+        let _hours = Math.round(_minutes / 60)
+        return _hours + " " + getCountHoursTitle(_hours)
+    } else {
+        return _minutes + " " + getCountMinutesTitle(_minutes)
     }
 }
 

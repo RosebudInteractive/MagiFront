@@ -69,15 +69,9 @@ export const getCourse = (url, options) => {
 
         const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
 
-        new Promise((resolve) => {
-            if (url !== "high-renaissance") {
-                return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
-                    .then(checkStatus)
-                    .then(parseJSON)
-            } else {
-                resolve(COURSES.HIGH_RENAISSANCE)
-            }
-        })
+        return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
             .then(data => {
                 handleCourse(data, getState());
 
@@ -161,7 +155,7 @@ const handleCourses = (data, state) => {
 const handleCourse = (data, state) => {
     const _handler = new CourseDiscountHandler({code: personalDiscountSelector(state), course: data, user: state.user.user})
     if (_handler.activePersonalDiscount) {
-        data.activePersonslDiscount = {..._handler.activePersonalDiscount}
+        data.activePersonalDiscount = {..._handler.activePersonalDiscount}
     }
 
     try {

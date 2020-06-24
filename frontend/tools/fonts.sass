@@ -1,5 +1,10 @@
 @import "./variables.sass"
 
+@font-face
+  font-family: 'Roboto'
+  src: url("/fonts/Roboto-Regular.ttf") format('truetype')
+  font-style: normal
+
 .font-universal__body-largex
   font-family: $font-fira
   font-style: normal
@@ -148,9 +153,24 @@
     line-height: 130%
     color: $color-main-dark
 
+.font-special__price-large
+  font-family: Roboto
+  font-style: normal
+  font-weight: normal
+  font-size: 28px
+  line-height: 33px
+  letter-spacing: -0.5px
+  @media (max-width: $tablet-width)
+    font-size: 20px
+    line-height: 23px
 
+.font-special__price-small
+  font-family: Roboto
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 20px
 
-
-
-
+._bold
+  font-weight: bold
 

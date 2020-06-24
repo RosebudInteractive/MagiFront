@@ -12,17 +12,17 @@ export default class PriceTitle extends React.Component {
         const {course,} = this.props,
             _currency = getCurrencySign()
 
-        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc || course.activePersonslDiscount,
+        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc || course.activePersonalDiscount,
             _price = _hasDiscount ?
-                course.activePersonslDiscount ?
-                    course.PersonalDiscounts[course.activePersonslDiscount.code].Price
+                course.activePersonalDiscount ?
+                    course.DynDiscounts[course.activePersonalDiscount.code].DPrice
                     :
                     course.DPrice
                 :
                 0,
             _percent = _hasDiscount ?
-                course.activePersonslDiscount ?
-                    course.PersonalDiscounts[course.activePersonslDiscount.code].Perc
+                course.activePersonalDiscount ?
+                    course.DynDiscounts[course.activePersonalDiscount.code].Perc
                     :
                     course.Discount.Perc
                 :
@@ -32,11 +32,11 @@ export default class PriceTitle extends React.Component {
             {
                 _hasDiscount ?
                     <React.Fragment>
-                        <p className="course-module__price">{_price + _currency + " "}<span className="discount">{`-${_percent}%`}</span></p>
-                        <p className="course-module__old-price">{course.Price + _currency}</p>
+                        <p className="course-module__old-price font-special__price-large">{course.Price + _currency}</p>
+                        <p className="course-module__price font-special__price-large">{_price + _currency + " "}<span className="discount">{`-${_percent}%`}</span></p>
                     </React.Fragment>
                     :
-                    <p className="course-module__price">{course.Price + _currency}</p>
+                    <p className="course-module__price font-special__price-large">{course.Price + _currency}</p>
             }
         </div>
     }

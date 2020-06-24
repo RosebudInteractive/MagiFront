@@ -1,3 +1,7 @@
+export const getCountDaysTitle = (count) => {
+    return getCounterTitle(count, {single: 'день', twice: 'дня', many: 'дней'})
+}
+
 export const getCountHoursTitle = (count) => {
     return getCounterTitle(count, {single: 'час', twice: 'часа', many: 'часов'})
 }
