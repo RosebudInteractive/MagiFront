@@ -17,6 +17,16 @@ function setupUsers(app) {
         global.$Services = {};
     global.$Services.users = UsersService;
 
+    app.get('/api/users/courses-for-sale', async (req, res, next) => {
+        try {
+            let rows = await UsersService().getCoursesForSale(req.user ? req.user : null, req.query);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/users/not-sent-trans', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })

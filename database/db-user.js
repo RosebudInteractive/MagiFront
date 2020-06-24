@@ -398,6 +398,26 @@ const SET_TRAN_SEND_STATUS_MYSQL =
     "update `Cheque` set `SendStatus` = 1, `SendStatusChangedAt` = NOW()\n" +
     "where (`Id` = <%= tran_id %>) and (`StateId` = 4) and (`SendStatus` = 0)";
 
+const GET_COURSES_FOR_SALE_MSSQL =
+    "select distinct c.[Id]\n" +
+    "from [Discount] d\n" +
+    "  join [Product] p on p.[Id] = d.[ProductId]\n" +
+    "  join [Course] c on c.[ProductId] = p.[Id]\n" +
+    "where ((d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
+    "  and ((d.[LastDate] > convert(datetime, '<%= dt %>')) or (d.[LastDate] is NULL))\n" +
+    "  and (d.[DiscountTypeId] = 2) and (d.[UserId] is NULL))<%= where_dyn %>";
+const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (d.[Code] in (<%= codes %>)) and (d.[UserId] is NULL))";
+    
+const GET_COURSES_FOR_SALE_MYSQL =
+    "select distinct c.`Id`\n" +
+    "from `Discount` d\n" +
+    "  join `Product` p on p.`Id` = d.`ProductId`\n" +
+    "  join `Course` c on c.`ProductId` = p.`Id`\n" +
+    "where ((d.`FirstDate` <= '<%= dt %>')\n" +
+    "  and ((d.`LastDate` > '<%= dt %>') or (d.`LastDate` is NULL))\n" +
+    "  and (d.`DiscountTypeId` = 2) and (d.`UserId` is NULL))<%= where_dyn %>";
+const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (d.`Code` in (<%= codes %>)) and (d.`UserId` is NULL))";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
@@ -718,6 +738,133 @@ const DbUser = class DbUser extends DbObject {
             })
     }
 
+    async getCoursesForSale(user, options) {
+        let result = {};
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+
+        let dt = new Date(Math.round(((new Date()) - 0) / 1000) * 1000); // round ms
+        let dt_str = this._dateToString(dt, true, false);
+        let where_dyn_mssql = '';
+        let where_dyn_mysql = '';
+        let dyn_codes = {};
+        if (opts.Codes) {
+            let codes = [];
+            let arr;
+            if (typeof (opts.Codes) === "string") {
+                arr = opts.Codes.split(",");
+            }
+            else {
+                if (!Array.isArray(opts.Codes))
+                    throw new Error(`Invalid parameter "Codes": ${JSON.stringify(opts.Codes)}.`);
+                arr = opts.Codes;
+            }
+            let order = 0;
+            arr.forEach(element => {
+                codes.push(`'${element}'`);
+                dyn_codes[element] = ++order;
+            });
+            if (codes.length === 0)
+                throw new Error(`Parameter "Codes" is empty.`);
+            let code_list = `${codes.join()}`;
+            where_dyn_mysql = _.template(WHERE_DYN_MYSQL)({ codes: code_list });
+            where_dyn_mssql = _.template(WHERE_DYN_MSSQL)({ codes: code_list });
+        }
+
+        let res = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_COURSES_FOR_SALE_MYSQL)({ dt: dt_str, where_dyn: where_dyn_mysql }),
+                mssql: _.template(GET_COURSES_FOR_SALE_MSSQL)({ dt: dt_str, where_dyn: where_dyn_mssql })
+            }
+        }, {});
+        let course_ids = [];
+        if (res && res.detail && (res.detail.length > 0)) {
+            res.detail.forEach(elem => {
+                course_ids.push(elem.Id);
+            })
+        }
+
+        if (course_ids.length > 0) {
+            let arrayOfIds = splitArray(course_ids, MAX_COURSES_REQ_NUM);
+            let { Courses: courses } = await this._getCoursesByIds(user,
+                { Courses: [] }, arrayOfIds, isAbsPath, dLink, null, { alwaysShowDiscount: true });
+            let other = [];
+            let dynamic = [];
+            for (let i = 0; i < courses.length; i++){
+                let course = courses[i];
+                let has_discount = course.Discount && ((dt - course.Discount.FirstDate) >= 0)
+                    && (((dt - course.Discount.LastDate) < 0) || (!course.Discount.LastDate)) ? true : false;
+                if (!has_discount)
+                    delete course.Discount;
+                let curr_perc = has_discount ? course.Discount.Perc : 0;
+                let has_dyn_discount = false;
+                if (course.DynDiscounts) {
+                    let keys = Object.keys(course.DynDiscounts);
+                    let curr_dyn_code = null;
+                    for (let j = 0; j < keys.length; j++) {
+                        let code = keys[j];
+                        if (dyn_codes[code]) {
+                            let discount = course.DynDiscounts[code];
+                            if (discount.Perc > curr_perc) {
+                                if (curr_dyn_code)
+                                    delete course.DynDiscounts[curr_dyn_code]
+                                else {
+                                    delete course.Discount;
+                                    has_discount = false;
+                                }
+                                curr_dyn_code = code;
+                                curr_perc = discount.Perc;
+                                course.DPrice = discount.DPrice;
+                                has_dyn_discount = true;
+                            }
+                            else
+                                delete course.DynDiscounts[code];
+                        }
+                        else
+                            delete course.DynDiscounts[code];
+                    }
+                }
+                if (has_discount)
+                    other.push(course)
+                else
+                    if (has_dyn_discount)
+                        dynamic.push(course);
+            }
+            if (dynamic.length > 0) {
+                dynamic.sort((a, b) => {
+                    let result = 0;
+                    let keys_a = Object.keys(a.DynDiscounts);
+                    let keys_b = Object.keys(b.DynDiscounts);
+                    if ((keys_a.length === 1) && (keys_b.length === 1)) {
+                        let order_a = dyn_codes[keys_a[0]];
+                        let order_b = dyn_codes[keys_b[0]];
+                        if (order_a && order_b)
+                            result = order_a - order_b;
+                    }
+                    return result;
+                })
+                result.Dynamic = dynamic;
+            }
+            if (other.length > 0) {
+                other.sort((a, b) => {
+                    let result = 0;
+                    if (a.Discount.LastDate && b.Discount.LastDate)
+                        result = a.Discount.LastDate - b.Discount.LastDate
+                    else
+                        if (a.Discount.LastDate)
+                            result = -1
+                        else
+                            if (b.Discount.LastDate)
+                                result = 1;
+                    return result;
+                })
+                result.Other = other;
+            }
+        }
+        return result;
+    }
+
     getHistory(user, lessonFilter, options) {
         let positions = {};
         let lessonIds = [];
@@ -881,8 +1028,7 @@ const DbUser = class DbUser extends DbObject {
                                         }
                                     }
                                     if (Object.keys(history.Courses).length > 0) {
-                                        for (let courseId in history.Courses)
-                                            await this._coursesService.getCoursePrice(history.Courses[courseId]);
+                                        await this._coursesService.getCoursesPrice(history.Courses);
                                     }
                                 }
                             })
@@ -993,7 +1139,8 @@ const DbUser = class DbUser extends DbObject {
         return result;
     }
 
-    async _getCoursesByIds(user_or_id, data, arrayOfIds, isAbsPath, dLink, courseBoookmarkOrder) {
+    async _getCoursesByIds(user_or_id, data, arrayOfIds, isAbsPath, dLink, courseBoookmarkOrder, options) {
+        let opts = _.cloneDeep(options || {});
         let courseList = {};
         let pendingCourses = {};
         let user = user_or_id;
@@ -1001,7 +1148,7 @@ const DbUser = class DbUser extends DbObject {
         if (typeof (user_or_id) === "number")
             user = await this._usersCache.getUserInfoById(user_or_id)
         else
-            userId = user.Id;
+            userId = user ? user.Id : 0;
         let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
         show_paid = show_paid || (!isBillingTest);
 
@@ -1050,65 +1197,68 @@ const DbUser = class DbUser extends DbObject {
                                 courseList[elem.Id] = course;
                             })
                             if (data.Courses.length > 0) {
-                                for (let i = 0; i < data.Courses.length; i++)
-                                    await this._coursesService.getCoursePrice(data.Courses[i]);
+                                let withCheckProd = opts.withCheckProd ? opts.withCheckProd : false;
+                                let alwaysShowDiscount = opts.alwaysShowDiscount ? opts.alwaysShowDiscount : false;
+                                await this._coursesService.getCoursesPrice(data.Courses, withCheckProd, alwaysShowDiscount);
                             }
                         }
                     })
             })
                 .then(() => {
-                    return Utils.seqExec(arrayOfIds, (elem) => {
-                        return $data.execSql({
-                            dialect: {
-                                mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
-                            }
-                        }, {})
-                            .then((result) => {
-                                if (result && result.detail && (result.detail.length > 0)) {
-                                    result.detail.forEach((elem) => {
-                                        let author = data.Authors[elem.Id];
-                                        if (!author) {
-                                            author = {
-                                                Id: elem.Id,
-                                                URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
-                                                FirstName: elem.FirstName,
-                                                LastName: elem.LastName,
-                                                Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
-                                                PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink)
-                                            };
-                                            data.Authors[elem.Id] = author;
-                                        }
-                                        let course = courseList[elem.CourseId];
-                                        if (course)
-                                            course.Authors.push(author.Id);
-                                    })
+                    if (data.Authors)
+                        return Utils.seqExec(arrayOfIds, (elem) => {
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
+                                    mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
                                 }
-                            })
-                    });
+                            }, {})
+                                .then((result) => {
+                                    if (result && result.detail && (result.detail.length > 0)) {
+                                        result.detail.forEach((elem) => {
+                                            let author = data.Authors[elem.Id];
+                                            if (!author) {
+                                                author = {
+                                                    Id: elem.Id,
+                                                    URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
+                                                    FirstName: elem.FirstName,
+                                                    LastName: elem.LastName,
+                                                    Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
+                                                    PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink)
+                                                };
+                                                data.Authors[elem.Id] = author;
+                                            }
+                                            let course = courseList[elem.CourseId];
+                                            if (course)
+                                                course.Authors.push(author.Id);
+                                        })
+                                    }
+                                })
+                        });
                 })
                 .then(() => {
-                    return Utils.seqExec(arrayOfIds, (elem) => {
-                        return this.getService("categories", true).reqCourseCategories(elem)
-                            .then((result) => {
-                                if (result && result.detail && (result.detail.length > 0)) {
-                                    result.detail.forEach((elem) => {
-                                        let category = data.Categories[elem.Id];
-                                        if (!category) {
-                                            category = {
-                                                Id: elem.Id,
-                                                URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
-                                                Name: elem.Name
-                                            };
-                                            data.Categories[elem.Id] = category;
-                                        }
-                                        let course = courseList[elem.CourseId];
-                                        if (course)
-                                            course.Categories.push(category.Id);
-                                    })
-                                }
-                            })
-                    });
+                    if (data.Categories)
+                        return Utils.seqExec(arrayOfIds, (elem) => {
+                            return this.getService("categories", true).reqCourseCategories(elem)
+                                .then((result) => {
+                                    if (result && result.detail && (result.detail.length > 0)) {
+                                        result.detail.forEach((elem) => {
+                                            let category = data.Categories[elem.Id];
+                                            if (!category) {
+                                                category = {
+                                                    Id: elem.Id,
+                                                    URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
+                                                    Name: elem.Name
+                                                };
+                                                data.Categories[elem.Id] = category;
+                                            }
+                                            let course = courseList[elem.CourseId];
+                                            if (course)
+                                                course.Categories.push(category.Id);
+                                        })
+                                    }
+                                })
+                        });
                 });
         }
         return data;
