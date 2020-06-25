@@ -173,8 +173,8 @@ class CourseSubscriptionForm extends React.Component {
                         <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid || _disabled}/>
                         <button className='tool-btn del discount-percent__button' onClick={::this._clearDiscount} disabled={!isPaid || !percent || _disabled}/>
                     </div>
-                    <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={Datepicker} name="FirstDate" label="Начало действия" showTime={true} disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={Datepicker} name="LastDate" label="Окончание действия" showTime={true} disabled={!percent || !isPaid || _disabled}/>
                 </div>
                 <Field component={DiscountGrid} name="DynDiscounts" editMode={this.props.editMode}/>
             </form>

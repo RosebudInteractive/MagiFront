@@ -32,11 +32,11 @@ export default class PriceTitle extends React.Component {
             {
                 _hasDiscount ?
                     <React.Fragment>
-                        <p className="course-module__old-price font-special__price-large">{course.Price + _currency}</p>
-                        <p className="course-module__price font-special__price-large">{_price + _currency + " "}<span className="discount">{`-${_percent}%`}</span></p>
+                        <p className="course-module__price">{_price + _currency + " "}<span className="discount">{`-${_percent}%`}</span></p>
+                        <p className="course-module__old-price">{course.Price + _currency}</p>
                     </React.Fragment>
                     :
-                    <p className="course-module__price font-special__price-large">{course.Price + _currency}</p>
+                    <p className="course-module__price">{course.Price + _currency}</p>
             }
         </div>
     }

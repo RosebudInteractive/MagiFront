@@ -1,75 +1,166 @@
 import {getMinutesBetween} from "tools/time-tools";
-import {getCountDaysTitle, getCountHoursTitle, getCountMinutesTitle} from "tools/word-tools";
+import {getCountDaysTitle, getCounterTitle, getCountHoursTitle,} from "tools/word-tools";
+import moment from "moment";
 
-export default class CourseDiscountHandler {
-    constructor(data) {
-        this.activePersonalDiscount = null
-        this._handleDiscount(data)
+const KEY = "mag_dyn_disc"
+
+let _instance = null,
+    discountCode = null
+
+export default class CourseDiscounts {
+
+    static getInstance() {
+        if (!_instance) {
+            _instance = new CourseDiscounts()
+        }
+
+        return _instance
     }
 
-    _handleDiscount({code, course, user}) {
-        // if (!user) return
-        if (!user) {user = {Id: 2}}
+    constructor() {
+        this.loadFromStorage()
+    }
 
-        if (course.DynDiscounts) {
-            let _discountsInStorage = localStorage.getItem(`u${user.Id}_disc`),
-                _serverDiscount = code && course.DynDiscounts[code],
-                _discounts
+    static getActualPriceAndDiscount(course) {
+        if (!(course && (course.IsPaid && !course.IsGift && !course.IsBought))) {
+            return 0
+        }
 
-            if (!_discountsInStorage) {
-                _discounts = {}
-            } else {
-                _discountsInStorage = JSON.parse(_discountsInStorage)
-                _discounts = this._checkExpireDiscounts(_discountsInStorage, course.DynDiscounts)
+        let _dynamicDiscount = this.getActiveDynamicDiscount({course: course})
+        if (_dynamicDiscount) {
+            course.activePersonalDiscount = _dynamicDiscount
+            return {
+                hasDiscount: true,
+                price: course.DynDiscounts[course.activePersonalDiscount.code].DPrice,
+                perc: course.DynDiscounts[course.activePersonalDiscount.code].Perc
             }
+        } else {
+            let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc
+            return {
+                hasDiscount: _hasDiscount,
+                price: _hasDiscount ? course.DPrice : course.Price,
+                perc: _hasDiscount ? course.Discount.Perc : 0
+            }
+        }
 
-            this._addDiscount({discounts: _discounts, code: code, serverItem: _serverDiscount})
-            localStorage.setItem(`u${user.Id}_disc`, JSON.stringify(_discounts))
+    }
 
-            this._findActiveDiscount({course: course, discounts: _discounts})
+    static checkDynamicDiscountInURL(params) {
+        const _dynamicDiscount = params.get('dnds') ? params.get('dnds') : null
+
+        if (_dynamicDiscount) {
+            discountCode = _dynamicDiscount
+            params.delete('dnds')
+            return true
         }
     }
 
-    _checkExpireDiscounts(savedDiscounts, courseDiscounts) {
+
+    loadFromStorage() {
+        let _discountsInStorage = localStorage.getItem(KEY)
+
+        if (!_discountsInStorage) {
+            this.localDiscounts = {}
+        } else {
+            _discountsInStorage = JSON.parse(_discountsInStorage)
+            this.localDiscounts = this._checkExpireDiscounts(_discountsInStorage,)
+        }
+    }
+
+    static getActiveDynamicDiscount(data) {
+        return this.getInstance()._getDiscount(data)
+    }
+
+    _getDiscount({course}) {
+        if (!this.localDiscounts || !Object.keys(this.localDiscounts).length) return null
+
+        let _courseDiscounts = this.localDiscounts[course.Id]
+
+        return _courseDiscounts ? this._findActiveDiscount({course: course, discounts: _courseDiscounts}) : null
+    }
+
+    static activateDiscount(data) {
+        return this.getInstance().addDiscount(data)
+    }
+
+    addDiscount({course,}) {
+        if (discountCode && course.DynDiscounts) {
+            let _serverDiscount = course.DynDiscounts[discountCode]
+
+            if (!_serverDiscount) return
+
+            try {
+                let _inDateRange = moment.utc(_serverDiscount.FirstDate).isBefore() &&
+                    moment.utc(_serverDiscount.LastDate).isAfter()
+
+                if (!_inDateRange) return
+
+                let _courseDiscounts = this.localDiscounts[course.Id],
+                    _discount = _courseDiscounts ? _courseDiscounts[discountCode] : null
+
+                if (_discount) return
+
+                let _activeDiscount = this._findActiveDiscount({course: course, discounts: _courseDiscounts}),
+                    _price = _activeDiscount ? _courseDiscounts[_activeDiscount.code].price : course.DPrice
+
+                if (_serverDiscount.DPrice < _price) {
+                    let _expDate = moment.utc().add(+_serverDiscount.TtlMinutes, "m")
+
+                    if (!_courseDiscounts) {
+                        this.localDiscounts[course.Id] = {}
+                        _courseDiscounts = this.localDiscounts[course.Id]
+                    }
+
+                    _courseDiscounts[discountCode] = {
+                        perc: +_serverDiscount.Perc,
+                        price: +_serverDiscount.DPrice,
+                        expireDate: _expDate,
+                        firstDate: _serverDiscount.FirstDate,
+                        lastDate: _serverDiscount.LastDate,
+                    }
+
+                    localStorage.setItem(KEY, JSON.stringify(this.localDiscounts))
+                }
+            } finally {
+                discountCode = null
+            }
+        }
+    }
+
+    _checkExpireDiscounts(savedDiscounts,) {
         const _result = {}
 
-        Object.entries(savedDiscounts).forEach(([key, value]) => {
-            if ((new Date(value.expireDate) >= Date.now()) && courseDiscounts[key]) {
-                _result[key] = value
+        Object.entries(savedDiscounts).forEach(([courseId, discounts]) => {
+            let _discounts = {}
+
+            Object.entries(discounts).forEach(([code, data]) => {
+                if (moment.utc(data.lastDate).isAfter()) {
+                    _discounts[code] = data
+                }
+            })
+
+            if (Object.entries(discounts).length) {
+                _result[courseId] = _discounts
             }
         })
 
         return _result
     }
 
-    _addDiscount({discounts, code, serverItem}) {
-        if (!(code && serverItem)) { return }
-
-        let _expDate = new Date()
-
-        _expDate = _expDate.setHours(_expDate.getHours() + +serverItem.TtlHours)
-
-        discounts[code] = {
-            perc: serverItem.Perc,
-            price: serverItem.DPrice,
-            expireDate: _expDate,
-            firstDate: serverItem.FirstDate,
-            lastDate: serverItem.LastDate,
-        }
-    }
-
     _findActiveDiscount({course, discounts}) {
         let _minPrice = course.DPrice,
             _currentCode = null
 
+        if (!discounts) return null
+
         Object.entries(discounts).forEach(([key, value]) => {
-            if (value.price < _minPrice) {
+            if ((value.price < _minPrice) && moment.utc(value.expireDate).isAfter())  {
                 _currentCode = key
                 _minPrice = value.price
             }
         })
 
-        if (_currentCode) { this.activePersonalDiscount = {code: _currentCode, expireDate: discounts[_currentCode].expireDate} }
+        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate} : null
     }
 }
 
@@ -83,8 +174,12 @@ export const getExpireTitle = (expireDate) => {
         let _hours = Math.round(_minutes / 60)
         return _hours + " " + getCountHoursTitle(_hours)
     } else {
-        return _minutes + " " + getCountMinutesTitle(_minutes)
+        return _minutes ? _minutes + " " + _getCountMinutesTitle(_minutes) : "менее 1 минуты"
     }
+}
+
+const _getCountMinutesTitle = (count) => {
+    return getCounterTitle(count, {single: 'минуту', twice: 'минуты', many: 'минут'})
 }
 
 

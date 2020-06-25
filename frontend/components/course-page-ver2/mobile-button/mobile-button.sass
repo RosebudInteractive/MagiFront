@@ -6,13 +6,22 @@
   z-index: 99
   bottom: 0
   width: 100%
-  margin: 0 56px 26px
+  margin: 0
+  background: $color-white
+  box-shadow: 0 0 10px $color-dark-06
   @media (max-width: 899px)
     display: flex
+    flex-direction: column
+    align-items: center
     width: calc(100% - 112px)
+    padding: 15px 56px 5px
   @media (max-width: 639px)
     width: calc(100% - 12px)
-    margin: 0 6px 6px
+    padding: 10px 6px
+
+  .mobile-buttons__container
+    display: flex
+    width: 100%
 
   .gift-button__wrapper
     margin: 0 0 0 10px
@@ -28,6 +37,13 @@
 
   .mobile-button_wrapper:only-child
     flex: 1 1 auto
+
+  .discount-title
+    padding: 7px 0
+    .discount-title__text
+      font-size: 14px
+      @media (max-width: $mobile-phone-width)
+        font-size: unset
 
 .mobile-button
   max-width: 627px

@@ -16,10 +16,7 @@ import {parseReadyDate} from "../tools/time-tools";
 import {DATA_EXPIRATION_TIME, LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
 
 import {checkStatus, parseJSON} from "tools/fetch-tools";
-import {personalDiscountSelector} from "ducks/billing";
-import CourseDiscountHandler from "tools/course-discount";
-
-import {COURSES} from "../mock-data/course/mock";
+import CourseDiscounts from "tools/course-discount";
 
 
 export const getCourses = () => {
@@ -152,10 +149,14 @@ const handleCourses = (data, state) => {
     }
 };
 
-const handleCourse = (data, state) => {
-    const _handler = new CourseDiscountHandler({code: personalDiscountSelector(state), course: data, user: state.user.user})
-    if (_handler.activePersonalDiscount) {
-        data.activePersonalDiscount = {..._handler.activePersonalDiscount}
+const handleCourse = (data, state, dispatch) => {
+    if (CourseDiscounts.activateDiscount({course: data})) {
+        dispatch()
+    }
+
+    const _discount = CourseDiscounts.getActiveDynamicDiscount({course: data})
+    if (_discount) {
+        data.activePersonalDiscount = {..._discount}
     }
 
     try {

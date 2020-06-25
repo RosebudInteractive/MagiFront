@@ -34,8 +34,21 @@ class PriceButton extends React.Component {
             return null
         }
 
-        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _price = _hasDiscount ? course.DPrice : course.Price,
+        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc || course.activePersonalDiscount,
+            _price = _hasDiscount ?
+                course.activePersonalDiscount ?
+                    course.DynDiscounts[course.activePersonalDiscount.code].DPrice
+                    :
+                    course.DPrice
+                :
+                0,
+            _percent = _hasDiscount ?
+                course.activePersonalDiscount ?
+                    course.DynDiscounts[course.activePersonalDiscount.code].Perc
+                    :
+                    course.Discount.Perc
+                :
+                0,
             _disabled = loading && (+loadingCourseId === course.Id)
 
         return <div className="mobile-button _price-block btn btn--brown">
@@ -47,7 +60,7 @@ class PriceButton extends React.Component {
                     {
                         _hasDiscount ?
                             <React.Fragment>
-                                <div className="course-module__price"><span className="discount">{`-${course.Discount.Perc}%`}</span></div>
+                                <div className="course-module__price"><span className="discount">{`-${_percent}%`}</span></div>
                                 <div className="course-module__old-price">{course.Price + _currency}</div>
                             </React.Fragment>
                             :

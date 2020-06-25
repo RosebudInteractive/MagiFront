@@ -69,6 +69,8 @@ function TotalTestsCounter(props) {
         null
 }
 
+
+const PUBLISHING = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#publishing"/>'
 /**
  * @return {null}
  */
@@ -81,8 +83,10 @@ function ReadyDate(props) {
 
     return !data.allPublished ?
                 <div className="data__ready-date">
-                    <div className="data__text">Курс в процессе публикации.</div>
-                    <div className="data__text">{`Время завершения публикации всех лекций - ${_readyDate}`}</div>
+                    <svg width="22" height="22" dangerouslySetInnerHTML={{__html: PUBLISHING}}/>
+                    <div className="ready-date__text-block font-universal__body-small _grey-06">
+                        {`Курс в процессе публикации. Время завершения публикации всех лекций - ${_readyDate}`}
+                    </div>
                 </div>
                 :
                 null

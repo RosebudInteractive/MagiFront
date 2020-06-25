@@ -30,7 +30,7 @@ import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
-import {setPersonalDiscount, setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
+import {setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
 import {setWaitingAuthorizeData as setPlayerWaitingAuthorizeData,} from "./ducks/player";
 import {setWaitingAuthorizeData as setTestWaitingAuthorizeData,} from "./ducks/test-instance";
 import {showFeedbackWindowSelector, showModalErrorMessage} from "./ducks/message";
@@ -66,6 +66,7 @@ import "./tools/fonts.sass"
 import "./tools/system.sass"
 import ReviewWindow from "./components/messages/review";
 import ReviewResultMessage from "./components/messages/review/result-message";
+import CourseDiscounts from "tools/course-discount";
 
 Polyfill.registry();
 
@@ -124,7 +125,6 @@ class App extends Component {
             _isTest = _params.get('t') ? _params.get('t') === 't' : false,
             _isAuth = _params.get('t') ? _params.get('t') === 'a' : false,
             _isNewUser = _params.get('_is_new_user') ? _params.get('_is_new_user') === 'true' : false,
-            _personalDiscount = _params.get('dnds') ? _params.get('dnds') : null,
             _message = _params.get('message')
 
         this._scrollPosition = +_params.get('pos');
@@ -192,9 +192,10 @@ class App extends Component {
             this.props.showModalErrorMessage(_error)
         }
 
-        if (_personalDiscount) {
-            this.props.history.replace(this.props.location.pathname)
-            this.props.setPersonalDiscount(_personalDiscount)
+        if (CourseDiscounts.checkDynamicDiscountInURL(_params)) {
+            let _sParams = _params.toString()
+
+            this.props.history.replace(this.props.location.pathname + (_sParams ? `?${_sParams}` : ""))
         }
     }
 
@@ -404,7 +405,6 @@ function mapDispatchToProps(dispatch) {
         showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
         pageChanged: bindActionCreators(pageChanged, dispatch),
-        setPersonalDiscount: bindActionCreators(setPersonalDiscount, dispatch),
     }
 }
 

@@ -6,11 +6,33 @@ import DiscountTitle from "../../../../billing/discount-title";
 import PropTypes from "prop-types";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import GiftButton from "../../../../billing/gift-button";
+import CourseDiscounts from "tools/course-discount";
+
+const INTERVAL = 60 * 1000
 
 class BillingBlock extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+    }
+
+    componentDidMount() {
+        const {course,} = this.props
+
+        if (course.activePersonalDiscount) {
+            this._timer = setInterval(() => {
+                    let _discount = CourseDiscounts.getActiveDynamicDiscount({course: course})
+
+                    course.activePersonalDiscount = _discount
+                    this.forceUpdate()
+                    if (!_discount) clearInterval(this._timer)
+                },
+                INTERVAL)
+        }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this._timer)
     }
 
     render() {

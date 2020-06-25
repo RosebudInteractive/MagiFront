@@ -24,6 +24,7 @@ import LessonInfoStorage from '../tools/player/lesson-info-storage'
 
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import {GET_LESSON_PLAY_INFO_REQUEST} from "../constants/lesson";
+import CourseDiscounts from "tools/course-discount";
 
 const LessonInfoStorageMiddleware = store => next => action => {
 

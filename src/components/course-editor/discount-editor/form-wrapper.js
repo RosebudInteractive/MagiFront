@@ -43,7 +43,7 @@ class DiscountEditorForm extends React.Component {
                 TtlMinutes: discount.TtlMinutes,
                 FirstDate: discount.FirstDate,
                 LastDate: discount.LastDate,
-
+                Description: discount.Description,
             });
         }
     }

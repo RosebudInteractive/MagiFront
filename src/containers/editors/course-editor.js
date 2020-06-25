@@ -363,6 +363,7 @@ class CourseEditor extends React.Component {
         discounts.forEach((item) => {
             _result[item.Code] = item
             _result[item.Code].Perc = +item.Perc
+            _result[item.Code].TtlMinutes = +item.TtlMinutes
         })
 
         return _result
