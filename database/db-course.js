@@ -16,6 +16,7 @@ const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
 const { SubscriptionService } = require('../services/mail-subscription');
 const { TestService } = require('./db-test');
+const { splitArray } = require('../utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
@@ -1709,6 +1710,75 @@ const DbCourse = class DbCourse extends DbObject {
             course._rawProduct = prod;
     }
 
+    async getCoursesPrice(courses, withCheckProd, alwaysShowDiscount) {
+        const MAX_PRODS_REQ_NUM = 10;
+
+        let prod_ids = [];
+        let prod_list = {};
+        let course_list = {};
+        let result = {};
+
+        for (let i in courses){
+            let course = courses[i];
+            course.Price = 0;
+            course.DPrice = 0;
+            delete course.Discount;
+            if (course.IsPaid && course.ProductId) {
+                course_list[course.ProductId] = course;
+                prod_list[course.ProductId] = true;
+                prod_ids.push(course.ProductId);
+            }
+            else {
+                course.ProductId = null;
+                result[course.Id] = {
+                    courseId: course.Id,
+                    IsPaid: course.IsPaid,
+                    Price: course.Price,
+                    DPrice: course.DPrice,
+                    IsSubsFree: course.IsSubsFree
+                };
+            }
+        }
+        if (prod_ids.length > 0) {
+            let products = [];
+            let arrayOfIds = splitArray(prod_ids, MAX_PRODS_REQ_NUM);
+            for (let i = 0; i < arrayOfIds.length; i++){
+                let prods = await this._productService.get({
+                    Ids: arrayOfIds[i],
+                    Detail: true,
+                    AlwaysShowDiscount: alwaysShowDiscount ? true : false,
+                    Truncate: true
+                });
+                Array.prototype.push.apply(products, prods);
+            }
+            for (let i = 0; i < products.length; i++){
+                let prod = products[i];
+                delete prod_list[prod.Id];
+                let course = course_list[prod.Id];
+                this._setPriceByProd(course, prod)
+                let res = result[course.Id] = {
+                    courseId: course.Id,
+                    IsPaid: course.IsPaid,
+                    Price: course.Price,
+                    DPrice: course.DPrice,
+                    IsSubsFree: course.IsSubsFree,
+                    ProductId: course.ProductId
+                };
+                if (course.Discount)
+                    res.Discount = course.Discount;
+                if (course.DynDiscounts)
+                    res.DynDiscounts = course.DynDiscounts;
+            }
+            if (withCheckProd) {
+                let missing_prods = Object.keys(prod_list);
+                if (missing_prods.length > 0)
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND,
+                        `Can't find products = [${missing_prods.join()}] of paid courses.`);
+            }
+        }
+        return result;
+    }
+
     async getCoursePrice(course, withCheckProd, alwaysShowDiscount) {
         course.Price = 0;
         course.DPrice = 0;
@@ -1740,6 +1810,8 @@ const DbCourse = class DbCourse extends DbObject {
             result.ProductId = course.ProductId;
         if (course.Discount)
             result.Discount = course.Discount;
+        if (course.DynDiscounts)
+            result.DynDiscounts = course.DynDiscounts;
         return result;
     }
 

@@ -41,7 +41,7 @@ const GET_PROD_DETAIL_MSSQL =
     "  p.[ProductTypeId], pt.[Code] as [TypeCode], pt.[ExtFields] as [TpExt], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
     "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription],\n" +
-    "  d.[Id] as [DiscountId], d.[DiscountTypeId], d.[Code] as [DCode], d.[TtlHours]\n" +
+    "  d.[Id] as [DiscountId], d.[DiscountTypeId], d.[Code] as [DCode], d.[TtlMinutes]\n" +
     "from[Product] p\n" +
     "  join[ProductType] pt on pt.[Id] = p.[ProductTypeId]\n" +
     "  join[Price] pr on pr.[ProductId] = p.[Id]\n" +
@@ -63,7 +63,7 @@ const GET_PROD_DETAIL_MYSQL =
     "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, pt.`ExtFields` as `TpExt`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
     "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`,\n" +
-    "  d.`Id` as `DiscountId`, d.`DiscountTypeId`, d.`Code` as `DCode`, d.`TtlHours`\n" +
+    "  d.`Id` as `DiscountId`, d.`DiscountTypeId`, d.`Code` as `DCode`, d.`TtlMinutes`\n" +
     "from`Product` p\n" +
     "  join`ProductType` pt on pt.`Id` = p.`ProductTypeId`\n" +
     "  join`Price` pr on pr.`ProductId` = p.`Id`\n" +
@@ -168,7 +168,7 @@ const DbProduct = class DbProduct extends DbObject {
                                     codes.push("'" + element + "'");
                                 });
                                 if (codes.length === 0)
-                                    throw new Error(`Invalid parameter "codes": ${opts.Codes}.`);
+                                    throw new Error(`Invalid parameter "Codes": ${opts.Codes}.`);
                             }
                             else {
                                 if (!Array.isArray(opts.Codes))
@@ -266,7 +266,7 @@ const DbProduct = class DbProduct extends DbObject {
                             delete curr_prod.DiscountId;
                             delete curr_prod.DiscountTypeId;
                             delete curr_prod.DCode;
-                            delete curr_prod.TtlHours;
+                            delete curr_prod.TtlMinutes;
                             curr_prod.DynDiscounts = {};
                             products.push(curr_prod);
                         }
@@ -278,7 +278,7 @@ const DbProduct = class DbProduct extends DbObject {
                                         DiscountTypeId: elem.DiscountTypeId,
                                         Description: elem.DDescription,
                                         Perc: elem.Perc,
-                                        TtlHours: elem.TtlHours,
+                                        TtlMinutes: elem.TtlMinutes,
                                         FirstDate: elem.FirstDate,
                                         LastDate: elem.LastDate,
                                         DPrice: calcDPrice(elem.Price, elem.Perc)
@@ -386,8 +386,8 @@ const DbProduct = class DbProduct extends DbObject {
 
         switch (discount.DiscountTypeId) {
             case Product.DiscountTypes.DynCoursePercId:
-                if ((!discount.TtlHours) || (typeof (discount.TtlHours) !== "number") || (isNaN(discount.TtlHours)) || (discount.TtlHours <= 0))
-                    throw new Error(`Invalid discount: "${discount.TtlHours}".`);
+                if ((!discount.TtlMinutes) || (typeof (discount.TtlMinutes) !== "number") || (isNaN(discount.TtlMinutes)) || (discount.TtlMinutes <= 0))
+                    throw new Error(`Invalid discount: "${discount.TtlMinutes}".`);
                 break;
         }
 
@@ -472,14 +472,14 @@ const DbProduct = class DbProduct extends DbObject {
                     let upd_item = dyn_list[p.id()];
                     if (upd_item) {
                         if ((p.priceListId() !== upd_item.PriceListId) || (p.perc() !== upd_item.Perc) ||
-                            (p.description() !== upd_item.Description) || (p.code() !== upd_item.Code) || (p.ttlHours() !== upd_item.TtlHours) ||
+                            (p.description() !== upd_item.Description) || (p.code() !== upd_item.Code) || (p.ttlMinutes() !== upd_item.TtlMinutes) ||
                             (Math.abs(p.firstDate() - upd_item.FirstDate) > 500) || (Math.abs(p.lastDate() - upd_item.LastDate) > 500)) {
                             
                             p.priceListId(upd_item.PriceListId);
                             p.perc(upd_item.Perc);
                             p.description(upd_item.Description);
                             p.code(upd_item.Code);
-                            p.ttlHours(upd_item.TtlHours);
+                            p.ttlMinutes(upd_item.TtlMinutes);
                             p.firstDate(upd_item.FirstDate);
                             p.lastDate(upd_item.LastDate);
                             upd_flag = true;

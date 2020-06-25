@@ -5,7 +5,7 @@
 exports.upgradeDb = async (schema) => {
     schema.getModel("Discount")
         .addField("Code", { type: "string", length: 50, allowNull: true })
-        .addField("TtlHours", { type: "int", allowNull: true });
+        .addField("TtlMinutes", { type: "int", allowNull: true });
 };
 
 exports.scriptUpgrade = async (options) => {
