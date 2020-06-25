@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import './../controls.sass'
 import InputMask from 'react-input-mask';
 
-const EMPTY_VALUE = "••",
+export const LAST_UNIT = {SECOND : "SECOND", MINUTES: "MINUTES", HOURS: "HOURS"}
+
+const EMPTY_VALUE = ["••", "•0", "0•"],
     MASK_CHAR = "•",
-    MASK = "99 ч. 99 мин. 99 сек."
+    MASK_WITH_SECONDS = "99 ч. 99 мин. 99 сек.",
+    MASK_WITH_MINUTES = "99 ч. 99 мин."
 
 export default class TimeInput extends React.Component {
 
@@ -14,8 +17,13 @@ export default class TimeInput extends React.Component {
         type: PropTypes.string,
         label: PropTypes.string,
         placeholder: PropTypes.string,
-        extClass: PropTypes.string
+        extClass: PropTypes.string,
+        lastUnit: PropTypes.string
     };
+
+    static defaultProps = {
+        lastUnit: LAST_UNIT.SECOND
+    }
 
     constructor(props) {
         super(props)
@@ -36,7 +44,7 @@ export default class TimeInput extends React.Component {
     }
 
     render() {
-        const {meta: {error, touched}, id, label, placeholder, disabled, hidden, extClass,} = this.props;
+        const {meta: {error, touched}, id, label, placeholder, disabled, hidden, extClass, lastUnit} = this.props;
         const _errorText = touched && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
@@ -48,7 +56,7 @@ export default class TimeInput extends React.Component {
                 <div className={"field-wrapper__editor-wrapper time-input"}>
                     <InputMask value={this.state.textValue}
                                disabled={disabled}
-                               mask={MASK}
+                               mask={(lastUnit === LAST_UNIT.SECOND) ? MASK_WITH_SECONDS : MASK_WITH_MINUTES}
                                maskChar={MASK_CHAR}
                                className={_inputClass}
                                placeholder={placeholder}
@@ -61,11 +69,11 @@ export default class TimeInput extends React.Component {
     }
 
     _onChange = (event) => {
-        this.setState({textValue : _lightCheck(event.target.value)})
+        this.setState({textValue : _lightCheck(event.target.value, this.props.lastUnit)})
     }
 
     _onBlur(event) {
-        let _value = _tryParseValue(event.target.value)
+        let _value = _tryParseValue(event.target.value, this.props.lastUnit)
 
         if (_value !== undefined) {
             this.props.input.onChange(_value)
@@ -81,28 +89,28 @@ export default class TimeInput extends React.Component {
 
 
 
-const _lightCheck = (textValue) => {
+const _lightCheck = (textValue, lastUnit) => {
     let hours = textValue.substring(0, 2),
         minutes = textValue.substring(6, 8),
-        seconds = textValue.substring(14, 16)
+        seconds = (lastUnit === LAST_UNIT.SECOND) ? textValue.substring(14, 16) : "00"
 
     minutes = minutes.includes(MASK_CHAR) ? minutes : (+minutes > 59) ? "59" : minutes
     seconds = seconds.includes(MASK_CHAR) ? seconds : (+seconds > 59) ? "59" : seconds
 
-    return `${hours} ч. ${minutes} мин. ${seconds} сек.`
+    return (lastUnit === LAST_UNIT.SECOND) ? `${hours} ч. ${minutes} мин. ${seconds} сек.` : `${hours} ч. ${minutes} мин.`
 }
 
 const _convertToInt = (value) => {
-    return (value === EMPTY_VALUE) ?
+    return EMPTY_VALUE.some(item => item === value) ?
         0
         :
-        isNaN(+value) ? undefined : +value
+        isNaN(+value.replace(/•/g, "0")) ? undefined : +value.replace(/•/g, "0")
 }
 
-const _tryParseValue = (textValue) => {
+const _tryParseValue = (textValue, lastUnit) => {
     let hours = _convertToInt(textValue.substring(0, 2)),
         minutes = _convertToInt(textValue.substring(6, 8)),
-        seconds = _convertToInt(textValue.substring(14, 16))
+        seconds = (lastUnit === LAST_UNIT.SECOND) ? _convertToInt(textValue.substring(14, 16)) : 0
 
     if ((hours === undefined) || (minutes === undefined) || (seconds === undefined)) {
         return undefined

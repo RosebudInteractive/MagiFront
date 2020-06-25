@@ -14,6 +14,7 @@ import BottomControls from "../../bottom-contols/buttons";
 import PropTypes from "prop-types";
 import {TextBox} from "../../common/input-controls";
 import Datepicker from "../../common/date-time-control";
+import TimeInput, {LAST_UNIT} from "../../common/masked-controls/time-input";
 
 const EDITOR_NAME = "DiscountEditor"
 
@@ -40,7 +41,7 @@ class DiscountEditorForm extends React.Component {
             this.props.initialize({
                 Code: discount.Code,
                 Perc: discount.Perc,
-                TtlMinutes: discount.TtlMinutes,
+                TotalTime: discount.TtlMinutes * 60,
                 FirstDate: discount.FirstDate,
                 LastDate: discount.LastDate,
                 Description: discount.Description,
@@ -62,11 +63,11 @@ class DiscountEditorForm extends React.Component {
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
                         <div className="controls-wrapper no-tabs-form">
+                            <Field component={Datepicker} name="FirstDate" label="Начало действия" showTime={true} disabled={false}/>
+                            <Field component={Datepicker} name="LastDate" label="Окончание действия" showTime={true} disabled={false}/>
                             <Field component={TextBox} name="Code" label="Код скидки"/>
                             <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={false}/>
-                            <Field component={TextBox} name="TtlMinutes" label="Время жизни, минут" placeholder="Введите значение" disabled={false}/>
-                            <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={false}/>
-                            <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={false}/>
+                            <Field component={TimeInput} name="TotalTime" label="Время жизни скидки" lastUnit={LAST_UNIT.MINUTES} placeholder="Введите значение" disabled={false}/>
                             <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание"/>
                         </div>
                     </form>
@@ -83,7 +84,7 @@ class DiscountEditorForm extends React.Component {
         let {editorValues, discount} = this.props
 
         if (this.props.onSave) {
-            this.props.onSave({...editorValues, id: discount.id, Id: discount.Id,})
+            this.props.onSave({...editorValues, id: discount.id, Id: discount.Id, TtlMinutes: Math.round(editorValues.TotalTime / 60)})
         }
     }
 

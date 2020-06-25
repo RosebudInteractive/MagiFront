@@ -134,7 +134,7 @@ export default class CourseDiscounts {
             let _discounts = {}
 
             Object.entries(discounts).forEach(([code, data]) => {
-                if (moment.utc(data.lastDate).isAfter()) {
+                if (moment.utc(data.lastDate).isAfter() || moment.utc(data.expireDate).isAfter()) {
                     _discounts[code] = data
                 }
             })
