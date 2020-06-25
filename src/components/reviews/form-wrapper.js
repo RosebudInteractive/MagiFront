@@ -91,7 +91,7 @@ class ReviewEditorForm extends React.Component {
     render() {
         const {hasChanges} = this.props;
 
-        return <div className="editor course_editor">
+        return <div className="editor review_editor">
             <div className="editor__main-area">
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>

@@ -10,6 +10,7 @@ import './subcription-tab.sass'
 import {bindActionCreators} from "redux";
 import moment from 'moment'
 import {billingModeSelector, enableButtonsSelector} from "adm-ducks/app";
+import DiscountGrid from "../grids/discounts";
 
 const NON_CONDITIONALLY = 1,
     FREE_FOR_REG_USER = 2,
@@ -25,7 +26,29 @@ class CourseSubscriptionForm extends React.Component {
         visible: PropTypes.bool,
     }
 
-    componentDidMount() {
+    constructor(props) {
+        super(props)
+
+        this._resizeHandler = () => {
+            let _main = $('.main-area__container'),
+                _rightPadding = 20;
+
+            if (_main) {
+                const _hasScrollBar = _main.get(0).scrollHeight > _main.height()
+                _rightPadding = _hasScrollBar ? 20 : 2
+            }
+
+            let _discounts = window.$$('course-dyn-discounts'),
+                _width = $('.editor__main-area').width() - _rightPadding
+
+            if (_discounts) {
+                _discounts.$setSize(_width, _discounts.height);
+            }
+        }
+    }
+
+    componentWillMount() {
+        $(window).bind('resize', this._resizeHandler)
         this._init()
     }
 
@@ -53,7 +76,30 @@ class CourseSubscriptionForm extends React.Component {
                         :
                         course.PaidRegDate
                     :
-                    ''
+                    '',
+                _dynDiscounts = course.DynDiscounts ? Object.entries(course.DynDiscounts).reduce((acc, [key, value]) => {
+                    let _data = {Code: key, ...value}
+
+                    _data.FirstDate = _data.FirstDate ? typeof _data.FirstDate === 'string' ?
+                            moment(new Date(_data.FirstDate))
+                            :
+                            _data.FirstDate
+                        :
+                        ''
+
+                    _data.LastDate = _data.LastDate ? typeof _data.LastDate === 'string' ?
+                            moment(new Date(_data.LastDate))
+                            :
+                            _data.LastDate
+                        :
+                        ''
+
+                    _data.id = _data.Id
+
+                        acc.push(_data)
+                        return acc
+                    }, []) : []
+
 
 
 
@@ -69,15 +115,21 @@ class CourseSubscriptionForm extends React.Component {
                 Perc: course.Discount ? course.Discount.Perc : '',
                 FirstDate: _firstDate,
                 LastDate: _lastDate,
+                DynDiscounts: _dynDiscounts
             });
         }
     }
 
     componentWillUnmount() {
         this.props.reset();
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     componentDidUpdate(prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            this._resizeHandler();
+        }
+
         if (prevProps.courseSaving && !this.props.courseSaving && !this.props.courseError) {
             this.props.destroy();
             this._init()
@@ -107,7 +159,7 @@ class CourseSubscriptionForm extends React.Component {
             _enableSubscription = !!billingMode.subscription
 
         return <div className={"form-wrapper non-webix-form" + (visible ? '' : ' hidden')}>
-            <form className="controls-wrapper course-subscription-tab">
+            <form className="controls-wrapper course-subscription-tab" action={"javascript:void(0)"}>
                 <Field component={CheckBox} name="IsPaid" label="Платный" disabled={_disabled}/>
                 <Field component={Select} name="PaidTp" label="Тип платности" placeholder="Выберите тип" disabled={_disabled || !isPaid} options={PAID_TYPE_OPTIONS}/>
                 <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после" showTime={true} hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
@@ -124,6 +176,7 @@ class CourseSubscriptionForm extends React.Component {
                     <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid || _disabled}/>
                     <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid || _disabled}/>
                 </div>
+                <Field component={DiscountGrid} name="DynDiscounts" editMode={this.props.editMode}/>
             </form>
         </div>
     }

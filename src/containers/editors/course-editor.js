@@ -266,6 +266,7 @@ class CourseEditor extends React.Component {
             EstDuration: layoutVer2Values.estDuration,
             LandCover: layoutVer2Values.cover.file,
             LandCoverMeta: layoutVer2Values.cover.meta,
+            DynDiscounts: this._convertDynDiscounts(subscriptionValues.DynDiscounts)
         };
 
 
@@ -352,6 +353,19 @@ class CourseEditor extends React.Component {
 
     _sendEmail() {
         this.props.sendEmail(this.props.courseId)
+    }
+
+    _convertDynDiscounts(discounts) {
+        if (discounts.length === 0) {return null}
+
+        let _result = {}
+
+        discounts.forEach((item) => {
+            _result[item.Code] = item
+            _result[item.Code].Perc = +item.Perc
+        })
+
+        return _result
     }
 }
 
