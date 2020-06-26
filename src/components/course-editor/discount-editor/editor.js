@@ -22,7 +22,7 @@ class DiscountEditor extends React.Component {
     render() {
         return <div className="dlg">
             <div className="dlg-bg"/>
-            <div className={"modal-editor question-editor" + (this.props.scrollable ? " scrollable" : "")}>
+            <div className={"modal-editor discount-editor" + (this.props.scrollable ? " scrollable" : "")}>
                 <div className={"scroll-button button-prev" + (!this.props.onPrevClick || !this.props.editorValid  ? " disabled" : "")} onClick={::this._onPrevClick}/>
                 <div className="modal-editor__wrapper">
                     <button type="button" className="modal-editor__close" onClick={::this._close}>Закрыть</button>
@@ -40,7 +40,7 @@ class DiscountEditor extends React.Component {
         let {editorValues, hasChanges, editorValid, data} = this.props
 
         if (hasChanges && editorValid) {
-            this.props.save({...editorValues, Number: data.Number, id: data.id, Id: data.Id})
+            this.props.save({...editorValues, id: data.id, Id: data.Id})
         }
     }
 

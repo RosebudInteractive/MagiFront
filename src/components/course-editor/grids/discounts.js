@@ -189,7 +189,9 @@ class CourseDiscounts extends GridControl {
             {id: 'Perc', header: 'Скидка, %', width: 100, format: function (value) {
                     return `${value}%`
                 }},
-            {id: 'TtlMinutes', header: 'Длительность, ч', width: 150,},
+            {id: 'TtlMinutes', header: 'Длительность', width: 150, format: function (value) {
+                    return `${Math.round(value / 60)} ч. ${(value % 60)} мин.`
+                }},
             {id: 'LastDate', header: 'Дата окончания', width: 150, format: this._formatDate},
             {id: 'Description', header: 'Описание', fillspace: true,},
         ];
