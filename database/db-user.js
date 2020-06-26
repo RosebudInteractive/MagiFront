@@ -13,6 +13,7 @@ const { splitArray } = require('../utils');
 const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
 const { EpisodeContentType } = require('../const/sql-req-common');
+const { ProductService } = require('./db-product');
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
@@ -403,20 +404,20 @@ const GET_COURSES_FOR_SALE_MSSQL =
     "from [Discount] d\n" +
     "  join [Product] p on p.[Id] = d.[ProductId]\n" +
     "  join [Course] c on c.[ProductId] = p.[Id]\n" +
-    "where ((d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
+    "where (d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
     "  and ((d.[LastDate] > convert(datetime, '<%= dt %>')) or (d.[LastDate] is NULL))\n" +
-    "  and (d.[DiscountTypeId] = 2) and (d.[UserId] is NULL))<%= where_dyn %>";
-const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (d.[Code] in (<%= codes %>)) and (d.[UserId] is NULL))";
+    "  and (d.[UserId] is NULL) and ((d.[DiscountTypeId] = 2)<%= where_dyn %>)";
+const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (d.[Code] in (<%= codes %>)))";
     
 const GET_COURSES_FOR_SALE_MYSQL =
     "select distinct c.`Id`\n" +
     "from `Discount` d\n" +
     "  join `Product` p on p.`Id` = d.`ProductId`\n" +
     "  join `Course` c on c.`ProductId` = p.`Id`\n" +
-    "where ((d.`FirstDate` <= '<%= dt %>')\n" +
+    "where (d.`FirstDate` <= '<%= dt %>')\n" +
     "  and ((d.`LastDate` > '<%= dt %>') or (d.`LastDate` is NULL))\n" +
-    "  and (d.`DiscountTypeId` = 2) and (d.`UserId` is NULL))<%= where_dyn %>";
-const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (d.`Code` in (<%= codes %>)) and (d.`UserId` is NULL))";
+    "  and (d.`UserId` is NULL) and ((d.`DiscountTypeId` = 2)<%= where_dyn %>)";
+const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (d.`Code` in (<%= codes %>)))";
 
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
@@ -438,6 +439,7 @@ const DbUser = class DbUser extends DbObject {
         super(opts);
         this._usersCache = UsersCache();
         this._coursesService = CoursesService();
+        this._productService = ProductService();
         this._stat_settings = _.defaultsDeep(config.statistics ? config.get('statistics') : {}, DFLT_STAT_OPTIONS);
         if (typeof (this._stat_settings.srcList) === "undefined")
             this._stat_settings.srcList = DFLT_SRC_LIST;
@@ -762,8 +764,16 @@ const DbUser = class DbUser extends DbObject {
             }
             let order = 0;
             arr.forEach(element => {
-                codes.push(`'${element}'`);
-                dyn_codes[element] = ++order;
+                let arr_code = element.split(':');
+                let code = arr_code[0];
+                let code_elem = { order: ++order };
+                if (arr_code.length === 2) {
+                    let perc = parseFloat(arr_code[1]);
+                    if (!isNaN(perc))
+                        code_elem.perc = perc;
+                }
+                codes.push(`'${code}'`);
+                dyn_codes[code] = code_elem;
             });
             if (codes.length === 0)
                 throw new Error(`Parameter "Codes" is empty.`);
@@ -788,7 +798,7 @@ const DbUser = class DbUser extends DbObject {
         if (course_ids.length > 0) {
             let arrayOfIds = splitArray(course_ids, MAX_COURSES_REQ_NUM);
             let { Courses: courses } = await this._getCoursesByIds(user,
-                { Courses: [] }, arrayOfIds, isAbsPath, dLink, null, { alwaysShowDiscount: true });
+                { Courses: [] }, arrayOfIds, isAbsPath, dLink, null, { alwaysShowDiscount: false });
             let other = [];
             let dynamic = [];
             for (let i = 0; i < courses.length; i++){
@@ -804,9 +814,12 @@ const DbUser = class DbUser extends DbObject {
                     let curr_dyn_code = null;
                     for (let j = 0; j < keys.length; j++) {
                         let code = keys[j];
-                        if (dyn_codes[code]) {
+                        let dsc_elem = dyn_codes[code];
+                        if (dsc_elem) {
                             let discount = course.DynDiscounts[code];
-                            if (discount.Perc > curr_perc) {
+                            let perc = dsc_elem.perc ? dsc_elem.perc : discount.Perc;
+                            let recalcDPrice = perc !== discount.Perc ? true : false;
+                            if (perc > curr_perc) {
                                 if (curr_dyn_code)
                                     delete course.DynDiscounts[curr_dyn_code]
                                 else {
@@ -814,9 +827,11 @@ const DbUser = class DbUser extends DbObject {
                                     has_discount = false;
                                 }
                                 curr_dyn_code = code;
-                                curr_perc = discount.Perc;
-                                course.DPrice = discount.DPrice;
+                                curr_perc = perc;
                                 has_dyn_discount = true;
+                                if (recalcDPrice)
+                                    discount.DPrice = this._productService.calcDPrice(course.Price, perc, true);
+                                course.DPrice = discount.DPrice;
                             }
                             else
                                 delete course.DynDiscounts[code];
@@ -840,7 +855,7 @@ const DbUser = class DbUser extends DbObject {
                         let order_a = dyn_codes[keys_a[0]];
                         let order_b = dyn_codes[keys_b[0]];
                         if (order_a && order_b)
-                            result = order_a - order_b;
+                            result = order_a.order - order_b.order;
                     }
                     return result;
                 })

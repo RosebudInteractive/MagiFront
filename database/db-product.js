@@ -100,6 +100,25 @@ const DbProduct = class DbProduct extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
+    calcDPrice(price, perc, truncate) {
+        let dprice = price * (1 - perc / 100);
+        let prec = Accounting.SumPrecision;
+        let trunc_flag = (truncate === "true") || (truncate === true) ? true : false;
+        let isDone = false;
+        if (trunc_flag) {
+            dprice = Math.trunc(dprice / 10) * 10;
+            isDone = true;
+        }
+        else {
+            let p = +opts.Prec;
+            if ((typeof (p) === "number") && (!isNaN(p)))
+                prec = p;
+        }
+        if (!isDone)
+            dprice = roundNumber(dprice, prec);
+        return dprice;
+    }
+
     get(options) {
         let opts = options || {};
         let dbOpts = opts.dbOptions || {};
@@ -222,23 +241,6 @@ const DbProduct = class DbProduct extends DbObject {
             resolve($data.execSql(sql, dbOpts));
         })
             .then(result => {
-                let calcDPrice = (price, perc) => {
-                    let dprice = price * (1 - perc / 100);
-                    let prec = Accounting.SumPrecision;
-                    let isDone = false;
-                    if ((opts.Truncate === "true") || (opts.Truncate === true)) {
-                        dprice = Math.trunc(dprice / 10) * 10;
-                        isDone = true;
-                    }
-                    else {
-                        let p = +opts.Prec;
-                        if ((typeof (p) === "number") && (!isNaN(p)))
-                            prec = p;
-                    }
-                    if (!isDone)
-                        dprice = roundNumber(dprice, prec);
-                    return dprice;
-                };
                 if (result && result.detail && (result.detail.length > 0)) {
                     let prod_list = {};
                     result.detail.forEach(elem => {
@@ -281,7 +283,7 @@ const DbProduct = class DbProduct extends DbObject {
                                         TtlMinutes: elem.TtlMinutes,
                                         FirstDate: elem.FirstDate,
                                         LastDate: elem.LastDate,
-                                        DPrice: calcDPrice(elem.Price, elem.Perc)
+                                        DPrice: this.calcDPrice(elem.Price, elem.Perc, opts.Truncate)
                                     }
                             }
                             else {
@@ -293,7 +295,7 @@ const DbProduct = class DbProduct extends DbObject {
                                     FirstDate: elem.FirstDate,
                                     LastDate: elem.LastDate
                                 };
-                                curr_prod.DPrice = calcDPrice(elem.Price, d.Perc);
+                                curr_prod.DPrice = this.calcDPrice(elem.Price, d.Perc, opts.Truncate);
                             }
                         }
                     });
@@ -452,6 +454,8 @@ const DbProduct = class DbProduct extends DbObject {
             let dyn_list = {};
             let dyn_new = [];
             for (let key in dyn_discount) {
+                if (key.indexOf(":") !== -1)
+                    throw new Error(`Dynamic discount code "${key}" containts symbol ":".`);
                 let dscnt = _.defaultsDeep(dyn_discount[key], { Code: key, PriceListId: Product.DefaultPriceListId });
                 dscnt.DiscountTypeId = Product.DiscountTypes.DynCoursePercId;
                 dscnt.Description = typeof (dscnt.Description) === "string" ? dscnt.Description : null;
