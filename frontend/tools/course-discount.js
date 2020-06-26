@@ -23,23 +23,31 @@ export default class CourseDiscounts {
 
     static getActualPriceAndDiscount(course) {
         if (!(course && (course.IsPaid && !course.IsGift && !course.IsBought))) {
-            return 0
+            return {
+                hasDiscount: false,
+                price: 0,
+                percent: 0,
+                dynamicDiscount: false
+            }
         }
 
         let _dynamicDiscount = this.getActiveDynamicDiscount({course: course})
         if (_dynamicDiscount) {
-            course.activePersonalDiscount = _dynamicDiscount
+            const _percent = _dynamicDiscount.percent
+
             return {
                 hasDiscount: true,
-                price: course.DynDiscounts[course.activePersonalDiscount.code].DPrice,
-                perc: course.DynDiscounts[course.activePersonalDiscount.code].Perc
+                price: Math.trunc((course.Price * (1 - _percent / 100))/ 10) * 10,
+                percent: _percent,
+                dynamicDiscount: true
             }
         } else {
             let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc
             return {
                 hasDiscount: _hasDiscount,
                 price: _hasDiscount ? course.DPrice : course.Price,
-                perc: _hasDiscount ? course.Discount.Perc : 0
+                percent: _hasDiscount ? course.Discount.Perc : 0,
+                dynamicDiscount: false
             }
         }
 
@@ -91,7 +99,8 @@ export default class CourseDiscounts {
 
             try {
                 let _inDateRange = moment.utc(_serverDiscount.FirstDate).isBefore() &&
-                    moment.utc(_serverDiscount.LastDate).isAfter()
+                    moment.utc(_serverDiscount.LastDate).isAfter() &&
+                    moment.utc().add(+_serverDiscount.TtlMinutes, "m").isBefore(moment.utc(_serverDiscount.LastDate))
 
                 if (!_inDateRange) return
 
@@ -104,7 +113,10 @@ export default class CourseDiscounts {
                     _price = _activeDiscount ? _courseDiscounts[_activeDiscount.code].price : course.DPrice
 
                 if (_serverDiscount.DPrice < _price) {
-                    let _expDate = moment.utc().add(+_serverDiscount.TtlMinutes, "m")
+                    let _exprDate = moment.utc().add(+_serverDiscount.TtlMinutes, "m"),
+                        _currentExprDate = _activeDiscount ? moment.utc(_activeDiscount.expireDate) : null
+
+                    _exprDate = (_currentExprDate && _currentExprDate.isAfter(_exprDate)) ? _currentExprDate : _exprDate
 
                     if (!_courseDiscounts) {
                         this.localDiscounts[course.Id] = {}
@@ -114,7 +126,7 @@ export default class CourseDiscounts {
                     _courseDiscounts[discountCode] = {
                         perc: +_serverDiscount.Perc,
                         price: +_serverDiscount.DPrice,
-                        expireDate: _expDate,
+                        expireDate: _exprDate,
                         firstDate: _serverDiscount.FirstDate,
                         lastDate: _serverDiscount.LastDate,
                     }
@@ -160,7 +172,7 @@ export default class CourseDiscounts {
             }
         })
 
-        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate} : null
+        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate, percent: discounts[_currentCode].perc} : null
     }
 }
 

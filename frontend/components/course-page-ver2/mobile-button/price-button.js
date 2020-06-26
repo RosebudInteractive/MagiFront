@@ -13,13 +13,20 @@ import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
 import {getCurrencySign} from "../../../tools/page-tools";
+import CourseDiscounts from "tools/course-discount";
 
 const CROWN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
+
+const REFRESH_INTERVAL = 60 * 1000
 
 class PriceButton extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+    }
+
+    componentWillUnmount() {
+        clearInterval(this._timer)
     }
 
     render() {
@@ -34,33 +41,21 @@ class PriceButton extends React.Component {
             return null
         }
 
-        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc || course.activePersonalDiscount,
-            _price = _hasDiscount ?
-                course.activePersonalDiscount ?
-                    course.DynDiscounts[course.activePersonalDiscount.code].DPrice
-                    :
-                    course.DPrice
-                :
-                0,
-            _percent = _hasDiscount ?
-                course.activePersonalDiscount ?
-                    course.DynDiscounts[course.activePersonalDiscount.code].Perc
-                    :
-                    course.Discount.Perc
-                :
-                0,
+        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount(course),
             _disabled = loading && (+loadingCourseId === course.Id)
+
+        this._toggleDiscountRefreshTimer(dynamicDiscount)
 
         return <div className="mobile-button _price-block btn btn--brown">
                 <div className="price-button__crown">
                     <svg className="course-module__label-icon" width="18" height="18" fill="#FFF" dangerouslySetInnerHTML={{__html: CROWN}}/>
                 </div>
-                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`Купить ${_price + _currency} `}</div>
+                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`Купить ${price + _currency} `}</div>
                 <div className="course-module__price-block-section">
                     {
-                        _hasDiscount ?
+                        hasDiscount ?
                             <React.Fragment>
-                                <div className="course-module__price"><span className="discount">{`-${_percent}%`}</span></div>
+                                <div className="course-module__price"><span className="discount">{`-${percent}%`}</span></div>
                                 <div className="course-module__old-price">{course.Price + _currency}</div>
                             </React.Fragment>
                             :
@@ -68,6 +63,19 @@ class PriceButton extends React.Component {
                     }
                 </div>
         </div>
+    }
+
+    _toggleDiscountRefreshTimer(dynamicDiscount) {
+        if (dynamicDiscount) {
+            if (!this._timer) {
+                this._timer = setInterval(() => {this.forceUpdate()}, REFRESH_INTERVAL)
+            }
+        } else {
+            if (this._timer) {
+                clearInterval(this._timer)
+                this._timer = null
+            }
+        }
     }
 
     _onClick() {

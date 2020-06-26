@@ -8,7 +8,7 @@ import $ from "jquery";
 import GiftButton from "../../billing/gift-button";
 import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 
-const INTERVAL = 60 * 1000
+const REFRESH_INTERVAL = 60 * 1000
 
 class MobileButton extends React.Component {
 
@@ -26,24 +26,8 @@ class MobileButton extends React.Component {
         $(window).on('resize', ::this._resizeHandler)
     }
 
-    componentDidMount() {
-        const {course,} = this.props
-
-        if (course.activePersonalDiscount) {
-            this._timer = setInterval(() => {
-                    let _discount = CourseDiscounts.getActiveDynamicDiscount({course: course})
-
-                    course.activePersonalDiscount = _discount
-                    this.forceUpdate()
-                    if (!_discount) clearInterval(this._timer)
-                },
-                INTERVAL)
-        }
-    }
-
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler);
-        clearInterval(this._timer)
     }
 
     render() {
@@ -53,7 +37,7 @@ class MobileButton extends React.Component {
             return null
         }
 
-        const _style = cookiesConfirmed ? null : {marginBottom : this._getMarginBottom()}
+        const _style = cookiesConfirmed ? null : {marginBottom: this._getMarginBottom()}
 
         const _showPriceButton = course.IsPaid && !course.IsGift && !course.IsBought
 
@@ -80,32 +64,68 @@ class MobileButton extends React.Component {
     }
 }
 
-const DiscountTitle = (props) => {
-    const {course} = props,
-        _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-        _description = course.activePersonalDiscount
-            ?
-            <div className="discount-title__text font-universal__body-medium _main-dark">
-                {"Ваша персональная "}
-                <span className="discount-title__text font-universal__body-medium _red _bold">
-                    {course.DynDiscounts[course.activePersonalDiscount.code].Perc + "%"}
-                </span>
-                {" скидка активна еще "}
-                <span className="discount-title__text font-universal__body-medium _red _bold">
-                    {getExpireTitle(course.activePersonalDiscount.expireDate)}
-                </span>
-            </div>
-            :
-            _hasDiscount &&
-            <div className="discount-title__text font-universal__body-medium _main-dark">
-                {" " + course.Discount.Description}
-            </div>,
-        _hasDiscountDescr = !!_description
+class DiscountTitle extends React.Component {
 
-    return _hasDiscountDescr &&
-        <div className="discount-title">
-            {_description}
+    componentWillUnmount() {
+        clearInterval(this._timer)
+    }
+
+    render() {
+        const {course} = this.props,
+            _activeDynamicDiscount = CourseDiscounts.getActiveDynamicDiscount({course}),
+            _description = _activeDynamicDiscount
+                ?
+                <DynamicDiscountDescription expireDate={_activeDynamicDiscount.expireDate}
+                                            percent={_activeDynamicDiscount.percent}/>
+                :
+                <CommonDiscountDescription course={course}/>,
+            _hasDiscountDescr = !!_description
+
+        this._toggleDiscountRefreshTimer(_activeDynamicDiscount)
+
+        return _hasDiscountDescr &&
+            <div className="discount-title">
+                {_description}
+            </div>
+    }
+
+    _toggleDiscountRefreshTimer(dynamicDiscount) {
+        if (dynamicDiscount) {
+            if (!this._timer) {
+                this._timer = setInterval(() => {this.forceUpdate()}, REFRESH_INTERVAL)
+            }
+        } else {
+            if (this._timer) {
+                clearInterval(this._timer)
+                this._timer = null
+            }
+        }
+    }
+}
+
+const CommonDiscountDescription = (props) => {
+    const {course} = props,
+        _hasCommonDiscount = course.DPrice && course.Discount && course.Discount.Perc
+
+    return (_hasCommonDiscount && course.Discount.Description) ?
+        <div className="discount-title__text font-universal__body-medium _main-dark">
+            {" " + course.Discount.Description}
         </div>
+        :
+        null
+}
+
+const DynamicDiscountDescription = (props) => {
+    return <div className="discount-title__text font-universal__body-medium _main-dark">
+        {"Ваша персональная "}
+        <span className="discount-title__text font-universal__body-medium _red _bold">
+                    {props.percent + "%"}
+                </span>
+        {" скидка активна еще "}
+        <span className="discount-title__text font-universal__body-medium _red _bold">
+                    {getExpireTitle(props.expireDate)}
+                </span>
+    </div>
 }
 
 const mapStateToProps = (state) => {

@@ -14,6 +14,7 @@ import {
 
 import 'whatwg-fetch';
 import {parseReadyDate} from "tools/time-tools";
+import CourseDiscounts from "tools/course-discount";
 
 
 
@@ -129,6 +130,7 @@ const parseJSON = (response) => {
 };
 
 const handleData = (data) => {
+    (CourseDiscounts.activateDiscount({course: data.Course}))
     let _lesson = data;
 
     _lesson.courseUrl = data.Course.URL;

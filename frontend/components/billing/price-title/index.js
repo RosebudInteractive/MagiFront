@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {getCurrencySign} from "tools/page-tools";
+import CourseDiscounts from "tools/course-discount";
+
+const REFRESH_INTERVAL = 60 * 1000
 
 export default class PriceTitle extends React.Component {
 
@@ -8,36 +11,41 @@ export default class PriceTitle extends React.Component {
         course: PropTypes.object,
     }
 
+    componentWillUnmount() {
+        clearInterval(this._timer)
+    }
+
     render() {
         const {course,} = this.props,
             _currency = getCurrencySign()
 
-        let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc || course.activePersonalDiscount,
-            _price = _hasDiscount ?
-                course.activePersonalDiscount ?
-                    course.DynDiscounts[course.activePersonalDiscount.code].DPrice
-                    :
-                    course.DPrice
-                :
-                0,
-            _percent = _hasDiscount ?
-                course.activePersonalDiscount ?
-                    course.DynDiscounts[course.activePersonalDiscount.code].Perc
-                    :
-                    course.Discount.Perc
-                :
-                0
+        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount(course)
+
+        this._toggleDiscountRefreshTimer(dynamicDiscount)
 
         return <div className="course-module__price-block-section">
             {
-                _hasDiscount ?
+                hasDiscount ?
                     <React.Fragment>
-                        <p className="course-module__price">{_price + _currency + " "}<span className="discount">{`-${_percent}%`}</span></p>
+                        <p className="course-module__price">{price + _currency + " "}<span className="discount">{`-${percent}%`}</span></p>
                         <p className="course-module__old-price">{course.Price + _currency}</p>
                     </React.Fragment>
                     :
                     <p className="course-module__price">{course.Price + _currency}</p>
             }
         </div>
+    }
+
+    _toggleDiscountRefreshTimer(dynamicDiscount) {
+        if (dynamicDiscount) {
+            if (!this._timer) {
+                this._timer = setInterval(() => {this.forceUpdate()}, REFRESH_INTERVAL)
+            }
+        } else {
+            if (this._timer) {
+                clearInterval(this._timer)
+                this._timer = null
+            }
+        }
     }
 }

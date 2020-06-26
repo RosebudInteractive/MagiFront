@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {getExpireTitle} from "tools/course-discount";
+import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
+
+const REFRESH_INTERVAL = 60 * 1000
 
 export default class DiscountTitle extends React.Component {
 
@@ -8,29 +10,60 @@ export default class DiscountTitle extends React.Component {
         course: PropTypes.object,
     }
 
+    componentWillUnmount() {
+        clearInterval(this._timer)
+    }
+
     render() {
         const {course,} = this.props,
-            _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _description = course.activePersonalDiscount
+
+            _activeDynamicDiscount = CourseDiscounts.getActiveDynamicDiscount({course}),
+            _description = _activeDynamicDiscount
                 ?
-                <p className="course-module__price-block-info font-universal__body-large _main-dark">
-                    {"Ваша персональная скидка активна еще "}
-                    <span className="price-block-info_expire-date font-universal__body-large _red _bold">
-                        {getExpireTitle(course.activePersonalDiscount.expireDate)}
-                    </span>
-                </p>
+                <DynamicDiscountDescription expireDate={_activeDynamicDiscount.expireDate}/>
                 :
-                _hasDiscount &&
-                <p className="course-module__price-block-info font-universal__body-large _main-dark">
-                    {" " + course.Discount.Description}
-                </p>,
+                <CommonDiscountDescription course={course}/>,
             _hasDiscountDescr = !!_description
 
-        return _hasDiscountDescr ?
-                <div className="course-module__price-block-wrapper">
-                    {_description}
-                </div>
-                :
-                null
+        this._toggleDiscountRefreshTimer(_activeDynamicDiscount)
+
+        return _hasDiscountDescr &&
+            <div className="course-module__price-block-wrapper">
+                {_description}
+            </div>
     }
+
+    _toggleDiscountRefreshTimer(dynamicDiscount) {
+        if (dynamicDiscount) {
+            if (!this._timer) {
+                this._timer = setInterval(() => {this.forceUpdate()}, REFRESH_INTERVAL)
+            }
+        } else {
+            if (this._timer) {
+                clearInterval(this._timer)
+                this._timer = null
+            }
+        }
+    }
+}
+
+const CommonDiscountDescription = (props) => {
+    const {course} = props,
+        _hasCommonDiscount = course.DPrice && course.Discount && course.Discount.Perc
+
+    return (_hasCommonDiscount && course.Discount.Description) ?
+        <p className="course-module__price-block-info font-universal__body-large _main-dark">
+            {" " + course.Discount.Description}
+        </p>
+        :
+        null
+}
+
+const DynamicDiscountDescription = (props) => {
+    return <p className="course-module__price-block-info font-universal__body-large _main-dark">
+        {"Ваша персональная скидка активна еще "}
+        <span className="price-block-info_expire-date font-universal__body-large _red _bold">
+            {getExpireTitle(props.expireDate)}
+        </span>
+    </p>
 }

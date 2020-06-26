@@ -21,11 +21,11 @@ import CourseDiscounts from "tools/course-discount";
 
 export const getCourses = () => {
     return (dispatch, getState) => {
-        const _state = getState().courses
+        // const _state = getState().courses
 
-        if (!!_state.lastSuccessTime && ((Date.now() - _state.lastSuccessTime) < DATA_EXPIRATION_TIME)) {
-            return
-        }
+        // if (!!_state.lastSuccessTime && ((Date.now() - _state.lastSuccessTime) < DATA_EXPIRATION_TIME)) {
+        //     return
+        // }
 
         dispatch({
             type: GET_COURSES_REQUEST,
@@ -149,15 +149,8 @@ const handleCourses = (data, state) => {
     }
 };
 
-const handleCourse = (data, state, dispatch) => {
-    if (CourseDiscounts.activateDiscount({course: data})) {
-        dispatch()
-    }
-
-    const _discount = CourseDiscounts.getActiveDynamicDiscount({course: data})
-    if (_discount) {
-        data.activePersonalDiscount = {..._discount}
-    }
+const handleCourse = (data, state,) => {
+    (CourseDiscounts.activateDiscount({course: data}))
 
     try {
         if (data.CoverMeta && (typeof data.CoverMeta === "string")) {
