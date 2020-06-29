@@ -11982,14 +11982,12 @@ ul.lectures-tab {
     font-weight: 400;
     font-size: 14px;
     line-height: 19px;
+    padding-right: 6px;
     color: rgba(47, 47, 47, 0.6); }
     @media (max-width: 1399px) {
       .course-announce__progress-label {
         font-size: 13px;
         line-height: 19px; } }
-    @media (max-width: 899px) {
-      .course-announce__progress-label {
-        padding-right: 6px; } }
   .course-announce__progress-actual {
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 54px;

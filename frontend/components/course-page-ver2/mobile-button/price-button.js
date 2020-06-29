@@ -41,7 +41,7 @@ class PriceButton extends React.Component {
             return null
         }
 
-        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount(course),
+        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount({course}),
             _disabled = loading && (+loadingCourseId === course.Id)
 
         this._toggleDiscountRefreshTimer(dynamicDiscount)

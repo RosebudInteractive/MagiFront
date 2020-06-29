@@ -13,7 +13,7 @@ export default class Courses extends React.Component {
         super(props);
 
         this.state = {
-            coursesOpened: false,
+            coursesOpened: true,
         }
     }
 

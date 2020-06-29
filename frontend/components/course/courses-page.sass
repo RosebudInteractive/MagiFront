@@ -221,6 +221,7 @@
     .course-module__header
       margin-bottom: 0
       @media (max-width: 639px)
+        width: 100%
         padding-right: 0
 
     .course-module__label-icon
@@ -271,14 +272,17 @@
 
     .course-module__price-block
       margin-bottom: auto
+      @media (max-width: $tablet-width)
+        margin-top: 28px
       @media (max-width: 639px)
         width: auto
+        margin-top: 0
         margin-bottom: 0
         position: relative
 
     .course-module__price-block-wrapper.button-block
       @media (max-width: 639px)
-        margin-bottom: 18px
+        margin-bottom: 10px
 
     .course-module__price-btn
       @media (max-width: 899px)
@@ -292,6 +296,7 @@
       @media (max-width: $tablet-width)
         max-width: 235px
       @media (max-width: 639px)
+        max-width: unset
         margin-top: 0 !important
         padding-top: 0
         padding-bottom: 36px

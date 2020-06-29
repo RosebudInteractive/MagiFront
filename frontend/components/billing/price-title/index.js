@@ -19,7 +19,7 @@ export default class PriceTitle extends React.Component {
         const {course,} = this.props,
             _currency = getCurrencySign()
 
-        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount(course)
+        let {hasDiscount, price, percent, dynamicDiscount} = CourseDiscounts.getActualPriceAndDiscount({course})
 
         this._toggleDiscountRefreshTimer(dynamicDiscount)
 

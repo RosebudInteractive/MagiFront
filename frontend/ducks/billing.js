@@ -451,7 +451,7 @@ function* _getPaidCourseInfoSaga(data) {
             } else {
                 yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
 
-                let {price} = CourseDiscounts.getActualPriceAndDiscount(_course)
+                let {price} = CourseDiscounts.getActualPriceAndDiscount({course:_course, buyAsGift: _data.buyAsGift})
 
                 let _offer = {
                     Price: price,

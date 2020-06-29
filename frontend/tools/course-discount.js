@@ -21,8 +21,8 @@ export default class CourseDiscounts {
         this.loadFromStorage()
     }
 
-    static getActualPriceAndDiscount(course) {
-        if (!(course && (course.IsPaid && !course.IsGift && !course.IsBought))) {
+    static getActualPriceAndDiscount({course, buyAsGift}) {
+        if (!buyAsGift && !(course && (course.IsPaid && !course.IsGift && !course.IsBought))) {
             return {
                 hasDiscount: false,
                 price: 0,
