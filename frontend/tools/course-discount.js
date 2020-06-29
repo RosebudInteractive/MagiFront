@@ -72,6 +72,8 @@ export default class CourseDiscounts {
         } else {
             _discountsInStorage = JSON.parse(_discountsInStorage)
             this.localDiscounts = this._checkExpireDiscounts(_discountsInStorage,)
+
+            localStorage.setItem(KEY, JSON.stringify(this.localDiscounts))
         }
     }
 
@@ -151,7 +153,7 @@ export default class CourseDiscounts {
                 }
             })
 
-            if (Object.entries(discounts).length) {
+            if (Object.entries(_discounts).length) {
                 _result[courseId] = _discounts
             }
         })
@@ -179,11 +181,11 @@ export default class CourseDiscounts {
 export const getExpireTitle = (expireDate) => {
     let _minutes = getMinutesBetween(Date.now(), new Date(expireDate))
 
-    if (_minutes > 24 * 60) {
-        let _days = Math.round(_minutes / (24 * 60))
+    if (_minutes >= 48 * 60) {
+        let _days = Math.trunc(_minutes / (24 * 60))
         return _days + " " + getCountDaysTitle(_days)
-    } else if (_minutes > 60) {
-        let _hours = Math.round(_minutes / 60)
+    } else if (_minutes >= 60) {
+        let _hours = Math.trunc(_minutes / 60)
         return _hours + " " + getCountHoursTitle(_hours)
     } else {
         return _minutes ? _minutes + " " + _getCountMinutesTitle(_minutes) : "менее 1 минуты"

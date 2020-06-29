@@ -1,4 +1,5 @@
 export function registry() {
+
     if (!String.prototype.padStart) {
         String.prototype.padStart = function padStart(targetLength, padString) {
             targetLength = targetLength >> 0; //truncate if number or convert non-number to 0;
@@ -121,6 +122,13 @@ export function registry() {
         return x > 0 ? 1 : -1;
     }
 
+    if (!Math.trunc) {
+        Math.trunc = function(v) {
+            v = +v;
+            return (v - v % 1)   ||   (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
+        };
+    }
+
     if (!String.prototype.startsWith) {
         String.prototype.startsWith = function(search, pos) {
             return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
@@ -168,5 +176,16 @@ export function registry() {
         };
     }
 
+    if (!Object.entries) {
+        Object.entries = function( obj ){
+            var ownProps = Object.keys( obj ),
+                ownValues = Object.values(obj),
+                i = ownProps.length,
+                resArray = new Array(i); // preallocate the Array
+            while (i--)
+                resArray[i] = [ownProps[i], ownValues[i]];
 
+            return resArray;
+        };
+    }
 }
