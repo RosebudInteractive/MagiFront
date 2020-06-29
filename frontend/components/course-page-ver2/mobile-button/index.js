@@ -117,11 +117,11 @@ const CommonDiscountDescription = (props) => {
 
 const DynamicDiscountDescription = (props) => {
     return <div className="discount-title__text font-universal__body-medium _main-dark">
-        {"Ваша персональная "}
+        {"Ваша персональная скидка "}
         <span className="discount-title__text font-universal__body-medium _red _bold">
                     {props.percent + "%"}
                 </span>
-        {" скидка активна еще "}
+        {" активна еще "}
         <span className="discount-title__text font-universal__body-medium _red _bold">
                     {getExpireTitle(props.expireDate)}
                 </span>

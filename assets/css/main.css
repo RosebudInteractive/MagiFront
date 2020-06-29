@@ -5674,13 +5674,14 @@ ul.user-tooltip {
   .text-block .course-module__price-block-info {
     margin-top: 14px !important;
     max-width: 370px;
-    font-size: 14px;
-    line-height: 1.4em;
-    color: #c8684c; }
-    @media (max-width: 1024px) {
-      .course-module .course-module__price-block-info,
-      .text-block .course-module__price-block-info {
-        font-size: 12px; } }
+    /*font-size: 14px;*/
+    /*line-height: 1.4em;*/
+    /*color: #c8684c; */
+  }
+    /*@media (max-width: 1024px) {*/
+    /*  .course-module .course-module__price-block-info,*/
+    /*  .text-block .course-module__price-block-info {*/
+    /*    font-size: 12px; } }*/
     @media (max-width: 639px) {
       .course-module .course-module__price-block-info,
       .text-block .course-module__price-block-info {
