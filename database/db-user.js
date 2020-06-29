@@ -14,6 +14,7 @@ const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
 const { EpisodeContentType } = require('../const/sql-req-common');
 const { ProductService } = require('./db-product');
+const { parseInt } = require('lodash');
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
@@ -407,7 +408,9 @@ const GET_COURSES_FOR_SALE_MSSQL =
     "where (d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
     "  and ((d.[LastDate] > convert(datetime, '<%= dt %>')) or (d.[LastDate] is NULL))\n" +
     "  and (d.[UserId] is NULL) and ((d.[DiscountTypeId] = 2)<%= where_dyn %>)";
-const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (d.[Code] in (<%= codes %>)))";
+const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (<%= code_dyn %>))";
+const COND_DYN_CODE_MSSQL = "((d.[Code] = '<%= code %>')<%= id_dyn %>)";
+const COND_DYN_ID_MSSQL = " and (c.[Id] = '<%= id %>')";
     
 const GET_COURSES_FOR_SALE_MYSQL =
     "select distinct c.`Id`\n" +
@@ -417,7 +420,9 @@ const GET_COURSES_FOR_SALE_MYSQL =
     "where (d.`FirstDate` <= '<%= dt %>')\n" +
     "  and ((d.`LastDate` > '<%= dt %>') or (d.`LastDate` is NULL))\n" +
     "  and (d.`UserId` is NULL) and ((d.`DiscountTypeId` = 2)<%= where_dyn %>)";
-const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (d.`Code` in (<%= codes %>)))";
+const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (<%= code_dyn %>))";
+const COND_DYN_CODE_MYSQL = "((d.`Code` = '<%= code %>')<%= id_dyn %>)";
+const COND_DYN_ID_MYSQL = " and (c.`Id` = '<%= id %>')";
 
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
@@ -752,8 +757,7 @@ const DbUser = class DbUser extends DbObject {
         let where_dyn_mysql = '';
         let dyn_codes = {};
         if (opts.Codes) {
-            let codes = [];
-            let arr;
+            let arr = [];
             if (typeof (opts.Codes) === "string") {
                 arr = opts.Codes.split(",");
             }
@@ -762,24 +766,48 @@ const DbUser = class DbUser extends DbObject {
                     throw new Error(`Invalid parameter "Codes": ${JSON.stringify(opts.Codes)}.`);
                 arr = opts.Codes;
             }
+            if (arr.length === 0)
+                throw new Error(`Parameter "Codes" is empty.`);
             let order = 0;
+            let cond_mssql;
+            let cond_mysql;
             arr.forEach(element => {
                 let arr_code = element.split(':');
                 let code = arr_code[0];
+                let key = code;
+                let id = null;
                 let code_elem = { order: ++order };
-                if (arr_code.length === 2) {
-                    let perc = parseFloat(arr_code[1]);
-                    if (!isNaN(perc))
-                        code_elem.perc = perc;
+                if (arr_code.length > 1) {
+                    id = parseInt(arr_code[1]);
+                    id = isNaN(id) ? null : id;
+                    if (id)
+                        key += ":" + id;
+                    if (arr_code.length > 2) {
+                        let perc = parseFloat(arr_code[2]);
+                        if (!isNaN(perc))
+                            code_elem.perc = perc;
+                    }
                 }
-                codes.push(`'${code}'`);
-                dyn_codes[code] = code_elem;
+                dyn_codes[key] = code_elem;
+                if (order > 1) {
+                    cond_mssql += "\n  or ";
+                    cond_mysql += "\n  or ";
+                }
+                else {
+                    cond_mssql = "";
+                    cond_mysql = "";
+                }
+                let cond_id_mssql = "";
+                let cond_id_mysql = "";
+                if (id) {
+                    cond_id_mssql = _.template(COND_DYN_ID_MSSQL)({ id: id });
+                    cond_id_mysql = _.template(COND_DYN_ID_MYSQL)({ id: id });
+                }
+                cond_mssql += _.template(COND_DYN_CODE_MSSQL)({ code: code, id_dyn: cond_id_mssql });
+                cond_mysql += _.template(COND_DYN_CODE_MYSQL)({ code: code, id_dyn: cond_id_mysql });
             });
-            if (codes.length === 0)
-                throw new Error(`Parameter "Codes" is empty.`);
-            let code_list = `${codes.join()}`;
-            where_dyn_mysql = _.template(WHERE_DYN_MYSQL)({ codes: code_list });
-            where_dyn_mssql = _.template(WHERE_DYN_MSSQL)({ codes: code_list });
+            where_dyn_mysql = _.template(WHERE_DYN_MYSQL)({ code_dyn: cond_mysql });
+            where_dyn_mssql = _.template(WHERE_DYN_MSSQL)({ code_dyn: cond_mssql });
         }
 
         let res = await $data.execSql({
@@ -814,7 +842,8 @@ const DbUser = class DbUser extends DbObject {
                     let curr_dyn_code = null;
                     for (let j = 0; j < keys.length; j++) {
                         let code = keys[j];
-                        let dsc_elem = dyn_codes[code];
+                        let key_dyn_id = `${code}:${course.Id}`;
+                        let dsc_elem = dyn_codes[key_dyn_id] ? dyn_codes[key_dyn_id] : dyn_codes[code];
                         if (dsc_elem) {
                             let discount = course.DynDiscounts[code];
                             let perc = dsc_elem.perc ? dsc_elem.perc : discount.Perc;
@@ -829,8 +858,10 @@ const DbUser = class DbUser extends DbObject {
                                 curr_dyn_code = code;
                                 curr_perc = perc;
                                 has_dyn_discount = true;
-                                if (recalcDPrice)
+                                if (recalcDPrice) {
+                                    discount.Perc = perc;
                                     discount.DPrice = this._productService.calcDPrice(course.Price, perc, true);
+                                }
                                 course.DPrice = discount.DPrice;
                             }
                             else
@@ -852,8 +883,10 @@ const DbUser = class DbUser extends DbObject {
                     let keys_a = Object.keys(a.DynDiscounts);
                     let keys_b = Object.keys(b.DynDiscounts);
                     if ((keys_a.length === 1) && (keys_b.length === 1)) {
-                        let order_a = dyn_codes[keys_a[0]];
-                        let order_b = dyn_codes[keys_b[0]];
+                        let key_id_a = `${keys_a[0]}:${a.Id}`;
+                        let key_id_b = `${keys_b[0]}:${b.Id}`;
+                        let order_a = dyn_codes[key_id_a] ? dyn_codes[key_id_a] : dyn_codes[keys_a[0]];
+                        let order_b = dyn_codes[key_id_b] ? dyn_codes[key_id_b] : dyn_codes[keys_b[0]];
                         if (order_a && order_b)
                             result = order_a.order - order_b.order;
                     }

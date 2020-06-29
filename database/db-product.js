@@ -397,57 +397,60 @@ const DbProduct = class DbProduct extends DbObject {
     }
 
     async _setDiscount(root, discount, dyn_discount, dbOpts) {
-        let result = true;
+        let result = false;
         let firstDate = null;
         let lastDate = null;
-
-        let clearFlag = discount.Perc === null; // if null - remove current discount
-        if (!clearFlag) {
-            let dates = this._checkDiscountFields(discount);
-            firstDate = dates.firstDate;
-            lastDate = dates.lastDate;
-        }
-        let fields = {
-            DiscountTypeId: discount.DiscountTypeId,
-            PriceListId: discount.PriceListId ? discount.PriceListId : Product.DefaultPriceListId,
-            Description: typeof (discount.Description) === "string" ? discount.Description : null,
-            FirstDate: firstDate,
-            LastDate: lastDate,
-            Perc: discount.Perc
-        };
         let col = root.getCol("DataElements");
-        let activePrice = null;
-        for (let i = 0; i < col.count(); i++) {
-            let p = col.get(i);
-            if ((p.priceListId() === fields.PriceListId) && (p.discountTypeId() === fields.DiscountTypeId)
-                && (!p.productTypeId()) && (!p.userId())) {
+
+        if (discount) {
+            result = true;
+            let clearFlag = discount.Perc === null; // if null - remove current discount
+            if (!clearFlag) {
+                let dates = this._checkDiscountFields(discount);
+                firstDate = dates.firstDate;
+                lastDate = dates.lastDate;
+            }
+            let fields = {
+                DiscountTypeId: discount.DiscountTypeId,
+                PriceListId: discount.PriceListId ? discount.PriceListId : Product.DefaultPriceListId,
+                Description: typeof (discount.Description) === "string" ? discount.Description : null,
+                FirstDate: firstDate,
+                LastDate: lastDate,
+                Perc: discount.Perc
+            };
+            let activePrice = null;
+            for (let i = 0; i < col.count(); i++) {
+                let p = col.get(i);
+                if ((p.priceListId() === fields.PriceListId) && (p.discountTypeId() === fields.DiscountTypeId)
+                    && (!p.productTypeId()) && (!p.userId())) {
         
-                activePrice = p;
-                if ((!clearFlag) &&  (p.perc() === fields.Perc) && (p.description() === fields.Description) &&
-                    (Math.abs(p.firstDate() - fields.FirstDate) < 500) && (Math.abs(p.lastDate() - fields.LastDate) < 500)) {
-                    result = false;
+                    activePrice = p;
+                    if ((!clearFlag) && (p.perc() === fields.Perc) && (p.description() === fields.Description) &&
+                        (Math.abs(p.firstDate() - fields.FirstDate) < 500) && (Math.abs(p.lastDate() - fields.LastDate) < 500)) {
+                        result = false;
+                    }
+                    break;
                 }
-                break;
             }
-        }
-        if (result) {
-            if (clearFlag) {
-                if (activePrice)
-                    col._del(activePrice)
-                else
-                    result = false;
-            }
-            else
-                if (activePrice) {
-                    activePrice.description(fields.Description);
-                    activePrice.firstDate(fields.FirstDate);
-                    activePrice.lastDate(fields.LastDate);
-                    activePrice.perc(fields.Perc)
+            if (result) {
+                if (clearFlag) {
+                    if (activePrice)
+                        col._del(activePrice)
+                    else
+                        result = false;
                 }
                 else
-                    await root.newObject({
-                        fields: fields
-                    }, dbOpts);
+                    if (activePrice) {
+                        activePrice.description(fields.Description);
+                        activePrice.firstDate(fields.FirstDate);
+                        activePrice.lastDate(fields.LastDate);
+                        activePrice.perc(fields.Perc)
+                    }
+                    else
+                        await root.newObject({
+                            fields: fields
+                        }, dbOpts);
+            }
         }
         if (dyn_discount) {
             let items_to_del = [];
