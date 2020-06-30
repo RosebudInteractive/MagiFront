@@ -100,7 +100,7 @@ const DbProduct = class DbProduct extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
-    calcDPrice(price, perc, truncate) {
+    calcDPrice(price, perc, truncate, precision) {
         let dprice = price * (1 - perc / 100);
         let prec = Accounting.SumPrecision;
         let trunc_flag = (truncate === "true") || (truncate === true) ? true : false;
@@ -110,7 +110,7 @@ const DbProduct = class DbProduct extends DbObject {
             isDone = true;
         }
         else {
-            let p = +opts.Prec;
+            let p = +precision;
             if ((typeof (p) === "number") && (!isNaN(p)))
                 prec = p;
         }
@@ -283,7 +283,7 @@ const DbProduct = class DbProduct extends DbObject {
                                         TtlMinutes: elem.TtlMinutes,
                                         FirstDate: elem.FirstDate,
                                         LastDate: elem.LastDate,
-                                        DPrice: this.calcDPrice(elem.Price, elem.Perc, opts.Truncate)
+                                        DPrice: this.calcDPrice(elem.Price, elem.Perc, opts.Truncate, opts.Prec)
                                     }
                             }
                             else {
@@ -295,7 +295,7 @@ const DbProduct = class DbProduct extends DbObject {
                                     FirstDate: elem.FirstDate,
                                     LastDate: elem.LastDate
                                 };
-                                curr_prod.DPrice = this.calcDPrice(elem.Price, d.Perc, opts.Truncate);
+                                curr_prod.DPrice = this.calcDPrice(elem.Price, d.Perc, opts.Truncate, opts.Prec);
                             }
                         }
                     });
