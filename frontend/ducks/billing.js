@@ -451,7 +451,7 @@ function* _getPaidCourseInfoSaga(data) {
             } else {
                 yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
 
-                let {price} = CourseDiscounts.getActualPriceAndDiscount({course:_course, buyAsGift: _data.buyAsGift})
+                let {price, hasDiscount, dynamicDiscount, code, promoSum} = CourseDiscounts.getActualPriceAndDiscount({course:_course, buyAsGift: _data.buyAsGift})
 
                 let _offer = {
                     Price: price,
@@ -463,6 +463,13 @@ function* _getPaidCourseInfoSaga(data) {
                     Author: _data.author,
                     Category: _data.category,
                     buyAsGift: _data.buyAsGift,
+                }
+
+                if (hasDiscount && dynamicDiscount) {
+                    _offer.Promo = {
+                        PromoCode: code,
+                        PromoSum: promoSum
+                    }
                 }
 
                 yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _offer})

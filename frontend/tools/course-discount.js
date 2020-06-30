@@ -27,19 +27,23 @@ export default class CourseDiscounts {
                 hasDiscount: false,
                 price: 0,
                 percent: 0,
-                dynamicDiscount: false
+                dynamicDiscount: false,
+                code: null,
             }
         }
 
         let _dynamicDiscount = this.getActiveDynamicDiscount({course: course})
         if (_dynamicDiscount) {
-            const _percent = _dynamicDiscount.percent
+            const _percent = _dynamicDiscount.percent,
+                _actualPrice = Math.trunc((course.Price * (1 - _percent / 100))/ 10) * 10
 
             return {
                 hasDiscount: true,
-                price: Math.trunc((course.Price * (1 - _percent / 100))/ 10) * 10,
+                price: _actualPrice,
                 percent: _percent,
-                dynamicDiscount: true
+                dynamicDiscount: true,
+                code: _dynamicDiscount.code,
+                promoSum: course.Price - _actualPrice
             }
         } else {
             let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc
@@ -47,7 +51,8 @@ export default class CourseDiscounts {
                 hasDiscount: _hasDiscount,
                 price: _hasDiscount ? course.DPrice : course.Price,
                 percent: _hasDiscount ? course.Discount.Perc : 0,
-                dynamicDiscount: false
+                dynamicDiscount: false,
+                ode: null,
             }
         }
 
