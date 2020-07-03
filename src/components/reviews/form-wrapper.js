@@ -105,7 +105,7 @@ class ReviewEditorForm extends React.Component {
                             <Field component={TextBox} name="profileUrl" label="Ссылка на профиль" placeholder="Ссылка на профиль в любой соцсети"/>
 
                             <Field component={TextArea} name="review" label="Текст отзыва" enableHtml={false} id={"review"}/>
-                            <Field component={TextArea} name="reviewPub" label="Публекуемый отзыв" enableHtml={false} id={"pub-review"}/>
+                            <Field component={TextArea} name="reviewPub" label="Публикуемый отзыв" enableHtml={false} id={"pub-review"}/>
                         </div>
                     </form>
                 </div>
