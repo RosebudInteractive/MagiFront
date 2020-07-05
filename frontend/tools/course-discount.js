@@ -1,6 +1,8 @@
 import {getMinutesBetween} from "tools/time-tools";
 import {getCountDaysTitle, getCounterTitle, getCountHoursTitle,} from "tools/word-tools";
 import moment from "moment";
+import {store} from "../store/configureStore"
+import {showDynamicDiscountPopup} from "ducks/message";
 
 const KEY = "mag_dyn_disc"
 
@@ -29,6 +31,7 @@ export default class CourseDiscounts {
                 percent: 0,
                 dynamicDiscount: false,
                 code: null,
+                expireDate: null
             }
         }
 
@@ -43,7 +46,8 @@ export default class CourseDiscounts {
                 percent: _percent,
                 dynamicDiscount: true,
                 code: _dynamicDiscount.code,
-                promoSum: course.Price - _actualPrice
+                promoSum: course.Price - _actualPrice,
+                expireDate: _dynamicDiscount.expireDate
             }
         } else {
             let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc
@@ -52,7 +56,8 @@ export default class CourseDiscounts {
                 price: _hasDiscount ? course.DPrice : course.Price,
                 percent: _hasDiscount ? course.Discount.Perc : 0,
                 dynamicDiscount: false,
-                ode: null,
+                code: null,
+                expireDate: null
             }
         }
 
@@ -139,6 +144,7 @@ export default class CourseDiscounts {
                     }
 
                     localStorage.setItem(KEY, JSON.stringify(this.localDiscounts))
+                    setTimeout(() => {store.dispatch(showDynamicDiscountPopup(course))}, 5000)
                 }
             } finally {
                 discountCode = null

@@ -1,0 +1,95 @@
+@import "~tools/variables"
+@import "~tools/mixins"
+
+.dynamic-discount-popup
+  width: 412px
+  //height: 127px
+  background-color: $color-white
+  box-shadow: 0 0 10px $color-dark-06
+  opacity: 1
+  pointer-events: initial
+  z-index: 999
+  position: fixed
+  bottom: 20px
+  right: 20px
+  -webkit-transition: opacity .3s ease-in-out
+  transition: opacity .3s ease-in-out
+  max-height: 350px
+  border-radius: 4px
+  display: block
+  cursor: pointer
+
+  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+    display: none
+
+  .discount-popup__wrapper
+    margin: 10px 15px 15px
+    display: flex
+    flex-direction: column
+
+  .popup-header
+    @include font-fira(12px, bold, 140%, $color-main-dark)
+
+  .popup-message
+    display: flex
+    margin: 9px 0 11px
+
+  .message__course-title
+    flex: 1 0 197px
+    margin-left: 10px
+    padding-right: 10px
+
+  .message__price-block
+    flex: 0 1 auto
+    display: flex
+    flex-direction: column
+    align-items: flex-end
+    .old-price
+      color: $color-dark-04
+      text-decoration-line: line-through
+      padding-right: 8px
+
+  .message__remaining-time
+    min-width: 59px
+    text-align: end
+
+  .course-module__price-btn
+    width: 115px
+    height: 35px
+    float: right
+    align-self: flex-end
+    @include font-fira(14px, normal, 17px)
+
+  .close-button
+    position: absolute
+    right: 0
+    top: 0
+    padding: 15px
+    border: none
+    outline: none
+    width: 8px
+    height: 8px
+    font-size: 0
+    background-color: transparent
+    &:before, &:after
+      content: ""
+      position: absolute
+      top: 50%
+      left: 50%
+      -webkit-transform: translate(-50%, -50%)
+      -ms-transform: translate(-50%, -50%)
+      transform: translate(-50%, -50%)
+      width: 10px
+      height: 2px
+      background-color: #c1c1c1
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+    &:before
+      -webkit-transform: translate(-50%, -50%) rotate(45deg)
+      -ms-transform: translate(-50%, -50%) rotate(45deg)
+      transform: translate(-50%, -50%) rotate(45deg)
+    &:after
+      -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+      -ms-transform: translate(-50%, -50%) rotate(-45deg)
+      transform: translate(-50%, -50%) rotate(-45deg)
+

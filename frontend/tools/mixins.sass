@@ -12,6 +12,18 @@
   @if $lh
     line-height: $lh
 
+@mixin font-fira($size: false, $weight: false,  $lh: false, $color: false)
+  font-family: $font-fira
+
+  @if $size
+    font-size: $size
+  @if $color
+    color: $color
+  @if $weight
+    font-weight: $weight
+  @if $lh
+    line-height: $lh
+
 @mixin line-count($count: false, $line-height: false, $max-height: false)
   overflow: hidden
   text-overflow: ellipsis

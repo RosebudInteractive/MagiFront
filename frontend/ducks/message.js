@@ -1,7 +1,7 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record} from 'immutable'
-import {all, call, put, takeEvery, select,} from "@redux-saga/core/effects";
+import {all, call, put, takeEvery, select, throttle } from "@redux-saga/core/effects";
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {reset} from "redux-form";
@@ -34,6 +34,9 @@ const SEND_REVIEW_START = `${prefix}/SEND_REVIEW_START`
 const SEND_REVIEW_SUCCESS = `${prefix}/SEND_REVIEW_SUCCESS`
 const SEND_REVIEW_FAIL = `${prefix}/SEND_REVIEW_FAIL`
 
+const SHOW_DYNAMIC_DISCOUNT_POPUP = `${prefix}/SHOW_DYNAMIC_DISCOUNT_POPUP`
+const CLOSE_DYNAMIC_DISCOUNT_POPUP = `${prefix}/CLOSE_DYNAMIC_DISCOUNT_POPUP`
+
 export const SHOW_MODAL_MESSAGE_ERROR = `${prefix}/SHOW_MODAL_MESSAGE_ERROR`
 
 /**
@@ -46,10 +49,16 @@ const ReviewRecord = Record({
     courseName: null,
 })
 
+const DynamicDiscount = Record({
+    showPopup: false,
+    course: null
+})
+
 export const ReducerRecord = Record({
     showFeedbackWindow: false,
     showFeedbackResultMessage: false,
     review: new ReviewRecord(),
+    dynamicDiscount: new DynamicDiscount(),
     fetching: false,
     successMessage: null,
     error: null,
@@ -126,6 +135,15 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['review', 'showWindow'], false)
                 .setIn(['review', 'showResultMessage'], true)
 
+        case SHOW_DYNAMIC_DISCOUNT_POPUP:
+            return state
+                .setIn(['dynamicDiscount', 'showPopup'], true)
+                .setIn(['dynamicDiscount', 'course'], payload)
+
+        case CLOSE_DYNAMIC_DISCOUNT_POPUP:
+            return state
+                .set('dynamicDiscount', new DynamicDiscount())
+
         default:
             return state
     }
@@ -146,6 +164,7 @@ export const showReviewResultMessageSelector = createSelector(reviewSelector, re
 export const errorMessageSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
 export const messageUrlSelector = createSelector(stateSelector, state => state.msgUrl)
+export const dynamicDiscountSelector = createSelector(stateSelector, state => state.dynamicDiscount)
 
 /**
  * Action Creators
@@ -258,6 +277,14 @@ export const hideReviewWindow = () => {
 
 export const sendReview = (data) => {
     return { type: SEND_REVIEW_REQUEST, payload: data }
+}
+
+export const showDynamicDiscountPopup = (course) => {
+    return { type: SHOW_DYNAMIC_DISCOUNT_POPUP, payload: course}
+}
+
+export const closeDynamicDiscountPopup = () => {
+    return { type: CLOSE_DYNAMIC_DISCOUNT_POPUP}
 }
 
 

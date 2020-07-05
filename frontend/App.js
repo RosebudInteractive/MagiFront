@@ -67,6 +67,7 @@ import "./tools/system.sass"
 import ReviewWindow from "./components/messages/review";
 import ReviewResultMessage from "./components/messages/review/result-message";
 import CourseDiscounts from "tools/course-discount";
+import DynamicDiscountPopup from "./components/messages/dynamic-discount-popup";
 
 Polyfill.registry();
 
@@ -366,6 +367,7 @@ class App extends Component {
                 <BillingWrapper/>
                 <CoursePaymentWrapper/>
                 <CookiesMessage/>
+                <DynamicDiscountPopup/>
                 <ModalWaiting visible={isWaiting}/>
             </div>
 

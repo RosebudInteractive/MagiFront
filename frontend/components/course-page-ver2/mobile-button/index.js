@@ -10,6 +10,8 @@ import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 
 const REFRESH_INTERVAL = 60 * 1000
 
+const DISCOUNT = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#discount"/>'
+
 class MobileButton extends React.Component {
 
     static propTypes = {
@@ -42,7 +44,7 @@ class MobileButton extends React.Component {
         const _showPriceButton = course.IsPaid && !course.IsGift && !course.IsBought
 
         return _showPriceButton &&
-            <div className="mobile-buttons__block" style={_style}>
+            <div className="mobile-buttons__block js-mobile-buttons-block" style={_style}>
                 <div className="mobile-buttons__container">
                     <div className="mobile-button_wrapper price-button__wrapper">
                         <PriceButton course={course}/>
@@ -116,16 +118,21 @@ const CommonDiscountDescription = (props) => {
 }
 
 const DynamicDiscountDescription = (props) => {
-    return <div className="discount-title__text font-universal__body-medium _main-dark">
+    return <div className="discount-title__wrapper">
+        <div className="message__icon">
+            <svg width="30" height="30" dangerouslySetInnerHTML={{__html: DISCOUNT}}/>
+        </div>
+        <div className="discount-title__text font-universal__body-medium _main-dark">
         {"Ваша персональная скидка "}
         <span className="discount-title__text font-universal__body-medium _red _bold">
-                    {props.percent + "%"}
-                </span>
+            {props.percent + "%"}
+        </span>
         {" активна еще "}
-        <span className="discount-title__text font-universal__body-medium _red _bold">
-                    {getExpireTitle(props.expireDate)}
-                </span>
+        <span className="discount-title__text font-universal__body-medium _red _bold expire-date">
+            {getExpireTitle(props.expireDate)}
+        </span>
     </div>
+        </div>
 }
 
 const mapStateToProps = (state) => {
