@@ -28,6 +28,7 @@ import ScrollMemoryStorage from "../tools/scroll-memory-storage"
 
 import WrapperVer1 from '../components/course-page-ver1/index'
 import WrapperVer2 from '../components/course-page-ver2/index'
+import {setVisibleCourse} from "ducks/course";
 
 class Main extends React.Component {
     constructor(props) {
@@ -73,6 +74,10 @@ class Main extends React.Component {
 
             this.props.notifyAnalyticsChangePage(this.props.ownProps.location.pathname)
         }
+
+        if (prevProps.course !== course) {
+            this.props.setVisibleCourse(course ? course.Id : null)
+        }
     }
 
     componentDidMount() {
@@ -89,6 +94,7 @@ class Main extends React.Component {
     componentWillUnmount() {
         this._removeMetaTags();
         this.props.clearCurrentPage();
+        this.props.setVisibleCourse(null)
     }
 
     _favoritesClick() {
@@ -312,6 +318,7 @@ function mapDispatchToProps(dispatch) {
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyConcreteCourseShowed: bindActionCreators(notifyConcreteCourseShowed, dispatch),
         notifyAnalyticsChangePage: bindActionCreators(notifyAnalyticsChangePage, dispatch),
+        setVisibleCourse: bindActionCreators(setVisibleCourse, dispatch),
     }
 }
 

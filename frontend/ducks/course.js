@@ -14,7 +14,7 @@ import {createSelector} from "reselect";
 /**
  * Constants
  * */
-export const moduleName = 'course'
+export const moduleName = 'course_ver_2'
 const prefix = `${appName}/${moduleName}`
 
 const GET_COURSE_DISCOUNTS_REQUEST = `${prefix}/GET_COURSE_DISCOUNTS_REQUEST`
@@ -25,6 +25,8 @@ const GET_COURSE_DISCOUNTS_FAIL = `${prefix}/GET_COURSE_DISCOUNTS_FAIL`
 
 const GET_CONCRETE_COURSE_REQUEST = `${prefix}/GET_CONCRETE_COURSE_REQUEST`
 
+const SET_VISIBLE_COURSE = `${prefix}/SET_VISIBLE_COURSE`
+
 
 const ReducerRecord = Record({
     loading: false,
@@ -32,6 +34,7 @@ const ReducerRecord = Record({
     discounts: new List(),
     lastSuccessTime: null,
     notFound: false,
+    visibleCourseId: null,
 })
 
 const Discount = Record({
@@ -54,6 +57,9 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_COURSE_DISCOUNTS_FAIL:
             return state.set("loading", false)
 
+        case SET_VISIBLE_COURSE:
+            return state.set("visibleCourseId", payload)
+
         default:
             return state
     }
@@ -72,12 +78,17 @@ const arrayToList = (values, DataRecord) => {
 const stateSelector = state => state[moduleName]
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const discountSelector = createSelector(stateSelector, state => state.discounts)
+export const visibleCourseSelector = createSelector(stateSelector, state => state.visibleCourseId)
 
 /**
  * Action Creators
  * */
 export const getCourseDiscounts = () => {
     return { type: GET_COURSE_DISCOUNTS_REQUEST }
+}
+
+export const setVisibleCourse = (courseId) => {
+    return { type: SET_VISIBLE_COURSE, payload: courseId }
 }
 
 /**

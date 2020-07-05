@@ -14,6 +14,10 @@
     .page-header
       display: block !important
 
+  .dynamic-discount-popup
+    @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+      display: none
+
 .course-page-ver2._transparent-menu
   .navigation li svg
     fill: $color-white-06

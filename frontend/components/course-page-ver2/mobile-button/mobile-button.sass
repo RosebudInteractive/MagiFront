@@ -54,8 +54,11 @@
     align-items: center
 
     .message__icon
+      display: none
       height: 30px
       margin-right: 10px
+      @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
+        display: block
 
 .mobile-button
   max-width: 627px

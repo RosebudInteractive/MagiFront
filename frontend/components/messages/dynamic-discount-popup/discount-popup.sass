@@ -2,7 +2,7 @@
 @import "~tools/mixins"
 
 .dynamic-discount-popup
-  width: 412px
+  //width: 412px
   //height: 127px
   background-color: $color-white
   box-shadow: 0 0 10px $color-dark-06
@@ -12,15 +12,13 @@
   position: fixed
   bottom: 20px
   right: 20px
+  margin-left: 20px
   -webkit-transition: opacity .3s ease-in-out
   transition: opacity .3s ease-in-out
   max-height: 350px
   border-radius: 4px
   display: block
   cursor: pointer
-
-  @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
-    display: none
 
   .discount-popup__wrapper
     margin: 10px 15px 15px
@@ -35,9 +33,9 @@
     margin: 9px 0 11px
 
   .message__course-title
-    flex: 1 0 197px
+    flex: 1 1 197px
     margin-left: 10px
-    padding-right: 10px
+    padding-right: 20px
 
   .message__price-block
     flex: 0 1 auto

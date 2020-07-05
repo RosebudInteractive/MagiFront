@@ -9,6 +9,7 @@ import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 import {getCurrencySign} from "tools/page-tools";
 import {closeDynamicDiscountPopup, dynamicDiscountSelector} from "ducks/message";
 import $ from "jquery";
+import {visibleCourseSelector} from "ducks/course";
 
 const DISCOUNT = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#discount"/>'
 
@@ -28,6 +29,12 @@ class DynamicDiscountPopup extends React.Component {
 
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler);
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.visibleCourseId !== this.props.visibleCourseId) {
+            this.forceUpdate()
+        }
     }
 
     render() {
@@ -109,7 +116,9 @@ class DynamicDiscountPopup extends React.Component {
 function mapStateToProps(state) {
     return {
         dynamicDiscount: dynamicDiscountSelector(state),
+        visibleCourseId: visibleCourseSelector(state),
         cookiesConfirmed: state.app.cookiesConfirmed,
+        currentPage: state.pageHeader.currentPage,
     }
 }
 
