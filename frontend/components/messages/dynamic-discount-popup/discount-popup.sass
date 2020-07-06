@@ -26,14 +26,19 @@
     flex-direction: column
 
   .popup-header
-    @include font-fira(12px, bold, 140%, $color-main-dark)
+    @include font-fira(14px, bold, 140%, $color-main-dark)
 
   .popup-message
     display: flex
     margin: 9px 0 11px
+    font-size: 14px
+
+  .message__icon
+    height: 30px
+    align-self: center
 
   .message__course-title
-    max-width: 197px
+    max-width: 227px
     flex: 1 1 197px
     margin-left: 10px
     padding-right: 20px
