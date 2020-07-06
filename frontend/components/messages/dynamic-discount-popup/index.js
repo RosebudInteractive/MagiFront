@@ -75,7 +75,7 @@ class DynamicDiscountPopup extends React.Component {
                             {getExpireTitle(expireDate)}
                         </div>
                     </div>
-                    <BuyButton course={COURSES.HIGH_RENAISSANCE}/>
+                    <BuyButton course={course}/>
                 </Link>
                 <button type="button" className="close-button" onClick={::this.props.close}>Закрыть
                 </button>
