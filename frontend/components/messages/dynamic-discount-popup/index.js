@@ -4,7 +4,6 @@ import {bindActionCreators} from 'redux';
 import "./discount-popup.sass"
 import BuyButton from "../../billing/buy-button";
 import {Link} from "react-router-dom";
-import {COURSES} from "../../../mock-data/course/mock";
 import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 import {getCurrencySign} from "tools/page-tools";
 import {closeDynamicDiscountPopup, dynamicDiscountSelector} from "ducks/message";
@@ -20,20 +19,28 @@ class DynamicDiscountPopup extends React.Component {
     constructor(props) {
         super(props)
 
+        this.state = {
+            hidden: true
+        }
+
         this._resizeHandler = () => {
             this.forceUpdate()
         }
 
-        $(window).on('resize', ::this._resizeHandler)
+        $(window).on('resize orientationchange', ::this._resizeHandler)
     }
 
     componentWillUnmount() {
-        $(window).unbind('resize', this._resizeHandler);
+        $(window).unbind('resize orientationchange', this._resizeHandler);
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.visibleCourseId !== this.props.visibleCourseId) {
             this.forceUpdate()
+        }
+
+        if (this.props.dynamicDiscount.showPopup && !prevProps.dynamicDiscount.showPopup) {
+            setTimeout(() => {this.setState({hidden: false})}, 0)
         }
     }
 
@@ -51,7 +58,7 @@ class DynamicDiscountPopup extends React.Component {
 
         const _style = this._getStyle()
 
-        return <div className="dynamic-discount-popup" style={_style}>
+        return <div className={"dynamic-discount-popup" + (this.state.hidden ? " _hidden" : "")} style={_style}>
                 <Link to={`/category/${course.URL}`} className="discount-popup__wrapper" onClick={::this._scrollToTop}>
                     <div className="popup-header">
                         У Вас новая персональная скидка
@@ -77,7 +84,7 @@ class DynamicDiscountPopup extends React.Component {
                     </div>
                     <BuyButton course={course}/>
                 </Link>
-                <button type="button" className="close-button" onClick={::this.props.close}>Закрыть
+                <button type="button" className="close-button" onClick={::this._close}>Закрыть
                 </button>
             </div>
     }
@@ -91,9 +98,15 @@ class DynamicDiscountPopup extends React.Component {
             if (this._timer) {
                 clearInterval(this._timer)
                 this._timer = null
-                this.props.close()
+                this._close()
             }
         }
+    }
+
+    _close() {
+        this.setState({hidden: true})
+
+        setTimeout(() => { this.props.close() }, 400)
     }
 
     _scrollToTop() {
@@ -106,7 +119,7 @@ class DynamicDiscountPopup extends React.Component {
 
         let _bottom = 20
 
-        _bottom = _bottom + ((_mobileButtons && _mobileButtons.length) ? _mobileButtons.outerHeight() : 0) +
+        _bottom = _bottom + ((($(window).width <= 899) && _mobileButtons && _mobileButtons.length) ? _mobileButtons.outerHeight() : 0) +
             ((!this.props.cookiesConfirmed && _message && _message.length) ? _message.height() : 0)
 
         return {bottom: _bottom}
