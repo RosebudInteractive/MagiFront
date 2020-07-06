@@ -144,7 +144,7 @@ export default class CourseDiscounts {
                     }
 
                     localStorage.setItem(KEY, JSON.stringify(this.localDiscounts))
-                    setTimeout(() => {store.dispatch(showDynamicDiscountPopup(course))}, 5000)
+                    store.dispatch(showDynamicDiscountPopup(course))
                 }
             } finally {
                 discountCode = null

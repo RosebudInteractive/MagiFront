@@ -45,12 +45,12 @@ module.exports = {
         corsEnabled: true,
         prerender: {
             usePrerender: true,
-            // useRedis: false,
-            // redisPrefix: "pg:",
-            // expInSec: 14 * 24 * 60 * 60,
-            // maxDevSec: 7 * 24 * 60 * 60,
-            // url: 'http://127.0.0.1:8000',
-            // logRequest: false
+            useRedis: false,
+            redisPrefix: "pg:",
+            expInSec: 14 * 24 * 60 * 60,
+            maxDevSec: 7 * 24 * 60 * 60,
+            url: 'http://127.0.0.1:8000',
+            logRequest: false
         },
     },
     dbProvider: 'mssql',
@@ -65,7 +65,7 @@ module.exports = {
         saveUninitialized: false
     },
     redisSession: {
-        enabled: false,
+        enabled: true,
         prefix: 'ses:',
         scanCount: 100
     },
@@ -94,7 +94,8 @@ module.exports = {
         useCapture: true,
         appLoginUrl: "https://magisteria.ru",
         secret: 'zxcvv8708xulsajfois23h32',
-        storage: 'local',// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
+        // storage: 'local',// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
+        storage: 'redis',// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
         reCapture: {
             siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
             secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
@@ -159,7 +160,15 @@ module.exports = {
                 idle: 10000
             }
         },
-        redis: null,
+        redis: {
+            host: "localhost",
+            port: 6379,
+            pool: {
+                max: 5,
+                min: 0,
+                idle: 10000
+            }
+        },
         mssql: {
             host: 'localhost',
             port: 1435,
