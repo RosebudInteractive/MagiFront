@@ -47,6 +47,8 @@ const playerMiddleware = store => next => action => {
 
             Player.clearPlayInfo(_state.lessonPlayInfo.playInfo)
 
+            noSleep.enable();
+
             return next(action)
         }
 
