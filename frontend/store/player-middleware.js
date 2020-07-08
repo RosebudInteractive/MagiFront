@@ -1,4 +1,5 @@
 import * as Player from '../tools/player/nested-player';
+import NoSleep from 'nosleep.js';
 
 import {
     PLAYER_START_PLAY,
@@ -27,6 +28,8 @@ import {
 } from '../constants/app'
 
 import * as storageActions from "../actions/lesson-info-storage-actions";
+
+const noSleep = new NoSleep();
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {
@@ -70,6 +73,9 @@ const playerMiddleware = store => next => action => {
                     Player.getInstance().play()
                 }
             }
+
+            noSleep.enable();
+
             return next(action)
         }
 
@@ -77,6 +83,9 @@ const playerMiddleware = store => next => action => {
             if (Player.getInstance()) {
                 Player.getInstance().replay()
             }
+
+            noSleep.enable();
+
             return next(action)
         }
 
@@ -84,6 +93,9 @@ const playerMiddleware = store => next => action => {
             if (Player.getInstance()) {
                 Player.getInstance().pause()
             }
+
+            noSleep.disable();
+
             return next(action)
         }
 
@@ -91,6 +103,9 @@ const playerMiddleware = store => next => action => {
             if (Player.getInstance()) {
                 Player.getInstance().stop()
             }
+
+            noSleep.disable();
+
             return next(action)
         }
 
@@ -152,6 +167,9 @@ const playerMiddleware = store => next => action => {
             if (_player) {
                 _player.switchToSmall()
             }
+
+            noSleep.disable();
+
             return next(action)
         }
 
@@ -165,9 +183,10 @@ const playerMiddleware = store => next => action => {
                     type: CLEAR_LESSON_PLAY_INFO,
                     payload: null,
                 })
-
-
             }
+
+            noSleep.disable();
+
             return next(action)
         }
 
@@ -176,6 +195,9 @@ const playerMiddleware = store => next => action => {
             if (_player) {
                 _player.switchToSmall()
             }
+
+            noSleep.disable();
+
             return next(action)
         }
 
