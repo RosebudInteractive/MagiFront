@@ -32,6 +32,7 @@ import LessonMenuReducer, {moduleName as LessonMenuModule} from 'ducks/lesson-me
 import TranscriptReducer, {moduleName as TranscriptModule} from 'ducks/transcript'
 import SearchReducer, {moduleName as SearchModule} from 'ducks/search'
 import CourseReducer, {moduleName as CourseModule} from 'ducks/course'
+import HeaderReducer, {moduleName as HeaderModule} from 'ducks/header'
 
 export default combineReducers({
 
@@ -66,6 +67,7 @@ export default combineReducers({
     [TranscriptModule]: TranscriptReducer,
     [SearchModule]: SearchReducer,
     [CourseModule]: CourseReducer,
+    [HeaderModule]: HeaderReducer,
     routing: routerReducer,
     form: formReducer,
 })

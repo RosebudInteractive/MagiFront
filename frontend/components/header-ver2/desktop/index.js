@@ -12,6 +12,7 @@ import {hideUserBlock} from "actions/app-actions";
 import {setInitialState} from "ducks/filters";
 
 import './desktop-header.sass'
+import DiscountButton from "../discounts/button";
 
 class DesktopHeader extends React.Component {
 
@@ -32,6 +33,7 @@ class DesktopHeader extends React.Component {
                         <svg width="130" height="31" dangerouslySetInnerHTML={{__html: LOGO}}/>
                     </Link>
                     <Navigator/>
+                    <DiscountButton/>
                     <UserBlock/>
                     <SignInBlock/>
                 </div>

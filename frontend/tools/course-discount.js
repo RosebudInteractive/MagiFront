@@ -23,6 +23,10 @@ export default class CourseDiscounts {
         this.loadFromStorage()
     }
 
+    static getActiveDynamicDiscounts() {
+        return this.getInstance()._findAllActiveDiscounts()
+    }
+
     static getActualPriceAndDiscount({course, buyAsGift}) {
         if (!buyAsGift && !(course && (course.IsPaid && !course.IsGift && !course.IsBought))) {
             return {
@@ -173,19 +177,29 @@ export default class CourseDiscounts {
     }
 
     _findActiveDiscount({course, discounts}) {
-        let _minPrice = course.DPrice,
+        let _minPrice = course ? course.DPrice : null,
             _currentCode = null
 
         if (!discounts) return null
 
         Object.entries(discounts).forEach(([key, value]) => {
-            if ((value.price < _minPrice) && moment.utc(value.expireDate).isAfter())  {
+            if ((!_minPrice || (value.price < _minPrice)) && moment.utc(value.expireDate).isAfter())  {
                 _currentCode = key
                 _minPrice = value.price
             }
         })
 
-        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate, percent: discounts[_currentCode].perc} : null
+        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate, percent: discounts[_currentCode].perc, price: discounts[_currentCode].price} : null
+    }
+
+    _findAllActiveDiscounts() {
+        if (!this.localDiscounts || !Object.keys(this.localDiscounts).length) return null
+
+        return Object.values(this.localDiscounts)
+            .map((item) => {
+                return this._findActiveDiscount({discounts: item})
+            })
+            .filter(item => item)
     }
 }
 

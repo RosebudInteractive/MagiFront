@@ -1,0 +1,36 @@
+@import "~tools/variables"
+
+.discount-button
+  display: flex
+  align-items: center
+  padding-left: 25px
+  margin-right: 25px
+  border-left: $border-dark-02
+  cursor: pointer
+  position: relative
+
+  svg
+    fill: $color-main-dark
+    fill-opacity: 0.3
+
+  .counter
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 14px
+    line-height: 17px
+    letter-spacing: 1px
+    text-transform: uppercase
+    color: $color-dark-03
+    position: absolute
+    right: -9px
+    top: 4px
+
+  &._active
+    svg
+      fill: $color-red
+      fill-opacity: 1
+
+    .counter
+      color: $color-red
+
