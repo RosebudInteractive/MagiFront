@@ -189,15 +189,15 @@ export default class CourseDiscounts {
             }
         })
 
-        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate, percent: discounts[_currentCode].perc, price: discounts[_currentCode].price} : null
+        return _currentCode ? {code: _currentCode, expireDate: discounts[_currentCode].expireDate, percent: discounts[_currentCode].perc} : null
     }
 
     _findAllActiveDiscounts() {
         if (!this.localDiscounts || !Object.keys(this.localDiscounts).length) return null
 
-        return Object.values(this.localDiscounts)
-            .map((item) => {
-                return this._findActiveDiscount({discounts: item})
+        return Object.entries(this.localDiscounts)
+            .map(([key, value]) => {
+                return {id: key, ...this._findActiveDiscount({discounts: value})}
             })
             .filter(item => item)
     }

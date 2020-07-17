@@ -1,0 +1,57 @@
+@import "~tools/variables"
+@import "~tools/mixins"
+
+.discount-menu
+  width: 405px
+  max-height: 441px
+  overflow-y: auto
+  background: $color-white
+  position: absolute
+  top: 72px
+  right: 0
+  border: $border-dark-02
+  opacity: 1
+  transition: opacity 300ms ease
+  &._hidden
+    opacity: 0
+
+.discount-menu__wrapper
+  margin: 17px 15px
+
+.discount-menu__title
+  @include font-fira(12px, bold, 140%, $color-black)
+
+.discount-menu__list
+  .discount-item__link:not(:last-child)
+    .discount-item
+      border-bottom: $border-dark-02
+
+  &:not(:first-child)
+    margin-top: 31px
+
+.discount-item
+  padding: 10px 0 11px
+  display: flex
+  justify-content: space-between
+
+.discount-item__course-title
+  width: 197px
+
+.discount-item__price-block
+  display: flex
+  flex-direction: column
+  @include font-fira(12px, bold, 140%)
+  margin-left: 7px
+  align-items: flex-end
+  .price
+    color: $color-main-dark
+  .old-price
+    color: $color-dark-04
+    text-decoration-line: line-through
+    padding-right: 8px
+
+.discount-item__remaining-time
+  min-width: 69px
+  margin-left: 14px
+  text-align: end
+

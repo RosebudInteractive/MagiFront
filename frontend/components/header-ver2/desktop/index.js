@@ -13,6 +13,7 @@ import {setInitialState} from "ducks/filters";
 
 import './desktop-header.sass'
 import DiscountButton from "../discounts/button";
+import DiscountMenu from "../discounts/menu";
 
 class DesktopHeader extends React.Component {
 
@@ -34,6 +35,7 @@ class DesktopHeader extends React.Component {
                     </Link>
                     <Navigator/>
                     <DiscountButton/>
+                    <DiscountMenu/>
                     <UserBlock/>
                     <SignInBlock/>
                 </div>
