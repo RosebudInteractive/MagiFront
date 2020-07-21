@@ -13,6 +13,7 @@ export default class DiscountItem extends React.Component {
     static propTypes = {
         course: PropTypes.object,
         dynamic: PropTypes.bool,
+        onClick: PropTypes.func,
     }
 
     render() {
@@ -21,7 +22,7 @@ export default class DiscountItem extends React.Component {
             _currency = getCurrencySign(),
             _expireDate = this._getExpireDate()
 
-        return <Link to={`/category/${course.URL}`} className="discount-item__link">
+        return <Link to={`/category/${course.URL}`} className="discount-item__link" onClick={::this.props.onClick}>
             <div className="discount-item">
                 <div className="discount-item__course-title font-universal__body-small">
                     <span className="_orange">Курс: </span>
@@ -45,8 +46,7 @@ export default class DiscountItem extends React.Component {
         const {course, dynamic} = this.props
 
         if (dynamic) {
-            const _data = CourseDiscounts.getActualPriceAndDiscount({course})
-            return _data ? _data.expireDate : null
+            return CourseDiscounts.getExpireDateForCourse({courseId: course.Id, code: Object.keys(course.DynDiscounts)[0]})
         } else {
             return course.Discount.LastDate ? moment(course.Discount.LastDate) : null
         }

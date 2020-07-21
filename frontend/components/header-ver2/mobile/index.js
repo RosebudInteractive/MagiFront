@@ -11,6 +11,8 @@ import {OverflowHandler} from "tools/page-tools";
 
 import {showMenu, hideMenu} from "actions/page-header-actions";
 import {setInitialState} from "ducks/filters";
+import DiscountButton from "../discounts/button";
+import DiscountMenu from "../discounts/menu";
 
 class MobileHeader extends React.Component {
 
@@ -32,6 +34,8 @@ class MobileHeader extends React.Component {
                     <svg width="70" height="38" dangerouslySetInnerHTML={{__html: LOGO}}/>
                 </Link>
                 <Navigator isPhoneViewPort={this.props.isPhoneViewPort}/>
+                <DiscountButton/>
+                <DiscountMenu/>
                 <div className="button-wrapper">
                     <button type="button" className="menu-trigger" onClick={::this._onClickMenuTrigger}>
                         <span>Меню</span>

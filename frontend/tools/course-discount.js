@@ -67,6 +67,16 @@ export default class CourseDiscounts {
 
     }
 
+    static getExpireDateForCourse({courseId, code}) {
+        const _discounts = this.getInstance()._getCourseDiscounts(courseId)
+
+        if (!_discounts) return null
+
+        const _item = _discounts[code]
+
+        return _item ? _item.expireDate : null
+    }
+
     static checkDynamicDiscountInURL(params) {
         const _dynamicDiscount = params.get('dnds') ? params.get('dnds') : null
 
@@ -96,11 +106,15 @@ export default class CourseDiscounts {
     }
 
     _getDiscount({course}) {
-        if (!this.localDiscounts || !Object.keys(this.localDiscounts).length) return null
-
-        let _courseDiscounts = this.localDiscounts[course.Id]
+        let _courseDiscounts = this._getCourseDiscounts(course.Id)
 
         return _courseDiscounts ? this._findActiveDiscount({course: course, discounts: _courseDiscounts}) : null
+    }
+
+    _getCourseDiscounts(courseId) {
+        if (!this.localDiscounts || !Object.keys(this.localDiscounts).length) return null
+
+        return  this.localDiscounts[courseId]
     }
 
     static activateDiscount(data) {

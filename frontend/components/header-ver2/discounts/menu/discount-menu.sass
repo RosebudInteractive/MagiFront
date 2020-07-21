@@ -7,13 +7,24 @@
   overflow-y: auto
   background: $color-white
   position: absolute
-  top: 72px
+  top: 71px
   right: 0
   border: $border-dark-02
   opacity: 1
   transition: opacity 300ms ease
   &._hidden
     opacity: 0
+  &._margin-no
+    margin-bottom: 0
+  @media (max-width: $tablet-width)
+    top: 63px
+  @media (max-width: $mobile-phone-width)
+    max-height: none
+    height: calc(100% - 63px)
+    position: fixed
+    overflow: auto
+    width: 100%
+
 
 .discount-menu__wrapper
   margin: 17px 15px
@@ -36,6 +47,7 @@
 
 .discount-item__course-title
   width: 197px
+  min-width: 87px
 
 .discount-item__price-block
   display: flex

@@ -46,7 +46,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_DISCOUNTS_SUCCESS:
             return state
-                .set("result", new ResultRecord({other: payload.Other, dynamic: payload.Dynamic}))
+                .set("result", new ResultRecord({other: payload.Other ? payload.Other: [], dynamic: payload.Dynamic ? payload.Dynamic : []}))
                 .set("count", payload.count)
                 .set("fetching", false)
 
