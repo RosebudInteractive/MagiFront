@@ -32,7 +32,7 @@ export default class DiscountItem extends React.Component {
                     <div className="_red">{_discount.Perc + "%"}</div>
                     <div className="price">
                         <span className="old-price">{course.Price + _currency}</span>
-                        <span>{course.Price + _currency}</span>
+                        <span>{course.DPrice + _currency}</span>
                     </div>
                 </div>
                 <div className="discount-item__remaining-time font-universal__body-small">
