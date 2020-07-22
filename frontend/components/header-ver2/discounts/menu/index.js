@@ -59,6 +59,10 @@ class DiscountMenu extends React.Component {
             setTimeout(() => this.setState({hidden: false}), 0)
             document.body.addEventListener(this._touchEventName, this._clickHandler)
         }
+
+        if (prevProps.visible && !this.props.visible) {
+            this._forceHideMenu()
+        }
     }
 
     componentWillUnmount() {
@@ -68,11 +72,11 @@ class DiscountMenu extends React.Component {
 
     render() {
         const {result, visible} = this.props,
-            {hidden, marginNo} = this.state,
+            {hidden,} = this.state,
             _dynamicList = this._getDiscountsList(result.dynamic, true),
             _commonList = this._getDiscountsList(result.other, false)
 
-        return visible && <div className={"discount-menu" + (hidden ? " _hidden" : "") + (marginNo ? " _margin-no" : "")}>
+        return visible && <div className={"discount-menu" + (hidden ? " _hidden" : "")}>
             <div className="discount-menu__wrapper">
                 {
                     _dynamicList &&
@@ -95,7 +99,7 @@ class DiscountMenu extends React.Component {
     _getDiscountsList(list, isDynamic) {
         return list.length ?
             list.map((item) => {
-                return <DiscountItem course={item} dynamic={!!isDynamic} onClick={::this._hideMenu}/>
+                return <DiscountItem course={item} dynamic={!!isDynamic} onClick={::this._forceHideMenu}/>
             })
             :
             null
@@ -112,24 +116,21 @@ class DiscountMenu extends React.Component {
         }, 300)
     }
 
+    _forceHideMenu() {
+        this.setState({hidden: true})
+
+        if (OverflowHandler.enable) {
+            OverflowHandler.turnOff()
+        }
+        this.props.actions.hideDiscountMenu()
+    }
+
     _switchOnPhoneMode() {
         OverflowHandler.turnOnOverflowFixed()
     }
 
     _switchOffPhoneMode() {
         OverflowHandler.turnOff()
-    }
-
-    _checkMenuHeight() {
-        let _list = $(".discount-menu__wrapper"),
-            _menu = $(".discount-menu")
-
-        if (_menu && _menu.length && _list && _list.length) {
-            let _marginNo = _menu.height() < _list.height()
-            if (_marginNo !== this.state.marginNo) {
-                this.setState({marginNo: _marginNo})
-            }
-        }
     }
 }
 

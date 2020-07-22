@@ -32,6 +32,7 @@ export const ReducerRecord = Record({
     fetching: false,
     result: new ResultRecord(),
     count: 0,
+    active: false,
     showDiscountMenu: false,
 })
 
@@ -48,12 +49,14 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("result", new ResultRecord({other: payload.Other ? payload.Other: [], dynamic: payload.Dynamic ? payload.Dynamic : []}))
                 .set("count", payload.count)
+                .set("active", payload.active)
                 .set("fetching", false)
 
         case GET_DISCOUNTS_FAIL:
             return state
                 .set("result", new ResultRecord())
                 .set("count", 0)
+                .set("active", false)
                 .set("fetching", false)
 
         case SHOW_DISCOUNT_MENU:
@@ -74,6 +77,7 @@ export const stateSelector = state => state[moduleName]
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching)
 export const countSelector = createSelector(stateSelector, state => state.count)
 export const resultSelector = createSelector(stateSelector, state => state.result)
+export const activeSelector = createSelector(stateSelector, state => state.active)
 export const showDiscountMenuSelector = createSelector(stateSelector, state => state.showDiscountMenu)
 
 /**
@@ -115,9 +119,10 @@ function* getDiscountsSaga(data) {
                 null
 
         const _discounts = yield call(commonGetQuery, "/api/users/courses-for-sale" + (_params ? "?Codes=" + _params : "")),
-            count = (_discounts.Other ? _discounts.Other.length : 0) + (_discounts.Dynamic ? _discounts.Dynamic.length : 0)
+            count = _discounts.Dynamic ? _discounts.Dynamic.length : 0,
+            active = count || (_discounts.Other && _discounts.Other.length)
 
-        yield put({type: GET_DISCOUNTS_SUCCESS, payload: {count, ..._discounts}})
+        yield put({type: GET_DISCOUNTS_SUCCESS, payload: {active, count, ..._discounts}})
         if (data.payload && data.payload.showMenu) {
             yield put({type: SHOW_DISCOUNT_MENU,})
         }

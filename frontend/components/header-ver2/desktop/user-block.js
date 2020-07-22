@@ -6,7 +6,7 @@ import * as userActions from '../../../actions/user-actions'
 import * as appActions from '../../../actions/app-actions'
 import {Link} from 'react-router-dom';
 import * as pageHeaderActions from "../../../actions/page-header-actions";
-import {OverflowHandler, widthLessThan900} from "../../../tools/page-tools";
+import {OverflowHandler, widthLessThan900} from "tools/page-tools";
 import {enabledPaidCoursesSelector,} from "ducks/app";
 
 class UserBlock extends React.Component {
@@ -19,14 +19,26 @@ class UserBlock extends React.Component {
                 this.props.appActions.hideUserBlock()
             }
         }
+
+        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+        this._clickHandler = (e) => {
+            const _isMenu = e.target.closest('.user-tooltip'),
+                _isButton = e.target.closest('.user-block__header')
+
+            if (!_isMenu && !_isButton) {
+                this.props.appActions.hideUserBlock()
+            }
+        }
     }
 
     componentDidMount() {
         // $(window).on('resize', this._resizeHandler)
+        document.body.addEventListener(this._touchEventName, this._clickHandler)
     }
 
     componentWillUnmount() {
         // $(window).unbind('resize', this._resizeHandler)
+        document.body.removeEventListener(this._touchEventName, this._clickHandler)
     }
 
     _onClick() {
@@ -119,6 +131,7 @@ function mapStateToProps(state) {
         user: state.user.user,
         showUserBlock: state.app.showUserBlock,
         enabledPaidCourses: enabledPaidCoursesSelector(state),
+        isMobileApp: state.app.isMobileApp,
     }
 }
 

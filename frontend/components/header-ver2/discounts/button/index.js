@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {countSelector, getDiscounts, getDiscountsAndShow, showDiscountMenuSelector} from "ducks/header";
+import {activeSelector, countSelector, getDiscounts, getDiscountsAndShow, showDiscountMenuSelector} from "ducks/header";
 import {bindActionCreators} from "redux";
 import "./discount-button.sass"
 
@@ -14,11 +14,11 @@ class DiscountButton extends React.Component {
     }
 
     render() {
-        const {count} = this.props
+        const {count, active} = this.props
 
-        return <div className={"discount-button" + (count ? " _active" : "")} onClick={::this._onButtonClick}>
+        return <div className={"discount-button" + (active ? " _active" : "")} onClick={::this._onButtonClick}>
             <svg width="14" height="17" dangerouslySetInnerHTML={{__html: DISCOUNT_BUTTON}}/>
-            {!!count && <div className="counter">{count}</div>}
+            {!!count && active && <div className="counter">{count}</div>}
         </div>
     }
 
@@ -32,6 +32,7 @@ class DiscountButton extends React.Component {
 const mapState2Props = (state) => {
     return {
         count: countSelector(state),
+        active: activeSelector(state),
         showDiscountMenu: showDiscountMenuSelector(state),
     }
 }
