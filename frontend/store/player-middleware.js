@@ -47,7 +47,7 @@ const playerMiddleware = store => next => action => {
 
             Player.clearPlayInfo(_state.lessonPlayInfo.playInfo)
 
-            noSleep.enable();
+            _noSleepEnable();
 
             return next(action)
         }
@@ -76,7 +76,7 @@ const playerMiddleware = store => next => action => {
                 }
             }
 
-            noSleep.enable();
+            _noSleepEnable();
 
             return next(action)
         }
@@ -86,7 +86,7 @@ const playerMiddleware = store => next => action => {
                 Player.getInstance().replay()
             }
 
-            noSleep.enable();
+            _noSleepEnable();
 
             return next(action)
         }
@@ -96,7 +96,7 @@ const playerMiddleware = store => next => action => {
                 Player.getInstance().pause()
             }
 
-            noSleep.disable();
+            _noSleepDisable();
 
             return next(action)
         }
@@ -106,7 +106,7 @@ const playerMiddleware = store => next => action => {
                 Player.getInstance().stop()
             }
 
-            noSleep.disable();
+            _noSleepDisable();
 
             return next(action)
         }
@@ -170,7 +170,7 @@ const playerMiddleware = store => next => action => {
                 _player.switchToSmall()
             }
 
-            noSleep.disable();
+            _noSleepDisable();
 
             return next(action)
         }
@@ -187,7 +187,7 @@ const playerMiddleware = store => next => action => {
                 })
             }
 
-            noSleep.disable();
+            _noSleepDisable();
 
             return next(action)
         }
@@ -198,7 +198,7 @@ const playerMiddleware = store => next => action => {
                 _player.switchToSmall()
             }
 
-            noSleep.disable();
+            _noSleepDisable();
 
             return next(action)
         }
@@ -217,3 +217,13 @@ const playerMiddleware = store => next => action => {
 }
 
 export default playerMiddleware;
+
+const _noSleepEnable = () => {
+    noSleep.enable()
+}
+
+const _noSleepDisable = () => {
+    if (noSleep._wakeLock) {
+        noSleep.disable()
+    }
+}
