@@ -223,7 +223,7 @@ const _noSleepEnable = () => {
 }
 
 const _noSleepDisable = () => {
-    if (noSleep._wakeLock) {
+    if (noSleep._wakeLock || (noSleep.noSleepVideo && !noSleep.noSleepVideo.paused)) {
         noSleep.disable()
     }
 }
