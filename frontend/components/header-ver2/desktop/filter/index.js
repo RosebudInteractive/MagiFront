@@ -59,11 +59,51 @@ class FiltersRow extends React.Component {
 
         }.bind(this)
 
-        this._addEventListeners();
+        this._wheelHandler = (e) => {
+            let _last = $('.filter-item').last(),
+                _right = _last.offset().left + _last.innerWidth(),
+                _row = $('.filters-row__inner')
+
+            let _first = $('.filter-item').first(),
+                _left = _first.offset().left
+
+            const _needHandle = Math.round(_right) > Math.round(_row.offset().left + _row.innerWidth()) ||
+                Math.round(_left) < Math.round(_row.offset().left)
+
+            if (!_needHandle) return
+
+            const _delta = e.originalEvent.deltaY
+            $(".filters-list").scrollLeft(_delta)
+            e.preventDefault()
+        }
+
+        this._scrollHandler = () => {
+            let _last = $('.filter-item').last(),
+                _right = _last.offset().left + _last.innerWidth(),
+                _row = $('.filters-row__inner')
+
+            const _needShowShadowAfter = Math.round(_right - 5) > Math.round(_row.offset().left + _row.innerWidth())
+
+            if (this.state.showShadowAfter !== _needShowShadowAfter) {
+                this.setState({showShadowAfter: _needShowShadowAfter})
+            }
+
+            let _first = $('.filter-item').first(),
+                _left = _first.offset().left
+
+            const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
+
+            if (this.state.showShadowBefore !== _needShowShadowBefore) {
+                this.setState({showShadowBefore: _needShowShadowBefore})
+            }
+        }
+
+
     }
 
     componentDidMount() {
         this._handleResize();
+        this._addEventListeners();
 
     }
 
@@ -72,26 +112,9 @@ class FiltersRow extends React.Component {
             this._handleResize();
 
             if (!this._onScrollBinded) {
-                $('.filters-list').scroll(() => {
-                    let _last = $('.filter-item').last(),
-                        _right = _last.offset().left + _last.innerWidth(),
-                        _row = $('.filters-row__inner')
+                $('.filters-list').bind("wheel", this._wheelHandler)
 
-                    const _needShowShadowAfter = Math.round(_right - 5) > Math.round(_row.offset().left + _row.innerWidth())
-
-                    if (this.state.showShadowAfter !== _needShowShadowAfter) {
-                        this.setState({showShadowAfter: _needShowShadowAfter})
-                    }
-
-                    let _first = $('.filter-item').first(),
-                        _left = _first.offset().left
-
-                    const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
-
-                    if (this.state.showShadowBefore !== _needShowShadowBefore) {
-                        this.setState({showShadowBefore: _needShowShadowBefore})
-                    }
-                })
+                $('.filters-list').scroll(this._scrollHandler)
 
                 this._onScrollBinded = true
             }
@@ -201,10 +224,14 @@ class FiltersRow extends React.Component {
 
     _addEventListeners() {
         $(window).bind('resize', this._handleResize)
+        $(".filters-list").bind("wheel", this._wheelHandler)
+        $(".filters-list").bind("scroll", this._scrollHandler)
     }
 
     _removeEventListeners() {
         $(window).unbind('resize', this._handleResize)
+        $(".filters-list").unbind("wheel", this._wheelHandler)
+        $(".filters-list").unbind("scroll", this._scrollHandler)
     }
 }
 

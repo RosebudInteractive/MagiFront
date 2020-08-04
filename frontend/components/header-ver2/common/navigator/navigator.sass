@@ -11,6 +11,12 @@
     display: block !important
     padding-top: 7px
     flex: 1 1 100%
+    width: 450px
+    overflow-x: auto
+    -ms-overflow-style: none
+    scrollbar-width: none
+    &::-webkit-scrollbar
+      display: none
     ul a
       padding: 0
 
@@ -24,9 +30,9 @@
     display: -moz-box
     display: -ms-flexbox
     display: flex
-    -webkit-flex-wrap: wrap
-    -ms-flex-wrap: wrap
-    flex-wrap: wrap
+    -webkit-flex-wrap: nowrap
+    -ms-flex-wrap: nowrap
+    flex-wrap: nowrap
     margin: 0
     padding: 0
     list-style: none
