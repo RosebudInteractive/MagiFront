@@ -47,6 +47,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('episodesTimes', payload.episodesTimes)
                 .set('refs', payload.transcript.Refs)
                 .set('assets', payload.assets)
+                .set('gallery', payload.gallery)
 
         case GET_TRANSCRIPT_FAIL:
             return state
@@ -69,6 +70,7 @@ export const episodesTimesSelector = createSelector(stateSelector, state => stat
 export const refsSelector = createSelector(stateSelector, state => state.refs)
 export const refsVisibleSelector = createSelector(refsSelector, refs => (refs.length > 0))
 export const assetsSelector = createSelector(stateSelector, state => state.assets)
+export const gallerySelector = createSelector(stateSelector, state => state.gallery)
 
 /**
  * Action Creators
@@ -115,7 +117,8 @@ function* getTranscriptSaga(data) {
                 timeStamps: _transcriptData.timeStamps,
                 episodesTimes: _transcriptData.episodesTimes,
                 refsVisible: _transcript.Refs && Array.isArray(_transcript.Refs) && (_transcript.Refs.length > 0),
-                assets: _assets
+                assets: _assets,
+                gallery: (_transcript.Galery && _transcript.Galery.length) ? _transcript.Galery : []
             }
 
         yield put({type: GET_TRANSCRIPT_SUCCESS, payload: _payload})

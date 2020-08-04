@@ -7,7 +7,7 @@ import Swiper from 'swiper';
 import * as appActions from "../../actions/app-actions";
 
 import $ from 'jquery'
-import {getImagePath, ImageSize} from "../../tools/page-tools";
+import {getImagePath, ImageSize} from "tools/page-tools";
 import * as userActions from "actions/user-actions";
 
 class GalleryWrapper extends React.Component {
