@@ -33,6 +33,7 @@ import {getLessonsAll, loadingSelector as menuDataLoading} from "ducks/lesson-me
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 import "../components/combined-lesson-page/lesson-page.sass"
+import SwitchButtons from "../components/combined-lesson-page/switch-buttons";
 
 let _scrollTop = 0;
 
@@ -409,6 +410,7 @@ class CombineLessonPage extends React.Component {
                                         course={course} lesson={_lesson}
                                         isNeedHideGallery={_isNeedHideGallery}
                                         isPaidCourse={this._isPaidCourse}/>
+                            <SwitchButtons/>
                         </React.Fragment>
                         :
                         null
