@@ -103,7 +103,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_REVIEWS_FAIL:
             return state
-                .set('loaded', false)
+                .set('loaded', true)
                 .set('loading', false)
 
         case CREATE_NEW_REVIEW_START:
@@ -212,10 +212,9 @@ function* getReviewsSaga(data) {
     yield put({type: GET_REVIEWS_START})
 
     try {
-        const [_reviews] = yield all([
-            call(_fetchReviews, data.payload),
-            put(getCourses()),
-        ])
+        const _reviews = yield call(_fetchReviews, data.payload)
+
+        yield put(getCourses())
 
         const {success} = yield race({
             success: take(GET_COURSES_SUCCESS),
