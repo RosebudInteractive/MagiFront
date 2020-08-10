@@ -17,7 +17,7 @@ import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as userActions from "../actions/user-actions";
 
-import {getDomain, pages} from '../tools/page-tools';
+import {getDomain, pages} from 'tools/page-tools';
 import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";
@@ -410,11 +410,20 @@ class CombineLessonPage extends React.Component {
                                         course={course} lesson={_lesson}
                                         isNeedHideGallery={_isNeedHideGallery}
                                         isPaidCourse={this._isPaidCourse}/>
-                            <SwitchButtons/>
+                            { this._isPlayerMode(_lesson) && <SwitchButtons/> }
                         </React.Fragment>
                         :
                         null
         )
+    }
+
+    _isPlayerMode(lesson) {
+        const {lessonUrl, playingLesson, lessonEnded, canNotPlay,} = this.props
+
+        let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
+            _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
+
+        return (_playingLessonUrl || _lessonInPlayer) && !(lessonEnded || canNotPlay)
     }
 
     _getLessonsBundles() {

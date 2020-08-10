@@ -4,7 +4,6 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import "./asset-viewer.sass"
 import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
-import {isInViewport} from "tools/page-tools";
 
 const IMAGE_MAX_HEIGHT = 400,
     FADE_TIMEOUT = 400,
