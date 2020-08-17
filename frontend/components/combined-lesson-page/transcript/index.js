@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import TextBlock from './text-block';
 import GallerySlides from '../../transcript-page/gallery-slides';
-import {loadingSelector, transcriptSelector, assetsSelector, loadTranscript, gallerySelector} from "ducks/transcript";
+import {loadingSelector, transcriptSelector, assetsSelector, loadTranscript, galleryItemsSelector} from "ducks/transcript";
 import LoadingFrame from "../../loading-frame";
 
 export class Current {
@@ -77,7 +77,7 @@ const mapState2Props = (state) => {
     return {
         loading: loadingSelector(state),
         transcript: transcriptSelector(state),
-        gallery: gallerySelector(state),
+        gallery: galleryItemsSelector(state),
         hasAssets: !!assetsSelector(state),
         authorized: !!state.user.user,
         isAdmin: !!state.user.user && state.user.user.isAdmin,

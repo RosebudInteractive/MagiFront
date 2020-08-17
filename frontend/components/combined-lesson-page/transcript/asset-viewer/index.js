@@ -4,6 +4,9 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import "./asset-viewer.sass"
 import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
+import {isMobilePlatform} from "tools/page-tools";
+import {bindActionCreators} from "redux";
+import {showGallery} from "ducks/transcript";
 
 const IMAGE_MAX_HEIGHT = 400,
     FADE_TIMEOUT = 400,
@@ -135,11 +138,17 @@ class AssetBlock extends React.Component{
         return asset &&
             <div className="asset-block">
                 <div className="image-block">
-                    <img className={_imageClassName} src={imageClear ? null : `/data/${asset.file}`} onLoad={::this._onLoadImage}/>
+                    <img className={_imageClassName} src={imageClear ? null : `/data/${asset.file}`} onLoad={::this._onLoadImage} onClick={::this._onImageClick}/>
                 </div>
                 { asset.title && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title}</div> }
                 { asset.title2 && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title2}</div> }
             </div>
+    }
+
+    _onImageClick() {
+        if (!isMobilePlatform()) {
+            this.props.actions.showGallery(this.state.asset)
+        }
     }
 
 
@@ -335,4 +344,10 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps,)(AssetBlock);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        actions: bindActionCreators({showGallery}, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AssetBlock);

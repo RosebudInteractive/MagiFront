@@ -34,6 +34,7 @@ import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 import "../components/combined-lesson-page/lesson-page.sass"
 import SwitchButtons from "../components/combined-lesson-page/switch-buttons";
+import GallerySlider from "../components/combined-lesson-page/desktop/gallery-slider";
 
 let _scrollTop = 0;
 
@@ -401,6 +402,7 @@ class CombineLessonPage extends React.Component {
                                     <React.Fragment>
                                         <GalleryButtons isLocked={!authorized}/>
                                         {lessonText.loaded && <GalleryWrapper gallery={lessonText.gallery}/>}
+                                        {lessonText.loaded && <GallerySlider/>}
                                     </React.Fragment>
                             }
                             {this._getLessonsBundles()}

@@ -7,8 +7,9 @@ import Swiper from 'swiper';
 import * as appActions from "../../actions/app-actions";
 
 import $ from 'jquery'
-import {getImagePath, ImageSize} from "tools/page-tools";
+import {getImagePath, ImageSize, isMobilePlatform} from "tools/page-tools";
 import * as userActions from "actions/user-actions";
+import {showGallery} from "ducks/transcript";
 
 class GalleryWrapper extends React.Component {
 
@@ -76,11 +77,17 @@ class GalleryWrapper extends React.Component {
                 _wrap = $('.js-gallery-slider-wrapper'),
                 _stickyBlock = $('.js-sticky-block');
 
-            _controls.removeClass('hide').addClass('show');
-            _wrap.addClass('show');
-            _stickyBlock.addClass('slider-opened');
+            if (isMobilePlatform()) {
+                _controls.removeClass('hide').addClass('show');
+                _wrap.addClass('show');
+                _stickyBlock.addClass('slider-opened');
 
-            this.props.appActions.openGallery()
+                this.props.appActions.openGallery()
+            } else {
+                this.props.showDesktopGallery()
+            }
+
+
         } else {
             this.props.userActions.showSignInForm();
         }
@@ -139,6 +146,7 @@ function mapDispatchToProps(dispatch) {
     return {
         appActions: bindActionCreators(appActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        showDesktopGallery: bindActionCreators(showGallery, dispatch)
     }
 }
 

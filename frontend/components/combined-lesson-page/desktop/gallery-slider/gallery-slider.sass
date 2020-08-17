@@ -1,0 +1,200 @@
+@import "~tools/variables.sass"
+
+.gallery-slider__container
+  position: fixed
+  //visibility: 1
+  width: 100%
+  height: 100vh
+  z-index: 1000
+  background-color: $color-dark-09
+  box-sizing: border-box
+  padding-top: 59px
+
+  .gallery-slider__arrow
+    position: absolute
+    width: 24px
+    height: 24px
+    color: transparent
+    bottom: 13px
+    z-index: 1
+    cursor: pointer
+
+    &::before
+      content: ""
+      position: absolute
+      width: 19px
+      height: 3px
+      top: 4px
+      background-color: $color-white
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+
+    &::after
+      content: ""
+      position: absolute
+      width: 19px
+      height: 3px
+      bottom: 4px
+      background-color: $color-white
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+
+    &._left
+      left: 13px
+      &::before
+        left: 5px
+        transform: rotate(-45deg)
+      &::after
+        left: 5px
+        transform: rotate(45deg)
+
+    &._right
+      right: 13px
+      &::before
+        right: 5px
+        transform: rotate(45deg)
+      &::after
+        right: 5px
+        transform: rotate(-45deg)
+
+        
+  .gallery-slider__close
+    z-index: 10
+    padding: 0
+    border: none
+    outline: none
+    position: fixed
+    top: -24px
+    right: -24px
+    width: 48px
+    height: 48px
+    font-size: 0
+    background-color: $color-dark-06
+    border-radius: 50%
+    -webkit-box-shadow: 6px -6px 30px rgba(0, 0, 0, 0.15)
+    box-shadow: 6px -6px 30px rgba(0, 0, 0, 0.15)
+    -webkit-transition: -webkit-box-shadow 0.3s ease
+    transition: -webkit-box-shadow 0.3s ease
+    transition: box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease
+    &::after
+      content: ""
+      position: absolute
+      top: 50%
+      left: 50%
+      width: 24px
+      height: 2px
+      background-color: $color-white
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+      -webkit-transform: translate(-50%, -50%) rotate(45deg)
+      -ms-transform: translate(-50%, -50%) rotate(45deg)
+      transform: translate(-50%, -50%) rotate(45deg)
+    &::before
+      content: ""
+      position: absolute
+      top: 50%
+      left: 50%
+      width: 24px
+      height: 2px
+      background-color: $color-white
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+      -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+      -ms-transform: translate(-50%, -50%) rotate(-45deg)
+      transform: translate(-50%, -50%) rotate(-45deg)
+
+  .carousel-root
+    height: 100%
+    width: 100%
+
+
+  .slide
+    background: none !important
+    height: 100%
+    .carousel-slide__wrapper
+      inline-size: max-content
+      margin: auto
+
+  .carousel.carousel-slider
+    height: calc(100% - 50px)
+    width: 100%
+    box-sizing: border-box
+
+    .slider-wrapper
+      height: 100% !important
+
+      .slider
+        height: 100% !important
+
+    .carousel-slide__wrapper
+      display: flex
+      flex-direction: column
+      justify-content: center
+      height: calc(100% - 84px)
+
+      img
+        max-height: 100%
+        width: auto
+
+      .carousel-slide__legend
+        position: relative
+        height: 84px
+
+      .gallery-slide__caption
+        bottom: 0
+        opacity: 1
+        background: none
+        width: 50%
+        padding: 0
+        margin: 0
+        left: 50%
+        transform: translateX(-50%)
+        display: flex
+        flex-direction: column
+        justify-content: center
+        font-size: 17px
+        height: 84px
+
+  .carousel
+    .thumbs-wrapper
+      margin: 0
+
+    .thumb
+      position: relative
+      border: none
+      margin: 0
+      padding: 0
+      background-color: $color-main-dark
+      &:not(.selected)
+        &::before
+          content: ""
+          position: absolute
+          top: 0
+          left: 0
+          width: 100%
+          height: 100%
+          background: $color-dark-08
+          transition: background ease 300ms
+
+      &.selected
+        border: none
+        &::after
+          position: absolute
+          content: ""
+          bottom: 0
+          left: 0
+          height: 3px
+          width: 100%
+          background: $color-orange
+
+      &:hover
+        border: none
+        &::before
+          background: none
+
+      &:focus
+        border: none
+
+      img
+        height: 50px
+        width: auto

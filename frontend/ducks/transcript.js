@@ -3,7 +3,6 @@ import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import {all, call, put, takeEvery, select,} from "@redux-saga/core/effects";
 import {commonGetQuery} from "tools/fetch-tools";
-import React from "react";
 import {GET_LESSON_SUCCESS} from "../constants/lesson";
 import TranscriptParser from "tools/transcript";
 
@@ -18,6 +17,15 @@ const GET_TRANSCRIPT_START = `${prefix}/GET_TRANSCRIPT_START`
 const GET_TRANSCRIPT_SUCCESS = `${prefix}/GET_TRANSCRIPT_SUCCESS`
 const GET_TRANSCRIPT_FAIL = `${prefix}/GET_TRANSCRIPT_FAIL`
 
+const SHOW_GALLERY_REQUEST = `${prefix}/SHOW_GALLERY_REQUEST`
+const SHOW_GALLERY = `${prefix}/SHOW_GALLERY`
+const CLOSE_GALLERY = `${prefix}/CLOSE_GALLERY`
+
+const Gallery = Record({
+    items: [],
+    visible: false,
+    currentIndex: 0,
+})
 
 const ReducerRecord = Record({
     loading: false,
@@ -27,7 +35,8 @@ const ReducerRecord = Record({
     timeStamps: false,
     refs: [],
     assets: null,
-    gallery: [],
+    gallery: new Gallery(),
+
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -47,11 +56,27 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('episodesTimes', payload.episodesTimes)
                 .set('refs', payload.transcript.Refs)
                 .set('assets', payload.assets)
-                .set('gallery', payload.gallery)
+                .setIn(['gallery', 'items'], payload.gallery)
 
         case GET_TRANSCRIPT_FAIL:
             return state
                 .set('loading', false)
+
+        case SHOW_GALLERY:
+            return state
+                .update("gallery", (gallery) => {
+                    return gallery
+                        .set("visible", true)
+                        .set("currentIndex", payload)
+                })
+
+        case CLOSE_GALLERY:
+            return state
+                .update("gallery", (gallery) => {
+                    return gallery
+                        .set("visible", false)
+                        .set("currentIndex", 0)
+                })
 
         default:
             return state
@@ -70,13 +95,24 @@ export const episodesTimesSelector = createSelector(stateSelector, state => stat
 export const refsSelector = createSelector(stateSelector, state => state.refs)
 export const refsVisibleSelector = createSelector(refsSelector, refs => (refs.length > 0))
 export const assetsSelector = createSelector(stateSelector, state => state.assets)
-export const gallerySelector = createSelector(stateSelector, state => state.gallery)
+const gallerySelector = createSelector(stateSelector, state => state.gallery)
+export const galleryItemsSelector = createSelector(gallerySelector, gallery => gallery.items)
+export const galleryVisibleSelector = createSelector(gallerySelector, gallery => gallery.visible)
+export const galleryCurrentIndexSelector = createSelector(gallerySelector, gallery => gallery.currentIndex)
 
 /**
  * Action Creators
  * */
 export const loadTranscript = (data) => {
     return {type: GET_TRANSCRIPT_REQUEST, payload: data}
+}
+
+export const showGallery = (currentSlide) => {
+    return {type: SHOW_GALLERY_REQUEST, payload: currentSlide}
+}
+
+export const closeGallery = () => {
+    return {type: CLOSE_GALLERY}
 }
 
 
@@ -86,7 +122,8 @@ export const loadTranscript = (data) => {
 export const saga = function* () {
     yield all([
             takeEvery(GET_TRANSCRIPT_REQUEST, getTranscriptSaga),
-            takeEvery(GET_LESSON_SUCCESS, loadAssetsInfoSaga)
+            takeEvery(GET_LESSON_SUCCESS, loadAssetsInfoSaga),
+            takeEvery(SHOW_GALLERY_REQUEST, showGallerySaga)
         ]
     )
 }
@@ -133,5 +170,19 @@ function* getTranscriptSaga(data) {
 // /api/lessons/play/
 
 function* loadAssetsInfoSaga() {
+
+}
+
+function* showGallerySaga(data) {
+    const current = data.payload
+
+    if (current) {
+        const _items = yield select(galleryItemsSelector),
+            _index = _items.findIndex(item => item.Id === current.id)
+
+        yield put({type: SHOW_GALLERY, payload: _index > 0 ? _index : 0})
+    } else {
+        yield put({type: SHOW_GALLERY, payload: 0})
+    }
 
 }
