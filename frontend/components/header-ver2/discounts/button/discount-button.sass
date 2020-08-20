@@ -5,13 +5,26 @@
   align-items: center
   padding-left: 25px
   margin-right: 25px
-  border-left: $border-dark-02
   cursor: pointer
   position: relative
   @media (max-width: $tablet-width)
     margin-right: 50px
     padding: 0
     border: none
+
+  &::before
+    content: ""
+    position: absolute
+    left: 0
+    top: 15px
+    margin-top: 0
+    width: 1px
+    height: 37px
+    border-left: $border-dark-015
+
+  @media (max-width: $tablet-width)
+    &::before
+      content: none
 
   svg
     fill: $color-main-dark

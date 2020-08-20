@@ -19,6 +19,8 @@
       display: none
     ul a
       padding: 0
+    @media (max-width: $tablet-width)
+      padding-top: 12px
 
 
 
@@ -76,9 +78,9 @@
           position: absolute
           width: 100%
           left: 0
-          top: -28px
+          top: -25px
           @media (max-width: 899px)
-            top: -31px
+            top: -24px
       svg
         opacity: 0.6
 
@@ -93,7 +95,7 @@
 
 
   .search-string
-    top: -1px
+    top: 12px
     max-width: 0
     right: 0
     transition: max-width 300ms linear
@@ -137,9 +139,9 @@
 
     &._visible
       max-width: 100%
-      width: calc(100% - 19px)
+      width: calc(100% - 21px)
       @media (max-width: $tablet-width)
-        width: calc(100% - 33px)
+        width: calc(100% - 35px)
 
 
       .wrapper

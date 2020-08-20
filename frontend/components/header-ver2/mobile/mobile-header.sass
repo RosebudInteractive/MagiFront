@@ -18,8 +18,7 @@
     -webkit-box-sizing: border-box
     -moz-box-sizing: border-box
     box-sizing: border-box
-    padding: 12px 20px 14px
-    //height: 64px
+    padding: 0 20px
     -webkit-transition: background-color 0.3s ease
     transition: background-color 0.3s ease
     &::after
@@ -31,10 +30,15 @@
       height: 1px
       background-color: $border-dark-02
 
+    & > *
+      padding-top: 12px
+      padding-bottom: 14px
+
   .logo-mobile
     margin: 0 !important
 
   .button-wrapper
+    padding: 0
     position: absolute
     right: 20px
     top: 0
