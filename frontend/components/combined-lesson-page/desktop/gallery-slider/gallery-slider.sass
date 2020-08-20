@@ -2,7 +2,6 @@
 
 .gallery-slider__container
   position: fixed
-  //visibility: 1
   width: 100%
   height: 100vh
   z-index: 1000
@@ -103,6 +102,7 @@
       -ms-transform: translate(-50%, -50%) rotate(-45deg)
       transform: translate(-50%, -50%) rotate(-45deg)
 
+
   .carousel-root
     height: 100%
     width: 100%
@@ -110,9 +110,10 @@
 
   .slide
     background: none !important
+    width: calc(100% - 40px)
+    padding: 0 20px
     height: 100%
     .carousel-slide__wrapper
-      inline-size: max-content
       margin: auto
 
   .carousel.carousel-slider
@@ -131,10 +132,16 @@
       flex-direction: column
       justify-content: center
       height: calc(100% - 84px)
-
       img
         max-height: 100%
         width: auto
+
+      &._portrait
+        inline-size: max-content
+
+      &._landscape
+        max-width: 100%
+        width: fit-content
 
       .carousel-slide__legend
         position: relative
@@ -156,6 +163,9 @@
         height: 84px
 
   .carousel
+    .control-arrow
+      display: none
+
     .thumbs-wrapper
       margin: 0
 
@@ -165,6 +175,8 @@
       margin: 0
       padding: 0
       background-color: $color-main-dark
+      display: inline-flex
+      justify-content: center
       &:not(.selected)
         &::before
           content: ""

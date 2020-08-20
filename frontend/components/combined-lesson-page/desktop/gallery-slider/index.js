@@ -4,7 +4,6 @@ import {connect} from "react-redux";
 import "./gallery-slider.sass"
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import {getImagePath, ImageSize} from "tools/page-tools";
 import {
     galleryCurrentIndexSelector,
     galleryVisibleSelector,
@@ -23,6 +22,20 @@ class GallerySlider extends React.Component{
             closeButtonTop: 0,
             closeButtonLeft: 0,
         };
+
+        this._resizeHandler = () => {
+            this._setCloseButtonPosition()
+        }
+    }
+
+    componentDidMount() {
+        this._setCloseButtonPosition()
+        $(window).bind("resize", this._resizeHandler)
+    }
+
+
+    componentWillUnmount() {
+        $(window).unbind("resize", this._resizeHandler)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -50,10 +63,6 @@ class GallerySlider extends React.Component{
         }
     }
 
-    componentDidMount() {
-        this._setCloseButtonPosition()
-    }
-
     render() {
         const {currentSlide, showCloseButton, closeButtonTop, closeButtonLeft} = this.state
 
@@ -63,7 +72,8 @@ class GallerySlider extends React.Component{
             showIndicators: false,
             dynamicHeight: true,
             useKeyboardArrows: true,
-            thumbWidth: "auto",
+            // thumbWidth: "auto",
+            thumbWidth: 70,
             showArrows: false,
             swipeable: true,
             selectedItem: currentSlide,
@@ -133,12 +143,25 @@ class GallerySlider extends React.Component{
 
     _getList() {
         return this.props.items.map((item, index) => {
-            let _fileName = getImagePath(item, ImageSize.medium)
+            let _fileName = item.FileName,
+                _metaData = JSON.parse(item.MetaData),
+                _imageRatio = _metaData && _metaData.size && _metaData.size.width && _metaData.size.height ?
+                    _metaData.size.width / _metaData.size.height
+                    :
+                    1,
+                _orientationClass = (_imageRatio > 1) ? "_landscape" : "_portrait"
 
-            let _name = item.Name ? `${(index + 1)}. ${item.Name}` : ""
+            let _name = item.Name ? `${(index + 1)}. ${item.Name}` : "",
+                _width = $(window).width() - 40,
+                _wrapperHeight = $(".carousel-slide__wrapper").height(),
+                _maxHeight = _width / _imageRatio
 
-            return <div className="carousel-slide__wrapper" key={index}>
-                <img src={'/data/' + _fileName}/>
+            _maxHeight = (_maxHeight > _wrapperHeight) ? _wrapperHeight : _maxHeight
+
+            const _style = (_imageRatio > 1) ? {maxHeight: _maxHeight} : {maxWidth: _width}
+
+            return <div className={"carousel-slide__wrapper " + _orientationClass} key={index}>
+                    <img src={'/data/' + _fileName} style={_style}/>
                 <div className="gallery-slide__caption legend font-universal__body-large">
                     <span>{_name}</span>
                     <span>{item.Description}</span>

@@ -133,17 +133,39 @@ class AssetBlock extends React.Component{
         if (!asset) {return null}
 
         const _orientation = asset.info.size && ( (asset.info.size.width / asset.info.size.height) < 1 ) ?  "_vertical" : "_horizontal",
-            _imageClassName = _orientation + (fading || !imageLoaded ? " _hidden" : "")
+            _imageClassName = _orientation + (fading || !imageLoaded ? " _hidden" : ""),
+            _fileName = this._getAdaptiveImage(asset)
 
         return asset &&
             <div className="asset-block">
                 <div className="image-block">
-                    <img className={_imageClassName} src={imageClear ? null : `/data/${asset.file}`} onLoad={::this._onLoadImage} onClick={::this._onImageClick}/>
+                    <img className={_imageClassName} src={imageClear ? null : `/data/${_fileName}`} onLoad={::this._onLoadImage} onClick={::this._onImageClick}/>
                 </div>
                 { asset.title && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title}</div> }
                 { asset.title2 && imageLoaded && <div className="asset-title font-universal__body-medium ">{asset.title2}</div> }
             </div>
     }
+
+    _getAdaptiveImage(asset) {
+        const _imageBlock = $(".image-block")
+
+        if (_imageBlock && _imageBlock.length) {
+            const _width = _imageBlock.width()
+
+            if ((_width < 360) && (asset.info.content.s)) {
+                return asset.info.path + asset.info.content.s
+            } else if ((_width < 768) && (asset.info.content.m)) {
+                return asset.info.path + asset.info.content.m
+            } else if ((_width < 1366) && (asset.info.content.l)) {
+                return asset.info.path + asset.info.content.l
+            } else {
+                return asset.file
+            }
+        } else {
+            return asset.file
+        }
+    }
+
 
     _onImageClick() {
         if (!isMobilePlatform()) {
