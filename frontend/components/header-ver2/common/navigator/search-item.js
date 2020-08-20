@@ -22,10 +22,17 @@ class SearchItem extends React.Component{
             hiding: false,
         }
 
+        this._isTouchDevice = window.hasOwnProperty("ontouchstart") && window.hasOwnProperty("ontouchend")
+        this._touchMoved = false
+
         this.input = null
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
 
         this._handler = (e) => {
+            if (this._touchMoved) {
+                return
+            }
+
             const _isSearch = e.target.closest('.search-string')
 
             if (this.state.active && !_isSearch) {
@@ -35,7 +42,7 @@ class SearchItem extends React.Component{
     }
 
     componentDidMount() {
-        document.body.addEventListener(this._touchEventName, this._handler)
+        this._addEventListeners()
 
         if (this.state.active) {
             if (this.input && !this.input.value && this.props.query) {
@@ -48,7 +55,7 @@ class SearchItem extends React.Component{
     }
 
     componentWillUnmount() {
-        document.body.removeEventListener(this._touchEventName, this._handler)
+        this._removeEventListeners()
         $(".page-header__row").removeClass("_search-mode")
     }
 
@@ -164,6 +171,28 @@ class SearchItem extends React.Component{
         if (this.input) {
             this.input.value = ""
             this.forceUpdate(() => { if (this.input) this.input.focus()})
+        }
+    }
+
+    _addEventListeners() {
+        document.body.addEventListener(this._touchEventName, this._handler)
+
+        if (this._isTouchDevice) {
+            $(window)
+                .bind('touchmove', () => {
+                    this._touchMoved = true;
+                })
+                .bind('touchstart', () => {
+                    this._touchMoved = false;
+                })
+        }
+    }
+
+    _removeEventListeners() {
+        document.body.removeEventListener(this._touchEventName, this._handler)
+        if (this._isTouchDevice) {
+            $(window).bind('touchmove')
+            $(window).bind('touchstart')
         }
     }
 }
