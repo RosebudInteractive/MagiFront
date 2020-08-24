@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {activeSelector, countSelector, getDiscounts, getDiscountsAndShow, showDiscountMenuSelector} from "ducks/header";
+import { hideMenu } from "actions/page-header-actions";
 import {bindActionCreators} from "redux";
 import "./discount-button.sass"
 
@@ -23,6 +24,10 @@ class DiscountButton extends React.Component {
     }
 
     _onButtonClick() {
+        if (this.props.showMobileMenu) {
+            this.props.actions.hideMenu()
+        }
+
         if (!this.props.showDiscountMenu) {
             this.props.actions.getDiscountsAndShow()
         }
@@ -34,12 +39,13 @@ const mapState2Props = (state) => {
         count: countSelector(state),
         active: activeSelector(state),
         showDiscountMenu: showDiscountMenuSelector(state),
+        showMobileMenu: state.pageHeader.showMenu
     }
 }
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getDiscounts, getDiscountsAndShow}, dispatch)
+        actions: bindActionCreators({getDiscounts, getDiscountsAndShow, hideMenu}, dispatch)
     }
 }
 
