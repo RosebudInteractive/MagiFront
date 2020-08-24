@@ -4,6 +4,7 @@ import {activeSelector, countSelector, getDiscounts, getDiscountsAndShow, showDi
 import { hideMenu } from "actions/page-header-actions";
 import {bindActionCreators} from "redux";
 import "./discount-button.sass"
+import {OverflowHandler} from "tools/page-tools";
 
 const DISCOUNT_BUTTON = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#discount-btn"/>'
 
@@ -26,6 +27,7 @@ class DiscountButton extends React.Component {
     _onButtonClick() {
         if (this.props.showMobileMenu) {
             this.props.actions.hideMenu()
+            OverflowHandler.turnOff();
         }
 
         if (!this.props.showDiscountMenu) {
