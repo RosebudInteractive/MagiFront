@@ -67,6 +67,7 @@ class GallerySlider extends React.Component{
         const {currentSlide, showCloseButton, closeButtonTop, closeButtonLeft} = this.state
 
         const settings = {
+            axis: 'horizontal',
             showThumbs: true,
             showStatus: false,
             showIndicators: false,
