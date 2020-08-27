@@ -248,7 +248,9 @@ const calcStatistics = (course, state) => {
             :
             _duration
 
-    _duration = new Date(_duration * 1000)
+    // _duration = new Date(_duration * 1000)
+    const _durationHours = Math.trunc(_duration / (60 * 60)),
+        _durationMinutes = Math.trunc((_duration  - (_durationHours * 60 * 60)) /60)
 
     let {lesson: lastListened, hasListened} = getLastListenedLesson(course.Lessons, state)
 
@@ -258,7 +260,7 @@ const calcStatistics = (course, state) => {
         published: _published,
         allPublished : _allPublished,
         readyDate: _allPublished ? null : parseReadyDate(_maxReadyDate),
-        duration: {hours: _duration.getUTCHours().toString(), minutes: _duration.getUTCMinutes().toString()},
+        duration: {hours: _durationHours, minutes: _durationMinutes},
         finishedLessons: _finishedLessons,
         lastListened: lastListened,
         hasListened: !!hasListened,
