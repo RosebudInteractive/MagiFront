@@ -1,13 +1,19 @@
 import React from 'react';
-import "./switch-buttons.sass"
 import {episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
 import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
 import {startSetCurrentTime} from "actions/player-start-actions"
+import {SVG} from "tools/svg-paths";
+import PropTypes from 'prop-types';
 
 class SwitchButtons extends React.Component {
+
+    static propTypes = {
+        type: PropTypes.string,
+        isPlayerMode: PropTypes.bool,
+    }
 
     constructor(props) {
         super(props);
@@ -15,27 +21,14 @@ class SwitchButtons extends React.Component {
         this._currentTime = 0
 
         this._scrollHandler = () => {
-            // const _readLineTop = this._getReadLineTop(),
-            //     _textBlockElem = $(".text-block__wrapper"),
-            //     _textBlockTop = _textBlockElem.offset().top,
-            //     _textBlockBottom = _textBlockTop + _textBlockElem.height()
-
-            // if (_readLineTop < _textBlockTop) {
-            //     this._applyFirstAsset()
-            //     return;
-            // } else if (_textBlockBottom < _readLineTop) {
-            //     this._applyLastAsset()
-            //     return;
-            // }
-
-            const {timeStamps} = this.props,
-                _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
-
-            if (_newType) {
-                this._handleScrollNewType()
-            } else {
+            // const {timeStamps} = this.props,
+            //     _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+            //
+            // if (_newType) {
+            //     this._handleScrollNewType()
+            // } else {
                 this._oldTypeHandleScroll()
-            }
+            // }
         }
 
         $(window).bind('resize scroll', this._scrollHandler)
@@ -50,17 +43,28 @@ class SwitchButtons extends React.Component {
     }
 
     render() {
-        return <div className="lesson__switch-buttons__block">
-             <div className="lesson__switch-button _to-player button _brown" onClick={::this._toPlayer}>Время в плеер</div>
-             <div className="lesson__switch-button _to-text button _brown" onClick={::this._toText}>К позиции в транскрипте</div>
-            </div>
+        return (this.props.type === "_dark") ?
+            <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
+                    onClick={::this._toText}>
+                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_TRANSCRIPT}}/>
+            </button>
+            :
+            <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
+                    onClick={::this._toPlayer}>
+                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_PLAYER}}/>
+            </button>
     }
 
     _toPlayer() {
+        if (!this.props.isPlayerMode) return
+
         this.props.actions.startSetCurrentTime(this._currentTime / 1000)
+        window.scrollTo(0, 0)
     }
 
     _toText() {
+        if (!this.props.isPlayerMode) return
+
         const {playerTime, episodesTimes} = this.props
 
         const _textBlockElem = $(".text-block__wrapper"),
@@ -119,7 +123,7 @@ class SwitchButtons extends React.Component {
                 _part = _timeDelta / _timeLength,
                 _length = _item.bottom - _item.top,
                 _delta = _length * _part,
-                _currentPos = _item.top + _delta - ($(window).height() / 2)
+                _currentPos = _item.top + _delta - 52//($(window).height() / 2)
 
             window.scrollTo(0, _currentPos)
         }
@@ -244,7 +248,8 @@ class SwitchButtons extends React.Component {
     }
 
     _getReadLineTop() {
-        return $(window).scrollTop() + ($(window).height() / 2)
+        // return $(window).scrollTop() + ($(window).height() / 2)
+        return $(window).scrollTop() + 52
     }
 
 }

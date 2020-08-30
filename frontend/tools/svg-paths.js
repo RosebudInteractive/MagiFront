@@ -49,3 +49,9 @@ export const getCrownForCourse = (course, className) => {
             :
             null
 }
+
+export const SVG = {
+    FULLSCREEN: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>',
+    TO_PLAYER: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#to-player"/>',
+    TO_TRANSCRIPT: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#to-transcript"/>',
+}

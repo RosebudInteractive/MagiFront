@@ -98,7 +98,7 @@ export default class Wrapper extends React.Component {
             <div className={_sectionClassName}>
                 <div className='lecture-wrapper' id={_divId} style={_coverStyle}>
                     <Menu {...this.props} current={lesson.Number}
-                          id={'lesson-menu-' + lesson.Id} extClass={'landscape'}/>
+                          id={'lesson-menu-' + lesson.Id} extClass={'landscape'} isPlayerMode={isPlayer}/>
                     <div className={_subwrapperClassName}>
                         <LandscapePlayerFrame {...this.props}
                                               visible={isPlayer}/>

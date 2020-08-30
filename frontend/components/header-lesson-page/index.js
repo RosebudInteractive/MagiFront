@@ -10,8 +10,10 @@ import {courseSelector} from "ducks/lesson-menu"
 
 import $ from "jquery";
 import RestartButton from "./restart-test-button";
+import {SVG} from "tools/svg-paths";
 
 import "./header-lesson-page.sass"
+import SwitchButtons from "./switch-buttons";
 
 class HeaderWrapper extends React.Component {
 
@@ -19,15 +21,43 @@ class HeaderWrapper extends React.Component {
         lesson: PropTypes.object,
         test: PropTypes.object,
         active: PropTypes.number,
-        showRestartButton: PropTypes.bool
+        showRestartButton: PropTypes.bool,
+        isPlayerMode: PropTypes.bool,
     };
 
     constructor(props) {
         super(props)
 
         this.state = {
-            hiding: false
+            hiding: false,
+            type: "_fixed"
         }
+
+        this._handleScroll = () => {
+            const _scrollTop = $(window).scrollTop();
+
+            if ($('.js-player').length) {
+                let _height = $('.js-player').outerHeight(),
+                    _menu = $('.js-lectures-menu');
+
+                _height = this.props.isMobileApp ? _height : _height - _menu.height() ;
+
+                if (_scrollTop > (_height + 63)) {
+                    if (this.state.type === "_dark") {
+                        this.setState({type: "_fixed"})
+                    }
+                } else {
+                    if (this.state.type === "_fixed") {
+                        this.setState({type: "_dark"})
+                    }
+                }
+            }
+        }
+    }
+
+    componentDidMount() {
+        $(window).bind('scroll', this._handleScroll);
+        this._handleScroll()
     }
 
     componentDidUpdate(prevProps) {
@@ -41,11 +71,18 @@ class HeaderWrapper extends React.Component {
         }
     }
 
-    _getMenuType() {
-        let _scrollTop = $(window).scrollTop();
-
-        return (_scrollTop > ($('.js-player').outerHeight() - 73)) ? '_fixed' : '_dark';
+    componentWillUnmount() {
+        $(window).unbind('scroll', this._handleScroll);
     }
+
+    // _getMenuType() {
+    //     let _scrollTop = $(window).scrollTop();
+    //
+    //     console.log(_scrollTop, $('.js-player').outerHeight())
+    //
+    //     this._currentType = (_scrollTop > ($('.js-player').outerHeight() - 63)) ? '_fixed' : '_dark'
+    //     return this._currentType;
+    // }
 
     _onFullScreenClick() {
         let _wrapper = $(".global-wrapper"),
@@ -62,19 +99,20 @@ class HeaderWrapper extends React.Component {
     }
 
     render() {
-        const FULLSCREEN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
-
-        let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass, showRestartButton} = this.props,
+        let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass, showRestartButton, isPlayerMode} = this.props,
+            {type, hiding} = this.state,
             _singleLesson = course ? !!course.OneLesson : false,
-            _type = this._getMenuType(),
+            _type = type,//this._getMenuType(),
             _menuClassName = "new-header lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
-                (isLessonMenuOpened && !this.state.hiding ? ' opened' : '') +
-                (this.state.hiding ? ' _hiding' : '') +
+                (isLessonMenuOpened && !hiding ? ' opened' : '') +
+                (hiding ? ' _hiding' : '') +
                 (isMobileApp ? ' mobile' : ' desktop') +
                 (extClass ? ' ' + extClass : '') +
                 (_singleLesson ? ' ' + '_single' : '')
 
         const _courseIsPaid = course ? (course.IsPaid && !course.IsGift && !course.IsBought) : false
+
+        console.log("PLAYER::: ", isPlayerMode)
 
         return <div className={_menuClassName}>
                 <LogoAndTitle course={course} lesson={lesson} test={test}/>
@@ -85,8 +123,9 @@ class HeaderWrapper extends React.Component {
                         <React.Fragment>
                             <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
                                     onClick={::this._onFullScreenClick}>
-                                <svg width="60" height="53" dangerouslySetInnerHTML={{__html: FULLSCREEN}}/>
+                                <svg width="60" height="53" dangerouslySetInnerHTML={{__html: SVG.FULLSCREEN}}/>
                             </button>
+                            <SwitchButtons type={_type} isPlayerMode={isPlayerMode}/>
                             <Navigator isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes} courseIsPaid={_courseIsPaid}/>
                         </React.Fragment>
                 }

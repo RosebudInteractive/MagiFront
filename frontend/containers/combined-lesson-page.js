@@ -33,7 +33,6 @@ import {getLessonsAll, loadingSelector as menuDataLoading} from "ducks/lesson-me
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 import "../components/combined-lesson-page/lesson-page.sass"
-import SwitchButtons from "../components/combined-lesson-page/switch-buttons";
 import GallerySlider from "../components/combined-lesson-page/desktop/gallery-slider";
 
 let _scrollTop = 0;
@@ -132,14 +131,9 @@ class CombineLessonPage extends React.Component {
                 _height = _menu.hasClass('desktop') ? _height - _menu.height() : _height;
 
                 if (st > (_height + 63)) {
-                    _menu.removeClass('_dark');
-                    _menu.addClass('_fixed');
                     if (this.props.galleryIsOpen) {
                         _openGallerySlider()
                     }
-                } else {
-                    _menu.addClass('_dark');
-                    _menu.removeClass('_fixed');
                 }
 
                 if (st < $('.js-player').outerHeight()) {
@@ -396,7 +390,8 @@ class CombineLessonPage extends React.Component {
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={_lesson.Id}
-                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
+                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}
+                                  isPlayerMode={this._isPlayerMode(_lesson)}/>
                             {
                                 _galleryHasItems &&
                                     <React.Fragment>
@@ -412,7 +407,6 @@ class CombineLessonPage extends React.Component {
                                         course={course} lesson={_lesson}
                                         isNeedHideGallery={_isNeedHideGallery}
                                         isPaidCourse={this._isPaidCourse}/>
-                            { this._isPlayerMode(_lesson) && <SwitchButtons/> }
                         </React.Fragment>
                         :
                         null
