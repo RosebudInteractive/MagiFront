@@ -112,8 +112,6 @@ class HeaderWrapper extends React.Component {
 
         const _courseIsPaid = course ? (course.IsPaid && !course.IsGift && !course.IsBought) : false
 
-        console.log("PLAYER::: ", isPlayerMode)
-
         return <div className={_menuClassName}>
                 <LogoAndTitle course={course} lesson={lesson} test={test}/>
                 <MenuBlock course={course} lesson={lesson} test={test}/>
