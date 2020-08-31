@@ -200,7 +200,7 @@ module.exports = {
             secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
         },
         googleAppId: "AIzaSyAcqC46EVwt7voascHI5j9CrGVbeiiwgVQ",
-        appleMobileAppAud: "ru.magisteria.Magisteria.dev"
+        appleMobileAppAud: "ru.magisteria.magisteriaapp"
     },
     mail: {
         feedback: {
