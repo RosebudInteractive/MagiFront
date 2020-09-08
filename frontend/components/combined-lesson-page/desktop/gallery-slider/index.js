@@ -38,7 +38,7 @@ class GallerySlider extends React.Component{
         $(window).unbind("resize", this._resizeHandler)
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!this.props.visible && nextProps.visible && (nextProps.currentIndex !== this.state.currentSlide)) {
             this.setState({
                 currentSlide: nextProps.currentIndex

@@ -29,7 +29,7 @@ class Courses extends React.Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.coursesActions.getCourses();
         this._selected = null;
     }
@@ -87,7 +87,7 @@ class Courses extends React.Component {
         this._selected = +id;
     }
 
-    componentWillReceiveProps(nextProps,) {
+    UNSAFE_componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
             this._selected = (nextProps.courses.length > 0) ? nextProps.courses[0].id : null;
         }

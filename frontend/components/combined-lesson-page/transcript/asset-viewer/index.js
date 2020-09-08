@@ -107,7 +107,7 @@ class AssetBlock extends React.Component{
         $(window).unbind('resize scroll', this._resizeHandler);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const {lessonPlayInfo} = this.props
 
         if (lessonPlayInfo) {

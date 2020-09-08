@@ -16,12 +16,12 @@ class PromoEditor extends React.Component {
         onNextClick: PropTypes.func,
     };
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.getProducts()
         // this.props.actions.getAuthors()
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!this.props.showEditor && nextProps.showEditor) {
             this.props.getProducts()
             // this.props.actions.getAuthors()

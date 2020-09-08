@@ -23,11 +23,11 @@ class SubscriptionForm extends React.Component {
         onChoose: PropTypes.func,
     };
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.getSubscriptionTypes()
     }
 
-    componentWillReceiveProps() {
+    UNSAFE_componentWillReceiveProps() {
 
     }
 

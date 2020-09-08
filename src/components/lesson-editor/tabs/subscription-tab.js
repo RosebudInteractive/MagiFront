@@ -15,7 +15,7 @@ class SubscriptionTab extends React.Component {
         visible: PropTypes.bool,
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.isSubsRequired !== this.props.isSubsRequired) {
             if (nextProps.isSubsRequired && !nextProps.isAuthRequired) {
                 this.props.changeFieldValue('LessonEditor', 'isAuthRequired', true);

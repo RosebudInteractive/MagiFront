@@ -41,7 +41,7 @@ class ProfileSubForm extends React.Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.dispatch(initialize('ProfileSubForm', this.props, ['name', 'email']));
     }
 

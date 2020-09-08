@@ -19,7 +19,7 @@ class CourseTestsWrapper extends React.Component {
         this._selected = 0
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const _oldLength = this.props.tests.length,
             _newLength = nextProps.tests.length
 

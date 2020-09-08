@@ -43,7 +43,7 @@ class LessonsListWrapper extends React.Component {
         });
     }
 
-    componentWillReceiveProps(nextProps){
+    UNSAFE_componentWillReceiveProps(nextProps){
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
             OverflowHandler.rememberScrollPos()
         }

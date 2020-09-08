@@ -53,7 +53,7 @@ class ReviewsPage extends React.Component {
         return "reviews-grid"
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         if (this.props.showEditor) {
             if (this.props.editMode) {
                 this.props.editReview(this.props.reviewId)
@@ -71,7 +71,7 @@ class ReviewsPage extends React.Component {
         this._resizeHandler();
     }
 
-    componentWillReceiveProps(nextProps,) {
+    UNSAFE_componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
             this._selected = (nextProps.reviews.length > 0) ?

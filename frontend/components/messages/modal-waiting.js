@@ -10,7 +10,7 @@ export default class ModalWaiting extends React.Component {
         visible: PropTypes.bool,
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!this.props.visible && nextProps.visible) {
             $('body').addClass('modal-open')
         }

@@ -20,7 +20,7 @@ class HistoryBlock extends React.Component {
         this._visibleCount = 0;
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.storageActions.refreshState();
         this.props.getUserHistory();
     }

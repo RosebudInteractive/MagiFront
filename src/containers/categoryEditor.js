@@ -43,7 +43,7 @@ class CategoryForm extends ObjectEditor {
         super._save(_obj)
     }
 
-    componentWillReceiveProps(next) {
+    UNSAFE_componentWillReceiveProps(next) {
         const {
             category,
         } = next;

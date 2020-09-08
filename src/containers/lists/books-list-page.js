@@ -59,7 +59,7 @@ class BooksPage extends React.Component {
         return "books-grid"
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         if (this.props.showEditor) {
             if (this.props.editMode) {
                 this.props.actions.editCurrentBook(this.props.bookId)
@@ -76,7 +76,7 @@ class BooksPage extends React.Component {
         $(window).on('resize', this._resizeHandler);
     }
 
-    componentWillReceiveProps(nextProps,) {
+    UNSAFE_componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
             this._selected = (nextProps.books.length > 0) ?

@@ -31,7 +31,7 @@ class AnswerGrid extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.meta.dirty && !nextProps.meta.dirty) {
             this._setObjectsRank(nextProps.input.value)
         }

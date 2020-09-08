@@ -183,7 +183,7 @@ class CombineLessonPage extends React.Component {
         $('body').removeClass('_player');
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         let {courseUrl, lessonUrl} = this.props;
 
@@ -307,7 +307,7 @@ class CombineLessonPage extends React.Component {
             })
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
