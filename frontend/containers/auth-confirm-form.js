@@ -11,7 +11,7 @@ class AuthConfirmForm extends React.Component {
         super(props)
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.userActions.sendActivationKey(this.props.activationKey)
     }
 

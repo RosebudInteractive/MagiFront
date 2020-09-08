@@ -22,13 +22,13 @@ class PurchasesPage extends React.Component {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.whoAmI()
         this.props.getUserProfileFull();
         this.props.setCurrentPage(pages.purchases);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((this.props.loading) && (!nextProps.loading)) {
             window.requestAnimationFrame(() => {window.scrollTo(0, 0) });
             if (!nextProps.authorized || !nextProps.enabledPaidCourses) {

@@ -7,7 +7,7 @@ import {
     addLessonToBookmarks,
     userBookmarksSelector,
     userPaidCoursesSelector,
-} from '../../ducks/profile'
+} from 'ducks/profile'
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../actions/lesson-info-storage-actions";
 import Item from "./lesson-item";
@@ -27,7 +27,7 @@ class LessonsBlock extends React.Component {
         this._visibleCount = 0;
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.storageActions.refreshState();
     }
 

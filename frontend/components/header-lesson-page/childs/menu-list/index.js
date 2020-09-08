@@ -26,7 +26,7 @@ class LessonsListWrapper extends React.Component {
         this._calcActiveObject(this.props)
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         this._calcActiveObject(nextProps)
 
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {

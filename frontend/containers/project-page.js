@@ -11,7 +11,7 @@ const TITLE = "Образовательный сайт с лекциями о ж
 
 class ProjectPage extends React.Component {
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.setCurrentPage(pages.about)
     }

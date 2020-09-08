@@ -58,7 +58,7 @@ class ReviewWindow extends React.Component {
         return !this.props.loading && !!this.state.message && !!this.state.sender && !!this.props.user
     }
 
-    componentWillReceiveProps(next) {
+    UNSAFE_componentWillReceiveProps(next) {
         if (!this.props.visible && next.visible) {
             let _state = this._getInitState()
 

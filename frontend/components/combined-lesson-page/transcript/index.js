@@ -33,7 +33,7 @@ class Transcript extends React.Component {
         this._hideAssets = !course.IsPaid && lesson.IsAuthRequired && !authorized
     }
 
-    componentWillMount(){
+    UNSAFE_componentWillMount(){
         this.props.actions.loadTranscript({
             ...this.props.current,
             requestAssets: !this._hideAssets,

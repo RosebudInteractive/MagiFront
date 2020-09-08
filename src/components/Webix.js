@@ -32,7 +32,7 @@ class Webix extends Component {
         this.ui = null;
     }
 
-    componentWillUpdate(props) {
+    UNSAFE_componentWillUpdate(props) {
         if (props.data)
             this.setWebixData(props.data);
         if (props.select)
@@ -45,7 +45,7 @@ class Webix extends Component {
             ReactDOM.findDOMNode(this.refs.root)
         );
 
-        this.componentWillUpdate(this.props);
+        this.UNSAFE_componentWillUpdate(this.props);
     }
 
 }

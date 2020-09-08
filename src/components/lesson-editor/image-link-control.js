@@ -37,7 +37,7 @@ class ImageLink extends React.Component {
         this._fileName = '';
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         let {fileName, name} = this._getResourceName(this.props.input.value)
 
         this._name = name

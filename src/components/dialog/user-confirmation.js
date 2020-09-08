@@ -31,7 +31,7 @@ class UserConfirmation extends React.Component {
         e.preventDefault();
     }
 
-    componentWillReceiveProps() {
+    UNSAFE_componentWillReceiveProps() {
         this.setState({hidden: false})
     }
 

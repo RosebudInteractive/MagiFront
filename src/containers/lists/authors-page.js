@@ -38,7 +38,7 @@ class AuthorsPage extends React.Component {
         return "categories-grid"
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.authorsActions.getAuthors();
     }
 
@@ -49,7 +49,7 @@ class AuthorsPage extends React.Component {
         this._selected = null;
     }
 
-    componentWillReceiveProps(nextProps,) {
+    UNSAFE_componentWillReceiveProps(nextProps,) {
         if (this.props.fetching && !nextProps.fetching) {
 
             this._selected = (nextProps.authors.length > 0) ?

@@ -35,7 +35,7 @@ class Main extends React.Component {
         super(props);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
@@ -44,7 +44,7 @@ class Main extends React.Component {
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
 
-    componentWillUpdate(nextProps) {
+    UNSAFE_componentWillUpdate(nextProps) {
         if (this.props.courseUrl && nextProps.courseUrl && (this.props.courseUrl !== nextProps.courseUrl)) {
             this.props.storageActions.refreshState();
             this.props.coursesActions.getCourses();

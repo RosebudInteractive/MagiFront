@@ -37,7 +37,7 @@ class CategoriesPage extends React.Component {
         return "categories-grid"
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.categoriesActions.getCategories();
     }
 
@@ -48,7 +48,7 @@ class CategoriesPage extends React.Component {
         this._selected = null;
     }
 
-    componentWillReceiveProps(nextProps,) {
+    UNSAFE_componentWillReceiveProps(nextProps,) {
         if (this.props.fetching && !nextProps.fetching) {
 
             this._selected = (nextProps.categories.length > 0) ?

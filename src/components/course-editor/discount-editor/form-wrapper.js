@@ -30,7 +30,7 @@ class DiscountEditorForm extends React.Component {
         super(props);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this._init()
     }
 

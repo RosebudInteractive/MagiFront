@@ -96,7 +96,7 @@ class App extends Component {
         window.callback_payment = callbackPayment
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
@@ -200,7 +200,7 @@ class App extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         let _thisLocation = this.props.ownProps.location.pathname,
             _nextLocation = nextProps.ownProps.location.pathname,
             _isNewLocation = _thisLocation !== _nextLocation;

@@ -11,7 +11,7 @@ import {AUTHORIZATION_STATE} from '../../constants/user'
 
 class Wrapper extends React.Component {
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
 
             this.props.userActions.redirectComplete();

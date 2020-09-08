@@ -40,7 +40,7 @@ class TestEditorForm extends React.Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         let _activeTab = this.props.activeTabs.get(EDITOR_NAME)
         if (_activeTab) {
             this.setState({

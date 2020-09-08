@@ -54,11 +54,11 @@ class PaymentForm extends React.Component {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.getSubscriptionInfo()
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((!nextProps.loadingSubsInfo) && (this.props.loadingSubsInfo)) {
             if (nextProps.info && nextProps.info.get('Payment')) {
                 this.setState({

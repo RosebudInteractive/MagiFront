@@ -25,11 +25,11 @@ class AudioLink extends React.Component {
         super(props)
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this._metaObj = this.props.input.value.meta
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!Object.is(this.props.input.value, nextProps.input.value)) {
             this._metaObj = nextProps.input.value.meta
         }

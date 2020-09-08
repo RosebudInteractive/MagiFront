@@ -13,7 +13,7 @@ class PasswordConfirmForm extends React.Component {
         super(props)
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.userActions.switchToPasswordConfirm();
         this.props.userActions.getActivationUser(this.props.activationKey)
     }

@@ -37,7 +37,7 @@ export default class TimeInput extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((this.props.input.value !== nextProps.input.value) && !isNaN(nextProps.input.value)) {
             this.setState({textValue: _convertToTime(nextProps.input.value)})
         }

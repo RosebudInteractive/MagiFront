@@ -28,7 +28,7 @@ class BookmarksPage extends React.Component {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
@@ -43,7 +43,7 @@ class BookmarksPage extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((this.props.loading) && (!nextProps.loading)) {
             if (!nextProps.authorized) {
                 this._redirect = true;
