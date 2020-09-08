@@ -71,11 +71,18 @@ const _prodConfig = {
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader"
-                })
+                use: [
+                    'style-loader',
+                    "css-loader",
+                ]
             },
+            // {
+            //     test: /\.css$/,
+            //     use: ExtractTextPlugin.extract({
+            //         fallback: "style-loader",
+            //         use: "css-loader"
+            //     })
+            // },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
                 loader: "url-loader?limit=10000&mimetype=application/font-woff"
