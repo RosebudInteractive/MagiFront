@@ -4,7 +4,7 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
-import {startSetCurrentTime} from "actions/player-start-actions"
+import {startSetCurrentTime, startPause, startPlay} from "actions/player-start-actions"
 import {SVG} from "tools/svg-paths";
 import PropTypes from 'prop-types';
 
@@ -13,6 +13,7 @@ class SwitchButtons extends React.Component {
     static propTypes = {
         type: PropTypes.string,
         isPlayerMode: PropTypes.bool,
+        lesson: PropTypes.object,
     }
 
     constructor(props) {
@@ -60,10 +61,13 @@ class SwitchButtons extends React.Component {
 
         this.props.actions.startSetCurrentTime(this._currentTime / 1000)
         window.scrollTo(0, 0)
+        this.props.actions.startPlay(this.props.lesson.Id)
     }
 
     _toText() {
         if (!this.props.isPlayerMode) return
+
+        this.props.actions.startPause()
 
         const {playerTime, episodesTimes} = this.props
 
@@ -264,7 +268,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        actions : bindActionCreators({startSetCurrentTime}, dispatch)
+        actions : bindActionCreators({startSetCurrentTime, startPause, startPlay}, dispatch)
     }
 }
 

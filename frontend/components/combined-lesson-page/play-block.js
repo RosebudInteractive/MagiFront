@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import $ from "jquery";
 import history from '../../history';
-import {getCoverPath, ImageSize, TooltipTitles} from "../../tools/page-tools";
+import {getCoverPath, ImageSize, TooltipTitles} from "tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {_unlock, SVG} from "../common/play-block-functions";
