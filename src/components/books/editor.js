@@ -17,12 +17,12 @@ class BookEditor extends React.Component {
         onNextClick: PropTypes.func,
     };
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.actions.getCourses()
         this.props.actions.getAuthors()
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!this.props.showEditor && nextProps.showEditor) {
             this.props.actions.getCourses()
             this.props.actions.getAuthors()

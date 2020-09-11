@@ -32,7 +32,7 @@ class MainTab extends React.Component {
         visible: PropTypes.bool,
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.courseId !== this.props.courseId) {
             this.props.getCourseLessons(nextProps.courseId)
         }

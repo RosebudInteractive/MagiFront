@@ -14,7 +14,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
 class RedirectHandler extends React.PureComponent{
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((nextProps.billingRedirectActive) && (!this.props.billingRedirectActive)) {
 
             this.props.completeBillingRedirect();

@@ -176,7 +176,7 @@ class Menu extends React.Component {
     }
 
 
-    componentWillReceiveProps() {
+    UNSAFE_componentWillReceiveProps() {
 
     }
 

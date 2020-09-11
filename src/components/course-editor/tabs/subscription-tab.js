@@ -47,7 +47,7 @@ class CourseSubscriptionForm extends React.Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         $(window).bind('resize', this._resizeHandler)
         this._init()
     }

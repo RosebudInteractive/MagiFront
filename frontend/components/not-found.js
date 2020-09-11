@@ -1,37 +1,37 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import MetaTags from 'react-meta-tags';
 import $ from "jquery";
-import {pages} from "../tools/page-tools";
-import * as pageHeaderActions from "../actions/page-header-actions";
+import {pages} from "tools/page-tools";
+import {setCurrentPage} from "actions/page-header-actions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 
+function NotFoundPage(props) {
+    const {actions} = props
 
-class NotFoundPage extends React.Component {
+    useEffect(() => {
+        actions.setCurrentPage(pages.notFound)
 
-    _getMetaTags() {
+        return () => {
+            _removeMetaTags()
+        }
+    })
+
+    const _getMetaTags = () => {
         return <MetaTags>
             <meta name="robots" content="noindex,follow"/>
             <meta name="prerender-status-code" content="404"/>
         </MetaTags>
     }
 
-    _removeMetaTags() {
+    const _removeMetaTags = () => {
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
     }
 
-    componentWillMount() {
-        this.props.pageHeaderActions.setCurrentPage(pages.notFound);
-    }
-
-    componentWillUnmount() {
-        this._removeMetaTags();
-    }
-
-    render() {
-        return [this._getMetaTags(),
+        return <React.Fragment>
+            {_getMetaTags()}
             <div className='not_found__page'>
                 <div className='not-found__wrapper'>
                     <div className='header'>Ошибка 404. Страница не найдена.</div>
@@ -41,13 +41,12 @@ class NotFoundPage extends React.Component {
                     <Link to="/" className='btn btn--brown'>На главную страницу</Link>
                 </div>
             </div>
-        ]
-    }
+        </React.Fragment>
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        actions: bindActionCreators({setCurrentPage}, dispatch),
     }
 }
 

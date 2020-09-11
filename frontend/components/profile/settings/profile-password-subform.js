@@ -58,10 +58,6 @@ class ProfilePasswordSubForm extends React.Component {
         }
     }
 
-    componentWillMount() {
-        // this.props.dispatch(initialize('ProfilePasswordSubForm', this.props, ['name', 'email']));
-    }
-
     render() {
         const {invalid, serverError, loading, anyTouched} = this.props;
         const _errorText = serverError &&

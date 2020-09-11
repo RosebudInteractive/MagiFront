@@ -57,7 +57,7 @@ class AuthorEditor extends ObjectEditor {
         super._save(value);
     }
 
-    componentWillReceiveProps(next) {
+    UNSAFE_componentWillReceiveProps(next) {
         const {
             author,
         } = next;

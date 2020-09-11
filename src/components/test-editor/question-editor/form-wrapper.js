@@ -37,7 +37,7 @@ class QuestionEditorForm extends React.Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this._init()
     }
 

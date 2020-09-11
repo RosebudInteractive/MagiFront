@@ -25,7 +25,7 @@ class SearchPage extends Component {
         window.addEventListener("popstate", this._onBackHandler);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.actions.whoAmI()
         this.props.actions.setCurrentPage(PAGES.search);

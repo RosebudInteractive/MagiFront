@@ -28,7 +28,7 @@ export default class GridControl extends Component {
         this._isLastSelected = false;
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const _data = nextProps.data;
         if (_data && Array.isArray(_data) && _data.length > 0) {
             const _selected = nextProps.selected;

@@ -124,7 +124,7 @@ export default class ObjectEditor extends React.Component {
         // this._clearObjectInStorage()
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this._clearObjectInStorage()
     }
 

@@ -84,7 +84,7 @@ class TestPage extends React.Component {
         this._addEventListeners();
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.whoAmI()
         this.props.refreshStorage();
@@ -115,7 +115,7 @@ class TestPage extends React.Component {
         this.props.setCurrentPage(this);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         let _currentType = this._getPageType(this.props),
             _nextType = this._getPageType(nextProps)
 

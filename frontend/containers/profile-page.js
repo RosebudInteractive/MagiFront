@@ -30,7 +30,7 @@ class ProfilePage extends React.Component {
         };
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.getUserProfile();
         switch (this.props.page) {
@@ -52,7 +52,7 @@ class ProfilePage extends React.Component {
 
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if ((this.props.loading) && (!nextProps.loading)) {
             if (nextProps.error === "Authorization required!") {
                 this._redirect = true;

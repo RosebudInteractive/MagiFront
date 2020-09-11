@@ -42,7 +42,7 @@ class CoursesPage extends React.Component {
         this._needRedirectToCourses = false;
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.coursesActions.getCourses();
         this.props.whoAmI()

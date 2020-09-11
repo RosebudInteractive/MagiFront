@@ -17,7 +17,7 @@ class PromoEditor extends React.Component {
     };
 
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (!this.props.showEditor && nextProps.showEditor) {
             this.props.getCourses()
         }

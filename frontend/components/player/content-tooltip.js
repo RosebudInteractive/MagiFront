@@ -37,7 +37,7 @@ class ContentTooltip extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps){
+    UNSAFE_componentWillReceiveProps(nextProps){
         let _contentHasChanged = (nextProps.contentArray.length !== this.props.contentArray.length);
         if (_contentHasChanged) {
             this._unmountCustomScroll();

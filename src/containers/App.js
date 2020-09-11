@@ -31,12 +31,12 @@ import ReviewsPage from "./lists/reviews";
 
 class App extends Component {
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props.getAppOptions()
         this.props.whoAmI();
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.location.pathname !== nextProps.location.pathname) {
             this.props.whoAmI();
 
