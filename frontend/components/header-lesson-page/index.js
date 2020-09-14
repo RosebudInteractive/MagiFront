@@ -123,7 +123,7 @@ class HeaderWrapper extends React.Component {
                                     onClick={::this._onFullScreenClick}>
                                 <svg width="60" height="53" dangerouslySetInnerHTML={{__html: SVG.FULLSCREEN}}/>
                             </button>
-                            <SwitchButtons type={_type} isPlayerMode={isPlayerMode}/>
+                            <SwitchButtons type={_type} isPlayerMode={isPlayerMode} lesson={lesson}/>
                             <Navigator isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes} courseIsPaid={_courseIsPaid}/>
                         </React.Fragment>
                 }

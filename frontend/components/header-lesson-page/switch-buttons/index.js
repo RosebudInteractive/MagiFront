@@ -8,6 +8,8 @@ import {startSetCurrentTime, startPause, startPlay} from "actions/player-start-a
 import {SVG} from "tools/svg-paths";
 import PropTypes from 'prop-types';
 
+const TIME_DELTA = 5
+
 class SwitchButtons extends React.Component {
 
     static propTypes = {
@@ -59,9 +61,15 @@ class SwitchButtons extends React.Component {
     _toPlayer() {
         if (!this.props.isPlayerMode) return
 
-        this.props.actions.startSetCurrentTime(this._currentTime / 1000)
+        const _newValue = this._currentTime / 1000
+
+        if (Math.abs(_newValue - this.props.playerTime) <= TIME_DELTA) {
+            this.props.actions.startPlay(this.props.lesson.Id)
+        } else {
+            this.props.actions.startSetCurrentTime(_newValue)
+        }
+
         window.scrollTo(0, 0)
-        this.props.actions.startPlay(this.props.lesson.Id)
     }
 
     _toText() {
@@ -122,12 +130,13 @@ class SwitchButtons extends React.Component {
         })
 
         if (_item) {
+
             const _timeLength = _item.end - _item.start,
                 _timeDelta = playerTime * 1000 - _item.start,
                 _part = _timeDelta / _timeLength,
                 _length = _item.bottom - _item.top,
                 _delta = _length * _part,
-                _currentPos = _item.top + _delta - 52//($(window).height() / 2)
+                _currentPos = _item.top + _delta - this._getTopMargin() - (_delta * 0.03)//($(window).height() / 2)
 
             window.scrollTo(0, _currentPos)
         }
@@ -253,7 +262,20 @@ class SwitchButtons extends React.Component {
 
     _getReadLineTop() {
         // return $(window).scrollTop() + ($(window).height() / 2)
-        return $(window).scrollTop() + 52
+        return $(window).scrollTop() + this._getTopMargin()
+    }
+
+    _getTopMargin() {
+        const _headline = $(".text-block__headline"),
+            _menu = $(".js-lectures-menu")
+
+        let _margin = 92
+
+        if (_headline && _headline.length && _menu && _menu.length) {
+            _margin = +_headline.css("margin-bottom").replace("px", "") + _menu.height()
+        }
+
+        return _margin
     }
 
 }
