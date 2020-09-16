@@ -1,5 +1,5 @@
 import React from 'react';
-import {episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
+import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
 import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
@@ -24,14 +24,14 @@ class SwitchButtons extends React.Component {
         this._currentTime = 0
 
         this._scrollHandler = () => {
-            // const {timeStamps} = this.props,
-            //     _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
-            //
-            // if (_newType) {
-            //     this._handleScrollNewType()
-            // } else {
+            const {timeStamps} = this.props,
+                _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+
+            if (_newType) {
+                this._handleScrollNewType()
+            } else {
                 this._oldTypeHandleScroll()
-            // }
+            }
         }
 
         $(window).bind('resize scroll', this._scrollHandler)
@@ -77,6 +77,34 @@ class SwitchButtons extends React.Component {
 
         this.props.actions.startPause()
 
+        const _item = this.props.timeStamps ? this._getNewTypeTextItem() : this._getOldTypeTextItem()
+
+        if (_item) {
+            const _timeLength = _item.end - _item.start,
+                _timeDelta = this.props.playerTime * 1000 - _item.start,
+                _part = _timeDelta / _timeLength,
+                _length = _item.bottom - _item.top,
+                _delta = _length * _part,
+                _currentPos = _item.top + _delta - this._getTopMargin() - (_delta * 0.03)
+
+            window.scrollTo(0, _currentPos)
+        }
+    }
+
+    _getNewTypeTextItem() {
+        const {playerTime} = this.props
+
+        let _timeStamps = this._getTimeStamps()
+
+        return  _timeStamps ?
+            _timeStamps.find((item) => {
+                return ((playerTime * 1000) >= item.start) && (item.end > (playerTime * 1000))
+            })
+            :
+            null
+    }
+
+    _getOldTypeTextItem() {
         const {playerTime, episodesTimes} = this.props
 
         const _textBlockElem = $(".text-block__wrapper"),
@@ -125,60 +153,37 @@ class SwitchButtons extends React.Component {
             })
             .filter(item => !!item)
 
-        const _item = _visible.find((item) => {
+        return  _visible.find((item) => {
             return ((playerTime * 1000) >= item.start) && (item.end > (playerTime * 1000))
         })
-
-        if (_item) {
-
-            const _timeLength = _item.end - _item.start,
-                _timeDelta = playerTime * 1000 - _item.start,
-                _part = _timeDelta / _timeLength,
-                _length = _item.bottom - _item.top,
-                _delta = _length * _part,
-                _currentPos = _item.top + _delta - this._getTopMargin() - (_delta * 0.03)//($(window).height() / 2)
-
-            window.scrollTo(0, _currentPos)
-        }
     }
 
     _handleScrollNewType() {
-        const {lessonPlayInfo, timeStamps} = this.props
+        const {lessonPlayInfo,} = this.props
 
-        if (!(lessonPlayInfo && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
+        if (!lessonPlayInfo) return
 
-        let _visible = timeStamps
-            .map((item, index) => {
-                return {time: item, top: $(`#asset-${index + 1}`).offset().top}
-            })
-            .sort((a, b) => {
-                const _readLineTop =  this._getReadLineTop(),
-                    _inReadLineA = (_readLineTop - a.top) >= 0,
-                    _inReadLineB = (_readLineTop - b.top) >= 0
+        let _timeStamps = this._getTimeStamps()
 
-                return (_inReadLineA && _inReadLineB) ? (b.top - a.top) : (a.top - b.top)
-            })
+        if (!_timeStamps) return;
 
-        if (_visible.length === 0) return;
-
-        let _assets = lessonPlayInfo.episodes[0].elements.map((item, index, array) => {
-            let _asset = lessonPlayInfo.assets.find(asset => asset.id === item.assetId)
-
-            return _asset ? {
-                start: item.start * 1000,
-                end: (index === (array.length - 1) ?
-                    lessonPlayInfo.episodes[0].audio ? lessonPlayInfo.episodes[0].audio.info.length : array[index].start
-                    :
-                    array[index + 1].start) * 1000,
-                asset: _asset
-            } : null
+        const _readLine = this._getReadLineTop()
+        let _currentParagraph = _timeStamps.find((item) => {
+            return item.top < _readLine && item.bottom > _readLine
         })
 
-        let _current = _assets.find((item) => {
-            return (item.start >= _visible[0].time) && (_visible[0].time < item.end)
-        })
+        if (!_currentParagraph) {
+            this._currentTime = 0
+            return;
+        }
 
-        // if (_current) this._applyNewAsset(_current.asset)
+
+        let _height = _currentParagraph.bottom - _currentParagraph.top,
+            _part = _readLine - _currentParagraph.top,
+            _percent = _part / _height,
+            _length = _currentParagraph.end - _currentParagraph.start
+
+        this._currentTime = _currentParagraph.start + (_length * _percent)
     }
 
     _oldTypeHandleScroll() {
@@ -278,6 +283,28 @@ class SwitchButtons extends React.Component {
         return _margin
     }
 
+    _getTimeStamps() {
+        const {timeStamps, lesson,} = this.props
+
+        if (!(lesson && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
+
+        const _textBlockElem = $(".text-block__wrapper"),
+            _textBlockTop = _textBlockElem.offset().top,
+            _textBlockBottom = _textBlockTop + _textBlockElem.height()
+
+        return  timeStamps
+            .map((item, index) => {
+                return {start: item, top: $(`#asset-${index + 1}`).offset().top}
+            })
+            .filter(item => !!item)
+            .map((item, index, array) => {
+                item.bottom = index === (array.length - 1) ? _textBlockBottom : array[index + 1].top
+                item.end = index === (array.length - 1) ? lesson.Duration * 1000 : array[index + 1].start
+
+                return item
+            })
+    }
+
 }
 
 const mapStateToProps = (state) => {
@@ -285,6 +312,7 @@ const mapStateToProps = (state) => {
         episodesTimes: episodesTimesSelector(state),
         timeStamps: timeStampsSelector(state),
         playerTime: state.player.currentTime,
+        lessonPlayInfo: assetsSelector(state),
     }
 }
 
