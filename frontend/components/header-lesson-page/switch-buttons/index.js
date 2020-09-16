@@ -8,7 +8,7 @@ import {startSetCurrentTime, startPause, startPlay} from "actions/player-start-a
 import {SVG} from "tools/svg-paths";
 import PropTypes from 'prop-types';
 
-const TIME_DELTA = 5
+const TIME_DELTA = 6
 
 class SwitchButtons extends React.Component {
 
@@ -84,8 +84,8 @@ class SwitchButtons extends React.Component {
                 _timeDelta = this.props.playerTime * 1000 - _item.start,
                 _part = _timeDelta / _timeLength,
                 _length = _item.lastLineTop - _item.firstLineTop,
-                _delta = _length * _part,
-                _currentPos = _item.firstLineTop + _delta //- this._getTopMargin() - (_delta * 0.03)
+                _delta = _item.lineHeight ? Math.floor(_length * _part / _item.lineHeight) * _item.lineHeight : _length * _part,
+                _currentPos = _item.firstLineTop + _delta - this._getTopMargin()
 
             window.scrollTo(0, _currentPos)
         }
@@ -179,10 +179,9 @@ class SwitchButtons extends React.Component {
             return;
         }
 
-
-        let _height = _currentParagraph.bottom - _currentParagraph.top,
-            _part = _readLine - _currentParagraph.top,
-            _percent = _part / _height,
+        let _height = _currentParagraph.lastLineTop - _currentParagraph.firstLineTop,
+            _part = _readLine - _currentParagraph.firstLineTop,
+            _percent = (_part <= 0) ? 0 : (_part / _height),
             _length = _currentParagraph.end - _currentParagraph.start
 
         this._currentTime = _currentParagraph.start + (_length * _percent)
@@ -268,18 +267,16 @@ class SwitchButtons extends React.Component {
     }
 
     _getReadLineTop() {
-        // return $(window).scrollTop() + ($(window).height() / 2)
         return $(window).scrollTop() + this._getTopMargin()
     }
 
     _getTopMargin() {
-        const _headline = $(".text-block__headline"),
-            _menu = $(".js-lectures-menu")
+        const _menu = $(".js-lectures-menu")
 
-        let _margin = 92
+        let _margin = 52
 
-        if (_headline && _headline.length && _menu && _menu.length) {
-            _margin = +_headline.css("margin-bottom").replace("px", "") + _menu.height()
+        if (_menu && _menu.length) {
+            _margin = _menu.height()
         }
 
         return _margin
@@ -290,16 +287,13 @@ class SwitchButtons extends React.Component {
 
         if (!(lesson && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
 
-        // const _textBlockElem = $(".text-block__wrapper"),
-        //     _textBlockTop = _textBlockElem.offset().top,
-        //     _textBlockBottom = _textBlockTop + _textBlockElem.height()
-
         return  timeStamps
             .map((item, index) => {
                 const _assetBlock = $(`#asset-${index + 1}`),
                     _lineHeight = +_assetBlock.css("line-height").replace("px", ""),
                     _blockTop = _assetBlock.offset().top,
-                    _blockBottom = _blockTop + _assetBlock.height()
+                    _blockBottom = _blockTop + _assetBlock.height(),
+                    _fontSize = +_assetBlock.css("font-size").replace("px", "")
 
                 return (_assetBlock && _assetBlock.length) ? {
                     start: item,
@@ -307,7 +301,8 @@ class SwitchButtons extends React.Component {
                     bottom: _blockBottom,
                     lineHeight: _lineHeight,
                     firstLineTop: _assetBlock.offset().top,
-                    lastLineTop: _blockBottom - _lineHeight
+                    lastLineTop: _blockBottom - _lineHeight,
+                    fontSize: _fontSize
                 }
                 :
                     null

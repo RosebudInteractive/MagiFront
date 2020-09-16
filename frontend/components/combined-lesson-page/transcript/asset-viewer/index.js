@@ -354,18 +354,16 @@ class AssetBlock extends React.Component{
     }
 
     _getReadLineTop() {
-        // return $(window).scrollTop() + ($(window).height() / 2)
         return $(window).scrollTop() + this._getTopMargin()
     }
 
     _getTopMargin() {
-        const _headline = $(".text-block__headline"),
-            _menu = $(".js-lectures-menu")
+        const _menu = $(".js-lectures-menu")
 
-        let _margin = 92
+        let _margin = 52
 
-        if (_headline && _headline.length && _menu && _menu.length) {
-            _margin = +_headline.css("margin-bottom").replace("px", "") + _menu.height()
+        if (_menu && _menu.length) {
+            _margin = _menu.height()
         }
 
         return _margin
