@@ -83,9 +83,9 @@ class SwitchButtons extends React.Component {
             const _timeLength = _item.end - _item.start,
                 _timeDelta = this.props.playerTime * 1000 - _item.start,
                 _part = _timeDelta / _timeLength,
-                _length = _item.bottom - _item.top,
+                _length = _item.lastLineTop - _item.firstLineTop,
                 _delta = _length * _part,
-                _currentPos = _item.top + _delta - this._getTopMargin() - (_delta * 0.03)
+                _currentPos = _item.firstLineTop + _delta //- this._getTopMargin() - (_delta * 0.03)
 
             window.scrollTo(0, _currentPos)
         }
@@ -153,9 +153,11 @@ class SwitchButtons extends React.Component {
             })
             .filter(item => !!item)
 
-        return  _visible.find((item) => {
+        const _item = _visible.find((item) => {
             return ((playerTime * 1000) >= item.start) && (item.end > (playerTime * 1000))
         })
+
+        return {firstLineTop : _item.top, lastLineTop: _item.bottom, ..._item}
     }
 
     _handleScrollNewType() {
@@ -288,17 +290,31 @@ class SwitchButtons extends React.Component {
 
         if (!(lesson && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
 
-        const _textBlockElem = $(".text-block__wrapper"),
-            _textBlockTop = _textBlockElem.offset().top,
-            _textBlockBottom = _textBlockTop + _textBlockElem.height()
+        // const _textBlockElem = $(".text-block__wrapper"),
+        //     _textBlockTop = _textBlockElem.offset().top,
+        //     _textBlockBottom = _textBlockTop + _textBlockElem.height()
 
         return  timeStamps
             .map((item, index) => {
-                return {start: item, top: $(`#asset-${index + 1}`).offset().top}
+                const _assetBlock = $(`#asset-${index + 1}`),
+                    _lineHeight = +_assetBlock.css("line-height").replace("px", ""),
+                    _blockTop = _assetBlock.offset().top,
+                    _blockBottom = _blockTop + _assetBlock.height()
+
+                return (_assetBlock && _assetBlock.length) ? {
+                    start: item,
+                    top: _blockTop,
+                    bottom: _blockBottom,
+                    lineHeight: _lineHeight,
+                    firstLineTop: _assetBlock.offset().top,
+                    lastLineTop: _blockBottom - _lineHeight
+                }
+                :
+                    null
             })
             .filter(item => !!item)
             .map((item, index, array) => {
-                item.bottom = index === (array.length - 1) ? _textBlockBottom : array[index + 1].top
+                item.top = index === 0 ? item.top : array[index - 1].bottom
                 item.end = index === (array.length - 1) ? lesson.Duration * 1000 : array[index + 1].start
 
                 return item
