@@ -6,6 +6,8 @@ export default class TranscriptParser {
     constructor(data) {
         this.timeStamps = []
         this.episodesTimes = []
+        this.paragraphs = []
+        this._paraCounter = 0
         this._currentEpisodeFinishTime = 0
 
         this.html = this._handleTranscript(data)
@@ -19,13 +21,22 @@ export default class TranscriptParser {
 
             let _html = this._parseTranscript({episode: episode, playInfo: _playInfo, episodeIndex: index})
 
-            if (_html) { html = html.concat(_html) }
+            if (_html) {
+                html = html.concat(_html)
+            }
         });
+
+        const _length = playInfo && playInfo.episodes && Array.isArray(playInfo.episodes) && playInfo.episodes.reduce((acc, item) => {
+            return acc + (item.contentType === CONTENT_TYPE.AUDIO) ? item.audio && item.audio.info && item.audio.info.length * 1000 : 0
+        }, 0)
+
+        this._calcParagraphTimes({audioLength: _length})
 
         return (html.length > 0) ? html : null;
     }
 
     _parseTranscript({episode, playInfo, episodeIndex}) {
+        this._paraCounter = 0
         this.timeStamps.length = 0
         this._calcEpisodesTimes({episode: episode, playInfo: playInfo, episodeIndex: episodeIndex})
 
@@ -139,58 +150,63 @@ export default class TranscriptParser {
 
         _content = _content.trim();
 
-        let _array = _content.split(/<p>(.*?)(<\/p>)?/gim);
+        let _array = _content.split(/<p>(.*?)<\/p>?/gim);
         let _isToc = true;
 
-        _array.forEach((item) => {
-            let _paragraph = item;
+        _array
+            .filter(item => !!item)
+            .forEach((_paragraph) => {
 
-            if (!_paragraph) {
-                return
-            }
+                _paragraph.trim();
+                if (_paragraph.length === 0) {
+                    return
+                }
 
-            _paragraph.trim();
-            if (_paragraph.length === 0) {
-                return
-            }
+                _paragraph = this._handleParagraph({paragraph: _paragraph, isToc: _isFirstParagraph || _isToc, startTime: _toc ? _toc.StartTime : null})
 
-            _paragraph = this._handleParagraph(_paragraph)
-
-            if (_isFirstParagraph) {
-                _div.push(<div id={_toc ? 'toc' + _toc.Id : null} className="toc-anchor">
-                    <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
-                    <p className='text-intro'>
-                        <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
-                    </p>
-                </div>)
-
-                _isFirstParagraph = false;
-            } else {
-                if (!_isToc) {
-                    _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
-                } else {
-                    _isToc = false;
+                if (_isFirstParagraph) {
                     _div.push(<div id={_toc ? 'toc' + _toc.Id : null} className="toc-anchor">
                         <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
-                        <p>
-                            <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
-                        </p>
+                        <p id={`para-${this._paraCounter}`} className='text-intro'
+                           dangerouslySetInnerHTML={{__html: _paragraph}}/>
                     </div>)
-                }
-            }
 
-            _isToc = false;
-        })
+                    _isFirstParagraph = false;
+                } else {
+                    if (!_isToc) {
+                        _div.push(<p id={`para-${this._paraCounter}`} dangerouslySetInnerHTML={{__html: _paragraph}}/>)
+                    } else {
+                        _isToc = false;
+                        _div.push(<div id={_toc ? 'toc' + _toc.Id : null} className="toc-anchor">
+                            <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
+                            <p id={`para-${this._paraCounter}`} dangerouslySetInnerHTML={{__html: _paragraph}}/>
+                        </div>)
+                    }
+                }
+
+                _isToc = false;
+
+                this._paraCounter++
+            })
 
         data.div = _div
-        return {div: _div.length ? _div : null, newTranscriptText: _transcriptText, isFirstParagraph: _isFirstParagraph};
+        return {
+            div: _div.length ? _div : null,
+            newTranscriptText: _transcriptText,
+            isFirstParagraph: _isFirstParagraph
+        };
     }
 
-    _handleParagraph(paragraph) {
+    _handleParagraph({paragraph, isToc, startTime}) {
         let _re = /<b><u>ts:{(.*?)}<\/u><\/b>/gim,
             _matches
 
+        let _index = this.paragraphs.push({startTime: null}),
+            _newType = false
+
         while ((_matches = _re.exec(paragraph)) !== null) {
+            _newType = true
+
             if (_matches[1]) {
                 let _stringTime = _matches[1].split(":"),
                     _seconds = _stringTime[_stringTime.length - 1] ? _stringTime[_stringTime.length - 1] : 0,
@@ -200,6 +216,10 @@ export default class TranscriptParser {
 
                 this.timeStamps.push(_milliseconds)
 
+                if (this.paragraphs[_index - 1].startTime === null) {
+                    this.paragraphs[_index - 1].startTime = _milliseconds
+                }
+
                 paragraph = (_matches.index === 0) ?
                     paragraph.replace(_matches[0], `<div class="asset-anchor" id="asset-${this.timeStamps.length}"/>`)
                     :
@@ -207,6 +227,59 @@ export default class TranscriptParser {
             }
         }
 
+        if (!_newType && isToc) {
+            this.paragraphs[_index - 1].startTime = startTime
+        }
+
+        this.paragraphs[_index - 1].length = $("<div>").html(paragraph).text().length
+
         return paragraph
+    }
+
+    _calcParagraphTimes({audioLength}) {
+        let _empties = [],
+            _lastIndexWithTime = null
+
+        this.paragraphs.forEach((item, index, paragraphs) => {
+            let _time = item.startTime,
+                _isLast = index === (paragraphs.length - 1)
+
+            if (_isLast && !item.startTime) {
+                _time = audioLength
+                _empties.push(index)
+            }
+
+            if (_time !== null) {
+                if (_empties.length && (_lastIndexWithTime !== null)) {
+                    _empties.unshift(_lastIndexWithTime)
+
+                    let _startTime = paragraphs[_lastIndexWithTime].startTime,
+                        _finishTime = _time,
+                        _timeLength = _finishTime - _startTime,
+                        _textLength = _empties.reduce((acc, value) => {
+                            return acc + paragraphs[value].length
+                        }, 0)
+
+                    _empties.forEach((paragraphIndex, index, empties) => {
+                        if (index > 0) {
+                            let _part = paragraphs[empties[index - 1]].length / _textLength
+                            _startTime += _timeLength * _part
+                            paragraphs[paragraphIndex].startTime = _startTime
+                        }
+                    })
+
+                    _empties = []
+                }
+
+                _lastIndexWithTime = index
+            } else {
+                _empties.push(index)
+            }
+        })
+
+        this.paragraphs.map((item, index, array) => {
+            item.finishTime = index === (array.length - 1) ? audioLength : array[index + 1].startTime
+            return item
+        })
     }
 }

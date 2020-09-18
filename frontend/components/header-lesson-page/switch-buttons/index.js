@@ -1,5 +1,5 @@
 import React from 'react';
-import {assetsSelector, episodesTimesSelector, timeStampsSelector} from "ducks/transcript"
+import {assetsSelector, episodesTimesSelector, paragraphsSelector, timeStampsSelector} from "ducks/transcript"
 import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
@@ -24,14 +24,7 @@ class SwitchButtons extends React.Component {
         this._currentTime = 0
 
         this._scrollHandler = () => {
-            const {timeStamps} = this.props,
-                _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
-
-            if (_newType) {
-                this._handleScrollNewType()
-            } else {
-                this._oldTypeHandleScroll()
-            }
+            this._handleScrollNewType()
         }
 
         $(window).bind('resize scroll', this._scrollHandler)
@@ -77,7 +70,7 @@ class SwitchButtons extends React.Component {
 
         this.props.actions.startPause()
 
-        const _item = this.props.timeStamps ? this._getNewTypeTextItem() : this._getOldTypeTextItem()
+        const _item = this._getNewTypeTextItem()
 
         if (_item) {
             const _timeLength = _item.end - _item.start,
@@ -94,7 +87,7 @@ class SwitchButtons extends React.Component {
     _getNewTypeTextItem() {
         const {playerTime} = this.props
 
-        let _timeStamps = this._getTimeStamps()
+        let _timeStamps = this._getParagraphs()
 
         return  _timeStamps ?
             _timeStamps.find((item) => {
@@ -104,73 +97,17 @@ class SwitchButtons extends React.Component {
             null
     }
 
-    _getOldTypeTextItem() {
-        const {playerTime, episodesTimes} = this.props
-
-        const _textBlockElem = $(".text-block__wrapper"),
-            _textBlockTop = _textBlockElem.offset().top,
-            _textBlockBottom = _textBlockTop + _textBlockElem.height()
-
-        let _anchors = $(".toc-anchor")
-
-        if (_anchors.length !== 0) {
-            _anchors.each(function() {
-                let _current = $(this),
-                    id = _current.attr("id")
-
-                if (!id) {
-                    if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
-                        episodesTimes[0].top = _current.offset().top
-                        return
-                    } else {
-                        return
-                    }
-                }
-                id = id.replace("toc", "")
-
-                id = +id
-
-                if (id) {
-                    let _item = episodesTimes.find(item => item.id === id)
-
-                    if (_item) {
-                        _item.top = _current.offset().top
-                    }
-                }
-            })
-        } else if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
-            episodesTimes[0].top = _textBlockTop
-        } else {
-            return
-        }
-
-        let _visible = episodesTimes
-            .filter(item => !!item.top)
-            .map((item, index, array) => {
-                item.bottom = index === (array.length - 1) ? _textBlockBottom : array[index + 1].top
-
-                return item
-            })
-            .filter(item => !!item)
-
-        const _item = _visible.find((item) => {
-            return ((playerTime * 1000) >= item.start) && (item.end > (playerTime * 1000))
-        })
-
-        return {firstLineTop : _item.top, lastLineTop: _item.bottom, ..._item}
-    }
-
     _handleScrollNewType() {
         const {lessonPlayInfo,} = this.props
 
         if (!lessonPlayInfo) return
 
-        let _timeStamps = this._getTimeStamps()
+        let paragraphs = this._getParagraphs()
 
-        if (!_timeStamps) return;
+        if (!paragraphs) return;
 
         const _readLine = this._getReadLineTop()
-        let _currentParagraph = _timeStamps.find((item) => {
+        let _currentParagraph = paragraphs.find((item) => {
             return item.top < _readLine && item.bottom > _readLine
         })
 
@@ -185,85 +122,6 @@ class SwitchButtons extends React.Component {
             _length = _currentParagraph.end - _currentParagraph.start
 
         this._currentTime = _currentParagraph.start + (_length * _percent)
-    }
-
-    _oldTypeHandleScroll() {
-        const {episodesTimes} = this.props
-
-        if (!(episodesTimes && Array.isArray(episodesTimes) && (episodesTimes.length > 0))) return
-
-        const _readLineTop = this._getReadLineTop(),
-            _textBlockElem = $(".text-block__wrapper"),
-            _textBlockTop = _textBlockElem.offset().top,
-            _textBlockBottom = _textBlockTop + _textBlockElem.height()
-
-        let _anchors = $(".toc-anchor")
-
-        if (_anchors.length !== 0) {
-            _anchors.each(function() {
-                let _current = $(this),
-                    id = _current.attr("id")
-
-                if (!id) {
-                    if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
-                        episodesTimes[0].top = _current.offset().top
-                        return
-                    } else {
-                        return
-                    }
-                }
-                id = id.replace("toc", "")
-
-                id = +id
-
-                if (id) {
-                    let _item = episodesTimes.find(item => item.id === id)
-
-                    if (_item) {
-                        _item.top = _current.offset().top
-                    }
-                }
-            })
-        } else if ((episodesTimes.length === 1) && (episodesTimes[0].id === null)) {
-            episodesTimes[0].top = _textBlockTop
-        } else {
-            return
-        }
-
-        let _visible = episodesTimes
-            .filter(item => !!item.top)
-            .map((item, index, array) => {
-                let _bottom = index === (array.length - 1) ? _textBlockBottom : array[index + 1].top,
-                    _height = _bottom - item.top
-
-                item.bottom = _bottom
-                item.percent = (_bottom < _readLineTop) ?
-                    1
-                    :
-                    (item.top > _readLineTop) ?
-                        0
-                        :
-                        (_readLineTop - item.top) / _height
-
-                return item
-            })
-            .filter(item => !!item)
-            .sort((a, b) => {
-                const _inReadLineA = (_readLineTop - a.top) >= 0,
-                    _inReadLineB = (_readLineTop - b.top) >= 0
-
-                return (_inReadLineA && _inReadLineB) ? (b.top - a.top) : (a.top - b.top)
-            })
-
-        if (_visible.length === 0) return;
-
-        const _topPos = this._getReadLineTop() - _visible[0].top
-        if (_topPos >= 0) {
-            const _timeLength = _visible[0].end - _visible[0].start,
-                _timePart = _timeLength * _visible[0].percent
-
-            this._currentTime = _visible[0].start + _timePart
-        }
     }
 
     _getReadLineTop() {
@@ -282,40 +140,42 @@ class SwitchButtons extends React.Component {
         return _margin
     }
 
-    _getTimeStamps() {
-        const {timeStamps, lesson,} = this.props
+    _getParagraphs() {
+        const {paragraphs, lesson,} = this.props
 
-        if (!(lesson && timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0))) return
+        if (!(lesson && paragraphs && Array.isArray(paragraphs) && (paragraphs.length > 0))) return
 
-        return  timeStamps
+        return  paragraphs
             .map((item, index) => {
-                const _assetBlock = $(`#asset-${index + 1}`),
-                    _lineHeight = +_assetBlock.css("line-height").replace("px", ""),
-                    _blockTop = _assetBlock.offset().top,
-                    _blockBottom = _blockTop + _assetBlock.height(),
-                    _fontSize = +_assetBlock.css("font-size").replace("px", "")
+                const _para = $(`#para-${index}`)
 
-                return (_assetBlock && _assetBlock.length) ? {
-                    start: item,
-                    top: _blockTop,
-                    bottom: _blockBottom,
-                    lineHeight: _lineHeight,
-                    firstLineTop: _assetBlock.offset().top,
-                    lastLineTop: _blockBottom - _lineHeight,
-                    fontSize: _fontSize
+                if (_para && _para.length) {
+                    const _lineHeight = +_para.css("line-height").replace("px", ""),
+                        _blockTop = _para.offset().top,
+                        _blockBottom = _blockTop + _para.height(),
+                        _fontSize = +_para.css("font-size").replace("px", "")
+
+                    return {
+                        start: item.startTime,
+                        end: item.finishTime,
+                        top: _blockTop,
+                        bottom: _blockBottom,
+                        lineHeight: _lineHeight,
+                        firstLineTop: _blockTop,
+                        lastLineTop: _blockBottom - _lineHeight,
+                        fontSize: _fontSize
+                    }
+                } else {
+                    return null
                 }
-                :
-                    null
+
             })
             .filter(item => !!item)
             .map((item, index, array) => {
                 item.top = index === 0 ? item.top : array[index - 1].bottom
-                item.end = index === (array.length - 1) ? lesson.Duration * 1000 : array[index + 1].start
-
                 return item
             })
     }
-
 }
 
 const mapStateToProps = (state) => {
@@ -324,6 +184,7 @@ const mapStateToProps = (state) => {
         timeStamps: timeStampsSelector(state),
         playerTime: state.player.currentTime,
         lessonPlayInfo: assetsSelector(state),
+        paragraphs: paragraphsSelector(state),
     }
 }
 

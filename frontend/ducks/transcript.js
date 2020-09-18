@@ -33,6 +33,7 @@ const ReducerRecord = Record({
     html: null,
     episodesTimes: false,
     timeStamps: false,
+    paragraphs: null,
     refs: [],
     assets: null,
     gallery: new Gallery(),
@@ -53,6 +54,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('transcript', payload)
                 .set('html', payload.html)
                 .set('timeStamps', payload.timeStamps)
+                .set('paragraphs', payload.paragraphs)
                 .set('episodesTimes', payload.episodesTimes)
                 .set('refs', payload.transcript.Refs)
                 .set('assets', payload.assets)
@@ -91,6 +93,7 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 export const transcriptSelector = createSelector(stateSelector, state => state.transcript)
 export const textSelector = createSelector(stateSelector, state => state.html)
 export const timeStampsSelector = createSelector(stateSelector, state => state.timeStamps)
+export const paragraphsSelector = createSelector(stateSelector, state => state.paragraphs)
 export const episodesTimesSelector = createSelector(stateSelector, state => state.episodesTimes)
 export const refsSelector = createSelector(stateSelector, state => state.refs)
 export const refsVisibleSelector = createSelector(refsSelector, refs => (refs.length > 0))
@@ -152,6 +155,7 @@ function* getTranscriptSaga(data) {
                 transcript: _transcript,
                 html: _transcriptData.html && (_transcriptData.html.length > 0) ? _transcriptData.html : null,
                 timeStamps: _transcriptData.timeStamps,
+                paragraphs: _transcriptData.paragraphs,
                 episodesTimes: _transcriptData.episodesTimes,
                 refsVisible: _transcript.Refs && Array.isArray(_transcript.Refs) && (_transcript.Refs.length > 0),
                 assets: _assets,
