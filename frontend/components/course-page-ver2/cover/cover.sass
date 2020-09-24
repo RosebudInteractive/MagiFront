@@ -24,6 +24,10 @@
     position: relative
     top: 0
     left: 0
+    margin-bottom: 0
+    @media (max-width: $tablet-width)
+      margin-bottom: 17px
+
 
   .course-page__info-wrapper
     position: absolute
@@ -55,6 +59,10 @@
     svg
       top: 50%
       transform: translateY(-50%)
+      @media(max-width: $tablet-width)
+        top: -4px
+        transform: none
+        position: relative
 
 
   .title__label

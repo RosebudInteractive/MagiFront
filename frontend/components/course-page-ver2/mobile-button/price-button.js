@@ -46,11 +46,11 @@ class PriceButton extends React.Component {
 
         this._toggleDiscountRefreshTimer(dynamicDiscount)
 
-        return <div className="mobile-button _price-block btn btn--brown">
+        return <div className="mobile-button _price-block btn btn--brown" onClick={::this._onClick}>
                 <div className="price-button__crown">
                     <svg className="course-module__label-icon" width="18" height="18" fill="#FFF" dangerouslySetInnerHTML={{__html: CROWN}}/>
                 </div>
-                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`Купить ${price + _currency} `}</div>
+                <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")}>{`Купить ${price + _currency} `}</div>
                 <div className="course-module__price-block-section">
                     {
                         hasDiscount ?

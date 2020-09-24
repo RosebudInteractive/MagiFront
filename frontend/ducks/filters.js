@@ -92,7 +92,9 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return item.set('selected', false)
                     })
                 } else {
-                    _map = _map.setIn([payload.value, 'selected'], true)
+                    _map = _map.map((item) => {
+                        return item.set('selected', item.get("URL") === payload.value)
+                    })
                 }
 
                 let _mainType, _courseType

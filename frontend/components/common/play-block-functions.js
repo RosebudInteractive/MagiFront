@@ -1,4 +1,4 @@
-import {TooltipTitles} from "../../tools/page-tools";
+import {TooltipTitles} from "tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
 
 export const SVG = {
@@ -71,6 +71,7 @@ export function _calcIsFinishedAndPlayedPart() {
     let result = {};
 
     result.playedPart = _playedPart;
+    result.currentTime = _currentTime;
     result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
 
     return result

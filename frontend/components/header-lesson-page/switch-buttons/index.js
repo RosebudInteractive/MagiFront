@@ -4,9 +4,13 @@ import $ from "jquery";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
-import {startSetCurrentTime, startPause, startPlay} from "actions/player-start-actions"
+import {startSetCurrentTime, startPause, startPlay, preinitAudios} from "actions/player-start-actions"
 import {SVG} from "tools/svg-paths";
 import PropTypes from 'prop-types';
+import {_calcIsFinishedAndPlayedPart,} from "../../common/play-block-functions";
+import {unlockLesson} from "ducks/player";
+import history from "../../../history";
+import {getPaidCourseInfo} from "ducks/billing";
 
 const TIME_DELTA = 6
 
@@ -16,6 +20,7 @@ class SwitchButtons extends React.Component {
         type: PropTypes.string,
         isPlayerMode: PropTypes.bool,
         lesson: PropTypes.object,
+        course: PropTypes.object,
     }
 
     constructor(props) {
@@ -26,6 +31,8 @@ class SwitchButtons extends React.Component {
         this._scrollHandler = () => {
             this._handleScrollNewType()
         }
+
+        this._calcIsFinishedAndPlayedPart = _calcIsFinishedAndPlayedPart.bind(this)
 
         $(window).bind('resize scroll', this._scrollHandler)
     }
@@ -52,29 +59,63 @@ class SwitchButtons extends React.Component {
     }
 
     _toPlayer() {
-        if (!this.props.isPlayerMode) return
+        const {isPlayerMode, lesson, course, authorized, isAdmin} = this.props
 
         const _newValue = this._currentTime / 1000
 
-        if (Math.abs(_newValue - this.props.playerTime) <= TIME_DELTA) {
-            this.props.actions.startPlay(this.props.lesson.Id)
+        if (isPlayerMode) {
+            if (Math.abs(_newValue - this.props.playerTime) <= TIME_DELTA) {
+                this.props.actions.startPlay(this.props.lesson.Id)
+            } else {
+                this.props.actions.startSetCurrentTime(_newValue)
+            }
         } else {
-            this.props.actions.startSetCurrentTime(_newValue)
+            let _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought),
+                _needLockLessonAsPaid = _isPaidCourse && !(lesson.IsFreeInPaidCourse || isAdmin)
+
+            if (_needLockLessonAsPaid) {
+                const _needLocation = '/' + course.URL + '/' + lesson.URL,
+                    _courseInfo = {
+                    courseId: course.Id,
+                    productId: course.ProductId,
+                    returnUrl: _needLocation,
+                    firedByPlayerBlock: true,
+                }
+
+                this.props.actions.getPaidCourseInfo(_courseInfo)
+            } else if (lesson.IsAuthRequired && !authorized) {
+                this.props.actions.unlockLesson({returnUrl: `/${course.URL}/${lesson.URL}`});
+            } else {
+                const _audios = Object.values(lesson.Audios);
+
+                this.props.actions.preinitAudios(_audios);
+                history.replace('/' + course.URL + '/' + lesson.URL + '?play')
+            }
         }
+
 
         window.scrollTo(0, 0)
     }
 
     _toText() {
-        if (!this.props.isPlayerMode) return
+        if (this.props.isPlayerMode) {
+            this.props.actions.startPause()
+        }
 
-        this.props.actions.startPause()
+        let _currentTime = 0
 
-        const _item = this._getNewTypeTextItem()
+        if (!this.props.isPlayerMode) {
+            const {isFinished, currentTime} = this._calcIsFinishedAndPlayedPart()
+            _currentTime = isFinished ? 0 : currentTime
+        } else {
+           _currentTime = this.props.playerTime
+        }
+
+        const _item = this._getNewTypeTextItem(_currentTime)
 
         if (_item) {
             const _timeLength = _item.end - _item.start,
-                _timeDelta = this.props.playerTime * 1000 - _item.start,
+                _timeDelta = _currentTime * 1000 - _item.start,
                 _part = _timeDelta / _timeLength,
                 _length = _item.lastLineTop - _item.firstLineTop,
                 _delta = _item.lineHeight ? Math.floor(_length * _part / _item.lineHeight) * _item.lineHeight : _length * _part,
@@ -84,9 +125,7 @@ class SwitchButtons extends React.Component {
         }
     }
 
-    _getNewTypeTextItem() {
-        const {playerTime} = this.props
-
+    _getNewTypeTextItem(playerTime) {
         let _timeStamps = this._getParagraphs()
 
         return  _timeStamps ?
@@ -185,12 +224,15 @@ const mapStateToProps = (state) => {
         playerTime: state.player.currentTime,
         lessonPlayInfo: assetsSelector(state),
         paragraphs: paragraphsSelector(state),
+        lessonInfoStorage: state.lessonInfoStorage,
+        authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        actions : bindActionCreators({startSetCurrentTime, startPause, startPlay}, dispatch)
+        actions : bindActionCreators({startSetCurrentTime, startPause, startPlay, preinitAudios, unlockLesson, getPaidCourseInfo}, dispatch),
     }
 }
 

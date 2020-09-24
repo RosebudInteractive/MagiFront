@@ -6,7 +6,7 @@ import {Redirect} from 'react-router';
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
-import {whoAmI} from "../actions/user-actions";
+import {whoAmI} from "actions/user-actions";
 import {notifyCoursesShowed} from "ducks/google-analytics";
 
 import * as tools from '../tools/page-tools';
@@ -33,8 +33,10 @@ import MetaTags from 'react-meta-tags';
 import $ from "jquery";
 import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
-import {OverflowHandler} from "../tools/page-tools";
+import {OverflowHandler} from "tools/page-tools";
 import {notifyAnalyticsChangePage} from 'ducks/app';
+
+let POP_GUARD = false
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -75,6 +77,11 @@ class CoursesPage extends React.Component {
                 this.props.applyExternalFilter(filterType, externalFilter)
                 return
             }
+        } else {
+            if (hasExternalFilter && ((prevProps.externalFilter !== externalFilter) || (prevProps.filterType !== filterType))) {
+                this.props.applyExternalFilter(filterType, externalFilter)
+                return
+            }
         }
 
         const _filterChanged = !prevProps.selectedFilter.equals(selectedFilter) ||
@@ -106,7 +113,11 @@ class CoursesPage extends React.Component {
                 let _filters = (_filter.length > 0) ? _filter.join('+') : 'all',
                     _url = `/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search
 
-                this.props.history.replace(_url)
+                if ((this.props.history.action === "PUSH") || !POP_GUARD) {
+                    this.props.history.push(_url)
+                    POP_GUARD = true
+                }
+
                 this.props.notifyAnalyticsChangePage(_url)
             }
         }
