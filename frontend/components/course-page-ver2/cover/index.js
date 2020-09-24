@@ -39,7 +39,8 @@ export default class Cover extends React.Component {
                 backgroundImage : "url(" + '/data/' + _coverUrl + ")",
                 backgroundPositionX: _backgroundPosition.left,
                 backgroundPositionY: _backgroundPosition.top,
-            }
+            },
+            _crown = getCrownForCourse(this.props.course)
 
         return <div className="course-page__cover" style={_coverStyle}>
             <PageHeader visible={true}/>
@@ -49,9 +50,12 @@ export default class Cover extends React.Component {
                 </button>
                 <div className="course-page__info">
                     <h1 className="info__title">
-                        <span className="title__course-pay-status">
-                            { getCrownForCourse(this.props.course) }
-                        </span>
+                        {
+                            _crown &&
+                            <span className="title__course-pay-status">
+                                {_crown}
+                            </span>
+                        }
                         <p className="title__label">Курс:</p>
                         <span>{course.Name.trim()}</span>
                     </h1>
