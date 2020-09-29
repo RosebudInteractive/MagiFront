@@ -36,12 +36,12 @@ import {FILTER_TYPE} from "../constants/common-consts";
 import {OverflowHandler} from "tools/page-tools";
 import {notifyAnalyticsChangePage} from 'ducks/app';
 
-let POP_GUARD = false
-
 class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
         this._needRedirectToCourses = false;
+        this._historyGuard = false
+        this._externalFilterGuard = false
     }
 
     UNSAFE_componentWillMount() {
@@ -74,13 +74,20 @@ class CoursesPage extends React.Component {
 
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
+                this._historyGuard = true
+                this._externalFilterGuard = false
                 this.props.applyExternalFilter(filterType, externalFilter)
                 return
             }
         } else {
             if (hasExternalFilter && ((prevProps.externalFilter !== externalFilter) || (prevProps.filterType !== filterType))) {
-                this.props.applyExternalFilter(filterType, externalFilter)
-                return
+                if (this._externalFilterGuard) {
+                    this._externalFilterGuard = false
+                } else {
+                    this._historyGuard = true
+                    this.props.applyExternalFilter(filterType, externalFilter)
+                    return
+                }
             }
         }
 
@@ -113,9 +120,13 @@ class CoursesPage extends React.Component {
                 let _filters = (_filter.length > 0) ? _filter.join('+') : 'all',
                     _url = `/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search
 
-                if ((this.props.history.action === "PUSH") || !POP_GUARD) {
+
+                console.log("ACTION :: ", this.props.history.action, "length : ", this.props.history.length)
+                if (!this._historyGuard) {
                     this.props.history.push(_url)
-                    POP_GUARD = true
+                    this._externalFilterGuard = true
+                } else {
+                    this._historyGuard = false
                 }
 
                 this.props.notifyAnalyticsChangePage(_url)

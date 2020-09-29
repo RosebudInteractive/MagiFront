@@ -29,7 +29,7 @@ class SwitchButtons extends React.Component {
         this._currentTime = 0
 
         this._scrollHandler = () => {
-            this._handleScrollNewType()
+            this._handleScroll()
         }
 
         this._calcIsFinishedAndPlayedPart = _calcIsFinishedAndPlayedPart.bind(this)
@@ -46,6 +46,11 @@ class SwitchButtons extends React.Component {
     }
 
     render() {
+        const {timeStamps} = this.props,
+            _newType = timeStamps && Array.isArray(timeStamps) && (timeStamps.length > 0)
+
+        if (!_newType) return null
+
         return (this.props.type === "_dark") ?
             <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
                     onClick={::this._toText}>
@@ -111,7 +116,7 @@ class SwitchButtons extends React.Component {
            _currentTime = this.props.playerTime
         }
 
-        const _item = this._getNewTypeTextItem(_currentTime)
+        const _item = this._getTextItem(_currentTime)
 
         if (_item) {
             const _timeLength = _item.end - _item.start,
@@ -125,7 +130,7 @@ class SwitchButtons extends React.Component {
         }
     }
 
-    _getNewTypeTextItem(playerTime) {
+    _getTextItem(playerTime) {
         let _timeStamps = this._getParagraphs()
 
         return  _timeStamps ?
@@ -136,7 +141,7 @@ class SwitchButtons extends React.Component {
             null
     }
 
-    _handleScrollNewType() {
+    _handleScroll() {
         const {lessonPlayInfo,} = this.props
 
         if (!lessonPlayInfo) return
