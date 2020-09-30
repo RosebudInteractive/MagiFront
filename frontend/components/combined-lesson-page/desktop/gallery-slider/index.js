@@ -95,21 +95,11 @@ class GallerySlider extends React.Component{
         return <div className={"gallery-slider__container" + (this.state.rendered ? "" : " _hidden")}>
             <div className="gallery-slider__arrow _left" onClick={::this._prev}/>
             {showCloseButton && <button className="gallery-slider__close" style={_closeStyle} onClick={::this._close}/>}
-            <Carousel {...settings} onChange={this.updateCurrentSlide} renderItem={::this._renderItem}>
+            <Carousel {...settings} onChange={this.updateCurrentSlide}>
                 {this._getList()}
             </Carousel >
             <div className="gallery-slider__arrow _right" onClick={::this._next}/>
         </div>
-    }
-
-    _renderItem(item) {
-        setTimeout(() => {
-            if (!this.state.rendered) {
-                this.setState({rendered: true})
-                this._setCloseButtonPosition()
-            }
-        }, 200)
-        return item
     }
 
     _setCloseButtonPosition() {
@@ -174,13 +164,23 @@ class GallerySlider extends React.Component{
             const _style = (_imageRatio > 1) ? {maxHeight: _maxHeight} : {maxWidth: _width}
 
             return <div className={"carousel-slide__wrapper " + _orientationClass} key={index}>
-                    <img src={'/data/' + _fileName} style={_style}/>
+                    <img src={'/data/' + _fileName} style={_style} onLoad={() => this._setImageLoaded(index)}/>
                 <div className="gallery-slide__caption legend font-universal__body-large">
                     <span>{_name}</span>
                     <span>{item.Description}</span>
                 </div>
             </div>
         })
+    }
+
+    _setImageLoaded(e) {
+        if (e === this.state.currentSlide) {
+            if (!this.state.rendered) {
+                this.setState({rendered: true})
+            }
+
+            this._setCloseButtonPosition()
+        }
     }
 
     _close() {
