@@ -88,7 +88,7 @@ class DiscountMenu extends React.Component {
                 {
                     _commonList &&
                         <div className="discount-menu__list">
-                            <div className="discount-menu__title">Общие скидки</div>
+                            <div className="discount-menu__title">Скидки на курсы</div>
                             {_commonList}
                         </div>
                 }

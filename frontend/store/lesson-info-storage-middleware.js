@@ -8,6 +8,7 @@ import {
     PLAYER_STOPPED,
     PLAYER_ENDED,
     FINISH_DELTA_TIME,
+    PLAYER_SET_FORCE_CURRENT_TIME,
 } from '../constants/player'
 
 import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS, WHO_AM_I_SUCCESS} from "../constants/user";
@@ -24,7 +25,6 @@ import LessonInfoStorage from '../tools/player/lesson-info-storage'
 
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import {GET_LESSON_PLAY_INFO_REQUEST} from "../constants/lesson";
-import CourseDiscounts from "tools/course-discount";
 
 const LessonInfoStorageMiddleware = store => next => action => {
 
@@ -66,32 +66,27 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case PLAYER_SET_CURRENT_TIME: {
             let _state = store.getState();
 
-            const _isPlayingLessonExists = !!_state.player.playingLesson,
-                _authorized = !!_state.user.user
+            const _isPlayingLessonExists = !!_state.player.playingLesson
 
             if (_isPlayingLessonExists) {
-                let _id = _state.player.playingLesson.lessonId,
-                    _lessonsMap = _state.lessonInfoStorage.lessons,
-                    _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
-                    _newPosition = action.payload
+                let _lessonId = _state.player.playingLesson.lessonId,
+                    _time = action.payload
 
-                store.dispatch(storageActions.setCurrentTimeForLesson({
-                    id: _id,
-                    currentTime: _newPosition,
-                    needSetTS: !_authorized,
-                }))
-
-                if (Math.abs(_newPosition - _currentPosition) > 1) {
-                    LessonInfoStorage.calcDelta(_currentPosition, _newPosition, _id)
-                    LessonInfoStorage.saveChanges()
-                } else {
-                    LessonInfoStorage.setDeltaStart(_currentPosition, _id)
-                    LessonInfoStorage.hasChangedPosition();
-                }
+                setLessonCurrentTime(_lessonId, _time, _state, store)
             }
 
             return next(action)
         }
+
+        case PLAYER_SET_FORCE_CURRENT_TIME: {
+            const {lessonId, time} = action.payload,
+                _state = store.getState();
+
+            setLessonCurrentTime(lessonId, time, _state, store)
+
+            return next(action)
+        }
+
 
         case PLAYER_SET_VOLUME: {
             store.dispatch(storageActions.setVolume(action.payload));
@@ -194,6 +189,28 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
         default:
             return next(action)
+    }
+}
+
+const setLessonCurrentTime = (lessonId, time, state, store) => {
+    const _authorized = !!state.user.user
+
+    let _lessonsMap = state.lessonInfoStorage.lessons,
+        _currentPosition = _lessonsMap.has(lessonId) ? _lessonsMap.get(lessonId).currentTime : 0,
+        _newPosition = time
+
+    store.dispatch(storageActions.setCurrentTimeForLesson({
+        id: lessonId,
+        currentTime: _newPosition,
+        needSetTS: !_authorized,
+    }))
+
+    if (Math.abs(_newPosition - _currentPosition) > 1) {
+        LessonInfoStorage.calcDelta(_currentPosition, _newPosition, lessonId)
+        LessonInfoStorage.saveChanges()
+    } else {
+        LessonInfoStorage.setDeltaStart(_currentPosition, lessonId)
+        LessonInfoStorage.hasChangedPosition();
     }
 }
 

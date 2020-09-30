@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
 import {startSetCurrentTime, startPause, startPlay, preinitAudios} from "actions/player-start-actions"
+import {setForceCurrentTime} from "actions/player-actions"
 import {SVG} from "tools/svg-paths";
 import PropTypes from 'prop-types';
 import {_calcIsFinishedAndPlayedPart,} from "../../common/play-block-functions";
@@ -70,7 +71,7 @@ class SwitchButtons extends React.Component {
 
         if (isPlayerMode) {
             if (Math.abs(_newValue - this.props.playerTime) <= TIME_DELTA) {
-                this.props.actions.startPlay(this.props.lesson.Id)
+                this.props.actions.startPlay(lesson.Id)
             } else {
                 this.props.actions.startSetCurrentTime(_newValue)
             }
@@ -93,6 +94,7 @@ class SwitchButtons extends React.Component {
             } else {
                 const _audios = Object.values(lesson.Audios);
 
+                this.props.actions.setForceCurrentTime({lessonId: lesson.Id, time: _newValue})
                 this.props.actions.preinitAudios(_audios);
                 history.replace('/' + course.URL + '/' + lesson.URL + '?play')
             }
@@ -237,7 +239,15 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        actions : bindActionCreators({startSetCurrentTime, startPause, startPlay, preinitAudios, unlockLesson, getPaidCourseInfo}, dispatch),
+        actions: bindActionCreators({
+            startSetCurrentTime,
+            startPause,
+            startPlay,
+            preinitAudios,
+            unlockLesson,
+            getPaidCourseInfo,
+            setForceCurrentTime
+        }, dispatch),
     }
 }
 

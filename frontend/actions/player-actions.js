@@ -5,6 +5,7 @@ import {
     PLAYER_STOPPED,
     PLAYER_ENDED,
     PLAYER_SET_CURRENT_TIME,
+    PLAYER_SET_FORCE_CURRENT_TIME,
     PLAYER_SET_TITLE,
     PLAYER_SET_MUTE_STATE,
     PLAYER_SET_VOLUME,
@@ -69,6 +70,13 @@ export const setCurrentTime = (time) => {
     return {
         type: PLAYER_SET_CURRENT_TIME,
         payload: time
+    };
+};
+
+export const setForceCurrentTime = ({lessonId, time}) => {
+    return {
+        type: PLAYER_SET_FORCE_CURRENT_TIME,
+        payload: {lessonId, time}
     };
 };
 

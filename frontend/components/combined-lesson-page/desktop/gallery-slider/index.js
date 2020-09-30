@@ -21,6 +21,7 @@ class GallerySlider extends React.Component{
             showCloseButton: false,
             closeButtonTop: 0,
             closeButtonLeft: 0,
+            rendered: false,
         };
 
         this._resizeHandler = () => {
@@ -59,6 +60,7 @@ class GallerySlider extends React.Component{
         if (props.visible && !this.props.visible) {
             this.setState({
                 showCloseButton: false,
+                rendered: false,
             })
         }
     }
@@ -90,14 +92,24 @@ class GallerySlider extends React.Component{
 
         if (!this.props.visible) return null
 
-        return <div className="gallery-slider__container">
+        return <div className={"gallery-slider__container" + (this.state.rendered ? "" : " _hidden")}>
             <div className="gallery-slider__arrow _left" onClick={::this._prev}/>
             {showCloseButton && <button className="gallery-slider__close" style={_closeStyle} onClick={::this._close}/>}
-            <Carousel {...settings} onChange={this.updateCurrentSlide}>
+            <Carousel {...settings} onChange={this.updateCurrentSlide} renderItem={::this._renderItem}>
                 {this._getList()}
             </Carousel >
             <div className="gallery-slider__arrow _right" onClick={::this._next}/>
         </div>
+    }
+
+    _renderItem(item) {
+        setTimeout(() => {
+            if (!this.state.rendered) {
+                this.setState({rendered: true})
+                this._setCloseButtonPosition()
+            }
+        }, 200)
+        return item
     }
 
     _setCloseButtonPosition() {
