@@ -29,11 +29,11 @@ const AUTHOR_REQ_TREE = {
 };
 
 const AUTHOR_MSSQL_ALL_REQ =
-    "select a.[Id], l.[FirstName], l.[LastName], a.[URL], a.[Portrait], a.[PortraitMeta], l.[Description], l.[Occupation], l.[Employment] from [Author] a\n" +
+    "select a.[Id], l.[FirstName], l.[LastName], a.[URL], a.[Portrait], a.[PortraitMeta], l.[ShortDescription], l.[Description], l.[Occupation], l.[Employment] from [Author] a\n" +
     "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and a.[AccountId] = <%= accountId %>";
 
 const AUTHOR_MYSQL_ALL_REQ =
-    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`URL`, a.`Portrait`, a.`PortraitMeta`, l.`Description`, l.`Occupation`, l.`Employment` from `Author` a\n" +
+    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`URL`, a.`Portrait`, a.`PortraitMeta`, l.`ShortDescription`, l.`Description`, l.`Occupation`, l.`Employment` from `Author` a\n" +
     "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and a.`AccountId` = <%= accountId %>";
 
 const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
