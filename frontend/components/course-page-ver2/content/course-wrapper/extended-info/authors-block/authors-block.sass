@@ -15,6 +15,26 @@
       font-size: 15px
       line-height: 19px
 
+    a
+      color: $color-orange !important
+      border-bottom: $border-hidden-link !important
+      -webkit-transition: border-color 0.3s ease !important
+      transition: border-color 0.3s ease !important
+      text-decoration-line: none !important
+      font-weight: normal !important
+
+      &:hover
+        border-bottom: $border-orange-03 !important
+
+    > *, > * > *
+      font-family: "PT Serif", serif !important
+      font-weight: normal !important
+      font-size: 20px !important
+      line-height: 140% !important
+      @media (max-width: $tablet-width)
+        font-size: 15px !important
+        line-height: 19px !important
+
 .author-block__title
   margin-bottom: 30px
   font-family: $font-fira

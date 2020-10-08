@@ -1,0 +1,22 @@
+@import "~tools/variables.sass"
+
+.author-block__descr
+  a
+    color: $color-orange !important
+    border-bottom: $border-hidden-link !important
+    -webkit-transition: border-color 0.3s ease !important
+    transition: border-color 0.3s ease !important
+    text-decoration-line: none !important
+    font-weight: 400 !important
+
+    &:hover
+      border-bottom: $border-orange-03 !important
+
+  > *, > * > *
+    font-family: "PT Serif", serif !important
+    font-weight: 400 !important
+    font-size: 20px !important
+    line-height: 26px !important
+    @media (max-width: $tablet-width)
+      font-size: 15px !important
+      line-height: 19px !important

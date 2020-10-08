@@ -6,7 +6,8 @@ import {Switch, Route, withRouter, Link,} from 'react-router-dom'
 import Menu from "../components/menu"
 import Home from "../components/Home"
 import Authors from "./lists/authors-page"
-import AuthorForm from './authorEditor';
+// import AuthorForm from './authorEditor';
+import AuthorForm from './editors/author-editor';
 import Categories from './lists/categories-page';
 import CategoriesForm from './categoryEditor';
 import Courses from './lists/courses';

@@ -52,9 +52,7 @@ class AuthorItem extends React.Component {
                     {author.Employment ? <div className="author-header__employment header-row">{author.Employment}</div> : null}
                 </div>
             </div>
-            <div className="author-description">
-                {_description}
-            </div>
+            <div className="author-description" dangerouslySetInnerHTML={{__html: _description}}/>
         </div>
     }
 

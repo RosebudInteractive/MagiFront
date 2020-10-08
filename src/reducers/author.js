@@ -3,17 +3,16 @@ import {
     GET_AUTHOR_REQUEST,
     GET_AUTHOR_SUCCESS,
     GET_AUTHOR_FAIL,
-    CHANGE_AUTHOR_DATA,
-    CANCEL_CHANGE_AUTHOR_DATA,
-    SAVE_AUTHOR_DATA,
-    CLEAR_AUTHOR,
+    SAVE_AUTHOR_DATA_START,
+    SAVE_AUTHOR_DATA_SUCCESS,
+    SAVE_AUTHOR_DATA_FAIL,
 } from '../constants/author'
 
 const initialState = {
-    initial: null,
     current: null,
     fetching: false,
-    hasChanges: false,
+    saving: false,
+    hasError: false,
 };
 
 export default function author(state = initialState, action) {
@@ -24,67 +23,47 @@ export default function author(state = initialState, action) {
                 FirstName: '',
                 LastName: '',
                 Description: '',
+                ShortDescription: '',
             };
 
             return {
                 ...state,
-                initial: _newObject,
                 current: Object.assign({}, _newObject),
                 fetching: false,
-                hasChanges: false,
             }
         }
 
         case GET_AUTHOR_REQUEST:
-            return {
-                ...state,
-                fetching: true,
-                hasError: false
-            };
+            return {...state, fetching: true,};
 
         case GET_AUTHOR_SUCCESS: {
-            return {
-                ...state,
-                initial: action.payload,
-                current: Object.assign({}, action.payload),
-                fetching: false,
-                hasChanges: false,
-            };
+            return {...state, current: Object.assign({}, action.payload), fetching: false,};
         }
 
         case GET_AUTHOR_FAIL:
             return initialState;
 
-        case SAVE_AUTHOR_DATA: {
+
+        case SAVE_AUTHOR_DATA_START: {
+            return {...state, fetching: false, saving: true, hasError: false}
+        }
+
+        case SAVE_AUTHOR_DATA_SUCCESS: {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
             state.current.Id = _id;
 
             return {
                 ...state,
-                initial: Object.assign({}, state.current),
+                current: Object.assign({}, action.payload),
                 fetching: false,
-                hasChanges : false,
+                saving: false,
+                hasError: false
             };
         }
 
-        case CHANGE_AUTHOR_DATA: {
-            let _object = Object.assign({}, action.payload);
-
-            return {...state, current: _object, hasChanges: true };
-        }
-
-        case CANCEL_CHANGE_AUTHOR_DATA: {
-            return {...state, current: Object.assign({}, state.initial), hasChanges: false}
-        }
-
-        case CLEAR_AUTHOR:{
-            return {
-                initial: null,
-                current: null,
-                fetching: true,
-                hasChanges: false,
-            }
+        case SAVE_AUTHOR_DATA_FAIL: {
+            return {...state, fetching: false, saving: false, hasError: true}
         }
 
         default:
