@@ -25,6 +25,30 @@ const VERSION_CODE = "1.0.0.1";
 const BUILD_NUM = 33;
 
 //bld.initDatabase()
+function showSysInfo() {
+    const v8 = require('v8');
+    let ver = process.versions;
+    console.log(buildLogString("======================================"));
+    console.log(buildLogString("Node JS version:"));
+    console.log(buildLogString("======================================"));
+    console.log(buildLogString(`  Node: ${ver.node}`));
+    console.log(buildLogString(`  V8: ${ver.v8}`));
+    console.log(buildLogString(`  Open SSL: ${ver.openssl}`));
+    let res = v8.getHeapStatistics();
+    console.log(buildLogString("======================================"));
+    console.log(buildLogString("Memory Usage:"));
+    console.log(buildLogString("======================================"));
+    console.log(buildLogString("  Total heap size: " + res.total_heap_size));
+    console.log(buildLogString("  Total heap size executable: " + res.total_heap_size_executable));
+    console.log(buildLogString("  Total physical size: " + res.total_physical_size));
+    console.log(buildLogString("  Total available size : " + res.total_available_size));
+    console.log(buildLogString("  Used heap size : " + res.used_heap_size));
+    console.log(buildLogString("  Heap size limit : " + res.heap_size_limit));
+    console.log(buildLogString("======================================"));
+}
+
+showSysInfo();
+
 Promise.resolve()
     .then(() => {
 
