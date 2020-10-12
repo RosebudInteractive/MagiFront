@@ -301,8 +301,8 @@ module.exports = {
             }
         },
         mysql: {
-            host: 'localhost',
-            username: '10.1.0.35',
+            host: '10.1.0.35',
+            username: 'magisteria',
             password: 'ukko89QH',
             database: 'magisteria',
             connection_options: {},
