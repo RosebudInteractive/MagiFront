@@ -28,10 +28,13 @@ for (let i = 0; i < N_INSTANCES; i++) {
 }
 
 // Scheduled Tasks instance
+let app_name = "Scheduled Tasks";
 apps.push({
-    name: 'Scheduled Tasks',
+    name: app_name,
     script: './index.js',
     cwd: `${srcBase}/tasks`,
+    error_file: `${app_name}-error.log`,
+    out_file: `${app_name}-out.log`,
     instance_var: 'INSTANCE_ID',
     env: {
         NODE_ENV: 'production',
