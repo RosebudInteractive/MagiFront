@@ -19,7 +19,4 @@ RUN npm install
 RUN cd ./Uccello2
 RUN npm install
 
-# Show current folder structure in logs
-RUN ls -al -R
-
 CMD [ "pm2-runtime", "--error", "./logs", "--output", "./logs", "start", "./MagisteriaTwo/production/new-magisteria-docker.config.js" ]
