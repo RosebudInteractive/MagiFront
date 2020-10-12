@@ -4,4 +4,4 @@ cd ../Uccello2
 npm install
 cd ..
 
-pm2-runtime --error /app/logs --output /app/logs start ./MagisteriaTwo/production/new-magisteria-docker.config.js
+pm2-runtime start ./MagisteriaTwo/production/new-magisteria-docker.config.js --error "/app/logs/" --output "/app/logs/"
