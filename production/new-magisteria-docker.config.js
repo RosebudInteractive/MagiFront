@@ -2,6 +2,8 @@
 const N_INSTANCES = 4;
 const BASE_PORT = 3001;
 
+let logPath = '/app/logs/';
+
 let app = {
     script: './MagisteriaTwo/server.js',
     cwd: './MagisteriaTwo/',
@@ -18,6 +20,8 @@ for (let i = 0; i < N_INSTANCES; i++) {
     let port = BASE_PORT + i;
     let obj = Object.assign({}, app);
     obj.name = `Magisteria-${i + 1}`;
+    obj.error_file = `${logPath}${obj.name}-error.log`;
+    obj.out_file = `${logPath}${obj.name}-out.log`;
     obj.args = `-P ${port} -p ukko89QH`;
     apps.push(obj);
 }
