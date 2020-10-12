@@ -33,8 +33,8 @@ apps.push({
     name: app_name,
     script: './index.js',
     cwd: `${srcBase}/tasks`,
-    error_file: `${app_name}-error.log`,
-    out_file: `${app_name}-out.log`,
+    error_file: `${logPath}${app_name}-error.log`,
+    out_file: `${logPath}${app_name}-out.log`,
     instance_var: 'INSTANCE_ID',
     env: {
         NODE_ENV: 'production',
