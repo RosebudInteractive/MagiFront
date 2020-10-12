@@ -3,10 +3,11 @@ const N_INSTANCES = 4;
 const BASE_PORT = 3001;
 
 let logPath = '/app/logs/';
+let srcBase = '/app/src/node-v12/MagisteriaTwo';
 
 let app = {
-    script: './MagisteriaTwo/server.js',
-    cwd: './MagisteriaTwo/',
+    script: './server.js',
+    cwd: `${srcBase}`,
     instance_var: 'INSTANCE_ID',
     env: {
         NODE_ENV: 'production',
@@ -27,16 +28,16 @@ for (let i = 0; i < N_INSTANCES; i++) {
 }
 
 // Scheduled Tasks instance
-// apps.push({
-//     name: 'Scheduled Tasks',
-//     script: './MagisteriaTwo/tasks/index.js',
-//     cwd: './MagisteriaTwo/tasks/',
-//     instance_var: 'INSTANCE_ID',
-//     env: {
-//         NODE_ENV: 'production',
-//         NODE_CONFIG_ENV: 'new-magisteria-tasks-docker'
-//     }
-// });
+apps.push({
+    name: 'Scheduled Tasks',
+    script: './index.js',
+    cwd: `${srcBase}/tasks`,
+    instance_var: 'INSTANCE_ID',
+    env: {
+        NODE_ENV: 'production',
+        NODE_CONFIG_ENV: 'new-magisteria-tasks-docker'
+    }
+});
 
 module.exports = {
     /**
