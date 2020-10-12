@@ -16,7 +16,7 @@ mkdir uploads
 # Install app dependencies
 RUN cd ./MagisteriaTwo
 RUN npm install
-RUN cd ./Uccello2
+RUN cd ../Uccello2
 RUN npm install
 
 CMD [ "pm2-runtime", "--error", "./logs", "--output", "./logs", "start", "./MagisteriaTwo/production/new-magisteria-docker.config.js" ]
