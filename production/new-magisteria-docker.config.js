@@ -8,7 +8,7 @@ let app = {
     instance_var: 'INSTANCE_ID',
     env: {
         NODE_ENV: 'production',
-        NODE_CONFIG_ENV: 'new-magisteria'
+        NODE_CONFIG_ENV: 'new-magisteria-docker'
     }
 };
 
@@ -23,16 +23,16 @@ for (let i = 0; i < N_INSTANCES; i++) {
 }
 
 // Scheduled Tasks instance
-apps.push({
-    name: 'Scheduled Tasks',
-    script: './MagisteriaTwo/tasks/index.js',
-    cwd: './MagisteriaTwo/tasks/',
-    instance_var: 'INSTANCE_ID',
-    env: {
-        NODE_ENV: 'production',
-        NODE_CONFIG_ENV: 'new-magisteria-tasks'
-    }
-});
+// apps.push({
+//     name: 'Scheduled Tasks',
+//     script: './MagisteriaTwo/tasks/index.js',
+//     cwd: './MagisteriaTwo/tasks/',
+//     instance_var: 'INSTANCE_ID',
+//     env: {
+//         NODE_ENV: 'production',
+//         NODE_CONFIG_ENV: 'new-magisteria-tasks-docker'
+//     }
+// });
 
 module.exports = {
     /**

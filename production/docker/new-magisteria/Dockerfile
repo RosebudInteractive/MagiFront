@@ -3,4 +3,4 @@ FROM keymetrics/pm2:12-alpine
 
 WORKDIR /app
 
-CMD [ "docker-start.sh" ]
+CMD [ "./src/node-v12/MagisteriaTwo/production/docker/new-magisteria/docker-start.sh" ]
