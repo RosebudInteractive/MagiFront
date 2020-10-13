@@ -1,10 +1,11 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+const uploadPath = '/app/uploads';
 
 module.exports = {
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(uploadPath, path.sep),
     proxyServer: {
         protocol: 'https',
         address: 'new.magisteria.ru',
@@ -24,7 +25,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000',
+            url: 'http://10.1.0.35:8000',
             logRequest: true
         },
     },
@@ -268,7 +269,7 @@ module.exports = {
     connections: {
         elastic: {
             connection_options: {
-                node: 'http://localhost:9200',
+                node: 'http://10.1.0.35:9200',
                 log: 'trace'
             },
             pool: {
@@ -278,7 +279,7 @@ module.exports = {
             }
         },
         redis: {
-            host: "localhost",
+            host: "10.1.0.35",
             port: 6379,
             pool: {
                 max: 5,

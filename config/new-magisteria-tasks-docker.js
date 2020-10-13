@@ -2,7 +2,10 @@ const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
 
-const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitemaps"));
+const feedPath = '/app/feed';
+const uploadPath = '/app/uploads';
+const pricelistPath = '/app/pricelist';
+const siteMapsPath = path.normalize('/app/sitemaps');
 
 module.exports = {
     tasks: [
@@ -14,7 +17,7 @@ module.exports = {
             schedule: "0 56 * * * *", // run every hour
             options: {
                 fb: {
-                    path: path.normalize(path.join(process.cwd(), "..", "..", "pricelist", "fb")),
+                    path: path.normalize(path.join(pricelistPath, "fb")),
                     file: "products.tsv",
                     baseUrl: "https://magisteria.ru"
                 }
@@ -143,7 +146,7 @@ module.exports = {
             disabled: false,
             schedule: "0 5,15,25,35,45,55 * * * *", // run every 10 min
             options: {
-                path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                path: path.normalize(feedPath),
                 channels: {
                     'yandex-zen': {
                         enabled: true
@@ -175,7 +178,7 @@ module.exports = {
         }
     ],
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
+    uploadPath: path.join(uploadPath, path.sep),
     dataUrl: '/data',
     proxyServer: {
         protocol: 'https',
@@ -195,7 +198,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000'
+            url: 'http://10.1.0.35:8000'
         }
     },
     dbProvider: 'mysql',
@@ -337,7 +340,7 @@ module.exports = {
     },
     connections: {
         redis: {
-            host: "localhost",
+            host: "10.1.0.35",
             port: 6379,
             pool: {
                 max: 5,
