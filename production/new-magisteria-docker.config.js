@@ -2,7 +2,7 @@
 const N_INSTANCES = 4;
 const BASE_PORT = 3001;
 
-let logPath = '/app/logs/node-v12';
+let logPath = '/app/logs/node-v12/';
 let srcBase = '/app/src/node-v12/MagisteriaTwo';
 
 let app = {
