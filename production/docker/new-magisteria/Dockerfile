@@ -1,6 +1,10 @@
 # PM2 & Node JS v.12
 FROM keymetrics/pm2:12-alpine
 
+#Time service
+RUN apk update
+RUN apk add --update tzdata
+
 # It's supposed to be mapped to "/var/www/sites/magisteria"
 WORKDIR /app
 
