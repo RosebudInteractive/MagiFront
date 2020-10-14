@@ -13,5 +13,6 @@ WORKDIR /app
 
 # Magisteria ports
 EXPOSE 3001-3004
+EXPOSE 3010
 
 CMD [ "./src/node-v12/MagisteriaTwo/production/docker/magisteria-ru/docker-start.sh" ]
