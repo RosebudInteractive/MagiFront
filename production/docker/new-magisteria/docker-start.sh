@@ -1,18 +1,36 @@
 BuildVar=${BUILD:-SKIP}
-ModeVar=${MODE:-NONE}
+RunVar=${RUN:-NONE}
+HostIp=10.1.0.35
 
-echo "BuildVar: "$BuildVar
-echo "ModeVar: "$ModeVar
+echo "BUILD: "$BuildVar
+echo "RUN: "$RunVar
+echo "HostIp: "$HostIp
+
+echo "=================================================================="
+echo "  OPTIONS:"
+echo "    BUILD ="
+echo "       SKIP    - (default) do nothing"
+echo "       ALL     - bild all"
+echo "       SRV     - bild server only"
+echo "       CLI     - bild client only"
+echo "       SRV_CLI - bild server && client only"
+echo "       LIB     - bild Uccello library only"
+echo "    RUN ="
+echo "       NONE    - (default) do nothing"
+echo "       START   - start service"
+echo "       UPGRADE - run DB upgrader"
+echo "=================================================================="
+
 
 cd /app/src/node-v12/MagisteriaTwo
 
 case $BuildVar in
-ALL|MAG|MAG_CLIENT)
+ALL|SRV|SRV_CLI)
 npm install;;
 esac
 
 case $BuildVar in
-ALL|CLIENT|MAG_CLIENT)
+ALL|CLI|SRV_CLI)
 npm run build;;
 esac
 
@@ -22,16 +40,16 @@ ALL|LIB)
 npm install;;
 esac
 
-case $ModeVar in
+case $RunVar in
 START)
 cd /app/src/node-v12;;
 UPGRADE)
 cd /app/src/node-v12/MagisteriaTwo/upgrader;;
 esac
 
-case $ModeVar in
+case $RunVar in
 START)
-pm2-runtime start ./MagisteriaTwo/production/new-magisteria-docker.config.js --error "/app/logs/" --output "/app/logs/";;
+pm2-runtime start ./MagisteriaTwo/production/new-magisteria-docker.config.js;;
 UPGRADE)
-node upgrader -sqlTrace -v mysql -h 10.1.0.35 -d magisteria -u magisteria -p ${PASSWD};;
+node upgrader -sqlTrace -v mysql -h $HostIp -d magisteria -u magisteria -p ${PASSWD};;
 esac

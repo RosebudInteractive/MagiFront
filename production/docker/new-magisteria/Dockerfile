@@ -5,6 +5,9 @@ FROM keymetrics/pm2:12-alpine
 RUN apk update
 RUN apk add --update tzdata
 
+# PM2 logrotate
+RUN pm2 install pm2-logrotate
+
 # It's supposed to be mapped to "/var/www/sites/magisteria"
 WORKDIR /app
 

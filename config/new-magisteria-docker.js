@@ -1,7 +1,9 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+
 const uploadPath = '/app/uploads';
+const dockerHostIP = '10.1.0.35';
 
 module.exports = {
     root: process.cwd(),
@@ -25,7 +27,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://10.1.0.35:8000',
+            url: `http://${dockerHostIP}:8000`,
             logRequest: true
         },
     },
@@ -269,7 +271,7 @@ module.exports = {
     connections: {
         elastic: {
             connection_options: {
-                node: 'http://10.1.0.35:9200',
+                node: `http://${dockerHostIP}:9200`,
                 log: 'trace'
             },
             pool: {
@@ -279,7 +281,7 @@ module.exports = {
             }
         },
         redis: {
-            host: "10.1.0.35",
+            host: `${dockerHostIP}`,
             port: 6379,
             pool: {
                 max: 5,
@@ -302,7 +304,7 @@ module.exports = {
             }
         },
         mysql: {
-            host: '10.1.0.35',
+            host: `${dockerHostIP}`,
             username: 'magisteria',
             password: 'ukko89QH',
             database: 'magisteria',

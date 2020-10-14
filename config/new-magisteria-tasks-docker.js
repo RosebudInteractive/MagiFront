@@ -6,6 +6,7 @@ const feedPath = '/app/feed';
 const uploadPath = '/app/uploads';
 const pricelistPath = '/app/pricelist';
 const siteMapsPath = path.normalize('/app/sitemaps');
+const dockerHostIP = '10.1.0.35';
 
 module.exports = {
     tasks: [
@@ -198,7 +199,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://10.1.0.35:8000'
+            url: `http://${dockerHostIP}:8000`
         }
     },
     dbProvider: 'mysql',
@@ -340,7 +341,7 @@ module.exports = {
     },
     connections: {
         redis: {
-            host: "10.1.0.35",
+            host: `${dockerHostIP}`,
             port: 6379,
             pool: {
                 max: 5,
@@ -363,7 +364,7 @@ module.exports = {
             }
         },
         mysql: {
-            host: '10.1.0.35',
+            host: `${dockerHostIP}`,
             username: 'magisteria',
             password: 'ukko89QH',
             database: 'magisteria',
