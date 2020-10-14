@@ -49,7 +49,7 @@ esac
 
 case $RunVar in
 START)
-pm2-runtime start ./MagisteriaTwo/production/new-magisteria-docker.config.js;;
+pm2-runtime start ./MagisteriaTwo/production/magisteria-docker.config.js;;
 UPGRADE)
-node upgrader -sqlTrace -v mysql -h $HostIp -d magisteria -u magisteria -p ${PASSWD};;
+node upgrader -sqlTrace -v mysql -h $HostIp -d new_magisteria -u mag2 -p ${PASSWD};;
 esac

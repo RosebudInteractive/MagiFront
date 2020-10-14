@@ -1,6 +1,7 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+const pk = require('/app/keys');
 
 const uploadPath = '/app/uploads';
 const dockerHostIP = '172.17.0.1';
@@ -10,7 +11,7 @@ module.exports = {
     uploadPath: path.join(uploadPath, path.sep),
     proxyServer: {
         protocol: 'https',
-        address: 'new.magisteria.ru',
+        address: 'magisteria.ru',
         port: null
     },
     server: {
@@ -18,9 +19,8 @@ module.exports = {
         address: '0.0.0.0',
         port: 3000,
         publicEnabled: true,
-        adminEnabled: true,
+        adminEnabled: false,
         pushNotifications: true,
-        corsEnabled: true,
         prerender: {
             usePrerender: true,
             useRedis: true,
@@ -28,20 +28,26 @@ module.exports = {
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
             url: `http://${dockerHostIP}:8000`,
-            logRequest: true
+            logRequest: false
         },
     },
     admin: {
-        logFileUpload: true,
-        logModif: true
+        logFileUpload: false,
+        logModif: false
     },
     dbProvider: 'mysql',
+    integration: {
+        carrotquest: {
+            userAuthKey: pk.integration && pk.integration.carrotquest
+                && pk.integration.carrotquest.userAuthKey ? pk.integration.carrotquest.userAuthKey : null
+        }
+    },
     session: {
         name: 'magisteria.sid',
-        secret: 'vdsadfrwer46546fdgrtj',
+        secret: pk.session.secret,
         resave: false,
         saveUninitialized: false,
-        logCampaign: true
+        logCampaign: false
     },
     redisSession: {
         enabled: true,
@@ -53,26 +59,29 @@ module.exports = {
         importFileTrace: false
     },
     lessonPositions: {
-        debug: true,
+        debug: false,
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',
-        histTTL: 30 * 24 * 60 * 60, // 30 days
+        histTTL: 10 * 24 * 60 * 60, // 10 days
         maxIdle: 10 * 60, // 10 min
         maxInterval: 1 * 60 * 60 // 1 hour
     },
     debug: {
+        clientTrace: {
+            gtm: false
+        },
         routes: {
             "set-user-subscription": false,
-            player: true,
-            testupload: true,
-            testimport: true,
-            logintest: true,
-            feedbacktest: true,
-            paymenttest: true,
-            regtest: true,
-            pushtest: true,
-            testrecovery: true
+            player: false,
+            testupload: false,
+            testimport: false,
+            logintest: false,
+            feedbacktest: false,
+            paymenttest: false,
+            regtest: false,
+            pushtest: false,
+            testrecovery: false
         }
     },
     general: {
@@ -80,20 +89,28 @@ module.exports = {
     },
     statistics: {
         srcList: ["fb", "vk", "ya", "gl", "mt"],
-        serverTimeout: 30, // 30 sec
-        clientTimeout: 60, // 60 sec
+        serverTimeout: 60 * 9, // 9 min
+        clientTimeout: 60 * 10, // 10 min
+    },
+    mrktSystem: {
+        carrotquest: {
+            enabled: true,
+            auth_token: pk.integration && pk.integration.carrotquest
+                && pk.integration.carrotquest.auth_token ? pk.integration.carrotquest.auth_token : null,
+            urlEvents: "https://api.carrotquest.io/v1/users/<%= user_id %>/events",
+            urlProps: "https://api.carrotquest.io/v1/users/<%= user_id %>/props"
+        }
     },
     billing: {
         module: "./yandex-kassa",
         enabled: true,
         debug: true,
         billing_test: false,
-        self_refund: true,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
-            shopId: "536331",
-            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            shopId: pk.billing.yandexKassa.shopId,
+            secretKey: pk.billing.yandexKassa.secretKey,
             callBack: "/api/yandex-kassa/callback",
             trace_callback: true,
             returnUrl: "/",
@@ -104,7 +121,7 @@ module.exports = {
             prefix: "STP",
             key: "STRIKE_PROMO",
             values: [
-                { value: 20, descr: "При покупке следующего курса в течение 2 дней Вы получите скидку 20% по промокоду" },
+                { value: 25, descr: "При покупке следующего курса в течение 2 дней Вы получите скидку 25% по промокоду" },
                 { value: 30, descr: "Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду" },
                 { value: 35, descr: "На очередной курс, приобретенный сегодня или завтра Вы получаете скидку 35% по промокоду" },
                 { value: 40, descr: "Теперь Вы получите скидку 40%, если купите один из курсов Магистерии не позднее завтрашнего вечера - используйте промокод" },
@@ -120,12 +137,13 @@ module.exports = {
         useCapture: true,
         activationRoute: "/activation-confirm",
         recoveryRoute: "/recovery",
-        secret: 'zxcvv8708xulsajfois23h32',
+        secret: pk.authentication.secret,
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
         reCapture: {
-            siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
-            secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
-        }
+            siteKey: pk.authentication.reCapture.siteKey,
+            secretKey: pk.authentication.reCapture.secretKey
+        },
+        googleAppId: pk.authentication.googleAppId
     },
     mail: {
         autosubscribe: {
@@ -136,62 +154,62 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/feedback.tmpl",
             subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
-            sender: '"Magisteria" <test@magisteria.ru>',
-            recipients: 'test@magisteria.ru',
+            sender: pk.mail.feedback.sender,
+            recipients: 'alexander.f.sokolov@gmail.com,ivan@magisteria.ru,adm@magisteria.ru',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.feedback.user,
+                    pass: pk.mail.feedback.pass
                 }
             }
         },
         sendPulse: {
-            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
-            apiSecret: "2593d02228f842c412e51d24de824dde",
-            scriptPath: "//cdn.sendpulse.com/js/push/700d4d64866e5acf0b24dfead24eac1d_1.js",
+            apiUserId: pk.mail.sendPulse.apiUserId,
+            apiSecret: pk.mail.sendPulse.apiSecret,
+            scriptPath: pk.mail.sendPulse.scriptPath,
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
         mailing: {
             newCourse: {
                 addressBook: "Магистерия",
-                sender: "test@magisteria.ru",
+                sender: "sys@magisteria.ru",
                 senderName: "Magisteria.ru",
-                host: "https://new.magisteria.ru"
+                host: "https://magisteria.ru"
             }
         },
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
-            subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            subject: "Регистрация на \"Magisteria.Ru\".",
+            sender: pk.mail.userReg.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.userReg.user,
+                    pass: pk.mail.userReg.pass
                 }
             }
         },
         pwdRecovery: {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
-            subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            subject: "Восстановление пароля на \"Magisteria.Ru\".",
+            sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.pwdRecovery.user,
+                    pass: pk.mail.pwdRecovery.pass
                 }
             }
         },
@@ -199,38 +217,43 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/promo-course.tmpl",
             subject: "Промокод на активацию курса \"<%= course %>\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.pwdRecovery.user,
+                    pass: pk.mail.pwdRecovery.pass
                 }
             }
         },
         purchaseCourse: {
             type: "smtp",
             subject: "Вы приобрели курс \"<%= course %>\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.pwdRecovery.user,
+                    pass: pk.mail.pwdRecovery.pass
                 }
             }
+        },
+        userWelcome: {
+            type: "sendpulse",
+            subject: "Добро пожаловать на Магистерию!",
+            sender: '"Magisteria" <adm@magisteria.ru>'
         }
     },
     snets: {
         facebook: {
-            appId: '591000364592228',
-            appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
+            appId: pk.app.facebook.appId,
+            appSecret: pk.app.facebook.appSecret,
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/facebook/oauth',
             profileURL: 'https://graph.facebook.com/v5.0/me',
@@ -243,8 +266,8 @@ module.exports = {
             }
         },
         google: {
-            appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
-            appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
+            appId: pk.app.google.appId,
+            appSecret: pk.app.google.appSecret,
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/google/oauth',
             passportOptions: {
@@ -252,8 +275,8 @@ module.exports = {
             }
         },
         vk: {
-            appId: '6400839',
-            appSecret: 'LsrNgANtMnP0ofdT4dKB',
+            appId: pk.app.vk.appId,
+            appSecret: pk.app.vk.appSecret,
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
             apiVersion: '5.107',
             redirectURL: { success: '/', error: '/auth/error' },
@@ -305,9 +328,9 @@ module.exports = {
         },
         mysql: {
             host: `${dockerHostIP}`,
-            username: 'magisteria',
-            password: 'ukko89QH',
-            database: 'magisteria',
+            username: pk.connections.mysql.username,
+            password: pk.connections.mysql.password,
+            database: pk.connections.mysql.database,
             connection_options: {},
             provider_options: {},
             pool: {
