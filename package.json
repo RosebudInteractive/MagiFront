@@ -1,6 +1,6 @@
 {
   "name": "magisteria",
-  "version": "5.0.2",
+  "version": "7.0.1",
   "description": "Magistery workshop & admin site",
   "main": "index.js",
   "scripts": {
