@@ -9,6 +9,8 @@ import {all, takeEvery, put, call, select} from 'redux-saga/effects'
 import {reset} from "redux-form";
 import {EDIT_TEST_REQUEST} from "adm-ducks/test-list";
 import {queryUserConfirmationSaga} from "adm-ducks/messages";
+import {IMPORT_EPISODE_FAIL, IMPORT_EPISODE_SUCCESS} from "../constants/episode/singleEpisode";
+import {get} from "../actions/episode/episode-actions";
 
 /**
  * Constants
@@ -41,6 +43,11 @@ export const UPDATE_TEST_REQUEST = `${prefix}/UPDATE_TEST_REQUEST`
 export const UPDATE_TEST_START = `${prefix}/UPDATE_TEST_START`
 export const UPDATE_TEST_SUCCESS = `${prefix}/UPDATE_TEST_SUCCESS`
 export const UPDATE_TEST_FAIL = `${prefix}/UPDATE_TEST_FAIL`
+
+export const IMPORT_TEST_REQUEST = `${prefix}/IMPORT_TEST_REQUEST`
+export const IMPORT_TEST_START = `${prefix}/IMPORT_TEST_START`
+export const IMPORT_TEST_SUCCESS = `${prefix}/IMPORT_TEST_SUCCESS`
+export const IMPORT_TEST_FAIL = `${prefix}/IMPORT_TEST_FAIL`
 
 const TEST_ALREADY_HAS_INSTANCES = "testHasInstances"
 
@@ -141,6 +148,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case INSERT_TEST_START:
         case UPDATE_TEST_START:
+        case IMPORT_TEST_START:
             return state
                 .set('saving', true)
 
@@ -148,6 +156,8 @@ export default function reducer(state = new ReducerRecord(), action) {
         case INSERT_TEST_FAIL:
         case UPDATE_TEST_SUCCESS:
         case UPDATE_TEST_FAIL:
+        case IMPORT_TEST_SUCCESS:
+        case IMPORT_TEST_FAIL:
             return state
                 .set('saving', false)
 
@@ -211,6 +221,10 @@ export const updateTest = (test) => {
 
 export const backToCourse = (courseId) => {
     return {type: BACK_TO_COURSE_REQUEST, payload: courseId}
+}
+
+export const uploadTest = (data) => {
+    return {type: IMPORT_TEST_REQUEST, payload: data}
 }
 
 
@@ -352,6 +366,49 @@ const _putTest = (data) => {
         .then(parseJSON)
 }
 
+function* importTestSaga(data) {
+    yield put({type: IMPORT_TEST_START})
+    try {
+        let _formData = new FormData()
+        _formData.append('file', data.payload.file)
+        _formData.append('idTest', data.payload.testId)
+
+        const _result = yield call(_uploadPackage, _formData)
+
+        if (_result.result === 'OK') {
+            yield put({ type: IMPORT_TEST_SUCCESS })
+            yield put(getTest(data.payload.testId))
+        } else if (_result.result === 'WARN') {
+            yield put({ type: IMPORT_TEST_FAIL })
+
+            const _message = _result.warnings.join('\n')
+            yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+        } else {
+            yield put({ type: IMPORT_TEST_FAIL })
+
+            const _message = (_result.errors.length > 0) ? _result.errors.join('\n') : _result.message;
+            yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+        }
+    }
+    catch (e) {
+        yield put({ type: IMPORT_TEST_FAIL })
+
+        const _message = yield call(getErrorMessage, e)
+        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+    }
+}
+
+const _uploadPackage = (formData) => {
+    return fetch('/api/adm/import-test',
+        {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_TEST_REQUEST, getTestSaga),
@@ -359,6 +416,7 @@ export const saga = function* () {
         takeEvery(INSERT_TEST_REQUEST, insertTestSaga),
         takeEvery(UPDATE_TEST_REQUEST, updateTestSaga),
         takeEvery(BACK_TO_COURSE_REQUEST, backToCourseSaga),
+        takeEvery(IMPORT_TEST_REQUEST, importTestSaga),
         ]
     )}
 

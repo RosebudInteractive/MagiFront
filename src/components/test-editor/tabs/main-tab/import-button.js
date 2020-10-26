@@ -2,18 +2,17 @@ import React from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import PropTypes from "prop-types";
-import {uploadPackage} from "../../../../actions/episode/episode-actions";
+import {uploadTest} from "adm-ducks/single-test";
 
 class ImportButton extends React.Component {
     static propTypes = {
-        lessonId: PropTypes.number,
-        episodeId: PropTypes.number,
+        testId: PropTypes.number,
         disabled: PropTypes.bool,
     }
 
     render() {
         const {packageUploadProcess} = this.props,
-            _importButtonCaption = packageUploadProcess ? "Идет импорт эпизода" : "Импорт эпизода из Word XML",
+            _importButtonCaption = packageUploadProcess ? "Идет импорт теста" : "Импорт теста из Word XML",
             _inputStyle = {display: "none"}
 
         return <React.Fragment>
@@ -38,7 +37,7 @@ class ImportButton extends React.Component {
     }
 
     _uploadPackage(files) {
-        this.props.uploadPackage({idLesson: this.props.lessonId, idEpisode: this.props.episodeId, file: files[0]})
+        this.props.uploadTest({testId: this.props.testId, file: files[0]})
     }
 }
 
@@ -49,7 +48,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({uploadPackage}, dispatch)
+    return bindActionCreators({uploadTest}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ImportButton)

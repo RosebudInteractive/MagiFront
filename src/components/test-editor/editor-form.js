@@ -106,6 +106,7 @@ class TestEditorForm extends React.Component {
 
         if (_test) {
             this.props.initialize({
+                testId: test.Id,
                 testTypeId: test.TestTypeId,
                 courseId: test.CourseId,
                 lessonId: test.LessonId ? test.LessonId : -1,

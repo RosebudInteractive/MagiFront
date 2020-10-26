@@ -35,11 +35,16 @@ export const checkStatus = (response) => {
                     _serverError
 
                 if (data) {
-                    _serverError = JSON.parse(data);
-                    if (_serverError.hasOwnProperty('message')) {
-                        _message = _serverError.message;
-                    } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
-                        _message = _serverError.errors.join(',\n')
+                    try {
+                        _serverError = JSON.parse(data);
+                        if (_serverError.hasOwnProperty('message')) {
+                            _message = _serverError.message;
+                        } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
+                            _message = _serverError.errors.join(',\n')
+                        }
+                    } catch (e) {
+                        // Иногда текст ошибки может прийти в body, а иногда там находится html
+                        // Этот try-catch для того чтоб загасить ошибку парсинга body as json
                     }
                 }
                 let error = new Error(_message);

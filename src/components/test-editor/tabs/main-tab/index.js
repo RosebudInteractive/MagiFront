@@ -3,12 +3,14 @@ import PropTypes from "prop-types";
 import {bindActionCreators} from 'redux';
 import {connect} from "react-redux";
 import {Field, formValueSelector, isDirty} from "redux-form";
-import {CheckBox, TextBox} from "../../common/input-controls";
-import Select from "../../common/select-control";
-import RadioBox from "../../common/radio-box-control";
-import TextArea from "../../common/text-area";
+import {CheckBox, TextBox} from "../../../common/input-controls";
+import Select from "../../../common/select-control";
+import RadioBox from "../../../common/radio-box-control";
+import TextArea from "../../../common/text-area";
 import {getCourseLessons, typesSelector} from 'adm-ducks/single-test'
-import Cover from "../../common/cover-with-cross";
+import Cover from "../../../common/cover-with-cross";
+import ImportButton from "./import-button";
+import "./main-tab.sass"
 
 const METHODS = [
         {id: 1, value: 'Последовательный'},
@@ -39,11 +41,14 @@ class MainTab extends React.Component {
     }
 
     render() {
-        const {editMode, hasChanges} = this.props;
+        const {editMode, hasChanges, testId} = this.props;
 
         const _disabled = false;
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
+            <div className="main-tab__buttons-wrapper">
+                <ImportButton testId={testId} disabled={_disabled}/>
+            </div>
             <Field component={Select} name="courseId" label="Курс" options={this._getCourses()} placeholder="Выберите курс" disabled={true}/>
             <Field component={Select} name="lessonId" label="Лекция" placeholder="Выберите лекцию" options={this._getLessons()} disabled={_disabled}/>
             <Field component={TextBox} name="name" label="Название" placeholder="Введите название" disabled={_disabled}/>
@@ -87,6 +92,7 @@ const selector = formValueSelector('TestEditor')
 const _MainTab = connect(state => {
     return {
         courseId: selector(state, 'courseId'),
+        testId: selector(state, 'testId'),
     }
 })(MainTab)
 
