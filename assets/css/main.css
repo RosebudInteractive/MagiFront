@@ -371,6 +371,8 @@ body {
 }
 
 .global-wrapper {
+  top: 140px;
+
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;

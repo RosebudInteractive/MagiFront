@@ -68,6 +68,7 @@ import ReviewWindow from "./components/messages/review";
 import ReviewResultMessage from "./components/messages/review/result-message";
 import CourseDiscounts from "tools/course-discount";
 import DynamicDiscountPopup from "./components/messages/dynamic-discount-popup";
+import TopMessage from "./components/messages/top-message";
 
 Polyfill.registry();
 
@@ -353,7 +354,10 @@ class App extends Component {
             isWaiting
         } = this.props;
 
-        return <div className="App global-wrapper" onScroll={this._handleScroll}>
+        return <React.Fragment>
+            <TopMessage/>
+            <div className="App global-wrapper" onScroll={this._handleScroll}>
+
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
@@ -370,6 +374,7 @@ class App extends Component {
                 <DynamicDiscountPopup/>
                 <ModalWaiting visible={isWaiting}/>
             </div>
+            </React.Fragment>
 
     }
 }

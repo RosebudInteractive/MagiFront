@@ -13,11 +13,11 @@ import history from "./history";
 ReactDOM.render(
     <Provider store={store}>
         <Router history={history}>
-            <div>
+            <React.Fragment>
                 <ScrollMemory/>
                 <RedirectHandler/>
                 <App/>
-            </div>
+            </React.Fragment>
         </Router>
     </Provider>,
     document.getElementById('root'));
