@@ -101,7 +101,7 @@ exports.ImportEpisode = class ImportEpisode {
         this._db = $memDataBase;
     }
 
-    importEpisode(fileName, options) {
+    import(fileName, options) {
         let opts = _.defaultsDeep(options, IMPOPT_OPTIONS_DFLT);
         opts.importErrors = [];
         opts.importWarnings = [];
@@ -173,10 +173,10 @@ exports.ImportEpisode = class ImportEpisode {
                                         if (result && result.guids && (result.guids.length === 1)) {
                                             root_obj = self._db.getObj(result.guids[0]);
                                             if (!root_obj)
-                                                throw new Error("ImportEpisode::importEpisode: Object doesn't exist: " + result.guids[0]);
+                                                throw new Error("ImportEpisode::import: Object doesn't exist: " + result.guids[0]);
                                         }
                                         else
-                                            throw new Error("ImportEpisode::importEpisode: Invalid result of \"getData\": " + JSON.stringify(result));
+                                            throw new Error("ImportEpisode::import: Invalid result of \"getData\": " + JSON.stringify(result));
 
                                         edtOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                                         let col = root_obj.getCol("DataElements");

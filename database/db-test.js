@@ -775,6 +775,7 @@ const DbTest = class DbTest extends DbObject {
                                 CorrectAnswResp: obj.correctAnswResp(),
                                 WrongAnswResp: obj.wrongAnswResp(),
                                 Comment: obj.comment(),
+                                Complexity: obj.complexity(),
                                 Answers: []
                             };
                             testData.Questions[obj.number() - 1] = q;
