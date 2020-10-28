@@ -393,6 +393,7 @@ function* importTestSaga(data) {
         let _formData = new FormData()
         _formData.append('file', data.payload.file)
         _formData.append('idTest', data.payload.testId)
+        _formData.append('deleteInstances', data.payload.deleteInstances)
 
         const _result = yield call(_uploadPackage, _formData)
 
