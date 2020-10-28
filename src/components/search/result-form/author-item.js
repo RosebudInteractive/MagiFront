@@ -19,7 +19,7 @@ export default class AuthorItem extends React.Component {
         return item && <div className="search-result__item author-item">
             <div className="image" style={_style}/>
             <div className="info">
-                <Link to={item.URL} className="name result-link header">{item.Name}</Link>
+                <a href={item.URL} className="name result-link header">{item.Name}</a>
                 <div className="pub-date">{item.PubDate}</div>
                 <div className="highlights">{this._getHighlights()}</div>
             </div>

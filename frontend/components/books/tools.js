@@ -16,7 +16,7 @@ export const getExtLinks = (extLinks) => {
 
     _links = _links.map((item) => {
         return <li>
-            <Link to={extLinks[item]} target="_blank"><span>{HOSTS[item].title}</span></Link>
+            <a href={extLinks[item]} target="_blank"><span>{HOSTS[item].title}</span></a>
         </li>
     })
 

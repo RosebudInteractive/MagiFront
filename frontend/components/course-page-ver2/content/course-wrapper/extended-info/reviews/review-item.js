@@ -28,7 +28,7 @@ export default class ReviewItem extends React.Component {
                 {
                     review.ProfileUrl
                         ?
-                        <Link to={review.ProfileUrl} target="_blank" className="font-universal__title-smallx user-name _link">{review.UserName}</Link>
+                        <a href={review.ProfileUrl} target="_blank" className="font-universal__title-smallx user-name _link">{review.UserName}</a>
                             :
                         <div className="font-universal__title-smallx user-name">{review.UserName}</div>
                 }

@@ -62,7 +62,7 @@ export default class CourseItem extends React.Component {
 
         return item && <div className="search-result__item course-item">
             <div className="content">
-                    <Link to={item.URL} target="_blank" className="text">
+                    <a href={item.URL} target="_blank" className="text">
                         <div className="image" style={_style}/>
                         {
                             item.IsPaid &&
@@ -74,11 +74,11 @@ export default class CourseItem extends React.Component {
                         <span className="item__text-block" ref={e => this.wrapper = e}>
                             <span className="header font-universal__title-smallx">
                                 <span className="title">Курс</span>
-                                <Link to={item.URL} target="_blank" className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
+                                <a href={item.URL} target="_blank" className="name result-link" dangerouslySetInnerHTML={{__html: this._getNameText()}}/>
                             </span>
                             <span className="highlights font-universal__book-medium" ref={e => this.highlight = e}>{this._getHighlights()}</span>
                         </span>
-                    </Link>
+                    </a>
                 <div className={"footer" + (this.state.fixedFooter ? " _fixed" : "")} ref={e => this.footer = e}>
                     <div className="categories font-universal__body-medium">{this._getCategories()}</div>
                     <div className="authors font-universal__body-medium">{this._getAuthors()}</div>
@@ -108,9 +108,9 @@ export default class CourseItem extends React.Component {
             return <React.Fragment>
                 {
                     item.Highlight ?
-                        <Link to={item.URL} target="_blank" className="author-name  result-link" dangerouslySetInnerHTML={{__html: item.Highlight + (_needSeparator ? ", " : "")}}/>
+                        <a href={item.URL} target="_blank" className="author-name  result-link" dangerouslySetInnerHTML={{__html: item.Highlight + (_needSeparator ? ", " : "")}}/>
                         :
-                        <Link to={item.URL} target="_blank" className="author-name  result-link">{item.Name + (_needSeparator ? ", " : "")}</Link>
+                        <a href={item.URL} target="_blank" className="author-name  result-link">{item.Name + (_needSeparator ? ", " : "")}</a>
                 }
             </React.Fragment>
         })
@@ -121,12 +121,12 @@ export default class CourseItem extends React.Component {
             return <React.Fragment>
                 {
                     item.Highlight ?
-                        <Link to={item.URL} target="_blank" className="category-name result-link _orange">
+                        <a href={item.URL} target="_blank" className="category-name result-link _orange">
                             <span>#</span>
                             <span dangerouslySetInnerHTML={{__html: item.Highlight}}/>
-                        </Link>
+                        </a>
                         :
-                        <Link to={item.URL} target="_blank" className="category-name result-link _orange">{`#${item.Name}`}</Link>
+                        <a href={item.URL} target="_blank" className="category-name result-link _orange">{`#${item.Name}`}</a>
                 }
                 {(index !== (array.length - 1)) && <div className="separator">, </div>}
             </React.Fragment>
