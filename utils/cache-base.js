@@ -6,6 +6,16 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const SCAN_PAGE_SIZE = 100;
 
 exports.CacheableObject = class CacheableObject {
+
+    static getService(service_name, isSilent) {
+        let result = null;
+        if (global.$Services && global.$Services[service_name])
+            result = global.$Services[service_name]();
+        if ((!result) && (!isSilent))
+            throw new Error(`Service "${service_name}" isn't registered.`);
+        return result;
+    }
+
     constructor(options) {
         let opts = options || {};
         this._cache = {};
@@ -18,12 +28,7 @@ exports.CacheableObject = class CacheableObject {
     }
 
     getService(service_name, isSilent) {
-        let result = null;
-        if (global.$Services && global.$Services[service_name])
-            result = global.$Services[service_name]();
-        if ((!result) && (!isSilent))
-            throw new Error(`Service "${service_name}" isn't registered.`);
-        return result;        
+        return CacheableObject.getService(service_name, isSilent);
     }
 
     cacheGetKey(key) {
