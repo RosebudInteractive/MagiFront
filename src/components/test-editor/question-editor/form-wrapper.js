@@ -184,6 +184,10 @@ const validate = (values) => {
         errors.AnswText = 'Значение не может быть пустым'
     }
 
+    if (values.Complexity && !$.isNumeric(values.Complexity)) {
+        errors.Complexity = 'Значение должно быть числовым'
+    }
+
     return errors
 }
 
