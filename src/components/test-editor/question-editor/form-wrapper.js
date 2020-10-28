@@ -67,6 +67,7 @@ class QuestionEditorForm extends React.Component {
                 CorrectAnswResp: question.CorrectAnswResp,
                 WrongAnswResp: question.WrongAnswResp,
                 Comment: question.Comment,
+                Complexity: question.Complexity,
                 Answers: question.Answers,
             });
         }

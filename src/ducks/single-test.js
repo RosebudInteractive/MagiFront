@@ -112,6 +112,7 @@ const QuestionRecord = Record({
     WrongAnswResp: null,
     Comment: null,
     Answers: [],
+    Complexity: null,
 })
 
 

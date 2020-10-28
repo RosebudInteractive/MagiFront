@@ -47,7 +47,7 @@ class MainTab extends React.Component {
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <div className="main-tab__buttons-wrapper">
-                <ImportButton testId={testId} disabled={_disabled}/>
+                <ImportButton testId={testId} disabled={!editMode || hasChanges}/>
             </div>
             <Field component={Select} name="courseId" label="Курс" options={this._getCourses()} placeholder="Выберите курс" disabled={true}/>
             <Field component={Select} name="lessonId" label="Лекция" placeholder="Выберите лекцию" options={this._getLessons()} disabled={_disabled}/>
