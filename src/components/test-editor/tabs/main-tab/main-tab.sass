@@ -2,8 +2,71 @@
   margin-top: 5px
   display: flex
 
-  button:nth-of-type(1)
+  .import-test-button:nth-of-type(1)
     margin-left: auto
 
-  button:nth-last-of-type(1)
+  .import-test-button:nth-last-of-type(1)
     margin-right: auto
+    
+.drop-down__button
+  &:after
+    content: ""
+    position: absolute
+    top: 50%
+    -webkit-transform: translateY(-50%) rotate(45deg)
+    -ms-transform: translateY(-50%) rotate(45deg)
+    transform: translateY(-50%) rotate(45deg)
+    right: 13px
+    margin-top: -4px
+    width: 11px
+    height: 11px
+    border: 2px solid #134563 //rgba(47, 47, 47, 0.2)
+    border-left: none
+    border-top: none
+    -webkit-transition: -webkit-transform 0.3s ease
+    transition: transform 0.3s ease, -webkit-transform 0.3s ease
+
+  &._opened
+    &:after
+      -webkit-transform: translateY(-50%) rotate(-135deg)
+      -ms-transform: translateY(-50%) rotate(-135deg)
+      transform: translateY(-50%) rotate(-135deg)
+      margin-top: 1px
+
+
+.import-test-button
+  button
+    margin: 0
+    min-height: 39px
+    &:nth-of-type(1)
+      border-bottom-right-radius: 0
+      border-top-right-radius: 0
+
+    &:nth-last-of-type(1)
+      border-bottom-left-radius: 0
+      border-top-left-radius: 0
+      border-left: 1px solid #134563
+
+  .drop-down__button
+    position: absolute
+    width: 40px
+    min-width: auto
+
+  .drop-down__menu
+    position: absolute
+    display: none
+    background-color: #3498db
+    color: #FFFFFF
+    font-size: 13px
+    line-height: 130%
+    margin-left: 6px
+    &._opened
+      display: block
+      z-index: 10
+
+  .drop-down__item
+    padding: 10px 5px
+    cursor: pointer
+    &:not(:last-of-type)
+      border-bottom: 1px solid #268fd5
+

@@ -1,44 +1,56 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import PropTypes from "prop-types";
 import {uploadTest} from "adm-ducks/single-test";
 
-class ImportButton extends React.Component {
-    static propTypes = {
-        testId: PropTypes.number,
-        disabled: PropTypes.bool,
-    }
+function ImportButton(props) {
 
-    render() {
-        const {packageUploadProcess} = this.props,
-            _importButtonCaption = packageUploadProcess ? "Идет импорт теста" : "Импорт теста из Word XML",
-            _inputStyle = {display: "none"}
+    const [menuVisible, setMenuVisible] = useState(false)
 
-        return <React.Fragment>
-            <input style={_inputStyle} type="file" id="file-dialog" accept=".xml"/>
-            <button className="adm__button bottom-controls__button"
-                    onClick={::this._execImport} disabled={this.props.disabled}>{_importButtonCaption}</button>
-        </React.Fragment>
+    const {testId, packageUploadProcess, disabled} = props,
+        _importButtonCaption = packageUploadProcess ? "Идет импорт теста" : "Импорт теста из Word XML",
+        _inputStyle = {display: "none"}
 
-    }
 
-    _execImport(e) {
+    const _execImport = (e) => {
         e.preventDefault()
         $('#file-dialog').unbind("change");
         $('#file-dialog').val("");
 
-        let that = this;
         $('#file-dialog').bind("change", function () {
-            that._uploadPackage(this.files)
+            _uploadPackage(this.files)
         });
 
         $("#file-dialog").trigger('click');
     }
 
-    _uploadPackage(files) {
-        this.props.uploadTest({testId: this.props.testId, file: files[0]})
+    const _execImportWithConfirm = () => {
+
     }
+
+    const _uploadPackage = (files) => {
+        props.uploadTest({testId: testId, file: files[0]})
+    }
+
+    const _toggleMenu = () => {
+        setMenuVisible(!menuVisible)
+    }
+
+    return <div className="import-test-button">
+        <input style={_inputStyle} type="file" id="file-dialog" accept=".xml"/>
+        <button className="adm__button bottom-controls__button" onClick={_execImport} disabled={disabled}>{_importButtonCaption}</button>
+        <button className={"adm__button bottom-controls__button drop-down__button" + (menuVisible ? " _opened" : "")}onClick={_toggleMenu} disabled={disabled}/>
+        <div className={"drop-down__menu" + (menuVisible ? " _opened" : "")}>
+            <div className="drop-down__item" onClick={_execImport}>Импорт теста</div>
+            <div className="drop-down__item" onClick={_execImportWithConfirm}>Импорт с удалением всех результатов прохождения теста</div>
+        </div>
+    </div>
+}
+
+ImportButton.propTypes = {
+    testId: PropTypes.number,
+    disabled: PropTypes.bool,
 }
 
 function mapStateToProps(state) {
