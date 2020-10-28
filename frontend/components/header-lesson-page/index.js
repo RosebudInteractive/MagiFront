@@ -30,7 +30,7 @@ class HeaderWrapper extends React.Component {
 
         this.state = {
             hiding: false,
-            type: "_fixed"
+            type: props.lesson ? "_fixed" : props.test ? "_dark" : "_fixed"
         }
 
         this._handleScroll = () => {
