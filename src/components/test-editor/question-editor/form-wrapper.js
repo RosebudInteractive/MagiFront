@@ -67,6 +67,7 @@ class QuestionEditorForm extends React.Component {
                 CorrectAnswResp: question.CorrectAnswResp,
                 WrongAnswResp: question.WrongAnswResp,
                 Comment: question.Comment,
+                Complexity: question.Complexity,
                 Answers: question.Answers,
             });
         }
@@ -182,6 +183,10 @@ const validate = (values) => {
 
     if ((+values.AnswType === 5) && !values.AnswText) {
         errors.AnswText = 'Значение не может быть пустым'
+    }
+
+    if (values.Complexity && !$.isNumeric(values.Complexity)) {
+        errors.Complexity = 'Значение должно быть числовым'
     }
 
     return errors

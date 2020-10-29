@@ -11,7 +11,7 @@ export default class Refs extends React.Component {
     _getList() {
         return this.props.refs.map((ref, index) => {
             return <li key={index}>
-                {ref.URL ? <Link to={ref.URL} target="_blank" rel="nofollow">{ref.Description}</Link> : ref.Description}
+                {ref.URL ? <a href={ref.URL} target="_blank" rel="nofollow">{ref.Description}</a> : ref.Description}
             </li>
         })
     }

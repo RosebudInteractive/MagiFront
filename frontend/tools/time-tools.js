@@ -128,23 +128,26 @@ export const parseReadyDate = (date) => {
     }
 
     if (date) {
-        let _now = new Date(),
-            _monthDelta = getMonthBetween(_now, date);
-
         result.readyYear = date.getFullYear();
+        result.readyMonth = Months[date.getMonth()];
 
-        if (_monthDelta > 9) {
-            result.readyMonth = '';
-        } else {
-            if (getSeasonBetween(_now, date) > 1) {
-                result.readyMonth = getSeason(date);
-                if (date.getMonth() === 11) {
-                    result.readyYear++
-                }
-            } else {
-                result.readyMonth = Months[date.getMonth()];
-            }
-        }
+        // Эта логика выдавала не только месяц но и сезон
+        // Пока убрали, но не факт, что не вернем
+        // let _now = new Date(),
+        //     _monthDelta = getMonthBetween(_now, date);
+        // if (_monthDelta > 9) {
+        //     result.readyMonth = '';
+        // } else {
+        //     if (getSeasonBetween(_now, date) > 1) {
+        //         // result.readyMonth = getSeason(date);
+        //         result.readyMonth = Months[date.getMonth()];
+        //         if (date.getMonth() === 11) {
+        //             result.readyYear++
+        //         }
+        //     } else {
+        //         result.readyMonth = Months[date.getMonth()];
+        //     }
+        // }
     }
 
     return result

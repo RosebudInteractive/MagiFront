@@ -33,7 +33,7 @@ class FeedbackResultMessage extends React.Component {
                         {
                             msgUrl
                                 ?
-                            <Link to={msgUrl} className="feedback-message__link">{'>>> Ваше сообщение <<<'}</Link>
+                            <a href={msgUrl} className="feedback-message__link">{'>>> Ваше сообщение <<<'}</a>
                             :
                             null
                         }

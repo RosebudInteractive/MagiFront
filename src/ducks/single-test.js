@@ -44,10 +44,12 @@ export const UPDATE_TEST_START = `${prefix}/UPDATE_TEST_START`
 export const UPDATE_TEST_SUCCESS = `${prefix}/UPDATE_TEST_SUCCESS`
 export const UPDATE_TEST_FAIL = `${prefix}/UPDATE_TEST_FAIL`
 
-export const IMPORT_TEST_REQUEST = `${prefix}/IMPORT_TEST_REQUEST`
-export const IMPORT_TEST_START = `${prefix}/IMPORT_TEST_START`
-export const IMPORT_TEST_SUCCESS = `${prefix}/IMPORT_TEST_SUCCESS`
-export const IMPORT_TEST_FAIL = `${prefix}/IMPORT_TEST_FAIL`
+const IMPORT_TEST_REQUEST = `${prefix}/IMPORT_TEST_REQUEST`
+const IMPORT_TEST_START = `${prefix}/IMPORT_TEST_START`
+const IMPORT_TEST_SUCCESS = `${prefix}/IMPORT_TEST_SUCCESS`
+const IMPORT_TEST_FAIL = `${prefix}/IMPORT_TEST_FAIL`
+
+const IMPORT_TEST_WITH_CONFIRM_REQUEST = `${prefix}/IMPORT_TEST_WITH_CONFIRM_REQUEST`
 
 const TEST_ALREADY_HAS_INSTANCES = "testHasInstances"
 
@@ -110,6 +112,7 @@ const QuestionRecord = Record({
     WrongAnswResp: null,
     Comment: null,
     Answers: [],
+    Complexity: null,
 })
 
 
@@ -227,10 +230,28 @@ export const uploadTest = (data) => {
     return {type: IMPORT_TEST_REQUEST, payload: data}
 }
 
+export const uploadTestWithConfirm = (data) => {
+    return {type: IMPORT_TEST_WITH_CONFIRM_REQUEST, payload: data}
+}
+
 
 /**
  * Sagas
  */
+export const saga = function* () {
+    yield all([
+            takeEvery(GET_TEST_REQUEST, getTestSaga),
+            takeEvery(CREATE_NEW_TEST_REQUEST, createNewTestSaga),
+            takeEvery(INSERT_TEST_REQUEST, insertTestSaga),
+            takeEvery(UPDATE_TEST_REQUEST, updateTestSaga),
+            takeEvery(BACK_TO_COURSE_REQUEST, backToCourseSaga),
+            takeEvery(IMPORT_TEST_REQUEST, importTestSaga),
+            takeEvery(IMPORT_TEST_WITH_CONFIRM_REQUEST, importTestWithConfirmSaga),
+        ]
+    )
+}
+
+
 function* createNewTestSaga(data) {
     yield put({type: CREATE_NEW_TEST_START})
     yield call(getTestTypesSaga)
@@ -372,6 +393,7 @@ function* importTestSaga(data) {
         let _formData = new FormData()
         _formData.append('file', data.payload.file)
         _formData.append('idTest', data.payload.testId)
+        _formData.append('deleteInstances', data.payload.deleteInstances)
 
         const _result = yield call(_uploadPackage, _formData)
 
@@ -409,16 +431,13 @@ const _uploadPackage = (formData) => {
         .then(parseJSON)
 }
 
-export const saga = function* () {
-    yield all([
-        takeEvery(GET_TEST_REQUEST, getTestSaga),
-        takeEvery(CREATE_NEW_TEST_REQUEST, createNewTestSaga),
-        takeEvery(INSERT_TEST_REQUEST, insertTestSaga),
-        takeEvery(UPDATE_TEST_REQUEST, updateTestSaga),
-        takeEvery(BACK_TO_COURSE_REQUEST, backToCourseSaga),
-        takeEvery(IMPORT_TEST_REQUEST, importTestSaga),
-        ]
-    )}
+function* importTestWithConfirmSaga(data) {
+    const _confirmed = yield queryUserConfirmationSaga(`Вы уверены, что хотите удалить все результаты пользователей, прошедших этот тест?`)
+
+    if (!_confirmed) { return }
+
+    yield put(uploadTest(data.payload))
+}
 
 
 const dataToEntries = (values, DataRecord) => {

@@ -23,9 +23,9 @@ export default class Item extends React.Component {
             _defaultLink = getDefaultExtLink(book.ExtLinks);
 
         const _imageDiv = _defaultLink ?
-            <Link to={_defaultLink} target="_blank" className="book-preview__image">
+            <a href={_defaultLink} target="_blank" className="book-preview__image">
                 <img src={_cover} alt=""/>
-            </Link>
+            </a>
             :
             <div className="book-preview__image">
                 <img src={_cover} alt=""/>

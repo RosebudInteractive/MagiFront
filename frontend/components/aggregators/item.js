@@ -12,13 +12,13 @@ export default class Item extends React.Component {
 
     render() {
         return <li id={this._getId()}>
-            <Link to={this.props.link} target="_blank">
+            <a href={this.props.link} target="_blank">
                 <span className="other-sources__icon">
                     <img src={this._getImage()} width={this._getWidth()} height={this._getHeight()}
                          alt={this._getTitle()}/>
                 </span>
                 <span className="other-sources__name">{this._getTitle()}</span>
-            </Link>
+            </a>
         </li>
 
     }

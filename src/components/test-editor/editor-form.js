@@ -245,6 +245,7 @@ class TestEditorForm extends React.Component {
                 AnswInt: null,
                 AnswText: null,
                 Comment: question.Comment,
+                Complexity: question.Complexity ? +question.Complexity : null,
                 Answers: [],
             }
 

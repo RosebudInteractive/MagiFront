@@ -19,9 +19,9 @@ export default class LessonItem extends React.Component {
         return item && <div className="search-result__item lesson-item">
             <div className="image" style={_style}/>
             <div className="info">
-                <div className="header">Лекция: <Link to={item.URL} className="name result-link">{item.Name}</Link></div>
-                <Link to={item.Author.URL} className="author-name result-link">{item.Author.Name}</Link>
-                <Link to={item.Course.URL} className="course result-link">{item.Course.Name}</Link>
+                <div className="header">Лекция: <a href={item.URL} className="name result-link">{item.Name}</a></div>
+                <a href={item.Author.URL} className="author-name result-link">{item.Author.Name}</a>
+                <a href={item.Course.URL} className="course result-link">{item.Course.Name}</a>
                 <div className="pub-date">{item.PubDate}</div>
                 <div className="highlights">{this._getHighlights()}</div>
             </div>
@@ -31,7 +31,7 @@ export default class LessonItem extends React.Component {
     _getAuthors() {
         return this.Author.map((item, index, array) => {
             return <React.Fragment>
-                <Link to={item.URL} className="author-name result-link">{item.Name}</Link>
+                <a href={item.URL} className="author-name result-link">{item.Name}</a>
                 { (index !== (array.length - 1)) && <div className="separator">, </div> }
             </React.Fragment>
         })

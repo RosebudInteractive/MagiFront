@@ -48,7 +48,7 @@ const { SetupRoute: setupFeedback } = require('./feedback');
 const { SetupRoute: setupBilling } = require('./billing');
 const { buildLogString } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
-const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
+const { ImportEpisode, ImportEpisodeParams, ImportTest, ImportTestParams } = require('../database/import');
 
 const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 Hour
 const DFLT_CLIENT_TIMEOUT = 60 * 10; // 10 min
@@ -176,6 +176,7 @@ function setupAPI(express, app) {
     SetupWhoAmI(app);
     app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
+    app.post('/api/adm/import-test', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportTest(), ImportTestParams()));
 
     setupPrerender(app);
     setupCache(app);
