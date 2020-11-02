@@ -17,6 +17,19 @@ export const CHECK_START = `${prefix}/CHECK_START`
 export const CHECK_SUCCESS = `${prefix}/CHECK_SUCCESS`
 export const CHECK_FAIL = `${prefix}/CHECK_FAIL`
 
+const StorePopupItem = Record({
+    visible: false,
+    link: null
+})
+
+const StorePopupRecord = Record({
+    ios: new StorePopupItem(),
+    android: new StorePopupItem()
+})
+
+const PopupRecord = Record({
+    storePopup: new StorePopupRecord()
+})
 /**
  * Reducer
  * */
@@ -24,6 +37,7 @@ export const ReducerRecord = Record({
     main: 0,
     loading: false,
     error: null,
+    popup: new PopupRecord()
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -41,7 +55,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('main', payload.main)
-
+                .set('popup', new PopupRecord(payload.popup))
 
         case LOAD_FAIL:
         case CHECK_FAIL:
@@ -56,6 +70,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const appVersionSelector = createSelector(stateSelector, state => state.main)
+export const popupSelector = createSelector(stateSelector, state => state.popup)
 
 /**
  * Action Creators

@@ -4,6 +4,7 @@ import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
+import $ from "jquery";
 
 /**
  * Constants
@@ -35,6 +36,11 @@ export const NOTIFY_GA_CHANGE_PAGE = `${prefix}/NOTIFY_GA_CHANGE_PAGE`;
 export const APP_CHANGE_PAGE = `${prefix}/APP_CHANGE_PAGE`;
 export const SET_CURRENT_GA_URL = `${prefix}/SET_CURRENT_URL`;
 
+const STORE_POPUP_CLOSE_REQUEST = `${prefix}/STORE_POPUP_CLOSE_REQUEST`;
+
+const LOAD_LOCAL_SETTINGS_REQUEST = `${prefix}/LOAD_LOCAL_SETTINGS_REQUEST`;
+const APPLY_LOCAL_SETTINGS = `${prefix}/APPLY_LOCAL_SETTINGS`;
+
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
@@ -50,6 +56,15 @@ const DebugRecord = Record({
 const StatRecord = Record({
     clientTimeout: 10 * 60
 })
+
+const PopupSettings = Record({
+    storePopupConfirmedMode: null,
+    cookiesConfirmed: false
+})
+
+const LocalSettings = Record({
+    popup: new PopupSettings()
+})
 /**
  * Reducer
  * */
@@ -64,6 +79,7 @@ export const ReducerRecord = Record({
     currentUrl: null,
     debug: new DebugRecord(),
     stat: new StatRecord(),
+    localSettings: new LocalSettings()
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -116,6 +132,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('currentUrl', payload)
 
+        case APPLY_LOCAL_SETTINGS:
+            return state
+                .set("localSettings", new LocalSettings(payload))
+
         default:
             return state
     }
@@ -150,6 +170,7 @@ export const waitingSelector = createSelector(stateSelector, state => state.isWa
 export const analyticsDebugModeSelector = createSelector(stateSelector, state => state.getIn(['debug', 'gtm']))
 const currentUrlSelector = createSelector(stateSelector, state => state.currentUrl)
 export const paymentPingIntervalSelector = createSelector(stateSelector, state => state.getIn(['stat', 'clientTimeout']))
+export const localSettingsSelector = createSelector(stateSelector, state => state.localSettings)
 
 
 /**
@@ -187,6 +208,14 @@ export const pageChanged = () => {
     return {type: APP_CHANGE_PAGE}
 }
 
+export const storePopupClose = (mode) => {
+    return {type: STORE_POPUP_CLOSE_REQUEST, payload: mode}
+}
+
+export const loadLocalSettings = () => {
+    return {type: LOAD_LOCAL_SETTINGS_REQUEST}
+}
+
 /**
  * Sagas
  */
@@ -196,6 +225,8 @@ export const saga = function* () {
         takeEvery(CALC_BILLING_ENABLE_REQUEST, calcBillingEnabledSaga),
         takeEvery(RELOAD_CURRENT_PAGE_REQUEST, reloadCurrentPageSaga),
         takeEvery(NOTIFY_GA_CHANGE_PAGE_REQUEST, changeCurrentPageSaga),
+        takeEvery(STORE_POPUP_CLOSE_REQUEST, storePopupCloseSaga),
+        takeEvery(LOAD_LOCAL_SETTINGS_REQUEST, loadLocalSettingsSaga),
     ])
 }
 
@@ -267,3 +298,23 @@ function* reloadCurrentPageSaga() {
     }
 }
 
+function* storePopupCloseSaga(data) {
+    let _date = new Date(new Date().setFullYear(new Date().getFullYear() + 10))
+
+    $.cookie('_CONFIRMED_STORE_POPUP_MODE', data.payload, { expires: _date })
+
+    yield put(loadLocalSettings())
+}
+
+function* loadLocalSettingsSaga() {
+    let cookiesConfirmed = !!$.cookie('magisteria_cookies_confirm'),
+        storePopupConfirmedMode = $.cookie('_CONFIRMED_STORE_POPUP_MODE')
+
+    storePopupConfirmedMode = storePopupConfirmedMode ? +storePopupConfirmedMode : 0
+
+    const _settings = {
+        popup: {cookiesConfirmed, storePopupConfirmedMode}
+    }
+
+    yield put({type: APPLY_LOCAL_SETTINGS, payload: _settings})
+}

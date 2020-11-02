@@ -54,7 +54,7 @@ import BillingWrapper from "./components/messages/billing/subscription-window";
 import CoursePaymentWrapper from "./components/messages/billing-ver-2";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import {getAppOptions, pageChanged, waitingSelector} from 'ducks/app'
+import {getAppOptions, loadLocalSettings, pageChanged, waitingSelector} from 'ducks/app'
 import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
@@ -108,6 +108,7 @@ class App extends Component {
         this.props.appActions.getCookiesConfimation()
         this.props.getParameters()
         this.props.loadVersion()
+        this.props.loadLocalSettings()
     }
 
     componentDidMount() {
@@ -412,6 +413,7 @@ function mapDispatchToProps(dispatch) {
         showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
         pageChanged: bindActionCreators(pageChanged, dispatch),
+        loadLocalSettings: bindActionCreators(loadLocalSettings, dispatch),
     }
 }
 

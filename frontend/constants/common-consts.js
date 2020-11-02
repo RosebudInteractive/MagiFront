@@ -50,3 +50,9 @@ export const SEARCH_SORT_TYPE = {
     BY_DATE: {name: "by_date", value: {"pubDate":"desc"}},
     BY_DATE_ASC: {name: "by_date_asc", value: {"pubDate":"asc"}},
 }
+
+export const STORE_POPUP_MODE = {
+    NONE: 0,
+    ONLY_IOS: 1,
+    BOTH: 2
+}

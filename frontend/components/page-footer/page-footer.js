@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux';
 import {showFeedbackWindow,} from "../../ducks/message";
 import SubscribeForm from './subscribe-form'
 import {Link} from 'react-router-dom';
+import StoreButton, {STORE_BUTTON_TYPE} from "../messages/top-message/store-popup/store-button";
 
 class PageFooter extends React.Component {
 
@@ -78,6 +79,10 @@ class Inner extends React.Component {
                 </div>
                 <div className='page-footer__col'>
                     <SubscribeForm/>
+                    <div className="store-buttons-block">
+                        <StoreButton type={STORE_BUTTON_TYPE.APPLE}/>
+                        <StoreButton type={STORE_BUTTON_TYPE.ANDROID}/>
+                    </div>
                 </div>
             </div>
         )

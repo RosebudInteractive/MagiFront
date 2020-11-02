@@ -1,3 +1,16 @@
 {
-  "main": 14
+  "main": 14,
+  "popup": {
+    "storePopup": {
+      "ios": {
+        "visible": true,
+        "link": "https://apps.apple.com/ru/app/apple-music-for-artists/id1366467972"
+      },
+      "android": {
+        "visible": true,
+        "link": "https://apps.apple.com/ru/app/apple-music-for-artists/id1366467972"
+      }
+    }
+
+  }
 }
