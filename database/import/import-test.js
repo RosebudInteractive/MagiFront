@@ -133,7 +133,7 @@ exports.ImportTest = class ImportTest {
             if (isNaN(idTest))
                 throw new Error(`Incorrect "idTest" parameter: ${opts.idTest}.`);
             delete opts.idTest;
-            deleteInstances = opts.deleteInstances;
+            deleteInstances = typeof (opts.deleteInstances) === "boolean" ? opts.deleteInstances : JSON.parse(opts.deleteInstances);
             delete opts.deleteInstances;
 
             let parser = new ParserWordXML();
