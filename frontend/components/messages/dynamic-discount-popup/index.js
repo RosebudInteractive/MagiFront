@@ -9,6 +9,7 @@ import {getCurrencySign} from "tools/page-tools";
 import {closeDynamicDiscountPopup, dynamicDiscountSelector} from "ducks/message";
 import $ from "jquery";
 import {visibleCourseSelector} from "ducks/course";
+import {localSettingsSelector} from "ducks/app";
 
 const DISCOUNT = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#discount"/>'
 
@@ -119,8 +120,8 @@ class DynamicDiscountPopup extends React.Component {
 
         let _bottom = 20
 
-        _bottom = _bottom + ((($(window).width <= 899) && _mobileButtons && _mobileButtons.length) ? _mobileButtons.outerHeight() : 0) +
-            ((!this.props.cookiesConfirmed && _message && _message.length) ? _message.height() : 0)
+        _bottom = _bottom + ((($(window).width() <= 899) && _mobileButtons && _mobileButtons.length) ? _mobileButtons.outerHeight() : 0) +
+            ((!this.props.localSettings.popup.cookiesConfirmed && _message && _message.length) ? _message.height() : 0)
 
         return {bottom: _bottom}
     }
@@ -130,7 +131,7 @@ function mapStateToProps(state) {
     return {
         dynamicDiscount: dynamicDiscountSelector(state),
         visibleCourseId: visibleCourseSelector(state),
-        cookiesConfirmed: state.app.cookiesConfirmed,
+        localSettings: localSettingsSelector(state),
         currentPage: state.pageHeader.currentPage,
     }
 }

@@ -14,6 +14,7 @@ import {SVG} from "tools/svg-paths";
 
 import "./header-lesson-page.sass"
 import SwitchButtons from "./switch-buttons";
+import {localSettingsSelector} from "ducks/app";
 
 class HeaderWrapper extends React.Component {
 
@@ -42,7 +43,7 @@ class HeaderWrapper extends React.Component {
 
                 _height = this.props.isMobileApp ? _height : _height - _menu.height() ;
 
-                if (_scrollTop > (_height + 63)) {
+                if (_scrollTop > (_height + 63 + this.props.localSettings.appWrapperTop)) {
                     if (this.state.type === "_dark") {
                         this.setState({type: "_fixed"})
                     }
@@ -138,6 +139,7 @@ function mapStateToProps(state) {
         isMobileApp: state.app.isMobileApp,
         // course: state.singleLesson.course,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
+        localSettings: localSettingsSelector(state),
         course: courseSelector(state)
     }
 }

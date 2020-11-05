@@ -7,6 +7,7 @@ import "./discount-menu.sass"
 import $ from "jquery";
 import {OverflowHandler} from "tools/overflow-handler";
 import {isMobilePlatform} from "tools/page-tools";
+import {localSettingsSelector} from "ducks/app";
 
 class DiscountMenu extends React.Component {
 
@@ -76,7 +77,9 @@ class DiscountMenu extends React.Component {
             _dynamicList = this._getDiscountsList(result.dynamic, true),
             _commonList = this._getDiscountsList(result.other, false)
 
-        return visible && <div className={"discount-menu" + (hidden ? " _hidden" : "")}>
+        const _style = this._getStyle()
+
+        return visible && <div className={"discount-menu" + (hidden ? " _hidden" : "")} style={_style}>
             <div className="discount-menu__wrapper">
                 {
                     _dynamicList &&
@@ -132,6 +135,21 @@ class DiscountMenu extends React.Component {
     _switchOffPhoneMode() {
         OverflowHandler.turnOff()
     }
+
+    _getStyle() {
+        const {localSettings} = this.props
+
+        if (($(window).width() <= 414) && localSettings.appWrapperTop) {
+            const _top = 63 + localSettings.appWrapperTop
+
+            return {
+                top: _top,
+                height: `calc(100% - ${_top})`
+            }
+        }
+
+        return null
+    }
 }
 
 const mapState2Props = (state) => {
@@ -139,6 +157,7 @@ const mapState2Props = (state) => {
         result: resultSelector(state),
         visible: showDiscountMenuSelector(state),
         isMobileApp: state.app.isMobileApp,
+        localSettings: localSettingsSelector(state),
     }
 }
 

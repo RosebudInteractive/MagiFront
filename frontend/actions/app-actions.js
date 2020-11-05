@@ -171,24 +171,6 @@ export const getAppOptions = () => {
     }
 };
 
-export const getCookiesConfimation = () => {
-    return {
-        type: GET_COOKIES_CONFIRMATION,
-        payload: $.cookie('magisteria_cookies_confirm')
-    }
-}
-
-export const confirmCookies = () => {
-    let _date = new Date(new Date().setFullYear(new Date().getFullYear() + 10))
-
-    $.cookie('magisteria_cookies_confirm', true, { expires: _date })
-
-    return {
-        type: CONFIRM_COOKIES,
-        payload: null
-    }
-}
-
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {
         return response

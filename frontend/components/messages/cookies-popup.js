@@ -1,13 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {confirmCookies} from '../../actions/app-actions'
+import {cookiesMessageClose, localSettingsSelector} from "ducks/app"
 import {Link} from "react-router-dom";
 
 class CookiesMessage extends React.Component {
     render() {
         return (
-            !this.props.cookiesConfirmed ?
+            !this.props.localSettings.popup.cookiesConfirmed ?
                 <div className="balloon-wrapper js-cookies-popup">
                     <div className="balloon-wrapper_message">
                         <p className="balloon-wrapper_message__body">
@@ -32,13 +32,13 @@ class CookiesMessage extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        cookiesConfirmed: state.app.cookiesConfirmed,
+        localSettings: localSettingsSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        confirm: bindActionCreators(confirmCookies, dispatch)
+        confirm: bindActionCreators(cookiesMessageClose, dispatch)
     }
 }
 

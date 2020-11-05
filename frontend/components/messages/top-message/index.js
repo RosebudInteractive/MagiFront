@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import "./top-message.sass"
 import StorePopup from "./store-popup";
 import {popupSelector} from "ducks/version";
-import {localSettingsSelector, storePopupClose} from "ducks/app";
+import {localSettingsSelector, storePopupClose, setAppDivTop} from "ducks/app";
 
 const _divRef = React.createRef()
 
@@ -12,7 +12,8 @@ function TopMessage(props) {
 
     const _onResize = () => {
         if (_divRef && _divRef.current) {
-            $(".App.global-wrapper").css("top", _divRef.current.clientHeight + "px")
+            props.actions.setAppDivTop(_divRef.current.clientHeight)
+            // $(".App.global-wrapper").css("top", _divRef.current.clientHeight + "px")
         }
     }
 
@@ -41,7 +42,7 @@ const mapState2Props = (state) => {
 
 const masDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({storePopupClose}, dispatch)
+        actions: bindActionCreators({storePopupClose, setAppDivTop}, dispatch)
     }
 }
 

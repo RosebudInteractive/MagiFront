@@ -105,7 +105,6 @@ class App extends Component {
             this.props.userActions.whoAmI()
         }
 
-        this.props.appActions.getCookiesConfimation()
         this.props.getParameters()
         this.props.loadVersion()
         this.props.loadLocalSettings()

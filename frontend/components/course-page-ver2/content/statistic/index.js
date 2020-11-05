@@ -13,6 +13,7 @@ import {SocialBlock} from "./social-block";
  import GiftButton from "../../../billing/gift-button";
  import BillingBlock from "./billing-block";
  import ReviewButton from "./review-button";
+ import {localSettingsSelector} from "ducks/app";
 
 const FIXED_BLOCK_MARGIN_TOP = 58
 
@@ -40,6 +41,12 @@ class Statistic extends React.Component {
                     })
                 }
 
+                if (this.state.onBottom) {
+                    this.setState({
+                        onBottom: false
+                    })
+                }
+
                 _resetPlayBlockSize()
 
                 return
@@ -55,11 +62,11 @@ class Statistic extends React.Component {
 
             if (!_wrapper || !_wrapper.length) return;
 
-            let _statDivTop = _statDiv.offset().top,
-                _innerDivTop = _wrapper.offset().top,
+            let _statDivTop = _statDiv.offset().top - this.props.localSettings.appWrapperTop,
+                _innerDivTop = _wrapper.offset().top - this.props.localSettings.appWrapperTop,
                 _innerDivHeight = _wrapper.innerHeight(),
                 _divTop = this.state.fixed ? _statDivTop : _innerDivTop,
-                _footerTop = _footer.offset().top
+                _footerTop = _footer.offset().top - this.props.localSettings.appWrapperTop
 
             const _newState = {}
 
@@ -117,8 +124,10 @@ class Statistic extends React.Component {
                 (course.IsPaid && course.IsBought) ||
                 ((!course.IsPaid || course.IsGift) && course.statistics.lessons.finishedLessons || course.statistics.tests.completed)
 
+        const _style = (this.state.fixed && this.props.localSettings.appWrapperTop) ? {top : this.props.localSettings.appWrapperTop} : null
+
         return <div className={"course-page__statistic" + (_isBought ? " _bought" : "")}>
-            <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "") + (this.state.onBottom ? " _bottom" : "")}>
+            <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "") + (this.state.onBottom ? " _bottom" : "")} style={_style}>
                 {
                     _isBought ?
                         <React.Fragment>
@@ -215,6 +224,7 @@ function _setPlayBlockSize() {
 function mapStateToProps(state,) {
     return {
         isAdmin: !!state.user.user && state.user.user.isAdmin,
+        localSettings: localSettingsSelector(state),
     }
 }
 

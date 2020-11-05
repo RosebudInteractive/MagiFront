@@ -7,6 +7,7 @@ import './mobile-button.sass'
 import $ from "jquery";
 import GiftButton from "../../billing/gift-button";
 import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
+import {localSettingsSelector} from "ducks/app";
 
 const REFRESH_INTERVAL = 60 * 1000
 
@@ -33,13 +34,13 @@ class MobileButton extends React.Component {
     }
 
     render() {
-        const {course, cookiesConfirmed} = this.props
+        const {course, localSettings} = this.props
 
         if (!course || !isMobile()) {
             return null
         }
 
-        const _style = cookiesConfirmed ? null : {marginBottom: this._getMarginBottom()}
+        const _style = localSettings.popup.cookiesConfirmed ? null : {marginBottom: this._getMarginBottom()}
 
         const _showPriceButton = course.IsPaid && !course.IsGift && !course.IsBought
 
@@ -137,7 +138,7 @@ const DynamicDiscountDescription = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        cookiesConfirmed: state.app.cookiesConfirmed,
+        localSettings: localSettingsSelector(state),
     }
 }
 
