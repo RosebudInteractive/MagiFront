@@ -87,9 +87,10 @@ class HeaderWrapper extends React.Component {
     _onFullScreenClick() {
         let _wrapper = $(".global-wrapper"),
             _player = $('.js-player'),
+            _wrapperCssTop = +_wrapper.css("top").replace("px", ""),
 
             _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
-            _wrapperOffsetPosition = _wrapper.offset().top,
+            _wrapperOffsetPosition = _wrapper.offset().top - _wrapperCssTop,
             _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
             _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
 

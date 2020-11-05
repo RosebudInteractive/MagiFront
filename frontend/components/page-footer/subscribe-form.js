@@ -41,7 +41,7 @@ let SubscribeForm = class SubscribeForm extends React.Component {
 
         return (
             <div className="subscribe-block">
-                <h4 className="subscribe-block__label">Подписка</h4>
+                <h4 className="subscribe-block__label font-universal__title-smallx">Подписка</h4>
                 <p className="subscribe-block__descr">Оставьте ваш e-mail и мы оповестим вас когда новые лекции появятся
                     на сайте</p>
                 <form className="form subscribe-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>

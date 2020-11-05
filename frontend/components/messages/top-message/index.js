@@ -6,12 +6,14 @@ import StorePopup from "./store-popup";
 import {popupSelector} from "ducks/version";
 import {localSettingsSelector, storePopupClose} from "ducks/app";
 
+const _divRef = React.createRef()
+
 function TopMessage(props) {
 
-    const _divRef = React.createRef()
-
     const _onResize = () => {
-        $(".App.global-wrapper").css("top", _divRef.current.clientHeight + "px")
+        if (_divRef && _divRef.current) {
+            $(".App.global-wrapper").css("top", _divRef.current.clientHeight + "px")
+        }
     }
 
     useEffect(() => {
@@ -20,10 +22,13 @@ function TopMessage(props) {
         return () => {
             $(window).bind("resize", _onResize)
         }
-    }, [])
+    }, [props.config])
 
     return <div className="top-balloon-message" ref={_divRef}>
-        <StorePopup config={props.config.storePopup} onClose={props.actions.storePopupClose} confirmedMode={props.localSettings.popup.storePopupConfirmedMode}/>
+        <StorePopup config={props.config.storePopup}
+                    onClose={props.actions.storePopupClose}
+                    confirmedMode={props.localSettings.popup.storePopupConfirmedMode}
+                    onReady={_onResize}/>
     </div>
 }
 

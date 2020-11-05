@@ -6,12 +6,15 @@
   justify-content: center
   overflow: hidden
 
+  .store-popup__info-block__wrapper
+    flex: 1 1 auto
+    display: flex
+    justify-content: center
+
   &._mobile
     @media (max-width: $mobile-phone-width), (max-height: $mobile-phone-width)
       height: 64px
       .store-popup__close-button
-        order: 0
-
         .balloon-wrapper__close
           margin: 0 10px
 
@@ -33,22 +36,18 @@
       .store-popup__info-block
         &._small
           display: flex
+          flex-basis: auto
         &._big
           display: none
-
-      .store-popup__close-button
-        .balloon-wrapper__close
-          width: 12px
-          height: 12px
-          &:before, &:after
-            width: 12px
 
 
 .store-popup__info-block
   display: flex
-  justify-content: space-between
+  justify-content: space-around
   align-items: center
   padding-left: 10px
+  &._small
+    padding-left: 20px
 
   &._mobile
     flex: 0 1 726px
@@ -99,18 +98,8 @@
         flex-direction: column
         min-height: 90px
 
-    .store-button
-      margin: 0
-      padding: 0
-      border: none
-      height: 40px
-      width: 135px
-
-      img
-        width: 100%
-        height: auto
-
   .store-button__link
+    font-size: 14px
     margin-right: 10px
 
   &._big
@@ -120,7 +109,7 @@
     flex-basis: 345px
 
     .text-block
-      flex-basis: 197px
+      flex-basis: 210px
 
     .buttons-block
       min-width: auto
@@ -129,19 +118,13 @@
       min-height: auto
       flex-basis: 75px
 
-    .store-button
-      width: 20px
-      height: 24px
-      margin-bottom: 2px
-      &:first-child
-        margin-right: auto
-      &:not(:first-child)
-        margin-left: auto
-    .button-border
-      height: 26px
-      border-right: $border-dark-04
-      position: relative
-      top: 3px
+      .store-button
+        width: 32px
+        height: 32px
+        &:first-child
+          margin-right: 12px
+
+
 
 .store-popup__close-button
   display: flex
@@ -151,7 +134,7 @@
   .balloon-wrapper__close
     background: none
     padding: 0
-    margin: 0 0 0 20px
+    margin: 0 20px
 
     &:before, &:after
       background-color: $color-dark-03
@@ -160,8 +143,29 @@
       &:before, &:after
         background-color: $color-dark-06
 
-    @media (max-width: $mobile-phone-width)
-      width: 12px
-      height: 12px
-      &:before, &:after
-        width: 12px
+.store-button
+  outline: none
+  display: flex
+  margin: 0
+  padding: 0
+  border: none
+  height: 40px
+  width: 135px
+
+  img
+    width: 100%
+    height: auto
+
+.store-popup__mobile-logo
+  padding-right: 14px
+  border-right: $border-dark-04
+  margin-right: 19px
+
+  .store-button
+    margin: 0
+    height: auto
+    padding: 1px 0
+    &._apple
+      width: 26.68px
+    &._android
+      width: 29px

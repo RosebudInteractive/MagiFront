@@ -1,99 +1,118 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showFeedbackWindow,} from "../../ducks/message";
+import {showFeedbackWindow,} from "ducks/message";
 import SubscribeForm from './subscribe-form'
 import {Link} from 'react-router-dom';
 import StoreButton, {STORE_BUTTON_TYPE} from "../messages/top-message/store-popup/store-button";
+import "./page-footer.sass"
+import {popupSelector} from "ducks/version";
+import {localSettingsSelector} from "ducks/app";
+import PropTypes from "prop-types";
+import {STORE_POPUP_MODE} from "../../constants/common-consts";
 
-class PageFooter extends React.Component {
-
-    render() {
-        return (
-            <footer className="page-footer">
-                <Wrapper {...this.props}/>
-                <Copyright/>
-            </footer>
-        )
-    }
+function PageFooter(props) {
+    return <footer className="page-footer">
+        <div className="page-footer__wrapper">
+            <Row showFeedbackWindow={props.showFeedbackWindow}/>
+            <Inner config={props.config.storePopup} confirmedMode={props.localSettings.popup.storePopupConfirmedMode}/>
+        </div>
+        <Copyright/>
+    </footer>
 }
 
-class Wrapper extends React.Component {
 
-    render() {
-        return (
-            <div className="page-footer__wrapper">
-                <Row {...this.props}/>
-                <Inner/>
-            </div>
-        )
-    }
-}
+function Row(props) {
 
-class Row extends React.Component {
+    const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
+        _idea = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#idea"/>',
+        _comment = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#comment"/>';
 
-    render() {
-        const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
-            _idea = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#idea"/>',
-            _comment = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#comment"/>';
-
-        return (
-            <div className="page-footer__row">
-                <a href="#" className="logo-footer">
-                    <svg width="70" height="43" dangerouslySetInnerHTML={{__html: _logoMob}}/>
-                </a>
-                <ul className="footer-actions">
-                    <li>
-                        <a href="http://ideas.magisteria.ru/" target="_blank" rel="nofollow">
-                            <div className="icon">
-                                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _idea}}/>
-                            </div>
-                            <span>Оставьте идею</span>
-                        </a>
-                    </li>
-                    <li>
-                        <div className='footer-actions__item' onClick={::this.props.showFeedbackWindow}>
-                            <div className="icon">
-                                <svg width="22" height="18" dangerouslySetInnerHTML={{__html: _comment}}/>
-                            </div>
-                            <span>Напишите нам</span>
-                        </div>
-                    </li>
-                    <li>
-                        <Link to="/about">
-                            <span>О проекте</span>
-                        </Link>
-                    </li>
-                </ul>
-            </div>
-        )
-    }
-}
-
-class Inner extends React.Component {
-    render() {
-        return (
-            <div className='page-footer__inner'>
-                <div className='page-footer__col'>
-                    <SocialBlock/>
-                </div>
-                <div className='page-footer__col'>
-                    <SubscribeForm/>
-                    <div className="store-buttons-block">
-                        <StoreButton type={STORE_BUTTON_TYPE.APPLE}/>
-                        <StoreButton type={STORE_BUTTON_TYPE.ANDROID}/>
+    return <div className="page-footer__row">
+        <a href="#" className="logo-footer">
+            <svg width="70" height="43" dangerouslySetInnerHTML={{__html: _logoMob}}/>
+        </a>
+        <ul className="footer-actions">
+            <li>
+                <a href="http://ideas.magisteria.ru/" target="_blank" rel="nofollow">
+                    <div className="icon">
+                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _idea}}/>
                     </div>
+                    <span>Оставьте идею</span>
+                </a>
+            </li>
+            <li>
+                <div className='footer-actions__item' onClick={props.showFeedbackWindow}>
+                    <div className="icon">
+                        <svg width="22" height="18" dangerouslySetInnerHTML={{__html: _comment}}/>
+                    </div>
+                    <span>Напишите нам</span>
                 </div>
-            </div>
-        )
-    }
+            </li>
+            <li>
+                <Link to="/about">
+                    <span>О проекте</span>
+                </Link>
+            </li>
+        </ul>
+    </div>
+}
+
+Row.propTypes = {
+    showFeedbackWindow: PropTypes.func
+}
+
+function Inner(props) {
+
+    const {config,} = props
+    const [mode, setMode] = useState(STORE_POPUP_MODE.NONE)
+
+    useEffect(() => {
+        const _mode = (config.ios.visible && config.android.visible) ?
+            STORE_POPUP_MODE.BOTH
+            :
+            (config.ios.visible && !config.android.visible) ?
+                STORE_POPUP_MODE.ONLY_IOS
+                :
+                STORE_POPUP_MODE.NONE
+
+        setMode(_mode)
+    }, [config])
+
+    return <div className={'page-footer__inner' + ((mode !== STORE_POPUP_MODE.NONE) ? " _with-store-buttons" : "")}>
+        <div className='page-footer__col'>
+            <SocialBlock/>
+        </div>
+        <div className='page-footer__col _subscribe-block-wrapper'>
+            <SubscribeForm/>
+            {
+                mode !== STORE_POPUP_MODE.NONE ?
+                    <div className="store-buttons-block">
+                        <div className="font-universal__title-smallx _title">Мобильное приложение</div>
+                        <div className="_buttons">
+                            <StoreButton type={STORE_BUTTON_TYPE.APPLE} link={config.ios.link}/>
+                            <StoreButton type={STORE_BUTTON_TYPE.ANDROID} link={config.android.link}
+                                         disabled={mode !== STORE_POPUP_MODE.BOTH}/>
+                        </div>
+                    </div>
+                    :
+                    null
+            }
+
+        </div>
+    </div>
+}
+
+Inner.propTypes = {
+    confirmedMode: PropTypes.number,
+    config: PropTypes.object,
 }
 
 class SocialBlock extends React.Component {
     render() {
         return (
             <div className="social-block-big">
-                <h4 className="social-block-big__title">Мы в соц. сетях</h4>
+                <h4 className="social-block-big__title font-universal__title-smallx">Мы в соц. сетях</h4>
                 <div className="social-block-big__inner">
                     <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18}
                                 href={'https://www.facebook.com/Magisteria.ru/'}/>
@@ -135,62 +154,6 @@ class SocialLink extends React.Component {
     }
 }
 
-class SubscribeBlock extends React.Component {
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            email: '',
-            name: ' ',
-            lastName: ' ',
-        }
-    }
-
-    _handleSubmit(event) {
-        event.preventDefault();
-
-        if (this._isSendingEnable()) {
-            const data = new FormData(event.target);
-            data.Email = this.state.email;
-            data.Name = this.state.name;
-            data.LastName = this.state.lastName;
-
-            this.props.subscribe(data)
-        }
-    }
-
-    _changeEmail(e) {
-        this.setState({email: e.target.value})
-    }
-
-    _isSendingEnable() {
-        return (this.state.email !== '') && (this.state.name !== '') && (this.state.lastName !== '')
-    }
-
-
-    render() {
-        const _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#next"/>';
-        let _disabledBtn = !this._isSendingEnable()
-
-        return (
-            <div className="subscribe-block">
-                <h4 className="subscribe-block__label">Подписка</h4>
-                <p className="subscribe-block__descr">Оставьте ваш e-mail и мы оповестим вас когда новые лекции появятся
-                    на сайте</p>
-                <form className="form subscribe-form" onSubmit={::this._handleSubmit}>
-                    <div className="subscribe-form__field-wrapper">
-                        <input type="email" id="email" name="email-field" className="subscribe-form__field"
-                               placeholder="E-mail" onChange={::this._changeEmail}/>
-                        <button className={"subscribe-form__submit" + (_disabledBtn ? ' disabled' : '')} type='submit'>
-                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        )
-    }
-}
-
 class Copyright extends React.Component {
     render() {
         return (
@@ -209,10 +172,17 @@ class Copyright extends React.Component {
     }
 }
 
+const mapState2Props = (state) => {
+    return {
+        config: popupSelector(state),
+        localSettings: localSettingsSelector(state)
+    }
+}
+
 function mapDispatchToProps(dispatch) {
     return {
         showFeedbackWindow: bindActionCreators(showFeedbackWindow, dispatch),
     }
 }
 
-export default connect(null, mapDispatchToProps)(PageFooter)
+export default connect(mapState2Props, mapDispatchToProps)(PageFooter)
