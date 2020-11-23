@@ -13,7 +13,7 @@ import * as userActions from "../actions/user-actions";
 
 import $ from 'jquery'
 
-import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
+import {pages, getDomain, getPageUrl,} from 'tools/page-tools';
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
 import {
     enabledPaidCoursesSelector,
@@ -216,7 +216,7 @@ class Main extends React.Component {
         return fetching ?
             <LoadingFrame/>
             :
-            notFound || _needHide ?
+            notFound || _needHide || course.OneLesson ?
                 <NotFoundPage/>
                 :
                 course ?
