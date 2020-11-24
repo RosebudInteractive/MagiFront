@@ -43,6 +43,28 @@
     @media (max-width: $tablet-width)
       display: block
 
+  .lectures-menu__button:hover + .header__tooltip
+    display: block
+
+
+  .sync-switch-button
+    position: relative
+    .header__tooltip
+      position: absolute
+      top: -webkit-calc(100% + 10px)
+      top: calc(100% + 10px)
+      left: 50%
+      -webkit-transform: translateX(-50%)
+      -ms-transform: translateX(-50%)
+      transform: translateX(-50%)
+      width: max-content
+
+      &:after
+        left: 50%
+        -webkit-transform: translateX(-50%)
+        -ms-transform: translateX(-50%)
+        transform: translateX(-50%)
+
 ._dark .header__tooltip
   color: $color-white
   background-color: $color-main-dark

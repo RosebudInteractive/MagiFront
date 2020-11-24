@@ -53,15 +53,21 @@ class SwitchButtons extends React.Component {
         if (!_newType) return null
 
         return (this.props.type === "_dark") ?
-            <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
-                    onClick={::this._toText}>
-                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_TRANSCRIPT}}/>
-            </button>
+            <div className="sync-switch-button">
+                <button className="lectures-menu__fullscreen fullscreen-btn js-adjust lectures-menu__button" type="button"
+                        onClick={::this._toText}>
+                    <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_TRANSCRIPT}}/>
+                </button>
+                <div className="header__tooltip">К транскрипту</div>
+            </div>
             :
-            <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
-                    onClick={::this._toPlayer}>
-                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_PLAYER}}/>
-            </button>
+            <div className="sync-switch-button">
+                <button className="lectures-menu__fullscreen fullscreen-btn js-adjust lectures-menu__button" type="button"
+                        onClick={::this._toPlayer}>
+                    <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_PLAYER}}/>
+                </button>
+                <div className="header__tooltip">К просмотру лекции</div>
+            </div>
     }
 
     _toPlayer() {

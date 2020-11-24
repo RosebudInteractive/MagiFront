@@ -19,9 +19,10 @@ class DiscountButton extends React.Component {
         const {count, active} = this.props
 
         return <div className={"discount-button" + (active ? " _active" : "")} onClick={::this._onButtonClick}>
-            <svg width="14" height="17" dangerouslySetInnerHTML={{__html: DISCOUNT_BUTTON}}/>
-            {!!count && active && <div className="counter">{count}</div>}
-        </div>
+                <svg width="14" height="17" dangerouslySetInnerHTML={{__html: DISCOUNT_BUTTON}}/>
+                {!!count && active && <div className="counter">{count}</div>}
+                <div className="play-block__tooltip">Персональные скидки</div>
+            </div>
     }
 
     _onButtonClick() {
