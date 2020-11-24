@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field, formValueSelector} from 'redux-form';
+import {reduxForm, Field, formValueSelector, getFormValues} from 'redux-form';
 import ButtonsBlock from './buttons-block'
 import Recaptcha from 'react-google-invisible-recaptcha';
 import {connect} from 'react-redux'
 import PasswordValidator from 'password-validator';
-import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton} from './editors'
+import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton, PasswordEditFake} from './editors'
 import Warning from "./warning";
 import {reCaptureSelector} from "ducks/app";
+
+import PasswordEditor from "./password-editor";
 
 let schema = new PasswordValidator();
 schema
@@ -26,15 +28,15 @@ const validate = values => {
     if (!values.username || (values.username.trim() === "")) {
         errors.username = 'Required'
     }
-    if (!values.password1) {
+    if (!(values.password1 && values.password1.realPassword)) {
         errors.password1 = 'Required'
-    } else if (!schema.validate(values.password1)) {
+    } else if (!schema.validate(values.password1.realPassword)) {
         errors.password1 = 'Пароль недостаточно надежен'
     }
-    if (!values.password2) {
+    if (!(values.password2 && values.password2.realPassword)) {
         errors.password2 = 'Required'
     }
-    if (values.password1 !== values.password2) {
+    if (values.password1 && values.password2 && (values.password1.realPassword !== values.password2.realPassword)) {
         errors.password2 = 'Пароли не совпадают'
     }
     return errors
@@ -69,11 +71,11 @@ let SignUpForm = class SignUpForm extends React.Component {
             })
         }
 
-        if (values.login && values.password1) {
+        if (values.login && values.password1 && values.password1.realPassword) {
             this.setState({
                 login: values.login,
                 name: values.username.trim(),
-                password: values.password1,
+                password: values.password1.realPassword,
             })
             this.recaptcha.execute();
         } else {
@@ -107,7 +109,7 @@ let SignUpForm = class SignUpForm extends React.Component {
             <p className="form__error-message js-error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
 
         return (
-            <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
+            <form id={"sign-up-form"} className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)} autoComplete="off">
                 <div className='register-block-wrapper__logo'/>
                 {
                     this.state.screen === screens.email
@@ -128,8 +130,8 @@ let SignUpForm = class SignUpForm extends React.Component {
                         <div className="form register-form">
                             <Field name="login" component={LoginEdit} hidden={true}/>
                             <Field name="username" component={UserNameEdit}/>
-                            <Field name="password1" component={PasswordEdit}/>
-                            <Field name="password2" component={PasswordEdit}/>
+                            <Field name="password1" component={PasswordEditor}/>
+                            <Field name="password2" component={PasswordEditor}/>
                             {_errorText}
                             <Recaptcha
                                 ref={ ref => this.recaptcha = ref }
@@ -139,8 +141,8 @@ let SignUpForm = class SignUpForm extends React.Component {
                             {_captchaError}
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={invalid || loading}
-                                              caption={'Зарегистрироваться'} type={'submit'}/>
+                                <SignUpButton disabled={invalid || loading} type={"submit"}
+                                              caption={'Зарегистрироваться'}/>
                             </div>
                         </div>
                 }
@@ -172,6 +174,7 @@ _SignUpForm = connect(
 function mapStateToProps(state) {
     return {
         reCapture: reCaptureSelector(state),
+        editorValues: getFormValues('SignUpForm')(state),
     }
 }
 
