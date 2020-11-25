@@ -218,6 +218,7 @@ x\:ui{display:none}
 .webix_popup_text{overflow:hidden}
 .webix_popup_controls{border-radius:6px;padding:5px 10px 10px}
 .webix_button,.webix_popup_button{height:30px;line-height:30px;display:inline-block;margin:0 5px;border-radius:6px}
+.webix_button{height:30px;line-height:30px;display:inline-block;margin:0;border-radius:6px}
 .webix_popup_button div{border-radius:6px}
 .webix_popup_button{min-width:100px}
 div.webix_modal_cover{background-color:#000;cursor:default;filter:alpha(opacity=10);opacity:.1;position:fixed;z-index:19999;left:0;top:0;width:100%;height:100%;border:none;zoom:1}
@@ -483,7 +484,7 @@ div.webix_modal_cover{background-color:#000;cursor:default;filter:alpha(opacity=
 .webix_el_button button,.webix_el_button input,.webix_el_toggle button,.webix_el_toggle input,.webixbutton{border-radius:6px;height:100%;width:100%;cursor:pointer;color:#fff;font-size:15px;padding:auto 6px;font-family:'PT Sans',Tahoma;border:1px solid #3498db;border-bottom:1px solid #268fd5;outline:0;-webkit-appearance:none}
 .webix_el_button .webix_img_btn,.webix_el_button .webix_img_btn .webix_img_btn_text,.webix_el_button .webix_img_btn_top,.webix_el_button .webix_img_btn_top .webix_img_btn_text,.webix_el_toggle .webix_img_btn,.webix_el_toggle .webix_img_btn .webix_img_btn_text,.webix_el_toggle .webix_img_btn_top,.webix_el_toggle .webix_img_btn_top .webix_img_btn_text{color:#666}
 .webix_el_button .webix_img_btn,.webix_el_button .webix_img_btn_top,.webix_el_toggle .webix_img_btn,.webix_el_toggle .webix_img_btn_top{border:0}
-.webixbutton,.webixtype_base,.webixtype_next,.webixtype_prev{background:#3498db;color:#fff;font-size:15px;font-family:'PT Sans',Tahoma;outline:0;padding:0;border:0}
+.webixbutton, .webix_button, .webixtype_base,.webixtype_next,.webixtype_prev{background:#3498db;color:#fff;font-size:15px;font-family:'PT Sans',Tahoma;outline:0;padding:0;border:0}
 .webixtype_form{font-size:15px;padding:auto 6px;font-family:'PT Sans',Tahoma;border:1px solid #3498db;outline:0;background:#27ae60;color:#fff;border-color:#27ae60;border-bottom:1px solid #209150;box-shadow:none}
 .webix_el_button .webixtype_danger{background:#ce5545;border:1px solid #ce5545;border-bottom:1px solid #b13e2f;color:#fff}
 .webix_el_button .webix_el_box,.webix_el_toggle .webix_el_box{position:relative}
@@ -1784,3 +1785,4 @@ body.webix_print *{visibility:hidden}
 .webix_view.webix_el_label{box-sizing:border-box}
 .webix_inp_label,.webix_inp_top_label,.webix_label_right{margin-bottom:0}
 .webix_view table{border-collapse:initial}
+.wxi-menu-down:before { content: "\F107"; }

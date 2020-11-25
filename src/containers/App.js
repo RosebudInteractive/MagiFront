@@ -29,7 +29,15 @@ import './app.sass'
 import UserConfirmation from "../components/dialog/confirm";
 import ReviewsPage from "./lists/reviews";
 
+import * as webix from 'webix/webix.js';
+
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+
+        window.webix = webix
+    }
 
     UNSAFE_componentWillMount() {
         this.props.getAppOptions()
