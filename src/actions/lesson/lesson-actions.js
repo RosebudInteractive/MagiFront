@@ -209,7 +209,7 @@ export const setExtLinks = (value) => {
     }
 }
 
-const handleLesson = (lesson) => {
+export const handleLesson = (lesson) => {
     lesson.id = lesson.Id;
     lesson.mainEpisodes = [];
     lesson.suppEpisodes = [];

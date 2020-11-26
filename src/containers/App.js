@@ -28,8 +28,9 @@ import * as appActions from '../actions/app-actions'
 import './app.sass'
 import UserConfirmation from "../components/dialog/confirm";
 import ReviewsPage from "./lists/reviews";
-
 import * as webix from 'webix/webix.js';
+import TranscriptEditor from "./editors/transcript-editor";
+import "../tools/player-notifier"
 
 class App extends Component {
 
@@ -112,6 +113,8 @@ class App extends Component {
                                    component={SubLessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:id'}
                                    component={LessonEditor}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/transcript/:lessonId'}
+                                   component={TranscriptEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/lessons/new'}
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/tests/edit/:testId'}

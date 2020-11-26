@@ -1,0 +1,101 @@
+@import "../../../styles/variables"
+
+.player__ext-layer
+  position: absolute
+  width: 100%
+  z-index: 1
+  bottom: 0
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-orient: vertical
+  -webkit-box-direction: normal
+  -webkit-flex-direction: column
+  -moz-box-orient: vertical
+  -moz-box-direction: normal
+  -ms-flex-direction: column
+  max-height: 500px
+  flex-direction: column
+  /* height: calc(100vh - 54px) */
+  /* height: -webkit-calc(100vh - 54px) */
+  padding-top: 48px
+  background: -webkit-linear-gradient(top, rgba(47,47,47,0) 0%,rgba(47,47,47,1) 43%,rgba(47,47,47,1) 100%)
+  background: linear-gradient(to bottom, rgba(47,47,47,0) 0%,rgba(47,47,47,1) 43%,rgba(47,47,47,1) 100%)
+
+.player__controls-block
+  //z-index: 1
+  //position: absolute
+  box-sizing: border-box
+  width: 100%
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-orient: vertical
+  -webkit-box-direction: normal
+  -webkit-flex-direction: column
+  -moz-box-orient: vertical
+  -moz-box-direction: normal
+  -ms-flex-direction: column
+  flex-direction: column
+  padding: 0 18px 10px 18px
+  min-height: 40px
+  pointer-events: initial
+
+.player__controls-block__buttons-row
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-align: center
+  -webkit-align-items: center
+  -moz-box-align: center
+  -ms-flex-align: center
+  align-items: center
+
+  .control-button
+    padding: 0
+    background-color: rgba(255, 255, 255, 0)
+    border: none
+    outline: none
+    -webkit-transition: opacity 0.3s ease
+    transition: opacity 0.3s ease
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-pack: center
+    -webkit-justify-content: center
+    -moz-box-pack: center
+    -ms-flex-pack: center
+    justify-content: center
+    -webkit-box-align: center
+    -webkit-align-items: center
+    -moz-box-align: center
+    -ms-flex-align: center
+    align-items: center
+    width: 40px
+    height: 30px
+    cursor: pointer
+
+    svg
+      fill: $color-white
+      
+.player__controls-block__stats
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-align: center
+  -webkit-align-items: center
+  -moz-box-align: center
+  -ms-flex-align: center
+  align-items: center
+  margin-left: auto
+  

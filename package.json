@@ -113,6 +113,7 @@
     "react-router-redux": "^4.0.8",
     "react-router-scroll-memory": "^1.0.2",
     "react-share": "^2.3.1",
+    "react-splitter-layout": "^4.0.0",
     "react-swipe": "^5.1.1",
     "react-swipeable": "^4.2.1",
     "react-tabs-redux": "^2.0.1",

@@ -1,0 +1,197 @@
+@import "../styles/variables.sass"
+
+.text-block
+  .text-block__label
+    margin: 24px 0 0 20px
+
+  .text-block__headline
+    margin: 22px 0 45px
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-align: start
+    -webkit-align-items: flex-start
+    -moz-box-align: start
+    -ms-flex-align: start
+    align-items: flex-start
+    @media (max-width: $tablet-width)
+      display: block
+      margin-bottom: 24px
+    @media print
+      text-indent: 0 !important
+
+    .number
+      text-align: right
+      text-align: -webkit-right
+      margin-left: -105px
+      -webkit-box-sizing: border-box
+      -moz-box-sizing: border-box
+      box-sizing: border-box
+      padding-right: 8px
+      min-width: 105px
+      font-family: "Fira Sans", Arial, sans-serif
+      font-size: 55px
+      line-height: 60px
+      color: $color-orange
+      font-variant-numeric: oldstyle-nums
+      -moz-font-feature-settings: 'onum'
+      -webkit-font-feature-settings: 'onum'
+      font-feature-settings: 'onum' on
+      @media (max-width: $tablet-width)
+        margin-left: 0
+        width: auto
+        font-size: 30px
+        line-height: 30px
+      @media print
+        margin-left: 0 !important
+        padding-right: 0 !important
+        min-width: auto !important
+
+  .text-block__content
+    h2
+      margin: 0 0 20px 0
+      font-family: "Fira Sans", Arial, sans-serif
+      font-weight: 400
+      font-size: 30px
+      line-height: 32px
+    p
+      font-family: "PT Serif", serif
+      margin: 0 0 26px 0
+      font-size: 20px
+      line-height: 29px
+      -webkit-font-smoothing: antialiased
+      color: $color-main-dark
+
+  .text-intro:first-letter
+    float: left
+    width: auto
+    margin-right: 7px
+    font-family: "Fira Sans", Arial, sans-serif
+    font-weight: 400
+    font-size: 61px
+    line-height: 58px
+    color: $color-orange
+    @media (max-width: 1023px)
+      margin-top: 3px
+      font-size: 43px
+      line-height: 35px
+
+  .content-block
+    display: flex
+
+  .text-container
+    display: flex
+
+  .white-block
+    position: relative
+    align-self: stretch
+    @media(max-width: 599px)
+      display: none
+    &._ended
+      align-self: flex-end
+
+  .left-block
+    padding-left: 14px
+    padding-top: 90px
+    @media (max-width: $tablet-width)
+      padding-left: 9px
+
+  .text-block__wrapper
+    margin: 0
+    flex: 1 0 750px
+    @media(max-width: 1500px)
+      flex-shrink: 1
+
+  .fixed-container
+    position: relative
+    width: inherit
+    &._fixed
+      position: fixed
+      top: 0
+      margin-top: 78px
+
+  &._only-text
+    .white-block
+      flex: 0 1 33.3%
+
+  &._with-assets
+    .left-block
+      flex: 0 0 18.75%
+      width: 18.75%
+      @media(max-width: $tablet-width)
+        flex: 0 1 33.3%
+        width: inherit
+      .fixed-container
+        &._fixed
+          left: 0
+          padding-left: 14px
+          @media (max-width: $tablet-width)
+            padding-left: 9px
+
+    .right-block
+      top: -58px
+      flex: 1 1 31.25%
+      padding: 9px 20px 0 30px
+      flex-direction: column
+      @media(max-width: $tablet-width)
+        flex: 0 1 33.3%
+        width: inherit
+        padding: 0
+      &._fixed
+        padding-top: 0
+      .fixed-container
+        @media(max-width: $tablet-width)
+          width: auto !important
+        &._fixed
+          //right: 20px
+          right: inherit
+          top: 0
+      &._ended
+        top: 156px
+
+
+  .play-btn
+    position: relative
+    top: 0
+    left: 0
+    right: auto
+    margin: 0 0 131px 11px
+
+  .social-block-vertical
+    width: fit-content
+    padding: 0
+    position: relative
+    left: 0
+
+  .social-button-wrapper
+    width: fit-content
+
+
+  @media (max-width: 1023px)
+    .play-block,
+    .play-block__image-wrapper,
+    .play-block__loader,
+    .play-block__loader:after
+      width: 80px
+      height: 80px
+
+    .play-block
+      min-width: 80px
+      .svg-loader
+        width: 80px
+      height: 80px
+      .lecture__btn svg
+        width: 22px
+        height: 22px
+
+    //.left-block
+      .fixed-container
+        padding-top: 67px
+
+
+
+
+
+

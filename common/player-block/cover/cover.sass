@@ -1,0 +1,93 @@
+@import "../../styles/variables.sass"
+
+.cover-block
+  top: 0
+  left: 0
+  position: absolute
+  height: 100%
+  width: 100%
+  background-size: cover
+  background-position: center top
+  display: flex
+  flex-direction: column
+  justify-content: flex-end
+  padding-left: 86px
+  padding-bottom: 72px
+  box-sizing: border-box
+  @media (max-width: $tablet-width)
+    padding: 0 60px 20px
+  @media (max-width: $mobile-phone-width)
+    padding: 0 20px 20px
+  .lesson-info-frame
+    position: relative
+    width: 100%
+
+
+  .lecture-frame__title
+    .number
+      font-variant-numeric: oldstyle-nums
+      -webkit-font-feature-settings: 'onum' on
+      -moz-font-feature-settings: 'onum' on
+      font-feature-settings: 'onum' on
+
+    .title-paragraph
+      text-indent: 88px
+      @media (max-width: $tablet-width)
+        text-indent: 48px
+
+
+  .lecture-frame__duration
+    position: relative
+    top: -45px
+    left: 0
+    @media (max-width: $tablet-width)
+      top: -15px
+
+  .lecture-frame__descr
+    display: inline
+    margin: 0
+    padding-right: 8px
+
+  .lecture-frame__author
+    margin: 0
+    font-weight: bold
+    border-bottom: $border-hidden-link
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+    white-space: nowrap
+    display: inline-block
+    &:hover
+      border-bottom: $border-white-06
+
+  .player-button
+    &._play
+      //position: relative
+      padding: 0
+      background-color: rgba(255, 255, 255, 0)
+      border: none
+      outline: none
+      -webkit-transition: opacity 0.3s ease
+      transition: opacity 0.3s ease
+      font-size: 0
+      width: 102px
+      height: 90px
+      position: absolute
+      top: 2px
+      left: 0
+      margin: 0 auto
+      @media (max-width: $tablet-width)
+        width: 47px
+        height: 41px
+        top: 13px
+      &:after
+        content: ""
+        position: absolute
+        top: 0
+        left: 0
+        width: 0
+        height: 0
+        border-style: solid
+        border-width: 45px 0 45px 102px
+        border-color: transparent transparent transparent rgba(255, 255, 255, 0.4)
+        @media (max-width: $tablet-width)
+          border-width: 20.5px 0 20.5px 47px

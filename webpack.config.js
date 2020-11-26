@@ -122,6 +122,8 @@ const _prodConfig = {
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
             'actions': path.resolve(__dirname, 'frontend/actions'),
             'tools': path.resolve(__dirname, 'frontend/tools'),
+            'common-tools': path.resolve(__dirname, 'common/tools'),
+            'common-styles': path.resolve(__dirname, 'common/styles'),
         }
     },
     resolveLoader: {
@@ -250,6 +252,8 @@ const _devConfig = {
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
             'actions': path.resolve(__dirname, 'frontend/actions'),
             'tools': path.resolve(__dirname, 'frontend/tools'),
+            'common-tools': path.resolve(__dirname, 'common/tools'),
+            'common-styles': path.resolve(__dirname, 'common/styles'),
         }
     },
     resolveLoader: {

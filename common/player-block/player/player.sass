@@ -1,0 +1,21 @@
+@import "~common-styles/variables.sass"
+
+.player-frame
+  top: 0
+  left: 0
+  position: absolute
+  background: $color-main-dark
+  height: 100%
+  width: 100%
+  box-sizing: border-box
+  //position: relative
+  &._hidden
+    opacity: 0
+    z-index: -100
+    visibility: hidden
+    display: none
+
+.player-frame__poster
+  padding-top: 8px
+  height: calc(100% - 130px) !important
+  width: 100%

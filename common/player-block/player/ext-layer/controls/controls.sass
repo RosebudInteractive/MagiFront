@@ -1,0 +1,68 @@
+@import "../../../../styles/variables"
+
+.player__controls-block__buttons
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-align: center
+  -webkit-align-items: center
+  -moz-box-align: center
+  -ms-flex-align: center
+  align-items: center
+  margin-right: auto
+  max-height: 40px
+  opacity: 1
+  overflow: hidden
+  -webkit-transition: max-height 0.3s ease, opacity 0.3s ease
+  transition: max-height 0.3s ease, opacity 0.3s ease
+
+  .sound-control
+    position: relative
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-orient: vertical
+    -webkit-box-direction: normal
+    -webkit-flex-direction: column
+    -moz-box-orient: vertical
+    -moz-box-direction: normal
+    -ms-flex-direction: column
+    flex-direction: column
+    -webkit-box-pack: center
+    -webkit-justify-content: center
+    -moz-box-pack: center
+    -ms-flex-pack: center
+    justify-content: center
+    width: 100px
+    height: 16px
+    cursor: pointer
+
+  .sound-control__progress
+    position: absolute
+    top: 0
+    left: 0
+    height: 4px
+    background-color: #c8684c
+
+  .sound-control__bar
+    position: relative
+    height: 4px
+    background-color: rgba(255, 255, 255, 0.3)
+    
+  .sound-control__btn
+    padding: 0
+    border: none
+    outline: none
+    position: absolute
+    top: 50%
+    -webkit-transform: translateY(-50%)
+    -ms-transform: translateY(-50%)
+    transform: translateY(-50%)
+    width: 4px
+    height: 16px
+    font-size: 0
+    background-color: $color-white
