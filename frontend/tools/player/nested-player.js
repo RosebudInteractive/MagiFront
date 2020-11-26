@@ -12,6 +12,7 @@ import {CONTENT_TYPE} from "../../constants/common-consts";
 import VideoWrapper from './video-player-wrapper'
 
 let _instance = null;
+let _notifier = null
 
 let Utils = {};
 
@@ -250,12 +251,14 @@ class NestedPlayer {
                             this.setVolume(_state.volume)
                         } else {
                             store.dispatch(playerActions.setVolume(_audioState.volume))
+                            if (_notifier) _notifier.setVolume(_audioState.volume)
                         }
                     }
                 })
                 .catch((e) => {
                     console.log(e)
                     store.dispatch(playerActions.canNotPlay())
+                    if (_notifier) {_notifier.canNotPlay()}
                 })
 
             this._hasStoppedOnSwitch = false;
@@ -269,6 +272,7 @@ class NestedPlayer {
             this.player.pause()
                 .then(() => {
                     store.dispatch(playerActions.stop())
+                    if (_notifier) _notifier.stop()
                     // this.player = null;
                     // this.clearPlayInfo();
                     this._stopped = true;
@@ -287,6 +291,7 @@ class NestedPlayer {
 
         if (!this._videoMode) {
             store.dispatch(playerActions.setRate(this.audioState.playbackRate))
+            if (_notifier) _notifier.setRate(this.audioState.playbackRate)
         }
     }
 
@@ -296,6 +301,7 @@ class NestedPlayer {
         } else {
             this.player.setMute(true);
             store.dispatch(playerActions.setMuteState(this.audioState.muted))
+            if (_notifier) _notifier.setMute(this.audioState.muted)
         }
     }
 
@@ -305,6 +311,7 @@ class NestedPlayer {
         } else {
             this.player.setMute(false);
             store.dispatch(playerActions.setMuteState(this.audioState.muted))
+            if (_notifier) _notifier.setMute(this.audioState.muted)
         }
     }
 
@@ -368,6 +375,7 @@ class NestedPlayer {
         }
 
         store.dispatch(playerActions.setContentArray(content))
+        if (_notifier) _notifier.setContentArray(content)
     }
 
     _setCurrentTime(value) {
@@ -375,6 +383,7 @@ class NestedPlayer {
         if ((_delta > 0.5) || (_delta < 0)) {
             this._currentTime = value;
             store.dispatch(playerActions.setCurrentTime(value))
+            if (_notifier) _notifier.setCurrentTime(value)
         }
     }
 
@@ -395,6 +404,10 @@ class NestedPlayer {
 
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
+                if (_notifier) {
+                    _notifier.setMute(_state.muted)
+                    _notifier.setRate(_state.playbackRate)
+                }
             },
             onCurrentTimeChanged: (e, isRealTimeChanged) => {
                 if (!isRealTimeChanged) return
@@ -407,6 +420,7 @@ class NestedPlayer {
             },
             onVolumeChanged: (value) => {
                 store.dispatch(playerActions.setVolume(value))
+                if (_notifier) _notifier.setVolume(value)
             },
             onChangeTitles: function (titles) {
                 let _title = '',
@@ -432,6 +446,7 @@ class NestedPlayer {
                 }
 
                 store.dispatch(playerActions.setTitle(_result))
+                if (_notifier) _notifier.setTitle(_result)
             },
             onChangeContent: (content) => {
                 if (that._onChangeContent) {
@@ -439,6 +454,7 @@ class NestedPlayer {
                 }
 
                 store.dispatch(playerActions.setCurrentContent(content))
+                if (_notifier) _notifier.setCurrentContent(content)
             },
             onAudioInitialized: () => {
                 let _state = that.player._audioState;
@@ -457,6 +473,10 @@ class NestedPlayer {
                 store.dispatch(playerActions.setRate(_state.playbackRate))
 
                 // that._setCurrentTime(_state.currentTime)
+                if (_notifier) {
+                    _notifier.setMute(_state.muted)
+                    _notifier.setRate(_state.playbackRate)
+                }
 
                 that._hasStoppedOnSwitch = false
             },
@@ -476,21 +496,30 @@ class NestedPlayer {
 
                     store.dispatch(playerActions.setMuteState(_state.muted))
                     store.dispatch(playerActions.setRate(_state.playbackRate))
+                    if (_notifier) {
+                        _notifier.setMute(_state.muted)
+                        _notifier.setRate(_state.playbackRate)
+                    }
                 }
             },
             onPaused: () => {
                 store.dispatch(playerActions.pause())
+                if (_notifier) _notifier.pause()
             },
             onStarted: () => {
                 store.dispatch(playerActions.play())
+                if (_notifier) _notifier.play()
             },
             onEnded: () => {
                 store.dispatch(playerActions.end())
+                if (_notifier) _notifier.end()
             },
             onBuffered: (value) => {
                 store.dispatch(playerActions.setBufferedTime(value))
+                if (_notifier) _notifier.setBufferedTime(value)
             },
             onError: (e) => {
+                if (_notifier) _notifier.error(e)
                 console.log(e)
             }
         };
@@ -627,4 +656,8 @@ export const clearFullViewPort = (div) => {
     if (_instance) {
         _instance.clearFullViewPort(div)
     }
+}
+
+export const setNotifier = (notifier) => {
+    _notifier = notifier
 }
