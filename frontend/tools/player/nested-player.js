@@ -250,15 +250,22 @@ class NestedPlayer {
                         if (_state.volume !== undefined) {
                             this.setVolume(_state.volume)
                         } else {
-                            store.dispatch(playerActions.setVolume(_audioState.volume))
-                            if (_notifier) _notifier.setVolume(_audioState.volume)
+                            if (_notifier) {
+                                _notifier.setVolume(_audioState.volume)
+                            } else {
+                                store.dispatch(playerActions.setVolume(_audioState.volume))
+                            }
                         }
                     }
                 })
                 .catch((e) => {
                     console.log(e)
-                    store.dispatch(playerActions.canNotPlay())
-                    if (_notifier) {_notifier.canNotPlay()}
+
+                    if (_notifier) {
+                        _notifier.canNotPlay()
+                    } else {
+                        store.dispatch(playerActions.canNotPlay())
+                    }
                 })
 
             this._hasStoppedOnSwitch = false;
@@ -271,10 +278,11 @@ class NestedPlayer {
         } else {
             this.player.pause()
                 .then(() => {
-                    store.dispatch(playerActions.stop())
-                    if (_notifier) _notifier.stop()
-                    // this.player = null;
-                    // this.clearPlayInfo();
+                    if (_notifier) {
+                        _notifier.stop()
+                    } else {
+                        store.dispatch(playerActions.stop())
+                    }
                     this._stopped = true;
                 })
             this._hasStoppedOnSwitch = false;
@@ -290,8 +298,11 @@ class NestedPlayer {
         this.player.setRate(value)
 
         if (!this._videoMode) {
-            store.dispatch(playerActions.setRate(this.audioState.playbackRate))
-            if (_notifier) _notifier.setRate(this.audioState.playbackRate)
+            if (_notifier) {
+                _notifier.setRate(this.audioState.playbackRate)
+            } else {
+                store.dispatch(playerActions.setRate(this.audioState.playbackRate))
+            }
         }
     }
 
@@ -300,8 +311,11 @@ class NestedPlayer {
             this.player.mute()
         } else {
             this.player.setMute(true);
-            store.dispatch(playerActions.setMuteState(this.audioState.muted))
-            if (_notifier) _notifier.setMute(this.audioState.muted)
+            if (_notifier) {
+                _notifier.setMute(this.audioState.muted)
+            } else {
+                store.dispatch(playerActions.setMuteState(this.audioState.muted))
+            }
         }
     }
 
@@ -310,15 +324,17 @@ class NestedPlayer {
             this.player.unMute()
         } else {
             this.player.setMute(false);
-            store.dispatch(playerActions.setMuteState(this.audioState.muted))
-            if (_notifier) _notifier.setMute(this.audioState.muted)
+
+            if (_notifier) {
+                _notifier.setMute(this.audioState.muted)
+            } else {
+                store.dispatch(playerActions.setMuteState(this.audioState.muted))
+            }
         }
     }
 
     setVolume(value) {
         this.player.setVolume(value);
-        // store.dispatch(playerActions.setVolume(value))
-        // store.dispatch(playerActions.setVolume(this.audioState.volume))
     }
 
     _cancelStarting(){
@@ -374,16 +390,22 @@ class NestedPlayer {
             this._onRenderContent(content);
         }
 
-        store.dispatch(playerActions.setContentArray(content))
-        if (_notifier) _notifier.setContentArray(content)
+        if (_notifier) {
+            _notifier.setContentArray(content)
+        } else {
+            store.dispatch(playerActions.setContentArray(content))
+        }
     }
 
     _setCurrentTime(value) {
         let _delta = value - this._currentTime;
         if ((_delta > 0.5) || (_delta < 0)) {
             this._currentTime = value;
-            store.dispatch(playerActions.setCurrentTime(value))
-            if (_notifier) _notifier.setCurrentTime(value)
+            if (_notifier) {
+                _notifier.setCurrentTime(value)
+            } else {
+                store.dispatch(playerActions.setCurrentTime(value))
+            }
         }
     }
 
@@ -402,11 +424,12 @@ class NestedPlayer {
                     }
                 }
 
-                store.dispatch(playerActions.setMuteState(_state.muted))
-                store.dispatch(playerActions.setRate(_state.playbackRate))
                 if (_notifier) {
                     _notifier.setMute(_state.muted)
                     _notifier.setRate(_state.playbackRate)
+                } else {
+                    store.dispatch(playerActions.setMuteState(_state.muted))
+                    store.dispatch(playerActions.setRate(_state.playbackRate))
                 }
             },
             onCurrentTimeChanged: (e, isRealTimeChanged) => {
@@ -419,8 +442,11 @@ class NestedPlayer {
                 that._setCurrentTime(e.globalTime)
             },
             onVolumeChanged: (value) => {
-                store.dispatch(playerActions.setVolume(value))
-                if (_notifier) _notifier.setVolume(value)
+                if (_notifier) {
+                    _notifier.setVolume(value)
+                } else {
+                    store.dispatch(playerActions.setVolume(value))
+                }
             },
             onChangeTitles: function (titles) {
                 let _title = '',
@@ -445,16 +471,22 @@ class NestedPlayer {
                     that._onChangeTitle(_result)
                 }
 
-                store.dispatch(playerActions.setTitle(_result))
-                if (_notifier) _notifier.setTitle(_result)
+                if (_notifier) {
+                    _notifier.setTitle(_result)
+                } else {
+                    store.dispatch(playerActions.setTitle(_result))
+                }
             },
             onChangeContent: (content) => {
                 if (that._onChangeContent) {
                     that._onChangeContent(content)
                 }
 
-                store.dispatch(playerActions.setCurrentContent(content))
-                if (_notifier) _notifier.setCurrentContent(content)
+                if (_notifier) {
+                    _notifier.setCurrentContent(content)
+                } else {
+                    store.dispatch(playerActions.setCurrentContent(content))
+                }
             },
             onAudioInitialized: () => {
                 let _state = that.player._audioState;
@@ -469,13 +501,12 @@ class NestedPlayer {
                     })
                 }
 
-                store.dispatch(playerActions.setMuteState(_state.muted))
-                store.dispatch(playerActions.setRate(_state.playbackRate))
-
-                // that._setCurrentTime(_state.currentTime)
                 if (_notifier) {
                     _notifier.setMute(_state.muted)
                     _notifier.setRate(_state.playbackRate)
+                } else {
+                    store.dispatch(playerActions.setMuteState(_state.muted))
+                    store.dispatch(playerActions.setRate(_state.playbackRate))
                 }
 
                 that._hasStoppedOnSwitch = false
@@ -493,30 +524,42 @@ class NestedPlayer {
                         }
                     }
 
-
-                    store.dispatch(playerActions.setMuteState(_state.muted))
-                    store.dispatch(playerActions.setRate(_state.playbackRate))
                     if (_notifier) {
                         _notifier.setMute(_state.muted)
                         _notifier.setRate(_state.playbackRate)
+                    } else {
+                        store.dispatch(playerActions.setMuteState(_state.muted))
+                        store.dispatch(playerActions.setRate(_state.playbackRate))
                     }
                 }
             },
             onPaused: () => {
-                store.dispatch(playerActions.pause())
-                if (_notifier) _notifier.pause()
+                if (_notifier) {
+                    _notifier.pause()
+                } else {
+                    store.dispatch(playerActions.pause())
+                }
             },
             onStarted: () => {
-                store.dispatch(playerActions.play())
-                if (_notifier) _notifier.play()
+                if (_notifier) {
+                    _notifier.play()
+                } else {
+                    store.dispatch(playerActions.play())
+                }
             },
             onEnded: () => {
-                store.dispatch(playerActions.end())
-                if (_notifier) _notifier.end()
+                if (_notifier) {
+                    _notifier.end()
+                } else {
+                    store.dispatch(playerActions.end())
+                }
             },
             onBuffered: (value) => {
-                store.dispatch(playerActions.setBufferedTime(value))
-                if (_notifier) _notifier.setBufferedTime(value)
+                if (_notifier) {
+                    _notifier.setBufferedTime(value)
+                } else {
+                    store.dispatch(playerActions.setBufferedTime(value))
+                }
             },
             onError: (e) => {
                 if (_notifier) _notifier.error(e)

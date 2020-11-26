@@ -426,6 +426,9 @@ html,
     grid-template-rows: 60px 1fr;
     flex-direction: row;
     height: 100%;
+    display: -ms-grid;
+    -ms-grid-columns: 15% 1fr;
+    -ms-grid-rows: 60px 1fr;
 }
 
 .app div {
@@ -434,6 +437,8 @@ html,
 
 .app .left {
     grid-area: nav;
+    -ms-grid-column: 1;
+    -ms-grid-row-span: 2;
 }
 
 .app .tollbar {
@@ -481,11 +486,15 @@ html,
     grid-area: head;
     background-color: #4f5a6e;
     display: flex;
+    -ms-grid-column: 2;
+    -ms-grid-row: 1;
 }
 
 .app .main-area {
     grid-area: main;
     position: relative;
+    -ms-grid-column: 2;
+    -ms-grid-row: 2;
 }
 
 .app .tab-scroll-box {
