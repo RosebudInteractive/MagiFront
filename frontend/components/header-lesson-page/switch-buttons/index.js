@@ -58,7 +58,7 @@ class SwitchButtons extends React.Component {
                         onClick={::this._toText}>
                     <svg width="24" height="24" dangerouslySetInnerHTML={{__html: SVG.TO_TRANSCRIPT}}/>
                 </button>
-                <div className="header__tooltip">К транскрипту</div>
+                <div className="header__tooltip">К чтению лекции</div>
             </div>
             :
             <div className="sync-switch-button">
