@@ -187,10 +187,18 @@ class LessonEditorForm extends React.Component {
                 </div>
             </div>
             <div className="editor__footer">
+                <button className={"adm__button bottom-controls__button transcript-button"}
+                        onClick={::this._openTranscript}>Транскрипт</button>
                 <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
                                 onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
             </div>
         </React.Fragment>
+    }
+
+    _openTranscript() {
+        let _newRout = `/adm/courses/edit/${this.props.course.id}/lessons/transcript/${this.props.lesson.id}`;
+        window.open(_newRout)
+        // history.push(_newRout);
     }
 
     _switchTo(tabName) {
@@ -428,7 +436,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({resetReduxForm: reset, showErrorDialog, cancelChanges, setExtLinks, setFixedLesson, save, setActiveTab}, dispatch);
+    return bindActionCreators({resetReduxForm: reset, showErrorDialog, cancelChanges, setExtLinks, setFixedLesson, save, setActiveTab,}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LessonEditorWrapper)

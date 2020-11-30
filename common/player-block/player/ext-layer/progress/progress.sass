@@ -1,0 +1,56 @@
+@import "../../../../styles/variables"
+
+.player-block__progress
+  position: relative
+  margin-bottom: 6px
+  width: 100%
+  height: 15px
+  cursor: pointer
+  &:hover
+    .player-block__time
+      opacity: 1
+  
+.player-block__timeline
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  margin-top: 5px
+  height: 5px
+  background-color: rgba(255, 255, 255, 0.3)
+  
+.player-block__load 
+  position: absolute
+  top: 0
+  left: 0
+  margin-top: 5px
+  height: 5px
+  background-color: rgba(255, 255, 255, 0.3)
+  
+.player-block__play 
+  text-align: right
+  position: absolute
+  top: 0
+  left: 0
+  margin-top: 5px
+  height: 5px
+  background-color: $color-orange
+  
+.player-block__gap
+  position: absolute
+  top: 0
+  width: 1px
+  margin-top: 5px
+  height: 5px
+  background-color: $color-main-dark
+  
+.player-block__time
+  position: absolute
+  top: -18px
+  font-family: "Fira Sans", Arial, sans-serif
+  font-size: 14px
+  line-height: 16px
+  color: $color-white
+  opacity: 0
+  -webkit-transition: opacity 0.3s ease
+  transition: opacity 0.3s ease

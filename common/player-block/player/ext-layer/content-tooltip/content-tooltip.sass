@@ -1,0 +1,220 @@
+@import "../../../../styles/variables"
+
+.contents-tooltip
+  position: absolute
+  right: 18px
+  bottom: 72px
+  padding: 0 0 0 16px
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+  box-sizing: border-box
+  width: 320px
+  font-family: "Fira Sans", Arial, sans-serif
+  font-size: 14px
+  line-height: 20px
+  color: $color-white
+  background-color: $color-main-dark
+  -webkit-box-shadow: 2px 0 10px 3px rgba(0, 0, 0, 0.4)
+  box-shadow: 2px 0 10px 3px rgba(0, 0, 0, 0.4)
+  -webkit-transition: opacity 0.3s ease
+  transition: opacity 0.3s ease
+
+  &:before 
+    content: ""
+    position: absolute
+    width: 18px
+    height: 18px
+    background-color: $color-main-dark
+    bottom: -9px
+    right: 11px
+    -webkit-transform: rotate(45deg)
+    -ms-transform: rotate(45deg)
+    transform: rotate(45deg)
+    -webkit-box-shadow: 2px 0 10px 3px rgba(0, 0, 0, 0.3)
+    box-shadow: 2px 0 10px 3px rgba(0, 0, 0, 0.3)
+    
+  &:after
+    content: ""
+    position: absolute
+    bottom: 0
+    left: 0
+    right: 0
+    height: 20px
+    background-color: $color-main-dark
+    
+.contents-tooltip__header 
+  margin-right: 16px
+  padding-top: 14px
+  padding-bottom: 8px
+  border-bottom: $border-white-02
+  
+.contents-tooltip__body 
+  margin: 0
+  padding: 0
+  height: 310px
+  list-style: none
+  counter-reset: li
+  
+  li 
+    position: relative
+    margin-bottom: 16px
+    padding-left: 30px
+    padding-right: 32px
+    line-height: 18px
+
+    &:before
+      content: counter(li) "."
+      counter-increment: li
+      position: absolute
+      left: 14px
+      -webkit-transform: translateX(-50%)
+      -ms-transform: translateX(-50%)
+      transform: translateX(-50%)
+      top: 0
+      font-family: "Fira Sans", Arial, sans-serif
+      font-size: 14px
+      line-height: 20px
+      color: rgba(255, 255, 255, 0.6)
+
+    &:first-child
+      padding-top: 24px
+      .equalizer
+        top: 24px
+
+      &:before
+        top: 24px
+        
+  .equalizer
+    top: 2px
+    position: absolute
+    right: 18px
+    -webkit-box-align: center
+    -webkit-align-items: center
+    -moz-box-align: center
+    -ms-flex-align: center
+    align-items: center
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    height: 14px
+    -webkit-box-pack: justify
+    -webkit-justify-content: space-between
+    -moz-box-pack: justify
+    -ms-flex-pack: justify
+    justify-content: space-between
+    overflow: hidden
+    width: 14px
+
+    &.paused div
+      -webkit-animation: none
+      animation: none
+
+    div 
+      background: $color-orange
+      height: 100%
+      width: 2px
+      animation-name: eq-animation
+      animation-timing-function: linear
+      animation-iteration-count: infinite
+      animation-direction: alternate
+      animation-duration: 0.3s
+      -webkit-animation: equalize 2s infinite
+      animation: equalize 2s infinite
+
+      &:nth-child(1)
+        -webkit-animation-delay: -1.2s
+        animation-delay: -1.2s
+
+      &:nth-child(2)
+        -webkit-animation-delay: -5.2s
+        animation-delay: -5.2s
+
+      &:nth-child(3)
+        -webkit-animation-delay: -4.9s
+        animation-delay: -4.9s
+
+      &:nth-child(4)
+        -webkit-animation-delay: -5.6s
+        animation-delay: -5.6s
+
+      &:nth-child(5)
+        -webkit-animation-delay: -1.2s
+        animation-delay: -1.2s
+
+.contents-tooltip_item
+  cursor: pointer
+
+
+@keyframes eq-animation
+  0%
+    transform: translateY(100%)
+  100%
+    transform: translateY(0)
+
+@-webkit-keyframes equalize
+  0%, 100% 
+    -webkit-clip-path: inset(17% 0 0 0)
+    clip-path: inset(17% 0 0 0)
+  10% 
+    -webkit-clip-path: inset(65% 0 0 0)
+    clip-path: inset(65% 0 0 0)
+  20% 
+    -webkit-clip-path: inset(6% 0 0 0)
+    clip-path: inset(6% 0 0 0)
+  30% 
+    -webkit-clip-path: inset(67% 0 0 0)
+    clip-path: inset(67% 0 0 0)
+  40% 
+    -webkit-clip-path: inset(9% 0 0 0)
+    clip-path: inset(9% 0 0 0)
+  50% 
+    -webkit-clip-path: inset(32% 0 0 0)
+    clip-path: inset(32% 0 0 0)
+  60% 
+    -webkit-clip-path: inset(80% 0 0 0)
+    clip-path: inset(80% 0 0 0)
+  70% 
+    -webkit-clip-path: inset(46% 0 0 0)
+    clip-path: inset(46% 0 0 0)
+  80% 
+    -webkit-clip-path: inset(2% 0 0 0)
+    clip-path: inset(2% 0 0 0)
+  90% 
+    -webkit-clip-path: inset(39% 0 0 0)
+    clip-path: inset(39% 0 0 0)
+
+@keyframes equalize 
+  0%, 100%
+    -webkit-clip-path: inset(17% 0 0 0)
+    clip-path: inset(17% 0 0 0)
+  10%
+    -webkit-clip-path: inset(65% 0 0 0)
+    clip-path: inset(65% 0 0 0)
+  20%
+    -webkit-clip-path: inset(6% 0 0 0)
+    clip-path: inset(6% 0 0 0)
+  30%
+    -webkit-clip-path: inset(67% 0 0 0)
+    clip-path: inset(67% 0 0 0)
+  40%
+    -webkit-clip-path: inset(9% 0 0 0)
+    clip-path: inset(9% 0 0 0)
+  50%
+    -webkit-clip-path: inset(32% 0 0 0)
+    clip-path: inset(32% 0 0 0)
+  60%
+    -webkit-clip-path: inset(80% 0 0 0)
+    clip-path: inset(80% 0 0 0)
+  70%
+    -webkit-clip-path: inset(46% 0 0 0)
+    clip-path: inset(46% 0 0 0)
+  80%
+    -webkit-clip-path: inset(2% 0 0 0)
+    clip-path: inset(2% 0 0 0)
+  90%
+    -webkit-clip-path: inset(39% 0 0 0)
+    clip-path: inset(39% 0 0 0)
+
+

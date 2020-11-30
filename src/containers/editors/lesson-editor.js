@@ -10,6 +10,7 @@ import EditorForm from '../../components/lesson-editor/editor-form'
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import "../../components/lesson-editor/lesson-editor.sass"
 
 const NEW_LESSON = {
     Name: '',
@@ -125,7 +126,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({getCourse, getCourseAuthors, createLesson, getLesson, getParameters}, dispatch);
+    return bindActionCreators({getCourse, getCourseAuthors, createLesson, getLesson, getParameters,}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LessonEditor);

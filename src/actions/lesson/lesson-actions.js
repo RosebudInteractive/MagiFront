@@ -209,7 +209,7 @@ export const setExtLinks = (value) => {
     }
 }
 
-const handleLesson = (lesson) => {
+export const handleLesson = (lesson) => {
     lesson.id = lesson.Id;
     lesson.mainEpisodes = [];
     lesson.suppEpisodes = [];
@@ -277,6 +277,8 @@ const handleLesson = (lesson) => {
     //     lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
     // }
     lesson.extLinksValues = convertLinksToString(lesson.ExtLinks)
+
+    return lesson
 };
 
 const handleLessonResources = (resources) => {

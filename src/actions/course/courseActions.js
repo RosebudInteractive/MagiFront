@@ -196,7 +196,7 @@ export const setExtLinks = (value) => {
     }
 }
 
-const handleCourse = (course) => {
+export const handleCourse = (course) => {
     course.id = course.Id;
     course.Mask = course.Mask ? course.Mask : '_mask01';
     course.extLinksValues = convertLinksToString(course.ExtLinks)

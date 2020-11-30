@@ -216,7 +216,7 @@ class Main extends React.Component {
         return fetching ?
             <LoadingFrame/>
             :
-            notFound || _needHide || course.OneLesson ?
+            notFound || _needHide || (course && course.OneLesson) ?
                 <NotFoundPage/>
                 :
                 course ?

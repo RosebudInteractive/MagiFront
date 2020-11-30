@@ -7,6 +7,7 @@
   padding-right: 25px
   cursor: pointer
   position: relative
+  width: 22px
   @media (max-width: $tablet-width)
     margin-right: 50px
     padding: 0
@@ -27,6 +28,10 @@
       content: none
 
   svg
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
     fill: $color-main-dark
     fill-opacity: 0.3
 
