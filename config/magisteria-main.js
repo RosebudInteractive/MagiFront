@@ -105,6 +105,11 @@ module.exports = {
         billing_test: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        disablePayments: {
+            from: '2020-12-31T18:00:00.000Z',
+            to: '2020-12-31T21:30:00.000Z',
+            msg: "Сервис платежей временно недоступен. Оплатить курс можно будет, начиная с 00:30 01.01.2021 MSK."
+        },
         yandexKassa: {
             shopId: pk.billing.yandexKassa.shopId,
             secretKey: pk.billing.yandexKassa.secretKey,

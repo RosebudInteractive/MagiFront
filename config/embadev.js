@@ -101,6 +101,11 @@ let options = {
         self_refund: true,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        disablePayments: {
+            // from: '2020-12-14T11:24:00.000Z',
+            // to: '2020-12-14T11:28:00.000Z',
+            msg: "Сервис платежей временно недоступен. Оплатить курс можно будет, начиная с 00:00 01.01.2021 MSK."
+        },
         yandexKassa: {
             shopId: "536331",
             secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
