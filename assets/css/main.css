@@ -12122,6 +12122,7 @@ ul.lectures-tab {
       padding-top: 0;
       padding-right: 0; } }
   .project-info__image-block:before {
+    z-index: -1;
     content: "";
     position: absolute;
     top: 369px;
