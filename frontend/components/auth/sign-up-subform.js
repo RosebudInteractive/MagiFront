@@ -5,11 +5,12 @@ import ButtonsBlock from './buttons-block'
 import Recaptcha from 'react-google-invisible-recaptcha';
 import {connect} from 'react-redux'
 import PasswordValidator from 'password-validator';
-import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton, PasswordEditFake} from './editors'
+import {LoginEdit, UserNameEdit, BackButton, SignUpButton,} from './editors'
 import Warning from "./warning";
 import {reCaptureSelector} from "ducks/app";
 
 import PasswordEditor from "./password-editor";
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 let schema = new PasswordValidator();
 schema
@@ -22,7 +23,7 @@ const validate = values => {
 
     if (!values.login) {
         errors.login = 'Required'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
+    } else if (!EMAIL_REGEXP.test(values.login)) {
         errors.login = 'Invalid email address'
     }
     if (!values.username || (values.username.trim() === "")) {

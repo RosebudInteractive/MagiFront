@@ -5,13 +5,14 @@ import {LoginEdit, SignUpButton} from './editors'
 import {reCaptureSelector} from "ducks/app";
 import Recaptcha from 'react-google-invisible-recaptcha';
 import {connect} from 'react-redux'
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 const validate = values => {
     const errors = {}
 
     if (!values.login) {
         errors.login = 'Required'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
+    } else if (!EMAIL_REGEXP.test(values.login)) {
         errors.login = 'Invalid email address'
     }
     return errors

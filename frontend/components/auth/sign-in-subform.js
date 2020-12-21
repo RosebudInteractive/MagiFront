@@ -8,13 +8,14 @@ import Warning from "./warning";
 import ScrollMemoryStorage from "../../tools/scroll-memory-storage";
 import Recaptcha from 'react-google-invisible-recaptcha';
 import {reCaptureSelector} from "ducks/app";
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 const validate = values => {
     const errors = {}
 
     if (!values.login) {
         errors.login = 'Не может быть пустым'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
+    } else if (!EMAIL_REGEXP.test(values.login)) {
         errors.login = 'Недопустимый email'
     }
     if (!values.password) {
