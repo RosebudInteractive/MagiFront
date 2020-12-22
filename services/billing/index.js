@@ -66,22 +66,44 @@ exports.SetupRoute = (app) => {
 
             app.post('/api/payments', (req, res, next) => {
                 if (req.user) {
-                    if (req.body && req.campaignId)
-                        req.body.campaignId = req.campaignId;
-                    paymentObject.insert(req.body, { user: req.user, debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
-                        .then(result => {
-                            if (result && result.confirmationUrl)
-                                // res.redirect(result.confirmationUrl)
-                                res.send({ result: "OK", confirmationUrl: result.confirmationUrl })
-                            else
-                                res.send({ result: "OK", paymentData: result });
-                        })
-                        .catch(err => {
+                    let isDisabled = false;
+                    if (config.has('billing.disablePayments.from')) {
+                        try {
+                            let fromDate = new Date(config.get('billing.disablePayments.from'));
+                            let toDate = null;
+                            if (config.has('billing.disablePayments.to'))
+                                toDate = new Date(config.get('billing.disablePayments.to'));
+                            let cDate = new Date();
+                            isDisabled = (cDate >= fromDate) && ((toDate === null) || (cDate < toDate));
+                            if (isDisabled) {
+                                let msg = config.has('billing.disablePayments.msg') ? config.get('billing.disablePayments.msg') :
+                                    `Payments service is temporary unavailable.`;                                
+                                res.status(HttpCode.ERR_BAD_REQ).json({ result: "ERROR", message: msg });
+                            }
+                        }
+                        catch (err) {
                             next(err);
-                        });
+                            isDisabled = true;
+                        }
+                    }
+                    if (!isDisabled) {
+                        if (req.body && req.campaignId)
+                            req.body.campaignId = req.campaignId;
+                        paymentObject.insert(req.body, { user: req.user, debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
+                            .then(result => {
+                                if (result && result.confirmationUrl)
+                                    // res.redirect(result.confirmationUrl)
+                                    res.send({ result: "OK", confirmationUrl: result.confirmationUrl })
+                                else
+                                    res.send({ result: "OK", paymentData: result });
+                            })
+                            .catch(err => {
+                                next(err);
+                            });
+                    }
                 }
                 else
-                    res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });;
+                    res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });
             });
         }
     }

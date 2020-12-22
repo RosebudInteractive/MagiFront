@@ -1,11 +1,14 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
-const pk = require('../../keys');
+const pk = require('/app/keys');
+
+const uploadPath = '/app/uploads';
+const dockerHostIP = '172.17.0.1';
 
 module.exports = {
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(uploadPath, path.sep),
     proxyServer: {
         protocol: 'https',
         address: 'magisteria.ru',
@@ -24,7 +27,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000',
+            url: `http://${dockerHostIP}:8000`,
             logRequest: false
         },
     },
@@ -105,11 +108,6 @@ module.exports = {
         billing_test: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
-        disablePayments: {
-            from: '2020-12-31T18:00:00.000Z',
-            to: '2020-12-31T21:30:00.000Z',
-            msg: "Сервис платежей временно недоступен. Оплатить курс можно будет, начиная с 00:30 01.01.2021 MSK."
-        },
         yandexKassa: {
             shopId: pk.billing.yandexKassa.shopId,
             secretKey: pk.billing.yandexKassa.secretKey,
@@ -296,7 +294,7 @@ module.exports = {
     connections: {
         elastic: {
             connection_options: {
-                node: 'http://localhost:9200',
+                node: `http://${dockerHostIP}:9200`,
                 log: 'trace'
             },
             pool: {
@@ -306,7 +304,7 @@ module.exports = {
             }
         },
         redis: {
-            host: "localhost",
+            host: `${dockerHostIP}`,
             port: 6379,
             pool: {
                 max: 5,
@@ -329,7 +327,7 @@ module.exports = {
             }
         },
         mysql: {
-            host: 'localhost',
+            host: `${dockerHostIP}`,
             username: pk.connections.mysql.username,
             password: pk.connections.mysql.password,
             database: pk.connections.mysql.database,

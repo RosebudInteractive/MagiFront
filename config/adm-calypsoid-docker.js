@@ -1,36 +1,41 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
-const pk = require('../../keys');
+const pk = require('/app/keys');
+
+const uploadPath = '/app/uploads';
+const pricelistPath = '/app/pricelist';
+const dockerHostIP = '172.17.0.1';
 
 module.exports = {
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(uploadPath, path.sep),
     proxyServer: {
         protocol: 'https',
-        address: 'magisteria.ru',
-        port: null
+        address: 'adm.magisteria.ru',
+        port: 444
     },
     server: {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
         publicEnabled: true,
-        adminEnabled: false,
-        pushNotifications: true,
+        adminEnabled: true,
+        pushNotifications: false,
         prerender: {
             usePrerender: true,
             useRedis: true,
             redisPrefix: "pg:",
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000',
+            targetHost: "https://magisteria.ru",
+            url: `http://${dockerHostIP}:8000`,
             logRequest: false
         },
     },
     admin: {
-        logFileUpload: false,
-        logModif: false
+        logFileUpload: true,
+        logModif: true
     },
     dbProvider: 'mysql',
     integration: {
@@ -56,7 +61,6 @@ module.exports = {
         importFileTrace: false
     },
     lessonPositions: {
-        debug: false,
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',
@@ -84,20 +88,6 @@ module.exports = {
     general: {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
     },
-    statistics: {
-        srcList: ["fb", "vk", "ya", "gl", "mt"],
-        serverTimeout: 60 * 9, // 9 min
-        clientTimeout: 60 * 10, // 10 min
-    },
-    mrktSystem: {
-        carrotquest: {
-            enabled: true,
-            auth_token: pk.integration && pk.integration.carrotquest
-                && pk.integration.carrotquest.auth_token ? pk.integration.carrotquest.auth_token : null,
-            urlEvents: "https://api.carrotquest.io/v1/users/<%= user_id %>/events",
-            urlProps: "https://api.carrotquest.io/v1/users/<%= user_id %>/props"
-        }
-    },
     billing: {
         module: "./yandex-kassa",
         enabled: true,
@@ -105,11 +95,6 @@ module.exports = {
         billing_test: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
-        disablePayments: {
-            from: '2020-12-31T18:00:00.000Z',
-            to: '2020-12-31T21:30:00.000Z',
-            msg: "Сервис платежей временно недоступен. Оплатить курс можно будет, начиная с 00:30 01.01.2021 MSK."
-        },
         yandexKassa: {
             shopId: pk.billing.yandexKassa.shopId,
             secretKey: pk.billing.yandexKassa.secretKey,
@@ -118,19 +103,6 @@ module.exports = {
             returnUrl: "/",
             payment_mode: "full_payment",
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
-        },
-        strikePromo: {
-            prefix: "STP",
-            key: "STRIKE_PROMO",
-            values: [
-                { value: 25, descr: "При покупке следующего курса в течение 2 дней Вы получите скидку 25% по промокоду" },
-                { value: 30, descr: "Если Вы приобретете еще один курс в течение 48 часов, то получите скидку 30% по промокоду" },
-                { value: 35, descr: "На очередной курс, приобретенный сегодня или завтра Вы получаете скидку 35% по промокоду" },
-                { value: 40, descr: "Теперь Вы получите скидку 40%, если купите один из курсов Магистерии не позднее завтрашнего вечера - используйте промокод" },
-                { value: 45, descr: "А теперь скидка выросла еще на 5%. Купите в течение 2 дней еще 1 курс с дисконтом 45% по промокоду" },
-                { value: 50, descr: "Вы достигли суперскидки и можете купить любой наш курс в 2 раза дешевле, используйте для этого ограниченный по времени (2 суток) промокод" },
-            ],
-            durationInHours: 49
         }
     },
     authentication: {
@@ -157,7 +129,7 @@ module.exports = {
             template: "./templates/mail/feedback.tmpl",
             subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
             sender: pk.mail.feedback.sender,
-            recipients: 'alexander.f.sokolov@gmail.com,ivan@magisteria.ru,adm@magisteria.ru',
+            recipients: 'alexander.f.sokolov@gmail.com,ivan@magisteria.ru',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
@@ -186,7 +158,7 @@ module.exports = {
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
-            subject: "Регистрация на \"Magisteria.Ru\".",
+            subject: "Registration on \"Magisteria.Ru\".",
             sender: pk.mail.userReg.sender,
             options: {
                 disableUrlAccess: false,
@@ -202,7 +174,7 @@ module.exports = {
         pwdRecovery: {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
-            subject: "Восстановление пароля на \"Magisteria.Ru\".",
+            subject: "Password recovery on \"Magisteria.Ru\".",
             sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
@@ -213,43 +185,8 @@ module.exports = {
                     user: pk.mail.pwdRecovery.user,
                     pass: pk.mail.pwdRecovery.pass
                 }
+
             }
-        },
-        promoCourse: {
-            type: "smtp",
-            template: "./templates/mail/promo-course.tmpl",
-            subject: "Промокод на активацию курса \"<%= course %>\".",
-            sender: pk.mail.pwdRecovery.sender,
-            options: {
-                disableUrlAccess: false,
-                host: "smtp.yandex.ru",
-                port: 465,//587
-                secure: true, // true for 465, false for other ports
-                auth: {
-                    user: pk.mail.pwdRecovery.user,
-                    pass: pk.mail.pwdRecovery.pass
-                }
-            }
-        },
-        purchaseCourse: {
-            type: "smtp",
-            subject: "Вы приобрели курс \"<%= course %>\".",
-            sender: pk.mail.pwdRecovery.sender,
-            options: {
-                disableUrlAccess: false,
-                host: "smtp.yandex.ru",
-                port: 465,//587
-                secure: true, // true for 465, false for other ports
-                auth: {
-                    user: pk.mail.pwdRecovery.user,
-                    pass: pk.mail.pwdRecovery.pass
-                }
-            }
-        },
-        userWelcome: {
-            type: "sendpulse",
-            subject: "Добро пожаловать на Магистерию!",
-            sender: '"Magisteria" <adm@magisteria.ru>'
         }
     },
     snets: {
@@ -289,14 +226,21 @@ module.exports = {
             }
         }
     },
+    pricelist: {
+        fb: {
+            path: path.normalize(path.join(pricelistPath, "fb")),
+            file: "products.tsv",
+            baseUrl: "https://magisteria.ru"
+        }
+    },
     search: {
         baseURL: "https://magisteria.ru",
-        keep_up_to_date: false
+        keep_up_to_date: true
     },
     connections: {
         elastic: {
             connection_options: {
-                node: 'http://localhost:9200',
+                node: `http://${dockerHostIP}:9200`,
                 log: 'trace'
             },
             pool: {
@@ -306,7 +250,7 @@ module.exports = {
             }
         },
         redis: {
-            host: "localhost",
+            host: `${dockerHostIP}`,
             port: 6379,
             pool: {
                 max: 5,
@@ -329,7 +273,7 @@ module.exports = {
             }
         },
         mysql: {
-            host: 'localhost',
+            host: `${dockerHostIP}`,
             username: pk.connections.mysql.username,
             password: pk.connections.mysql.password,
             database: pk.connections.mysql.database,

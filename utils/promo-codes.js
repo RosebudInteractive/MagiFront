@@ -20,7 +20,7 @@ module.exports = {
         var m = (Number(promo.slice(8, 10)) - 11) / 5;
         var d = (Number(promo.slice(10, 12)) - 16) / 2
         var dr = Number(promo.slice(6, 8)) - 45;
-        if (m == 11) y = 2019;
+        // if (m == 11) y = 2019;
         var checksum = Number(promo.slice(12, 13));
         if (checksum == ((y + m + d + dr) % 10))
             return new Date(y, m, d)
