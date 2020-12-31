@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import "./sale2021.sass"
 import PropTypes from "prop-types";
 import Arrow from './arrow.svg';
@@ -6,23 +6,40 @@ import ArrowPhone from './arrow-mobile.svg';
 
 export default function Sale2021(props) {
 
-    const {config, confirmed, onClose} = props
+    const {config, confirmed, onClose, headerVisible} = props,
+        [arrowVisible, setArrowVisible] = useState(false),
+        [ready, setReady] = useState(false)
 
     useEffect(() => {
         props.onReady()
     })
 
     useEffect(() => {
-        $(window).bind("resize", _onResize)
-        setTimeout(()=> {_onResize()}, 200)
-        return () => {
-            $(window).bind("resize", _onResize)
+        if (ready) {
+            if (headerVisible) _onResize()
+            setArrowVisible(headerVisible)
         }
-    })
+    }, [headerVisible])
+
+    useEffect(() => {
+        $(window).bind("resize", _onResize)
+        $(document).ready(_onReady)
+        return () => {
+            $(window).unbind("resize", _onResize)
+            $(document).unbind("ready", _onReady)
+        }
+    }, [])
+
+    const _onReady = () => {
+        setReady(true)
+        setTimeout(()=> {_onResize()}, 300)
+    }
 
     const _close = () => {
         if (onClose) {
             onClose()
+            $(window).unbind("resize", _onResize)
+            $(document).unbind("ready", _onReady)
         }
     }
 
@@ -31,8 +48,13 @@ export default function Sale2021(props) {
             _arrow = $(".arrow")
 
         if (_discountButton && _discountButton.length) {
-            const _left = _discountButton.offset().left  - _arrow.width() + (_discountButton.outerWidth() * 0.5) + 6
+            const _button = _discountButton.get(_discountButton.length - 1)
+            const _left = _button.offsetLeft  - _arrow.width() + (_button.clientWidth * 0.5) + 6
             _arrow.css("left", `${_left}px`)
+
+            if (!arrowVisible) {setArrowVisible(true)}
+        } else {
+            if (arrowVisible) {setArrowVisible(false)}
         }
     }
 
@@ -51,7 +73,7 @@ export default function Sale2021(props) {
                 </div>
                 <div className="text-block__text _phone">Скидки до 35%,  до 11 января.</div>
             </div>
-            <div className="arrow">
+            <div className={`arrow ${arrowVisible ? " _visible" : " _hidden"}`}>
                 <img className="_desktop" src={Arrow} alt="Arrow" />
                 <img className="_phone" src={ArrowPhone} alt="Arrow" />
             </div>
@@ -67,5 +89,6 @@ Sale2021.propTypes = {
     config: PropTypes.object,
     confirmed: PropTypes.bool,
     onClose: PropTypes.func,
-    onReady: PropTypes.func
+    onReady: PropTypes.func,
+    headerVisible: PropTypes.bool,
 }
