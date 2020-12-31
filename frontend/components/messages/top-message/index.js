@@ -4,7 +4,8 @@ import {bindActionCreators} from 'redux';
 import "./top-message.sass"
 import StorePopup from "./store-popup";
 import {popupSelector} from "ducks/version";
-import {localSettingsSelector, storePopupClose, setAppDivTop} from "ducks/app";
+import {localSettingsSelector, storePopupClose, setAppDivTop, sale2021PopupClose} from "ducks/app";
+import Sale2021 from "./sale2021";
 
 const _divRef = React.createRef()
 
@@ -30,6 +31,10 @@ function TopMessage(props) {
                     onClose={props.actions.storePopupClose}
                     confirmedMode={props.localSettings.popup.storePopupConfirmedMode}
                     onReady={_onResize}/>
+        <Sale2021 config={props.config.sale2021}
+                  confirmed={props.localSettings.popup.sale2021PopupConfirmed}
+                  onClose={props.actions.sale2021PopupClose}
+                  onReady={_onResize}/>
     </div>
 }
 
@@ -42,7 +47,7 @@ const mapState2Props = (state) => {
 
 const masDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({storePopupClose, setAppDivTop}, dispatch)
+        actions: bindActionCreators({storePopupClose, sale2021PopupClose, setAppDivTop}, dispatch)
     }
 }
 
