@@ -12,8 +12,7 @@
       }
     },
     "sale2021": {
-      "visible": false
+      "visible": true
     }
-
   }
 }
