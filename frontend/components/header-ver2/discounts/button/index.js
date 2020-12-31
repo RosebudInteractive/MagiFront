@@ -16,12 +16,12 @@ class DiscountButton extends React.Component {
     }
 
     render() {
-        const {count, active} = this.props
+        const {count, active, showDiscountMenu} = this.props
 
         return <div className={"discount-button" + (active ? " _active" : "")} onClick={::this._onButtonClick}>
                 <svg width="14" height="17" dangerouslySetInnerHTML={{__html: DISCOUNT_BUTTON}}/>
                 {!!count && active && <div className="counter">{count}</div>}
-                <div className="play-block__tooltip">Персональные скидки</div>
+                { !showDiscountMenu && <div className="play-block__tooltip">Персональные скидки</div> }
             </div>
     }
 
