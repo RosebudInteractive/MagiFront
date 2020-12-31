@@ -7,9 +7,14 @@
   display: flex
   justify-content: center
   overflow: hidden
+  @media (max-width: $mobile-phone-width)
+    height: 64px
 
   .sale2021-popup__info-block__wrapper
     display: flex
+    max-width: 50%
+    @media (max-width: $tablet-width)
+      max-width: 70%
 
     .left-image, .right-image
       position: absolute
@@ -29,8 +34,7 @@
     padding: 0
     align-self: center
     text-align: center
-    @media (max-width: $tablet-width)
-      flex-basis: 319px
+
 
 
 
@@ -49,7 +53,9 @@
         display: block
 
   .text-block__text
-    @include font-fira(15px, normal, 130%, #ffffff)
+    @include font-fira(16px, normal, 130%, #ffffff)
+    @media (max-width: $tablet-width)
+      font-size: 15px
 
   .arrow
     position: absolute
