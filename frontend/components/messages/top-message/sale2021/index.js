@@ -14,7 +14,7 @@ export default function Sale2021(props) {
 
     useEffect(() => {
         $(window).bind("resize", _onResize)
-        _onResize()
+        setTimeout(()=> {_onResize()}, 200)
         return () => {
             $(window).bind("resize", _onResize)
         }
