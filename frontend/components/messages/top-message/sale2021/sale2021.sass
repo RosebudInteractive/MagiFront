@@ -20,12 +20,24 @@
       position: absolute
       top: 0
       z-index: 0
+      height: 140px
+      @media (max-width: $mobile-phone-width)
+        height: 64px
+
 
     .left-image
       left: -35px
+      width: 502px
+      @media (max-width: $mobile-phone-width)
+        width: 230px
+        left: -76px
 
     .right-image
       right: -104px
+      width: 525px
+      @media (max-width: $mobile-phone-width)
+        width: 240px
+        right: -113px
 
 
   .text-block
@@ -35,13 +47,13 @@
     align-self: center
     text-align: center
 
-
-
-
   .text-block__content
+    margin-bottom: 12px
     @include font-pt-serif(33px, normal, 110%, #ffffff)
     @media (max-width: $tablet-width)
       font-size: 31px
+    @media (max-width: $mobile-phone-width)
+      font-size: 17px
 
     &._desktop
       display: block
@@ -56,12 +68,33 @@
     @include font-fira(16px, normal, 130%, #ffffff)
     @media (max-width: $tablet-width)
       font-size: 15px
+    @media (max-width: $mobile-phone-width)
+      font-size: 11px
+
+    &._desktop
+      display: block
+      @media (max-width: $mobile-phone-width)
+        display: none
+    &._phone
+      display: none
+      @media (max-width: $mobile-phone-width)
+        display: block
 
   .arrow
     position: absolute
     bottom: 0
-    right: 180px
     z-index: 1
+    ._desktop
+      padding-bottom: 6px
+      display: block
+      @media (max-width: $mobile-phone-width)
+        display: none
+    ._phone
+      padding-bottom: 4px
+      display: none
+      @media (max-width: $mobile-phone-width)
+        display: block
+
 
 
 .sale2021-popup__close-button
