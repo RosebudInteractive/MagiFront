@@ -3,7 +3,7 @@
   "popup": {
     "storePopup": {
       "ios": {
-        "visible": true,
+        "visible": false,
         "link": "https://apps.apple.com/ru/app/apple-music-for-artists/id1366467972"
       },
       "android": {
