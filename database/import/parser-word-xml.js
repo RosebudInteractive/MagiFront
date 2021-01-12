@@ -311,7 +311,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                 }
             }
             if (result.link) {
-                result.text = result.text + " [[" + result.link + "]]";
+                result.text = result.text + Import.HYPER_LINK_PREFIX + result.link + Import.HYPER_LINK_SUFFIX;
                 result.html = `<a href="${escape(result.link)}" rel="nofollow" target="_blank">${result.html}</a>`;
             }
         }

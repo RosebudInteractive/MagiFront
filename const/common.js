@@ -3,7 +3,9 @@
 exports.Import = {
     FILE_FIELD_SEPARATOR: "@",
     FILE_LIST_SEPARATOR: "#",
-    PARAGRAPH_MERGE_SYMBOL: "§"
+    PARAGRAPH_MERGE_SYMBOL: "§",
+    HYPER_LINK_PREFIX: " [[",
+    HYPER_LINK_SUFFIX: "]]"
 };
 
 exports.SEO = {

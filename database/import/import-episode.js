@@ -434,6 +434,21 @@ exports.ImportEpisode = class ImportEpisode {
         let lastHeader = null;
         let isInParagraph = false;
 
+        function extractFile(str) {
+            let file = "";
+            let rest = str;
+            let idx = rest.indexOf(Import.HYPER_LINK_PREFIX);
+            while (idx >= 0) {
+                file += rest.slice(0, idx);
+                idx = rest.indexOf(Import.HYPER_LINK_SUFFIX, idx);
+                if (idx >= 0) {
+                    rest = rest.slice(idx + Import.HYPER_LINK_SUFFIX.length);
+                    idx = rest.indexOf(Import.HYPER_LINK_PREFIX);
+                }
+            }
+            return file;
+        }
+
         function parseFiles(cell, rowNum, colNum) {
             let fileList = getCellText(cell);
             let files = null;
@@ -441,14 +456,7 @@ exports.ImportEpisode = class ImportEpisode {
                 let filesArr = fileList.split(Import.FILE_LIST_SEPARATOR);
                 let tracks = [];
                 filesArr.forEach((fileRaw) => {
-                    let file = fileRaw;
-                    let idx = file.indexOf("[");
-                    if (idx >= 0) {
-                        // Hyperlink
-                        if (idx === 0) file = ""
-                        else
-                            file = file.slice(0, idx - 1);
-                    }
+                    let file = extractFile(fileRaw);
                     let name = file.trim();
                     let mimeType = mime.getType(name);
                     if (mimeType) {
