@@ -439,10 +439,10 @@ exports.ImportEpisode = class ImportEpisode {
             let rest = str;
             let idx = rest.indexOf(Import.HYPER_LINK_PREFIX);
             while (idx >= 0) {
-                file += rest.slice(0, idx);
-                idx = rest.indexOf(Import.HYPER_LINK_SUFFIX, idx);
-                if (idx >= 0) {
-                    rest = rest.slice(idx + Import.HYPER_LINK_SUFFIX.length);
+                let idx2 = rest.indexOf(Import.HYPER_LINK_SUFFIX, idx);
+                if (idx2 >= 0) {
+                    file += rest.slice(0, idx);
+                    rest = rest.slice(idx2 + Import.HYPER_LINK_SUFFIX.length);
                     idx = rest.indexOf(Import.HYPER_LINK_PREFIX);
                 }
             }
