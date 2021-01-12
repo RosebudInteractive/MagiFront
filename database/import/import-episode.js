@@ -446,7 +446,7 @@ exports.ImportEpisode = class ImportEpisode {
                     idx = rest.indexOf(Import.HYPER_LINK_PREFIX);
                 }
             }
-            return file;
+            return file + rest;
         }
 
         function parseFiles(cell, rowNum, colNum) {
