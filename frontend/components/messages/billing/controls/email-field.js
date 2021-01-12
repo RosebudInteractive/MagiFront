@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
 
 export default class EmailField extends React.Component {
 
@@ -67,7 +68,7 @@ export default class EmailField extends React.Component {
     _validate(e) {
         if (!e.target.value) {
             this.setState({error : 'Required'})
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(e.target.value)) {
+        } else if (!EMAIL_REGEXP.test(e.target.value)) {
             this.setState({error :  'Invalid email address'})
         } else {
             this.setState({error: '', value: e.target.value})

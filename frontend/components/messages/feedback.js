@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux';
 import {hideFeedbackWindow, sendFeedback, loadingSelector} from "ducks/message";
 import Platform from "platform";
 import {Field, getFormValues, isValid, reduxForm} from "redux-form";
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 let FeedbackForm = class FeedbackMessageBox extends React.Component {
 
@@ -90,7 +91,7 @@ const validate = values => {
 
     if (!values.email) {
         errors.email = 'Поле является обязательным для заполнения'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    } else if (!EMAIL_REGEXP.test(values.email)) {
         errors.email = 'Некорректный email'
     }
     return errors

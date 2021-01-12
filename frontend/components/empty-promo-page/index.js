@@ -17,13 +17,15 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "robinson2020": "Пока все дома",
         "giftcode": "Глубоких знаний хватит надолго",
         "technews062020": "Мы создаем не только контент",
+        "ny-sale-2021": "С Новым 2021 годом!",
     },
     DESCRIPTION = {
         "sales2020": DEFAULT_DESCRIPTION,
         "sales2020-1": DEFAULT_DESCRIPTION,
         "robinson2020": "Слушай, смотри, думай, читай!",
         "giftcode": "«послушает мудрый, и умножит познания»",
-        "technews062020": "Технологические новости проекта"
+        "technews062020": "Технологические новости проекта",
+        "ny-sale-2021": "Добрых вестей и крепкого здоровья в наступающем году!",
     },
     OG_IMAGE = {
         "sales2020": DEFAULT_OG_IMAGE,
@@ -31,6 +33,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "robinson2020": "2020/03/fb-Eastman-Johnson_Reading-Boy_1863.jpg",
         "giftcode": "2020/04/fb-gift.jpg",
         "technews062020": "2020/06/fb-technews-06-2020.jpg",
+        "ny-sale-2021": "2020/12/fb-2021-sale-3b5bb13d-f82f-4d2f-90a1-8d8e5d0c7c6d.jpg",
     },
     TW_IMAGE = {
         "sales2020": DEFAULT_TW_IMAGE,
@@ -38,6 +41,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "robinson2020": "2020/03/tw-Eastman-Johnson_Reading-Boy_1863.jpg",
         "giftcode": "2020/04/tw-gift.jpg",
         "technews062020": "2020/06/tw-technews-06-2020.jpg",
+        "ny-sale-2021": "2020/12/tw-2021-sale-762c263c-17b1-4979-9192-a0a6f3de9886.jpg",
     },
     URL = {
         "sales2020": ROOT_URL,
@@ -45,6 +49,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "robinson2020": "/razdel/literature",
         "giftcode": ROOT_URL,
         "technews062020": ROOT_URL,
+        "ny-sale-2021": ROOT_URL,
     }
 
 

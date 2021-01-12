@@ -3,13 +3,14 @@ import {reduxForm, Field} from 'redux-form';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {subscribe, loadingSelector} from "../../ducks/message";
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 const validate = values => {
     const errors = {}
 
     if (!values.email) {
         errors.email = 'Required'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    } else if (!EMAIL_REGEXP.test(values.email)) {
         errors.email = 'Invalid email address'
     }
     return errors

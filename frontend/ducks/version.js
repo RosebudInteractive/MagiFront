@@ -28,7 +28,8 @@ const StorePopupRecord = Record({
 })
 
 const PopupRecord = Record({
-    storePopup: new StorePopupRecord()
+    storePopup: new StorePopupRecord(),
+    sale2021: new Record({ visible: false })
 })
 /**
  * Reducer

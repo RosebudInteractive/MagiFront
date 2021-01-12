@@ -6,13 +6,14 @@ import {connect} from "react-redux";
 import {userAuthSelector, errorSelector, loadingSelector, initializedSelector, login} from "../ducks/auth";
 import Recaptcha from 'react-google-invisible-recaptcha';
 import {reCaptureSelector, fetchingSelector} from "adm-ducks/app";
+import {EMAIL_REGEXP} from "../../common/constants/common-consts";
 
 const validate = values => {
     const errors = {}
 
     if (!values.login) {
         errors.login = 'Не может быть пустым'
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
+    } else if (!EMAIL_REGEXP.test(values.login)) {
         errors.login = 'Недопустимый email'
     }
     if (!values.password) {

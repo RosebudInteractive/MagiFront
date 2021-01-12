@@ -26,6 +26,7 @@ import {
 } from "adm-ducks/reviews";
 import Select from "../common/select-control";
 import {coursesSelector} from "adm-ducks/course";
+import {EMAIL_REGEXP} from "../../../common/constants/common-consts";
 
 const STATE_OPTIONS = [
     {id: 1, value: 'Опубликованный'},
@@ -183,7 +184,7 @@ const validate = (values,) => {
 }
 
 const asyncValidate = (values, dispacth,) => {
-    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.userEmail)) {
+    if (!EMAIL_REGEXP.test(values.userEmail)) {
         return new Promise(() => {throw {userEmail: 'Недопустимый email'}})
     } else {
         return checkUser({email: values.userEmail})
