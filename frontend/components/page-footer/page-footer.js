@@ -6,16 +6,15 @@ import SubscribeForm from './subscribe-form'
 import {Link} from 'react-router-dom';
 import StoreButton, {STORE_BUTTON_TYPE} from "../messages/top-message/store-popup/store-button";
 import "./page-footer.sass"
-import {popupSelector} from "ducks/version";
-import {localSettingsSelector} from "ducks/app";
+import {mobileAppSelector,} from "ducks/version";
 import PropTypes from "prop-types";
-import {STORE_POPUP_MODE} from "../../constants/common-consts";
+import {MOBILE_STORE_MODE} from "../../constants/common-consts";
 
 function PageFooter(props) {
     return <footer className="page-footer">
         <div className="page-footer__wrapper">
             <Row showFeedbackWindow={props.showFeedbackWindow}/>
-            <Inner config={props.config.storePopup} confirmedMode={props.localSettings.popup.storePopupConfirmedMode}/>
+            <Inner mobileAppLinks={props.mobileAppLinks}/>
         </div>
         <Copyright/>
     </footer>
@@ -64,35 +63,35 @@ Row.propTypes = {
 
 function Inner(props) {
 
-    const {config,} = props
-    const [mode, setMode] = useState(STORE_POPUP_MODE.NONE)
+    const {mobileAppLinks,} = props
+    const [mode, setMode] = useState(MOBILE_STORE_MODE.NONE)
 
     useEffect(() => {
-        const _mode = (config.ios.visible && config.android.visible) ?
-            STORE_POPUP_MODE.BOTH
+        const _mode = (mobileAppLinks.ios && mobileAppLinks.android) ?
+            MOBILE_STORE_MODE.BOTH
             :
-            (config.ios.visible && !config.android.visible) ?
-                STORE_POPUP_MODE.ONLY_IOS
+            (mobileAppLinks.ios && !mobileAppLinks.android) ?
+                MOBILE_STORE_MODE.ONLY_IOS
                 :
-                STORE_POPUP_MODE.NONE
+                MOBILE_STORE_MODE.NONE
 
         setMode(_mode)
-    }, [config])
+    }, [mobileAppLinks])
 
-    return <div className={'page-footer__inner' + ((mode !== STORE_POPUP_MODE.NONE) ? " _with-store-buttons" : "")}>
+    return <div className={'page-footer__inner' + ((mode !== MOBILE_STORE_MODE.NONE) ? " _with-store-buttons" : "")}>
         <div className='page-footer__col'>
             <SocialBlock/>
         </div>
         <div className='page-footer__col _subscribe-block-wrapper'>
             <SubscribeForm/>
             {
-                mode !== STORE_POPUP_MODE.NONE ?
+                mode !== MOBILE_STORE_MODE.NONE ?
                     <div className="store-buttons-block">
                         <div className="font-universal__title-smallx _title">Мобильное приложение</div>
                         <div className="_buttons">
-                            <StoreButton type={STORE_BUTTON_TYPE.APPLE} link={config.ios.link}/>
-                            <StoreButton type={STORE_BUTTON_TYPE.ANDROID} link={config.android.link}
-                                         disabled={mode !== STORE_POPUP_MODE.BOTH}/>
+                            <StoreButton type={STORE_BUTTON_TYPE.APPLE} link={mobileAppLinks.ios}/>
+                            <StoreButton type={STORE_BUTTON_TYPE.ANDROID} link={mobileAppLinks.android}
+                                         disabled={mode !== MOBILE_STORE_MODE.BOTH}/>
                         </div>
                     </div>
                     :
@@ -104,8 +103,7 @@ function Inner(props) {
 }
 
 Inner.propTypes = {
-    confirmedMode: PropTypes.number,
-    config: PropTypes.object,
+    mobileAppLinks: PropTypes.object,
 }
 
 class SocialBlock extends React.Component {
@@ -174,8 +172,7 @@ class Copyright extends React.Component {
 
 const mapState2Props = (state) => {
     return {
-        config: popupSelector(state),
-        localSettings: localSettingsSelector(state)
+        mobileAppLinks: mobileAppSelector(state),
     }
 }
 

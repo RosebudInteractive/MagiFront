@@ -21,7 +21,7 @@ export default function StoreButton(props) {
         //         window.location.href = link
         //     }, 1000);
         // } else {
-        window.location.href = link
+        window.open(link)
         // }
 
     }

@@ -3,24 +3,24 @@ import "./store-popup.sass"
 import StoreButton, {STORE_BUTTON_SIZE, STORE_BUTTON_TYPE} from "./store-button";
 import {isMobileAppleDevice, isMobilePlatform} from "tools/page-tools";
 import PropTypes from "prop-types";
-import {STORE_POPUP_MODE} from "../../../../constants/common-consts";
+import {MOBILE_STORE_MODE} from "../../../../constants/common-consts";
 
 export default function StorePopup(props) {
 
-    const {confirmedMode, config, onClose} = props
-    const [mode, setMode] = useState(STORE_POPUP_MODE.NONE)
+    const {confirmedMode, popupConfig, mobileAppLinks, onClose} = props
+    const [mode, setMode] = useState(MOBILE_STORE_MODE.NONE)
 
     useEffect(() => {
-        const _mode = (config.ios.visible && config.android.visible) ?
-            STORE_POPUP_MODE.BOTH
+        const _mode = ( (popupConfig.ios.visible && mobileAppLinks.ios) && (popupConfig.android.visible && mobileAppLinks.android) ) ?
+            MOBILE_STORE_MODE.BOTH
             :
-            (config.ios.visible && !config.android.visible) ?
-                STORE_POPUP_MODE.ONLY_IOS
+            ( (popupConfig.ios.visible && mobileAppLinks.ios) && !popupConfig.android.visible ) ?
+                MOBILE_STORE_MODE.ONLY_IOS
                 :
-                STORE_POPUP_MODE.NONE
+                MOBILE_STORE_MODE.NONE
 
         setMode(_mode)
-    }, [config])
+    }, [popupConfig])
 
     useEffect(() => {
         props.onReady()
@@ -31,17 +31,17 @@ export default function StorePopup(props) {
     const _isMobilePlatform = isMobilePlatform(),
         _isAppleMobile = isMobileAppleDevice()
 
-    const _hidden = (mode === STORE_POPUP_MODE.NONE) ||
+    const _hidden = (mode === MOBILE_STORE_MODE.NONE) ||
         (mode === confirmedMode) ||
-        (_isAppleMobile && (confirmedMode >= STORE_POPUP_MODE.ONLY_IOS)) ||
-        (_isMobilePlatform && !_isAppleMobile && (mode < STORE_POPUP_MODE.BOTH))
+        (_isAppleMobile && (confirmedMode >= MOBILE_STORE_MODE.ONLY_IOS)) ||
+        (_isMobilePlatform && !_isAppleMobile && (mode < MOBILE_STORE_MODE.BOTH))
 
     const _onLinkClick = (e) => {
         window.open("magisteria://")
         e.preventDefault()
         e.returnValue = false
         setTimeout(() => {
-            window.location.href = _isAppleMobile ? config.ios.link : config.android.link
+            window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
         }, 1000);
     }
 
@@ -59,12 +59,12 @@ export default function StorePopup(props) {
                 <div className={"buttons-block" + (_isMobilePlatform ? " _single" : " _all")}>
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.APPLE}
-                                 link={config.ios.link}
+                                 link={mobileAppLinks.ios}
                                  visible={true}/>
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.ANDROID}
-                                 link={config.android.link}
-                                 disabled={mode !== STORE_POPUP_MODE.BOTH}
+                                 link={mobileAppLinks.android}
+                                 disabled={mode !== MOBILE_STORE_MODE.BOTH}
                                  visible={!isMobileAppleDevice()}/>
                 </div>
             </div>
@@ -74,13 +74,13 @@ export default function StorePopup(props) {
                     <div className="store-popup__mobile-logo">
                         <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                      type={STORE_BUTTON_TYPE.APPLE}
-                                     link={config.ios.link}
+                                     link={mobileAppLinks.ios}
                                      visible={isMobileAppleDevice()}/>
                         <div className="button-border"/>
                         <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                      type={STORE_BUTTON_TYPE.ANDROID}
-                                     link={config.android.link}
-                                     disabled={mode !== STORE_POPUP_MODE.BOTH}
+                                     link={mobileAppLinks.android}
+                                     disabled={mode !== MOBILE_STORE_MODE.BOTH}
                                      visible={!isMobileAppleDevice()}/>
                     </div>
                 }
@@ -96,13 +96,13 @@ export default function StorePopup(props) {
                             <React.Fragment>
                                 <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                              type={STORE_BUTTON_TYPE.APPLE}
-                                             link={config.ios.link}
+                                             link={mobileAppLinks.ios}
                                              visible={true}/>
                                 <div className="button-border"/>
                                 <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                              type={STORE_BUTTON_TYPE.ANDROID}
-                                             link={config.android.link}
-                                             disabled={mode !== STORE_POPUP_MODE.BOTH}
+                                             link={mobileAppLinks.android}
+                                             disabled={mode !== MOBILE_STORE_MODE.BOTH}
                                              visible={!isMobileAppleDevice()}/>
                             </React.Fragment>
                     }
@@ -117,7 +117,8 @@ export default function StorePopup(props) {
 
 StorePopup.propTypes = {
     confirmedMode: PropTypes.number,
-    config: PropTypes.object,
+    popupConfig: PropTypes.object,
+    mobileAppLinks: PropTypes.object,
     onClose: PropTypes.func,
     onReady: PropTypes.func
 }

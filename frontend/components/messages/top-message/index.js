@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./top-message.sass"
 import StorePopup from "./store-popup";
-import {popupSelector} from "ducks/version";
+import {mobileAppSelector, popupSelector} from "ducks/version";
 import {localSettingsSelector, storePopupClose, setAppDivTop, sale2021PopupClose} from "ducks/app";
 import Sale2021 from "./sale2021";
 
@@ -12,7 +12,7 @@ const _divRef = React.createRef()
 
 function TopMessage(props) {
 
-    const {config, localSettings, headerVisible, pageHeaderState} = props
+    const {config, mobileAppLinks, localSettings, headerVisible, pageHeaderState} = props
 
     const _onResize = () => {
         if (_divRef && _divRef.current) {
@@ -29,7 +29,8 @@ function TopMessage(props) {
     }, [props.config])
 
     return <div className="top-balloon-message" ref={_divRef}>
-        <StorePopup config={config.storePopup}
+        <StorePopup popupConfig={config.storePopup}
+                    mobileAppLinks={mobileAppLinks}
                     onClose={props.actions.storePopupClose}
                     confirmedMode={localSettings.popup.storePopupConfirmedMode}
                     onReady={_onResize}/>
@@ -48,6 +49,7 @@ TopMessage.propTypes = {
 const mapState2Props = (state) => {
     return {
         config: popupSelector(state),
+        mobileAppLinks: mobileAppSelector(state),
         localSettings: localSettingsSelector(state),
         pageHeaderState: state.pageHeader
     }
