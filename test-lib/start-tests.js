@@ -88,7 +88,8 @@ async function start() {
                 let st = new Date();
                 await DownloadFiles.getCourse(0 + courses[i], false, host, null, 10, false, token)
                     .then(result => {
-                        Array.prototype.push.apply(tot_result, result);
+                        if (Array.isArray(result.result))
+                            Array.prototype.push.apply(tot_result, result.result);
                         isErr = isErr || result.isErr;
                         let dt = ((new Date()) - st) / 1000;
                         let sz = totSize(result);
