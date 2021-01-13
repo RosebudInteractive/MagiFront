@@ -3,16 +3,18 @@
   "popup": {
     "storePopup": {
       "ios": {
-        "visible": false,
-        "link": "https://apps.apple.com/ru/app/apple-music-for-artists/id1366467972"
+        "visible": false
       },
       "android": {
-        "visible": false,
-        "link": "https://play.google.com/store/apps/details?id=com.facebook.lite&hl=ru&gl=US"
+        "visible": false
       }
     },
     "sale2021": {
-      "visible": true
+      "visible": false
     }
+  },
+  "mobileApp": {
+    "ios": "https://apps.apple.com/ru/app/apple-music-for-artists/id1366467972",
+    "android": "https://play.google.com/store/apps/details?id=com.facebook.lite&hl=ru&gl=US"
   }
 }

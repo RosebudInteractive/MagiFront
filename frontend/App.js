@@ -355,7 +355,7 @@ class App extends Component {
         } = this.props;
 
         return <React.Fragment>
-            <TopMessage/>
+            <TopMessage headerVisible={this.state.showHeader}/>
             <div className="App global-wrapper" onScroll={this._handleScroll}>
 
                 <PageHeader visible={this.state.showHeader}/>

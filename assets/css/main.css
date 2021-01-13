@@ -358,6 +358,14 @@ body {
   body.overflow_fixed {
     position: fixed; }
 
+  body.mobile-menu__visible .top-balloon-message {
+    z-index: -1;
+  }
+
+  body.mobile-menu__visible .global-wrapper {
+    top: 0 !important;
+  }
+
 .size-info {
   position: fixed;
   background-color: #2f2f2f;

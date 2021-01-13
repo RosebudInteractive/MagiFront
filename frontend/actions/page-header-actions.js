@@ -40,19 +40,16 @@ export const hideFiltersForm = () => {
 
 export const showMenu = () => {
     return (dispatch) => {
-        dispatch({
-            type: SHOW_MENU,
-            payload: null
-        });
+        dispatch({ type: SHOW_MENU, payload: null });
+        $("body").addClass("mobile-menu__visible")
+
     }
 };
 
 export const hideMenu = () => {
     return (dispatch) => {
-        dispatch({
-            type: HIDE_MENU,
-            payload: null
-        });
+        dispatch({ type: HIDE_MENU, payload: null });
+        $("body").removeClass("mobile-menu__visible")
     }
 };
 
