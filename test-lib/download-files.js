@@ -5,14 +5,19 @@ const { URL } = require('url');
 const path = require('path');
 const { buildLogString } = require('../utils');
 
-function getFile(url, fileName) {
+function getFile(url, fileName, token) {
     return new Promise(resolve => {
         try {
             let statusCode;
             let length;
             let stTime = new Date();
             console.log(buildLogString(`+++ Started: "${url}"`));
-            let inpStream = request(url)
+            let req = {
+                url: url,
+                headers: token ? { "Authorization": "JWT " + token } : undefined,
+                json: true
+            }
+            let inpStream = request(req)
                 .on('response', response => {
                     statusCode = response.statusCode;
                     length = response.headers['content-length'] ? parseInt(response.headers['content-length']) : -1;
@@ -70,7 +75,7 @@ function makeDir(path) {
     });
 };
 
-async function getLessonSeq(id, isOld, baseUrl, baseDir, dLink) {
+async function getLessonSeq(id, isOld, baseUrl, baseDir, dLink, token) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
@@ -107,19 +112,23 @@ async function getLessonSeq(id, isOld, baseUrl, baseDir, dLink) {
                                 if (body.assets) {
                                     for (let i = 0; i < body.assets.length; i++){
                                         let elem = body.assets[i];
-                                        let parsed = path.parse(elem.file);
-                                        let fileName = `${dir}/${parsed.base}`;
-                                        let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
-                                        promises.push(await getFile(fileUrl, fileName));
+                                        if (elem && elem.file) {
+                                            let parsed = path.parse(elem.file);
+                                            let fileName = `${dir}/${parsed.base}`;
+                                            let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
+                                            promises.push(await getFile(fileUrl, fileName, token));
+                                        }
                                     }
                                 }
                                 if (body.episodes) {
                                     for (let i = 0; i < body.episodes.length; i++) {
                                         let elem = body.episodes[i];
-                                        let parsed = path.parse(elem.audio.file);
-                                        let fileName = `${dir}/${parsed.base}`;
-                                        let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
-                                        promises.push(await getFile(fileUrl, fileName));
+                                        if (elem && elem.audio && elem.audio.file) {
+                                            let parsed = path.parse(elem.audio.file);
+                                            let fileName = `${dir}/${parsed.base}`;
+                                            let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
+                                            promises.push(await getFile(fileUrl, fileName, token));
+                                        }
                                     }
                                 }
                             }
@@ -164,7 +173,7 @@ async function concurExec(promise, p_arr, res_arr, degree) {
     return res_arr;
 }
 
-function getLesson(id, isOld, baseUrl, baseDir, degree, dLink) {
+function getLesson(id, isOld, baseUrl, baseDir, degree, dLink, token) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
@@ -202,19 +211,23 @@ function getLesson(id, isOld, baseUrl, baseDir, degree, dLink) {
                                 if (body.assets) {
                                     for (let i = 0; i < body.assets.length; i++){
                                         let elem = body.assets[i];
-                                        let parsed = path.parse(elem.file);
-                                        let fileName = `${dir}/${parsed.base}`;
-                                        let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
-                                        await concurExec(getFile(fileUrl, fileName), promises, res, degree)
+                                        if (elem && elem.file) {
+                                            let parsed = path.parse(elem.file);
+                                            let fileName = `${dir}/${parsed.base}`;
+                                            let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
+                                            await concurExec(getFile(fileUrl, fileName, token), promises, res, degree)
+                                        }
                                     }
                                 }
                                 if (body.episodes) {
                                     for (let i = 0; i < body.episodes.length; i++) {
                                         let elem = body.episodes[i];
-                                        let parsed = path.parse(elem.audio.file);
-                                        let fileName = `${dir}/${parsed.base}`;
-                                        let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
-                                        await concurExec(getFile(fileUrl, fileName), promises, res, degree)
+                                        if (elem && elem.audio && elem.audio.file) {
+                                            let parsed = path.parse(elem.audio.file);
+                                            let fileName = `${dir}/${parsed.base}`;
+                                            let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
+                                            await concurExec(getFile(fileUrl, fileName, token), promises, res, degree)
+                                        }
                                     }
                                 }
                             }
@@ -247,7 +260,7 @@ function getLesson(id, isOld, baseUrl, baseDir, degree, dLink) {
     });
 }
 
-function getCourse(id, isOld, baseUrl, baseDir, degree, dLink) {
+function getCourse(id, isOld, baseUrl, baseDir, degree, dLink, token) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/courses/${id.toString()}?abs_path=true`;
@@ -268,10 +281,10 @@ function getCourse(id, isOld, baseUrl, baseDir, degree, dLink) {
                             if (body) {
                                 if (body.Lessons) {
                                     body.Lessons.forEach(elem => {
-                                        promises.push(getLesson(elem.Id, isOld, baseUrl, baseDir, degree, dLink));
+                                        promises.push(getLesson(elem.Id, isOld, baseUrl, baseDir, degree, dLink, token));
                                         if (elem.Lessons.length > 0)
                                             elem.Lessons.forEach(subElem => {
-                                                promises.push(getLesson(subElem.Id, isOld, baseUrl, baseDir, degree, dLink));
+                                                promises.push(getLesson(subElem.Id, isOld, baseUrl, baseDir, degree, dLink, token));
                                             });
                                     })
                                 }
