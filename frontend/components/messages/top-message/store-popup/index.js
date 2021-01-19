@@ -37,12 +37,13 @@ export default function StorePopup(props) {
         (_isMobilePlatform && !_isAppleMobile && (mode < MOBILE_STORE_MODE.BOTH))
 
     const _onLinkClick = (e) => {
-        window.open("magisteria://")
-        e.preventDefault()
-        e.returnValue = false
-        setTimeout(() => {
-            window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
-        }, 1000);
+        // window.open("magisteria://")
+        // e.preventDefault()
+        // e.returnValue = false
+
+        // setTimeout(() => {
+        window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
+        // }, 1000);
     }
 
     if (_hidden) return null
