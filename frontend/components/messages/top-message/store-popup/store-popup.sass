@@ -6,6 +6,19 @@
   justify-content: center
   overflow: hidden
 
+  .top-message__background
+    position: absolute
+    width: 100%
+    height: 100%
+
+    &._main
+      z-index: -2
+      background: linear-gradient(107.45deg, #B15135 0%, #F16647 100%)
+    &._shadow
+      z-index: -1
+      background: linear-gradient(254.21deg, #2A2C37 8.01%, rgba(124, 69, 52, 0.5) 59.97%)
+      opacity: 0.3
+
   .store-popup__info-block__wrapper
     flex: 1 1 auto
     display: flex
@@ -40,6 +53,9 @@
         &._big
           display: none
 
+  ._white
+    color: $color-white
+
 
 .store-popup__info-block
   display: flex
@@ -70,6 +86,21 @@
     margin-top: 10px
     margin-right: 10px
     display: block
+    position: relative
+    filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.35))
+
+  .phone-image__main
+    width: 100%
+    height: 100%
+    min-width: 135px
+    margin-top: 6px
+
+  .phone-image__pods
+    position: absolute
+    bottom: 0
+    height: 70px
+    width: auto
+    right: -20px
 
   .text-block
     flex: 0 1 372px
@@ -137,11 +168,11 @@
     margin: 0 20px
 
     &:before, &:after
-      background-color: $color-dark-03
+      background-color: $color-white-04
 
     &:hover
       &:before, &:after
-        background-color: $color-dark-06
+        background-color: $color-white-06
 
 .store-button
   outline: none
@@ -151,6 +182,7 @@
   border: none
   height: 40px
   width: 135px
+  background: transparent
 
   img
     width: 100%
@@ -158,13 +190,14 @@
 
 .store-popup__mobile-logo
   padding-right: 14px
-  border-right: $border-dark-04
+  border-right: $border-white-03
   margin-right: 19px
 
   .store-button
     margin: 0
     height: auto
     padding: 1px 0
+    filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.35))
     &._apple
       width: 26.68px
     &._android
