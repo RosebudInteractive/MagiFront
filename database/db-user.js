@@ -405,7 +405,7 @@ const GET_COURSES_FOR_SALE_MSSQL =
     "from [Discount] d\n" +
     "  join [Product] p on p.[Id] = d.[ProductId]\n" +
     "  join [Course] c on c.[ProductId] = p.[Id]\n" +
-    "where (d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
+    "where (c.[State] = 'P') and (d.[FirstDate] <= convert(datetime, '<%= dt %>'))\n" +
     "  and ((d.[LastDate] > convert(datetime, '<%= dt %>')) or (d.[LastDate] is NULL))\n" +
     "  and (d.[UserId] is NULL) and ((d.[DiscountTypeId] = 2)<%= where_dyn %>)";
 const WHERE_DYN_MSSQL = "\n  or ((d.[DiscountTypeId] = 3) and (<%= code_dyn %>))";
@@ -417,7 +417,7 @@ const GET_COURSES_FOR_SALE_MYSQL =
     "from `Discount` d\n" +
     "  join `Product` p on p.`Id` = d.`ProductId`\n" +
     "  join `Course` c on c.`ProductId` = p.`Id`\n" +
-    "where (d.`FirstDate` <= '<%= dt %>')\n" +
+    "where (c.`State` = 'P') and (d.`FirstDate` <= '<%= dt %>')\n" +
     "  and ((d.`LastDate` > '<%= dt %>') or (d.`LastDate` is NULL))\n" +
     "  and (d.`UserId` is NULL) and ((d.`DiscountTypeId` = 2)<%= where_dyn %>)";
 const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (<%= code_dyn %>))";
