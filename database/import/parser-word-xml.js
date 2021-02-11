@@ -329,6 +329,11 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                 let elem = prg.elements[i];
                 if (elem.type === "element") {
                     switch (elem.name) {
+                        case "w:smartTag":
+                            let { text: textSmart, html: htmlSmart } = this._parseParagraph(elem, options);
+                            result.text += textSmart;
+                            result.html += htmlSmart;
+                            break;
                         case "w:pPr":
                             result.props = this._parseParagraphProps(elem, options);
                             break;

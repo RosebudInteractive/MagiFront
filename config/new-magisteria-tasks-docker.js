@@ -318,8 +318,10 @@ module.exports = {
             }
         },
         google: {
-            appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
-            appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
+            appId: '902617006551-8ujt3v40c9js88cllafccbuhop4qjg3l.apps.googleusercontent.com',
+            appSecret: 'xOnkj8eFwydDegfbY6lmgzrC',
+            // appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
+            // appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/google/oauth',
             passportOptions: {
