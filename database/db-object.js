@@ -133,10 +133,39 @@ exports.DbObject = class DbObject extends CacheableObject {
         return res;
     }
 
-    _setFieldValues(obj, fields, ignore) {
-        let ignore_list = ignore || { Id: true };
+    _buildLists(ignore, allow) {
+        let ignore_list;
+        let allow_list = null;
+        if (Array.isArray(allow) && (allow.length > 0)) {
+            allow_list = {};
+            allow.forEach(elem => { allow_list[elem] = 1 })
+        }
+        if (Array.isArray(ignore) && (ignore.length > 0)) {
+            ignore_list = {};
+            ignore.forEach(elem => { ignore_list[elem] = 1 })
+        }
+        else
+            ignore_list = ignore || { Id: 1 };
+        return { ignore_list: ignore_list, allow_list: allow_list };
+    }
+
+    async _getFieldValues(obj, fields, ignore, allow) {
+        let { fields: field_defs } = await $data.getFieldDefs({ name: obj.modelName });
+        let { ignore_list, allow_list } = this._buildLists(ignore, allow);
+        for (let i = 0; i < field_defs.length; i++) {
+            let { name: fld } = field_defs[i];
+            if ((ignore_list[fld] === undefined) && ((!allow_list) || allow_list[fld])) {
+                let method = this._genGetterName(fld);
+                if (typeof (obj[method]) === "function")
+                    fields[fld] = obj[method]();
+            }
+        }
+    }
+
+    _setFieldValues(obj, fields, ignore, allow) {
+        let { ignore_list, allow_list } = this._buildLists(ignore, allow);
         for (let fld in fields) {
-            if (!ignore_list[fld]) {
+            if ((ignore_list[fld] === undefined) && ((!allow_list) || allow_list[fld])) {
                 let method = this._genGetterName(fld);
                 if (typeof (obj[method]) === "function")
                     obj[method](fields[fld]);
