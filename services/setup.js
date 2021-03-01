@@ -46,6 +46,7 @@ const { setupCache } = require('./cache');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 const { SetupRoute: setupFeedback } = require('./feedback');
 const { SetupRoute: setupBilling } = require('./billing');
+const { setupProcesses } = require('./pm');
 const { buildLogString } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams, ImportTest, ImportTestParams } = require('../database/import');
@@ -131,14 +132,21 @@ function setupAPI(express, app) {
 
     let publicEnabled = config.has("server.publicEnabled") && (config.server.publicEnabled === true) ? true : false;
     let adminEnabled = config.has("server.adminEnabled") && (config.server.adminEnabled === true) ? true : false;
+    let pmEnabled = config.has("server.pmEnabled") && (config.server.pmEnabled === true) ? true : false;
     app.use("/api", (req, res, next) => {
-        if (publicEnabled || adminEnabled)
+        if (publicEnabled || adminEnabled || pmEnabled)
             next()
         else
             next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
     });
     app.use("/api/adm", (req, res, next) => {
         if (adminEnabled)
+            next()
+        else
+            next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
+    });
+    app.use("/api/pm", (req, res, next) => {
+        if (pmEnabled)
             next()
         else
             next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
@@ -165,10 +173,12 @@ function setupAPI(express, app) {
 
     app.use("/data", AuthenticateLocal(app)); // Optional Local Authentication
     app.use("/api/adm", AuthenticateLocal(app, useJWT ? false : true, AccessFlags.ContentManager)); // Local Authentication
+    app.use("/api/pm", AuthenticateLocal(app, useJWT ? false : true, AccessFlags.PmTaskExecutor)); // Local Authentication
     app.use("/api", AuthenticateLocal(app)); // Optional Local Authentication
     if (useJWT) {
         app.use("/data", AuthenticateJWT(app)); // Optional JWT Authentication
         app.use("/api/adm", AuthenticateJWT(app, true, AccessFlags.ContentManager)); // JWT Authentication
+        app.use("/api/pm", AuthenticateJWT(app, true, AccessFlags.PmTaskExecutor)); // JWT Authentication
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
@@ -203,6 +213,8 @@ function setupAPI(express, app) {
     setupSessions(app);
     setupTests(app);
     setupSearch(app);
+    if (pmEnabled)
+        setupProcesses(app);
     
     //
     // Common API options

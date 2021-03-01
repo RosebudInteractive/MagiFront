@@ -30,8 +30,9 @@ module.exports = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
-        publicEnabled: true,
-        adminEnabled: true,
+        publicEnabled: true, // public site
+        adminEnabled: true,  // site content administration
+        pmEnabled: true,     // process manager
         teamTaskEnabled: true,
         pushNotifications: false,
         corsEnabled: false,
