@@ -64,7 +64,7 @@ Promise.resolve()
                 else
                     console.log(buildLogString(`Current DB version: "${verInfo.product.Code}" v.${verInfo.version.Code} build ${verInfo.build.BuildNum}.`));
             });
-        
+
         // log.info("Init Db succeded!")
 
         // Prepare http server
@@ -232,6 +232,12 @@ Promise.resolve()
         if (config.has("server.adminEnabled") && (config.server.adminEnabled === true))
             app.get("/adm/*", function (req, res) {
                 res.sendFile(__dirname + '/adm-index.html');
+            });
+
+        if (config.has("server.teamTaskEnabled") && (config.server.teamTaskEnabled === true))
+            app.get("/tt/*", function (req, res) {
+                // res.sendFile(__dirname + '/adm-index.html');
+                res.sendFile(path.join(__dirname, "team-task", "index.html"));
             });
 
         PrerenderInit(app);

@@ -1,0 +1,114 @@
+@import "~tt-assets/styles/colors.sass"
+
+.filter-button
+  display: flex
+  cursor: pointer
+  align-items: center
+
+.filter-button__title
+  color: #C8684C
+  font-family: Inter
+  font-style: normal
+  font-weight: 600
+  font-size: 14px
+  line-height: 17px
+  letter-spacing: 0.75px
+  margin-left: 10px
+
+.filter-block
+  max-height: 0
+  transition: max-height 300ms ease
+  & > *
+    visibility: hidden
+  &._visible
+    max-height: 1000px
+    & > *
+      visibility: visible
+
+.filter-row
+  display: flex
+  justify-content: space-between
+  box-sizing: border-box
+
+.filter-block__buttons
+  display: flex
+  padding: 28px 0
+
+.filter-block__clear-button
+  display: flex
+  cursor: pointer
+  align-items: center
+  ._title
+    margin-left: 8px
+    color: #C8684C
+    font-family: Inter
+    font-style: normal
+    font-weight: 600
+    font-size: 14px
+    line-height: 17px
+    text-align: right
+    letter-spacing: 0.75px
+
+.filter-row__field:not(:last-of-type)
+  padding-right: 16px
+
+.filter-row__field-input
+  width: 100%
+  height: 40px
+  font-family: Inter
+  font-style: normal
+  font-weight: normal
+  font-size: 13px
+  line-height: 22px
+  letter-spacing: 0.25px
+  color: $grey50
+  border: 1px solid #D2D2D6
+  box-sizing: border-box
+  border-radius: 8px
+  &._text
+    padding: 9px 8px
+  &._select
+    padding-top: 2px
+
+  .rs-picker-toggle
+    border: none !important
+    height: 100%
+    width: 100%
+    padding: 9px 8px
+    color: $grey50
+
+  .rs-picker-default .rs-picker-toggle
+    border: none
+
+.filter-block__apply-button
+  padding: 12px 16px
+  height: 40px
+
+.filter-block__buttons
+  justify-content: space-between
+
+
+.rs-picker-menu
+  border-radius: 8px
+  &.rs-picker-check-menu
+    margin-top: 8px
+
+.rs-check-item .rs-checkbox-checker > label
+  font-family: Inter
+  font-style: normal
+  font-weight: normal
+  font-size: 13px
+  line-height: 20px
+  letter-spacing: 0.25px
+  color: $grey70
+
+.rs-checkbox-wrapper::before
+  border: 2px solid $grey60 !important
+  box-sizing: border-box
+  border-radius: 1px !important
+
+.rs-picker-value-item
+  color: $grey70
+
+.rs-picker-value-count
+  background-color: $grey40!important

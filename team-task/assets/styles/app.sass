@@ -1,0 +1,80 @@
+@import "colors"
+
+@font-face
+  font-family: 'Inter'
+  src: url("/fonts/inter/Inter-SemiBold.ttf") format('truetype')
+  font-style: normal
+
+html
+  font-family: Inter
+  -ms-text-size-adjust: 100%
+  -webkit-text-size-adjust: 100%
+  height: 100%
+
+body
+  margin: 0
+  min-height: 100%
+
+h5
+  font-family: Inter
+  font-style: normal
+  font-weight: bold
+  font-size: 24px
+  line-height: 36px
+
+#root
+  position: absolute
+  width: 100%
+  height: 100%
+
+.tt-main-area
+  display: flex
+  width: 100%
+  height: 100%
+
+  & > *
+    box-sizing: border-box
+
+
+.tt-main-area__info-panel
+  display: flex
+  flex: 1 0 83.34%
+  flex-direction: column
+
+
+.grey-button
+  background: $grey05
+  border-radius: 8px
+  border: none
+
+.orange-button
+  background: $orange
+  border-radius: 8px
+  border: none
+  color: $color-main-light
+  font-family: Inter
+  font-style: normal
+  font-weight: 600
+  font-size: 14px
+  line-height: 17px
+  text-align: center
+  letter-spacing: 0.75px
+  box-sizing: border-box
+  cursor: pointer
+
+.form
+  background-color: $grey01
+  height: 100%
+  width: 100%
+  padding: 24px
+  box-sizing: border-box
+  position: relative
+
+  .grid-container
+    position: absolute
+
+.form-header
+  margin: 0 0 24px
+
+._grey70
+  color: $grey70

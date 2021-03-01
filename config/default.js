@@ -32,6 +32,7 @@ module.exports = {
         port: 3000,
         publicEnabled: true,
         adminEnabled: true,
+        teamTaskEnabled: true,
         pushNotifications: false,
         corsEnabled: false,
         prerender: {
@@ -50,7 +51,7 @@ module.exports = {
         })
     },
     client: {
-        devHotReload: true  
+        devHotReload: true
     },
     admin: {
         logFileUpload: false,
@@ -97,7 +98,7 @@ module.exports = {
     },
     debug: {
         clientTrace: {
-            gtm: true  
+            gtm: true
         },
         routes: {
             "set-user-subscription": false,
@@ -113,7 +114,7 @@ module.exports = {
         }
     },
     general: {
-        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        
+        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
     },
     statistics: {
         srcList: ["fb", "vk", "ya", "gl", "mt"],
@@ -285,7 +286,7 @@ module.exports = {
         fb: {
             path: path.normalize(path.join(process.cwd(), "..", "pricelist", "fb")),
             file: "products.tsv",
-        }  
+        }
     },
     search: {
         keep_up_to_date: false
