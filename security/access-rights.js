@@ -112,14 +112,32 @@ exports.AccessRights = class {
     static checkPermissions(user, accessRights) {
         let result = 0;
         if (user && user.PData) {
-            if (accessRights & AccessFlags.Administrator)
-                result += user.PData.isAdmin ? AccessFlags.Administrator : 0;
-            if (accessRights & AccessFlags.ContentManager)
-                result += (user.PData.isAdmin || user.PData.roles.e) ? AccessFlags.ContentManager : 0;
-            if (accessRights & AccessFlags.Pending)
-                result += user.PData.roles.p ? AccessFlags.Pending : 0;
-            if (accessRights & AccessFlags.Subscriber)
-                result += user.PData.roles.s ? AccessFlags.Subscriber : 0;
+            if (user.PData.isAdmin)
+                result = accessRights
+            else {
+                if (user.PData.roles.e)
+                    result |= accessRights & (AccessFlags.ContentManager | AccessFlags.Subscriber)
+                else
+                    if (user.PData.roles.s)
+                        result |= accessRights & AccessFlags.Subscriber;
+                if (user.PData.roles.pma)
+                    result |= accessRights & (AccessFlags.PmAdmin | AccessFlags.PmSupervisor | AccessFlags.PmElemManager | AccessFlags.PmTaskExecutor)
+                else
+                    if (user.PData.roles.pms)
+                        result |= accessRights & (AccessFlags.PmSupervisor | AccessFlags.PmElemManager | AccessFlags.PmTaskExecutor)
+                    else
+                        if (user.PData.roles.pme)
+                            result |= accessRights & (AccessFlags.PmElemManager | AccessFlags.PmTaskExecutor)
+                        else
+                            if (user.PData.roles.pmu)
+                                result |= accessRights & AccessFlags.PmTaskExecutor;
+            }
+            if (accessRights & AccessFlags.Pending) {
+                result &= (~AccessFlags.Pending);
+                if (user.PData.roles.p)
+                    result |= AccessFlags.Pending
+            }
+            
         }
         return result;
     }

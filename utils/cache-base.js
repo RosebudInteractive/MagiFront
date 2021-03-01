@@ -87,6 +87,24 @@ exports.CacheableObject = class CacheableObject {
         });
     }
 
+    cacheExpire(key, val, inMsec) {
+        return new Promise(resolve => {
+            let rc = null;
+            let id = this.cacheGetKey(key);
+            if (this._isRedis) {
+                rc = ConnectionWrapper((connection) => {
+                    return (inMsec ? connection.pexpireAsync(id, val) : connection.expireAsync(id, val))
+                        .then(result => {
+                            return result;
+                        });
+                });
+            }
+            else
+                rc = this._cache[id] ? 1 : 0;
+            resolve(rc);
+        });
+    }
+
     cacheGet(key, options) {
         return new Promise(resolve => {
             let rc;
@@ -230,6 +248,29 @@ exports.CacheableObject = class CacheableObject {
             }
             else {
                 rc = this._cache[id];
+            }
+            resolve(rc);
+        });
+    }
+
+    cacheHget(hkey, key, options) {
+        return new Promise(resolve => {
+            let rc = null;
+            let opts = options || {};
+            let id = opts.isInternal ? hkey : this.cacheGetKey(hkey);
+            if (this._isRedis) {
+                rc = ConnectionWrapper(((connection) => {
+                    return connection.hgetAsync(id, key)
+                        .then((result) => {
+                            let res = null;
+                            if (result)
+                                res = opts.json ? JSON.parse(result) : result;
+                            return res;
+                        });
+                }).bind(this));
+            }
+            else {
+                rc = this._cache[id] ? this._cache[id][key] : null;
             }
             resolve(rc);
         });

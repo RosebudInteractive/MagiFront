@@ -26,5 +26,9 @@ exports.AccessFlags = {
     Administrator: 1,
     ContentManager: 2,
     Subscriber: 4,
-    Pending: 8
+    Pending: 8,
+    PmAdmin: 16,
+    PmSupervisor: 32,
+    PmElemManager: 64,
+    PmTaskExecutor: 128
 };
