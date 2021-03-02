@@ -119,6 +119,6 @@ const _getTaskStateData = (state) => {
 }
 
 const _fetchTasks = (params) => {
-    return Promise.resolve(TASKS)
-    // return commonGetQuery("/api/pm/task-list" + (params ? `&${params}` : ""))
+    // return Promise.resolve(TASKS)
+    return commonGetQuery("/api/pm/task-list" + (params ? `?${params}` : ""))
 }

@@ -113,6 +113,6 @@ const _getStateData = (state) => {
 }
 
 const _fetchProcesses = (params) => {
-    return Promise.resolve(PROCESSES)
-    // return commonGetQuery("/api/pm/process-list" + (params ? `&${params}` : ""))
+    // return Promise.resolve(PROCESSES)
+    return commonGetQuery("/api/pm/process-list" + (params ? `&${params}` : ""))
 }
