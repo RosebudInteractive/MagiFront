@@ -199,6 +199,48 @@ const SQL_GET_TASK_LIST_MYSQL =
     "  left join `PmElement` el on el.`Id` = e.`ElemId`\n" +
     "  left join `User` eu on eu.`SysParentId` = e.`SupervisorId`";
 
+const SQL_GET_TASK_MSSQL =
+    "select t.[Id], t.[Name], t.[ProcessId], t.[TimeCr], t.[DueDate], t.[ExecutorId], u.[DisplayName] as [UserName],\n" +
+    "  t.[Description], t.[AlertId], t.[IsElemReady], t.[WriteFieldSet], t.[ElementId], t.[State], ep.[State] as [EState],\n" +
+    "  ep.[SupervisorId], eu.[DisplayName] as [EUserName], e.[Name] as [EName], e.[WriteFields], e.[ViewFields], ps.[ProcessFields]\n" +
+    "from [PmTask] t\n" +
+    "  join [PmProcess] p on t.[ProcessId] = p.[Id]\n" +
+    "  join [PmProcessStruct] ps on ps.[Id] = p.[StructId]\n" +
+    "  left join [PmElemProcess] ep on t.[ElementId] = ep.[Id]\n" +
+    "  left join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
+    "  left join [User] u on u.[SysParentId] = t.[ExecutorId]\n" +
+    "  left join [User] eu on eu.[SysParentId] = ep.[SupervisorId]\n" +
+    "where t.[Id] = <%= id %>";
+
+const SQL_GET_TASK_MYSQL =
+    "select t.`Id`, t.`Name`, t.`ProcessId`, t.`TimeCr`, t.`DueDate`, t.`ExecutorId`, u.`DisplayName` as `UserName`,\n" +
+    "  t.`Description`, t.`AlertId`, t.`IsElemReady`, t.`WriteFieldSet`, t.`ElementId`, t.`State`, ep.`State` as `EState`,\n" +
+    "  ep.`SupervisorId`, eu.`DisplayName` as `EUserName`, e.`Name` as `EName`, e.`WriteFields`, e.`ViewFields`, ps.`ProcessFields`\n" +
+    "from `PmTask` t\n" +
+    "  join `PmProcess` p on t.`ProcessId` = p.`Id`\n" +
+    "  join `PmProcessStruct` ps on ps.`Id` = p.`StructId`\n" +
+    "  left join `PmElemProcess` ep on t.`ElementId` = ep.`Id`\n" +
+    "  left join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
+    "  left join `User` u on u.`SysParentId` = t.`ExecutorId`\n" +
+    "  left join `User` eu on eu.`SysParentId` = ep.`SupervisorId`\n" +
+    "where t.`Id` = <%= id %>";
+
+const SQL_GET_TASK_LOG_MSSQL =
+    "select l.[Id], l.[TimeCr], l.[Text], l.[UserId], u.[DisplayName]\n" +
+    "from [PmTask] t\n" +
+    "  join [PmTaskLog] l on l.[TaskId] = t.[Id]\n" +
+    "  join [User] u on u.[SysParentId] = l.[UserId]\n" +
+    "where t.[Id] = <%= id %>\n" +
+    "order by l.[TimeCr]";
+
+const SQL_GET_TASK_LOG_MYSQL =
+    "select l.[Id], l.[TimeCr], l.[Text], l.[UserId], u.[DisplayName]\n" +
+    "from [PmTask] t\n" +
+    "  join [PmTaskLog] l on l.[TaskId] = t.[Id]\n" +
+    "  join [User] u on u.[SysParentId] = l.[UserId]\n" +
+    "where t.[Id] = <%= id %>\n" +
+    "order by l.[TimeCr]";
+
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
 
@@ -382,7 +424,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     TimeCr: elem.TimeCr,
                     Supervisor: {
                         Id: elem.SupervisorId,
-                        Name: elem.DisplayName
+                        DisplayName: elem.DisplayName
                     },
                     Course: {
                         Id: elem.CourseId,
@@ -395,6 +437,115 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 };
                 result.push(process);
             });
+        }
+
+        return result;
+    }
+
+    async getTask(id, options) {
+        let result;
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
+
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(SQL_GET_TASK_MYSQL)({ id: id }),
+                mssql: _.template(SQL_GET_TASK_MSSQL)({ id: id })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length === 1)) {
+            let elem = records.detail[0];
+            result = {
+                Id: elem.Id,
+                Name: elem.Name,
+                TimeCr: elem.TimeCr,
+                State: elem.State,
+                DueDate: elem.DueDate,
+                Description: elem.Description,
+                AlertId: elem.AlertId,
+                IsElemReady: elem.IsElemReady ? true : false,
+                WriteFieldSet: elem.WriteFieldSet,
+                Log: []
+            };
+            if (elem.ExecutorId)
+                result.Executor = { Id: elem.ExecutorId, DisplayName: elem.UserName };
+            if (elem.ElementId) {
+                result.Element = {
+                    Id: elem.ElementId,
+                    Name: elem.EName,
+                    State: elem.EState
+                }
+                if (elem.SupervisorId)
+                    result.Element.Supervisor = { Id: elem.SupervisorId, DisplayName: elem.EUserName };
+                if (elem.ViewFields) {
+                    let viewFields = JSON.parse(elem.ViewFields);
+                    let writeFields = {};
+                    result.WriteSets = {};
+                    if (elem.WriteFields) {
+                        result.WriteSets = JSON.parse(elem.WriteFields);
+                        if (result.WriteFieldSet) {
+                            let wf_arr = result.WriteSets[result.WriteFieldSet];
+                            if (Array.isArray(wf_arr)) {
+                                for (let i = 0; Array.isArray(wf_arr) && (i < wf_arr.length); i++)
+                                    writeFields[wf_arr[i]] = true;
+                            }
+                            else
+                                result.WriteFieldSet = null;
+                        }
+                    }
+
+                    let procFields = {};
+                    let root_obj = await this._getObjById(elem.ProcessId, { expr: { model: { name: "PmProcess" } } }, dbOpts);
+                    try {
+                        let collection = root_obj.getCol("DataElements");
+                        if (collection.count() != 1)
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Процесс (Id =${id}) не найден.`);
+
+                        let process_obj = collection.get(0);
+                        await this._getFieldValues(process_obj, procFields);
+                        let procFieldDefs = JSON.parse(elem.ProcessFields);
+                        result.Fields = [];
+                        for (let i = 0; i < viewFields.length; i++) {
+                            let fn = viewFields[i];
+                            if (procFieldDefs[fn])
+                                result.Fields.push(_.defaultsDeep({ name: fn, readOnly: writeFields[fn] ? false : true }, procFieldDefs[fn]));
+                        }
+                        for (let idx in result.Fields) {
+                            let val = procFields[result.Fields[idx].name];
+                            if (typeof (val) !== "undefined")
+                                result.Fields[idx].value = val;
+                        }
+                    }
+                    finally {
+                        if (root_obj)
+                            this._db._deleteRoot(root_obj.getRoot());
+                    }
+                }
+            }
+        }
+        else
+            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${id}) не найдена.`);
+
+        records = await $data.execSql({
+            dialect: {
+                mysql: _.template(SQL_GET_TASK_LOG_MYSQL)({ id: id }),
+                mssql: _.template(SQL_GET_TASK_LOG_MSSQL)({ id: id })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            records.detail.forEach(elem => {
+                result.Log.push({
+                    Id: elem.Id,
+                    TimeCr: elem.TimeCr,
+                    Text: elem.Text,
+                    User: {
+                        Id: elem.UserId,
+                        DisplayName: elem.DisplayName
+                    }
+                });
+            })
         }
 
         return result;
@@ -471,6 +622,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     mssql_field = "t.[TimeCr]";
                     mysql_field = "t.`TimeCr`";
                     break;
+                case "Name":
+                    mssql_field = "t.[Name]";
+                    mysql_field = "t.`Name`";
+                    break;
                 case "ProcessName":
                     mssql_field = "p.[ProcessName]";
                     mysql_field = "p.`ProcessName`";
@@ -515,7 +670,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 if (elem.ElementId)
                     task["Element"] = { Id: elem.ElementId, Name: elem.ElName };
                 if (elem.ExecutorId)
-                    task["Executor"] = { Id: elem.ExecutorId, Name: elem.DisplayName };
+                    task["Executor"] = { Id: elem.ExecutorId, DisplayName: elem.DisplayName };
                 result.push(task);
             });
         }
