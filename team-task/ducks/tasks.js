@@ -100,7 +100,7 @@ function* getTasksSaga() {
                 Executor: {
                     Id: task.Executor.Id ? task.Executor.Id : -1
                 },
-                ExecutorName: task.Executor.DisplayName,
+                UserName: task.Executor.DisplayName,
                 ..._getTaskStateData(task.State)
             }
         })

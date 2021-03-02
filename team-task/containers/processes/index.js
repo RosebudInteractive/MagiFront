@@ -2,14 +2,14 @@ import React, {useMemo, useEffect, useRef} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {processesSelector, statesSelector, fetchingSelector, getProcesses} from "tt-ducks/processes";
-import {setGridSortOrder, applyFilter, setInitState} from "tt-ducks/route";
+import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import $ from "jquery";
 import "./processes.sass"
 import Webix from "../../components/Webix";
 import type {FilterField} from "../../components/filter/types";
 import FilterRow from "../../components/filter";
 import {GRID_SORT_DIRECTION} from "../../constants/common";
-import {convertFilter2Params, getFilterConfig, parseParams} from "./functions";
+import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import {useLocation,} from "react-router-dom"
 
 
@@ -31,19 +31,23 @@ function Processes(props) {
         }
         if (initState.filter) {
             filter.current = initState.filter
+            initState.filter = convertFilter2Params(initState.filter)
         }
+
+        initState.pathname = location.pathname
 
         actions.setInitState(initState)
 
-        $(window).on('resize', _resizeHandler);
-        _resizeHandler();
+        $(window).on('resize', resizeHandler);
+        resizeHandler();
 
         return () => {
-            $(window).unbind('resize', _resizeHandler)
+            $(window).unbind('resize', resizeHandler)
         }
     }, [])
 
     useEffect(() => {
+        actions.setPathname(location.pathname)
         if (!fetching) {
             actions.getProcesses()
         }
@@ -72,7 +76,7 @@ function Processes(props) {
                     return `<div class="process-state ${data.css}">${data.label}</div>`
                 }
             },
-            {id: 'SupervisorName', header: 'Супервизор', width: 170},
+            {id: 'UserName', header: 'Супервизор', width: 170},
             {id: 'Name', header: 'Название', width: 250, fillspace: 30},
             {id: 'CourseName', header: 'Курс', width: 80, fillspace: 30},
             {id: 'LessonName', header: 'Лекция', width: 115, fillspace: 30},
@@ -91,7 +95,6 @@ function Processes(props) {
                 actions.setGridSortOrder(_sort)
                 this.markSorting(_sort.field, _sort.direction)
             }
-
         }
     };
 
@@ -124,20 +127,8 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcesses, setGridSortOrder, applyFilter, setInitState}, dispatch)
+        actions: bindActionCreators({getProcesses, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
     }
 }
 
 export default connect(mapState2Props, mapDispatch2Props)(Processes)
-
-const _resizeHandler = () => {
-    const _form = $('.form'),
-        _height = _form.height(),
-        _width = _form.width()
-
-    if (window.$$('processes-grid')) {
-        const _headerHeight = window.$$('processes-grid').config.headerRowHeight
-
-        window.$$('processes-grid').$setSize(_width, _height - _headerHeight - 48)
-    }
-}

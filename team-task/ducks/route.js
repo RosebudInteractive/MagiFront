@@ -168,8 +168,12 @@ function* buildLocationSaga() {
 }
 
 function* setInitStateSaga({payload}) {
+    if (payload.pathname) {
+        yield put({type: SET_PATHNAME, payload: payload.pathname})
+    }
+
     if (payload.filter) {
-        yield put({ type: APPLY_FILTER, payload: {...payload} })
+        yield put({ type: APPLY_FILTER, payload: {...payload.filter} })
     }
 
     if (payload.order) {

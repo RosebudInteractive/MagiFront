@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react"
+import React, {useState, useRef, useEffect} from "react"
 import type {FilterField} from "./types";
 import Button from "./button";
 import Row from "./row";
@@ -13,13 +13,21 @@ export default function Filter(props: FilterProps) {
     const {fields} = props
 
     const [visible, setVisible] = useState(false)
+    const filterValueRef = useRef({})
+
+    useEffect(() => {
+        fields.forEach((item: FilterField) => {
+            filterValueRef.current[item.name] = item.value
+        })
+
+    }, [fields])
 
     const _onFilterClick = () => {
         setVisible(!visible)
         props.onChangeVisibility()
     }
 
-    const filterValueRef = useRef({})
+
 
     const _onChange = (data) => { filterValueRef.current[data.field] = data.value }
     const _onClean = (fieldName) => { if (filterValueRef.current[fieldName]) delete filterValueRef.current[fieldName] }

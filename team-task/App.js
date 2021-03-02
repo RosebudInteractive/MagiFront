@@ -4,8 +4,6 @@ import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
 
-
-
 // import SignInForm from './sign-in-form';
 
 import {userAuthSelector, whoAmI} from "tt-ducks/auth";
@@ -24,7 +22,6 @@ import SideBarMenu from "./containers/side-bar-menu";
 import Breadcrumb from "./containers/header-pane";
 import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
-import {setPathname} from "tt-ducks/route";
 import LoadingPage from "./components/loading-page";
 
 window.webix = webix
@@ -36,11 +33,6 @@ function App(props) {
 
     useEffect(() => {
         actions.whoAmI()
-    },[])
-
-    useEffect(() => {
-        actions.whoAmI()
-        actions.setPathname(location.pathname)
     },[location])
 
     return isUserAuthorized ?
@@ -65,9 +57,7 @@ function mapStateToProps(state,) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI, setPathname}, dispatch),
-        // getAppOptions: bindActionCreators(getAppOptions, dispatch),
-        // appActions: bindActionCreators(appActions, dispatch),
+        actions: bindActionCreators({whoAmI,}, dispatch),
     }
 }
 

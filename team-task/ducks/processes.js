@@ -94,7 +94,7 @@ function* getTasksSaga() {
             return {
                 ...task,
                 CourseName: task.Course.Name,
-                SupervisorName: task.Supervisor.DisplayName,
+                UserName: task.Supervisor.DisplayName,
                 LessonName: task.Lesson.Name,
                 ..._getStateData(task.State)
             }
@@ -114,5 +114,5 @@ const _getStateData = (state) => {
 
 const _fetchProcesses = (params) => {
     // return Promise.resolve(PROCESSES)
-    return commonGetQuery("/api/pm/process-list" + (params ? `&${params}` : ""))
+    return commonGetQuery("/api/pm/process-list" + (params ? `?${params}` : ""))
 }

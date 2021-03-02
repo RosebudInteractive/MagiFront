@@ -234,9 +234,8 @@ Promise.resolve()
                 res.sendFile(__dirname + '/adm-index.html');
             });
 
-        if (config.has("server.teamTaskEnabled") && (config.server.teamTaskEnabled === true))
-            app.get("/tt/*", function (req, res) {
-                // res.sendFile(__dirname + '/adm-index.html');
+        if (config.has("server.pmEnabled") && (config.server.pmEnabled === true))
+            app.get("/pm/*", function (req, res) {
                 res.sendFile(path.join(__dirname, "team-task", "index.html"));
             });
 

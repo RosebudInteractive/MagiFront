@@ -1,5 +1,6 @@
 import {GRID_SORT_DIRECTION} from "../../constants/common";
 import {FILTER_FIELD_TYPE} from "../../components/filter/types";
+import $ from "jquery";
 
 export const parseParams = () => {
     const paramsData = {}
@@ -77,4 +78,16 @@ export const getFilterConfig = (filter, states) => {
             value: filter ? filter.LessonName : null
         },
     ]
+}
+
+export const resizeHandler = () => {
+    const _form = $('.form'),
+        _height = _form.height(),
+        _width = _form.width()
+
+    if (window.$$('processes-grid')) {
+        const _headerHeight = window.$$('processes-grid').config.headerRowHeight
+
+        window.$$('processes-grid').$setSize(_width, _height - _headerHeight - 48)
+    }
 }

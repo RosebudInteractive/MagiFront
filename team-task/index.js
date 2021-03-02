@@ -13,7 +13,7 @@ import history from './history'
 
 render(
     <Provider store={store}>
-        <Router history={history} bas>
+        <Router history={history}>
             <App />
         </Router>
     </Provider>,

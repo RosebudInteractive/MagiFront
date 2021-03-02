@@ -33,7 +33,6 @@ module.exports = {
         publicEnabled: true, // public site
         adminEnabled: true,  // site content administration
         pmEnabled: true,     // process manager
-        teamTaskEnabled: true,
         pushNotifications: false,
         corsEnabled: false,
         prerender: {
