@@ -111,6 +111,17 @@ function setupProcesses(app) {
             }
         });
 
+        app.get(`${ROUTE_PREFIX}task/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().getTask(parseInt(req.params.id), opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.delete(`${ROUTE_PREFIX}task/:id`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
