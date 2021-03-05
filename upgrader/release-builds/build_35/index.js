@@ -23,7 +23,7 @@ exports.upgradeDb = async (schema) => {
         .addField("State", { type: "int", allowNull: false }) // 1- Draft, 2- Executing, 3- Finished 
         .addField("StructId", { type: "dataRef", model: "PmProcessStruct", refAction: "parentRestrict", allowNull: false })
         .addField("SupervisorId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
-        .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
+        .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: true })
         .addField("DueDate", { type: "datetime", allowNull: true })
 
     schema.getModel("PmProcess")
