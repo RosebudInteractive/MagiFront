@@ -424,6 +424,20 @@ const WHERE_DYN_MYSQL = "\n  or ((d.`DiscountTypeId` = 3) and (<%= code_dyn %>))
 const COND_DYN_CODE_MYSQL = "((d.`Code` = '<%= code %>')<%= id_dyn %>)";
 const COND_DYN_ID_MYSQL = " and (c.`Id` = '<%= id %>')";
 
+const GET_USER_LIST_MSSQL =
+    "select TOP <%= limit %> s.[Id], s.[Login], u.[Email], u.[DisplayName], u.[PData]\n" +
+    "from [SysUser] s\n" +
+    "  join [User] u on u.[SysParentId] = s.[Id]\n" +
+    "  join [UserRole] ur on ur.[UserId] = s.[Id]\n" +
+    "  join [Role] r on r.[Id] = ur.[RoleId]";
+
+const GET_USER_LIST_MYSQL =
+    "select s.`Id`, s.`Login`, u.`Email`, u.`DisplayName`, u.`PData`\n" +
+    "from `SysUser` s\n" +
+    "  join `User` u on u.`SysParentId` = s.`Id`\n" +
+    "  join `UserRole` ur on ur.`UserId` = s.`Id`\n" +
+    "  join `Role` r on r.`Id` = ur.`RoleId`";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
@@ -694,6 +708,64 @@ const DbUser = class DbUser extends DbObject {
                     return { result: "OK" };
                 })
         }, memDbOptions);
+    }
+
+    async getUserList(user, options) {
+        const DEFAULT_LIMIT = 50;
+
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+        if (!(user && user.Id))
+            throw new HttpError(HttpCode.ERR_BAD_REQ, "Missing user argument.");
+        let dbOpts = _.defaultsDeep({ userId: user.Id }, opts.dbOptions || {});
+        
+        let permissions = AccessFlags.Administrator | AccessFlags.PmAdmin | AccessFlags.PmSupervisor | AccessFlags.PmElemManager;
+        if(AccessRights.checkPermissions(user, permissions) === 0)
+            throw new HttpError(HttpCode.ERR_FORBIDDEN, "User is not permitted to request this data.");
+
+        let limit = opts.limit ? +opts.limit : DEFAULT_LIMIT;
+        let sql_mysql = GET_USER_LIST_MYSQL;
+        let sql_mssql = _.template(GET_USER_LIST_MSSQL)({ limit: limit });
+
+        let mssql_conds = [];
+        let mysql_conds = [];
+
+        if (opts.role) {
+            let roles = Array.isArray(opts.role) ? opts.role : opts.role.split(',');
+            for (let i = 0; i < roles.length; i++)
+                roles[i] = `'${roles[i]}'`;
+            mssql_conds.push(`(r.[ShortCode] in (${roles.join(',')}))`);
+            mysql_conds.push(`(r.${'`'}ShortCode${'`'} in (${roles.join(',')}))`);
+        }
+
+        if (mysql_conds.length > 0) {
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
+        }
+
+        sql_mysql = `${sql_mysql}\nlimit ${limit}`;
+
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(sql_mysql)(),
+                mssql: _.template(sql_mssql)()
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            let user_ids = {};
+            records.detail.forEach(elem => {
+                if (!user_ids[elem.Id]) {
+                    user_ids[elem.Id] = 1;
+                    result.push({
+                        Id: elem.Id,
+                        Email: elem.Email,
+                        DisplayName: elem.DisplayName,
+                        PData: JSON.parse(elem.PData)
+                    });
+                }
+            })
+        }
+        return result;
     }
 
     getPublic(user) {
