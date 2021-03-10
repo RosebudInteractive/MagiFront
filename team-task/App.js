@@ -20,6 +20,7 @@ import * as webix from 'webix/webix.js';
 // import "../tools/player-notifier"
 import SideBarMenu from "./containers/side-bar-menu";
 import Breadcrumb from "./containers/header-pane";
+import {fetchingSelector as taskFetching} from "tt-ducks/task";
 import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import LoadingPage from "./components/loading-page";
@@ -36,7 +37,7 @@ function App(props) {
     },[location])
 
     return isUserAuthorized ?
-        <div className="tt-main-area">
+        <div className="team-task tt-main-area">
             { fetching && <LoadingPage/> }
             <SideBarMenu/>
             <div className="tt-main-area__info-panel">
@@ -51,7 +52,7 @@ function App(props) {
 function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
-        fetching: tasksFetching(state) || processesFetching(state)
+        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state)
     }
 }
 

@@ -96,6 +96,9 @@ export const stateSelector = state => state[moduleName]
 export const userSelector = createSelector(stateSelector, state => state.user)
 export const userAuthSelector = createSelector(stateSelector, state => state.authorized)
 export const initializedSelector = createSelector(stateSelector, state => state.initialized)
+export const hasSupervisorRights = createSelector(userSelector, (user) => {
+    return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pma)
+})
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
