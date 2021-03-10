@@ -37,23 +37,29 @@ export default function StorePopup(props) {
         (_isMobilePlatform && !_isAppleMobile && (mode < MOBILE_STORE_MODE.BOTH))
 
     const _onLinkClick = (e) => {
-        window.open("magisteria://")
-        e.preventDefault()
-        e.returnValue = false
-        setTimeout(() => {
-            window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
-        }, 1000);
+        // window.open("magisteria://")
+        // e.preventDefault()
+        // e.returnValue = false
+
+        // setTimeout(() => {
+        window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
+        // }, 1000);
     }
 
     if (_hidden) return null
 
     return <div className={"top-message__store-popup" + (_isMobilePlatform ? " _mobile" : " _desktop")}>
+        <div className="top-message__background _main"/>
+        <div className="top-message__background _shadow"/>
         <div className="store-popup__info-block__wrapper">
             <div className={"store-popup__info-block _big" + (_isMobilePlatform ? " _mobile" : " _desktop")}>
-                <img className="phone-image" src="/assets/images/store-popup/phone.png" width="276" height="263"/>
+                <div className="phone-image">
+                    <img className="phone-image__main" src="/assets/images/store-popup/phone.png" width="276" height="263"/>
+                    <img className="phone-image__pods" src="/assets/images/store-popup/pods.png"/>
+                </div>
                 <div className="text-block">
-                    <div className="text-block__content font-universal__title-small">Загрузите мобильное приложение</div>
-                    <div className="text-block__text font-universal__body-medium">Мобильное приложение, с которым наши
+                    <div className="text-block__content font-universal__title-small _white">Загрузите мобильное приложение</div>
+                    <div className="text-block__text font-universal__body-medium _white">Мобильное приложение, с которым наши
                         лекции и материалы удобно смотреть и слушать в любом месте</div>
                 </div>
                 <div className={"buttons-block" + (_isMobilePlatform ? " _single" : " _all")}>
@@ -85,13 +91,13 @@ export default function StorePopup(props) {
                     </div>
                 }
                 <div className="text-block">
-                    <div className="text-block__text font-universal__body-medium _mobile">Наши лекции и материалы удобно
+                    <div className="text-block__text font-universal__body-medium _mobile _white">Наши лекции и материалы удобно
                         смотреть и слушать в любом месте</div>
                 </div>
                 <div className={"buttons-block" + (_isMobilePlatform ? " _single" : " _all")}>
                     {
                         _isMobilePlatform ?
-                            <div className="store-button__link font-universal__body-medium _orange" onClick={_onLinkClick}>Загрузить</div>
+                            <div className="store-button__link font-universal__body-medium _white" onClick={_onLinkClick}>Загрузить</div>
                             :
                             <React.Fragment>
                                 <StoreButton size={STORE_BUTTON_SIZE.SMALL}
