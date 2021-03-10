@@ -34,6 +34,17 @@ function setupProcesses(app) {
             }
         });
 
+        app.get(`${ROUTE_PREFIX}process-elem/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().getProcessElem(parseInt(req.params.id), opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.put(`${ROUTE_PREFIX}process-elem/:id`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
@@ -148,6 +159,17 @@ function setupProcesses(app) {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
                 let rows = await ProcessService().newTask(req.body, opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.get(`${ROUTE_PREFIX}process/:id/elements`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().getProcessElems(parseInt(req.params.id), opts);
                 res.send(rows);
             }
             catch (err) {

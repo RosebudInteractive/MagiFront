@@ -275,6 +275,18 @@ function setupUsers(app) {
         }
     });
 
+    app.get('/api/users/list', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' });
+            let rows = await UsersService().getUserList(req.user, req.query);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/users', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
