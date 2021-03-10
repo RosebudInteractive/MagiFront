@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useMemo} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {getTasks, statesSelector, tasksSelector, fetchingSelector} from "tt-ducks/tasks";
+import {getTasks, goToTask, statesSelector, tasksSelector, fetchingSelector} from "tt-ducks/tasks";
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import Webix from "../../components/Webix";
 import "./tasks.sass"
@@ -100,6 +100,12 @@ function Tasks(props) {
 
                 actions.setGridSortOrder(_sort)
                 this.markSorting(_sort.field, _sort.direction)
+            },
+            onItemClick: function (id) {
+                const item = this.getItem(id)
+                if (item && item.Id) {
+                    actions.goToTask(item.Id)
+                }
             }
         }
     };
@@ -129,7 +135,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getTasks, applyFilter, setGridSortOrder, setInitState, setPathname}, dispatch)
+        actions: bindActionCreators({getTasks, goToTask, applyFilter, setGridSortOrder, setInitState, setPathname}, dispatch)
     }
 }
 

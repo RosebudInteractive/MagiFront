@@ -9,6 +9,7 @@ import {showErrorMessage} from "tt-ducks/messages";
 import TASKS from "../mock-data/tasks"
 import {TASK_STATE} from "../constants/states";
 import {paramsSelector} from "tt-ducks/route";
+import {push} from "react-router-redux/src";
 /**
  * Constants
  * */
@@ -19,6 +20,8 @@ const GET_TASKS_REQUEST = `${prefix}/GET_TASKS_REQUEST`
 const GET_TASKS_START = `${prefix}/GET_TASKS_START`
 export const GET_TASKS_SUCCESS = `${prefix}/GET_TASKS_SUCCESS`
 export const GET_TASKS_FAIL = `${prefix}/GET_TASKS_FAIL`
+
+const GO_TO_TASKS_REQUEST = `${prefix}/GO_TO_TASKS_REQUEST`
 
 
 /**
@@ -74,6 +77,10 @@ export const getTasks = () => {
     return {type: GET_TASKS_REQUEST}
 }
 
+export const goToTask = (taskId) => {
+    return {type: GO_TO_TASKS_REQUEST, payload: taskId}
+}
+
 
 /**
  * Sagas
@@ -81,6 +88,7 @@ export const getTasks = () => {
 export const saga = function* () {
     yield all([
         takeEvery(GET_TASKS_REQUEST, getTasksSaga),
+        takeEvery(GO_TO_TASKS_REQUEST, goToTaskSaga),
     ])
 }
 
@@ -121,4 +129,8 @@ const _getTaskStateData = (state) => {
 const _fetchTasks = (params) => {
     // return Promise.resolve(TASKS)
     return commonGetQuery("/api/pm/task-list" + (params ? `?${params}` : ""))
+}
+
+function* goToTaskSaga(data) {
+    yield put(push(`/task/${data.payload}`))
 }

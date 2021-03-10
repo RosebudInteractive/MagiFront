@@ -7,6 +7,7 @@ import {useLocation} from "react-router-dom"
 const PATHES = {
     processes: "Процессы",
     tasks: "Задачи",
+    task: "Задача",
     notifications: "Уведомления",
     dictionaries: "Справочники"
 }
