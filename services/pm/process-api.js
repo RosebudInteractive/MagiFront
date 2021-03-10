@@ -234,12 +234,12 @@ const SQL_GET_TASK_LOG_MSSQL =
     "order by l.[TimeCr]";
 
 const SQL_GET_TASK_LOG_MYSQL =
-    "select l.[Id], l.[TimeCr], l.[Text], l.[UserId], u.[DisplayName]\n" +
-    "from [PmTask] t\n" +
-    "  join [PmTaskLog] l on l.[TaskId] = t.[Id]\n" +
-    "  join [User] u on u.[SysParentId] = l.[UserId]\n" +
-    "where t.[Id] = <%= id %>\n" +
-    "order by l.[TimeCr]";
+    "select l.`Id`, l.`TimeCr`, l.`Text`, l.`UserId`, u.`DisplayName`\n" +
+    "from `PmTask` t\n" +
+    "  join `PmTaskLog` l on l.`TaskId` = t.`Id`\n" +
+    "  join `User` u on u.`SysParentId` = l.`UserId`\n" +
+    "where t.`Id` = <%= id %>\n" +
+    "order by l.`TimeCr`";
 
 const SQL_GET_PELEM_MSSQL =
     "select ep.[Id] as [ElementId], ep.[ProcessId], ep.[State] as [EState], ep.[SupervisorId],\n" +
