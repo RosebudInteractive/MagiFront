@@ -268,7 +268,8 @@ const SQL_GET_ALL_PELEMS_MSSQL =
     "  join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
     "  join [PmProcess] p on p.[Id] = ep.[ProcessId]\n" +
     "  left join [User] eu on eu.[SysParentId] = ep.[SupervisorId]\n" +
-    "where p.[Id] = <%= id %>";
+    "where p.[Id] = <%= id %>\n" +
+    "order by ep.[Index]";
 
 const SQL_GET_ALL_PELEMS_MYSQL =
     "select ep.`Id`, ep.`ProcessId`, ep.`State`, ep.`SupervisorId`,\n" +
@@ -277,7 +278,22 @@ const SQL_GET_ALL_PELEMS_MYSQL =
     "  join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
     "  join `PmProcess` p on p.`Id` = ep.`ProcessId`\n" +
     "  left join `User` eu on eu.`SysParentId` = ep.`SupervisorId`\n" +
-    "where p.`Id` = <%= id %>";
+    "where p.`Id` = <%= id %>\n" +
+    "order by ep.`Index`";
+
+const SQL_GET_ALL_PSELEMS_MSSQL =
+    "select e.[Id], e.[Name], e.[WriteFields], e.[ViewFields]\n" +
+    "from [PmProcessStruct] s\n" +
+    "  join [PmElement] e on e.[StructId] = s.[Id]\n" +
+    "where s.[Id] = <%= id %>\n" +
+    "order by e.[Index]";
+
+const SQL_GET_ALL_PSELEMS_MYSQL =
+    "select e.`Id`, e.`Name`, e.`WriteFields`, e.`ViewFields`\n" +
+    "from `PmProcessStruct` s\n" +
+    "  join `PmElement` e on e.`StructId` = s.`Id`\n" +
+    "where s.`Id` = <%= id %>\n" +
+    "order by e.`Index`";
 
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
@@ -738,6 +754,32 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 if (elem.ExecutorId)
                     task["Executor"] = { Id: elem.ExecutorId, DisplayName: elem.DisplayName };
                 result.push(task);
+            });
+        }
+
+        return result;
+    }
+
+    async getProcessStructElems(id, options) {
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
+
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(SQL_GET_ALL_PSELEMS_MYSQL)({ id: id }),
+                mssql: _.template(SQL_GET_ALL_PSELEMS_MSSQL)({ id: id })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            records.detail.forEach(elem => {
+                result.push({
+                    Id: elem.Id,
+                    Name: elem.Name,
+                    WriteFields: elem.WriteFields ? JSON.parse(elem.WriteFields) : null,
+                    ViewFields: elem.ViewFields ? JSON.parse(elem.ViewFields) : null
+                });
             });
         }
 
@@ -1691,7 +1733,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         if (isSupervisor)
-                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description"]);
+                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"])
+                        else
+                            this._setFieldValues(taskObj, inpFields, null, ["DueDate"]);
 
                         let child_tasks = [];
                         if (typeof (inpFields.State) !== "undefined")
