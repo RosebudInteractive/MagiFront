@@ -88,15 +88,13 @@ export default function UiSelect(props) {
             // onChange={handleChange}
             variant="outlined"
             native
+            disabled={props.disabled}
+            readOnly={props.readOnly}
         >
             <option value=""/>
             {
-                props.options && props.options.map(item => <option value={item.id}>{item.name}</option>)
+                props.options && props.options.map((item, index) => {return <option value={item.id} key={index}>{item.name}</option>})
             }
         </Select>
-        {/*<FormHelperText>Auto width</FormHelperText>*/}
     </CssFormControl>
-
-
-    // return <Select  {...props.input} className={"input-field" + (props.extClass ? props.extClass : "")}/>
 }

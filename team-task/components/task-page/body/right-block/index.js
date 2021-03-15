@@ -1,25 +1,32 @@
 import React, {useEffect, useRef, useMemo} from "react"
 import {Field} from "redux-form";
-import TextBox from "../../../ui-kit/text-box";
-import SupervisorBlock from "./supervisor-block";
-import ProcessFields from "./process-fields";
+import {TextBox, Select, DatePicker} from "../../../ui-kit";
+import CommentBlock from "./сomment-block";
 import "./right-block.sass"
+import {TASK_STATE} from "../../../../constants/states";
 
 type TaskBodyProps = {
-    hasChanged: boolean,
+    users: Array,
     task: any,
     isSupervisor: boolean,
 }
 
 export default function RightBlock(props: TaskBodyProps) {
-    const {hasChanged, isSupervisor, task} = props
+    const {task, users, isSupervisor} = props
+
+    const _getStateOptions = () => {
+        return Object.values(TASK_STATE).map(item => ({id: item.value, name: item.label}))
+    }
+
+    const _getUsers = () => {
+        return users && users.map((item) => {return {id: item.Id, name: item.DisplayName}})
+    }
 
     return <div className="body__right-block">
-        <div className={"right-block__description"}>
-            <Field component={TextBox} name={"Description"} label={"Описание"}/>
-        </div>
-
-        {isSupervisor && <SupervisorBlock hasChanged={hasChanged} task={task}/>}
-        <ProcessFields fields={task.Fields}/>
+        <Field component={Select} name={"ExecutorId"} label={"Испольнитель"} options={_getUsers()} disabled={!isSupervisor} readOnly={!isSupervisor}/>
+        <Field component={Select} name={"State"} label={"Состояние"} options={_getStateOptions()}/>
+        <Field component={DatePicker} name={"DueDate"} label={"Дата исполнения"}/>
+        <Field component={TextBox} name={"LastComment"} label={"Комментарий"}/>
+        <CommentBlock task={task}/>
     </div>
 }

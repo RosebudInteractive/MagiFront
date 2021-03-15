@@ -1,19 +1,12 @@
 import React from "react"
-import {FormControlLabel, Checkbox, withStyles, FormControl, TextField} from "@material-ui/core"
+import { withStyles} from "@material-ui/core"
+import {KeyboardDatePicker} from "@material-ui/pickers"
 
-const CssFormControlLabel = withStyles({
+const CssKeyboardDatePicker = withStyles({
     root: {
-        "& .MuiCheckbox-colorSecondary.Mui-checked": {
-            color: "#5A5B6A"
-        },
-        "& .MuiIconButton-root:hover": {
-            background: "none"
-        },
-        "& .MuiCheckbox-colorSecondary.Mui-checked:hover": {
-            background: "none"
-        },
         minHeight: "48px",
-        '& .MuiTypography-body1': {
+        '& label': {
+            left: 16,
             "font-family": "Inter",
             "font-size": "13px",
             "font-style": "normal",
@@ -62,21 +55,16 @@ const CssFormControlLabel = withStyles({
             },
         },
 
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                border: "none",
-            },
-            '& fieldset legend': {
-                display: "none"
-            },
+        '&.MuiTextField-root': {
+            borderRadius: "8px",
+            padding: "0 0 0 16px",
+            border: '1px solid #D2D2D6',
+            "-webkit-transition": "border, background 300ms ease-out",
+            "-moz-transition": "border, background 300ms ease-out",
+            "-o-transition": "border, background 300ms ease-out",
+            "transition": "border, background 300ms ease-out",
+
             "& input": {
-                borderRadius: "8px",
-                padding: "15px 16px",
-                border: '1px solid #D2D2D6',
-                "-webkit-transition": "border, background 300ms ease-out",
-                "-moz-transition": "border, background 300ms ease-out",
-                "-o-transition": "border, background 300ms ease-out",
-                "transition": "border, background 300ms ease-out",
                 "font-family": "Inter",
                 "font-style": "normal",
                 "font-weight": "normal",
@@ -84,13 +72,23 @@ const CssFormControlLabel = withStyles({
                 "line-height": "18px",
                 "letter-spacing": "0.15px",
                 "color": "#19191D",
-
+                padding: 0,
+                height: 18,
             },
-            '&:hover input:not(.Mui-disabled)': {
+            '&:hover:not(.Mui-disabled)': {
                 backgroundColor: "#E5E5E7",
                 borderColor: '#C8684C',
             },
-            '&.Mui-focused input': {
+            // "& "
+            "& button": {
+                top: -2,
+                "&:hover": {
+                    background: "none"
+                }
+            },
+
+            '& + .Mui-focused': {
+                backgroundColor: "red",
                 border: '1px solid #C8684C',
             },
             '&.Mui-disabled input': {
@@ -99,8 +97,39 @@ const CssFormControlLabel = withStyles({
             },
         },
     },
-})(FormControlLabel);
+})(KeyboardDatePicker);
 
-export default function UiCheckbox(props) {
-    return <CssFormControlLabel control={<Checkbox {...props.input} />} label={props.label}/>
+export default function UiDatePicker(props) {
+
+    const onChange = (e) => {
+        console.log(e)
+        props.input.onChange(e.toDate())
+    }
+
+    const onBlur = () => {
+        // props.input.onChange(e.valueOf())
+    }
+
+    const _id = props.id ? props.id : "ui-date-time-picker-" + Math.floor(Math.random() * Math.floor(10000))
+
+    return <CssKeyboardDatePicker
+        id={_id}
+        className={"input-field"}
+        disableToolbar
+        variant="inline"
+        format="DD.MM.yyyy"
+        margin="normal"
+
+        label={props.label}
+        {...props.input}
+        onChange={onChange}
+        onBlur={onBlur}
+        KeyboardButtonProps={{
+            'aria-label': 'change date',
+        }}
+        InputProps={{
+            disableUnderline: true,
+        }}
+    />
 }
+

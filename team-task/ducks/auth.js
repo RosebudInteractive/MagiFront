@@ -97,7 +97,7 @@ export const userSelector = createSelector(stateSelector, state => state.user)
 export const userAuthSelector = createSelector(stateSelector, state => state.authorized)
 export const initializedSelector = createSelector(stateSelector, state => state.initialized)
 export const hasSupervisorRights = createSelector(userSelector, (user) => {
-    return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pma)
+    return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms)
 })
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
@@ -119,9 +119,9 @@ export const saga = function* () {
     ])
 }
 
-const _isUserAdmin = (data) => {
+const _isPmUser = (data) => {
     let _rights = data.PData;
-    return _rights && (_rights.isAdmin || (_rights.roles && _rights.roles.e))
+    return _rights && (_rights.isAdmin || (_rights.roles && (_rights.roles.pma || _rights.roles.pms || _rights.roles.pme || _rights.roles.pmu)))
 }
 
 function* whoAmISaga() {
@@ -129,7 +129,7 @@ function* whoAmISaga() {
     try {
         const _authData = yield call(commonGetQuery,"/api/whoami")
 
-        if (_isUserAdmin(_authData)) {
+        if (_isPmUser(_authData)) {
             yield put({ type: WHO_AM_I_SUCCESS, payload: _authData })
         } else {
             // throw new Error('Not enough rights')
@@ -159,7 +159,7 @@ export const login = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                if (_isUserAdmin(data)) {
+                if (_isPmUser(data)) {
                     dispatch({
                         type: SIGN_IN_SUCCESS,
                         payload: data

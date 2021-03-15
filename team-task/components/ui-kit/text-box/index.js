@@ -25,6 +25,34 @@ const CssTextField = withStyles({
                 "transform": "translate(16px, 0px) scale(0.75)",
             }
         },
+        "& .MuiOutlinedInput-multiline": {
+            borderRadius: "8px",
+            padding: "15px 16px",
+            border: '1px solid #D2D2D6',
+            "-webkit-transition": "border, background 300ms ease-out",
+            "-moz-transition": "border, background 300ms ease-out",
+            "-o-transition": "border, background 300ms ease-out",
+            "transition": "border, background 300ms ease-out",
+            "font-family": "Inter",
+            "font-style": "normal",
+            "font-weight": "normal",
+            "font-size": "13px",
+            "line-height": "18px",
+            "letter-spacing": "0.15px",
+            "color": "#19191D",
+            '&:hover:not(.Mui-disabled)': {
+                backgroundColor: "#E5E5E7",
+                borderColor: '#C8684C',
+            },
+            '&.Mui-focused': {
+                border: '1px solid #C8684C',
+            },
+            '&.Mui-disabled': {
+                backgroundColor: "#F8F8F8",
+                color: "#9696A0",
+            },
+        },
+
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
                 border: "none",
@@ -70,5 +98,6 @@ export default function TextBox(props) {
                          disabled={props.disabled}
                          label={props.label}
                          variant="outlined"
+                         multiline={true}
                          className={"input-field"}/>
 }

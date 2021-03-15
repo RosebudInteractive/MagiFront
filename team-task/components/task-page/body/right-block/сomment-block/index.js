@@ -10,7 +10,7 @@ export default function CommentBlock(props: TaskBodyProps) {
 
     return <div className="body__comment-block">
         {
-            task.Log.map((item) => {return <Comment comment={item}/>})
+            task.Log.map((item, index) => {return <Comment comment={item} key={index}/>})
         }
     </div>
 }
