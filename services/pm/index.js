@@ -210,6 +210,17 @@ function setupProcesses(app) {
             }
         });
 
+        app.get(`${ROUTE_PREFIX}process-struct/:id/elements`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().getProcessStructElems(parseInt(req.params.id), opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.get(`${ROUTE_PREFIX}process-struct/:id`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
