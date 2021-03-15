@@ -1733,9 +1733,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         if (isSupervisor)
-                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"])
-                        else
-                            this._setFieldValues(taskObj, inpFields, null, ["DueDate"]);
+                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"]);
 
                         let child_tasks = [];
                         if (typeof (inpFields.State) !== "undefined")
