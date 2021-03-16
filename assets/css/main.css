@@ -19796,7 +19796,8 @@ ul.lectures-tab {
     -ms-flex: none;
     flex: none;
     margin-left: 5px;
-    max-width: 25px; }
+    /*max-width: 25px; */
+  }
     .payment-method__icon img {
       display: block;
       max-width: 100%; }

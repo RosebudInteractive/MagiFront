@@ -26,13 +26,13 @@ export const Card = (props) => {
 
 export const Yandex = (props) => {
     return <li className="payment-method">
-        <input type="radio" className="payment-form__option" name="payment-type" id="yad"
+        <input type="radio" className="payment-form__option" name="payment-type" id="iomoney"
                onClick={props.onClick} checked={props.checked}/>
-        <label htmlFor="yad" className="payment-form__text">
-            <span>Яндекс Деньги</span>
+        <label htmlFor="iomoney" className="payment-form__text">
+            <span>ЮMoney</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/yad.png" width="15" height="19" alt=""/>
+                    <img src="/assets/images/iomoney.png" width="86" height="18" alt="iomoney"/>
                 </div>
             </div>
         </label>
