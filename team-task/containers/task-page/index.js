@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useMemo, useState} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {useLocation, useParams} from "react-router-dom"
+import {useParams} from "react-router-dom"
 import {
     getTask,
     saveTask,
@@ -20,11 +20,12 @@ import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import "./task-page.sass"
 import {COMMENT_ACTION} from "../../constants/common";
 
+const EDITOR_NAME = "TASK_EDITOR"
+
 function TaskEditor(props) {
     const {actions, task, fetching, isSupervisor, hasChanges, editorValues, currentElement} = props
 
-    const location = useLocation(),
-        params = useParams()
+    const params = useParams()
 
     useEffect(() => {
         actions.getTask(params.taskId)
@@ -136,9 +137,9 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         isSupervisor: hasSupervisorRights(state),
         currentElement: currentElementSelector(state),
-        hasChanges: isDirty("TASK_EDITOR")(state),
-        editorValues: getFormValues("TASK_EDITOR")(state),
-        editorValid: isValid("TASK_EDITOR")(state),
+        hasChanges: isDirty(EDITOR_NAME)(state),
+        editorValues: getFormValues(EDITOR_NAME)(state),
+        editorValid: isValid(EDITOR_NAME)(state),
         user: userSelector(state)
     }
 }
@@ -150,7 +151,7 @@ const mapDispatch2Props = (dispatch) => {
 }
 
 const enhance = compose(
-    reduxForm({form: "TASK_EDITOR", validate}),
+    reduxForm({form: EDITOR_NAME, validate}),
     connect(mapState2Props, mapDispatch2Props)
 )
 

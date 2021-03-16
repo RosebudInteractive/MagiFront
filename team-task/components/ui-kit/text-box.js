@@ -92,7 +92,7 @@ const CssTextField = withStyles({
     },
 })(TextField);
 
-export default function TextBox(props) {
+export default function UiTextBox(props) {
 
     return <CssTextField {...props.input}
                          disabled={props.disabled}

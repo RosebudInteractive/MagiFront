@@ -1,20 +1,20 @@
 import React, {useEffect, useRef, useMemo} from "react"
 import {Field} from "redux-form";
-import {TextBoxWithConfirm} from "../../ui-kit";
+import TextBox from "../../ui-kit/text-box-with-confirm";
 import "./header.sass"
 
-type TaskHeaderProps = {
+type HeaderProps = {
     hasChanged: boolean,
-    taskId: ?string,
-    processName: string,
+    // taskId: ?string,
+    process: any,
     onSave: Function,
 }
 
-export default function TaskHeader(props: TaskHeaderProps) {
+export default function ProcessHeader(props: HeaderProps) {
     const {hasChanged, taskId, processName} = props
 
-    return <div className="task-page__header">
-        <Field component={TextBoxWithConfirm} name={"Name"} label={"Название задачи"}/>
+    return <div className="process-page__header">
+        <Field component={TextBox} name={"Name"} label={"Название задачи"}/>
         <div className="task-info-block">
             <h6 className="task-info__task-id _grey50">{taskId ? `№${taskId}` : "not saved"}</h6>
             <div className="task-info__separator"/>

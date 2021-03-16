@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useMemo} from "react"
 import {Field} from "redux-form";
-import TextBox from "../../../ui-kit/text-box";
+import TextBox from "../../../ui-kit/text-box-with-confirm";
 import SupervisorBlock from "./supervisor-block";
 import ProcessFields from "./process-fields";
 import "./main-block.sass"
