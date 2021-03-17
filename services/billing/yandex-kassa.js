@@ -9,8 +9,8 @@ const { Payment } = require('./payment');
 const { Accounting } = require('../../const/accounting');
 const { UsersCache } = require("../../security/users-cache");
 
-const BASE_HOST = "https://payment.yandex.net";
-const API_VERSION = "/api/v3/";
+const BASE_HOST = "https://api.yookassa.ru"; // "https://payment.yandex.net";
+const API_VERSION = "/v3/"; // "/api/v3/";
 const DEFAULT_TIMEOUT = require('http').createServer().timeout; // node's default timeout
 
 class YandexKassa extends Payment {
