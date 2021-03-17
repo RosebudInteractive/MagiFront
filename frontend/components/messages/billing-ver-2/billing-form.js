@@ -75,7 +75,7 @@ class PaymentForm extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yandex_money')
+        let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yoo_money')
 
         // Пока не показываем эту кнопку, а всегда передаем true
         // let _newShowSaveMethodButton = false
@@ -168,8 +168,8 @@ class PaymentForm extends React.Component {
                 this.setState({selectedMethod: 'bank_card'})
                 break
             }
-            case 'yad': {
-                this.setState({selectedMethod: 'yandex_money'})
+            case 'iomoney': {
+                this.setState({selectedMethod: 'yoo_money'})
                 break
             }
             case 'sber': {
@@ -250,7 +250,7 @@ class PaymentForm extends React.Component {
                                     visible={this.state.showStoredMethod}/>
                         <ul className="payment-methods__list">
                             <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
-                            <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yandex_money'}/>
+                            <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yoo_money'}/>
                             <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
                             <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
                             <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>

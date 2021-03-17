@@ -51,7 +51,7 @@ class CardBlock extends React.Component {
             }
 
 
-            case 'yandex_money' :
+            case 'yoo_money' :
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
                            defaultValue={_payment.get('account_number')}
@@ -130,7 +130,7 @@ class CardBlock extends React.Component {
             }
 
 
-            case 'yandex_money' :
+            case 'yoo_money' :
                 return <div className="card-block__footer">
                     <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue=""
                            disabled/>
