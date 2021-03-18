@@ -1,7 +1,7 @@
 import React, {useMemo, useEffect, useRef} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {processesSelector, statesSelector, fetchingSelector, getProcesses} from "tt-ducks/processes";
+import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import $ from "jquery";
 import "./processes.sass"
@@ -94,6 +94,12 @@ function Processes(props) {
 
                 actions.setGridSortOrder(_sort)
                 this.markSorting(_sort.field, _sort.direction)
+            },
+            onItemClick: function (id) {
+                const item = this.getItem(id)
+                if (item && item.Id) {
+                    actions.goToProcess(item.Id)
+                }
             }
         }
     };
@@ -127,7 +133,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcesses, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
+        actions: bindActionCreators({getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
     }
 }
 

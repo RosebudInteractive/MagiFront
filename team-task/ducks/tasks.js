@@ -21,7 +21,7 @@ const GET_TASKS_START = `${prefix}/GET_TASKS_START`
 export const GET_TASKS_SUCCESS = `${prefix}/GET_TASKS_SUCCESS`
 export const GET_TASKS_FAIL = `${prefix}/GET_TASKS_FAIL`
 
-const GO_TO_TASKS_REQUEST = `${prefix}/GO_TO_TASKS_REQUEST`
+const GO_TO_TASK_REQUEST = `${prefix}/GO_TO_TASK_REQUEST`
 
 
 /**
@@ -78,7 +78,7 @@ export const getTasks = () => {
 }
 
 export const goToTask = (taskId) => {
-    return {type: GO_TO_TASKS_REQUEST, payload: taskId}
+    return {type: GO_TO_TASK_REQUEST, payload: taskId}
 }
 
 
@@ -88,7 +88,7 @@ export const goToTask = (taskId) => {
 export const saga = function* () {
     yield all([
         takeEvery(GET_TASKS_REQUEST, getTasksSaga),
-        takeEvery(GO_TO_TASKS_REQUEST, goToTaskSaga),
+        takeEvery(GO_TO_TASK_REQUEST, goToTaskSaga),
     ])
 }
 

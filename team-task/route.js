@@ -5,12 +5,17 @@ import Tasks from "./containers/tasks";
 import Processes from "./containers/processes";
 import TaskEditor from "./containers/task-page"
 import ProcessEditor from "./containers/process-page";
+import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 
-export default function AppRouter() {
+type RouterProps = {
+    hasSupervisorRights: boolean
+}
+
+export default function AppRouter(props: RouterProps) {
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
-        <Route path={'/processes'} component={Processes}/>
         <Route path={'/task/:taskId'} component={TaskEditor}/>
-        <Route path={'/processes/:processId'} component={ProcessEditor}/>
+        <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
     </Switch>
 }

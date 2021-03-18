@@ -96,8 +96,6 @@ const CssTextField = withStyles({
 
 export default function TextBoxWithConfirm(props) {
 
-
-
     return <CssTextField {...props.input}
                          disabled={props.disabled}
                          label={props.label}

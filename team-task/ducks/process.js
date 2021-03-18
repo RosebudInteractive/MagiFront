@@ -7,7 +7,7 @@ import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
 
 import PROCESS from "../mock-data/process-1"
-import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
+import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import type {UpdatingCommentData, UpdatingProcess, UpdatingProcessData} from "../types/process";
@@ -155,33 +155,16 @@ export const saga = function* () {
 
 
 function* getProcessSaga(data) {
+    const _hasSupervisorRights = yield select(hasSupervisorRights)
+
+    if (!_hasSupervisorRights) return
+
     yield put({type: GET_PROCESS_START})
     try {
         let _process = yield call(_fetchProcess, data.payload)
-
-        const _user = yield select(userSelector),
-            _hasSupervisorRights = yield select(hasSupervisorRights)
-
-        // let _users = []
-        // if (_hasSupervisorRights) {
-            const _users = yield call(_getUsers)
-        // } else {
-        //     if (_task.Executor) {
-        //         _users.push({Id: _task.Executor.Id, DisplayName: _task.Executor.DisplayName})
-        //     }
-        // }
+        const _users = yield call(_getUsers)
 
         yield put({type: SET_USERS, payload: _users})
-
-        // if (_task.Process && _task.Process.Id) {
-        //     const _elements = yield call(_getProcessElements, _task.Process.Id)
-        //     yield put({type: SET_ELEMENTS, payload: _elements})
-        // }
-
-        // const _lastComment = _task.Log && _task.Log.length && _task.Log[_task.Log.length - 1],
-        //     _isUserComment = _lastComment && _lastComment.User.Id === _user.Id
-        //
-        // _task.UserLastComment = _isUserComment ? { Id: _lastComment.Id, Text: _lastComment.Text } : null
 
         yield put({type: GET_PROCESS_SUCCESS, payload: _process})
     } catch (e) {
@@ -196,7 +179,7 @@ const _fetchProcess = (processId) => {
 }
 
 const _getUsers = () => {
-    return commonGetQuery("/api/users/list?role=a,pma,pms,pme,pmu")
+    return commonGetQuery("/api/users/list?role=a,pma,pms")
 }
 
 const _getProcessElements = (processId) => {

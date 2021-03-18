@@ -66,7 +66,7 @@ export default function Row(props: RowProps) {
                 <ClearIcon/>
                 <span className="_title">Сбросить</span>
             </div>
-            <div className="filter-block__apply-button orange-button" onClick={props.onApply}>Показать</div>
+            <div className="filter-block__apply-button orange-button big-button" onClick={props.onApply}>Показать</div>
         </div>
 
     </div>

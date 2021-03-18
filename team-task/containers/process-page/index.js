@@ -8,7 +8,7 @@ import {
     saveProcess,
     // getProcessElement,
     processSelector,
-    // usersSelector,
+    usersSelector,
     // elementsSelector,
     // fetchingSelector,
     // currentElementSelector
@@ -17,9 +17,12 @@ import {
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 // import TaskBody from "../../components/task-page/body";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
+import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
 // import "./task-page.sass"
 // import {COMMENT_ACTION} from "../../constants/common";
 import ProcessHeader from "../../components/process-page/header";
+import ProcessBody from "../../components/process-page/body";
+import {PROCESS_FIELDS} from "../../constants/process";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -29,7 +32,12 @@ function ProcessEditor(props) {
     const params = useParams()
 
     useEffect(() => {
+        actions.hideSideBarMenu()
         actions.getProcess(params.taskId)
+
+        return () => {
+            actions.showSideBarMenu()
+        }
     }, [])
 
     useEffect(() => {
@@ -37,11 +45,12 @@ function ProcessEditor(props) {
             const _object = {
                 Name: process.Name,
                 State: process.State,
-                ExecutorId: process.Executor.Id,
+                SupervisorId: process.SupervisorId,
+                // ExecutorId: process.Executor.Id,
             }
 
-            task.Fields.forEach((field) => {
-                _object[field.name] = field.value
+            PROCESS_FIELDS.forEach((field) => {
+                _object[field] = process[field]
             })
 
             props.initialize(_object)
@@ -105,9 +114,10 @@ function ProcessEditor(props) {
     // }
 
 
-    // return !fetching && task &&
-    return <form className="process-editor-page form" action={"javascript:void(0)"}>
-            <ProcessHeader hasChanged={hasChanges} taskId={task.Id} processName={task.Process.Name} onSave={_save}/>
+    return !fetching && process &&
+        <form className="process-editor-page form" action={"javascript:void(0)"}>
+            <ProcessHeader hasChanged={hasChanges} state={process.State} onSave={_save}/>
+            <ProcessBody users={props.users}/>
             {/*<TaskBody task={task}*/}
             {/*          isSupervisor={isSupervisor}*/}
             {/*          elements={props.elements}*/}
@@ -127,7 +137,7 @@ const validate = (values) => {
 const mapState2Props = (state) => {
     return {
         process: processSelector(state),
-        // users: usersSelector(state),
+        users: usersSelector(state),
         // elements: elementsSelector(state),
         // fetching: fetchingSelector(state),
         user: userSelector(state),
@@ -140,7 +150,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcess,}, dispatch)
+        actions: bindActionCreators({getProcess, hideSideBarMenu, showSideBarMenu,}, dispatch)
     }
 }
 

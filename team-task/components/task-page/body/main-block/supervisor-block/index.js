@@ -44,6 +44,5 @@ export default function SupervisorBlock(props: TaskBodyProps) {
             }
         </div>
         <Field component={Select} name={"WriteFieldSet"} label={"Набор полей процесса на запись"} options={_getSetsList()} disabled={!writeSetEnable} readOnly={!writeSetEnable}/>
-        {/*<button className="supervisor-block__load-button orange-button" disabled>Загрузить поля процесса</button>*/}
     </div>
 }

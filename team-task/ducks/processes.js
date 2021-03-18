@@ -10,6 +10,7 @@ import {showErrorMessage} from "tt-ducks/messages";
 import PROCESSES from "../mock-data/processes"
 import {PROCESS_STATE} from "../constants/states";
 import {paramsSelector} from "tt-ducks/route";
+import {push} from "react-router-redux/src";
 
 /**
  * Constants
@@ -21,6 +22,8 @@ const GET_PROCESSES_REQUEST = `${prefix}/GET_PROCESSES_REQUEST`
 const GET_PROCESSES_START = `${prefix}/GET_PROCESSES_START`
 export const GET_PROCESSES_SUCCESS = `${prefix}/GET_PROCESSES_SUCCESS`
 export const GET_PROCESSES_FAIL = `${prefix}/GET_PROCESSES_FAIL`
+
+const GO_TO_PROCESS_REQUEST = `${prefix}/GO_TO_PROCESS_REQUEST`
 
 /**
  * Reducer
@@ -73,18 +76,23 @@ export const getProcesses = () => {
     return {type: GET_PROCESSES_REQUEST}
 }
 
+export const goToProcess = (processId: number) => {
+    return {type: GO_TO_PROCESS_REQUEST, payload: processId}
+}
 
-/**
+
+    /**
  * Sagas
  */
 export const saga = function* () {
     yield all([
-        takeEvery(GET_PROCESSES_REQUEST, getTasksSaga)
+        takeEvery(GET_PROCESSES_REQUEST, getProcessesSaga),
+        takeEvery(GO_TO_PROCESS_REQUEST, goToProcessSaga),
     ])
 }
 
 
-function* getTasksSaga() {
+function* getProcessesSaga() {
     yield put({type: GET_PROCESSES_START})
     try {
         const params = yield select(paramsSelector)
@@ -109,10 +117,14 @@ function* getTasksSaga() {
 const _getStateData = (state) => {
     const _state = Object.values(PROCESS_STATE).find(item => item.value === state)
 
-    return _state ? {css: _state.css, label: _state.label} : {css: "_unknown", label: "Неизвестно"}
+    return _state ? {css: _state.css, label: _state.label} : {css: "_error", label: "Ошибка"}
 }
 
 const _fetchProcesses = (params) => {
     // return Promise.resolve(PROCESSES)
     return commonGetQuery("/api/pm/process-list" + (params ? `?${params}` : ""))
+}
+
+function* goToProcessSaga(data) {
+    yield put(push(`/process/${data.payload}`))
 }

@@ -15,25 +15,22 @@
     box-sizing: border-box
     border-radius: 32px
 
-    &._waiting
-      background-color: $grey01
-      color: #2979FF
-
     &._draft
       background-color: #EBF2FF
-      color: #2979FF
+      color: $blue
 
     &._executing
       background-color: #FFF8EA
-      color: #F1A205
-
-    &._question
-      background-color: #FEEDEC
-      color: #C8372D
+      color: $yellow
 
     &._done
       background-color: #EDF6EE
-      color: #43A047
+      color: $green
+
+    &._error
+      background-color: #EDF6EE
+      color: $red
+
 
   .filter-button
     position: absolute

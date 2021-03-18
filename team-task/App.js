@@ -6,7 +6,7 @@ import {useLocation} from "react-router-dom"
 
 // import SignInForm from './sign-in-form';
 
-import {userAuthSelector, whoAmI} from "tt-ducks/auth";
+import {hasSupervisorRights, userAuthSelector, whoAmI} from "tt-ducks/auth";
 // import {getAppOptions,} from "../ducks/app";
 
 // import Toolbar from "../components/app/toolbar";
@@ -28,7 +28,7 @@ import LoadingPage from "./components/loading-page";
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, isUserAuthorized} = props
+    const {fetching, actions, isUserAuthorized, hasSupervisorRights} = props
 
     let location = useLocation();
 
@@ -42,7 +42,7 @@ function App(props) {
             <SideBarMenu/>
             <div className="tt-main-area__info-panel">
                 <Breadcrumb/>
-                <AppRouter/>
+                <AppRouter hasSupervisorRights={hasSupervisorRights}/>
             </div>
         </div>
         :
@@ -52,6 +52,7 @@ function App(props) {
 function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
+        hasSupervisorRights: hasSupervisorRights(state),
         fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state)
     }
 }
