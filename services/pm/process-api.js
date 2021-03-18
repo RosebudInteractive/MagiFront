@@ -114,17 +114,47 @@ const SQL_PROCESS_ELEMS_MSSQL =
 const SQL_PROCESS_ELEMS_MYSQL =
     "select `Id`, `State`, `ElemId`, `TaskId`, `SupervisorId` from `PmElemProcess` where `ProcessId` = <%= id %> order by `Index`";
 
+const SQL_PROCESS_PUB_ELEMS_MSSQL =
+    "select ep.[Id], e.[Name], ep.[State], ep.[ElemId], ep.[TaskId], ep.[SupervisorId], u.[DisplayName]\n" +
+    "from [PmElemProcess] ep\n" +
+    "  left join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
+    "  left join [User] u on u.[SysParentId] = ep.[SupervisorId]\n" +
+    "where ep.[ProcessId] = <%= id %>\n" +
+    "order by ep.[Index]";
+
+const SQL_PROCESS_PUB_ELEMS_MYSQL =
+    "select ep.`Id`, e.`Name`, ep.`State`, ep.`ElemId`, ep.`TaskId`, ep.`SupervisorId`, u.`DisplayName`\n" +
+    "from `PmElemProcess` ep\n" +
+    "  left join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
+    "  left join `User` u on u.`SysParentId` = ep.`SupervisorId`\n" +
+    "where ep.`ProcessId` = <%= id %>\n" +
+    "order by ep.`Index`";
+
 const SQL_PROCESS_TASKS_MSSQL =
-    "select [Id], [Name], [State], [DueDate], [ExecutorId], [Description], [AlertId], [ElementId]\n" +
-    "  [IsElementReady], [WriteFieldSet]\n" +
+    "select [Id], [Name], [State], [DueDate], [ExecutorId], [Description], [AlertId], [ElementId],\n" +
+    "  [IsElemReady], [WriteFieldSet]\n" +
     "from [PmTask]\n" +
     "where [ProcessId] = <%= id %>";
 
 const SQL_PROCESS_TASKS_MYSQL =
-    "select `Id`, `Name`, `State`, `DueDate`, `ExecutorId`, `Description`, `AlertId`, `ElementId`\n" +
-    "  `IsElementReady`, `WriteFieldSet`\n" +
+    "select `Id`, `Name`, `State`, `DueDate`, `ExecutorId`, `Description`, `AlertId`, `ElementId`,\n" +
+    "  `IsElemReady`, `WriteFieldSet`\n" +
     "from `PmTask`\n" +
     "where `ProcessId` = <%= id %>";
+
+const SQL_PROCESS_TASKS_PUB_MSSQL =
+    "select t.[Id], t.[Name], t.[State], t.[DueDate], t.[ExecutorId], t.[Description], t.[AlertId], t.[ElementId], \n" +
+    "  t.[IsElemReady], t.[WriteFieldSet], u.[DisplayName]\n" +
+    "from[PmTask] t\n" +
+    "  left join [User] u on u.[SysParentId] = t.[ExecutorId]\n" +
+    "where[ProcessId] = <%= id %>";
+
+const SQL_PROCESS_TASKS_PUB_MYSQL =
+    "select t.`Id`, t.`Name`, t.`State`, t.`DueDate`, t.`ExecutorId`, t.`Description`, t.`AlertId`, t.`ElementId`, \n" +
+    "  t.`IsElemReady`, t.`WriteFieldSet`, u.`DisplayName`\n" +
+    "from`PmTask` t\n" +
+    "  left join `User` u on u.`SysParentId` = t.`ExecutorId`\n" +
+    "where`ProcessId` = <%= id %>";
 
 const SQL_PROCESS_DEPS_MSSQL =
     "select d.[Id], d.[DepTaskId], d.[TaskId] from[PmDepTask] d\n" +
@@ -294,6 +324,22 @@ const SQL_GET_ALL_PSELEMS_MYSQL =
     "  join `PmElement` e on e.`StructId` = s.`Id`\n" +
     "where s.`Id` = <%= id %>\n" +
     "order by e.`Index`";
+
+const SQL_GET_PFIELDS_MSSQL =
+    "select s.[ProcessFields], p.[SupervisorId], u.[DisplayName], ll.[Name]\n" +
+    "from [PmProcessStruct] s\n" +
+    "  join [PmProcess] p on p.[StructId] = s.[Id]\n" +
+    "  left join [User] u on u.[SysParentId] = p.[SupervisorId]\n" +
+    "  left join [LessonLng] ll on ll.[LessonId] = p.[LessonId]\n" +
+    "where p.[Id] = <%= id %>";
+
+const SQL_GET_PFIELDS_MYSQL =
+    "select s.`ProcessFields`, p.`SupervisorId`, u.`DisplayName`, ll.`Name`\n" +
+    "from `PmProcessStruct` s\n" +
+    "  join `PmProcess` p on p.`StructId` = s.`Id`\n" +
+    "  left join `User` u on u.`SysParentId` = p.`SupervisorId`\n" +
+    "  left join `LessonLng` ll on ll.`LessonId` = p.`LessonId`\n" +
+    "where p.`Id` = <%= id %>";
 
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
@@ -828,6 +874,108 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 throw new HttpError(HttpCode.ERR_NOT_FOUND, `Процесс (Id =${id}) не найден.`);
 
             let process_obj = collection.get(0);
+            await this._getFieldValues(process_obj, result, ["GuidVer", "SysTypeId", "SupervisorId"]);
+
+            let records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SQL_PROCESS_PUB_ELEMS_MYSQL)({ id: id }),
+                    mssql: _.template(SQL_PROCESS_PUB_ELEMS_MSSQL)({ id: id })
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length > 0)) {
+                records.detail.forEach(elem => {
+                    result.Elements.push({
+                        Id: elem.Id,
+                        Name: elem.Name,
+                        State: elem.State,
+                        ElemId: elem.ElemId,
+                        TaskId: elem.TaskId,
+                        Supervisor: elem.SupervisorId ? {
+                            Id: elem.SupervisorId,
+                            DisplayName: elem.DisplayName
+                        } : undefined
+                    });
+                });
+            }
+
+            records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SQL_GET_PFIELDS_MYSQL)({ id: id }),
+                    mssql: _.template(SQL_GET_PFIELDS_MSSQL)({ id: id })
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length === 1)) {
+                let rec = records.detail[0];
+                result.ProcessFields = rec.ProcessFields ? JSON.parse(rec.ProcessFields) : undefined;
+                result.Supervisor = rec.SupervisorId ? {
+                    Id: rec.SupervisorId,
+                    DisplayName: rec.DisplayName
+                } : undefined;
+                if (typeof (result.LessonId) !== "undefined") {
+                    result.Lesson = {
+                        Id: result.LessonId,
+                        Name: rec.Name
+                    };
+                    delete result.LessonId;
+                }
+            }
+
+            records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SQL_PROCESS_TASKS_PUB_MYSQL)({ id: id }),
+                    mssql: _.template(SQL_PROCESS_TASKS_PUB_MSSQL)({ id: id })
+                }
+            }, dbOpts);
+            if (records && records.detail && (records.detail.length > 0)) {
+                records.detail.forEach(elem => {
+                    let val = _.clone(elem);
+                    val.IsElemReady = val.IsElemReady ? true : false;
+                    if (typeof (val.ExecutorId) !== "undefined") {
+                        if (val.ExecutorId) {
+                            val.Executor = {
+                                Id: val.ExecutorId,
+                                DisplayName: val.DisplayName
+                            };
+                        }
+                        delete val.ExecutorId;
+                        delete val.DisplayName;
+                    }
+                    result.Tasks.push(val);
+                });
+            }
+
+            records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SQL_PROCESS_DEPS_MYSQL)({ id: id }),
+                    mssql: _.template(SQL_PROCESS_DEPS_MSSQL)({ id: id })
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length > 0)) {
+                records.detail.forEach(elem => {
+                    result.Deps.push(_.clone(elem));
+                });
+            }
+        }
+        finally {
+            if (root_obj)
+                this._db._deleteRoot(root_obj.getRoot());
+        }
+        return result;
+    }
+
+    async _get_process(id, options) {
+        let result = { Elements: [], Tasks: [], Deps: [] };
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
+
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = await this._getObjById(id, { expr: { model: { name: "PmProcess" } } }, dbOpts);
+        try {
+            let collection = root_obj.getCol("DataElements");
+            if (collection.count() != 1)
+                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Процесс (Id =${id}) не найден.`);
+
+            let process_obj = collection.get(0);
             await this._getFieldValues(process_obj, result, { "GuidVer": true });
 
             let records = await $data.execSql({
@@ -851,7 +999,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             if (records && records.detail && (records.detail.length > 0)) {
                 records.detail.forEach(elem => {
                     let val = _.clone(elem);
-                    val.IsElemready = val.IsElemready ? true : false;
+                    val.IsElemReady = val.IsElemReady ? true : false;
                     result.Tasks.push(val);
                 });
             }
@@ -1078,7 +1226,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Элемент процесса (Id =${process_id}) не найден.`);
                         let procElemObj = collection.get(0);
 
-                        let process = await this.getProcess(procElemObj.processId(), opts);
+                        let process = await this._get_process(procElemObj.processId(), opts);
                         if (process.State === ProcessState.Finished)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно изменить элемент в завершившемся процессе.`);
 
@@ -1399,7 +1547,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_BAD_REQ,
                                 `Невозможно добавить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
-                        let process = await this.getProcess(taskObj.processId(), opts);
+                        let process = await this._get_process(taskObj.processId(), opts);
                         if (process.State === ProcessState.Finished)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить зависимость в завершившийся процесс".`);
 
@@ -1487,7 +1635,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_BAD_REQ,
                                 `Невозможно добавить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
-                        let process = await this.getProcess(taskObj.processId(), opts);
+                        let process = await this._get_process(taskObj.processId(), opts);
                         if (process.State === ProcessState.Finished)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить зависимость в завершившийся процесс".`);
 
@@ -1692,7 +1840,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (processObj.state() === ProcessState.Finished)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно изменить задачу в завершившемся процессе.`);
 
-                        let process = await this.getProcess(taskObj.processId(), opts);
+                        let process = await this._get_process(taskObj.processId(), opts);
                         let pstruct = await this.getProcessStruct(process.StructId, opts);
 
                         if (((typeof (inpFields.ElementId) === "number") || (inpFields.ElementId === null)) &&
@@ -1867,7 +2015,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         await root_obj.edit();
 
-                        let process = await this.getProcess(inpFields.ProcessId, opts);
+                        let process = await this._get_process(inpFields.ProcessId, opts);
                         let pstruct = await this.getProcessStruct(process.StructId, opts);
 
                         let fields = { ProcessId: inpFields.ProcessId, IsElemReady: true, State: 1, AlertId: null }; // State = "В ожидании"
@@ -1968,7 +2116,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Процесс (Id =${id}) не найден.`);
                         let procObj = collection.get(0);
 
-                        let process = await this.getProcess(id, opts);
+                        let process = await this._get_process(id, opts);
 
                         await procObj.edit();
 
