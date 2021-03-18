@@ -756,6 +756,22 @@ const CHECK_IF_CAN_DEL_EPI_MYSQL =
     "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
     "where (e.`Id` = <%= id %>) and (eln.`State` = 'R')";
 
+const GET_LESSON_LIST_MSSQL =
+    "select l.[Id], ll.[Name], l.[CourseId], cl.[Name] as [CourseName], al.[AuthorId],\n" +
+    "  al.[FirstName], al.[LastName]\n" +
+    "from [CourseLng] cl\n" +
+    "  join [Lesson] l on l.[CourseId] = cl.[CourseId]\n" +
+    "  join [LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join [AuthorLng] al on al.[AuthorId] = l.[AuthorId]";
+
+const GET_LESSON_LIST_MYSQL =
+    "select l.`Id`, ll.`Name`, l.`CourseId`, cl.`Name` as `CourseName`, al.`AuthorId`,\n" +
+    "  al.`FirstName`, al.`LastName`\n" +
+    "from `CourseLng` cl\n" +
+    "  join `Lesson` l on l.`CourseId` = cl.`CourseId`\n" +
+    "  join `LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join `AuthorLng` al on al.`AuthorId` = l.`AuthorId`";
+
 const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
 const { IdxLessonService } = require('./elastic/indices/idx-lesson');
 
@@ -1011,6 +1027,93 @@ const DbLesson = class DbLesson extends DbObject {
                     })
             );
         })
+    }
+
+    async getLessonsList(options) {
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+
+        let dbOpts = _.cloneDeep(opts.dbOptions || {});
+
+        let sql_mysql = GET_LESSON_LIST_MYSQL;
+        let sql_mssql = GET_LESSON_LIST_MSSQL;
+
+        let mssql_conds = [];
+        let mysql_conds = [];
+
+        if (opts.course) {
+            mssql_conds.push(`(cl.[Name] like N'%${opts.course}%')`);
+            mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course}%')`);
+        }
+        if (opts.lesson) {
+            mssql_conds.push(`(ll.[Name] like N'%${opts.lesson}%')`);
+            mysql_conds.push(`(ll.${'`'}Name${'`'} like '%${opts.lesson}%')`);
+        }
+        if (opts.author) {
+            mssql_conds.push(`((al.[FirstName] like N'%${opts.author}%') OR (al.[LastName] like N'%${opts.author}%'))`);
+            mysql_conds.push(`((al.${'`'}FirstName${'`'} like '%${opts.author}%')` +
+                ` OR (al.${'`'}LastName${'`'} like '%${opts.author}%'))`);
+        }
+
+        if (mysql_conds.length > 0) {
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
+        }
+
+        if (opts.order) {
+            let ord_arr = opts.order.split(',');
+            let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
+            let mysql_field;
+            let mssql_field;
+            switch (ord_arr[0]) {
+                case "Id":
+                    mssql_field = "l.[Id]";
+                    mysql_field = "l.`Id`";
+                    break;
+                case "Lesson":
+                    mssql_field = "ll.[Name]";
+                    mysql_field = "ll.`Name`";
+                    break;
+                case "Course":
+                    mssql_field = "cl.[Name]";
+                    mysql_field = "cl.`Name`";
+                    break;
+                case "Author":
+                    mssql_field = "al.[FirstName]";
+                    mysql_field = "al.`FirstName`";
+                    break;
+            }
+            if (mysql_field) {
+                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
+                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+            }
+        }
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(sql_mysql)(),
+                mssql: _.template(sql_mssql)()
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            records.detail.forEach(elem => {
+                let lsn = {
+                    Id: elem.Id,
+                    Name: elem.Name,
+                    Course: {
+                        Id: elem.CourseId,
+                        Name: elem.CourseName
+                    },
+                    Author: {
+                        Id: elem.AuthorId,
+                        FirstName: elem.FirstName,
+                        LastName: elem.LastName
+                    }
+                };
+                result.push(lsn);
+            });
+        }
+
+        return result;
     }
 
     getLessonsAll(course_url, lesson_url, user) {
