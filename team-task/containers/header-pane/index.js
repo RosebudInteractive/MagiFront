@@ -4,11 +4,12 @@ import {bindActionCreators} from 'redux';
 import "./header-pane.sass"
 import {userSelector} from "tt-ducks/auth";
 import Breadcrumb from "../../components/breadcrumb";
+import {sideBarMenuVisible} from "tt-ducks/app";
 
 function HeaderPane(props) {
-    const {user} = props
+    const {user, sideBarMenuVisible} = props
 
-    return <nav className="header-pane">
+    return <nav className={"header-pane" + (sideBarMenuVisible ? "" : " _full-width")}>
         <Breadcrumb/>
         <div className="user-block">
             <div className="user-block__name">{user.DisplayName}</div>
@@ -19,7 +20,8 @@ function HeaderPane(props) {
 
 const mapState2Props = (state) => {
     return {
-        user: userSelector(state)
+        user: userSelector(state),
+        sideBarMenuVisible: sideBarMenuVisible(state),
     }
 }
 

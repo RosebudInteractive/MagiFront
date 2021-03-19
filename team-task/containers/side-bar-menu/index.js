@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React, {useState,} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ProcessesIco from "tt-assets/svg/processes.svg"

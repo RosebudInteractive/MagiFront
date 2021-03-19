@@ -26,8 +26,8 @@ export default function HeaderRow(props: HeaderRowProps) {
     }
 
     return <div className="process-body__header-row">
-        <Field component={Select} name={"LessonId"} label={"Лекция"}/>
-        <Field component={Select} name={"State"} label={"Состояние"} options={_getStateOptions()}/>
-        <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getUsers()}/>
+        <Field component={Select} name={"LessonId"} label={"Лекция"} extClass={"_lesson-field"}/>
+        <Field component={Select} name={"State"} label={"Состояние"} extClass={"_state-field"} options={_getStateOptions()}/>
+        <Field component={Select} name={"SupervisorId"} label={"Супервизор"} extClass={"_user-field"} options={_getUsers()}/>
     </div>
 }

@@ -6,34 +6,31 @@ import {useParams} from "react-router-dom"
 import {
     getProcess,
     saveProcess,
+    goBack,
     // getProcessElement,
     processSelector,
-    usersSelector,
+    supervisorsSelector,
+    editorsSelector,
     // elementsSelector,
-    // fetchingSelector,
+    fetchingSelector,
     // currentElementSelector
 } from "tt-ducks/process";
-// import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
-// import TaskBody from "../../components/task-page/body";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
-// import "./task-page.sass"
-// import {COMMENT_ACTION} from "../../constants/common";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
-import {PROCESS_FIELDS} from "../../constants/process";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
 function ProcessEditor(props) {
-    const {actions, process, fetching, isSupervisor, hasChanges, editorValues, currentElement} = props
+    const {actions, process, fetching, hasChanges, editorValues, currentElement} = props
 
     const params = useParams()
 
     useEffect(() => {
         actions.hideSideBarMenu()
-        actions.getProcess(params.taskId)
+        actions.getProcess(params.processId)
 
         return () => {
             actions.showSideBarMenu()
@@ -45,11 +42,12 @@ function ProcessEditor(props) {
             const _object = {
                 Name: process.Name,
                 State: process.State,
-                SupervisorId: process.SupervisorId,
-                // ExecutorId: process.Executor.Id,
+                SupervisorId: process.Supervisor.Id,
+                LessonId: process.Lesson.Id,
+                Elements: [...process.Elements]
             }
 
-            PROCESS_FIELDS.forEach((field) => {
+            Object.keys(process.ProcessFields).forEach((field) => {
                 _object[field] = process[field]
             })
 
@@ -97,6 +95,8 @@ function ProcessEditor(props) {
         // actions.saveTask({task: _value, comment: userCommentAction})
     }
 
+    const _back = () => { actions.goBack() }
+
     // useEffect(() => {
     //     const _elemId = editorValues && editorValues.ElementId
     //
@@ -114,17 +114,11 @@ function ProcessEditor(props) {
     // }
 
 
+
     return !fetching && process &&
         <form className="process-editor-page form" action={"javascript:void(0)"}>
-            <ProcessHeader hasChanged={hasChanges} state={process.State} onSave={_save}/>
-            <ProcessBody users={props.users}/>
-            {/*<TaskBody task={task}*/}
-            {/*          isSupervisor={isSupervisor}*/}
-            {/*          elements={props.elements}*/}
-            {/*          currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}*/}
-            {/*          users={props.users}*/}
-            {/*          currentElement={currentElement}*/}
-            {/*          onChangeElement={_onChangeElement}/>*/}
+            <ProcessHeader hasChanged={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
+            <ProcessBody process={process} supervisors={props.supervisors} editors={props.editors} />
         </form>
 }
 
@@ -137,9 +131,9 @@ const validate = (values) => {
 const mapState2Props = (state) => {
     return {
         process: processSelector(state),
-        users: usersSelector(state),
-        // elements: elementsSelector(state),
-        // fetching: fetchingSelector(state),
+        supervisors: supervisorsSelector(state),
+        editors: editorsSelector(state),
+        fetching: fetchingSelector(state),
         user: userSelector(state),
         isSupervisor: hasSupervisorRights(state),
         hasChanges: isDirty(EDITOR_NAME)(state),
@@ -150,7 +144,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcess, hideSideBarMenu, showSideBarMenu,}, dispatch)
+        actions: bindActionCreators({getProcess, hideSideBarMenu, showSideBarMenu, goBack}, dispatch)
     }
 }
 

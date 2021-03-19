@@ -78,7 +78,7 @@ export default function UiSelect(props) {
 
     const _id = props.id ? props.id : "ui-select-" + Math.floor(Math.random() * Math.floor(10000))
 
-    return <CssFormControl className={"input-field"}>
+    return <CssFormControl className={"input-field" + (props.extClass ? " " + props.extClass : "")}>
         <InputLabel id={_id}>{props.label}</InputLabel>
         <Select
             labelId={_id}

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useMemo} from "react"
+import React, {useMemo} from "react"
 import {Field} from "redux-form";
 import {TextBoxWithConfirm} from "../../ui-kit";
 import "./header.sass"
@@ -9,6 +9,7 @@ type HeaderProps = {
     hasChanged: boolean,
     state: number,
     onSave: Function,
+    onBack: Function,
 }
 
 export default function ProcessHeader(props: HeaderProps) {
@@ -21,7 +22,7 @@ export default function ProcessHeader(props: HeaderProps) {
     }, state)
 
     return <div className="process-page__header">
-        <div className="header__back-arrow">
+        <div className="header__back-arrow" onClick={props.onBack}>
             <BackArrow/>
         </div>
         <div className="process-page__field-name">

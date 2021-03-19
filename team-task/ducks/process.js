@@ -12,6 +12,7 @@ import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import type {UpdatingCommentData, UpdatingProcess, UpdatingProcessData} from "../types/process";
 import {COMMENT_ACTION} from "../constants/common";
+import {push} from "react-router-redux/src";
 
 /**
  * Constants
@@ -29,14 +30,11 @@ const SAVE_PROCESS_START = `${prefix}/SAVE_PROCESS_START`
 const SAVE_PROCESS_SUCCESS = `${prefix}/SAVE_PROCESS_SUCCESS`
 const SAVE_PROCESS_FAIL = `${prefix}/SAVE_PROCESS_FAIL`
 
-const SET_USERS = `${prefix}/SET_USERS`
-const SET_ELEMENTS = `${prefix}/SET_ELEMENTS`
+const SET_SUPERVISORS = `${prefix}/SET_SUPERVISORS`
+const SET_EDITORS = `${prefix}/SET_EDITORS`
 
-const GET_PROCESS_ELEMENT_REQUEST = `${prefix}/GET_PROCESS_ELEMENT_REQUEST`
-const GET_PROCESS_ELEMENT_START = `${prefix}/GET_PROCESS_ELEMENT_START`
-const GET_PROCESS_ELEMENT_SUCCESS = `${prefix}/GET_PROCESS_ELEMENT_SUCCESS`
-const GET_PROCESS_ELEMENT_FAIL = `${prefix}/GET_PROCESS_ELEMENT_FAIL`
-const CLEAR_PROCESS_ELEMENT = `${prefix}/CLEAR_PROCESS_ELEMENT`
+const GO_BACK_REQUEST = `${prefix}/GO_BACK_REQUEST`
+
 
 const Element = Record({
     Id: null,
@@ -54,8 +52,8 @@ const Element = Record({
  * */
 export const ReducerRecord = Record({
     process: null,
-    users: [],
-    elements: [],
+    supervisors: [],
+    editors: [],
     fetching: false,
     currentElement: new Element()
 })
@@ -79,35 +77,20 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_PROCESS_FAIL:
         case SAVE_PROCESS_FAIL:
-        case GET_PROCESS_ELEMENT_FAIL:
             return state
-                .set("fetching", false)
-
-        case GET_PROCESS_ELEMENT_SUCCESS:
-            return state
-                .set("currentElement", new Element(payload))
                 .set("fetching", false)
 
         case SAVE_PROCESS_START:
             return state
                 .set("fetching", true)
 
-        case GET_PROCESS_ELEMENT_START:
+        case SET_SUPERVISORS:
             return state
-                .set("fetching", true)
-                .set("currentElement", new Element())
+                .set("supervisors", payload)
 
-        case SET_USERS:
+        case SET_EDITORS:
             return state
-                .set("users", payload)
-
-        case SET_ELEMENTS:
-            return state
-                .set("elements", payload)
-
-        case CLEAR_PROCESS_ELEMENT:
-            return state
-                .set("currentElement", new Element())
+                .set("editors", payload)
 
         default:
             return state
@@ -121,8 +104,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName]
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching)
 export const processSelector = createSelector(stateSelector, state => state.process)
-export const usersSelector = createSelector(stateSelector, state => state.users)
-export const elementsSelector = createSelector(stateSelector, state => state.elements)
+export const supervisorsSelector = createSelector(stateSelector, state => state.supervisors)
+export const editorsSelector = createSelector(stateSelector, state => state.editors)
 export const currentElementSelector = createSelector(stateSelector, state => state.currentElement)
 
 
@@ -137,6 +120,10 @@ export const saveProcess = (data: UpdatingProcessData) => {
     return {type: SAVE_PROCESS_REQUEST, payload: data}
 }
 
+export const goBack = () => {
+    return {type: GO_BACK_REQUEST}
+}
+
 // export const getProcessElement = (elementId: number) => {
 //     return {type: GET_PROCESS_ELEMENT_REQUEST, payload: elementId}
 // }
@@ -149,7 +136,7 @@ export const saga = function* () {
     yield all([
         takeEvery(GET_PROCESS_REQUEST, getProcessSaga),
         takeEvery(SAVE_PROCESS_REQUEST, saveProcessSaga),
-        // takeEvery(GET_PROCESS_ELEMENT_REQUEST, getProcessElementSaga),
+        takeEvery(GO_BACK_REQUEST, goBackSaga),
     ])
 }
 
@@ -162,9 +149,11 @@ function* getProcessSaga(data) {
     yield put({type: GET_PROCESS_START})
     try {
         let _process = yield call(_fetchProcess, data.payload)
-        const _users = yield call(_getUsers)
+        const _supervisors = yield call(_getSupervisors),
+            _editors = yield call(_getEditors)
 
-        yield put({type: SET_USERS, payload: _users})
+        yield put({type: SET_SUPERVISORS, payload: _supervisors})
+        yield put({type: SET_EDITORS, payload: _editors})
 
         yield put({type: GET_PROCESS_SUCCESS, payload: _process})
     } catch (e) {
@@ -174,16 +163,15 @@ function* getProcessSaga(data) {
 }
 
 const _fetchProcess = (processId) => {
-    return Promise.resolve(PROCESS)
-    // return commonGetQuery(`/api/pm/process/${processId}`)
+    return commonGetQuery(`/api/pm/process/${processId}`)
 }
 
-const _getUsers = () => {
+const _getSupervisors = () => {
     return commonGetQuery("/api/users/list?role=a,pma,pms")
 }
 
-const _getProcessElements = (processId) => {
-    return commonGetQuery(`/api/pm/process/${processId}/elements`)
+const _getEditors = () => {
+    return commonGetQuery("/api/users/list?role=a,pma,pms,pme")
 }
 
 function* saveProcessSaga({payload}) {
@@ -230,22 +218,9 @@ const _putProcess = (data: UpdatingProcess) => {
         .then(parseJSON)
 }
 
-// function* getProcessElementSaga(data) {
-//     if (!data.payload) {
-//         yield put({type: CLEAR_PROCESS_ELEMENT})
-//     } else {
-//         yield put({type: GET_PROCESS_ELEMENT_START})
-//         try {
-//             const element = yield call(_getProcessElementData, data.payload)
-//
-//             yield put({type: GET_PROCESS_ELEMENT_SUCCESS, payload: element})
-//         } catch (e) {
-//             yield put({type: GET_PROCESS_ELEMENT_FAIL})
-//             yield put(showErrorMessage(e.message))
-//         }
-//     }
-// }
+function* goBackSaga() {
+    yield put(push(`/processes`))
 
-// const _getProcessElementData = (elementId) => {
-//     return commonGetQuery(`/api/pm/process-elem/${elementId}`)
-// }
+}
+
+
