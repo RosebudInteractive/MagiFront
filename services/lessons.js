@@ -1,5 +1,6 @@
 //let { LessonsService } = require('./../database/lessons');
-let { LessonsService } = require('./../database/db-lesson');
+const { LessonsService } = require('./../database/db-lesson');
+const _ = require('lodash');
 
 function setupLessons(app) {
 
@@ -110,6 +111,17 @@ function setupLessons(app) {
             .catch(err => {
                 next(err);
             });
+    });
+
+    app.get('/api/lessons-list', async (req, res, next) => {
+        try {
+            let opts = _.defaultsDeep({ user: req.user }, req.query);
+            let rows = await LessonsService().getLessonsList(opts);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     app.get('/api/lessons/:course_url/:lesson_url', (req, res, next) => {
