@@ -26,6 +26,14 @@ module.exports = {
                 (this.proxyServer.port ? (':' + this.proxyServer.port) : '');
         })
     },
+    mobileApp: {
+        ios: {
+            showPaidFor: "1.0.5"
+        },
+        android: {
+
+        }
+    },
     server: {
         protocol: 'http',
         address: '0.0.0.0',
