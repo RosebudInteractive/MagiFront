@@ -1,1 +1,1 @@
-export const appName = 'magisteria-admin'
+export const appName = 'team-task'

@@ -6,14 +6,14 @@ import {PROCESS_STATE} from "../../../constants/states";
 import BackArrow from "tt-assets/svg/back-arrow.svg"
 
 type HeaderProps = {
-    hasChanged: boolean,
+    hasChanges: boolean,
     state: number,
     onSave: Function,
     onBack: Function,
 }
 
 export default function ProcessHeader(props: HeaderProps) {
-    const {hasChanged, state} = props
+    const {hasChanges, state} = props
 
     const _state = useMemo(()=>{
         const result = Object.values(PROCESS_STATE).find(item => item.value === state)
@@ -29,6 +29,6 @@ export default function ProcessHeader(props: HeaderProps) {
             <Field component={TextBoxWithConfirm} name={"Name"} label={"Название процесса"}/>
         </div>
         <div className={"header__process-state font-body-s " + _state.css}>{_state.label}</div>
-        <button className="process-page__save-button orange-button big-button" disabled={!hasChanged} onClick={props.onSave}>Сохранить</button>
+        <button className="process-page__save-button orange-button big-button" disabled={!hasChanges} onClick={props.onSave}>Сохранить</button>
     </div>
 }

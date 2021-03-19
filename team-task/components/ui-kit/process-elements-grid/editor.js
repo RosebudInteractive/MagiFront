@@ -17,7 +17,7 @@ type ElementEditorProps = {
 }
 
 function ElementEditor(props: ElementEditorProps) {
-    const {value, editors, elements, editMode, onApply, onClose} = props
+    const {value, editors, elements, editMode, onApply, onClose, editorValues} = props
 
     useEffect(() => {
         if (value) {
@@ -43,6 +43,23 @@ function ElementEditor(props: ElementEditorProps) {
         })
     }
 
+    const _onApply = () => {
+        if (onApply) {
+            const _value = {
+                State: +editorValues.State,
+                SupervisorId: +editorValues.SupervisorId// && value.Supervisor.Id
+            }
+
+            if (editMode) {
+                _value.ElementId = +value.Id
+            } else {
+                _value.ElementId = +editorValues.Name
+            }
+
+            onApply(_value)
+        }
+    }
+
 
 
     return <form className="modal-form" action={"javascript:void(0)"}>
@@ -50,8 +67,8 @@ function ElementEditor(props: ElementEditorProps) {
             <h6 className="process-elements-grid__title _grey100">Настройка элемента</h6>
             <Field component={Select} name={"Name"} label={"Имя элемента"} disabled={editMode} readOnly={editMode} options={getElementsForSelect()}/>
             <Field component={Select} name={"SupervisorId"} options={getEditorsForSelect()}/>
-            <Field component={Select} name ={"State"} options={getStatesForSelect()}/>
-            <button className="element-editor__save-button orange-button big-button" onClick={onApply} disabled={!props.hasChanges}>
+            <Field component={Select} name ={"State"} options={getStatesForSelect()} disabled={!editMode} readOnly={!editMode}/>
+            <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!props.hasChanges}>
                 Применить
             </button>
             <button type="button" className="element-editor__close-button" onClick={onClose}>Закрыть</button>

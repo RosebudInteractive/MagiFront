@@ -13,10 +13,11 @@ type ProcessElementsGridProps = {
     onDelete: Function,
     onUpdate: Function,
     onAdd: Function,
+    disabled: boolean,
 }
 
 export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
-    const {onDelete, values, editors, elements} = props
+    const {onDelete, onAdd, onUpdate, values, editors, elements, disabled} = props
 
     const [editorVisible, setEditorVisible] = useState(false)
     const [currentElement, setCurrentElement] = useState(null)
@@ -79,7 +80,9 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     }, [sort,])
 
     const _getEditors = () => {
-        return editors && editors.map((item) => { return {id: item.Id, value: item.DisplayName}})
+        return editors && editors.map((item) => {
+            return {id: item.Id, value: item.DisplayName}
+        })
     }
 
     const GRID_CONFIG = useRef({
@@ -129,14 +132,17 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
                 },
             },
             onClick: {
-                "elem-delete": function(e, data) {
+                "elem-delete": function (e, data) {
+                    if (props.disabled) return
+
                     const item = this.getItem(data.row)
-                    if (item) {
-                        setCurrentElement(item)
-                        setEditorVisible(true)
+                    if (item && onDelete) {
+                        onDelete(item.Id)
                     }
                 },
-                "elem-edit": function(e, data) {
+                "elem-edit": function (e, data) {
+                    if (props.disabled) return
+
                     const item = this.getItem(data.row)
                     if (item) {
                         setCurrentElement(item)
@@ -149,29 +155,41 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     )
 
     const onAddElement = () => {
-        setCurrentElement({Name: null, SupervisorId: null, State: null})
+        setCurrentElement({Name: null, SupervisorId: null, State: 1})
         setElementInEditMode(false)
         setEditorVisible(true)
     }
 
     const onApply = (value) => {
         console.log(value)
+
+        if (elementInEditMode) {
+            onUpdate(value)
+        } else {
+            onAdd(value)
+        }
     }
 
     const closeEditor = () => {
         setEditorVisible(false)
     }
 
-
-
     return <div className="process-elements-grid" id={_wrapperId.current}>
         <div className="grid-wrapper">
             <Webix ui={GRID_CONFIG.current} data={myValues}/>
         </div>
-        <button className="process-page__save-button orange-button small-button" onClick={onAddElement}>
+        <button className="process-page__save-button orange-button small-button" disabled={props.disabled}
+                onClick={onAddElement}>
             Новый элемент
         </button>
-        {editorVisible && <ElementEditor editors={editors} elements={elements} value={currentElement} editMode={elementInEditMode} onApply={onApply} onClose={closeEditor}/>}
+        {
+            editorVisible &&
+            <ElementEditor value={currentElement}
+                           editors={editors}
+                           elements={elements}
+                           editMode={elementInEditMode}
+                           onApply={onApply}
+                           onClose={closeEditor}/>}
     </div>
 }
 

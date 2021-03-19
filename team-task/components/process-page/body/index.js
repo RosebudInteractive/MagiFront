@@ -7,6 +7,7 @@ import ProcessFields from "./fields";
 
 type ProcessBodyProps = {
     process: any,
+    hasChanges: boolean,
     editors: Array,
     supervisors: Array,
     elements: Array,
@@ -23,8 +24,13 @@ export default function ProcessBody(props: ProcessBodyProps) {
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
         <Schema/>
-        <ProcessElements editors={editors} values={process.Elements} elements={elements} onAdd={props.onAddElement}
-                         onUpdate={props.onUpdateElement} onDelete={props.onDeleteElement}/>
+        <ProcessElements values={process.Elements}
+                         disabled={props.hasChanges}
+                         editors={editors}
+                         elements={elements}
+                         onAdd={props.onAddElement}
+                         onUpdate={props.onUpdateElement}
+                         onDelete={props.onDeleteElement}/>
         <ProcessFields fields={process.ProcessFields}/>
     </div>
 }

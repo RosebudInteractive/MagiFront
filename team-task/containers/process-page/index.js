@@ -7,6 +7,9 @@ import {
     getProcess,
     saveProcess,
     goBack,
+    addElement,
+    updateElement,
+    deleteElement,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -75,31 +78,18 @@ function ProcessEditor(props) {
         actions.goBack()
     }
 
-    // useEffect(() => {
-    //     const _elemId = editorValues && editorValues.ElementId
-    //
-    //     actions.getProcessElement(_elemId)
-    // }, [editorValues && editorValues.ElementId])
-    //
-    // useEffect(() => {
-    //     const _elemId = editorValues && editorValues.ElementId
-    //
-    //     actions.getProcessElement(_elemId)
-    // }, [editorValues && editorValues.ElementId])
-    //
-    // const _onChangeElement = () => {
-    //
-    // }
-
-
     return !fetching && process &&
         <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
-            <ProcessHeader hasChanged={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
+            <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
             <ProcessBody process={process}
                          supervisors={props.supervisors}
                          editors={props.editors}
                          elements={props.elements}
-                         lessons={props.lessons}/>
+                         lessons={props.lessons}
+                         hasChanges={hasChanges}
+                         onAddElement={actions.addElement}
+                         onUpdateElement={actions.updateElement}
+                         onDeleteElement={actions.deleteElement}/>
         </form>
 }
 
@@ -127,7 +117,16 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcess, saveProcess, hideSideBarMenu, showSideBarMenu, goBack}, dispatch)
+        actions: bindActionCreators({
+            getProcess,
+            saveProcess,
+            hideSideBarMenu,
+            showSideBarMenu,
+            goBack,
+            addElement,
+            updateElement,
+            deleteElement,
+        }, dispatch)
     }
 }
 

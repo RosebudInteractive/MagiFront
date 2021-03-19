@@ -90,6 +90,16 @@ const useStyles = makeStyles(theme => ({
     },
     menuPaper: {
         maxHeight: 200
+    },
+    listItem: {
+        fontFamily: "Inter",
+        "font-size": "14px",
+        "font-style": "normal",
+        "font-weight": "400",
+        "line-height": "22px",
+        "letter-spacing": "0.25px",
+        "text-align": "left",
+        "min-height": "34px",
     }
 }));
 
@@ -112,11 +122,9 @@ export default function UiSelect(props) {
             label={props.label}
             {...props.input}
             variant="outlined"
-            // native
             disabled={props.disabled}
             readOnly={props.readOnly}
             ref={select}
-            // autoWidth={true}
             MenuProps={{
                 classes: { paper: classes.menuPaper },
                 transitionDuration: 50,
@@ -126,9 +134,9 @@ export default function UiSelect(props) {
                 transformOrigin: { vertical: 'top', horizontal: 'left' }
             }}
         >
-            <option value=""/>
+            <MenuItem value="" classes={ {root: classes.listItem} }/>
             {
-                props.options && props.options.map((item, index) => {return <MenuItem  value={item.id} key={index}>{item.name}</MenuItem>})
+                props.options && props.options.map((item, index) => {return <MenuItem classes={ {root: classes.listItem} } value={item.id} key={index}>{item.name}</MenuItem>})
             }
         </Select>
     </CssFormControl>
