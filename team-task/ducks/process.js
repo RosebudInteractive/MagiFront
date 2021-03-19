@@ -5,12 +5,10 @@ import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
-
-import PROCESS from "../mock-data/process-1"
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {UpdatingCommentData, UpdatingProcess, UpdatingProcessData} from "../types/process";
+import type {UpdatingProcess} from "../types/process";
 import {COMMENT_ACTION} from "../constants/common";
 import {push} from "react-router-redux/src";
 
@@ -32,6 +30,8 @@ const SAVE_PROCESS_FAIL = `${prefix}/SAVE_PROCESS_FAIL`
 
 const SET_SUPERVISORS = `${prefix}/SET_SUPERVISORS`
 const SET_EDITORS = `${prefix}/SET_EDITORS`
+const SET_ELEMENTS = `${prefix}/SET_ELEMENTS`
+const SET_LESSONS = `${prefix}/SET_LESSONS`
 
 const GO_BACK_REQUEST = `${prefix}/GO_BACK_REQUEST`
 
@@ -54,6 +54,8 @@ export const ReducerRecord = Record({
     process: null,
     supervisors: [],
     editors: [],
+    elements: [],
+    lessons: [],
     fetching: false,
     currentElement: new Element()
 })
@@ -92,6 +94,14 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("editors", payload)
 
+        case SET_ELEMENTS:
+            return state
+                .set("elements", payload)
+
+        case SET_LESSONS:
+            return state
+                .set("lessons", payload)
+
         default:
             return state
     }
@@ -106,8 +116,8 @@ export const fetchingSelector = createSelector(stateSelector, state => state.fet
 export const processSelector = createSelector(stateSelector, state => state.process)
 export const supervisorsSelector = createSelector(stateSelector, state => state.supervisors)
 export const editorsSelector = createSelector(stateSelector, state => state.editors)
-export const currentElementSelector = createSelector(stateSelector, state => state.currentElement)
-
+export const elementsSelector = createSelector(stateSelector, state => state.elements)
+export const lessonsSelector = createSelector(stateSelector, state => state.lessons)
 
 /**
  * Action Creators
@@ -116,18 +126,13 @@ export const getProcess = (processId: number) => {
     return {type: GET_PROCESS_REQUEST, payload: processId}
 }
 
-export const saveProcess = (data: UpdatingProcessData) => {
-    return {type: SAVE_PROCESS_REQUEST, payload: data}
+export const saveProcess = (process: UpdatingProcess) => {
+    return {type: SAVE_PROCESS_REQUEST, payload: process}
 }
 
 export const goBack = () => {
     return {type: GO_BACK_REQUEST}
 }
-
-// export const getProcessElement = (elementId: number) => {
-//     return {type: GET_PROCESS_ELEMENT_REQUEST, payload: elementId}
-// }
-
 
 /**
  * Sagas
@@ -149,11 +154,17 @@ function* getProcessSaga(data) {
     yield put({type: GET_PROCESS_START})
     try {
         let _process = yield call(_fetchProcess, data.payload)
-        const _supervisors = yield call(_getSupervisors),
-            _editors = yield call(_getEditors)
+        const [_supervisors, _editors, _elements, _lessons] = yield all([
+            call(_getSupervisors),
+            call(_getEditors),
+            call(_getElements, _process.Id),
+            call(_getLessons),
+        ])
 
         yield put({type: SET_SUPERVISORS, payload: _supervisors})
         yield put({type: SET_EDITORS, payload: _editors})
+        yield put({type: SET_ELEMENTS, payload: _elements})
+        yield put({type: SET_LESSONS, payload: _lessons})
 
         yield put({type: GET_PROCESS_SUCCESS, payload: _process})
     } catch (e) {
@@ -174,31 +185,25 @@ const _getEditors = () => {
     return commonGetQuery("/api/users/list?role=a,pma,pms,pme")
 }
 
+const _getElements = (processId) => {
+    return commonGetQuery(`/api/pm/process-struct/${processId}/elements`)
+}
+
+const _getLessons = () => {
+    return commonGetQuery("/api/lessons-list")
+}
+
 function* saveProcessSaga({payload}) {
     yield put({type: SAVE_PROCESS_START})
     try {
-        const data: UpdatingProcessData = payload,
-            result = yield call(_putProcess, data.process),
-            id = data.process.Id
-            // elementId = data.task.ElementId
+        const process: UpdatingProcess = payload,
+            result = yield call(_putProcess, process),
+            id = process.Id
 
         yield put({type: SAVE_PROCESS_SUCCESS, payload: result})
 
-        console.log(data)
-
-        if (data.comment) {
-            if (data.comment.action === COMMENT_ACTION.UPDATE) {
-                yield call(_updateComment, data.comment)
-            } else if (data.comment.action === COMMENT_ACTION.DELETE) {
-                yield call(_deleteComment, data.comment.id)
-            }
-        }
-
         yield put(reset('PROCESS_EDITOR'))
-        yield all([
-            put(getProcess(id)),
-            put(getProcessElement(elementId)),
-            ])
+        yield put(getProcess(id))
     } catch (e) {
         yield put({type: SAVE_PROCESS_FAIL})
         yield put(showErrorMessage(e.message))
@@ -206,6 +211,8 @@ function* saveProcessSaga({payload}) {
 }
 
 const _putProcess = (data: UpdatingProcess) => {
+    console.log(data)
+
     return fetch(`/api/pm/process/${data.Id}`, {
         method: 'PUT',
         headers: {

@@ -22,11 +22,11 @@ export default function HeaderRow(props: HeaderRowProps) {
     }
 
     const _getLessons = () => {
-        return null
+        return lessons && lessons.map((item) => {return {id: item.Id, name: item.Name}})
     }
 
     return <div className="process-body__header-row">
-        <Field component={Select} name={"LessonId"} label={"Лекция"} extClass={"_lesson-field"}/>
+        <Field component={Select} name={"LessonId"} label={"Лекция"} extClass={"_lesson-field"} options={_getLessons()}/>
         <Field component={Select} name={"State"} label={"Состояние"} extClass={"_state-field"} options={_getStateOptions()}/>
         <Field component={Select} name={"SupervisorId"} label={"Супервизор"} extClass={"_user-field"} options={_getUsers()}/>
     </div>

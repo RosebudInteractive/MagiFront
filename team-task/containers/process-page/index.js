@@ -7,24 +7,24 @@ import {
     getProcess,
     saveProcess,
     goBack,
-    // getProcessElement,
     processSelector,
     supervisorsSelector,
     editorsSelector,
-    // elementsSelector,
+    elementsSelector,
+    lessonsSelector,
     fetchingSelector,
-    // currentElementSelector
 } from "tt-ducks/process";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
+import {UpdatingProcess} from "../../types/process"
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
 function ProcessEditor(props) {
-    const {actions, process, fetching, hasChanges, editorValues, currentElement} = props
+    const {actions, process, fetching, hasChanges, editorValues,} = props
 
     const params = useParams()
 
@@ -44,7 +44,6 @@ function ProcessEditor(props) {
                 State: process.State,
                 SupervisorId: process.Supervisor.Id,
                 LessonId: process.Lesson.Id,
-                Elements: [...process.Elements]
             }
 
             Object.keys(process.ProcessFields).forEach((field) => {
@@ -56,46 +55,25 @@ function ProcessEditor(props) {
     }, [process])
 
     const _save = () => {
-        // const _commentText = editorValues.LastComment.trim() ? editorValues.LastComment : null
-        //
-        // const _value = {
-        //     Id: task.Id,
-        //     Name: editorValues.Name,
-        //     State: +editorValues.State,
-        //     ExecutorId: +editorValues.ExecutorId,
-        //     DueDate: editorValues.DueDate.toISOString(),
-        //     Description: editorValues.Description,
-        //     ElementId: +editorValues.ElementId,
-        //     IsElemReady: !!editorValues.IsElemReady,
-        //     WriteFieldSet: editorValues.WriteFieldSet,
-        //     Comment: !task.UserLastComment ? _commentText  : null,
-        // }
-        //
-        // _value.Fields = {}
-        // currentElement.Fields.forEach((field) => {
-        //     _value.Fields[field.name] = editorValues[field.name]
-        // })
-        //
-        // // Если есть последний комментарий пользователя и он его поменял, то
-        // // при смене статуса этот комментарий будет новым в логе, если статус не поменялся, а комментарий изменился, то
-        // // если новый комментарий пустой, запись надо удалить, иначе обновить
-        // let userCommentAction = null
-        // if (task.UserLastComment && (task.UserLastComment !== _commentText)) {
-        //     if (task.State !== _value.State) {
-        //         _value.Comment = _commentText
-        //     } else {
-        //         userCommentAction = {
-        //             id: task.UserLastComment.Id,
-        //             text: _commentText,
-        //             action: _commentText && _commentText.trim() ? COMMENT_ACTION.UPDATE : COMMENT_ACTION.DELETE
-        //         }
-        //     }
-        // }
-        //
-        // actions.saveTask({task: _value, comment: userCommentAction})
+        const _value: UpdatingProcess = {
+            Id: process.Id,
+            Name: editorValues.Name,
+            State: +editorValues.State,
+            SupervisorId: +editorValues.SupervisorId,
+            DueDate: process.DueDate,
+            LessonId: +editorValues.LessonId,
+        }
+
+        Object.keys(process.ProcessFields).forEach((field) => {
+            _value[field] = editorValues[field]
+        })
+
+        actions.saveProcess(_value)
     }
 
-    const _back = () => { actions.goBack() }
+    const _back = () => {
+        actions.goBack()
+    }
 
     // useEffect(() => {
     //     const _elemId = editorValues && editorValues.ElementId
@@ -114,11 +92,14 @@ function ProcessEditor(props) {
     // }
 
 
-
     return !fetching && process &&
-        <form className="process-editor-page form" action={"javascript:void(0)"}>
+        <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
             <ProcessHeader hasChanged={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
-            <ProcessBody process={process} supervisors={props.supervisors} editors={props.editors} />
+            <ProcessBody process={process}
+                         supervisors={props.supervisors}
+                         editors={props.editors}
+                         elements={props.elements}
+                         lessons={props.lessons}/>
         </form>
 }
 
@@ -133,6 +114,8 @@ const mapState2Props = (state) => {
         process: processSelector(state),
         supervisors: supervisorsSelector(state),
         editors: editorsSelector(state),
+        elements: elementsSelector(state),
+        lessons: lessonsSelector(state),
         fetching: fetchingSelector(state),
         user: userSelector(state),
         isSupervisor: hasSupervisorRights(state),
@@ -144,7 +127,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcess, hideSideBarMenu, showSideBarMenu, goBack}, dispatch)
+        actions: bindActionCreators({getProcess, saveProcess, hideSideBarMenu, showSideBarMenu, goBack}, dispatch)
     }
 }
 

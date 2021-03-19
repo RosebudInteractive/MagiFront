@@ -9,19 +9,21 @@ type ProcessBodyProps = {
     process: any,
     editors: Array,
     supervisors: Array,
+    elements: Array,
+    lessons: Array,
     onAddElement: Function,
     onUpdateElement: Function,
     onDeleteElement: Function,
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
-    const {process, supervisors, editors} = props
+    const {process, supervisors, editors, elements, lessons} = props
 
 
     return <div className="process-page__body">
-        <HeaderRow users={supervisors}/>
+        <HeaderRow users={supervisors} lessons={lessons}/>
         <Schema/>
-        <ProcessElements editors={editors} values={process.Elements} elements={[]} onAdd={props.onAddElement}
+        <ProcessElements editors={editors} values={process.Elements} elements={elements} onAdd={props.onAddElement}
                          onUpdate={props.onUpdateElement} onDelete={props.onDeleteElement}/>
         <ProcessFields fields={process.ProcessFields}/>
     </div>

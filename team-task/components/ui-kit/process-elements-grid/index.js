@@ -16,7 +16,7 @@ type ProcessElementsGridProps = {
 }
 
 export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
-    const {onDelete, values, editors} = props
+    const {onDelete, values, editors, elements} = props
 
     const [editorVisible, setEditorVisible] = useState(false)
     const [currentElement, setCurrentElement] = useState(null)
@@ -27,7 +27,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
 
     useEffect(() => {
         $(window).on('resize', resizeHandler);
-        resizeHandler();
+        setTimeout(resizeHandler, 300);
 
         return () => {
             $(window).unbind('resize', resizeHandler)
@@ -171,7 +171,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
         <button className="process-page__save-button orange-button small-button" onClick={onAddElement}>
             Новый элемент
         </button>
-        {editorVisible && <ElementEditor editors={editors} value={currentElement} editMode={elementInEditMode} onApply={onApply} onClose={closeEditor}/>}
+        {editorVisible && <ElementEditor editors={editors} elements={elements} value={currentElement} editMode={elementInEditMode} onApply={onApply} onClose={closeEditor}/>}
     </div>
 }
 

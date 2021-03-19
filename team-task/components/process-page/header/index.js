@@ -19,7 +19,7 @@ export default function ProcessHeader(props: HeaderProps) {
         const result = Object.values(PROCESS_STATE).find(item => item.value === state)
 
         return result ? result : {label: "Ошибка", css: "_error"}
-    }, state)
+    }, [state])
 
     return <div className="process-page__header">
         <div className="header__back-arrow" onClick={props.onBack}>

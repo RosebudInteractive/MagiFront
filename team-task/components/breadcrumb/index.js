@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react"
+import React, {useMemo} from "react"
 import "./breadcrumb.sass"
-import { Breadcrumb } from 'rsuite';
+import {Breadcrumb} from 'rsuite';
 import {Link} from "react-router-dom";
 import {useLocation} from "react-router-dom"
 
@@ -16,26 +16,31 @@ const BreadcrumbLink = props => <Breadcrumb.Item componentClass={Link} {...props
 
 export default function BreadcrumbPane(props) {
 
-    const location = useLocation()
+    const location = useLocation(),
+        paths = location.pathname.split("/")
 
-    // useEffect(() => {}, [location])
-        ,pathes = location.pathname.split("/")
+    const parsePath = () => {
+        let _result = []
 
-    const breadcrumbs = []
+        paths
+            .filter(item => !!item)
+            .reduce((acc, item, index) => {
+                let _newValue = "/" + acc + item,
+                    _label = PATHES[item] ? PATHES[item] : item
 
-    pathes.filter(item => !!item).reduce((acc, item) => {
-        let _newValue = "/" + acc + item,
-            _label = PATHES[item] ? PATHES[item] : item
+                _result.push(<BreadcrumbLink to={_newValue} key={index}>{_label}</BreadcrumbLink>)
+                return _newValue
+            }, "")
 
-        breadcrumbs.push(<BreadcrumbLink to={_newValue}>{_label}</BreadcrumbLink>)
-        return _newValue
-    }, "")
+        return _result
+    }
+
+    const breadcrumbs = useMemo(() => parsePath(), [location])
+
 
     return <nav className="breadcrumb-pane">
         <Breadcrumb separator={">"}>
             {breadcrumbs}
-            {/*<BreadcrumbLink to={"/processes"}>Процессы</BreadcrumbLink>*/}
-            {/*<BreadcrumbLink to={"/tasks"}>Задачи</BreadcrumbLink>*/}
         </Breadcrumb>
     </nav>
 }

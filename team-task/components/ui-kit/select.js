@@ -1,5 +1,6 @@
-import React from "react"
-import {FormControl, InputLabel, Select, MenuItem, withStyles, TextField} from "@material-ui/core"
+import React, {useRef, useEffect} from "react"
+import {FormControl, InputLabel, Select, MenuItem, withStyles, TextField,} from "@material-ui/core"
+import { makeStyles } from "@material-ui/core/styles"
 
 const CssFormControl = withStyles({
     root: {
@@ -12,9 +13,6 @@ const CssFormControl = withStyles({
             "line-height": "15px",
             "letter-spacing": "0.15px",
             "text-align": "left",
-        },
-        '& label[data-shrink="true"]': {
-            // display: "none"
         },
         "& .MuiInputLabel-root": {
             "z-index": "1",
@@ -41,7 +39,8 @@ const CssFormControl = withStyles({
             '& fieldset legend': {
                 display: "none"
             },
-            "& select": {
+            // "& select": {
+            "& .MuiSelect-select": {
                 borderRadius: "8px",
                 padding: "15px 16px",
                 border: '1px solid #D2D2D6',
@@ -56,44 +55,80 @@ const CssFormControl = withStyles({
                 "line-height": "15px",
                 "letter-spacing": "0.15px",
                 "color": "#19191D",
-
             },
-            '&:hover select:not(.Mui-disabled)': {
+            '&:hover .MuiSelect-select:not(.Mui-disabled)': {
                 backgroundColor: "#E5E5E7",
                 borderColor: '#C8684C',
             },
-            '&.Mui-focused select': {
+            '&.Mui-focused .MuiSelect-select': {
                 border: '1px solid #C8684C',
             },
-            '&.Mui-disabled select': {
+            '&.Mui-disabled .MuiSelect-select': {
                 backgroundColor: "#F8F8F8",
                 color: "#9696A0",
             },
         },
+        "& ..MuiListItem-gutters": {
+            "font-family": "Inter",
+            "font-size": 14,
+            "font-style": "normal",
+            "font-weight": 400,
+            "line-height": "22px",
+            "letter-spacing": "0.25px",
+            "color": "#4A4B57"
+        }
     },
 })(FormControl);
 
+const useStyles = makeStyles(theme => ({
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2)
+    },
+    menuPaper: {
+        maxHeight: 200
+    }
+}));
+
 
 export default function UiSelect(props) {
+    const classes = useStyles();
 
-    const _id = props.id ? props.id : "ui-select-" + Math.floor(Math.random() * Math.floor(10000))
+    const id = useRef(),
+        select = useRef()
+
+    useEffect(() => {
+        id.current = props.id ? props.id : "ui-select-" + Math.floor(Math.random() * 10000)
+    }, [])
 
     return <CssFormControl className={"input-field" + (props.extClass ? " " + props.extClass : "")}>
-        <InputLabel id={_id}>{props.label}</InputLabel>
+        <InputLabel id={`label-for-${id.current}`}>{props.label}</InputLabel>
         <Select
-            labelId={_id}
-            id="demo-simple-select-autowidth"
+            labelId={`label-for-${id.current}`}
+            id={id.current}
             label={props.label}
             {...props.input}
-            // onChange={handleChange}
             variant="outlined"
-            native
+            // native
             disabled={props.disabled}
             readOnly={props.readOnly}
+            ref={select}
+            // autoWidth={true}
+            MenuProps={{
+                classes: { paper: classes.menuPaper },
+                transitionDuration: 50,
+                anchorEl: select.current,
+                getContentAnchorEl: null,
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' }
+            }}
         >
             <option value=""/>
             {
-                props.options && props.options.map((item, index) => {return <option value={item.id} key={index}>{item.name}</option>})
+                props.options && props.options.map((item, index) => {return <MenuItem  value={item.id} key={index}>{item.name}</MenuItem>})
             }
         </Select>
     </CssFormControl>
