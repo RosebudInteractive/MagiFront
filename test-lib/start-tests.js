@@ -6,9 +6,11 @@ const { Prerender } = require('./prerender');
 const { CreateInvoice } = require('./create-invoice');
 const { UploadFile } = require('./upload-file');
 const { login } = require('./utils');
+const { PmTests } = require('./pm-tests');
 
-let user, password;
 let courses = [1, 2, 3, 17];
+let user = "sokolov@rosebud.ru";
+let password = "123456";
 for (let _cnt = 2; _cnt < process.argv.length; _cnt++) {
     switch (_cnt) {
         case 2:
@@ -64,6 +66,116 @@ async function start() {
     }
 
     if (true) {
+        let host = "http://localhost:3000";
+        try {
+            let result = [];
+            let token = await login(host, user, password);
+            let pdata = [
+                {
+                    name: "Test Process #1",
+                    tasks: [
+                        { name: "Task #1" },
+                        { name: "Task #2" },
+                        { name: "Task #3" },
+                        { name: "Task #4" },
+                        { name: "Task #5" },
+                        { name: "Task #6" }
+                    ],
+                    deps: [
+                        { src: "Task #1", dst: "Task #2" },
+                        { src: "Task #1", dst: "Task #3" },
+                        { src: "Task #1", dst: "Task #5" },
+                        { src: "Task #3", dst: "Task #4" },
+                        { src: "Task #5", dst: "Task #4" },
+                        { src: "Task #5", dst: "Task #6" }
+                    ]
+                },
+                {
+                    name: "Test Process #2",
+                    tasks: [
+                        { name: "Task #1" },
+                        { name: "Task #2" },
+                        { name: "Task #3" },
+                        { name: "Task #4" },
+                        { name: "Task #5" },
+                        { name: "Task #6" }
+                    ],
+                    deps: [
+                        { src: "Task #1", dst: "Task #2" },
+                        { src: "Task #1", dst: "Task #4" },
+                        { src: "Task #3", dst: "Task #2" },
+                        { src: "Task #3", dst: "Task #4" },
+                        { src: "Task #3", dst: "Task #6" },
+                        { src: "Task #2", dst: "Task #5" },
+                        { src: "Task #4", dst: "Task #5" },
+                        { src: "Task #4", dst: "Task #6" }
+                    ]
+                },
+                {
+                    name: "Test Process #3",
+                    tasks: [
+                        { name: "Task #1" },
+                        { name: "Task #2" },
+                        { name: "Task #3" },
+                        { name: "Task #4" },
+                        { name: "Task #5" },
+                        { name: "Task #6" }
+                    ],
+                    deps: [
+                        { src: "Task #1", dst: "Task #4" },
+                        { src: "Task #1", dst: "Task #2" },
+                        { src: "Task #2", dst: "Task #3" },
+                        { src: "Task #4", dst: "Task #3" },
+                        { src: "Task #5", dst: "Task #6" },
+                        { src: "Task #5", dst: "Task #3" }
+                    ]
+                },
+                {
+                    name: "Test Process #4",
+                    tasks: [
+                        { name: "Task #1" },
+                        { name: "Task #2" },
+                        { name: "Task #3" },
+                        { name: "Task #4" },
+                        { name: "Task #5" },
+                        { name: "Task #6" },
+                        { name: "Task #7" },
+                        { name: "Task #8" },
+                        { name: "Task #9" },
+                        { name: "Task #10" },
+                        { name: "Task #11" }
+                    ],
+                    deps: [
+                        { src: "Task #1", dst: "Task #2" },
+                        { src: "Task #2", dst: "Task #3" },
+                        { src: "Task #3", dst: "Task #4" },
+                        { src: "Task #4", dst: "Task #8" },
+                        { src: "Task #5", dst: "Task #6" },
+                        { src: "Task #6", dst: "Task #7" },
+                        { src: "Task #7", dst: "Task #8" },
+                        { src: "Task #5", dst: "Task #9" },
+                        { src: "Task #9", dst: "Task #11" },
+                        { src: "Task #9", dst: "Task #6" },
+                        { src: "Task #6", dst: "Task #10" },
+                        { src: "Task #10", dst: "Task #7" },
+                        { src: "Task #11", dst: "Task #10" }
+                    ]
+                }
+            ];
+            for (let i = 0; i < pdata.length; i++) {
+                let { process_id: pid } = await PmTests.createProcess(pdata[i], token, host);
+                result.push({ name: pdata[i].name, id: pid });
+            }
+            console.log(result);           
+            console.log("Finished!");           
+        }
+        catch (err) {
+            console.error(err);
+            console.log(err);
+        }
+    }
+
+    if (false) {
         let host = "https://magisteria.ru";
         try {
             let token = await login(host, user, password);
