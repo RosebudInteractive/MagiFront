@@ -11,6 +11,14 @@ module.exports = {
         address: 'magisteria.ru',
         port: null
     },
+    mobileApp: {
+        ios: {
+            showPaidFor: "1.0.5"
+        },
+        android: {
+
+        }
+    },
     server: {
         protocol: 'http',
         address: '0.0.0.0',

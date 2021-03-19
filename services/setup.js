@@ -260,6 +260,60 @@ function setupAPI(express, app) {
                 if (config.has('statistics.clientTimeout'))
                     options.stat.clientTimeout = config.statistics.clientTimeout;
 
+                function compare_versions(a, b) {
+                    let a_arr = a.split('.');
+                    let b_arr = b.split('.');
+                    let a_sum = 0;
+                    let b_sum = 0;
+                    let max_size = a_arr.length > b_arr.length ? a_arr.length : b_arr.length;
+                    for (let i = 0; i < max_size; i++){
+                        let a_num = i < a_arr.length ? +a_arr[i] : 0;
+                        let b_num = i < b_arr.length ? +b_arr[i] : 0;
+                        if (i > 0) {
+                            let max_shift = 0;
+                            if (i < a_arr.length) {
+                                max_shift = a_arr[i].length;
+                            }
+                            if (i < b_arr.length) {
+                                if (max_shift < b_arr[i].length)
+                                    max_shift = b_arr[i].length;
+                            }
+                            if (max_shift) {
+                                let mult = Math.pow(10, max_shift);
+                                a_sum *= mult;
+                                b_sum *= mult;
+                            }
+                        }
+                        a_sum += a_num;
+                        b_sum += b_num;
+                    }
+                    return a_sum - b_sum;
+                }
+
+                if (req && req.query && req.query.mobile_app) {
+                    options.shouldShowPaidContent = { "ios": true, "android": true };
+                    try {
+                        if (req.query.app_version) {
+                            switch (req.query.mobile_app) {
+                                case "ios":
+                                    if (config.has('mobileApp.ios.showPaidFor')) {
+                                        options.shouldShowPaidContent.ios = compare_versions(req.query.app_version,
+                                            config.get('mobileApp.ios.showPaidFor')) <= 0;
+                                    }
+                                    break;
+                                case "android":
+                                    if (config.has('mobileApp.android.showPaidFor')) {
+                                        options.shouldShowPaidContent.android = compare_versions(req.query.app_version,
+                                            config.get('mobileApp.android.showPaidFor')) <= 0;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    catch (err) {
+                        console.error(buildLogString(err.toString()));
+                    }
+                }
                 return ParametersService().getAllParameters(true)
                     .then(params => { options.parameters = params })
             })
