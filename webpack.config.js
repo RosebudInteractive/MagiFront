@@ -17,6 +17,7 @@ const _prodConfig = {
         'player-app': './scripts/native-app-player/player-app',
         'player-app-test': './scripts/native-app-player/example',
         'workshop-main': './scripts/workshop-main',
+        "team-task": './team-task/index',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -103,20 +104,26 @@ const _prodConfig = {
                 test: /\.(gif|jpe?g|png|ico)$/,
                 loader: "url-loader?limit=10000&mimetype=image/png+ico"
             },
+            // {
+            //     test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+            //     loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+            // },
             {
-                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                loader: "url-loader?limit=10000&mimetype=image/svg+xml"
-            }
+                test: /\.svg$/,
+                use: ['@svgr/webpack'],
+            },
         ]
     },
     resolve: {
         alias: {
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
-            "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
+            // "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
             'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
             'script-lib': path.resolve(__dirname, 'scripts/lib'),
+            'tt-ducks': path.resolve(__dirname, 'team-task/ducks'),
+            'tt-assets': path.resolve(__dirname, 'team-task/assets'),
             'adm-ducks': path.resolve(__dirname, 'src/ducks'),
             'adm-styles': path.resolve(__dirname, 'src/styles'),
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
