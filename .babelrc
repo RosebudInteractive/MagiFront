@@ -1,5 +1,5 @@
 {
-  "presets": ["es2015", "stage-0", "react", "env"], //поддержка ES2015, ES7 и JSX
+  "presets": ["es2015", "stage-0", "react", "env"], //поддержка ES2015, ES7 и JSX "@babel/preset-flow"
   "plugins": [
     ['transform-runtime', {
       helpers: false,

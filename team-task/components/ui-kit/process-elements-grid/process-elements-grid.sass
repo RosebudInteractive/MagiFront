@@ -1,0 +1,169 @@
+@import "~tt-assets/styles/colors"
+
+.grid-wrapper
+  position: relative
+  height: auto
+  margin-bottom: 26px
+
+.process-element__state
+  position: absolute
+  height: 26px
+  min-width: 92px
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  line-height: 22px
+  text-align: center
+
+.element-editor__dialog
+  background-color: $color-main-light
+  padding: 24px
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: 40%
+  max-width: 600px
+  box-sizing: border-box
+  box-shadow: 0 2px 10px rgba(41, 42, 49, 0.12)
+  border-radius: 8px
+  .input-field, .element-editor__save-button
+    margin-top: 16px
+
+.element-editor__close-button
+  position: absolute
+  right: 5px
+  top: 5px
+  padding: 15px
+  font-size: 0
+  cursor: pointer
+  background-color: transparent
+  &:before, &:after
+    content: ""
+    position: absolute
+    top: 50%
+    left: 50%
+    -webkit-transform: translate(-50%, -50%)
+    -ms-transform: translate(-50%, -50%)
+    transform: translate(-50%, -50%)
+    width: 15px
+    height: 2px
+    background-color: $grey40
+    -webkit-transition: background-color 0.3s ease
+    transition: background-color 0.3s ease
+  &:before
+    -webkit-transform: translate(-50%, -50%) rotate(45deg)
+    -ms-transform: translate(-50%, -50%) rotate(45deg)
+    transform: translate(-50%, -50%) rotate(45deg)
+  &:after
+    -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+    -ms-transform: translate(-50%, -50%) rotate(-45deg)
+    transform: translate(-50%, -50%) rotate(-45deg)
+
+
+
+.process-elements-grid__button
+  height: 48px
+  width: 48px
+  cursor: pointer
+  background-size: contain
+  background-origin: border-box
+  background-repeat: no-repeat
+  background-position: center
+  background-color: transparent
+  opacity: 0
+  transition: opacity 300ms ease-in
+  &.elem-edit
+    background-image: url("~tt-assets/png/pencil.png")
+  &.elem-delete
+    background-image: url("~tt-assets/png/trash.png")
+
+.row-hover
+  .process-elements-grid__button
+    opacity: 1
+
+.tt-element-grid
+  &.webix_view
+    border: none
+    background-color: transparent
+
+  .webix_ss_header, .webix_ss_body
+    background-color: transparent
+
+  .webix_hcell
+    cursor: pointer
+    font-family: Inter
+    font-size: 9px
+    font-style: normal
+    font-weight: 700
+    line-height: 16px
+    letter-spacing: 1.3px
+    text-transform: uppercase
+    color: $grey80
+
+  .webix_column
+    &.webix_first
+      .webix_cell
+        border-top-left-radius: 8px
+        border-bottom-left-radius: 8px
+
+    &.webix_last
+      .webix_cell
+        border-top-right-radius: 8px
+        border-bottom-right-radius: 8px
+
+  .webix_cell
+    position: relative
+    cursor: pointer
+    display: flex
+    height: 72px
+    background: $color-main-light
+    border: none
+    font-family: Inter
+    font-style: normal
+    font-weight: normal
+    font-size: 13px
+    line-height: 20px
+    letter-spacing: 0.25px
+    color: $grey100
+    transition: background-color 300ms ease
+    &.webix_row_select
+      background-color: rgba(25, 25, 29, .03)
+      color: $grey100
+
+  .row-hover
+    background-color: rgba(25, 25, 29, .03)
+
+
+.webix_ss_sort_desc:before, .webix_ss_sort_asc:before
+  content: "" !important
+  position: absolute
+  top: 50%
+  right: 2px
+
+  width: 6px
+  height: 6px
+  border: 1px solid #9696A0
+  border-left: none
+  border-top: none
+  -webkit-transition: -webkit-transform 0.3s ease
+  transition: -webkit-transform 0.3s ease
+  transition: transform 0.3s ease, -webkit-transform 0.3s ease
+
+.webix_ss_sort_desc:before
+  -webkit-transform: translateY(-50%) rotate(-135deg)
+  -ms-transform: translateY(-50%) rotate(-135deg)
+  transform: translateY(-50%) rotate(-135deg)
+
+
+.webix_ss_sort_asc:before
+  -webkit-transform: translateY(-50%) rotate(45deg)
+  -ms-transform: translateY(-50%) rotate(45deg)
+  transform: translateY(-50%) rotate(45deg)
+  margin-top: -3px
+
+.webix_ss_sort_single .webix_ss_sort_num
+  display: none
+
+
+

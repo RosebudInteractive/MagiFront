@@ -1,0 +1,76 @@
+@import "~tt-assets/styles/colors.sass"
+
+.tt-main-area__side-bar-menu
+  display: flex
+  flex: 1 0 16.66%
+  flex-direction: column
+  padding: 21px 8px 21px 26px
+  background-color: $color-main-light
+  filter: drop-shadow(0px 4px 7px rgba(0, 0, 0, 0.05))
+  transition: max-width 300ms ease-in
+  max-width: 1000px
+  &._hidden
+    max-width: 0
+    padding: 0
+
+    .side-bar-menu__logo
+      margin-top: 21px
+      margin-left: 26px
+
+  a
+    text-decoration: none
+
+  .title-font
+    font-family: Inter
+    font-style: normal
+    font-weight: 500
+    font-size: 16px
+    line-height: 24px
+    letter-spacing: 0.44px
+    color: $grey40
+
+.side-bar-menu__item
+  text-decoration: none
+  display: flex
+  cursor: pointer
+  margin-bottom: 24px
+  transition: color ease 300ms
+  svg
+    fill: $grey40
+    transition: fill ease 300ms
+
+  &:hover, &._active
+    color: $grey100
+    svg
+      fill: $grey100
+
+
+.side-bar-menu__item-title
+  margin-left: 12px
+  text-decoration: none
+
+
+.side-bar-menu__logo
+  width: 121px
+  height: auto
+  margin-bottom: 38px
+
+.side-bar-menu__elements
+  overflow: hidden
+  max-height: 0
+  transition: max-height 300ms ease
+  &._expanded
+    max-height: 1000px
+
+  .side-bar-menu__item
+    svg
+      fill: none
+      stroke: $grey40
+      transition: stroke ease 300ms
+
+    &:hover, &._active
+      svg
+        fill: none
+        stroke: $grey100
+
+

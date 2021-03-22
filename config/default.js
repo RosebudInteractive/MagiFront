@@ -59,14 +59,11 @@ module.exports = {
         })
     },
     client: {
-        devHotReload: true  
+        devHotReload: true
     },
     admin: {
         logFileUpload: false,
         logModif: false
-    },
-    pm: {
-        logModif: true
     },
     dbProvider: 'mysql',
     integration: {
@@ -109,7 +106,7 @@ module.exports = {
     },
     debug: {
         clientTrace: {
-            gtm: true  
+            gtm: true
         },
         routes: {
             "set-user-subscription": false,
@@ -125,7 +122,7 @@ module.exports = {
         }
     },
     general: {
-        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        
+        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
     },
     statistics: {
         srcList: ["fb", "vk", "ya", "gl", "mt"],
@@ -297,7 +294,7 @@ module.exports = {
         fb: {
             path: path.normalize(path.join(process.cwd(), "..", "pricelist", "fb")),
             file: "products.tsv",
-        }  
+        }
     },
     search: {
         keep_up_to_date: false

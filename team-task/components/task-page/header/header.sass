@@ -1,0 +1,38 @@
+.task-page__header
+  display: block
+  //flex-direction: column
+
+.task-info-block
+  display: flex
+  align-items: center
+  margin-top: 8px
+  margin-bottom: 15px
+
+.task-info__separator
+  width: 10px
+  height: 10px
+  position: relative
+  margin: 0 8px 0 7px
+
+  &:after
+    top: 50%
+    left: 0
+    content: ""
+    position: absolute
+    width: 7px
+    height: 7px
+    border: 2px solid #787885
+    border-top: none
+    border-right: none
+    -webkit-transform: translateY(-50%) rotate(-135deg)
+    -ms-transform: translateY(-50%) rotate(-135deg)
+    transform: translateY(-50%) rotate(-135deg)
+
+.task-info__process-name
+  background: #43A047
+  border-radius: 4px
+  padding: 3px 10px
+
+.task-info__save-button
+  justify-self: flex-end
+  margin-left: auto
