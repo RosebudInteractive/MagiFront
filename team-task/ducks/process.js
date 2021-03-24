@@ -186,8 +186,6 @@ function* getProcessSaga(data) {
 }
 
 const _fetchProcess = (processId) => {
-    console.log(processId)
-
     return commonGetQuery(`/api/pm/process/${processId}`)
 }
 

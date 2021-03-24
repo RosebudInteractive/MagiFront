@@ -1,5 +1,33 @@
+@import "~tt-assets/styles/colors.sass"
+
 .process-body__schema
   margin-top: 20px
 
 .process-schema__canvas
   min-height: 300px
+
+.process-schema__cell
+  padding: 10px 30px
+  display: flex
+  align-items: center
+  justify-content: center
+
+  .process-task
+    z-index: 2
+    align-items: center
+    justify-content: center
+    display: flex
+    background-color: $grey01
+    border-radius: 8px
+    height: 70px
+    width: 120px
+    cursor: pointer
+    transition: background-color 300ms ease-in
+    &:hover
+      background-color: $grey05
+
+    &._active
+      background-color: $grey05
+
+.leader-line._active
+  z-index: 3

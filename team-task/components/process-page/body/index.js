@@ -23,7 +23,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        <Schema/>
+        <Schema tree={props.tree}/>
         <ProcessElements values={process.Elements}
                          disabled={props.hasChanges}
                          editors={editors}

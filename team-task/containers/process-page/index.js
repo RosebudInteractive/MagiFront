@@ -23,6 +23,7 @@ import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
+import {buildTree} from "./functions";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -30,6 +31,8 @@ function ProcessEditor(props) {
     const {actions, process, fetching, hasChanges, editorValues,} = props
 
     const params = useParams()
+
+    const tree = useRef()
 
     useEffect(() => {
         actions.hideSideBarMenu()
@@ -54,6 +57,8 @@ function ProcessEditor(props) {
             })
 
             props.initialize(_object)
+
+            tree.current = buildTree(process)
         }
     }, [process])
 
@@ -82,6 +87,7 @@ function ProcessEditor(props) {
         <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
             <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
             <ProcessBody process={process}
+                         tree={tree.current}
                          supervisors={props.supervisors}
                          editors={props.editors}
                          elements={props.elements}
