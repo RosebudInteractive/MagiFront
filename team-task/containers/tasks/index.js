@@ -63,7 +63,8 @@ function Tasks(props) {
         scroll: 'none',
         headerRowHeight: 40,
         rowHeight: 72,
-        height: 500,
+        height: 1000,
+        // autoheight: true,
         select: true,
         editable: false,
         columns: [

@@ -1,0 +1,84 @@
+@import "~tt-assets/styles/colors.sass"
+
+.process-schema__cell
+  padding: 20px 30px
+  display: flex
+  align-items: center
+  justify-content: center
+
+.process-schema__task
+  position: relative
+  padding: 16px
+  z-index: 2
+  display: flex
+  align-items: flex-start
+  justify-content: flex-start
+  background-color: $grey01
+  border-radius: 8px
+  height: 170px
+  width: 298px
+  cursor: pointer
+  transition: background-color 300ms ease
+  flex-direction: column
+
+  &:hover
+    background-color: $grey05
+
+    .task__buttons-block
+      opacity: 1
+      visibility: visible
+
+  &._active
+    background-color: $grey05
+
+  .task__first-row
+    display: flex
+    width: 100%
+
+    .task__due-date
+      margin-left: auto
+
+  .task-state
+    position: absolute
+    left: 16px
+    bottom: 16px
+    padding: 2px 12px
+    border-radius: 32px
+    //&._waiting
+    color: #D1941A
+    background: #FFF1D6
+
+  .task__buttons-block
+    position: absolute
+    right: 0
+    bottom: 0
+    display: flex
+    opacity: 0
+    visibility: hidden
+    transition: opacity 300ms ease
+
+  .task__button
+    margin: 0 11px 11px 0
+    height: 16px
+    width: 16px
+    cursor: pointer
+    background-size: contain
+    background-origin: border-box
+    background-repeat: no-repeat
+    background-position: center
+    background-color: transparent
+    opacity: 0.4
+    transition: opacity 300ms ease
+    &:hover
+      opacity: 1
+
+    &._link
+      background-image: url("~tt-assets/png/chain.png")
+
+    &._edit
+      background-image: url("~tt-assets/png/pencil.png")
+
+    &._delete
+      background-image: url("~tt-assets/png/trash.png")
+
+

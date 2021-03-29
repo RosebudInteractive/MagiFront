@@ -17,3 +17,14 @@ export type UpdatingElement = {
     SupervisorId: number,
     State: number
 }
+
+export type CreatingProcess = {
+    ProcessId: number,
+    ExecutorId: number,
+    Name: string,
+    ElementId: number,
+    IsElemReady: boolean,
+    Description: string,
+    WriteFieldSet: string,
+    Dependencies: Array,
+}

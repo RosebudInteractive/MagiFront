@@ -12,7 +12,7 @@ const PATHES = {
     dictionaries: "Справочники"
 }
 
-const BreadcrumbLink = props => <Breadcrumb.Item componentClass={Link} {...props} />;
+const BreadcrumbLink = props => <Breadcrumb.Item componentClass={Link} {...props} key={props.index}/>;
 
 export default function BreadcrumbPane(props) {
 
@@ -28,7 +28,7 @@ export default function BreadcrumbPane(props) {
                 let _newValue = "/" + acc + item,
                     _label = PATHES[item] ? PATHES[item] : item
 
-                _result.push(<BreadcrumbLink to={_newValue} key={index}>{_label}</BreadcrumbLink>)
+                _result.push(<BreadcrumbLink to={_newValue} index={index} key={index}>{_label}</BreadcrumbLink>)
                 return _newValue
             }, "")
 

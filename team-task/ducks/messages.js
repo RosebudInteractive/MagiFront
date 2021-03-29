@@ -14,5 +14,6 @@ const SHOW_ERROR = `${prefix}/SHOW_ERROR`
  * Action Creators
  * */
 export const showErrorMessage = (message) => {
+    alert(message)
     return {type: SHOW_ERROR, payload: message}
 }

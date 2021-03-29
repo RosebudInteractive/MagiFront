@@ -15,6 +15,9 @@ type ProcessBodyProps = {
     onAddElement: Function,
     onUpdateElement: Function,
     onDeleteElement: Function,
+    onAddTask: Function,
+    onEditTask: Function,
+    onDeleteTask: Function,
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
@@ -23,7 +26,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        <Schema tree={props.tree}/>
+        <Schema tree={props.tree} onAddTask={props.onAddTask} onEditTask={props.onEditTask} onDeleteTask={props.onDeleteTask}/>
         <ProcessElements values={process.Elements}
                          disabled={props.hasChanges}
                          editors={editors}

@@ -20,10 +20,13 @@ import {
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
+import {deleteTask,} from "tt-ducks/task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
 import {buildTree} from "./functions";
+import {ModalTaskEditor} from "../task-page";
+import type {ProcessTask} from "../../types/task";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -33,6 +36,8 @@ function ProcessEditor(props) {
     const params = useParams()
 
     const tree = useRef()
+
+    const [currentTask, setCurrentTask] = useState(null)
 
     useEffect(() => {
         actions.hideSideBarMenu()
@@ -83,6 +88,23 @@ function ProcessEditor(props) {
         actions.goBack()
     }
 
+    const onEditTask = (taskId) => {
+        setCurrentTask(taskId)
+    }
+
+    const onAddTask = () => {
+        setCurrentTask(-1)
+    }
+
+    const onDeleteTask = (taskId) => {
+        const data: ProcessTask = {taskId: taskId, processId: process.Id}
+        actions.deleteTask(data)
+    }
+
+    const onCloseTaskEditor = () => {
+        setCurrentTask(null)
+    }
+
     return !fetching && process &&
         <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
             <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
@@ -95,7 +117,11 @@ function ProcessEditor(props) {
                          hasChanges={hasChanges}
                          onAddElement={actions.addElement}
                          onUpdateElement={actions.updateElement}
-                         onDeleteElement={actions.deleteElement}/>
+                         onDeleteElement={actions.deleteElement}
+                         onAddTask={onAddTask}
+                         onEditTask={onEditTask}
+                         onDeleteTask={onDeleteTask}/>
+            {currentTask && <ModalTaskEditor taskId={currentTask} onClose={onCloseTaskEditor} processId={process.Id}/>}
         </form>
 }
 
@@ -132,6 +158,7 @@ const mapDispatch2Props = (dispatch) => {
             addElement,
             updateElement,
             deleteElement,
+            deleteTask,
         }, dispatch)
     }
 }

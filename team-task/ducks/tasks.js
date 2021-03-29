@@ -103,12 +103,12 @@ function* getTasksSaga() {
         _tasks = _tasks.map((task) => {
             return {
                 ...task,
-                ProcessName: task.Process.Name,
-                ElementName: task.Element.Name,
+                ProcessName: task.Process && task.Process.Name,
+                ElementName: task.Element && task.Element.Name,
                 Executor: {
-                    Id: task.Executor.Id ? task.Executor.Id : -1
+                    Id: task.Executor && task.Executor.Id ? task.Executor.Id : -1
                 },
-                UserName: task.Executor.DisplayName,
+                UserName: task.Executor && task.Executor.DisplayName,
                 ..._getTaskStateData(task.State)
             }
         })
