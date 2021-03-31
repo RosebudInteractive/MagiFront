@@ -16,7 +16,7 @@ module.exports = {
     },
     mobileApp: {
         ios: {
-            showPaidFor: "1.0.5"
+            showPaidFor: "1.0.6"
         },
         android: {
 
