@@ -5,6 +5,7 @@ import {ProcessElementsGrid} from "../../../ui-kit";
 
 type ElementsProps  = {
     values: Array,
+    activeElementId: number,
     elements: Array,
     editors: Array,
     onDelete: Function,

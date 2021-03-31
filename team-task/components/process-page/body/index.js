@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useMemo} from "react"
+import React, {useState} from "react"
 import "./body.sass"
 import HeaderRow from "./header-row";
 import Schema from "./schema"
@@ -16,6 +16,7 @@ type ProcessBodyProps = {
     onUpdateElement: Function,
     onDeleteElement: Function,
     onAddTask: Function,
+    onEditTaskLinks: Function,
     onEditTask: Function,
     onDeleteTask: Function,
 }
@@ -23,11 +24,27 @@ type ProcessBodyProps = {
 export default function ProcessBody(props: ProcessBodyProps) {
     const {process, supervisors, editors, elements, lessons} = props
 
+    const [activeElementId, setActiveElementId] = useState(null)
+
+    const onSetActiveTask = (taskId) => {
+        const _task = process.Tasks.find(item => item.Id === taskId)
+        if (_task && _task.ElementId) {
+            setActiveElementId(_task.ElementId)
+        } else {
+            setActiveElementId(null)
+        }
+    }
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        <Schema tree={props.tree} onAddTask={props.onAddTask} onEditTask={props.onEditTask} onDeleteTask={props.onDeleteTask}/>
+        <Schema tree={props.tree}
+                onSetActiveTask={onSetActiveTask}
+                onAddTask={props.onAddTask}
+                onEditTaskLinks={props.onEditTaskLinks}
+                onEditTask={props.onEditTask}
+                onDeleteTask={props.onDeleteTask}/>
         <ProcessElements values={process.Elements}
+                         activeElementId={activeElementId}
                          disabled={props.hasChanges}
                          editors={editors}
                          elements={elements}

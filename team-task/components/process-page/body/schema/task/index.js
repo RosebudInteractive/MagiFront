@@ -1,10 +1,11 @@
-import React, {useMemo, useRef, useState} from "react"
+import React, {useMemo, useRef,} from "react"
 import "./task.sass"
 import {getTaskState} from "../../../../../tools/tasks";
 
 
 type TaskProps = {
     onClick: Function,
+    onEditLinks: Function,
     onEdit: Function,
     onDelete: Function,
     active: boolean,
@@ -15,6 +16,11 @@ export default function SchemaTask(props: TaskProps) {
 
     const {node, active, onClick,} = props
 
+    const _onEditLinks = () => {
+        if (props.onEditLinks) {
+            props.onEditLinks(node.id)
+        }
+    }
 
     const _onEdit = () => {
         if (props.onEdit) {
@@ -29,14 +35,14 @@ export default function SchemaTask(props: TaskProps) {
     }
 
 
-    const style = useRef({
+    const style = useMemo(() => {return {
         width: "100%",
         height: "100%",
         gridColumnStart: node.weight + 1,
         gridRowStart: node.rowNumber + 1,
-    })
+    }}, [node])
 
-    const _state = useRef(getTaskState(node.state))
+    const _state = useMemo(() => {return getTaskState(node.state)}, [node])
 
     const _onClick = () => {
         if (onClick) {
@@ -45,7 +51,7 @@ export default function SchemaTask(props: TaskProps) {
     }
 
     return node ?
-        <div className="process-schema__cell" style={style.current}>
+        <div className="process-schema__cell" style={style}>
             <div className={"process-schema__task" + (active ? " _active" : "")} id={"js-task_" + node.id} onClick={_onClick}>
                 <div className="task__first-row">
                     <div className="task__id font-body-s _grey50">{node.id}</div>
@@ -53,9 +59,9 @@ export default function SchemaTask(props: TaskProps) {
                 </div>
                 <div className="task__name font-h7 _black">{node.name}</div>
                 <div className="task__executor font-body-m _black">{node.executorName ? node.executorName : ""}</div>
-                <div className={`task-state ${_state.current.css}`}>{_state.current.caption}</div>
+                <div className={`task-state ${_state.css}`}>{_state.caption}</div>
                 <div className="task__buttons-block">
-                    <button className='task__button _link'/>
+                    <button className='task__button _link' onClick={_onEditLinks}/>
                     <button className='task__button _edit' onClick={_onEdit}/>
                     <button className='task__button _delete' onClick={_onDelete}/>
                 </div>

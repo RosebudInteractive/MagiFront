@@ -10,6 +10,7 @@ import {
     addElement,
     updateElement,
     deleteElement,
+    clear,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -21,12 +22,14 @@ import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
 import {deleteTask,} from "tt-ducks/task";
+import {showTaskEditor, showTaskLinkEditor} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
 import {buildTree} from "./functions";
 import {ModalTaskEditor} from "../task-page";
 import type {ProcessTask} from "../../types/task";
+import TaskLinksEditor from "../../components/process-page/editors/task-link-editor";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -37,13 +40,12 @@ function ProcessEditor(props) {
 
     const tree = useRef()
 
-    const [currentTask, setCurrentTask] = useState(null)
-
     useEffect(() => {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
 
         return () => {
+            actions.clear()
             actions.showSideBarMenu()
         }
     }, [])
@@ -88,21 +90,21 @@ function ProcessEditor(props) {
         actions.goBack()
     }
 
+    const onEditTaskLinks = (taskId) => {
+        actions.showTaskLinkEditor({processId: process.Id, taskId})
+    }
+
     const onEditTask = (taskId) => {
-        setCurrentTask(taskId)
+        actions.showTaskEditor({processId: process.Id, taskId})
     }
 
     const onAddTask = () => {
-        setCurrentTask(-1)
+        actions.showTaskEditor({processId: process.Id, taskId: -1})
     }
 
     const onDeleteTask = (taskId) => {
         const data: ProcessTask = {taskId: taskId, processId: process.Id}
         actions.deleteTask(data)
-    }
-
-    const onCloseTaskEditor = () => {
-        setCurrentTask(null)
     }
 
     return !fetching && process &&
@@ -119,9 +121,11 @@ function ProcessEditor(props) {
                          onUpdateElement={actions.updateElement}
                          onDeleteElement={actions.deleteElement}
                          onAddTask={onAddTask}
+                         onEditTaskLinks={onEditTaskLinks}
                          onEditTask={onEditTask}
                          onDeleteTask={onDeleteTask}/>
-            {currentTask && <ModalTaskEditor taskId={currentTask} onClose={onCloseTaskEditor} processId={process.Id}/>}
+            <ModalTaskEditor/>
+            <TaskLinksEditor/>
         </form>
 }
 
@@ -159,6 +163,9 @@ const mapDispatch2Props = (dispatch) => {
             updateElement,
             deleteElement,
             deleteTask,
+            showTaskEditor,
+            showTaskLinkEditor,
+            clear,
         }, dispatch)
     }
 }

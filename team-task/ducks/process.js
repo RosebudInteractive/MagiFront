@@ -41,6 +41,8 @@ const SET_LESSONS = `${prefix}/SET_LESSONS`
 
 const GO_BACK_REQUEST = `${prefix}/GO_BACK_REQUEST`
 
+const CLEAR_PROCESS = `${prefix}/CLEAR_PROCESS`
+
 
 /**
  * Reducer
@@ -97,6 +99,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("lessons", payload)
 
+        case CLEAR_PROCESS:
+            return state
+                .set("process", null)
+
         default:
             return state
     }
@@ -138,6 +144,10 @@ export const deleteElement = (elementId: number) => {
 
 export const goBack = () => {
     return {type: GO_BACK_REQUEST}
+}
+
+export const clear = () => {
+    return {type: CLEAR_PROCESS}
 }
 
 /**

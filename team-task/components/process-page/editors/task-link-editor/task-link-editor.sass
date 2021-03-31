@@ -1,0 +1,58 @@
+@import "~tt-assets/styles/colors.sass"
+
+.task-links-editor
+  display: flex
+  flex-direction: column
+  &.form
+    background-color: $color-main-light
+
+  ._apply
+    margin-right: 17px
+
+.task-links-editor__title
+  align-self: center
+
+.task-links-editor__tasks
+  width: 100%
+  display: flex
+  margin-top: 16px
+  margin-bottom: 30px
+
+  ._tasks-column
+    flex: 1 0 calc(50% - 12px)
+  .task-links__available-tasks
+    margin-right: 12px
+  .task-links__depending-tasks
+    margin-left: 12px
+
+  .link-editor__task
+    padding: 16px
+    display: flex
+    background-color: $grey01
+    border-radius: 8px
+    margin-bottom: 9px
+    cursor: pointer
+    align-items: center
+    transition: background-color 300ms ease-in-out
+    &:hover
+      background-color: $grey20
+
+    ._button
+      width: 24px
+      height: 24px
+      border-radius: 50%
+      background-color: $color-main-light
+      display: flex
+      align-items: center
+      justify-content: center
+
+  .depending-task
+    ._button
+      margin-right: 8px
+
+  .available-task
+    .task-title
+      margin-right: auto
+    ._button
+      margin-left: 8px
+      justify-self: flex-end

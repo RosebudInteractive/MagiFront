@@ -50,7 +50,6 @@ export default function LineArrow(props: ArrowProps) {
         return () => {
             if (line.current) {
                 line.current.remove()
-                console.log("unmount")
             }
         }
     }, [])

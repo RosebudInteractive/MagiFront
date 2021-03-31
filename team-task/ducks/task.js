@@ -37,9 +37,8 @@ const CREATE_TASK_FAIL = `${prefix}/CREATE_TASK_FAIL`
 
 const DELETE_TASK_REQUEST = `${prefix}/DELETE_TASK_REQUEST`
 const DELETE_TASK_START = `${prefix}/DELETE_TASK_START`
-const DELETE_TASK_SUCCESS = `${prefix}/DELETE_TASK_SUCCESS`
+export const DELETE_TASK_SUCCESS = `${prefix}/DELETE_TASK_SUCCESS`
 const DELETE_TASK_FAIL = `${prefix}/DELETE_TASK_FAIL`
-
 
 const SET_USERS = `${prefix}/SET_USERS`
 const SET_ELEMENTS = `${prefix}/SET_ELEMENTS`
@@ -49,6 +48,11 @@ const GET_PROCESS_ELEMENT_START = `${prefix}/GET_PROCESS_ELEMENT_START`
 const GET_PROCESS_ELEMENT_SUCCESS = `${prefix}/GET_PROCESS_ELEMENT_SUCCESS`
 const GET_PROCESS_ELEMENT_FAIL = `${prefix}/GET_PROCESS_ELEMENT_FAIL`
 const CLEAR_PROCESS_ELEMENT = `${prefix}/CLEAR_PROCESS_ELEMENT`
+
+const SAVE_TASK_LINKS_REQUEST = `${prefix}/SAVE_TASK_LINKS_REQUEST`
+const SAVE_TASK_LINKS_START = `${prefix}/SAVE_TASK_LINKS_START`
+export const SAVE_TASK_LINKS_SUCCESS = `${prefix}/SAVE_TASK_LINKS_SUCCESS`
+const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
 
 const Element = Record({
     Id: null,
@@ -100,6 +104,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CREATE_TASK_FAIL:
         case SAVE_TASK_FAIL:
         case GET_PROCESS_ELEMENT_FAIL:
+        case SAVE_TASK_LINKS_FAIL:
             return state
                 .set("fetching", false)
 
@@ -109,8 +114,13 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("fetching", false)
 
         case SAVE_TASK_START:
+        case SAVE_TASK_LINKS_START:
             return state
                 .set("fetching", true)
+
+        case SAVE_TASK_LINKS_SUCCESS:
+            return state
+                .set("fetching", false)
 
         case GET_PROCESS_ELEMENT_START:
             return state
@@ -170,6 +180,10 @@ export const getProcessElement = (elementId: number) => {
 
 }
 
+export const saveDependencies = (data) => {
+    return {type: SAVE_TASK_LINKS_REQUEST, payload: data}
+}
+
 
 /**
  * Sagas
@@ -181,6 +195,7 @@ export const saga = function* () {
         takeEvery(SAVE_TASK_REQUEST, saveTaskSaga),
         takeEvery(DELETE_TASK_REQUEST, deleteTaskSaga),
         takeEvery(GET_PROCESS_ELEMENT_REQUEST, getProcessElementSaga),
+        takeEvery(SAVE_TASK_LINKS_REQUEST, saveDependenciesSaga)
     ])
 }
 
@@ -243,9 +258,7 @@ function* saveTaskSaga({payload}) {
 
         yield put(reset('TASK_EDITOR'))
 
-        if (_creatingTask) {
-            yield put(getProcess(data.task.ProcessId))
-        } else {
+        if (!_creatingTask) {
             yield all([
                 put(getTask(id)),
                 put(getProcessElement(elementId)),
@@ -379,8 +392,6 @@ function* getDictionaryData(task) {
 
 
 function* deleteTaskSaga({payload}) {
-    console.log(payload)
-
     yield put({type: DELETE_TASK_START})
     try {
         yield call(_deleteTask, payload.taskId)
@@ -398,6 +409,56 @@ const _deleteTask = (taskId: number) => {
         method: 'DELETE',
         headers: { "Content-type": "application/json" },
         credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+
+function* saveDependenciesSaga({payload}) {
+    yield put({type: SAVE_TASK_LINKS_START})
+
+    try {
+        const _calls = payload.deps
+            .map((item) => {
+                return item.state === "DELETED"
+                    ? call(_deleteDependence, {DepTaskId: payload.taskId, TaskId: item.taskId})
+                    :
+                    item.state === "ADDED" ?
+                        call(_addDependence, {DepTaskId: payload.taskId, TaskId: item.taskId})
+                        :
+                        null
+            })
+            .filter(item => item)
+
+        if (_calls.length > 0) {
+            yield all(_calls)
+        }
+
+        yield put({type: SAVE_TASK_LINKS_SUCCESS})
+    } catch (e) {
+        yield put({type: SAVE_TASK_LINKS_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const _addDependence = (body) => {
+    return fetch("/api/pm/task-dep", {
+        method: 'POST',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(body),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _deleteDependence = (body) => {
+    return fetch("/api/pm/task-dep", {
+        method: 'DELETE',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(body),
     })
         .then(checkStatus)
         .then(parseJSON)
