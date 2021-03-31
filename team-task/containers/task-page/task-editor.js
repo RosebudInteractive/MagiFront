@@ -78,6 +78,8 @@ function TaskEditor(props: EditorProps) {
         }
 
         if (+editorValues.ElementId) {
+            // const _element = props.elements.find(item => item.Id === +editorValues.ElementId)
+            // _value.ElementId = _element && _element.ElemId
             _value.ElementId = +editorValues.ElementId
         }
 

@@ -106,7 +106,7 @@ function TaskLinksEditor(props) {
             if (_dep.state === DEP_STATE.NONE) {
                 _dep.state = DEP_STATE.DELETED
             } else {
-                _deps = _deps.splice(_depIndex, 1)
+                _deps.splice(_depIndex, 1)
             }
 
             setDeps(_deps)
