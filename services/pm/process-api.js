@@ -292,7 +292,7 @@ const SQL_GET_PELEM_MYSQL =
     "where ep.`Id` = <%= id %>";
 
 const SQL_GET_ALL_PELEMS_MSSQL =
-    "select ep.[Id], ep.[ProcessId], ep.[State], ep.[SupervisorId],\n" +
+    "select ep.[Id], ep.[ProcessId], ep.[ElemId], ep.[State], ep.[SupervisorId],\n" +
     "  eu.[DisplayName] as [EUserName], e.[Name]\n" +
     "from [PmElemProcess] ep\n" +
     "  join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
@@ -302,7 +302,7 @@ const SQL_GET_ALL_PELEMS_MSSQL =
     "order by ep.[Index]";
 
 const SQL_GET_ALL_PELEMS_MYSQL =
-    "select ep.`Id`, ep.`ProcessId`, ep.`State`, ep.`SupervisorId`,\n" +
+    "select ep.`Id`, ep.`ProcessId`, ep.`ElemId`, ep.`State`, ep.`SupervisorId`,\n" +
     "  eu.`DisplayName` as `EUserName`, e.`Name`\n" +
     "from `PmElemProcess` ep\n" +
     "  join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
@@ -849,6 +849,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 result.push({
                     Id: elem.Id,
                     Name: elem.Name,
+                    ElemId: elem.ElemId,
                     State: elem.State,
                     Supervisor: elem.SupervisorId ? {
                         Id: elem.SupervisorId,
