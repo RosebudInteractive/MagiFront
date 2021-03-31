@@ -1789,11 +1789,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         return result;
     }
 
-    _getFieldSetByElemId(pstruct, elem_id, set_name) {
+    _getFieldSetByElemId(pstruct, process, elem_id, set_name) {
         let result = null;
-        let elem = this._getProcessElement(pstruct, elem_id);
-        if (elem && elem.WriteFields)
-            result = elem.WriteFields[set_name];
+        let elem_proc = this._getProcessElement(process, elem_id);
+        if (elem_proc) {
+            let elem = this._getProcessElement(pstruct, elem_proc.ElemId);
+            if (elem && elem.WriteFields)
+                result = elem.WriteFields[set_name];
+        }
         return result;
     }
 
@@ -1946,7 +1949,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let allowed_fields = [];
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
-                            let wr_set = this._getFieldSetByElemId(pstruct, taskObj.elementId(), taskObj.writeFieldSet());
+                            let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
                                 throw new HttpError(HttpCode.ERR_FORBIDDEN,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
@@ -2051,7 +2054,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         this._setFieldValues(taskObj, inpFields, fields);
 
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
-                            let wr_set = this._getFieldSetByElemId(pstruct, taskObj.elementId(), taskObj.writeFieldSet());
+                            let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
                                 throw new HttpError(HttpCode.ERR_FORBIDDEN,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
