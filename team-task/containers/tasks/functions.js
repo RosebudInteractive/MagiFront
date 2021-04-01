@@ -58,15 +58,16 @@ const convertParam2Filter = ({hasExecutor, executor, state, process}) => {
         userName: executor ? executor : ""
     }
 
-    filter.State = (state ? state.split(",") : []).map(item => +item)
+    if (state) {
+        filter.State = state.split(",").map(item => +item)
+    }
     filter.ProcessName = process ? process : ""
 
     return filter
 }
 
-export const resizeHandler = () => {
+export const resizeHandler = (rowCount: number) => {
     const _form = $('.form'),
-        // _filter = $(".filter-block"),
         _height = _form.height(),
         _width = _form.width()
 
@@ -75,8 +76,11 @@ export const resizeHandler = () => {
 
 
         setTimeout(() => {
-            // const _filterHeight = _filter && _filter.length ? _filter.height() : 0
-            window.$$('tasks-grid').$setSize(_width, _height - _headerHeight - 48)
+            let _gridHeight = _height - _headerHeight - 48
+
+            const _calcHeight = (rowCount * 80) + _headerHeight + 60
+            _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
+            window.$$('tasks-grid').$setSize(_width, _gridHeight)
         }, 0)
 
     }

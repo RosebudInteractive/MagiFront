@@ -80,7 +80,7 @@ export const getFilterConfig = (filter, states) => {
     ]
 }
 
-export const resizeHandler = () => {
+export const resizeHandler = (rowCount: number) => {
     const _form = $('.form'),
         _height = _form.height(),
         _width = _form.width()
@@ -88,6 +88,12 @@ export const resizeHandler = () => {
     if (window.$$('processes-grid')) {
         const _headerHeight = window.$$('processes-grid').config.headerRowHeight
 
-        window.$$('processes-grid').$setSize(_width, _height - _headerHeight - 48)
+        let _gridHeight = _height - _headerHeight - 48
+
+        const _calcHeight = (rowCount * 80) + _headerHeight + 60
+
+        _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
+
+        window.$$('processes-grid').$setSize(_width, _gridHeight)
     }
 }

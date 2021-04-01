@@ -51,6 +51,8 @@ function TaskLinksEditor(props) {
         const _available = []
 
         Object.entries(tasks).forEach(([taskId, data]) => {
+            if (props.taskId === +taskId) return
+
             const _notInDeps = deps.every((dep) => { return (dep.taskId !== +taskId) || ((dep.taskId === +taskId) && dep.state === DEP_STATE.DELETED)})
             if (_notInDeps) {
                 _available.push({taskId: +taskId, name: data.name})
