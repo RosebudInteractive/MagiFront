@@ -2022,7 +2022,30 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         let process = await this._get_process(inpFields.ProcessId, opts);
                         let pstruct = await this.getProcessStruct(process.StructId, opts);
 
-                        let fields = { ProcessId: inpFields.ProcessId, IsElemReady: true, State: 1, AlertId: null }; // State = "В ожидании"
+                        if (process.State === ProcessState.Finished)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно создать задачу в завершившемся процессе.`);
+
+                        let task_state = TaskState.Draft; // State = "В ожидании"
+                        if (process.State === ProcessState.Executing) {
+                            if (inpFields.Dependencies && (inpFields.Dependencies.length > 0)) {
+                                let finished_cnt = 0;
+                                for (let i = 0; i < inpFields.Dependencies.length; i++) {
+                                    let elem = inpFields.Dependencies[i];
+                                    let task = this._getProcessTask(process, elem);
+                                    if (!task)
+                                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Родительская задача Id = ${elem} не существует.`);
+                                    if (task.State !== TaskState.Finished)
+                                        break;
+                                    finished_cnt++;
+                                }
+                                if (finished_cnt === inpFields.Dependencies.length)
+                                    task_state = TaskState.ReadyToStart;
+                            }
+                            else
+                                task_state = TaskState.ReadyToStart;
+                        }
+                            
+                        let fields = { ProcessId: inpFields.ProcessId, IsElemReady: true, State: task_state, AlertId: null };
 
                         if (typeof (inpFields.Name) !== "undefined")
                             fields.Name = inpFields.Name
@@ -2035,13 +2058,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 await this._checkIfPmTaskExecutor(inpFields.ExecutorId);
                         }
 
+                        let need_elem_rollback = false;
+
                         if (typeof (inpFields.ElementId) === "number") {
                             let elem = this._getProcessElement(process, inpFields.ElementId);
                             if(!elem)
                                 throw new HttpError(HttpCode.ERR_BAD_REQ, `Элемент (ElementId = ${inpFields.ElementId}) не найден.`);
                             fields.ElementId = inpFields.ElementId;
-                            if (typeof (inpFields.IsElemReady) === "boolean")
+                            if (typeof (inpFields.IsElemReady) === "boolean") {
                                 fields.IsElemReady = inpFields.IsElemReady;
+                                if (inpFields.IsElemReady && (elem.State === ElemState.Ready))
+                                    need_elem_rollback = true;
+                            }
                         }
 
                         let newHandler = await root_obj.newObject({
@@ -2060,6 +2088,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                         }
 
+                        let elemObj = null;
+                        if (taskObj.elementId() && need_elem_rollback) {
+                            let el_root_obj = await this._getObjById(taskObj.elementId(), PROC_ELEM_EXPRESSION, dbOpts);
+                            memDbOptions.dbRoots.push(el_root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                            let collection = el_root_obj.getCol("DataElements");
+                            if (collection.count() != 1)
+                                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Элемент (Id =${taskObj.elementId()}) не найден.`);
+                            elemObj = collection.get(0);
+                            await elemObj.edit();
+                            elemObj.state(ElemState.Partly);
+                        }
+
                         if (inpFields.Dependencies && (inpFields.Dependencies.length > 0)) {
                             let root_elems = taskObj.getDataRoot("PmDepTask");
                             for (let i = 0; i < inpFields.Dependencies.length; i++) {
@@ -2070,7 +2110,20 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                         }
 
-                        await root_obj.save(dbOpts);
+                        let tran = await $data.tranStart(dbOpts);
+                        let transactionId = tran.transactionId;
+                        dbOpts.transactionId = tran.transactionId;
+                        try {
+                            await root_obj.save(dbOpts);
+                            if (elemObj)
+                                await elemObj.save(dbOpts);
+                            await $data.tranCommit(transactionId)
+                        }
+                        catch (err) {
+                            await $data.tranRollback(transactionId);
+                            throw err;
+                        }
+
                         if (logModif)
                             console.log(buildLogString(`Task created: Id="${newId}".`));
                         return { result: "OK", id: newId };
