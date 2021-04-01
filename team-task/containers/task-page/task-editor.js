@@ -129,7 +129,7 @@ function TaskEditor(props: EditorProps) {
 
 
     return !fetching && task &&
-        <form className="task-editor-page form" onSubmit={e => e.preventDefault()}>
+        <form className="task-editor-page form form-with-header__main-block" onSubmit={e => e.preventDefault()}>
             <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name} onSave={_save}/>
             <TaskBody task={task}
                       isSupervisor={isSupervisor}

@@ -30,6 +30,28 @@ function Processes(props) {
         _onResize();
     }, [processes])
 
+    // useEffect(() => {
+    //     const initState = parseParams()
+    //     if (initState.order) {
+    //         _sortRef.current = initState.order
+    //         const _grid = window.webix.$$("processes-grid")
+    //         if (_grid) {
+    //             _grid.markSorting(_sortRef.current.field, _sortRef.current.direction)
+    //         }
+    //     }
+    //     if (initState.filter) {
+    //         filter.current = initState.filter
+    //         initState.filter = convertFilter2Params(initState.filter)
+    //     } else {
+    //         filter.current = null
+    //     }
+    //
+    //     initState.pathname = location.pathname
+    //
+    //     actions.setInitState(initState)
+    //
+    // }, [])
+
     useEffect(() => {
         const initState = parseParams()
         if (initState.order) {
@@ -42,16 +64,14 @@ function Processes(props) {
         if (initState.filter) {
             filter.current = initState.filter
             initState.filter = convertFilter2Params(initState.filter)
+        } else {
+            filter.current = null
         }
 
         initState.pathname = location.pathname
 
         actions.setInitState(initState)
 
-    }, [])
-
-    useEffect(() => {
-        actions.setPathname(location.pathname)
         if (!fetching) {
             actions.getProcesses()
         }

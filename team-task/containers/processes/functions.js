@@ -29,7 +29,10 @@ const convertParam2Filter = ({supervisor, course, lesson, state}) => {
     if (!(supervisor || course || lesson || state)) return null
 
     const filter = {}
-    filter.State = (state ? state.split(",") : []).map(item => +item)
+
+    if (state) {
+        filter.State = state.split(",").map(item => +item)
+    }
     filter.SupervisorName = supervisor ? supervisor : ""
     filter.CourseName = course ? course : ""
     filter.LessonName = lesson ? lesson : ""

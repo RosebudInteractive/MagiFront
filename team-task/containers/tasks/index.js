@@ -22,8 +22,7 @@ function Tasks(props) {
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null)
 
-    useWindowSize((size) => {
-        console.log(size)
+    useWindowSize(() => {
         resizeHandler(_taskCount)
     })
 
@@ -44,6 +43,8 @@ function Tasks(props) {
         if (initState.filter) {
             filter.current = initState.filter
             initState.filter = convertFilter2Params(initState.filter)
+        } else {
+            filter.current = null
         }
 
         initState.pathname = location.pathname
@@ -63,7 +64,6 @@ function Tasks(props) {
         headerRowHeight: 40,
         rowHeight: 72,
         height: 1000,
-        // autoheight: true,
         select: true,
         editable: false,
         columns: [
