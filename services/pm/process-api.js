@@ -718,7 +718,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }
         if (!has_executor) {
             mssql_conds.push(`(u.[SysParentId] is NULL)`);
-            mysql_conds.push(`(u.${'`'}SysParentId${'`'} is NULL`);
+            mysql_conds.push(`(u.${'`'}SysParentId${'`'} is NULL)`);
         }
         else
             if (opts.executor) {
