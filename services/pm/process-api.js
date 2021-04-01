@@ -2076,6 +2076,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             fields: fields
                         }, dbOpts);
 
+                        if (!taskObj.executorId())
+                            taskObj.state(TaskState.Draft);
+                        
                         newId = newHandler.keyValue;
                         taskObj = this._db.getObj(newHandler.newObject);
                         fields.Id = newId;
@@ -2150,6 +2153,30 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }
     }
 
+    _makeTasksReady(process) {
+        let result = [];
+        this._get_proc_deps(process);
+        for (let i = 0; i < process.Tasks.length; i++) {
+            let task = process.Tasks[i];
+            if ((task.State === TaskState.Draft) && task.ExecutorId) {
+                let needs_to_change = true;
+                let parents = process._parents[task.Id];
+                if (parents) {
+                    for (let p in parents) {
+                        let pt = this._getProcessTask(process, p);
+                        if (pt.State !== TaskState.Finished) {
+                            needs_to_change = false;
+                            break;
+                        }
+                    }
+                }
+                if (needs_to_change)
+                    result.push(task.Id);
+            }
+        }
+        return result;
+    }
+
     async updateProcess(id, data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
@@ -2177,6 +2204,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         await procObj.edit();
 
+                        let ready_tasks = [];
                         if (typeof (inpFields.State) !== "undefined")
                             if ((typeof (inpFields.State) === "number") && (inpFields.State > 0)
                                 && (inpFields.State <= Object.keys(ProcessState).length)) {
@@ -2185,6 +2213,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     let algo = 0;
                                     switch (procObj.state()) {
                                         case ProcessState.Draft:
+                                            algo = 3;
                                             is_allowed = inpFields.State === ProcessState.Executing;
                                             break;
                                         case ProcessState.Executing:
@@ -2219,6 +2248,22 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                             case 2:
                                                 this._canGoToDraft(process);
                                                 break;
+                                            case 3:
+                                                let task_ids = this._makeTasksReady(process);
+                                                if (task_ids.length > 0) {
+                                                    for (let i = 0; i < task_ids.length; i++) {
+                                                        let t_root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
+                                                        memDbOptions.dbRoots.push(t_root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                                        let collection = t_root_obj.getCol("DataElements");
+                                                        if (collection.count() != 1)
+                                                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${task_ids[i]}) не найдена.`);
+                                                        let ctask = collection.get(0);
+                                                        await ctask.edit();
+                                                        ctask.state(TaskState.ReadyToStart);
+                                                        ready_tasks.push(ctask);
+                                                    }
+                                                }
+                                                break;
                                         }
                                         procObj.state(inpFields.State);
                                     }
@@ -2239,7 +2284,20 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         this._setFieldValues(procObj, inpFields, ["Id", "State", "SupervisorId", "StructId", "LessonId"]);
-                        await procObj.save(dbOpts);
+
+                        let tran = await $data.tranStart(dbOpts);
+                        let transactionId = tran.transactionId;
+                        dbOpts.transactionId = tran.transactionId;
+                        try {
+                            for (let i = 0; i < ready_tasks.length; i++)
+                                await ready_tasks[i].save(dbOpts);
+                            await procObj.save(dbOpts);
+                            await $data.tranCommit(transactionId)
+                        }
+                        catch (err) {
+                            await $data.tranRollback(transactionId);
+                            throw err;
+                        }
 
                         if (logModif)
                             console.log(buildLogString(`Process updated: Id="${id}".`));
