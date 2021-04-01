@@ -1875,12 +1875,15 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             elemObj = collection.get(0);
                         }
 
-                        if (typeof (inpFields.ExecutorId) === "number") {
-                            taskObj.executorId(inpFields.ExecutorId);
-                            if (inpFields.ExecutorId !== opts.user.Id) {
+                        if (typeof (inpFields.ExecutorId) !== "undefined") {
+                            let old_executor = taskObj.executorId();
+                            let new_executor = (typeof (inpFields.ExecutorId) === "number") && (inpFields.ExecutorId > 0) ? inpFields.ExecutorId : null;
+                            if (old_executor !== new_executor) {
                                 if (!isSupervisor)
                                     throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять исполнителя задачи.`);
-                                await this._checkIfPmTaskExecutor(inpFields.ExecutorId);
+                                taskObj.executorId(new_executor);
+                                if (new_executor)
+                                    await this._checkIfPmTaskExecutor(new_executor);
                             }
                         }
 
@@ -2076,9 +2079,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             fields: fields
                         }, dbOpts);
 
-                        if (!taskObj.executorId())
-                            taskObj.state(TaskState.Draft);
-                        
                         newId = newHandler.keyValue;
                         taskObj = this._db.getObj(newHandler.newObject);
                         fields.Id = newId;
@@ -2136,10 +2136,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
     }
 
     _canGoToDraft(process) {
+        let result = [];
         for (let i = 0; i < process.Tasks.length; i++) {
             if ((process.Tasks[i].State !== TaskState.Draft) && (process.Tasks[i].State !== TaskState.ReadyToStart))
                 throw new HttpError(HttpCode.ERR_BAD_REQ, `Не все задачи процесса в состоянии "В ожидании" или "Можно приступать".`);
+            if (process.Tasks[i].State === TaskState.ReadyToStart)
+                result.push(process.Tasks[i].Id);
         }
+        return result;
     }
 
     _canGoToFinished(process) {
@@ -2241,29 +2245,33 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                             break;
                                     }
                                     if (is_allowed) {
+                                        let task_ids = [];
+                                        let task_state;
                                         switch (algo) {
                                             case 1:
                                                 this._canGoToFinished(process);
                                                 break;
                                             case 2:
-                                                this._canGoToDraft(process);
+                                                task_ids = this._canGoToDraft(process);
+                                                task_state = TaskState.Draft;
                                                 break;
                                             case 3:
-                                                let task_ids = this._makeTasksReady(process);
-                                                if (task_ids.length > 0) {
-                                                    for (let i = 0; i < task_ids.length; i++) {
-                                                        let t_root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
-                                                        memDbOptions.dbRoots.push(t_root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-                                                        let collection = t_root_obj.getCol("DataElements");
-                                                        if (collection.count() != 1)
-                                                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${task_ids[i]}) не найдена.`);
-                                                        let ctask = collection.get(0);
-                                                        await ctask.edit();
-                                                        ctask.state(TaskState.ReadyToStart);
-                                                        ready_tasks.push(ctask);
-                                                    }
-                                                }
+                                                task_ids = this._makeTasksReady(process);
+                                                task_state = TaskState.ReadyToStart;
                                                 break;
+                                        }
+                                        if (task_ids.length > 0) {
+                                            for (let i = 0; i < task_ids.length; i++) {
+                                                let t_root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
+                                                memDbOptions.dbRoots.push(t_root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                                let collection = t_root_obj.getCol("DataElements");
+                                                if (collection.count() != 1)
+                                                    throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${task_ids[i]}) не найдена.`);
+                                                let ctask = collection.get(0);
+                                                await ctask.edit();
+                                                ctask.state(task_state);
+                                                ready_tasks.push(ctask);
+                                            }
                                         }
                                         procObj.state(inpFields.State);
                                     }
