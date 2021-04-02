@@ -73,6 +73,7 @@
     "express-session": "^1.15.6",
     "fast-async": "^6.3.8",
     "formidable": "^1.1.1",
+    "got": "^11.8.2",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
     "jquery": "^3.3.1",

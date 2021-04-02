@@ -548,6 +548,7 @@ const { IdxCourseService } = require('./elastic/indices/idx-course');
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
 const { URL, URLSearchParams } = require('url');
+const { result } = require('lodash');
 
 const URL_PREFIX = "category";
 const MAILING_PREFIX = "mailing/new-course";
@@ -1075,11 +1076,12 @@ const DbCourse = class DbCourse extends DbObject {
                                     Detail: true,
                                     Truncate: true
                                 });
+                                let in_app_pricers = await this._getInAppPricers(opts);            
                                 for (let i = 0; i < prods.length; i++){
                                     let prod = prods[i];
                                     let course = productList[prod.Id];
                                     if (course)
-                                        this._setPriceByProd(course, prod, isPriceList);
+                                        this._setPriceByProd(course, prod, isPriceList, in_app_pricers);
                                 }
                             }
 
@@ -1227,7 +1229,7 @@ const DbCourse = class DbCourse extends DbObject {
                     };
                 };
             })
-            await this.getCoursePrice(course);
+            await this.getCoursePrice(course, false, false, opts);
             if (opts.promo && course.ProductId) {
                 let promo = null;
                 let promoService = this.getService("promo", true);
@@ -1455,7 +1457,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     lsn.Videos.push(elem.VideoLink);
                             })
 
-                            await this.getCoursePrice(course);
+                            await this.getCoursePrice(course, false, false, opts);
 
                             let authors = "";
                             isFirst = true;
@@ -1699,7 +1701,7 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    _setPriceByProd(course, prod, hasRaw) {
+    _setPriceByProd(course, prod, hasRaw, in_app_pricers) {
         course.Price = prod.Price;
         course.DPrice = prod.DPrice;
         if (prod.Discount)
@@ -1708,6 +1710,44 @@ const DbCourse = class DbCourse extends DbObject {
             course.DynDiscounts = prod.DynDiscounts;
         if (hasRaw)
             course._rawProduct = prod;
+        if (in_app_pricers) {
+            for (let key in in_app_pricers) {
+                let getPrice = in_app_pricers[key];
+                if (typeof (getPrice) === "function") {
+                    if (!course.InAppPrices)
+                        course.InAppPrices = {};
+                    let currPrices = course.InAppPrices[key];
+                    if (!currPrices)
+                        currPrices = course.InAppPrices[key] = {};
+                    if (course.Price) {
+                        let pelem = getPrice(course.Price);
+                        if (pelem)
+                            currPrices.Price = pelem.code;
+                    }
+                    if (course.DPrice) {
+                        let pelem = getPrice(course.DPrice);
+                        if (pelem)
+                            currPrices.DPrice = pelem.code;
+                    }
+                }
+            }
+        }
+    }
+
+    async _getInAppPricers(options) {
+        let result = null;
+        if (options && options.mobile_app) {
+            switch (options.mobile_app) {
+                case "ios":
+                    let ios = this.getService("iosInApp", true);
+                    if (ios) {
+                        result = {};
+                        result.ios = await ios.getInAppPricer();
+                    }
+                    break;
+            }
+        }
+        return result;
     }
 
     async getCoursesPrice(courses, withCheckProd, alwaysShowDiscount) {
@@ -1751,11 +1791,13 @@ const DbCourse = class DbCourse extends DbObject {
                 });
                 Array.prototype.push.apply(products, prods);
             }
+
+            let in_app_pricers = await this._getInAppPricers();            
             for (let i = 0; i < products.length; i++){
                 let prod = products[i];
                 delete prod_list[prod.Id];
                 let course = course_list[prod.Id];
-                this._setPriceByProd(course, prod)
+                this._setPriceByProd(course, prod, false, in_app_pricers)
                 let res = result[course.Id] = {
                     courseId: course.Id,
                     IsPaid: course.IsPaid,
@@ -1779,7 +1821,7 @@ const DbCourse = class DbCourse extends DbObject {
         return result;
     }
 
-    async getCoursePrice(course, withCheckProd, alwaysShowDiscount) {
+    async getCoursePrice(course, withCheckProd, alwaysShowDiscount, options) {
         course.Price = 0;
         course.DPrice = 0;
         delete course.Discount;
@@ -1790,8 +1832,10 @@ const DbCourse = class DbCourse extends DbObject {
                 AlwaysShowDiscount: alwaysShowDiscount ? true : false,
                 Truncate: true
             });
-            if (prods.length === 1)
-                this._setPriceByProd(course, prods[0])
+            if (prods.length === 1) {
+                let in_app_pricers = await this._getInAppPricers(options);
+                this._setPriceByProd(course, prods[0], false, in_app_pricers);
+            }
             else
                 if (withCheckProd)
                     throw new HttpError(HttpCode.ERR_NOT_FOUND,

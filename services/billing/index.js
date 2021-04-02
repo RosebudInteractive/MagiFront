@@ -12,6 +12,13 @@ exports.SetupRoute = (app) => {
             global.$Services = {};
         global.$Services.payments = () => { return paymentObject; };
 
+        const { PaymentObject: IosInApp } = require('./in-app/ios');
+        let iosInApp = IosInApp({ app: app });
+
+        if (!global.$Services)
+            global.$Services = {};
+        global.$Services.iosInApp = () => { return iosInApp; };
+
         if (app) {
             app.post('/api/payments/test', (req, res, next) => {
                 if (req.user) {
