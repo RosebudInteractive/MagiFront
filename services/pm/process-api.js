@@ -2167,7 +2167,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         this._get_proc_deps(process);
         for (let i = 0; i < process.Tasks.length; i++) {
             let task = process.Tasks[i];
-            if ((task.State === TaskState.Draft) && task.ExecutorId) {
+            if (task.State === TaskState.Draft) {
                 let needs_to_change = true;
                 let parents = process._parents[task.Id];
                 if (parents) {
