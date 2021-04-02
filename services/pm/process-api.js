@@ -693,6 +693,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
         let mssql_conds = [];
         let mysql_conds = [];
+
+        // Show only EXECUTING processes
+        mssql_conds.push(`(p.[State] = ${ProcessState.Executing})`);
+        mysql_conds.push(`(p.${'`'}State${'`'} = ${ProcessState.Executing})`);
+
         let has_executor = opts.hasExecutor ? (typeof (opts.hasExecutor) === "boolean" ?
             opts.hasExecutor : (opts.hasExecutor === "false" ? false : true)) : true;
         if (!(access_rights & AccessFlags.PmAdmin)) {
