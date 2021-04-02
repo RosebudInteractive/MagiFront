@@ -16,6 +16,7 @@ type ProcessBodyProps = {
     onUpdateElement: Function,
     onDeleteElement: Function,
     onAddTask: Function,
+    onAddTaskWithLink: Function,
     onEditTaskLinks: Function,
     onEditTask: Function,
     onDeleteTask: Function,
@@ -40,6 +41,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
         <Schema tree={props.tree}
                 onSetActiveTask={onSetActiveTask}
                 onAddTask={props.onAddTask}
+                onAddTaskWithLink={props.onAddTaskWithLink}
                 onEditTaskLinks={props.onEditTaskLinks}
                 onEditTask={props.onEditTask}
                 onDeleteTask={props.onDeleteTask}/>

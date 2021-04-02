@@ -9,6 +9,7 @@ type TaskProps = {
     onEditLinks: Function,
     onEdit: Function,
     onDelete: Function,
+    onAddNewTask: Function,
     active: boolean,
     node: any,
 }
@@ -32,6 +33,12 @@ export default function SchemaTask(props: TaskProps) {
     const _onDelete = () => {
         if (props.onDelete) {
             props.onDelete(node.id)
+        }
+    }
+
+    const _onAddNewTask = () => {
+        if (props.onAddNewTask) {
+            props.onAddNewTask(node.id)
         }
     }
 
@@ -69,6 +76,7 @@ export default function SchemaTask(props: TaskProps) {
                     <button className='task__button _edit' onClick={_onEdit}/>
                     <button className='task__button _delete' onClick={_onDelete}/>
                 </div>
+                <button className='task-button_add-new-task' onClick={_onAddNewTask}/>
             </div>
         </div>
         :

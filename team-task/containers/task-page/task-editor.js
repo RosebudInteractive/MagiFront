@@ -44,7 +44,7 @@ function TaskEditor(props: EditorProps) {
             const _object = {
                 Name: task.Name,
                 Description: task.Description,
-                DueDate: task.DueDate ? moment(task.DueDate) : moment(),
+                DueDate: task.DueDate ? moment(task.DueDate) : null,
                 State: task.State,
                 IsElemReady: !!task.IsElemReady,
                 WriteFieldSet: task.WriteFieldSet,
@@ -68,18 +68,18 @@ function TaskEditor(props: EditorProps) {
             Id: task.Id,
             Name: editorValues.Name,
             State: +editorValues.State,
-            ExecutorId: +editorValues.ExecutorId,
-            DueDate: editorValues.DueDate.toISOString(),
+            ExecutorId: +editorValues.ExecutorId ? +editorValues.ExecutorId : null,
             Description: editorValues.Description,
-
             IsElemReady: !!editorValues.IsElemReady,
             WriteFieldSet: editorValues.WriteFieldSet,
             Comment: !task.UserLastComment ? _commentText  : null,
         }
 
+        if (editorValues.DueDate) {
+            _value.DueDate = editorValues.DueDate.toISOString()
+        }
+
         if (+editorValues.ElementId) {
-            // const _element = props.elements.find(item => item.Id === +editorValues.ElementId)
-            // _value.ElementId = _element && _element.ElemId
             _value.ElementId = +editorValues.ElementId
         }
 

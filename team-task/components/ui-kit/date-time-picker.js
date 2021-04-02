@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useRef} from "react"
 import { withStyles} from "@material-ui/core"
 import {KeyboardDatePicker} from "@material-ui/pickers"
 
@@ -21,12 +21,15 @@ const CssKeyboardDatePicker = withStyles({
         '& label[data-shrink="true"]': {
             // display: "none"
         },
-        "& .MuiInputLabel-outlined": {
-            "transform": "translate(16px, 14px) scale(1)",
+        "& .MuiInputLabel-formControl": {
+            "transform": "translate(0, 14px) scale(1)",
             "&.MuiInputLabel-shrink": {
-                "transform": "translate(16px, 0px) scale(0.75)",
+                "transform": "translate(0, 0px) scale(0.75)",
             }
         },
+        // "& .MuiInputLabel-formControl:not(.MuiInputLabel-outlined)" : {
+        //     "transform": "translate(0, 16px) scale(1)",
+        // },
         "& .MuiOutlinedInput-multiline": {
             borderRadius: "8px",
             padding: "15px 16px",
@@ -100,28 +103,27 @@ const CssKeyboardDatePicker = withStyles({
 })(KeyboardDatePicker);
 
 export default function UiDatePicker(props) {
-
     const onChange = (e) => {
-        console.log(e)
-        props.input.onChange(e.toDate())
+        props.input.onChange(e ? e.toDate() : null)
     }
 
     const onBlur = () => {
         // props.input.onChange(e.valueOf())
     }
 
-    const _id = props.id ? props.id : "ui-date-time-picker-" + Math.floor(Math.random() * Math.floor(10000))
+    const _id = useRef(props.id ? props.id : "ui-date-time-picker-" + Math.floor(Math.random() * Math.floor(10000)))
 
     return <CssKeyboardDatePicker
-        id={_id}
+        id={_id.current}
         className={"input-field"}
         disableToolbar
         variant="inline"
-        format="DD.MM.yyyy"
+        format={"DD.MM.yyyy"}
         margin="normal"
 
         label={props.label}
         {...props.input}
+        value={props.input && props.input.value ? props.input.value : null}
         onChange={onChange}
         onBlur={onBlur}
         KeyboardButtonProps={{

@@ -102,6 +102,10 @@ function ProcessEditor(props) {
         actions.showTaskEditor({processId: process.Id, taskId: -1})
     }
 
+    const onAddTaskWithLink = (parentTaskId) => {
+        actions.showTaskEditor({processId: process.Id, taskId: -1, parentTaskId})
+    }
+
     const onDeleteTask = (taskId) => {
         const data: ProcessTask = {taskId: taskId, processId: process.Id}
         actions.deleteTask(data)
@@ -121,6 +125,7 @@ function ProcessEditor(props) {
                          onUpdateElement={actions.updateElement}
                          onDeleteElement={actions.deleteElement}
                          onAddTask={onAddTask}
+                         onAddTaskWithLink={onAddTaskWithLink}
                          onEditTaskLinks={onEditTaskLinks}
                          onEditTask={onEditTask}
                          onDeleteTask={onDeleteTask}/>

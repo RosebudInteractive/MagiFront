@@ -16,9 +16,9 @@ const CssTextField = withStyles({
                 color: "#C8684C"
             },
         },
-        '& label[data-shrink="true"]': {
-            // display: "none"
-        },
+        // '& label[data-shrink="true"]': {
+        //     // display: "none"
+        // },
         "& .MuiInputLabel-outlined": {
             "transform": "translate(16px, 14px) scale(1)",
             "&.MuiInputLabel-shrink": {

@@ -28,6 +28,10 @@
       opacity: 1
       visibility: visible
 
+    .task-button_add-new-task
+      opacity: 0.4
+      visibility: visible
+
   &._active
     background-color: #FFF8EA
 
@@ -81,5 +85,25 @@
 
     &._delete
       background-image: url("~tt-assets/png/trash.png")
+
+  .task-button_add-new-task
+    background-image: url("~tt-assets/png/plus.png")
+    position: absolute
+    right: 6px
+    top: 50%
+    transform: translateY(-50%)
+    height: 32px
+    width: 32px
+    cursor: pointer
+    background-size: contain
+    background-origin: border-box
+    background-repeat: no-repeat
+    background-position: center
+    background-color: transparent
+    visibility: hidden
+    opacity: 0
+    transition: opacity 300ms ease
+    &:hover
+      opacity: 1
 
 

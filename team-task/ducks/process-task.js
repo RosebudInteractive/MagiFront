@@ -33,6 +33,7 @@ export const ReducerRecord = Record({
     editorVisible: false,
     linkEditorVisible: false,
     taskId: null,
+    parentTaskId: null,
     processId: null,
 })
 
@@ -44,6 +45,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("editorVisible", true)
                 .set("taskId", payload.taskId)
+                .set("parentTaskId", payload.parentTaskId ? payload.parentTaskId : null)
                 .set("processId", payload.processId)
 
         case SHOW_TASK_LINK_EDITOR_START:
@@ -56,6 +58,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("editorVisible", false)
                 .set("taskId", null)
+                .set("parentTaskId", null)
                 .set("processId", null)
 
         case CLOSE_TASK_LINK_EDITOR_START:

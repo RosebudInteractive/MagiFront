@@ -7,6 +7,7 @@ import SchemaTask from "./task";
 
 type SchemaProps = {
     onAddTask: Function,
+    onAddTaskWithLink: Function,
     onEditTaskLinks: Function,
     onEditTask: Function,
     onDeleteTask: Function,
@@ -47,7 +48,7 @@ export default function Schema(props: SchemaProps) {
     const getCells = () => {
         if (tree) {
             return Object.values(tree.nodes).map((item, index) => {
-                return <SchemaTask onClick={onTaskClick} onEdit={editTask} onDelete={deleteTask} onEditLinks={editTaskLinks}
+                return <SchemaTask onClick={onTaskClick} onEdit={editTask} onDelete={deleteTask} onEditLinks={editTaskLinks} onAddNewTask={addTaskWithLink}
                                    active={active === item.id} node={item} key={index}/>
             })
         } else {
@@ -65,6 +66,8 @@ export default function Schema(props: SchemaProps) {
     const editTask = (taskId) => { if (props.onEditTask) {props.onEditTask(taskId)} }
 
     const deleteTask = (taskId) => { if (props.onDeleteTask) {props.onDeleteTask(taskId)} }
+
+    const addTaskWithLink = (taskId) => { if (props.onAddTaskWithLink) {props.onAddTaskWithLink(taskId)} }
 
     const getLines = () => {
         if (tree && tree.lines && tree.lines.length) {
