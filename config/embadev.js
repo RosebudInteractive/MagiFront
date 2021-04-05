@@ -168,7 +168,7 @@ let options = {
                 sender: "test@magisteria.ru",
                 senderName: "Magisteria.ru",
                 host: null
-            }            
+            }
         },
         userReg: {
             type: "test",//"smtp",
@@ -291,6 +291,15 @@ let options = {
                 min: 0,
                 idle: 60000
             }
+        }
+    },
+    mobileApp: {
+        ios: {
+            apiKeyId: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.apiKeyId ? pk.mobileApp.ios.apiKeyId : undefined,
+            issuerId: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.issuerId ? pk.mobileApp.ios.issuerId : undefined,
+            pkPath: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.pkPath ? pk.mobileApp.ios.pkPath : undefined,
+            inApps: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.inApps ? pk.mobileApp.ios.inApps : undefined,
+            template: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.template ? pk.mobileApp.ios.template : undefined
         }
     }
 };
