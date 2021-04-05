@@ -46,7 +46,7 @@ class PromoField extends React.Component {
         return <div className="promo__wrapper">
             <div className={"promo__field-wrapper" + _promoState}>
                 <div className="field__value-wrapper">
-                    <input type="text" name="promo" placeholder='Промокод' defaultValue={this.props.defaultValue} id="promo" className="form__field" onBlur={::this._forceValidate} onChange={::this._onChange}/>
+                    <input type="text" name="promo" placeholder='Промокод на скидку' defaultValue={this.props.defaultValue} id="promo" className="form__field" onBlur={::this._forceValidate} onChange={::this._onChange}/>
                     {
                         this.props.promo.checked && !this.props.promo.error ?
                             <span className="status-icon">

@@ -57,7 +57,7 @@ export default class EmailField extends React.Component {
             {
                 this.props.promoEnable
                     ?
-                    <span className='email__info font-universal__body-small secondary-dark'>Промокод также будет доступен в разделе "Платежи" Вашего личного кабинета</span>
+                    <span className='email__info font-universal__body-small secondary-dark'>Подарочный промокод также будет доступен в разделе "Платежи" Вашего личного кабинета</span>
                     :
                     <span className='email__info font-universal__body-small secondary-dark'>Введите адрес Вашей электронной почты для получения фискального чека</span>
             }
