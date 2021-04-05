@@ -25,11 +25,12 @@ const EDITOR_NAME = "TASK_EDITOR"
 
 type EditorProps = {
     taskId: number,
+    parentTaskId: ?number,
     processId: ?number,
 }
 
 function TaskEditor(props: EditorProps) {
-    const {actions, task, fetching, isSupervisor, hasChanges, editorValues, currentElement, taskId, processId} = props
+    const {actions, task, fetching, isSupervisor, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId} = props
 
     useEffect(() => {
         if (taskId === -1) {
@@ -85,6 +86,9 @@ function TaskEditor(props: EditorProps) {
 
         if (taskId === -1) {
             _value.ProcessId = processId
+            if (parentTaskId) {
+                _value.Dependencies = [parentTaskId]
+            }
         }
 
         _value.Fields = {}

@@ -79,6 +79,7 @@ const stateSelector = state => state[moduleName]
 export const editorVisibleSelector = createSelector(stateSelector, state => state.editorVisible)
 export const linkEditorVisibleSelector = createSelector(stateSelector, state => state.linkEditorVisible)
 export const taskIdSelector = createSelector(stateSelector, state => state.taskId)
+export const parentTaskIdSelector = createSelector(stateSelector, state => state.parentTaskId)
 export const processIdSelector = createSelector(stateSelector, state => state.processId)
 
 

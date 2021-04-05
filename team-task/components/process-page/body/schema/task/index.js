@@ -51,8 +51,10 @@ export default function SchemaTask(props: TaskProps) {
     }}, [node])
 
     const state = useMemo(() => {
-        const isExpired = node && moment(node.dueDate).isBefore(moment())
-        return isExpired ? { isExpired, css: "_expired", caption: "Просрочено" } : { isExpired, ...getTaskState(node.state)}
+        const isExpired = node && moment(node.dueDate).isBefore(moment()),
+            _state = getTaskState(node.state)
+
+        return isExpired ? { isExpired, css: "_expired", caption: _state.caption } : { isExpired, ..._state}
     }, [node])
 
     const _onClick = () => {

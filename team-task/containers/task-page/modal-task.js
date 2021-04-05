@@ -1,16 +1,16 @@
 import React from "react"
 import {connect} from 'react-redux';
 import TaskEditor from "./task-editor";
-import {editorVisibleSelector, taskIdSelector, processIdSelector, closeTaskEditor} from "tt-ducks/process-task";
+import {editorVisibleSelector, taskIdSelector, parentTaskIdSelector, processIdSelector, closeTaskEditor} from "tt-ducks/process-task";
 import {bindActionCreators} from "redux";
 
 function ModalTaskEditor(props) {
-    const {taskId, processId, actions} = props
+    const {taskId, processId, actions, parentTaskId} = props
 
     return props.editorVisible ?
         <div className="modal-form tak-editor__modal-form">
             <div className="tak-editor__modal-wrapper">
-                <TaskEditor taskId={taskId} processId={processId}/>
+                <TaskEditor taskId={taskId} processId={processId} parentTaskId={parentTaskId}/>
                 <button type="button" className="modal-form__close-button"
                         onClick={actions.closeTaskEditor}>Закрыть
                 </button>
@@ -23,6 +23,7 @@ function ModalTaskEditor(props) {
 const mapState2Props = (state) => {
     return {
         taskId: taskIdSelector(state),
+        parentTaskId: parentTaskIdSelector(state),
         processId: processIdSelector(state),
         editorVisible: editorVisibleSelector(state)
     }

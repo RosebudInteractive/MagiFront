@@ -16,7 +16,7 @@ export default function TaskHeader(props: TaskHeaderProps) {
     const _taskNumber = useRef(taskId ? (taskId === -1) ? "Создание задачи" : `№${taskId}` : "not saved")
 
     return <div className="task-page__header">
-        <Field component={TextBoxWithConfirm} name={"Name"} label={"Название задачи"}/>
+        <Field component={TextBoxWithConfirm} name={"Name"} label={"Название задачи"} extClass={"page-title"}/>
         <div className="task-info-block">
             <h6 className="task-info__task-id _grey50">{_taskNumber.current}</h6>
             <div className="task-info__separator"/>
