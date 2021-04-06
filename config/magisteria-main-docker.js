@@ -354,7 +354,9 @@ module.exports = {
             issuerId: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.issuerId ? pk.mobileApp.ios.issuerId : undefined,
             pkPath: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.pkPath ? pk.mobileApp.ios.pkPath : undefined,
             inApps: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.inApps ? pk.mobileApp.ios.inApps : undefined,
-            template: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.template ? pk.mobileApp.ios.template : undefined
+            template: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.template ? pk.mobileApp.ios.template : undefined,
+            sharedSecret: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.sharedSecret ? pk.mobileApp.ios.sharedSecret : undefined,
+            environment: 'sandbox'
         }
     }
 };

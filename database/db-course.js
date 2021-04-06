@@ -541,6 +541,9 @@ const COURSE_MYSQL_LSN_COVER_REQ =
 
 const DFLT_ADDRESS_BOOK = "Магистерия";
 const DFLT_SENDER_NAME = "Magisteria.ru";
+const PRICE_COEFF = {
+    ios: 1.2
+};
 
 const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
 const { IdxLessonService } = require('./elastic/indices/idx-lesson');
@@ -1713,6 +1716,7 @@ const DbCourse = class DbCourse extends DbObject {
         if (in_app_pricers) {
             for (let key in in_app_pricers) {
                 let getPrice = in_app_pricers[key];
+                let coeff = PRICE_COEFF[key] ? PRICE_COEFF[key] : 1.0;
                 if (typeof (getPrice) === "function") {
                     if (!course.InAppPrices)
                         course.InAppPrices = {};
@@ -1720,14 +1724,20 @@ const DbCourse = class DbCourse extends DbObject {
                     if (!currPrices)
                         currPrices = course.InAppPrices[key] = {};
                     if (course.Price) {
-                        let pelem = getPrice(course.Price);
-                        if (pelem)
-                            currPrices.Price = pelem.code;
+                        let price_ini = Math.round(course.Price * coeff);
+                        let pelem = getPrice(price_ini);
+                        if (pelem) {
+                            currPrices.Price = pelem;
+                            currPrices.Price.PriceIni = price_ini;
+                        }
                     }
                     if (course.DPrice) {
-                        let pelem = getPrice(course.DPrice);
-                        if (pelem)
-                            currPrices.DPrice = pelem.code;
+                        let price_ini = Math.round(course.DPrice * coeff);
+                        let pelem = getPrice(price_ini);
+                        if (pelem) {
+                            currPrices.DPrice = pelem;
+                            currPrices.DPrice.PriceIni = price_ini;
+                        }
                     }
                 }
             }

@@ -330,7 +330,7 @@ const GET_NOT_SENT_TRANS_MSSQL =
     "  join [CategoryLng] ct on ct.[CategoryId] = cc.[CategoryId]\n" +
     "  join [AuthorToCourse] ac on ac.[CourseId] = cc.[CourseId]\n" +
     "  join [AuthorLng] al on ac.[AuthorId] = al.[AuthorId]\n" +
-    "where (c.[UserId] = <%= user_id %>) and (c.[StateId] = 4) and (c.[ChequeTypeId] = 1) and (c.[SendStatus] = 0)\n" +
+    "where (c.[PaymentType] = 1) and (c.[UserId] = <%= user_id %>) and (c.[StateId] = 4) and (c.[ChequeTypeId] = 1) and (c.[SendStatus] = 0)\n" +
     "union all\n" +
     "select c.[Id] [TranId], ii.[Id] [ItemId], cc.[CourseId], al.[FirstName] + ' ' + al.[LastName] [Author],\n" +
     "  ct.[Name] [Category], cl.[Name], ii.[Price], ii.[Qty], ii.[Qty] * ii.[Price] [Sum],\n" +
@@ -347,12 +347,12 @@ const GET_NOT_SENT_TRANS_MSSQL =
     "  join [CategoryLng] ct on ct.[CategoryId] = cc.[CategoryId]\n" +
     "  join [AuthorToCourse] ac on ac.[CourseId] = cc.[CourseId]\n" +
     "  join [AuthorLng] al on ac.[AuthorId] = al.[AuthorId]\n" +
-    "where (c.[UserId] = <%= user_id %>) and (c.[StateId] = 4) and (c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)\n" +
+    "where (c.[PaymentType] = 1) and (c.[UserId] = <%= user_id %>) and (c.[StateId] = 4) and (c.[ChequeTypeId] = 1) and (c.[SendStatus] = 0)\n" +
     "order by 1, 2";
 
 const GET_SHORT_NOT_SENT_TRANS_MSSQL =
-    "select c.[Id] from[Cheque] c\n" +
-    "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)";
+    "select c.[Id] from [Cheque] c\n" +
+    "where (c.[PaymentType] = 1) and (c.[UserId] = <%= user_id %>) and (c.[StateId] = 4) and (c.[ChequeTypeId] = 1) and (c.[SendStatus] = 0)";
 
 const SET_TRAN_SEND_STATUS_MSSQL =
     "update [Cheque] set [SendStatus] = 1, [SendStatusChangedAt] = GETDATE()\n" +
@@ -372,7 +372,7 @@ const GET_NOT_SENT_TRANS_MYSQL =
     "  join `CategoryLng` ct on ct.`CategoryId` = cc.`CategoryId`\n" +
     "  join `AuthorToCourse` ac on ac.`CourseId` = cc.`CourseId`\n" +
     "  join `AuthorLng` al on ac.`AuthorId` = al.`AuthorId`\n" +
-    "where (c.`UserId` = <%= user_id %>) and (c.`StateId` = 4) and (c.`ChequeTypeId` = 1) and (c.`SendStatus` = 0)\n" +
+    "where (c.`PaymentType` = 1) and (c.`UserId` = <%= user_id %>) and (c.`StateId` = 4) and (c.`ChequeTypeId` = 1) and (c.`SendStatus` = 0)\n" +
     "union all\n" +
     "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
     "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price` `Sum`,\n" +
@@ -389,12 +389,12 @@ const GET_NOT_SENT_TRANS_MYSQL =
     "  join `CategoryLng` ct on ct.`CategoryId` = cc.`CategoryId`\n" +
     "  join `AuthorToCourse` ac on ac.`CourseId` = cc.`CourseId`\n" +
     "  join `AuthorLng` al on ac.`AuthorId` = al.`AuthorId`\n" +
-    "where (c.`UserId` = <%= user_id %>) and (c.`StateId` = 4) and (c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)\n" +
+    "where (c.`PaymentType` = 1) and (c.`UserId` = <%= user_id %>) and (c.`StateId` = 4) and (c.`ChequeTypeId` = 1) and (c.`SendStatus` = 0)\n" +
     "order by 1, 2";
 
 const GET_SHORT_NOT_SENT_TRANS_MYSQL =
-    "select c.`Id` from`Cheque` c\n" +
-    "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)";
+    "select c.`Id` from `Cheque` c\n" +
+    "where (c.`PaymentType` = 1) and (c.`UserId` = <%= user_id %>) and (c.`StateId` = 4) and (c.`ChequeTypeId` = 1) and (c.`SendStatus` = 0)";
 
 const SET_TRAN_SEND_STATUS_MYSQL =
     "update `Cheque` set `SendStatus` = 1, `SendStatusChangedAt` = NOW()\n" +

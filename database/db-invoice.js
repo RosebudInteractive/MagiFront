@@ -37,11 +37,12 @@ const convertToInt = (val) => {
 
 const GET_INVOICE_MSSQL =
     "select i.[Id], i.[UserId], i.[ParentId], i.[InvoiceTypeId], i.[StateId], i.[CurrencyId], c.[Code] as [CCode], i.[ChequeId], i.[Name],\n" +
-    "  i.[Description], i.[InvoiceNum], i.[InvoiceDate], i.[Sum], i.[RefundSum], it.[Id] as [ItemId], it.[ProductId],\n" +
+    "  i.[Description], i.[InvoiceNum], i.[InvoiceDate], i.[Sum], i.[RefundSum], it.[Id] as [ItemId], it.[ProductId], ch.[PaymentType],\n" +
     "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[AccName] as [ItemAccName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
-    "from[Invoice] i\n" +
-    "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
-    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
+    "from [Invoice] i\n" +
+    "  join [Currency] c on c.[Id] = i.[CurrencyId]\n" +
+    "  left join [Cheque] ch on ch.[Id] = i.[ChequeId]\n" +
+    "  left join [InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
     "order by i.[InvoiceDate] desc, i.[Id]";
 
 const GET_INVOICE_FILTER_MSSQL = {
@@ -52,11 +53,12 @@ const GET_INVOICE_FILTER_MSSQL = {
 
 const GET_INVOICE_MYSQL =
     "select i.`Id`, i.`UserId`, i.`ParentId`, i.`InvoiceTypeId`, i.`StateId`, i.`CurrencyId`, c.`Code` as `CCode`, i.`ChequeId`, i.`Name`,\n" +
-    "  i.`Description`, i.`InvoiceNum`, i.`InvoiceDate`, i.`Sum`, i.`RefundSum`, it.`Id` as `ItemId`, it.`ProductId`,\n" +
+    "  i.`Description`, i.`InvoiceNum`, i.`InvoiceDate`, i.`Sum`, i.`RefundSum`, it.`Id` as `ItemId`, it.`ProductId`, ch.`PaymentType`,\n" +
     "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`AccName` as `ItemAccName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
-    "from`Invoice` i\n" +
-    "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
-    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
+    "from `Invoice` i\n" +
+    "  join `Currency` c on c.`Id` = i.`CurrencyId`\n" +
+    "  left join `Cheque` ch on ch.`Id` = i.`ChequeId`\n" +
+    "  left join `InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
     "order by i.`InvoiceDate` desc, i.`Id`";
 
 const GET_INVOICE_FILTER_MYSQL = {
@@ -138,6 +140,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                             invoice.CurrencyId = elem.CurrencyId;
                             invoice.CurrencyCode = elem.CCode;
                             invoice.ChequeId = elem.ChequeId;
+                            invoice.PaymentType = elem.PaymentType;
                             invoice.Name = elem.Name;
                             invoice.Description = elem.Description;
                             invoice.InvoiceNum = elem.InvoiceNum;
