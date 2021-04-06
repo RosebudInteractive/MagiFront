@@ -48,7 +48,8 @@ class IosInApp extends Payment {
         if (this._shared_secret)
             appleReceiptVerify.config({
                 secret: this._shared_secret,
-                environment: [this._environment]
+                environment: [this._environment],
+                // excludeOldTransactions: true
             });
 
         if (options && options.app)
@@ -94,7 +95,7 @@ class IosInApp extends Payment {
             courseId: data.courseId,
             buyAsGift: false,
             Payment: {
-                InAppCode: Code,
+                inAppCode: Code,
                 email: options.user.Email
             },
             Invoice: {
@@ -134,23 +135,36 @@ class IosInApp extends Payment {
                         throw new HttpError(HttpCode.ERR_NOT_FOUND, `Payment ID="${id}" doesn't exist.`);
 
                     let cdata = chequeObj.chequeData() ? JSON.parse(chequeObj.chequeData()) : {};
-                    if (!cdata.InAppCode)
+                    if (!cdata.inAppCode)
                         throw new HttpError(HttpCode.ERR_BAD_REQ, {
                             error: "missingInAppCode",
                             message: `Payment ID="${id}" isn't IOS in-app purchase.`
                         });
 
-                    let products;
+                    let product = null;
                     try {
-                        products = await appleReceiptVerify.validate({
-                            excludeOldTransactions: true,
-                            receipt: data.receipt
+                        let products = await appleReceiptVerify.validate({
+                            // excludeOldTransactions: true,
+                            receipt: data.transactionReceipt
                         });
                         if (Array.isArray(products) && (products.length > 0)) {
-                            if (cdata.InAppCode !== products[0].productId)
+                            for (let i = 0; i < products.length; i++){
+                                if (products[i].transactionId === data.transactionOrderId) {
+                                    product = products[i];
+                                    break;
+                                }
+                            }
+                            
+                            if (!product)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                    error: "invalidtransactionId",
+                                    message: `Transaction "${data.transactionOrderId}" doesn't exist.`
+                                });
+                            
+                            if (cdata.inAppCode !== product.productId)
                                 throw new HttpError(HttpCode.ERR_BAD_REQ, {
                                     error: "invalidProductId",
-                                    message: `Expected: "${cdata.InAppCode}" vs received: "${products[0].productId}".`
+                                    message: `Expected: "${cdata.inAppCode}" vs received: "${product.productId}".`
                                 });
                         }
                         else
@@ -168,8 +182,8 @@ class IosInApp extends Payment {
                         result: JSON.parse(chequeObj.chequeData()),
                         cheque: {
                             chequeState: Accounting.ChequeState.Succeeded,
-                            ReceiptDate: typeof (products[0].purchaseDate) === "number" ? new Date(products[0].purchaseDate) : undefined,
-                            ReceiptData: products[0]
+                            ReceiptDate: typeof (product.purchaseDate) === "number" ? new Date(product.purchaseDate) : undefined,
+                            ReceiptData: product
                         }
                     }, root_obj, { chequeObj: chequeObj }, dbOpts, memDbOptions, undefined, { purchaseEmailNotification: false });
                 })
