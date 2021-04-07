@@ -78,3 +78,16 @@ const _calcNodesWeight = (nodes, node, level, row) => {
 
     return {row: _row, firstVisit: _firstVisit}
 }
+
+export const parseParams = () => {
+    const paramsData = {}
+
+    const _params = new URLSearchParams(location.search),
+        activeTask = _params.get("activeTask") ? +_params.get("activeTask") : null
+
+    if (activeTask) {
+        paramsData.activeTask = activeTask
+    }
+
+    return paramsData
+}

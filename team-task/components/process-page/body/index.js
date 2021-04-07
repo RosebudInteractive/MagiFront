@@ -7,11 +7,14 @@ import ProcessFields from "./fields";
 
 type ProcessBodyProps = {
     process: any,
+    horizontalProcess: boolean,
     hasChanges: boolean,
     editors: Array,
     supervisors: Array,
     elements: Array,
     lessons: Array,
+    activeTaskId: ?number,
+    onSetActiveTaskId:Function,
     onAddElement: Function,
     onUpdateElement: Function,
     onDeleteElement: Function,
@@ -20,6 +23,7 @@ type ProcessBodyProps = {
     onEditTaskLinks: Function,
     onEditTask: Function,
     onDeleteTask: Function,
+    onChangeRotation: Function,
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
@@ -28,23 +32,32 @@ export default function ProcessBody(props: ProcessBodyProps) {
     const [activeElementId, setActiveElementId] = useState(null)
 
     const onSetActiveTask = (taskId) => {
-        const _task = process.Tasks.find(item => item.Id === taskId)
-        if (_task && _task.ElementId) {
-            setActiveElementId(_task.ElementId)
-        } else {
+        if (!taskId) {
             setActiveElementId(null)
+        } else {
+            const _task = process.Tasks.find(item => item.Id === taskId)
+            if (_task && _task.ElementId) {
+                setActiveElementId(_task.ElementId)
+            } else {
+                setActiveElementId(null)
+            }
         }
+
+        props.onSetActiveTaskId(taskId)
     }
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
         <Schema tree={props.tree}
+                horizontalProcess={props.horizontalProcess}
+                activeTaskId={props.activeTaskId}
                 onSetActiveTask={onSetActiveTask}
                 onAddTask={props.onAddTask}
                 onAddTaskWithLink={props.onAddTaskWithLink}
                 onEditTaskLinks={props.onEditTaskLinks}
                 onEditTask={props.onEditTask}
-                onDeleteTask={props.onDeleteTask}/>
+                onDeleteTask={props.onDeleteTask}
+                onChangeRotation={props.onChangeRotation}/>
         <ProcessElements values={process.Elements}
                          activeElementId={activeElementId}
                          disabled={props.hasChanges}

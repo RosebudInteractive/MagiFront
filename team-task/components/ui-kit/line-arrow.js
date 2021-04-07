@@ -13,7 +13,8 @@ type ArrowProps = {
     dest: string,
     scrollPosition: number,
     type: ArrowType,
-    delay: ?number
+    delay: ?number,
+    horizontalProcess: boolean,
 }
 
 export default function LineArrow(props: ArrowProps) {
@@ -29,10 +30,10 @@ export default function LineArrow(props: ArrowProps) {
                     color: (type === ARROW_TYPE.OUT) ? "#C8684C" :
                         (type === ARROW_TYPE.IN) ? "#D1941A" : "#9696A0",
                     size: 2,
-                    startSocket: 'right',
-                    endSocket: 'left',
-                    startSocketGravity: 62,
-                    endSocketGravity: 62,
+                    startSocket: props.horizontalProcess ? 'right' : "bottom",
+                    endSocket: props.horizontalProcess ? 'left': "top",
+                    startSocketGravity: props.horizontalProcess ? 31 : 31,
+                    endSocketGravity: props.horizontalProcess ? 31 : 31,
                 }
 
 

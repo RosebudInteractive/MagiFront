@@ -6,9 +6,9 @@
   .schema__left-screen
     z-index: 10
     position: absolute
-    left: -198px
+    left: -127px
     top: 0
-    width: 166px
+    width: 95px
     height: 100%
     background-color: $grey01
     &:after
@@ -23,9 +23,9 @@
   .schema__right-screen
     z-index: 10
     position: absolute
-    right: -198px
+    right: -127px
     top: 0
-    width: 166px
+    width: 95px
     height: 100%
     background-color: $grey01
     &:before
@@ -70,4 +70,17 @@
 
 .process-schema__add-task-button
   margin-top: 24px
+
+.process-schema__title
+  display: flex
+
+.process-schema__rotate-button
+  background: none
+  margin-left: 16px
+  width: 32px
+  height: 32px
+  opacity: 0.4
+  transition: opacity 300ms ease-in-out
+  &:hover
+    opacity: 1
 

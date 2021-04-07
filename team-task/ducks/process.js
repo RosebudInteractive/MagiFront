@@ -8,8 +8,9 @@ import {showErrorMessage} from "tt-ducks/messages";
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {CreatingElement, UpdatingElement, UpdatingProcess} from "../types/process";
+import type {CreatingElement, CreatingProcess, UpdatingElement, UpdatingProcess} from "../types/process";
 import {push} from "react-router-redux/src";
+import {goToProcess} from "tt-ducks/processes";
 
 /**
  * Constants
@@ -21,6 +22,12 @@ const GET_PROCESS_REQUEST = `${prefix}/GET_PROCESS_REQUEST`
 const GET_PROCESS_START = `${prefix}/GET_PROCESS_START`
 const GET_PROCESS_SUCCESS = `${prefix}/GET_PROCESS_SUCCESS`
 const GET_PROCESS_FAIL = `${prefix}/GET_PROCESS_FAIL`
+
+const CREATE_PROCESS_REQUEST = `${prefix}/CREATE_PROCESS_REQUEST`
+const CREATE_PROCESS_START = `${prefix}/CREATE_PROCESS_START`
+const CREATE_PROCESS_SUCCESS = `${prefix}/CREATE_PROCESS_SUCCESS`
+const CREATE_PROCESS_FAIL = `${prefix}/CREATE_PROCESS_FAIL`
+
 
 const SAVE_PROCESS_REQUEST = `${prefix}/SAVE_PROCESS_REQUEST`
 const SAVE_PROCESS_START = `${prefix}/SAVE_PROCESS_START`
@@ -61,17 +68,22 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-
         case GET_PROCESS_START:
+        case CREATE_PROCESS_START:
             return state
                 .set("fetching", true)
                 .set("process", null)
+
+        case CREATE_PROCESS_SUCCESS:
+            return state
+                .set("fetching", false)
 
         case GET_PROCESS_SUCCESS:
             return state
                 .set("fetching", false)
                 .set("process", payload)
 
+        case CREATE_PROCESS_FAIL:
         case GET_PROCESS_FAIL:
         case SAVE_PROCESS_FAIL:
         case OPERATION_WITH_ELEMENT_FAIL:
@@ -122,6 +134,10 @@ export const lessonsSelector = createSelector(stateSelector, state => state.less
 /**
  * Action Creators
  * */
+export const createProcess = () => {
+    return {type: CREATE_PROCESS_REQUEST}
+}
+
 export const getProcess = (processId: number) => {
     return {type: GET_PROCESS_REQUEST, payload: processId}
 }
@@ -155,6 +171,7 @@ export const clear = () => {
  */
 export const saga = function* () {
     yield all([
+        takeEvery(CREATE_PROCESS_REQUEST, createProcessSaga),
         takeEvery(GET_PROCESS_REQUEST, getProcessSaga),
         takeEvery(SAVE_PROCESS_REQUEST, saveProcessSaga),
         takeEvery(GO_BACK_REQUEST, goBackSaga),
@@ -164,6 +181,38 @@ export const saga = function* () {
     ])
 }
 
+function* createProcessSaga() {
+    const data: CreatingProcess = {
+        "Name": "Новый процесс",
+        "StructId": 1,
+        "SupervisorId": 2,
+        "DueDate": "2021-12-31T21:00:00.000Z",
+        "LessonId": 1,
+    }
+
+    yield put({type: CREATE_PROCESS_START})
+    try {
+        const result = yield call(_postProcess, data)
+        yield put(goToProcess(result.id))
+        yield put({type: CREATE_PROCESS_SUCCESS})
+    } catch (e) {
+        yield put({type: CREATE_PROCESS_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const _postProcess = (data: CreatingProcess) => {
+    return fetch("/api/pm/process", {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
 
 function* getProcessSaga(data) {
     const _hasSupervisorRights = yield select(hasSupervisorRights)
@@ -187,9 +236,6 @@ function* getProcessSaga(data) {
 
         yield put({type: GET_PROCESS_SUCCESS, payload: _process})
     } catch (e) {
-
-        alert(e.message)
-
         yield put({type: GET_PROCESS_FAIL})
         yield put(showErrorMessage(e.message))
     }

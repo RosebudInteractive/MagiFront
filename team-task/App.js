@@ -22,6 +22,7 @@ import SideBarMenu from "./containers/side-bar-menu";
 import Breadcrumb from "./containers/header-pane";
 import {fetchingSelector as taskFetching} from "tt-ducks/task";
 import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
+import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import LoadingPage from "./components/loading-page";
 
@@ -53,7 +54,7 @@ function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state)
+        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state)
     }
 }
 

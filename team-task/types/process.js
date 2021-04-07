@@ -1,3 +1,11 @@
+export type CreatingProcess = {
+    Name: string,
+    StructId: number,
+    SupervisorId: number,
+    DueDate: string,
+    LessonId: number
+}
+
 export type UpdatingProcess = {
     Id: number,
     State: number,

@@ -12,6 +12,7 @@ type TaskProps = {
     onAddNewTask: Function,
     active: boolean,
     node: any,
+    horizontalProcess: boolean,
 }
 
 export default function SchemaTask(props: TaskProps) {
@@ -46,8 +47,8 @@ export default function SchemaTask(props: TaskProps) {
     const style = useMemo(() => {return {
         width: "100%",
         height: "100%",
-        gridColumnStart: node.weight + 1,
-        gridRowStart: node.rowNumber + 1,
+        gridColumnStart: props.horizontalProcess ? node.weight + 1 : node.rowNumber + 1,
+        gridRowStart: props.horizontalProcess ?  node.rowNumber + 1 : node.weight + 1,
     }}, [node])
 
     const state = useMemo(() => {
@@ -57,7 +58,9 @@ export default function SchemaTask(props: TaskProps) {
         return isExpired ? { isExpired, css: "_expired", caption: _state.caption } : { isExpired, ..._state}
     }, [node])
 
-    const _onClick = () => {
+    const _onClick = (e) => {
+        if (e.target.closest(".task__button") || e.target.closest(".task-button_add-new-task")) return
+
         if (onClick) {
             onClick(node.id)
         }

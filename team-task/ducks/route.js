@@ -23,10 +23,16 @@ const APPLY_FILTER = `${prefix}/APPLY_FILTER`
 const SET_GRID_SORT_ORDER_REQUEST = `${prefix}/SET_GRID_SORT_ORDER_REQUEST`
 const SET_GRID_SORT_ORDER = `${prefix}/SET_GRID_SORT_ORDER`
 
+const SET_ACTIVE_TASK_ID_REQUEST = `${prefix}/SET_ACTIVE_TASK_ID_REQUEST`
+const SET_ACTIVE_TASK_ID = `${prefix}/SET_ACTIVE_TASK_ID`
+
 const BUILD_LOCATION_REQUEST = `${prefix}/BUILD_LOCATION_REQUEST`
 const BUILD_LOCATION = `${prefix}/BUILD_LOCATION`
+const CLEAR_GUARD = `${prefix}/CLEAR_GUARD`
 
 const SET_INIT_STATE_REQUEST = `${prefix}/SET_INIT_STATE_REQUEST`
+
+
 
 /**
  * Reducer
@@ -36,6 +42,7 @@ export const ReducerRecord = Record({
     order: "",
     filter: {},
     refreshGuard: false,
+    activeTask: null,
 })
 
 
@@ -49,10 +56,15 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("path", payload)
                 .set("order", "")
                 .set("filter", {})
+                .set("activeTask", null)
 
         case SET_GRID_SORT_ORDER:
             return state
                 .set("order", payload)
+
+        case SET_ACTIVE_TASK_ID:
+            return state
+                .set("activeTask", payload)
 
         case APPLY_FILTER:
             return state
@@ -66,6 +78,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_TASKS_FAIL:
         case GET_PROCESSES_SUCCESS:
         case GET_PROCESSES_FAIL:
+        case CLEAR_GUARD:
             return state
                 .set("refreshGuard", false)
 
@@ -80,13 +93,15 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName]
 const pathSelector = createSelector(stateSelector, state => state.path)
 const refreshGuardSelector = createSelector(stateSelector, state => state.refreshGuard)
+export const activeTaskIdSelector = createSelector(stateSelector, state => state.activeTask)
 export const paramsSelector = createSelector(stateSelector, (state) => {
-    const filter = state.filter,
+    const params = {...state.filter},
         order = state.order
 
-    if (order) { filter.order = order }
+    if (order) { params.order = order }
+    if (state.activeTask) { params.activeTask = state.activeTask }
 
-    return  $.param(filter)
+    return  $.param(params)
 })
 
 
@@ -101,9 +116,12 @@ export const applyFilter = (filter) => {
     return {type: APPLY_FILTER_REQUEST, payload: filter}
 }
 
-
 export const setGridSortOrder = (order: GridSortOrder) => {
     return {type: SET_GRID_SORT_ORDER_REQUEST, payload: order}
+}
+
+export const setActiveTaskId = (taskId: number) => {
+    return {type: SET_ACTIVE_TASK_ID_REQUEST, payload: taskId}
 }
 
 export const buildLocation = () => {
@@ -123,6 +141,7 @@ export const saga = function* () {
         takeEvery(SET_PATHNAME_REQUEST, setPathnameSaga),
         takeEvery(APPLY_FILTER_REQUEST, applyFilterSaga),
         takeEvery(SET_GRID_SORT_ORDER_REQUEST, setGridSortOrderSaga),
+        takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
         takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga)
     ])
@@ -157,6 +176,16 @@ function* setGridSortOrderSaga(data) {
     yield put(buildLocation())
 }
 
+function* setActiveTaskIdSaga(data) {
+    const guard = yield select(refreshGuardSelector)
+
+    if (guard) return
+
+    yield put({type: SET_ACTIVE_TASK_ID, payload: data.payload})
+    yield put(buildLocation())
+    yield put({type: CLEAR_GUARD})
+}
+
 function* buildLocationSaga() {
     const path = yield select(pathSelector),
         params = yield select(paramsSelector)
@@ -174,6 +203,10 @@ function* setInitStateSaga({payload}) {
 
     if (payload.filter) {
         yield put({ type: APPLY_FILTER, payload: {...payload.filter} })
+    }
+
+    if (payload.activeTask) {
+        yield put({type: SET_ACTIVE_TASK_ID, payload: payload.activeTask})
     }
 
     if (payload.order) {

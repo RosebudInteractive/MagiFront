@@ -16,12 +16,14 @@ const prefix = `${appName}/${moduleName}`
 
 const HIDE_SIDE_BAR_MENU = `${prefix}/HIDE_SIDE_BAR_MENU`
 const SHOW_SIDE_BAR_MENU = `${prefix}/SHOW_SIDE_BAR_MENU`
+const CHANGE_PROCESS_ROTATION = `${prefix}/CHANGE_PROCESS_ROTATION`
 
 /**
  * Reducer
  * */
 export const ReducerRecord = Record({
-    sideBarMenuVisible: true
+    sideBarMenuVisible: true,
+    horizontalProcess: true,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -35,6 +37,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("sideBarMenuVisible", true)
 
+        case CHANGE_PROCESS_ROTATION:
+            return state
+                .set("horizontalProcess", !state.get("horizontalProcess"))
+
         default:
             return state
     }
@@ -46,6 +52,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 const stateSelector = state => state[moduleName]
 export const sideBarMenuVisible = createSelector(stateSelector, state => state.sideBarMenuVisible)
+export const horizontalProcess = createSelector(stateSelector, state => state.horizontalProcess)
 
 /**
  * Action Creators
@@ -56,6 +63,10 @@ export const hideSideBarMenu = () => {
 
 export const showSideBarMenu = () => {
     return {type: SHOW_SIDE_BAR_MENU}
+}
+
+export const changeProcessRotation = () => {
+    return {type: CHANGE_PROCESS_ROTATION}
 }
 
 

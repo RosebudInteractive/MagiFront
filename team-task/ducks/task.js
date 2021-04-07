@@ -94,6 +94,10 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("fetching", false)
                 .set("task", payload)
 
+        case SAVE_TASK_SUCCESS:
+            return state
+                .set("fetching", false)
+
         case CREATE_TASK_SUCCESS:
             return state
                 .set("fetching", false)
@@ -245,6 +249,8 @@ function* saveTaskSaga({payload}) {
                 yield call(_putTask, data.task),
             id = data.task.Id,
             elementId = data.task.ElementId
+
+        console.log(result)
 
         yield put({type: SAVE_TASK_SUCCESS, payload: result})
 

@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useMemo, useState} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {useParams} from "react-router-dom"
+import {useLocation, useParams} from "react-router-dom"
 import {
     getProcess,
     saveProcess,
@@ -20,13 +20,14 @@ import {
 } from "tt-ducks/process";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
-import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
+import {hideSideBarMenu, horizontalProcess, showSideBarMenu, changeProcessRotation} from "tt-ducks/app";
+import {activeTaskIdSelector, setActiveTaskId, setInitState} from "tt-ducks/route";
 import {deleteTask,} from "tt-ducks/task";
-import {showTaskEditor, showTaskLinkEditor} from "tt-ducks/process-task";
+import {showTaskEditor, showTaskLinkEditor,} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
-import {buildTree} from "./functions";
+import {buildTree, parseParams} from "./functions";
 import {ModalTaskEditor} from "../task-page";
 import type {ProcessTask} from "../../types/task";
 import TaskLinksEditor from "../../components/process-page/editors/task-link-editor";
@@ -37,6 +38,7 @@ function ProcessEditor(props) {
     const {actions, process, fetching, hasChanges, editorValues,} = props
 
     const params = useParams()
+    const location = useLocation()
 
     const tree = useRef()
 
@@ -49,6 +51,12 @@ function ProcessEditor(props) {
             actions.showSideBarMenu()
         }
     }, [])
+
+    useEffect(() => {
+        const initState = parseParams()
+        initState.pathname = location.pathname
+        actions.setInitState(initState)
+    }, [location])
 
     useEffect(() => {
         if (process) {
@@ -109,18 +117,28 @@ function ProcessEditor(props) {
     const onDeleteTask = (taskId) => {
         const data: ProcessTask = {taskId: taskId, processId: process.Id}
         actions.deleteTask(data)
+        if (props.activeTaskId === taskId) {
+            actions.setActiveTaskId(null)
+        }
+    }
+
+    const onSetActiveTask = (taskId) => {
+        actions.setActiveTaskId(taskId)
     }
 
     return !fetching && process &&
         <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
             <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
             <ProcessBody process={process}
+                         horizontalProcess={props.horizontalProcess}
                          tree={tree.current}
                          supervisors={props.supervisors}
                          editors={props.editors}
                          elements={props.elements}
                          lessons={props.lessons}
                          hasChanges={hasChanges}
+                         activeTaskId={props.activeTaskId}
+                         onSetActiveTaskId={onSetActiveTask}
                          onAddElement={actions.addElement}
                          onUpdateElement={actions.updateElement}
                          onDeleteElement={actions.deleteElement}
@@ -128,7 +146,8 @@ function ProcessEditor(props) {
                          onAddTaskWithLink={onAddTaskWithLink}
                          onEditTaskLinks={onEditTaskLinks}
                          onEditTask={onEditTask}
-                         onDeleteTask={onDeleteTask}/>
+                         onDeleteTask={onDeleteTask}
+                         onChangeRotation={actions.changeProcessRotation}/>
             <ModalTaskEditor/>
             <TaskLinksEditor/>
         </form>
@@ -150,9 +169,11 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         user: userSelector(state),
         isSupervisor: hasSupervisorRights(state),
+        activeTaskId: activeTaskIdSelector(state),
         hasChanges: isDirty(EDITOR_NAME)(state),
         editorValues: getFormValues(EDITOR_NAME)(state),
-        editorValid: isValid(EDITOR_NAME)(state)
+        editorValid: isValid(EDITOR_NAME)(state),
+        horizontalProcess: horizontalProcess(state)
     }
 }
 
@@ -171,6 +192,9 @@ const mapDispatch2Props = (dispatch) => {
             showTaskEditor,
             showTaskLinkEditor,
             clear,
+            setActiveTaskId,
+            setInitState,
+            changeProcessRotation,
         }, dispatch)
     }
 }

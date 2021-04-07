@@ -2,6 +2,7 @@ import React, {useMemo, useEffect, useRef, useCallback} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
+import {createProcess} from "tt-ducks/process";
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import "./processes.sass"
 import Webix from "../../components/Webix";
@@ -11,6 +12,7 @@ import {GRID_SORT_DIRECTION} from "../../constants/common";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import {useLocation,} from "react-router-dom"
 import {useWindowSize} from "../../tools/window-resize-hook";
+import PlusIco from "tt-assets/svg/plus.svg"
 
 let _rowCount = 0
 
@@ -29,28 +31,6 @@ function Processes(props) {
         _rowCount = processes.length
         _onResize();
     }, [processes])
-
-    // useEffect(() => {
-    //     const initState = parseParams()
-    //     if (initState.order) {
-    //         _sortRef.current = initState.order
-    //         const _grid = window.webix.$$("processes-grid")
-    //         if (_grid) {
-    //             _grid.markSorting(_sortRef.current.field, _sortRef.current.direction)
-    //         }
-    //     }
-    //     if (initState.filter) {
-    //         filter.current = initState.filter
-    //         initState.filter = convertFilter2Params(initState.filter)
-    //     } else {
-    //         filter.current = null
-    //     }
-    //
-    //     initState.pathname = location.pathname
-    //
-    //     actions.setInitState(initState)
-    //
-    // }, [])
 
     useEffect(() => {
         const initState = parseParams()
@@ -141,6 +121,9 @@ function Processes(props) {
     return <div className="processes-page form">
         <h5 className="form-header _grey70">Процессы</h5>
         <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
+        <button className="process-button _add" onClick={actions.createProcess}>
+            <PlusIco/>
+        </button>
         <div className="grid-container">
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
@@ -157,7 +140,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
+        actions: bindActionCreators({createProcess, getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
     }
 }
 
