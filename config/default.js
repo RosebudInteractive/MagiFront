@@ -208,7 +208,7 @@ module.exports = {
             siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
             secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
         },
-        googleAppId: "AIzaSyAcqC46EVwt7voascHI5j9CrGVbeiiwgVQ",
+        googleAppId: "AIzaSyB3F5PprbWaeVFgH9iVD3_1GEsAp5KDa00",
         appleMobileAppAud: "ru.magisteria.magisteria-app"
     },
     mail: {

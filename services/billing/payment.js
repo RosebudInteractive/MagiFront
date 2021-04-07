@@ -1277,14 +1277,20 @@ exports.Payment = class Payment extends DbObject {
                                 break;
                             }
                             else
-                                throw new Error(`${crs.name} уже доступен для использования.`);
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                    error: "courseAlreadyPaid",
+                                    message: `${crs.name} уже доступен для использования.`
+                                });
                         if (pending[crs.id])
                             if (isSilent) {
                                 result.isPending = true;
                                 break;
                             }
                             else
-                                throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                    error: "waitingForPay",
+                                    message: `${crs.name} ожидает завершения операции оплаты.`
+                                });
                     }
                 }
             }
