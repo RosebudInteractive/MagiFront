@@ -3,10 +3,10 @@
   "popup": {
     "storePopup": {
       "ios": {
-        "visible": false
+        "visible": true
       },
       "android": {
-        "visible": false
+        "visible": true
       }
     },
     "sale2021": {
