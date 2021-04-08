@@ -1,4 +1,5 @@
 import moment from "moment";
+import $ from "jquery";
 
 export const buildTree = (process) => {
     const _tree = {
@@ -90,4 +91,37 @@ export const parseParams = () => {
     }
 
     return paramsData
+}
+
+export const _scrollHandler = () => {
+    let st = $(window).scrollTop();
+
+    const _wrapper = $(".process-body__elements-wrapper"),
+        _container = $(".process-body__elements")
+
+    const _offset = _wrapper.offset(),
+        _containerBottom = _container.height() + _container.offset().top
+
+    console.log(st, _containerBottom, _containerBottom - _wrapper.height())
+
+    if (st  < 258) {
+        _wrapper.removeClass('_fixed');
+        _wrapper.width("auto")
+    }
+
+    if (st > _containerBottom - _wrapper.height()) {
+        _wrapper.removeClass('_fixed');
+        _wrapper.addClass('_bottom');
+    }
+
+    if ((st > 258) && (st < _containerBottom - _wrapper.height())) {
+        _wrapper.addClass('_fixed');
+        _wrapper.removeClass('_bottom');
+        if (_container.hasClass("_hidden")) {
+            _wrapper.width(26)
+        } else {
+            _wrapper.width(_container.width())
+        }
+    }
+
 }

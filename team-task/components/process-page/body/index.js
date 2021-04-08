@@ -48,24 +48,29 @@ export default function ProcessBody(props: ProcessBodyProps) {
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        <Schema tree={props.tree}
-                horizontalProcess={props.horizontalProcess}
-                activeTaskId={props.activeTaskId}
-                onSetActiveTask={onSetActiveTask}
-                onAddTask={props.onAddTask}
-                onAddTaskWithLink={props.onAddTaskWithLink}
-                onEditTaskLinks={props.onEditTaskLinks}
-                onEditTask={props.onEditTask}
-                onDeleteTask={props.onDeleteTask}
-                onChangeRotation={props.onChangeRotation}/>
-        <ProcessElements values={process.Elements}
-                         activeElementId={activeElementId}
-                         disabled={props.hasChanges}
-                         editors={editors}
-                         elements={elements}
-                         onAdd={props.onAddElement}
-                         onUpdate={props.onUpdateElement}
-                         onDelete={props.onDeleteElement}/>
+        {/*<div className="work-area__left-screen"/>*/}
+        {/*<div className="work-area__right-screen"/>*/}
+        <div className="process-page__work-area">
+            <ProcessElements values={process.Elements}
+                             activeElementId={activeElementId}
+                             disabled={props.hasChanges}
+                             editors={editors}
+                             elements={elements}
+                             onAdd={props.onAddElement}
+                             onUpdate={props.onUpdateElement}
+                             onDelete={props.onDeleteElement}/>
+            <Schema tree={props.tree}
+                    horizontalProcess={props.horizontalProcess}
+                    activeTaskId={props.activeTaskId}
+                    onSetActiveTask={onSetActiveTask}
+                    onAddTask={props.onAddTask}
+                    onAddTaskWithLink={props.onAddTaskWithLink}
+                    onEditTaskLinks={props.onEditTaskLinks}
+                    onEditTask={props.onEditTask}
+                    onDeleteTask={props.onDeleteTask}
+                    onChangeRotation={props.onChangeRotation}            />
+
+        </div>
         <ProcessFields fields={process.ProcessFields}/>
     </div>
 }

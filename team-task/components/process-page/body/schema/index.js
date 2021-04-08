@@ -4,7 +4,6 @@ import {LineArrow} from "../../../ui-kit";
 import {ARROW_TYPE} from "../../../ui-kit/line-arrow";
 import SchemaTask from "./task";
 import RotateIcon from "tt-assets/svg/rotate.svg"
-import {horizontalProcess} from "tt-ducks/app";
 
 
 type SchemaProps = {
@@ -26,11 +25,10 @@ export default function Schema(props: SchemaProps) {
 
     const [active, setActive] = useState(0),
         [scrollPosition, setScrollPosition] = useState(0),
-        [mounted, setMounted] = useState(false)
+        [mounted, setMounted] = useState(false),
+        [myRender, setRender] = useState(false)
 
     const canvas = useRef()
-
-    const activeTask = useRef()
 
     const _onAdd = (e) => {
         if (props.onAddTask) {
@@ -61,17 +59,36 @@ export default function Schema(props: SchemaProps) {
     useEffect(() => {
         if (active !== activeTaskId) {
             setActive(activeTaskId)
+
+            if (activeTaskId && $("#js-task_" + activeTaskId).length) {
+                setTimeout(() => {
+                    $("#js-task_" + activeTaskId)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
+                }, 300)
+
+            }
         }
-    }, [activeTaskId])
+    }, [activeTaskId, tree])
+
+    // useEffect(() => {
+    //     if (active && $("#js-task_" + active).length) {
+    //         setTimeout(() => {
+    //             $("#js-task_" + active)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
+    //         }, 300)
+    //
+    //     }
+    // }, [active, tree])
+
+    const toggleElems = () => {
+        setRender(!myRender)
+    }
 
     useEffect(() => {
-        if (active && $("#js-task_" + active).length) {
-            setTimeout(() => {
-                $("#js-task_" + active)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
-            }, 300)
+        $(window).bind("toggle-elements-visible", toggleElems)
 
+        return () => {
+            $(window).unbind("toggle-elements-visible", toggleElems)
         }
-    }, [active, tree])
+    })
 
     const getCells = () => {
         if (tree) {
@@ -105,7 +122,7 @@ export default function Schema(props: SchemaProps) {
                 const type = (item.from === active) ? ARROW_TYPE.OUT :
                     (item.to === active) ? ARROW_TYPE.IN : ARROW_TYPE.DEFAULT
 
-                return <LineArrow horizontalProcess={props.horizontalProcess} source={"js-task_" + item.from} dest={"js-task_" + item.to} type={type} scrollPosition={scrollPosition} key={index}/>
+                return <LineArrow horizontalProcess={props.horizontalProcess} source={"js-task_" + item.from} dest={"js-task_" + item.to} type={type} scrollPosition={myRender} key={index}/>
             })
         } else {
             return null
@@ -138,18 +155,22 @@ export default function Schema(props: SchemaProps) {
     }
 
     return <div className="process-body__schema" onClick={onClick}>
-        <div className="schema__left-screen"/>
-        <div className="schema__right-screen"/>
+        {/*<div className="schema__left-screen"/>*/}
+        {/*<div className="schema__right-screen"/>*/}
         <h6 className="process-schema__title">
             <span>Схема процесса</span>
             <button className="process-schema__rotate-button" onClick={changeRotation}>
                 <RotateIcon/>
             </button>
         </h6>
-        <div className="process-schema__canvas" style={style} ref={canvas}>
-            {getCells()}
-            {mounted && getLines()}
-        </div>
+
+            <div className="process-schema__canvas-background">
+                <div className="process-schema__canvas" style={style} ref={canvas}>
+                    {getCells()}
+                    {mounted && getLines()}
+                </div>
+            </div>
+
         <button className="process-schema__add-task-button orange-button small-button" onClick={_onAdd}>Добавить
             задачу
         </button>

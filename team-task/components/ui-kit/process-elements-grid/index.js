@@ -42,11 +42,11 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     const _gridData = useRef(new GridData())
 
     useEffect(() => {
-        $(window).on('resize', resizeHandler);
+        $(window).on('resize toggle-elements-visible', resizeHandler);
         setTimeout(resizeHandler, 300);
 
         return () => {
-            $(window).unbind('resize', resizeHandler)
+            $(window).unbind('resize toggle-elements-visible', resizeHandler)
         }
     })
 
@@ -128,24 +128,24 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
                 $change: getActiveRow
             },
             columns: [
-                {id: 'Name', header: 'Название элемента', fillspace: 80, width: 100,},
-                {id: 'SupervisorId', header: 'Ответственный', fillspace: 30, width: 105, options: _getEditors()},
+                {id: 'Name', header: 'Название элемента', fillspace: 40, width: 80,},
+                {id: 'SupervisorId', header: 'Ответственный', fillspace: 30, width: 80, options: _getEditors()},
                 {
-                    id: 'State', header: 'Статус', width: 130,
+                    id: 'State', header: 'Статус', width: 55,
                     template: function (data) {
                         const _data = getState(data.State)
-                        return `<div class="process-element__state ${_data.css}">${_data.caption}</div>`
+                        return `<div class="process-element__state ${_data.css}"></div>`
                     }
                 },
                 {
                     id: "",
                     template: "<button class='process-elements-grid__button elem-edit'/>",
-                    width: 40
+                    width: 24
                 },
                 {
                     id: "",
                     template: "<button class='process-elements-grid__button elem-delete'/>",
-                    width: 40
+                    width: 24
                 }
             ],
             on: {

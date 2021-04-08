@@ -27,10 +27,9 @@ export default class AssetBlock extends React.Component{
 
         this._scrollTimer = null
 
-        this._scrollHandler = () => {
-            if(this._scrollTimer) {
-                clearTimeout(this._scrollTimer);
-            }
+        this._scrollHandler = () => {if(this._scrollTimer) {
+            clearTimeout(this._scrollTimer);
+        }
 
             const _container = $(".fixed-container")
 
@@ -42,6 +41,7 @@ export default class AssetBlock extends React.Component{
                 _textBlockElem = $(".text-block__wrapper"),
                 _textBlockTop = _textBlockElem.offset().top,
                 _textBlockBottom = _textBlockTop + _textBlockElem.height()
+
 
             if (_readLineTop < _textBlockTop) {
                 this._applyFirstAsset()

@@ -28,9 +28,9 @@ const CssFormControl = withStyles({
             "&.MuiInputLabel-shrink": {
                 "transform": "translate(16px, 2px) scale(0.75)",
             },
-            "&.MuiFormLabel-filled": {
-                opacity: 0,
-            }
+            // "&.MuiFormLabel-filled": {
+            //     opacity: 0,
+            // }
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
@@ -68,7 +68,7 @@ const CssFormControl = withStyles({
                 color: "#9696A0",
             },
         },
-        "& ..MuiListItem-gutters": {
+        "& .MuiListItem-gutters": {
             "font-family": "Inter",
             "font-size": 14,
             "font-style": "normal",

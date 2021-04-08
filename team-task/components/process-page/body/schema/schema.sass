@@ -1,46 +1,52 @@
 @import "~tt-assets/styles/colors.sass"
 
 .process-body__schema
-  margin-top: 20px
+
   position: relative
-  .schema__left-screen
+  //.schema__left-screen
     z-index: 10
     position: absolute
-    left: -127px
+    left: -48px
     top: 0
-    width: 95px
+    width: 24px
     height: 100%
     background-color: $grey01
     &:after
       content: ""
       position: absolute
-      right: -32px
+      right: -24px
       top: 0
-      width: 32px
+      width: 24px
       height: 100%
       background-color: $color-main-light
 
-  .schema__right-screen
+  //.schema__right-screen
     z-index: 10
     position: absolute
-    right: -127px
+    right: -48px
     top: 0
-    width: 95px
+    width: 24px
     height: 100%
     background-color: $grey01
     &:before
       content: ""
       position: absolute
-      left: -32px
+      left: -24px
       top: 0
-      width: 32px
+      width: 24px
       height: 100%
       background-color: $color-main-light
 
+.process-schema__canvas-background
+  background-color: rgba(196, 196, 196, 0.2)
+  width: fit-content
+  border-radius: 10px
+  border: 1px solid $grey30
+
 .process-schema__canvas
   height: auto
-  width: 100%
-  overflow-x: auto
+  width: fit-content
+  overflow: auto
   min-height: 300px
   background-color: rgba(169, 169, 169, 0)
   -webkit-background-clip: text
@@ -73,12 +79,14 @@
 
 .process-schema__title
   display: flex
+  margin-bottom: 10px
 
 .process-schema__rotate-button
+  align-self: center
   background: none
   margin-left: 16px
-  width: 32px
-  height: 32px
+  width: 48px
+  height: 24px
   opacity: 0.4
   transition: opacity 300ms ease-in-out
   &:hover

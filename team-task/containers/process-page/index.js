@@ -27,10 +27,11 @@ import {showTaskEditor, showTaskLinkEditor,} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
-import {buildTree, parseParams} from "./functions";
+import {buildTree, parseParams, _scrollHandler} from "./functions";
 import {ModalTaskEditor} from "../task-page";
 import type {ProcessTask} from "../../types/task";
 import TaskLinksEditor from "../../components/process-page/editors/task-link-editor";
+import $ from "jquery";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -46,9 +47,13 @@ function ProcessEditor(props) {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
 
+        $(window).bind('resize scroll toggle-elements-visible', _scrollHandler)
+
         return () => {
             actions.clear()
             actions.showSideBarMenu()
+
+            $(window).unbind('resize scroll toggle-elements-visible', _scrollHandler)
         }
     }, [])
 
