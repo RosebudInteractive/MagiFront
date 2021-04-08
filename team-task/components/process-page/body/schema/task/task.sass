@@ -1,0 +1,143 @@
+@import "~tt-assets/styles/colors.sass"
+
+.process-schema__cell
+  padding: 20px
+  display: flex
+  align-items: center
+  justify-content: center
+  max-width: 265px
+
+.process-schema__task
+  position: relative
+  padding: 10px
+  z-index: 2
+  display: flex
+  align-items: flex-start
+  justify-content: flex-start
+  background-color: $color-main-light
+  border-radius: 8px
+  height: 136px
+  width: 245px
+  cursor: pointer
+  transition: border 300ms ease-in-out
+  flex-direction: column
+  border: 1px solid transparent
+
+  &:hover
+    border-color: #19191D
+
+    .task__buttons-block
+      opacity: 1
+      visibility: visible
+
+    .task-button_add-new-task
+      opacity: 1
+      visibility: visible
+
+  &._active
+    background-color: #FFF8EA
+    border-color: #D1941A
+
+  &._expired:not(._active)
+    background-color: #FEEDEC
+
+  .task__first-row
+    display: flex
+    width: 100%
+    font-family: Inter
+    font-style: normal
+    font-weight: normal
+    font-size: 12px
+    line-height: 22px
+    letter-spacing: 0.25px
+
+    .task__due-date
+      margin-left: auto
+
+  .task__name
+    font-family: Inter
+    font-style: normal
+    font-weight: 600
+    font-size: 14px
+    line-height: 18px
+    letter-spacing: 0.5px
+
+  .task__executor
+    display: flex
+    width: 100%
+    font-family: Inter
+    font-style: normal
+    font-weight: normal
+    font-size: 12px
+    line-height: 22px
+    letter-spacing: 0.25px
+
+  .task-state
+    position: absolute
+    left: 10px
+    bottom: 10px
+    padding: 0 8px
+    border-radius: 32px
+    font-family: Inter
+    font-style: normal
+    font-weight: normal
+    font-size: 12px
+    line-height: 22px
+    letter-spacing: 0.25px
+
+
+  .task__buttons-block
+    position: absolute
+    right: 0
+    bottom: 0
+    display: flex
+    opacity: 0
+    visibility: hidden
+    transition: opacity 300ms ease
+
+  .task__button
+    margin: 0 11px 11px 0
+    height: 16px
+    width: 16px
+    cursor: pointer
+    background-size: contain
+    background-origin: border-box
+    background-repeat: no-repeat
+    background-position: center
+    background-color: transparent
+    opacity: 0.4
+    transition: opacity 300ms ease
+    &:hover
+      opacity: 1
+
+    &._link
+      background-image: url("~tt-assets/png/chain.png")
+
+    &._edit
+      background-image: url("~tt-assets/png/pencil.png")
+
+    &._delete
+      background-image: url("~tt-assets/png/trash.png")
+
+  .task-button_add-new-task
+    background-image: url("~tt-assets/png/task-plus.png")
+    position: absolute
+    right: -8px
+    z-index: 10
+    top: 50%
+    transform: translateY(-50%)
+    height: 15px
+    width: 15px
+    cursor: pointer
+    background-size: contain
+    background-origin: border-box
+    background-repeat: no-repeat
+    background-position: center
+    background-color: transparent
+    visibility: hidden
+    opacity: 0
+    transition: opacity 300ms ease
+    //&:hover
+    //  opacity: 1
+
+

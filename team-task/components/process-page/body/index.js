@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useMemo} from "react"
+import React, {useState} from "react"
 import "./body.sass"
 import HeaderRow from "./header-row";
 import Schema from "./schema"
@@ -7,30 +7,70 @@ import ProcessFields from "./fields";
 
 type ProcessBodyProps = {
     process: any,
+    horizontalProcess: boolean,
     hasChanges: boolean,
     editors: Array,
     supervisors: Array,
     elements: Array,
     lessons: Array,
+    activeTaskId: ?number,
+    onSetActiveTaskId:Function,
     onAddElement: Function,
     onUpdateElement: Function,
     onDeleteElement: Function,
+    onAddTask: Function,
+    onAddTaskWithLink: Function,
+    onEditTaskLinks: Function,
+    onEditTask: Function,
+    onDeleteTask: Function,
+    onChangeRotation: Function,
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
     const {process, supervisors, editors, elements, lessons} = props
 
+    const [activeElementId, setActiveElementId] = useState(null)
+
+    const onSetActiveTask = (taskId) => {
+        if (!taskId) {
+            setActiveElementId(null)
+        } else {
+            const _task = process.Tasks.find(item => item.Id === taskId)
+            if (_task && _task.ElementId) {
+                setActiveElementId(_task.ElementId)
+            } else {
+                setActiveElementId(null)
+            }
+        }
+
+        props.onSetActiveTaskId(taskId)
+    }
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        <Schema/>
-        <ProcessElements values={process.Elements}
-                         disabled={props.hasChanges}
-                         editors={editors}
-                         elements={elements}
-                         onAdd={props.onAddElement}
-                         onUpdate={props.onUpdateElement}
-                         onDelete={props.onDeleteElement}/>
+        {/*<div className="work-area__left-screen"/>*/}
+        {/*<div className="work-area__right-screen"/>*/}
+        <div className="process-page__work-area">
+            <ProcessElements values={process.Elements}
+                             activeElementId={activeElementId}
+                             disabled={props.hasChanges}
+                             editors={editors}
+                             elements={elements}
+                             onAdd={props.onAddElement}
+                             onUpdate={props.onUpdateElement}
+                             onDelete={props.onDeleteElement}/>
+            <Schema tree={props.tree}
+                    horizontalProcess={props.horizontalProcess}
+                    activeTaskId={props.activeTaskId}
+                    onSetActiveTask={onSetActiveTask}
+                    onAddTask={props.onAddTask}
+                    onAddTaskWithLink={props.onAddTaskWithLink}
+                    onEditTaskLinks={props.onEditTaskLinks}
+                    onEditTask={props.onEditTask}
+                    onDeleteTask={props.onDeleteTask}
+                    onChangeRotation={props.onChangeRotation}            />
+
+        </div>
         <ProcessFields fields={process.ProcessFields}/>
     </div>
 }

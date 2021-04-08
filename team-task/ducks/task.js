@@ -10,8 +10,9 @@ import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {UpdatingCommentData, UpdatingTask, UpdatingTaskData} from "../types/task";
+import type {ProcessTask, UpdatingCommentData, UpdatingTask, UpdatingTaskData} from "../types/task";
 import {COMMENT_ACTION} from "../constants/common";
+import {getProcess} from "tt-ducks/process";
 
 /**
  * Constants
@@ -26,8 +27,18 @@ const GET_TASK_FAIL = `${prefix}/GET_TASK_FAIL`
 
 const SAVE_TASK_REQUEST = `${prefix}/SAVE_TASK_REQUEST`
 const SAVE_TASK_START = `${prefix}/SAVE_TASK_START`
-const SAVE_TASK_SUCCESS = `${prefix}/SAVE_TASK_SUCCESS`
+export const SAVE_TASK_SUCCESS = `${prefix}/SAVE_TASK_SUCCESS`
 const SAVE_TASK_FAIL = `${prefix}/SAVE_TASK_FAIL`
+
+const CREATE_TASK_REQUEST = `${prefix}/CREATE_TASK_REQUEST`
+const CREATE_TASK_START = `${prefix}/CREATE_TASK_START`
+const CREATE_TASK_SUCCESS = `${prefix}/CREATE_TASK_SUCCESS`
+const CREATE_TASK_FAIL = `${prefix}/CREATE_TASK_FAIL`
+
+const DELETE_TASK_REQUEST = `${prefix}/DELETE_TASK_REQUEST`
+const DELETE_TASK_START = `${prefix}/DELETE_TASK_START`
+export const DELETE_TASK_SUCCESS = `${prefix}/DELETE_TASK_SUCCESS`
+const DELETE_TASK_FAIL = `${prefix}/DELETE_TASK_FAIL`
 
 const SET_USERS = `${prefix}/SET_USERS`
 const SET_ELEMENTS = `${prefix}/SET_ELEMENTS`
@@ -37,6 +48,11 @@ const GET_PROCESS_ELEMENT_START = `${prefix}/GET_PROCESS_ELEMENT_START`
 const GET_PROCESS_ELEMENT_SUCCESS = `${prefix}/GET_PROCESS_ELEMENT_SUCCESS`
 const GET_PROCESS_ELEMENT_FAIL = `${prefix}/GET_PROCESS_ELEMENT_FAIL`
 const CLEAR_PROCESS_ELEMENT = `${prefix}/CLEAR_PROCESS_ELEMENT`
+
+const SAVE_TASK_LINKS_REQUEST = `${prefix}/SAVE_TASK_LINKS_REQUEST`
+const SAVE_TASK_LINKS_START = `${prefix}/SAVE_TASK_LINKS_START`
+export const SAVE_TASK_LINKS_SUCCESS = `${prefix}/SAVE_TASK_LINKS_SUCCESS`
+const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
 
 const Element = Record({
     Id: null,
@@ -67,6 +83,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     switch (type) {
 
         case GET_TASK_START:
+        case CREATE_TASK_START:
             return state
                 .set("fetching", true)
                 .set("task", null)
@@ -77,9 +94,21 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("fetching", false)
                 .set("task", payload)
 
+        case SAVE_TASK_SUCCESS:
+            return state
+                .set("fetching", false)
+
+        case CREATE_TASK_SUCCESS:
+            return state
+                .set("fetching", false)
+                .set("task", payload)
+                .set("currentElement", new Element())
+
         case GET_TASK_FAIL:
+        case CREATE_TASK_FAIL:
         case SAVE_TASK_FAIL:
         case GET_PROCESS_ELEMENT_FAIL:
+        case SAVE_TASK_LINKS_FAIL:
             return state
                 .set("fetching", false)
 
@@ -89,8 +118,13 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("fetching", false)
 
         case SAVE_TASK_START:
+        case SAVE_TASK_LINKS_START:
             return state
                 .set("fetching", true)
+
+        case SAVE_TASK_LINKS_SUCCESS:
+            return state
+                .set("fetching", false)
 
         case GET_PROCESS_ELEMENT_START:
             return state
@@ -133,13 +167,25 @@ export const getTask = (taskId: number) => {
     return {type: GET_TASK_REQUEST, payload: taskId}
 }
 
+export const createTask = (processId: number) => {
+    return {type: CREATE_TASK_REQUEST, payload: processId}
+}
+
 export const saveTask = (data: UpdatingTaskData) => {
     return {type: SAVE_TASK_REQUEST, payload: data}
+}
+
+export const deleteTask = (data: ProcessTask) => {
+    return {type: DELETE_TASK_REQUEST, payload: data}
 }
 
 export const getProcessElement = (elementId: number) => {
     return {type: GET_PROCESS_ELEMENT_REQUEST, payload: elementId}
 
+}
+
+export const saveDependencies = (data) => {
+    return {type: SAVE_TASK_LINKS_REQUEST, payload: data}
 }
 
 
@@ -148,9 +194,12 @@ export const getProcessElement = (elementId: number) => {
  */
 export const saga = function* () {
     yield all([
+        takeEvery(CREATE_TASK_REQUEST, createTaskSaga),
         takeEvery(GET_TASK_REQUEST, getTaskSaga),
         takeEvery(SAVE_TASK_REQUEST, saveTaskSaga),
+        takeEvery(DELETE_TASK_REQUEST, deleteTaskSaga),
         takeEvery(GET_PROCESS_ELEMENT_REQUEST, getProcessElementSaga),
+        takeEvery(SAVE_TASK_LINKS_REQUEST, saveDependenciesSaga)
     ])
 }
 
@@ -160,24 +209,9 @@ function* getTaskSaga(data) {
     try {
         let _task = yield call(_fetchTask, data.payload)
 
-        const _user = yield select(userSelector),
-            _hasSupervisorRights = yield select(hasSupervisorRights)
+        const _user = yield select(userSelector)
 
-        let _users = []
-        if (_hasSupervisorRights) {
-            _users = yield call(_getUsers)
-        } else {
-            if (_task.Executor) {
-                _users.push({Id: _task.Executor.Id, DisplayName: _task.Executor.DisplayName})
-            }
-        }
-
-        yield put({type: SET_USERS, payload: _users})
-
-        if (_task.Process && _task.Process.Id) {
-            const _elements = yield call(_getProcessElements, _task.Process.Id)
-            yield put({type: SET_ELEMENTS, payload: _elements})
-        }
+        yield call(getDictionaryData, _task)
 
         const _lastComment = _task.Log && _task.Log.length && _task.Log[_task.Log.length - 1],
             _isUserComment = _lastComment && _lastComment.User.Id === _user.Id
@@ -206,14 +240,19 @@ const _getProcessElements = (processId) => {
 function* saveTaskSaga({payload}) {
     yield put({type: SAVE_TASK_START})
     try {
+
         const data: UpdatingTaskData = payload,
-            result = yield call(_putTask, data.task),
+            _creatingTask = data.task.Id === -1,
+            result =  _creatingTask ?
+                yield call(_postTask, data.task)
+                :
+                yield call(_putTask, data.task),
             id = data.task.Id,
             elementId = data.task.ElementId
 
-        yield put({type: SAVE_TASK_SUCCESS, payload: result})
+        console.log(result)
 
-        console.log(data)
+        yield put({type: SAVE_TASK_SUCCESS, payload: result})
 
         if (data.comment) {
             if (data.comment.action === COMMENT_ACTION.UPDATE) {
@@ -224,10 +263,13 @@ function* saveTaskSaga({payload}) {
         }
 
         yield put(reset('TASK_EDITOR'))
-        yield all([
-            put(getTask(id)),
-            put(getProcessElement(elementId)),
+
+        if (!_creatingTask) {
+            yield all([
+                put(getTask(id)),
+                put(getProcessElement(elementId)),
             ])
+        }
     } catch (e) {
         yield put({type: SAVE_TASK_FAIL})
         yield put(showErrorMessage(e.message))
@@ -237,6 +279,21 @@ function* saveTaskSaga({payload}) {
 const _putTask = (data: UpdatingTask) => {
     return fetch(`/api/pm/task/${data.Id}`, {
         method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(data),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _postTask = (data) => {
+    delete data.Id
+
+    return fetch(`/api/pm/task`, {
+        method: 'POST',
         headers: {
             "Content-type": "application/json"
         },
@@ -288,4 +345,127 @@ function* getProcessElementSaga(data) {
 
 const _getProcessElementData = (elementId) => {
     return commonGetQuery(`/api/pm/process-elem/${elementId}`)
+}
+
+
+function* createTaskSaga({payload}) {
+    yield put({type: CREATE_TASK_START})
+    try {
+        const _user = yield select(userSelector)
+
+        const _newTask = {
+            Id: -1,
+            Process: {Id: payload},
+            Executor: {Id: _user.Id, DisplayName: _user.DisplayName},
+            Name: "",
+            Element: {Id: null},
+            IsElemReady: false,
+            Description: "",
+            WriteFieldSet: "",
+            Dependencies: [],
+            Log: [],
+        }
+
+        yield call(getDictionaryData, _newTask)
+
+        yield put({type: CREATE_TASK_SUCCESS, payload: _newTask})
+    } catch (e) {
+        yield put({type: CREATE_TASK_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+
+function* getDictionaryData(task) {
+    const _hasSupervisorRights = yield select(hasSupervisorRights)
+
+    let _users = []
+    if (_hasSupervisorRights) {
+        _users = yield call(_getUsers)
+    } else {
+        if (task.Executor) {
+            _users.push({Id: task.Executor.Id, DisplayName: task.Executor.DisplayName})
+        }
+    }
+
+    yield put({type: SET_USERS, payload: _users})
+
+    if (task.Process && task.Process.Id) {
+        const _elements = yield call(_getProcessElements, task.Process.Id)
+        yield put({type: SET_ELEMENTS, payload: _elements})
+    }
+}
+
+
+function* deleteTaskSaga({payload}) {
+    yield put({type: DELETE_TASK_START})
+    try {
+        yield call(_deleteTask, payload.taskId)
+        yield put(getProcess(payload.processId))
+
+        yield put({type: DELETE_TASK_SUCCESS,})
+    } catch (e) {
+        yield put({type: DELETE_TASK_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const _deleteTask = (taskId: number) => {
+    return fetch(`/api/pm/task/${taskId}`, {
+        method: 'DELETE',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+
+function* saveDependenciesSaga({payload}) {
+    yield put({type: SAVE_TASK_LINKS_START})
+
+    try {
+        const _calls = payload.deps
+            .map((item) => {
+                return item.state === "DELETED"
+                    ? call(_deleteDependence, {DepTaskId: payload.taskId, TaskId: item.taskId})
+                    :
+                    item.state === "ADDED" ?
+                        call(_addDependence, {DepTaskId: payload.taskId, TaskId: item.taskId})
+                        :
+                        null
+            })
+            .filter(item => item)
+
+        if (_calls.length > 0) {
+            yield all(_calls)
+        }
+
+        yield put({type: SAVE_TASK_LINKS_SUCCESS})
+    } catch (e) {
+        yield put({type: SAVE_TASK_LINKS_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const _addDependence = (body) => {
+    return fetch("/api/pm/task-dep", {
+        method: 'POST',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(body),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _deleteDependence = (body) => {
+    return fetch("/api/pm/task-dep", {
+        method: 'DELETE',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(body),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
 }

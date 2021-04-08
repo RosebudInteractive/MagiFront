@@ -24,3 +24,9 @@ export type UpdatingTaskData = {
     task: UpdatingTask,
     comment: ?UpdatingCommentData,
 }
+
+export type ProcessTask = {
+    taskId: number,
+    processId: number,
+    parentTaskId: ?number
+}

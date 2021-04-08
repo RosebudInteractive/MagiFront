@@ -52,7 +52,7 @@ function TextField(props) {
 
 function ComboField(props) {
     const _onClean = () => {
-        props.value = []
+        // props.value = []
         if (props.onClean) props.onClean(props.name)
     }
 

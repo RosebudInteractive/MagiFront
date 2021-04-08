@@ -5,15 +5,14 @@
   height: auto
   margin-bottom: 26px
 
-.process-element__state
-  position: absolute
-  height: 26px
-  min-width: 92px
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
-  line-height: 22px
-  text-align: center
+  .process-element__state
+    padding: 0
+    position: absolute
+    height: 14px
+    width: 14px
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
 
 .element-editor__dialog
   background-color: $color-main-light
@@ -64,7 +63,7 @@
 
 .process-elements-grid__button
   height: 48px
-  width: 48px
+  width: 24px
   cursor: pointer
   background-size: contain
   background-origin: border-box
@@ -130,6 +129,8 @@
     &.webix_row_select
       background-color: rgba(25, 25, 29, .03)
       color: $grey100
+    &._active
+      background-color: #FFF8EA
 
   .row-hover
     background-color: rgba(25, 25, 29, .03)

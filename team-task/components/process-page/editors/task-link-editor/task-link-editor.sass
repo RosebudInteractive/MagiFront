@@ -1,0 +1,85 @@
+@import "~tt-assets/styles/colors.sass"
+
+.task-links-editor
+  display: flex
+  flex-direction: column
+  &.form
+    background-color: $color-main-light
+
+  .bottom-buttons
+    margin-top: 30px
+    ._apply
+      margin-right: 17px
+
+.task-links-editor__title
+  align-self: center
+
+.task-links-editor__tasks
+  width: 100%
+  display: flex
+  margin-top: 16px
+  margin-bottom: auto
+  max-height: calc(100% - 130px)
+
+  ._tasks-column
+    flex: 1 0 calc(50% - 12px)
+    overflow-y: auto
+    //-webkit-background-clip: content-box
+    -webkit-text-fill-color: inherit
+    transition: background-color 300ms
+    &::-webkit-scrollbar
+      width: 8px
+      height: 8px
+      visibility: hidden
+
+
+    &::-webkit-scrollbar-track
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
+      border-radius: 8px
+
+    &::-webkit-scrollbar-thumb
+      //background-color: inherit
+      background-color: rgba(169, 169, 169, 100)
+      outline: none
+      border-radius: 8px
+
+    //&:hover
+    //  background-color: rgba(169, 169, 169, 100)
+
+
+  .task-links__available-tasks
+    padding-right: 12px
+  .task-links__depending-tasks
+    padding: 0 12px
+
+  .link-editor__task
+    padding: 16px
+    display: flex
+    background-color: $grey01
+    border-radius: 8px
+    margin-bottom: 9px
+    cursor: pointer
+    align-items: center
+    transition: background-color 300ms ease-in-out
+    &:hover
+      background-color: $grey20
+
+    ._button
+      width: 24px
+      height: 24px
+      border-radius: 50%
+      background-color: $color-main-light
+      display: flex
+      align-items: center
+      justify-content: center
+
+  .depending-task
+    ._button
+      margin-right: 8px
+
+  .available-task
+    .task-title
+      margin-right: auto
+    ._button
+      margin-left: 8px
+      justify-self: flex-end

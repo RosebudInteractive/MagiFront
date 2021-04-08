@@ -25,7 +25,7 @@ import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,}
 import {notifyPaymentButtonClicked, notifyPriceButtonClicked} from "ducks/google-analytics";
 import WaitingFrame from "./common/waiting-frame";
 import EmailField from "./common/email-field";
-import {getCurrencySign} from "../../../tools/page-tools";
+import {getCurrencySign} from "tools/page-tools";
 import PromoField from "./common/promo-field";
 
 export const PAYMENT_TYPE = {
@@ -258,9 +258,13 @@ class PaymentForm extends React.Component {
                     </div>
                     <div className="payment-form__footer-wrapper">
                         <div className="fields-editors__block">
-                            { _buyAsGift && <div className="font-universal__title-small">Введите e-mail для получения подарочного промокода и фискального чека</div> }
+                            { _buyAsGift && <div className="font-universal__title-small">
+                                <span className="fields-editors__block-message">Введите e-mail для получения подарочного промокода</span>
+                                <span className="fields-editors__block-message">и фискального чека</span>
+                            </div> }
                             <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
-                            {!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }
+                            {/*{!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }*/}
+                            <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/>
                         </div>
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton

@@ -3,7 +3,7 @@
 
 @font-face
   font-family: 'Inter'
-  src: url("/fonts/inter/Inter-SemiBold.ttf") format('truetype')
+  src: url("/fonts/inter/Inter-Regular.ttf") format('truetype')
   font-style: normal
 
 html
@@ -35,12 +35,26 @@ body
   flex: 1 0 83.34%
   flex-direction: column
   height: fit-content
+  width: 100%
 
 
 .grey-button
   background: $grey05
   border-radius: 8px
   border: none
+  color: $grey100
+  font-family: Inter
+  font-style: normal
+  font-weight: 600
+  font-size: 14px
+  line-height: 14px
+  text-align: center
+  letter-spacing: 0.75px
+  box-sizing: border-box
+  cursor: pointer
+  &:disabled
+    opacity: 0.5
+    cursor: default
 
 .orange-button
   background: $orange
@@ -51,7 +65,7 @@ body
   font-style: normal
   font-weight: 600
   font-size: 14px
-  line-height: 17px
+  line-height: 14px
   text-align: center
   letter-spacing: 0.75px
   box-sizing: border-box
@@ -75,9 +89,23 @@ body
   padding: 24px
   box-sizing: border-box
   position: relative
+  &._scrollable-y
+    overflow-y: auto
 
   .grid-container
     position: absolute
+
+  .page-title
+    .MuiInputBase-root input
+      font-family: Inter
+      font-style: normal
+      font-weight: bold
+      font-size: 24px
+      line-height: 36px
+      color: $grey70
+
+.form-with-header__main-block
+  min-height: calc(100% - 64px)
 
 .form-header
   margin: 0 0 24px
@@ -97,9 +125,70 @@ body
     background: #DCEDDD
 
 .modal-form
+  z-index: 100
   position: fixed
   top: 0
   left: 0
   width: 100%
   height: 100%
   background: rgba(0, 0, 0, .3)
+
+.modal-form__close-button
+  position: absolute
+  right: 5px
+  top: 5px
+  padding: 15px
+  font-size: 0
+  cursor: pointer
+  background-color: transparent
+  &:before, &:after
+    content: ""
+    position: absolute
+    top: 50%
+    left: 50%
+    -webkit-transform: translate(-50%, -50%)
+    -ms-transform: translate(-50%, -50%)
+    transform: translate(-50%, -50%)
+    width: 15px
+    height: 2px
+    background-color: $grey40
+    -webkit-transition: background-color 0.3s ease
+    transition: background-color 0.3s ease
+  &:before
+    -webkit-transform: translate(-50%, -50%) rotate(45deg)
+    -ms-transform: translate(-50%, -50%) rotate(45deg)
+    transform: translate(-50%, -50%) rotate(45deg)
+  &:after
+    -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+    -ms-transform: translate(-50%, -50%) rotate(-45deg)
+    transform: translate(-50%, -50%) rotate(-45deg)
+
+  &:hover
+    &:before, &:after
+      background-color: $grey80
+
+.task-state
+  &._waiting
+    background-color: $grey01
+    color: #2979FF
+
+  &._draft
+    background-color: #EBF2FF
+    color: #2979FF
+
+  &._executing
+    background-color: #FFF8EA
+    color: #F1A205
+
+  &._question
+    background-color: #FEEDEC
+    color: #C8372D
+
+  &._done
+    background-color: #EDF6EE
+    color: #43A047
+
+  &._expired
+    background-color: #F44336
+    color: #FFFFFF
+

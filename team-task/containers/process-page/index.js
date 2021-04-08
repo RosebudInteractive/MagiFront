@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useMemo, useState} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {useParams} from "react-router-dom"
+import {useLocation, useParams} from "react-router-dom"
 import {
     getProcess,
     saveProcess,
@@ -10,6 +10,7 @@ import {
     addElement,
     updateElement,
     deleteElement,
+    clear,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -19,10 +20,18 @@ import {
 } from "tt-ducks/process";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
-import {hideSideBarMenu, showSideBarMenu,} from "tt-ducks/app";
+import {hideSideBarMenu, horizontalProcess, showSideBarMenu, changeProcessRotation} from "tt-ducks/app";
+import {activeTaskIdSelector, setActiveTaskId, setInitState} from "tt-ducks/route";
+import {deleteTask,} from "tt-ducks/task";
+import {showTaskEditor, showTaskLinkEditor,} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
+import {buildTree, parseParams, _scrollHandler} from "./functions";
+import {ModalTaskEditor} from "../task-page";
+import type {ProcessTask} from "../../types/task";
+import TaskLinksEditor from "../../components/process-page/editors/task-link-editor";
+import $ from "jquery";
 
 const EDITOR_NAME = "PROCESS_EDITOR"
 
@@ -30,15 +39,29 @@ function ProcessEditor(props) {
     const {actions, process, fetching, hasChanges, editorValues,} = props
 
     const params = useParams()
+    const location = useLocation()
+
+    const tree = useRef()
 
     useEffect(() => {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
 
+        $(window).bind('resize scroll toggle-elements-visible', _scrollHandler)
+
         return () => {
+            actions.clear()
             actions.showSideBarMenu()
+
+            $(window).unbind('resize scroll toggle-elements-visible', _scrollHandler)
         }
     }, [])
+
+    useEffect(() => {
+        const initState = parseParams()
+        initState.pathname = location.pathname
+        actions.setInitState(initState)
+    }, [location])
 
     useEffect(() => {
         if (process) {
@@ -54,6 +77,8 @@ function ProcessEditor(props) {
             })
 
             props.initialize(_object)
+
+            tree.current = buildTree(process)
         }
     }, [process])
 
@@ -78,18 +103,58 @@ function ProcessEditor(props) {
         actions.goBack()
     }
 
+    const onEditTaskLinks = (taskId) => {
+        actions.showTaskLinkEditor({processId: process.Id, taskId})
+    }
+
+    const onEditTask = (taskId) => {
+        actions.showTaskEditor({processId: process.Id, taskId})
+    }
+
+    const onAddTask = () => {
+        actions.showTaskEditor({processId: process.Id, taskId: -1})
+    }
+
+    const onAddTaskWithLink = (parentTaskId) => {
+        actions.showTaskEditor({processId: process.Id, taskId: -1, parentTaskId})
+    }
+
+    const onDeleteTask = (taskId) => {
+        const data: ProcessTask = {taskId: taskId, processId: process.Id}
+        actions.deleteTask(data)
+        if (props.activeTaskId === taskId) {
+            actions.setActiveTaskId(null)
+        }
+    }
+
+    const onSetActiveTask = (taskId) => {
+        actions.setActiveTaskId(taskId)
+    }
+
     return !fetching && process &&
         <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
             <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
             <ProcessBody process={process}
+                         horizontalProcess={props.horizontalProcess}
+                         tree={tree.current}
                          supervisors={props.supervisors}
                          editors={props.editors}
                          elements={props.elements}
                          lessons={props.lessons}
                          hasChanges={hasChanges}
+                         activeTaskId={props.activeTaskId}
+                         onSetActiveTaskId={onSetActiveTask}
                          onAddElement={actions.addElement}
                          onUpdateElement={actions.updateElement}
-                         onDeleteElement={actions.deleteElement}/>
+                         onDeleteElement={actions.deleteElement}
+                         onAddTask={onAddTask}
+                         onAddTaskWithLink={onAddTaskWithLink}
+                         onEditTaskLinks={onEditTaskLinks}
+                         onEditTask={onEditTask}
+                         onDeleteTask={onDeleteTask}
+                         onChangeRotation={actions.changeProcessRotation}/>
+            <ModalTaskEditor/>
+            <TaskLinksEditor/>
         </form>
 }
 
@@ -109,9 +174,11 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         user: userSelector(state),
         isSupervisor: hasSupervisorRights(state),
+        activeTaskId: activeTaskIdSelector(state),
         hasChanges: isDirty(EDITOR_NAME)(state),
         editorValues: getFormValues(EDITOR_NAME)(state),
-        editorValid: isValid(EDITOR_NAME)(state)
+        editorValid: isValid(EDITOR_NAME)(state),
+        horizontalProcess: horizontalProcess(state)
     }
 }
 
@@ -126,6 +193,13 @@ const mapDispatch2Props = (dispatch) => {
             addElement,
             updateElement,
             deleteElement,
+            deleteTask,
+            showTaskEditor,
+            showTaskLinkEditor,
+            clear,
+            setActiveTaskId,
+            setInitState,
+            changeProcessRotation,
         }, dispatch)
     }
 }

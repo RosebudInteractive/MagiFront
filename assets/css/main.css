@@ -19649,10 +19649,12 @@ ul.lectures-tab {
       padding-top: 30px;
       padding-bottom: 30px;
       display: flex;
+      flex-direction: row;
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
     @media (max-width: 767px) {
       .promo__wrapper {
         padding: 20px;
+        flex-direction: column;
         background-color: #fff; } }
     .promo__field-wrapper {
       width: 50%;
@@ -19663,7 +19665,8 @@ ul.lectures-tab {
       color: #E21836 }
     @media (max-width: 767px) {
       .promo__field-wrapper {
-        margin: 0 12px 9px 0; } }
+        width: 100%;
+        margin: 0 0 9px; } }
     .promo__field-wrapper .form__field-label {
       width: 50%;
       text-align: right;
@@ -19696,10 +19699,9 @@ ul.lectures-tab {
       color: #000000;}
     @media (max-width: 767px) {
       .promo__message-wrapper.success {
-        display: flex;
+        width: auto;
         font-size: 15px;
-        line-height: 18px;
-        flex-direction: column; } }
+        line-height: 18px; } }
     .promo__message-wrapper .sum {
       font-weight: bolder;
     }

@@ -26,7 +26,7 @@ export default function ProcessHeader(props: HeaderProps) {
             <BackArrow/>
         </div>
         <div className="process-page__field-name">
-            <Field component={TextBoxWithConfirm} name={"Name"} label={"Название процесса"}/>
+            <Field component={TextBoxWithConfirm} name={"Name"} label={"Название процесса"} extClass="_grey100 page-title"/>
         </div>
         <div className={"header__process-state font-body-s " + _state.css}>{_state.label}</div>
         <button className="process-page__save-button orange-button big-button" disabled={!hasChanges} onClick={props.onSave}>Сохранить</button>

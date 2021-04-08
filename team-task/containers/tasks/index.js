@@ -1,18 +1,19 @@
-import React, {useEffect, useRef, useMemo} from "react"
-import {connect} from 'react-redux';
+import React, {useEffect, useRef, useMemo, useCallback} from "react"
+import {connect, useSelector} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {getTasks, goToTask, statesSelector, tasksSelector, fetchingSelector} from "tt-ducks/tasks";
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import Webix from "../../components/Webix";
 import "./tasks.sass"
-import $ from "jquery";
 import FilterRow from "../../components/filter";
 import type {FilterField} from "../../components/filter/types";
 import {GRID_SORT_DIRECTION} from "../../constants/common";
 import {useLocation,} from "react-router-dom"
 import type {GridSortOrder} from "../../types/grid";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
+import {useWindowSize} from "../../tools/window-resize-hook";
 
+let _taskCount = 0
 
 function Tasks(props) {
     const {actions, states, tasks, fetching} = props
@@ -20,6 +21,15 @@ function Tasks(props) {
     const location = useLocation()
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null)
+
+    useWindowSize(() => {
+        resizeHandler(_taskCount)
+    })
+
+    useEffect(() => {
+        _taskCount = tasks.length
+        _onResize();
+    }, [tasks])
 
     useEffect(() => {
         const initState = parseParams()
@@ -33,22 +43,12 @@ function Tasks(props) {
         if (initState.filter) {
             filter.current = initState.filter
             initState.filter = convertFilter2Params(initState.filter)
+        } else {
+            filter.current = null
         }
 
         initState.pathname = location.pathname
-
         actions.setInitState(initState)
-
-        $(window).on('resize', resizeHandler);
-        resizeHandler();
-
-        return () => {
-            $(window).unbind('resize', resizeHandler)
-        }
-    }, [])
-
-    useEffect(() => {
-        actions.setPathname(location.pathname)
 
         if (!fetching) {
             actions.getTasks()
@@ -63,7 +63,7 @@ function Tasks(props) {
         scroll: 'none',
         headerRowHeight: 40,
         rowHeight: 72,
-        height: 500,
+        height: 1000,
         select: true,
         editable: false,
         columns: [
@@ -114,11 +114,13 @@ function Tasks(props) {
 
     const _onApplyFilter = (filter) => { actions.applyFilter(convertFilter2Params(filter)) }
 
-    const _onChangeFilterVisibility = () => { resizeHandler() }
+    const _onResize = useCallback(() => {
+        resizeHandler(tasks.length)
+    }, [tasks])
 
-    return <div className="tasks-page form">
+    return <div className="tasks-page form _scrollable-y">
         <h5 className="form-header _grey70">Задачи</h5>
-        <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onChangeFilterVisibility}/>
+        <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
         <div className="grid-container">
             <Webix ui={GRID_CONFIG} data={tasks}/>
         </div>

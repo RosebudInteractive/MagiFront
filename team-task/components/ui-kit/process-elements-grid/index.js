@@ -8,6 +8,7 @@ import ElementEditor from "./editor";
 
 type ProcessElementsGridProps = {
     values: Array,
+    activeElementId: number,
     elements: Array,
     editors: Array,
     onDelete: Function,
@@ -16,22 +17,36 @@ type ProcessElementsGridProps = {
     disabled: boolean,
 }
 
+class GridData {
+    constructor() {
+        this.data = {}
+    }
+
+    setData(data) {
+        this.data = {...data}
+    }
+}
+
+// const _gridData = new GridData()
+
 export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
-    const {onDelete, onAdd, onUpdate, values, editors, elements, disabled} = props
+    const {onDelete, onAdd, onUpdate, values, editors, elements, disabled, activeElementId} = props
 
     const [editorVisible, setEditorVisible] = useState(false)
     const [currentElement, setCurrentElement] = useState(null)
-    const [myValues, setValues] = useState([])
+    const [myValues, setMyValues] = useState([])
+    const [render, setRender] = useState(false)
     const [sort, setSort] = useState({field: null, direction: null})
     const [elementInEditMode, setElementInEditMode] = useState(false)
 
+    const _gridData = useRef(new GridData())
 
     useEffect(() => {
-        $(window).on('resize', resizeHandler);
+        $(window).on('resize toggle-elements-visible', resizeHandler);
         setTimeout(resizeHandler, 300);
 
         return () => {
-            $(window).unbind('resize', resizeHandler)
+            $(window).unbind('resize toggle-elements-visible', resizeHandler)
         }
     })
 
@@ -46,7 +61,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
                 }
             })
 
-            setValues(_elements)
+            setMyValues(_elements)
         }
     }, [values])
 
@@ -65,18 +80,18 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     }
 
     const sortValues = () => {
-        let _values = values
         if (sort.field) {
-            _values = _values.sort((itemA, itemB) => {
-                return sort.direction === GRID_SORT_DIRECTION.ACS ? itemA[sort.field] - itemB[sort.field] : itemB[sort.field] - itemA[sort.field]
+            myValues.sort((itemA, itemB) => {
+                return sort.direction === GRID_SORT_DIRECTION.ACS ?
+                    itemA[sort.field] > itemB[sort.field] ? 1 : itemA[sort.field] < itemB[sort.field] ? -1 : 0
+                    :
+                    itemB[sort.field] > itemA[sort.field] ? 1 : itemB[sort.field] < itemA[sort.field] ? -1 : 0
             })
         }
-
-        setValues(_values)
     }
 
     useEffect(() => {
-        // sortValues()
+        sortValues()
     }, [sort,])
 
     const _getEditors = () => {
@@ -85,7 +100,20 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
         })
     }
 
-    const GRID_CONFIG = useRef({
+    const getActiveRow = (item) => {
+        if (item.Id === _gridData.current.data.activeElementId) {
+            item.$css = "_active"
+        } else {
+            item.$css = ""
+        }
+    }
+
+    useEffect(() => {
+        _gridData.current.setData({activeElementId: props.activeElementId, sort: sort})
+        setRender(!render)
+    }, [props.activeElementId, sort, myValues])
+
+    const gridConfig = useRef({
             view: "datatable",
             id: _id.current,
             css: 'tt-element-grid',
@@ -96,36 +124,40 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
             autoheight: true,
             select: true,
             editable: false,
+            scheme:{
+                $change: getActiveRow
+            },
             columns: [
-                {id: 'Name', header: 'Название элемента', fillspace: 80, width: 100,},
-                {id: 'SupervisorId', header: 'Ответственный', fillspace: 30, width: 105, options: _getEditors()},
+                {id: 'Name', header: 'Название элемента', fillspace: 40, width: 80,},
+                {id: 'SupervisorId', header: 'Ответственный', fillspace: 30, width: 80, options: _getEditors()},
                 {
-                    id: 'State', header: 'Статус', width: 130,
+                    id: 'State', header: 'Статус', width: 55,
                     template: function (data) {
                         const _data = getState(data.State)
-                        return `<div class="process-element__state ${_data.css}">${_data.caption}</div>`
+                        return `<div class="process-element__state ${_data.css}"></div>`
                     }
                 },
                 {
                     id: "",
                     template: "<button class='process-elements-grid__button elem-edit'/>",
-                    width: 40
+                    width: 24
                 },
                 {
                     id: "",
                     template: "<button class='process-elements-grid__button elem-delete'/>",
-                    width: 40
+                    width: 24
                 }
             ],
             on: {
                 onHeaderClick: function (header,) {
-                    const newSort = {...sort}
+                    const oldSort = _gridData.current.data.sort,
+                        newSort = {...oldSort}
 
-                    if (header.column !== sort.field) {
+                    if (header.column !== oldSort.field) {
                         newSort.field = header.column
                         newSort.direction = GRID_SORT_DIRECTION.ACS
                     } else {
-                        newSort.direction = sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : GRID_SORT_DIRECTION.ACS
+                        newSort.direction = oldSort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : GRID_SORT_DIRECTION.ACS
                     }
                     setSort(newSort)
                     this.markSorting(newSort.field, newSort.direction)
@@ -151,8 +183,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
                     }
                 }
             }
-        }
-    )
+        })
 
     const onAddElement = () => {
         setCurrentElement({Name: null, SupervisorId: null, State: 1})
@@ -176,7 +207,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
 
     return <div className="process-elements-grid" id={_wrapperId.current}>
         <div className="grid-wrapper">
-            <Webix ui={GRID_CONFIG.current} data={myValues}/>
+            <Webix ui={gridConfig.current} data={myValues}/>
         </div>
         <button className="process-page__save-button orange-button small-button" disabled={props.disabled}
                 onClick={onAddElement}>

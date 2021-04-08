@@ -66,12 +66,12 @@ export default function StorePopup(props) {
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.APPLE}
                                  link={mobileAppLinks.ios}
-                                 visible={true}/>
+                                 visible={!_isMobilePlatform || _isAppleMobile}/>
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.ANDROID}
                                  link={mobileAppLinks.android}
                                  disabled={mode !== MOBILE_STORE_MODE.BOTH}
-                                 visible={!isMobileAppleDevice()}/>
+                                 visible={!_isMobilePlatform || !_isAppleMobile}/>
                 </div>
             </div>
             <div className={"store-popup__info-block _small" + (_isMobilePlatform ? " _mobile" : " _desktop")}>
@@ -92,7 +92,7 @@ export default function StorePopup(props) {
                 }
                 <div className="text-block">
                     <div className="text-block__text font-universal__body-medium _mobile _white">Наши лекции и материалы удобно
-                        смотреть и слушать в любом месте</div>
+                        смотреть и слушать в мобильном приложении</div>
                 </div>
                 <div className={"buttons-block" + (_isMobilePlatform ? " _single" : " _all")}>
                     {

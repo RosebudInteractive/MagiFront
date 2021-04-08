@@ -31,7 +31,7 @@ export default function SupervisorBlock(props: TaskBodyProps) {
             <Field component={Checkbox} name={"IsElemReady"} label={"Элемент готов"} />
             <div className={"elem-info-block__item process-element__state font-body-xs " + _state.css}>{_state.caption}</div>
             {
-                currentElement.Supervisor &&
+                currentElement.Supervisor && currentElement.Supervisor.DisplayName &&
                 <div className="elem-info-block__item _executor font-body-xs _grey100">{currentElement.Supervisor.DisplayName}</div>
             }
         </div>
