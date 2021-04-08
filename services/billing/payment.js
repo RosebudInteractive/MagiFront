@@ -81,6 +81,10 @@ exports.Payment = class Payment extends DbObject {
         return this._chequePendingPeriod;
     }
 
+    get paymentType() {
+        return Accounting.PaymentSystem.Unknown;
+    }
+
     constructor(options) {
         let opts = _.cloneDeep(options || {});
         opts.cache = opts.cache ? opts.cache : {};
@@ -661,11 +665,13 @@ exports.Payment = class Payment extends DbObject {
         await this.cacheDel(`cheque:${id}`);
     }
 
-    _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoice_data) {
+    _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoice_data, options) {
         let chequeObj = cheque.chequeObj;
         let parentCheque = cheque.parentCheque;
         let invoiceData = invoice_data;
         let self = this;
+        let opts = options || {};
+        let purchaseEmailNotification = typeof (opts.purchaseEmailNotification) === "boolean" ? opts.purchaseEmailNotification : true;
 
         let updateState = async (reqResult) => {
             let dbOptsInt;
@@ -695,20 +701,26 @@ exports.Payment = class Payment extends DbObject {
                         chequeObj.isSaved(reqResult.cheque.isSaved);
                     if (reqResult.cheque.ReceiptStateId)
                         chequeObj.receiptStateId(reqResult.cheque.ReceiptStateId);
+                    if (reqResult.cheque.ReceiptDate)
+                        chequeObj.receiptDate(reqResult.cheque.ReceiptDate);
+                    if (reqResult.cheque.ReceiptData)
+                        chequeObj.receiptData(JSON.stringify(reqResult.cheque.ReceiptData));
                     chequeObj.chequeData(JSON.stringify(reqResult.result));
-                    root_item = chequeObj.getDataRoot("ChequeLog");
-                    let fields = {
-                        ResultCode: HttpCode.OK,
-                        Operation: reqResult.operation.operation,
-                        Request: JSON.stringify(reqResult.req),
-                        Response: JSON.stringify(reqResult.result)
-                    };
-                    if (reqResult.isError)
-                        fields.ResultCode = reqResult.statusCode ? reqResult.statusCode :
-                            (reqResult.result && reqResult.result.statusCode ? reqResult.result.statusCode : HttpCode.ERR_INTERNAL);
-                    return root_item.newObject({
-                        fields: fields
-                    }, dbOpts);
+                    if (reqResult.operation) {
+                        root_item = chequeObj.getDataRoot("ChequeLog");
+                        let fields = {
+                            ResultCode: HttpCode.OK,
+                            Operation: reqResult.operation.operation,
+                            Request: JSON.stringify(reqResult.req),
+                            Response: JSON.stringify(reqResult.result)
+                        };
+                        if (reqResult.isError)
+                            fields.ResultCode = reqResult.statusCode ? reqResult.statusCode :
+                                (reqResult.result && reqResult.result.statusCode ? reqResult.result.statusCode : HttpCode.ERR_INTERNAL);
+                        return root_item.newObject({
+                            fields: fields
+                        }, dbOpts);
+                    }
                 })
                 .then(() => {
                     return $data.tranStart(dbOpts)
@@ -844,8 +856,9 @@ exports.Payment = class Payment extends DbObject {
                             if (!isRefund)
                                 for (let i = 0; i < paidCourses.length; i++) {
                                     // we shouldn't "await" here !!! we don't care about a result
-                                    self._sendEmailPurchaseNotification(chequeObj, false,
-                                        paidCourses[i], { userName: user.DisplayName, dbOpts: dbOpts });
+                                    if (purchaseEmailNotification)
+                                        self._sendEmailPurchaseNotification(chequeObj, false,
+                                            paidCourses[i], { userName: user.DisplayName, dbOpts: dbOpts });
                                     self._sendPurchaseEventToMrktSystem(user, paidCourses[i], chequeObj, { dbOpts: dbOpts });
                                 }
                         }
@@ -1138,7 +1151,7 @@ exports.Payment = class Payment extends DbObject {
                     else {
                         await root_obj.edit();
 
-                        let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId, SendStatus: 0 };
+                        let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId, SendStatus: 0, PaymentType: this.paymentType };
                         if ((!isRefund) && data.Promo) {
                             fields.PromoCodeId = data.Promo.Id ? data.Promo.Id : null;
                             fields.PromoCode = data.Promo.PromoCode ? data.Promo.PromoCode : null;
@@ -1264,14 +1277,20 @@ exports.Payment = class Payment extends DbObject {
                                 break;
                             }
                             else
-                                throw new Error(`${crs.name} уже доступен для использования.`);
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                    error: "courseAlreadyPaid",
+                                    message: `${crs.name} уже доступен для использования.`
+                                });
                         if (pending[crs.id])
                             if (isSilent) {
                                 result.isPending = true;
                                 break;
                             }
                             else
-                                throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                    error: "waitingForPay",
+                                    message: `${crs.name} ожидает завершения операции оплаты.`
+                                });
                     }
                 }
             }

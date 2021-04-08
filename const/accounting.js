@@ -5,6 +5,12 @@ exports.Accounting = {
     ComparePrecision: 0.005,
     DfltCurrencyId: 1,
     DfltCurrencyCode: "RUB",
+    PaymentSystem: {
+        Unknown: 0,
+        Yandex: 1,
+        Ios: 2,
+        Android: 3
+    },
     InvoiceType: {
         Purchase: 1,
         Refund: 2

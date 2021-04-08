@@ -15,6 +15,10 @@ const DEFAULT_TIMEOUT = require('http').createServer().timeout; // node's defaul
 
 class YandexKassa extends Payment {
 
+    get paymentType() {
+        return Accounting.PaymentSystem.Yandex;
+    }
+
     constructor(options) {
         super(options);
 

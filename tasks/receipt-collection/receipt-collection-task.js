@@ -12,14 +12,14 @@ const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_CHEQUE_MSSQL =
-    "select<%= limit %> [Id], coalesce([LastTrialTs], convert(datetime, 0)) Ts from[Cheque]\n" +
-    "where ([StateId] = 4) and ([ChequeDate] >= convert(datetime, '<%= st_date %>'))\n" +
+    "select<%= limit %> [Id], coalesce([LastTrialTs], convert(datetime, 0)) Ts from [Cheque]\n" +
+    "where ([PaymentType] = 1) and ([StateId] = 4) and ([ChequeDate] >= convert(datetime, '<%= st_date %>'))\n" +
     "and ([ReceiptDate] is NULL) and (([TrialNum] is NULL) or ([TrialNum] < <%= max_trial %>))\n" +
     "order by 2";
 
 const GET_CHEQUE_MYSQL =
-    "select `Id`, coalesce(`LastTrialTs`, convert(0, datetime)) Ts from`Cheque`\n" +
-    "where (`StateId` = 4) and (`ChequeDate` >= '<%= st_date %>')\n" +
+    "select `Id`, coalesce(`LastTrialTs`, convert(0, datetime)) Ts from `Cheque`\n" +
+    "where (`PaymentType` = 1) and (`StateId` = 4) and (`ChequeDate` >= '<%= st_date %>')\n" +
     "and (`ReceiptDate` is NULL) and ((`TrialNum` is NULL) or (`TrialNum` < <%= max_trial %>))\n" +
     "order by 2<%= limit %>";
 
