@@ -541,9 +541,7 @@ const COURSE_MYSQL_LSN_COVER_REQ =
 
 const DFLT_ADDRESS_BOOK = "Магистерия";
 const DFLT_SENDER_NAME = "Magisteria.ru";
-const PRICE_COEFF = {
-    ios: 1.2
-};
+const DFLT_IOS_PRICE_COEFF = 1.0;
 
 const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
 const { IdxLessonService } = require('./elastic/indices/idx-lesson');
@@ -563,6 +561,7 @@ const DbCourse = class DbCourse extends DbObject {
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
         this._productService = ProductService();
+        this._ios_coeffs = config.has('mobileApp.ios.priceCoeffs') ? config.get('mobileApp.ios.priceCoeffs') : null;
     }
 
     async _updateSearchIndex(id, affected_list) {
@@ -1704,6 +1703,22 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
+    _getPriceCoeff(platform, price) {
+        let coeff = 1.0;
+        switch (platform) {
+            case "ios":
+                coeff = DFLT_IOS_PRICE_COEFF;
+                if (this._ios_coeffs) {
+                    for (let i = 0; i < this._ios_coeffs.length; i++){
+                        let elem = this._ios_coeffs[i];
+                        coeff = price > elem.price ? elem.coeff : coeff;
+                    }
+                }
+                break;
+        }
+        return coeff;
+    }
+
     _setPriceByProd(course, prod, hasRaw, in_app_pricers) {
         course.Price = prod.Price;
         course.DPrice = prod.DPrice;
@@ -1716,7 +1731,7 @@ const DbCourse = class DbCourse extends DbObject {
         if (in_app_pricers) {
             for (let key in in_app_pricers) {
                 let getPrice = in_app_pricers[key];
-                let coeff = PRICE_COEFF[key] ? PRICE_COEFF[key] : 1.0;
+                let coeff;
                 if (typeof (getPrice) === "function") {
                     if (!course.InAppPrices)
                         course.InAppPrices = {};
@@ -1724,19 +1739,20 @@ const DbCourse = class DbCourse extends DbObject {
                     if (!currPrices)
                         currPrices = course.InAppPrices[key] = {};
                     if (course.Price) {
+                        coeff = this._getPriceCoeff(key, course.Price);
                         let price_ini = Math.round(course.Price * coeff);
                         let pelem = getPrice(price_ini);
                         if (pelem) {
                             currPrices.Price = pelem;
                             currPrices.Price.PriceIni = price_ini;
                         }
-                    }
-                    if (course.DPrice) {
-                        let price_ini = Math.round(course.DPrice * coeff);
-                        let pelem = getPrice(price_ini);
-                        if (pelem) {
-                            currPrices.DPrice = pelem;
-                            currPrices.DPrice.PriceIni = price_ini;
+                        if (course.DPrice) {
+                            let price_ini = Math.round(course.DPrice * coeff);
+                            let pelem = getPrice(price_ini);
+                            if (pelem) {
+                                currPrices.DPrice = pelem;
+                                currPrices.DPrice.PriceIni = price_ini;
+                            }
                         }
                     }
                 }
