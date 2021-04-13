@@ -58,10 +58,10 @@ function ModalDialog(props) {
                     <div className="modal-dialog__actions">
                         {message.type === MESSAGE_CONFIRMATION_TYPE &&
                         <button className="cancel" onClick={declineAction}>
-                            No, thanks!
+                            {message.declineButtonText}
                         </button>}
                         <button className="confirm" onClick={confirmAction}>
-                            I agree with it!
+                            {message.confirmButtonText}
                         </button>
                     </div>
                 </div>

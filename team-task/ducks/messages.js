@@ -21,13 +21,18 @@ export const INFO = 'info',
     WARNING = 'warning',
     CONFIRMATION = 'confirmation';
 
-
+const initialButtonsText = {
+    confirmButtonText: 'I agree with it!',
+    declineButtonText: 'No, thanks!'
+};
 
 export const ReducerRecord = Record({
     visible: false,
     type: INFO,
     content: 'Вы увидели это сообщение, потому что что-то произошло',
-    title: 'Упс! похоже что-то случилось'
+    title: 'Упс! похоже что-то случилось',
+    confirmButtonText: initialButtonsText.confirmButtonText,
+    declineButtonText: initialButtonsText.declineButtonText
 });
 
 // reducer
@@ -39,11 +44,12 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SHOW_ERROR:
         case SHOW_WARNING:
         case SHOW_USER_CONFIRMATION:
-            return state
-                .set('visible', true)
-                .set('type', payload.type)
-                .set('content', payload.content)
-                .set('title', payload.title);
+            return state.merge( {
+                visible: true,
+                confirmButtonText: payload.confirmButtonText ? payload.confirmButtonText : initialButtonsText.confirmButtonText,
+                declineButtonText: payload.declineButtonText ? payload.declineButtonText : initialButtonsText.declineButtonText,
+                ...payload
+            });
         case TOGGLE_MESSAGE_VISIBILITY:
             return state.set('visible', payload);
         default:
@@ -54,6 +60,11 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Action Creators
  * */
+
+export const showErrorMessage = (message) => {
+    alert(message)
+    return {type: SHOW_ERROR, payload: {content: message}}
+};
 
 export const showInfo = (message) => {
     return {type: SHOW_INFO, payload: message}
