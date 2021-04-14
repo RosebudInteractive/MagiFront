@@ -17,7 +17,7 @@ const prefix = `${appName}/${moduleName}`;
 
 //action types
 
-const LOAD_ALL = `${prefix}/LOAD_ALL`;
+export const LOAD_ALL = `${prefix}/LOAD_ALL`;
 const LOAD_LESSONS = `${prefix}/LOAD_LESSONS`;
 const LOAD_USERS = `${prefix}/LOAD_USERS`;
 
@@ -118,7 +118,6 @@ export const saga = function* () {
 function* getDictionaryDataSaga(data) {
     const _hasSupervisorRights = yield select(hasSupervisorRights); //todo return this after it loaded before
     const _nextTimeToLoad = yield select(nextTimeSelector);
-
     if (!_hasSupervisorRights) return;
 
     if ((_nextTimeToLoad === 0 || (_nextTimeToLoad <= Date.now())) || data.payload.forceLoad) {

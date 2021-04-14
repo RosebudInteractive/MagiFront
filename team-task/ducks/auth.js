@@ -6,6 +6,8 @@ import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
 import {reset} from "redux-form";
 import {all, takeEvery, put, call} from "@redux-saga/core/effects";
 
+import {LOAD_ALL} from 'tt-ducks/dictionary'
+
 /**
  * Constants
  * */
@@ -131,6 +133,7 @@ function* whoAmISaga() {
 
         if (_isPmUser(_authData)) {
             yield put({ type: WHO_AM_I_SUCCESS, payload: _authData })
+            yield put({type: LOAD_ALL})
         } else {
             // throw new Error('Not enough rights')
             yield put({ type: WHO_AM_I_FAIL })

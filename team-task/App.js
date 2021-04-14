@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
@@ -7,7 +7,7 @@ import ModalDialog from "./components/messages/modal-dialog/modal-dialog";
 
 // import SignInForm from './sign-in-form';
 
-import {hasSupervisorRights, userAuthSelector, whoAmI} from "tt-ducks/auth";
+import {hasSupervisorRights, userAuthSelector, userSelector, whoAmI} from "tt-ducks/auth";
 // import {getAppOptions,} from "../ducks/app";
 
 // import Toolbar from "../components/app/toolbar";
@@ -30,17 +30,19 @@ import {getAllDictionaryData} from "tt-ducks/dictionary";
 
 window.webix = webix
 
+/**
+ * @return {null}
+ */
 function App(props) {
-    const {fetching, actions, isUserAuthorized, hasSupervisorRights} = props
+    const {fetching, actions, isUserAuthorized, hasSupervisorRights} = props;
 
     let location = useLocation();
 
     useEffect(() => {
         actions.whoAmI();
-        actions.getAllDictionaryData();
-    },[location, hasSupervisorRights]);
+    }, [location]);
 
-    return isUserAuthorized ?
+    return (isUserAuthorized ?
         <React.Fragment>
             <div className="team-task tt-main-area">
                 { fetching && <LoadingPage/> }
@@ -53,7 +55,7 @@ function App(props) {
 
             <ModalDialog/>
         </React.Fragment> :
-        null;
+        null)
 }
 
 function mapStateToProps(state,) {
