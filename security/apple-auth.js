@@ -53,7 +53,7 @@ class AuthApple {
 
         function getApplePublicKey(header, callback) {
             client.getSigningKey(header.kid, function (err, key) {
-                var signingKey = key.publicKey || key.rsaPublicKey;
+                var signingKey = key ? (key.publicKey || key.rsaPublicKey) : undefined;
                 callback(err ? err : null, signingKey);
             });
         }

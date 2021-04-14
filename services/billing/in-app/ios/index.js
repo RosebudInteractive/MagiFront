@@ -143,10 +143,19 @@ class IosInApp extends Payment {
 
                     let product = null;
                     try {
-                        let products = await appleReceiptVerify.validate({
-                            // excludeOldTransactions: true,
-                            receipt: data.transactionReceipt
-                        });
+                        let products;
+                        try {
+                            products = await appleReceiptVerify.validate({
+                                // excludeOldTransactions: true,
+                                receipt: data.transactionReceipt
+                            });
+                        }
+                        catch (error) {
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                                error: "invalidReceipt",
+                                message: error ? error.message :"Confirm: Invalid Receipt."
+                            });
+                        }
                         if (Array.isArray(products) && (products.length > 0)) {
                             for (let i = 0; i < products.length; i++){
                                 if (products[i].transactionId === data.transactionOrderId) {
