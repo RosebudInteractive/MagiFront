@@ -74,7 +74,7 @@ export const showError = (message) => {
 };
 
 export const showWarning = (message) => {
-    return {type: SHOW_WARNING, payload: {type: MESSAGE_TYPE.CONFIRMATION, ...message}}
+    return {type: SHOW_WARNING, payload: {type: MESSAGE_TYPE.WARNING, ...message}}
 };
 
 export const showUserConfirmation = (message: Message) => {
