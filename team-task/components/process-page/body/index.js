@@ -48,8 +48,8 @@ export default function ProcessBody(props: ProcessBodyProps) {
 
     return <div className="process-page__body">
         <HeaderRow users={supervisors} lessons={lessons}/>
-        {/*<div className="work-area__left-screen"/>*/}
-        {/*<div className="work-area__right-screen"/>*/}
+        <div className="work-area__left-screen"/>
+        <div className="work-area__right-screen"/>
         <div className="process-page__work-area">
             <ProcessElements values={process.Elements}
                              activeElementId={activeElementId}

@@ -20,6 +20,7 @@ import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import "./task-page.sass"
 import {COMMENT_ACTION} from "../../constants/common";
 import moment from "moment";
+import {Prompt} from "react-router-dom";
 
 const EDITOR_NAME = "TASK_EDITOR"
 
@@ -133,16 +134,21 @@ function TaskEditor(props: EditorProps) {
 
 
     return !fetching && task &&
-        <form className="task-editor-page form form-with-header__main-block" onSubmit={e => e.preventDefault()}>
-            <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name} onSave={_save}/>
-            <TaskBody task={task}
-                      isSupervisor={isSupervisor}
-                      elements={props.elements}
-                      currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
-                      users={props.users}
-                      currentElement={currentElement}
-                      onChangeElement={_onChangeElement}/>
-        </form>
+        <React.Fragment>
+            <Prompt when={hasChanges}
+                    message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+
+            <form className="task-editor-page form form-with-header__main-block" onSubmit={e => e.preventDefault()}>
+                <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name} onSave={_save}/>
+                <TaskBody task={task}
+                          isSupervisor={isSupervisor}
+                          elements={props.elements}
+                          currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
+                          users={props.users}
+                          currentElement={currentElement}
+                          onChangeElement={_onChangeElement}/>
+            </form>
+        </React.Fragment>
 }
 
 const validate = (values) => {

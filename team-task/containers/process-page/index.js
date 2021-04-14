@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useMemo, useState} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {useLocation, useParams} from "react-router-dom"
+import {Prompt, useLocation, useParams} from "react-router-dom"
 import {
     getProcess,
     saveProcess,
@@ -46,6 +46,7 @@ function ProcessEditor(props) {
     useEffect(() => {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
+        $("body").addClass("_no-horizontal-scroll")
 
         $(window).bind('resize scroll toggle-elements-visible', _scrollHandler)
 
@@ -54,6 +55,7 @@ function ProcessEditor(props) {
             actions.showSideBarMenu()
 
             $(window).unbind('resize scroll toggle-elements-visible', _scrollHandler)
+            $("body").removeClass("_no-horizontal-scroll")
         }
     }, [])
 
@@ -132,30 +134,33 @@ function ProcessEditor(props) {
     }
 
     return !fetching && process &&
-        <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
-            <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
-            <ProcessBody process={process}
-                         horizontalProcess={props.horizontalProcess}
-                         tree={tree.current}
-                         supervisors={props.supervisors}
-                         editors={props.editors}
-                         elements={props.elements}
-                         lessons={props.lessons}
-                         hasChanges={hasChanges}
-                         activeTaskId={props.activeTaskId}
-                         onSetActiveTaskId={onSetActiveTask}
-                         onAddElement={actions.addElement}
-                         onUpdateElement={actions.updateElement}
-                         onDeleteElement={actions.deleteElement}
-                         onAddTask={onAddTask}
-                         onAddTaskWithLink={onAddTaskWithLink}
-                         onEditTaskLinks={onEditTaskLinks}
-                         onEditTask={onEditTask}
-                         onDeleteTask={onDeleteTask}
-                         onChangeRotation={actions.changeProcessRotation}/>
-            <ModalTaskEditor/>
-            <TaskLinksEditor/>
-        </form>
+        <React.Fragment>
+            <Prompt when={hasChanges} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+            <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
+                <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
+                <ProcessBody process={process}
+                             horizontalProcess={props.horizontalProcess}
+                             tree={tree.current}
+                             supervisors={props.supervisors}
+                             editors={props.editors}
+                             elements={props.elements}
+                             lessons={props.lessons}
+                             hasChanges={hasChanges}
+                             activeTaskId={props.activeTaskId}
+                             onSetActiveTaskId={onSetActiveTask}
+                             onAddElement={actions.addElement}
+                             onUpdateElement={actions.updateElement}
+                             onDeleteElement={actions.deleteElement}
+                             onAddTask={onAddTask}
+                             onAddTaskWithLink={onAddTaskWithLink}
+                             onEditTaskLinks={onEditTaskLinks}
+                             onEditTask={onEditTask}
+                             onDeleteTask={onDeleteTask}
+                             onChangeRotation={actions.changeProcessRotation}/>
+                <ModalTaskEditor/>
+                <TaskLinksEditor/>
+            </form>
+        </React.Fragment>
 }
 
 const validate = (values) => {

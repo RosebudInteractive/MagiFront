@@ -122,7 +122,7 @@ export default function Schema(props: SchemaProps) {
                 const type = (item.from === active) ? ARROW_TYPE.OUT :
                     (item.to === active) ? ARROW_TYPE.IN : ARROW_TYPE.DEFAULT
 
-                return <LineArrow horizontalProcess={props.horizontalProcess} source={"js-task_" + item.from} dest={"js-task_" + item.to} type={type} scrollPosition={myRender} key={index}/>
+                return <LineArrow horizontalProcess={props.horizontalProcess} source={"js-task_" + item.from} dest={"js-task_" + item.to} type={type} scrollPosition={scrollPosition} key={index}/>
             })
         } else {
             return null
@@ -164,8 +164,8 @@ export default function Schema(props: SchemaProps) {
             </button>
         </h6>
 
-            <div className="process-schema__canvas-background">
-                <div className="process-schema__canvas" style={style} ref={canvas}>
+            <div className="process-schema__canvas-background" ref={canvas}>
+                <div className="process-schema__canvas" style={style}>
                     {getCells()}
                     {mounted && getLines()}
                 </div>

@@ -3,8 +3,14 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {all, takeEvery, put, call, select, take} from "@redux-saga/core/effects";
+import {
+    MODAL_MESSAGE_ACCEPT,
+    MODAL_MESSAGE_DECLINE,
+    showErrorMessage,
+    showUserConfirmation,
+    toggleMessage
+} from "tt-ducks/messages";
 
 import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
@@ -13,6 +19,8 @@ import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import type {ProcessTask, UpdatingCommentData, UpdatingTask, UpdatingTaskData} from "../types/task";
 import {COMMENT_ACTION} from "../constants/common";
 import {getProcess} from "tt-ducks/process";
+import {race} from "redux-saga/effects";
+import type {Message} from "../types/messages";
 
 /**
  * Constants
@@ -250,8 +258,6 @@ function* saveTaskSaga({payload}) {
             id = data.task.Id,
             elementId = data.task.ElementId
 
-        console.log(result)
-
         yield put({type: SAVE_TASK_SUCCESS, payload: result})
 
         if (data.comment) {
@@ -398,6 +404,22 @@ function* getDictionaryData(task) {
 
 
 function* deleteTaskSaga({payload}) {
+    const message: Message = {
+        content: `Удалить задачу #${payload.taskId}?`,
+        title: "Подтверждение удаления"
+    }
+
+    yield put(showUserConfirmation(message))
+
+    const {accept} = yield race({
+        accept: take(MODAL_MESSAGE_ACCEPT),
+        decline: take(MODAL_MESSAGE_DECLINE)
+    })
+
+    console.log(accept)
+
+    if (!accept) return
+
     yield put({type: DELETE_TASK_START})
     try {
         yield call(_deleteTask, payload.taskId)

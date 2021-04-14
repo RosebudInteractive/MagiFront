@@ -1,55 +1,53 @@
-import React from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {render} from "react-dom";
-import './dialog.sass'
+import {MESSAGE_TYPE} from "../../constants/messages";
+import {PureModalDialog} from "./modal-dialog/index"
+import type {Message, ModalDialogActions} from "../../types/messages";
+
+const DEFAULT_MESSAGE = 'Есть несохраненные данные.\n Перейти без сохранения?'
 
 export const getConfirmation = (message, callback) => {
-    render((
-        <UserConfirmation message={message} callback={callback}/>
-    ), document.getElementById('confirm'));
+    const _message = message ? message: DEFAULT_MESSAGE
+
+    render(
+        <UserConfirmation message={_message} callback={callback}/>,
+        document.getElementById('team-task__prompt-user-confirmation')
+    );
 };
 
-class UserConfirmation extends React.Component {
+const UserConfirmation = (props) => {
+    const {message, callback} = props
 
-    constructor(props) {
-        super(props)
-        this.yes = this.yes.bind(this)
-        this.no = this.no.bind(this)
+    const [visible, setVisible] = useState(false)
 
-        this.state = {
-            hidden: false
+    useEffect(() => { setVisible(true) }, [props])
+
+    const _message: Message = useMemo(() => {
+        const _result: Message = {
+            visible: visible,
+            content: message,
+            type: MESSAGE_TYPE.CONFIRMATION,
+            title: "Подверждение перехода",
+            confirmButtonText: "Да, хочу!",
+            declineButtonText: "Нет, остаться"
+        }
+        return _result
+    }, [visible])
+
+    const _actions: ModalDialogActions = {
+        confirmAction: () => {
+            callback(true)
+            setVisible(false)
+        },
+        declineAction: () => {
+            callback(false);
+            setVisible(false)
+        },
+        toggleMessage: () => {
+            callback(false);
+            setVisible(false)
         }
     }
 
-    yes() {
-        this.props.callback(true);
-        this.setState({hidden: true});
-    }
-
-    no(e) {
-        this.props.callback(false);
-        this.setState({hidden: true});
-        e.preventDefault();
-    }
-
-    UNSAFE_componentWillReceiveProps() {
-        this.setState({hidden: false})
-    }
-
-    render() {
-        return this.state.hidden ?
-            null
-            :
-            <div className='holder'>
-                <div className='dialog'>
-                    <div className="dialog-bg"/>
-                    <div className="dialog-window">
-                        <div className="dialog-message">{this.props.message}</div>
-                        <div className="dialog-btn-bar">
-                            <button className="btn" onClick={::this.yes}>Да</button>
-                            <button className="btn no" onClick={::this.no} autoFocus={true}>Нет</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    }
-}
+    return <PureModalDialog message={_message} actions={_actions}/>
+};

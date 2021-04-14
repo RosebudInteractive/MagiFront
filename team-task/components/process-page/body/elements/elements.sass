@@ -1,6 +1,8 @@
 @import "~tt-assets/styles/colors"
 
 .process-body__elements
+  z-index: 3
+  background-color: $color-main-light
   position: relative
   flex: 0 1 33.33%
   max-width: 1000px
@@ -32,6 +34,11 @@
   .process-elements-grid
     flex-grow: 1
 
+  .process-page__save-button
+    position: absolute
+    top: 0
+    right: 17px
+
   .elements__hide-button
     margin: auto 8.5px
     cursor: pointer
@@ -46,7 +53,7 @@
   margin-top: 0
   &._fixed
     position: fixed
-    top: 0
+    top: 16px
   &._bottom
     position: absolute
     bottom: 0
