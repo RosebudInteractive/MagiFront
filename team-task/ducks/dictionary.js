@@ -5,6 +5,9 @@ import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {hasSupervisorRights} from "tt-ducks/auth";
 import {SHOW_ERROR} from "tt-ducks/messages";
 import {commonGetQuery} from "common-tools/fetch-tools";
+import {showError} from "tt-ducks/messages";
+import moment from 'moment';
+
 
 
 
@@ -26,6 +29,7 @@ export const REQUEST_START = `${prefix}/REQUEST_START`;
 export const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
 export const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
 export const REQUEST_FAIL_WITH_ERROR = `${prefix}/REQUEST_FAIL_WITH_ERROR`;
+export const TOGGLE_FETCHING = `${prefix}/TOGGLE_FETCHING`;
 
 
 
@@ -34,7 +38,7 @@ const SET_ALL_DATA = `${prefix}/SET_ALL_DATA`;
 const SET_USERS = `${prefix}/SET_USERS`;
 const SET_LESSONS = `${prefix}/SET_LESSONS`;
 
-const DATA_LIFETIME = 1000 * (60 * 1); // 1000ms with minutes multiplier, 1 minute
+const DATA_LIFETIME = (60 * 1); //  1 minute
 
 
 //store
@@ -51,8 +55,10 @@ export const ReducerRecord = Record({
     lessons: [],
     users: new UsersRecord(),
     processStructures: [],
-    nextTimeToLoadData: 0
+    nextTimeToLoadData: 0,
+    fetching: false
 });
+
 
 
 //reducer
@@ -80,6 +86,9 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pms'], payload.pms)
                 .setIn(['users', 'pme'], payload.pme)
                 .setIn(['users', 'pmu'], payload.pmu);
+        case TOGGLE_FETCHING:
+            return state.set('fetching', payload);
+
         default:
             return state;
     }
@@ -90,6 +99,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
+export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 
 // actions
 //forceLoad: boolean
@@ -109,6 +119,10 @@ const setAllData = (data) => {
     return {type: SET_ALL_DATA, payload: data}
 };
 
+export const toggleFetching = (isOn) => {
+    return {type: TOGGLE_FETCHING, payload: isOn}
+};
+
 
 //sagas:
 
@@ -118,8 +132,19 @@ export const saga = function* () {
         takeEvery(LOAD_LESSONS, getLessonsDataSaga),
         // takeEvery(LOAD_PROCESS_STRUCTURES, deleteElementSaga),
         takeEvery(LOAD_USERS, getUsersDataSaga),
-        takeEvery(REQUEST_FAIL_WITH_ERROR, showErrorMessage)
+        takeEvery(REQUEST_FAIL_WITH_ERROR, showErrorMessage),
+        takeEvery(REQUEST_START, fetchingToggle),
+        takeEvery(REQUEST_SUCCESS, fetchingToggle),
+        takeEvery(REQUEST_FAIL, fetchingToggle),
     ])
+}
+
+function* fetchingToggle(isOn){
+    try {
+        yield put(toggleFetching(isOn.payload))
+    } catch (e) {
+        yield put(showError({content: 'toggle fetching error'}))
+    }
 }
 
 function* getDictionaryDataSaga(data) {
@@ -127,9 +152,9 @@ function* getDictionaryDataSaga(data) {
     const _nextTimeToLoad = yield select(nextTimeSelector);
     if (!_hasSupervisorRights) return;
 
-    if ((_nextTimeToLoad === 0 || (_nextTimeToLoad <= Date.now())) || data.payload.forceLoad) {
+    if ((_nextTimeToLoad === 0 || (_nextTimeToLoad <= moment(Date.now()))) || data.payload.forceLoad) {
         try {
-            yield put({type: REQUEST_START});
+            yield put({type: REQUEST_START, payload: true});
             const [
                 _a,
                 _pma,
@@ -147,7 +172,7 @@ function* getDictionaryDataSaga(data) {
             ]);
 
             if(_a && _pma && _pms && _pme && _pmu && _lessons){
-                yield put({type: REQUEST_SUCCESS});
+                yield put({type: REQUEST_SUCCESS, payload: false});
                 yield put({
                     type: SET_ALL_DATA,
                     payload: {
@@ -159,13 +184,15 @@ function* getDictionaryDataSaga(data) {
                         lessons: _lessons
                     }
                 });
-                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+
+                const nowTime = moment(Date.now());
+                const nextTime = nowTime.add(DATA_LIFETIME, 'seconds');
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: nextTime});
             } else {
-                yield put({type: REQUEST_FAIL})
+                yield put({type: REQUEST_FAIL, payload: false})
             }
         } catch (e) {
-            yield put({type: REQUEST_FAIL_WITH_ERROR});
-            yield put(showErrorMessage(e.message));
+            yield put({type: REQUEST_FAIL_WITH_ERROR, payload: {content: e. message}});
         }
 
     } else {
@@ -175,7 +202,8 @@ function* getDictionaryDataSaga(data) {
 
 
 function* showErrorMessage(data) {
-    yield put({type: SHOW_ERROR, payload: {content: data.payload.content, title: 'Error'}});
+    yield put(showError({content: data.payload.content, title: 'Error'}));
+    yield put(fetchingToggle(false));
 }
 
 function* getUsersDataSaga(data) {
@@ -183,8 +211,9 @@ function* getUsersDataSaga(data) {
     const _nextDataToLoad = yield select(nextTimeSelector);
 
     if (!_hasSupervisorRights) return;
-    if ((_nextDataToLoad === 0 || (_nextDataToLoad <= Date.now())) || data.payload.forceLoad) {
+    if ((_nextDataToLoad === 0 || (_nextDataToLoad <= moment(Date.now()))) || data.payload.forceLoad) {
         try {
+            yield put({type: REQUEST_START, payload: true});
             const [
                 _a,
                 _pma,
@@ -200,7 +229,7 @@ function* getUsersDataSaga(data) {
             ]);
 
             if(_a && _pma && _pms && _pme && _pmu){
-                yield put({action: REQUEST_SUCCESS});
+                yield put({action: REQUEST_SUCCESS, payload: false});
 
                 yield put({
                     type: SET_USERS,
@@ -213,15 +242,16 @@ function* getUsersDataSaga(data) {
                     }
                 });
 
-                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+                const nowTime = moment(Date.now());
+                const nextTime = nowTime.add(DATA_LIFETIME, 'seconds');
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: nextTime});
             } else {
-                yield put({type: REQUEST_FAIL})
+                yield put({type: REQUEST_FAIL, payload: false})
             }
 
 
         } catch (e) {
-            yield put({type: REQUEST_FAIL_WITH_ERROR});
-            yield put(showErrorMessage(e.message))
+            yield put({type: REQUEST_FAIL_WITH_ERROR, payload: {content: e. message}});
         }
 
     } else {
@@ -234,23 +264,25 @@ function* getLessonsDataSaga(data) {
     const _nextDataToLoad = yield select(nextTimeSelector);
 
     if (!_hasSupervisorRights) return;
-    if ((_nextDataToLoad === 0 || (_nextDataToLoad <= Date.now())) || data.payload.forceLoad) {
+    if ((_nextDataToLoad === 0 || (_nextDataToLoad <= moment(Date.now()))) || data.payload.forceLoad) {
         try {
-            yield put({type: REQUEST_START});
+            yield put({type: REQUEST_START, payload: true});
             const _lessons = yield call(_getLessons);
 
             if(_lessons){
-                yield put({type: REQUEST_SUCCESS});
+                yield put({type: REQUEST_SUCCESS, payload: false});
                 yield put({type: SET_LESSONS, payload: _lessons});
-                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+
+                const nowTime = moment(Date.now());
+                const nextTime = nowTime.add(DATA_LIFETIME, 'seconds');
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: nextTime});
             } else {
-                yield put({type: REQUEST_FAIL})
+                yield put({type: REQUEST_FAIL, payload: false})
             }
 
 
         } catch (e) {
-            yield put({type: REQUEST_FAIL_WITH_ERROR});
-            yield put(showErrorMessage(e.message))
+            yield put({type: REQUEST_FAIL_WITH_ERROR, payload: {content: e. message}});
         }
 
     } else {

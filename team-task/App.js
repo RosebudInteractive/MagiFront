@@ -26,7 +26,7 @@ import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import LoadingPage from "./components/loading-page";
-import {getAllDictionaryData} from "tt-ducks/dictionary";
+import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
 
 window.webix = webix
 
@@ -41,6 +41,11 @@ function App(props) {
     useEffect(() => {
         actions.whoAmI();
     }, [location]);
+
+    useEffect(() => {
+        isUserAuthorized && actions.getAllDictionaryData();
+
+    }, [isUserAuthorized]);
 
     return (isUserAuthorized ?
         <React.Fragment>
@@ -62,7 +67,7 @@ function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state)
+        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state) || dictionaryFetching(state)
     }
 }
 

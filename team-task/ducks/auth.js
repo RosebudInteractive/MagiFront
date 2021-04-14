@@ -133,7 +133,6 @@ function* whoAmISaga() {
 
         if (_isPmUser(_authData)) {
             yield put({ type: WHO_AM_I_SUCCESS, payload: _authData })
-            yield put({type: LOAD_ALL})
         } else {
             // throw new Error('Not enough rights')
             yield put({ type: WHO_AM_I_FAIL })
