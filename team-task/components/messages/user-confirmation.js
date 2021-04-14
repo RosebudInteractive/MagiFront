@@ -1,108 +1,48 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {render} from "react-dom";
-import './dialog.sass'
-import {bindActionCreators} from "redux";
-import {CONFIRMATION, showUserConfirmation, toggleMessage} from "tt-ducks/messages";
-import {connect} from "react-redux";
+import {MESSAGE_TYPE} from "../../constants/messages";
+import {PureModalDialog} from "./modal-dialog/index"
+import type {Message, ModalDialogActions} from "../../types/messages";
 
 export const getConfirmation = (message, callback) => {
     render((
         <UserConfirmation message={message} callback={callback}/>
-    ), document.getElementById('confirm'));
+    ), document.getElementById('team-task__prompt-user-confirmation'));
 };
 
 const UserConfirmation = (props) => {
-    const [hidden, setHidden] = useState(false);
+    const {message, callback} = props
 
-    const yes = () => {
-        props.callback(true)
-    };
+    const [visible, setVisible] = useState(false)
 
-    const no = (e) => {
-        props.callback(false);
-        setHidden(true);
-        e.preventDefault();
-    };
+    useEffect(() => { setVisible(true) }, [props])
 
-    useEffect(() => {
-        setHidden(true);
-        props.actions.showUserConfirmation({type: CONFIRMATION, content: props.message})
-    }, [props]);
+    const _message: Message = useMemo(() => {
+        const _result: Message = {
+            visible: visible,
+            content: message,
+            type: MESSAGE_TYPE.CONFIRMATION,
+            title: "Подверждение перехода",
+            confirmButtonText: "Да, хочу!",
+            declineButtonText: "Нет, остаться"
+        }
+        return _result
+    }, [visible])
 
-    return (
-        hidden ?
-            null
-            :
-            <div className='holder'>
-                <div className='dialog'>
-                    <div className="dialog-bg"/>
-                    <div className="dialog-window">
-                        <div className="dialog-message">{props.message}</div>
-                        <div className="dialog-btn-bar">
-                            <button className="btn" onClick={yes}>Да</button>
-                            <button className="btn no" onClick={no} autoFocus={true}>Нет</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    )
-};
-
-const mapDispatch2Props = (dispatch) => {
-    return {
-        actions: bindActionCreators({
-            showUserConfirmation,
-            toggleMessage
-        }, dispatch)
+    const _actions: ModalDialogActions = {
+        confirmAction: () => {
+            callback(true)
+            setVisible(false)
+        },
+        declineAction: () => {
+            callback(false);
+            setVisible(false)
+        },
+        toggleMessage: () => {
+            callback(false);
+            setVisible(false)
+        }
     }
+
+    return <PureModalDialog message={_message} actions={_actions}/>
 };
-
-export default connect(mapDispatch2Props)(UserConfirmation)
-
-
-//CLASS EQUIVALENT
-// class UserConfirmation extends React.Component {
-//
-//     constructor(props) {
-//         super(props)
-//         this.yes = this.yes.bind(this)
-//         this.no = this.no.bind(this)
-//
-//         this.state = {
-//             hidden: false
-//         }
-//     }
-//
-//     yes() {
-//         this.props.callback(true);
-//         this.setState({hidden: true});
-//     }
-//
-//     no(e) {
-//         this.props.callback(false);
-//         this.setState({hidden: true});
-//         e.preventDefault();
-//     }
-//
-//     UNSAFE_componentWillReceiveProps() {
-//         this.setState({hidden: false})
-//     }
-//
-//     render() {
-//         return this.state.hidden ?
-//             null
-//             :
-//             <div className='holder'>
-//                 <div className='dialog'>
-//                     <div className="dialog-bg"/>
-//                     <div className="dialog-window">
-//                         <div className="dialog-message">{this.props.message}</div>
-//                         <div className="dialog-btn-bar">
-//                             <button className="btn" onClick={::this.yes}>Да</button>
-//                             <button className="btn no" onClick={::this.no} autoFocus={true}>Нет</button>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//     }
-// }

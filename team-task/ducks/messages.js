@@ -1,6 +1,7 @@
 import {appName} from "../config";
 import {Record} from "immutable";
 import {createSelector} from 'reselect'
+import {MESSAGE_TYPE} from "../constants/messages"
 
 /**
  * Constants
@@ -15,12 +16,6 @@ const SHOW_WARNING = `${prefix}/SHOW_WARNING`;
 const SHOW_USER_CONFIRMATION = `${prefix}/SHOW_USER_CONFIRMATION`;
 const TOGGLE_MESSAGE_VISIBILITY = `${prefix}/TOGGLE_MESSAGE_VISIBILITY`;
 
-//Message types:
-export const INFO = 'info',
-    ERROR = 'error',
-    WARNING = 'warning',
-    CONFIRMATION = 'confirmation';
-
 const initialButtonsText = {
     confirmButtonText: 'I agree with it!',
     declineButtonText: 'No, thanks!'
@@ -28,7 +23,7 @@ const initialButtonsText = {
 
 export const ReducerRecord = Record({
     visible: false,
-    type: INFO,
+    type: MESSAGE_TYPE.INFO,
     content: 'Вы увидели это сообщение, потому что что-то произошло',
     title: 'Упс! похоже что-то случилось',
     confirmButtonText: initialButtonsText.confirmButtonText,
@@ -86,6 +81,8 @@ export const showUserConfirmation = (message) => {
 export const toggleMessage = (visible) => {
     return {type: TOGGLE_MESSAGE_VISIBILITY, payload: visible}
 };
+
+
 
 
 /**
