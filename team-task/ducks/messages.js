@@ -9,7 +9,7 @@ export const moduleName = 'messages';
 const prefix = `${appName}/${moduleName}`;
 
 //action types
-const SHOW_ERROR = `${prefix}/SHOW_ERROR`;
+export const SHOW_ERROR = `${prefix}/SHOW_ERROR`;
 const SHOW_INFO = `${prefix}/SHOW_INFO`;
 const SHOW_WARNING = `${prefix}/SHOW_WARNING`;
 const SHOW_USER_CONFIRMATION = `${prefix}/SHOW_USER_CONFIRMATION`;
@@ -60,11 +60,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Action Creators
  * */
-
-export const showErrorMessage = (message) => {
-    alert(message)
-    return {type: SHOW_ERROR, payload: {content: message}}
-};
 
 export const showInfo = (message) => {
     return {type: SHOW_INFO, payload: message}

@@ -4,7 +4,7 @@ import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {showError} from "tt-ducks/messages";
 
 import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
@@ -220,8 +220,8 @@ function* getTaskSaga(data) {
 
         yield put({type: GET_TASK_SUCCESS, payload: _task})
     } catch (e) {
-        yield put({type: GET_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put({type: GET_TASK_FAIL});
+        yield put(showError({content: e.message}));
     }
 }
 
@@ -272,7 +272,7 @@ function* saveTaskSaga({payload}) {
         }
     } catch (e) {
         yield put({type: SAVE_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}));
     }
 }
 
@@ -338,7 +338,7 @@ function* getProcessElementSaga(data) {
             yield put({type: GET_PROCESS_ELEMENT_SUCCESS, payload: element})
         } catch (e) {
             yield put({type: GET_PROCESS_ELEMENT_FAIL})
-            yield put(showErrorMessage(e.message))
+            yield put(showError({content: e.message}))
         }
     }
 }
@@ -371,7 +371,7 @@ function* createTaskSaga({payload}) {
         yield put({type: CREATE_TASK_SUCCESS, payload: _newTask})
     } catch (e) {
         yield put({type: CREATE_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 
@@ -406,7 +406,7 @@ function* deleteTaskSaga({payload}) {
         yield put({type: DELETE_TASK_SUCCESS,})
     } catch (e) {
         yield put({type: DELETE_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 
@@ -444,7 +444,7 @@ function* saveDependenciesSaga({payload}) {
         yield put({type: SAVE_TASK_LINKS_SUCCESS})
     } catch (e) {
         yield put({type: SAVE_TASK_LINKS_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 

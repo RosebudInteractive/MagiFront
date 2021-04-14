@@ -3,8 +3,9 @@ import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {hasSupervisorRights} from "tt-ducks/auth";
-import {showErrorMessage} from "tt-ducks/messages";
+import {SHOW_ERROR} from "tt-ducks/messages";
 import {commonGetQuery} from "common-tools/fetch-tools";
+
 
 
 //todo processStructures after request-query completed
@@ -20,6 +21,12 @@ const prefix = `${appName}/${moduleName}`;
 export const LOAD_ALL = `${prefix}/LOAD_ALL`;
 const LOAD_LESSONS = `${prefix}/LOAD_LESSONS`;
 const LOAD_USERS = `${prefix}/LOAD_USERS`;
+
+export const REQUEST_START = `${prefix}/REQUEST_START`;
+export const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
+export const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
+export const REQUEST_FAIL_WITH_ERROR = `${prefix}/REQUEST_FAIL_WITH_ERROR`;
+
 
 
 const SET_NEXT_TIME_TO_LOAD = `${prefix}/SET_NEXT_TIME_TO_LOAD`;
@@ -61,7 +68,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pms'], payload.pms)
                 .setIn(['users', 'pme'], payload.pme)
                 .setIn(['users', 'pmu'], payload.pmu)
-                // .set('users', payload.users) // simple case
                 .set('lessons', payload.lessons);
         case SET_NEXT_TIME_TO_LOAD:
             return state.set('nextTimeToLoadData', payload);
@@ -112,6 +118,7 @@ export const saga = function* () {
         takeEvery(LOAD_LESSONS, getLessonsDataSaga),
         // takeEvery(LOAD_PROCESS_STRUCTURES, deleteElementSaga),
         takeEvery(LOAD_USERS, getUsersDataSaga),
+        takeEvery(REQUEST_FAIL_WITH_ERROR, showErrorMessage)
     ])
 }
 
@@ -122,6 +129,7 @@ function* getDictionaryDataSaga(data) {
 
     if ((_nextTimeToLoad === 0 || (_nextTimeToLoad <= Date.now())) || data.payload.forceLoad) {
         try {
+            yield put({type: REQUEST_START});
             const [
                 _a,
                 _pma,
@@ -138,38 +146,36 @@ function* getDictionaryDataSaga(data) {
                 call(_getLessons),
             ]);
 
-            yield put({
-                type: SET_ALL_DATA,
-                payload: {
-                    a: _a,
-                    pma: _pma,
-                    pms: _pms,
-                    pme: _pme,
-                    pmu: _pmu,
-                    lessons: _lessons
-                }
-            });
-
-
-            //simple case:
-            // const [_allUsers, _lessons] = yield all([
-            //     call(_getAllUsers),
-            //     call(_getLessons),
-            // ]);
-            //
-            // yield put({
-            //     type: SET_ALL_DATA,
-            //     payload: {
-            //         users: _allUsers,
-            //         lessons: _lessons}});
-            yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+            if(_a && _pma && _pms && _pme && _pmu && _lessons){
+                yield put({type: REQUEST_SUCCESS});
+                yield put({
+                    type: SET_ALL_DATA,
+                    payload: {
+                        a: _a,
+                        pma: _pma,
+                        pms: _pms,
+                        pme: _pme,
+                        pmu: _pmu,
+                        lessons: _lessons
+                    }
+                });
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+            } else {
+                yield put({type: REQUEST_FAIL})
+            }
         } catch (e) {
-            yield put(showErrorMessage(e.message))
+            yield put({type: REQUEST_FAIL_WITH_ERROR});
+            yield put(showErrorMessage(e.message));
         }
 
     } else {
         return;
     }
+}
+
+
+function* showErrorMessage(data) {
+    yield put({type: SHOW_ERROR, payload: {content: data.payload.content, title: 'Error'}});
 }
 
 function* getUsersDataSaga(data) {
@@ -184,35 +190,37 @@ function* getUsersDataSaga(data) {
                 _pma,
                 _pms,
                 _pme,
-                _pmu,
-                _lessons
+                _pmu
             ] = yield all([
                 call(_getAUsers),
                 call(_getPmaUsers),
                 call(_getPmsUsers),
                 call(_getPmeUsers),
                 call(_getPmuUsers),
-                call(_getLessons),
             ]);
 
-            yield put({
-                type: SET_USERS,
-                payload: {
-                    a: _a,
-                    pma: _pma,
-                    pms: _pms,
-                    pme: _pme,
-                    pmu: _pmu,
-                    lessons: _lessons
-                }
-            });
+            if(_a && _pma && _pms && _pme && _pmu){
+                yield put({action: REQUEST_SUCCESS});
 
-            //simple case
-            // const _allUsers = yield call(_getAllUsers);
-            //
-            // yield put({type: SET_USERS, payload: _allUsers});
-            yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+                yield put({
+                    type: SET_USERS,
+                    payload: {
+                        a: _a,
+                        pma: _pma,
+                        pms: _pms,
+                        pme: _pme,
+                        pmu: _pmu,
+                    }
+                });
+
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+            } else {
+                yield put({type: REQUEST_FAIL})
+            }
+
+
         } catch (e) {
+            yield put({type: REQUEST_FAIL_WITH_ERROR});
             yield put(showErrorMessage(e.message))
         }
 
@@ -228,11 +236,20 @@ function* getLessonsDataSaga(data) {
     if (!_hasSupervisorRights) return;
     if ((_nextDataToLoad === 0 || (_nextDataToLoad <= Date.now())) || data.payload.forceLoad) {
         try {
+            yield put({type: REQUEST_START});
             const _lessons = yield call(_getLessons);
 
-            yield put({type: SET_LESSONS, payload: _lessons});
-            yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+            if(_lessons){
+                yield put({type: REQUEST_SUCCESS});
+                yield put({type: SET_LESSONS, payload: _lessons});
+                yield put({type: SET_NEXT_TIME_TO_LOAD, payload: new Date(new Date(Date.now()).getTime() + DATA_LIFETIME)});
+            } else {
+                yield put({type: REQUEST_FAIL})
+            }
+
+
         } catch (e) {
+            yield put({type: REQUEST_FAIL_WITH_ERROR});
             yield put(showErrorMessage(e.message))
         }
 
