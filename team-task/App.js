@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
+import ModalDialog from "./components/messages/modal-dialog/modal-dialog";
 
 // import SignInForm from './sign-in-form';
 
@@ -38,16 +39,19 @@ function App(props) {
     },[location])
 
     return isUserAuthorized ?
-        <div className="team-task tt-main-area">
-            { fetching && <LoadingPage/> }
-            <SideBarMenu/>
-            <div className="tt-main-area__info-panel">
-                <Breadcrumb/>
-                <AppRouter hasSupervisorRights={hasSupervisorRights}/>
+        <React.Fragment>
+            <div className="team-task tt-main-area">
+                { fetching && <LoadingPage/> }
+                <SideBarMenu/>
+                <div className="tt-main-area__info-panel">
+                    <Breadcrumb/>
+                    <AppRouter hasSupervisorRights={hasSupervisorRights}/>
+                </div>
             </div>
-        </div>
-        :
-        null
+
+            <ModalDialog/>
+        </React.Fragment> :
+        null;
 }
 
 function mapStateToProps(state,) {

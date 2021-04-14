@@ -356,7 +356,7 @@ module.exports = {
             inApps: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.inApps ? pk.mobileApp.ios.inApps : undefined,
             template: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.template ? pk.mobileApp.ios.template : undefined,
             sharedSecret: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.sharedSecret ? pk.mobileApp.ios.sharedSecret : undefined,
-            environment: 'sandbox'
+            environment: 'production'
         }
     }
 };
