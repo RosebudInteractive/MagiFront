@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
-import {hasSupervisorRights, userAuthSelector, userSelector, whoAmI} from "tt-ducks/auth";
+import {hasSupervisorRights, userAuthSelector, whoAmI} from "tt-ducks/auth";
 import './assets/styles/app.sass'
 import './assets/styles/grid.sass'
 import * as webix from 'webix/webix.js';
@@ -27,10 +27,6 @@ function App(props) {
         actions.whoAmI()
     },[location])
 
-    useEffect(() => {
-        console.log(isUserAuthorized)
-    }, [user])
-
     return isUserAuthorized ?
         <React.Fragment>
             <div className="team-task tt-main-area">
@@ -50,7 +46,6 @@ function App(props) {
 function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
-        user: userSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
         fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state)
     }

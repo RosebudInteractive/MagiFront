@@ -2,6 +2,7 @@ import {appName} from "../config";
 import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {MESSAGE_TYPE} from "../constants/messages"
+import type {Message} from "../types/messages";
 
 /**
  * Constants
@@ -16,9 +17,12 @@ const SHOW_WARNING = `${prefix}/SHOW_WARNING`;
 const SHOW_USER_CONFIRMATION = `${prefix}/SHOW_USER_CONFIRMATION`;
 const TOGGLE_MESSAGE_VISIBILITY = `${prefix}/TOGGLE_MESSAGE_VISIBILITY`;
 
+export const MODAL_MESSAGE_ACCEPT = `${prefix}/MODAL_MESSAGE_ACCEPT`;
+export const MODAL_MESSAGE_DECLINE = `${prefix}/MODAL_MESSAGE_DECLINE`;
+
 const initialButtonsText = {
-    confirmButtonText: 'I agree with it!',
-    declineButtonText: 'No, thanks!'
+    confirmButtonText: 'Ок',
+    declineButtonText: 'Отмена'
 };
 
 export const ReducerRecord = Record({
@@ -39,7 +43,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SHOW_ERROR:
         case SHOW_WARNING:
         case SHOW_USER_CONFIRMATION:
-            return state.merge( {
+            return state.merge({
                 visible: true,
                 confirmButtonText: payload.confirmButtonText ? payload.confirmButtonText : initialButtonsText.confirmButtonText,
                 declineButtonText: payload.declineButtonText ? payload.declineButtonText : initialButtonsText.declineButtonText,
@@ -73,9 +77,17 @@ export const showWarning = (message) => {
     return {type: SHOW_WARNING, payload: message}
 };
 
-export const showUserConfirmation = (message) => {
-    return {type: SHOW_USER_CONFIRMATION, payload: message}
+export const showUserConfirmation = (message: Message) => {
+    return {type: SHOW_USER_CONFIRMATION, payload: {type: MESSAGE_TYPE.CONFIRMATION, ...message}}
 };
+
+export const acceptAction = () => {
+    return { type: MODAL_MESSAGE_ACCEPT }
+}
+
+export const declineAction = () => {
+    return { type: MODAL_MESSAGE_DECLINE }
+}
 
 //visible: boolean
 export const toggleMessage = (visible) => {

@@ -62,14 +62,15 @@ export const buildTree = (process) => {
 
 const _calcNodesWeight = (nodes, node, level, row) => {
     const _firstVisit = node.rowNumber === undefined
+
     node.weight = ((node.weight === undefined) || (level > node.weight)) ? level : node.weight
     node.rowNumber = (_firstVisit || (row < node.rowNumber)) ? row : node.rowNumber
+
     let _row = row
-    // let _needIncRow = false
+
     node.dependencies.nodes.forEach((nodeId, index, array) => {
         const result = _calcNodesWeight(nodes, nodes[nodeId], level + 1, _row)
         _row = result.row
-        // if (!result.needIncRow && (array.length > 1)) {_row++}
         const _isLastChild = index === (array.length - 1)
         const _needIncRow = result.firstVisit && !_isLastChild
         if (_needIncRow) {
@@ -99,10 +100,7 @@ export const _scrollHandler = () => {
     const _wrapper = $(".process-body__elements-wrapper"),
         _container = $(".process-body__elements")
 
-    const _offset = _wrapper.offset(),
-        _containerBottom = _container.height() + _container.offset().top
-
-    console.log(st, _containerBottom, _containerBottom - _wrapper.height())
+    const _containerBottom = _container.height() + _container.offset().top
 
     if (st  < 242) {
         _wrapper.removeClass('_fixed');
@@ -123,5 +121,4 @@ export const _scrollHandler = () => {
             _wrapper.width(_container.width())
         }
     }
-
 }

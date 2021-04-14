@@ -12,18 +12,28 @@ export default function ModalDialog(props: ModalDialogProps) {
     const declineAction = (e) => {
         //some DECLINE logic here
         if (actions && actions.declineAction) actions.declineAction()
-        closeMessage()
+        hideMessage()
         e.preventDefault()
     };
 
     const confirmAction = (e) => {
         //some CONFIRM logic here
         if (actions && actions.confirmAction) actions.confirmAction()
-        closeMessage()
+        hideMessage()
         e.preventDefault()
     };
 
-    const closeMessage = () => {
+    const onCloseClick = (e) => {
+        if (actions && actions.closeAction) {
+            actions.closeAction()
+            hideMessage()
+            e.preventDefault()
+        } else {
+            declineAction(e)
+        }
+    }
+
+    const hideMessage = () => {
         if (actions && actions.toggleMessage) actions.toggleMessage(false);
     };
 
@@ -31,7 +41,7 @@ export default function ModalDialog(props: ModalDialogProps) {
     return (message && message.visible) &&
         <div className="modal-dialog">
             <div className={`modal-dialog__inner-window message-type_${message.type}`}>
-                <div className="modal-dialog__close-button" onClick={closeMessage}>
+                <div className="modal-dialog__close-button" onClick={onCloseClick}>
                     <CloseIco viewBox="5 5 15 15"/>
                 </div>
                 <div className="modal-dialog__info-icon">

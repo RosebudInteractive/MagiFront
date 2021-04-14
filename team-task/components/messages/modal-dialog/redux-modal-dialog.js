@@ -2,6 +2,8 @@ import React from "react";
 import {connect} from 'react-redux'
 import {bindActionCreators} from "redux";
 import {
+    acceptAction,
+    declineAction,
     toggleMessage,
     messageSelector,
 } from "tt-ducks/messages";
@@ -11,10 +13,8 @@ import type {ModalDialogActions} from "../../../types/messages";
 
 function ReduxModalDialog(props) {
     const _actions: ModalDialogActions = {
-        confirmAction: () => {
-        },
-        declineAction: () => {
-        },
+        confirmAction: props.actions.acceptAction,
+        declineAction: props.actions.declineAction,
         toggleMessage: props.actions.toggleMessage
     }
 
@@ -30,6 +30,8 @@ const mapState2Props = (state) => {
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
+            acceptAction,
+            declineAction,
             toggleMessage
         }, dispatch)
     }

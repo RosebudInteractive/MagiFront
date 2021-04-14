@@ -12,7 +12,8 @@ export type Message = {
 export type ModalDialogActions = {
     declineAction: Function,
     confirmAction: ?Function,
-    toggleMessage: ?Function
+    closeAction: ?Function,
+    toggleMessage: ?Function,
 }
 
 export type ModalDialogProps = {

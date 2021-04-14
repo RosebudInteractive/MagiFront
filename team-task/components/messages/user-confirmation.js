@@ -4,10 +4,15 @@ import {MESSAGE_TYPE} from "../../constants/messages";
 import {PureModalDialog} from "./modal-dialog/index"
 import type {Message, ModalDialogActions} from "../../types/messages";
 
+const DEFAULT_MESSAGE = 'Есть несохраненные данные.\n Перейти без сохранения?'
+
 export const getConfirmation = (message, callback) => {
-    render((
-        <UserConfirmation message={message} callback={callback}/>
-    ), document.getElementById('team-task__prompt-user-confirmation'));
+    const _message = message ? message: DEFAULT_MESSAGE
+
+    render(
+        <UserConfirmation message={_message} callback={callback}/>,
+        document.getElementById('team-task__prompt-user-confirmation')
+    );
 };
 
 const UserConfirmation = (props) => {
