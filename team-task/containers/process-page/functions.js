@@ -104,7 +104,7 @@ export const _scrollHandler = () => {
 
     console.log(st, _containerBottom, _containerBottom - _wrapper.height())
 
-    if (st  < 258) {
+    if (st  < 242) {
         _wrapper.removeClass('_fixed');
         _wrapper.width("auto")
     }
@@ -114,7 +114,7 @@ export const _scrollHandler = () => {
         _wrapper.addClass('_bottom');
     }
 
-    if ((st > 258) && (st < _containerBottom - _wrapper.height())) {
+    if ((st > 242) && (st < _containerBottom - _wrapper.height())) {
         _wrapper.addClass('_fixed');
         _wrapper.removeClass('_bottom');
         if (_container.hasClass("_hidden")) {

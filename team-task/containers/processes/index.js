@@ -1,8 +1,8 @@
-import React, {useMemo, useEffect, useRef, useCallback} from "react"
+import React, {useMemo, useEffect, useRef, useCallback, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
-import {createProcess} from "tt-ducks/process";
+import {createProcess, lessonsSelector, supervisorsSelector} from "tt-ducks/process";
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import "./processes.sass"
 import Webix from "../../components/Webix";
@@ -13,11 +13,14 @@ import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from 
 import {useLocation,} from "react-router-dom"
 import {useWindowSize} from "../../tools/window-resize-hook";
 import PlusIco from "tt-assets/svg/plus.svg"
+import CreateProcessForm from "../../components/create-page-form";
 
 let _rowCount = 0
 
 function Processes(props) {
     const {actions, processes, states, fetching} = props
+
+    const [createFormVisible, setCreateFormVisible] = useState(false)
 
     const location = useLocation()
     const _sortRef = useRef({field: null, direction: null}),
@@ -118,15 +121,24 @@ function Processes(props) {
         resizeHandler(processes.length)
     }, [processes])
 
+    const onAddProcess = () => {
+        setCreateFormVisible(true)
+    }
+
+    const closeProcessForm = () => {
+        setCreateFormVisible(false)
+    }
+
     return <div className="processes-page form">
         <h5 className="form-header _grey70">Процессы</h5>
         <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-        <button className="process-button _add" onClick={actions.createProcess}>
+        <button className="process-button _add" onClick={onAddProcess}>
             <PlusIco/>
         </button>
         <div className="grid-container">
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
+        {createFormVisible && <CreateProcessForm onApply={actions.createProcess} onClose={closeProcessForm} lessons={props.lessons} users={props.supervisors}/>}
     </div>
 }
 
@@ -135,6 +147,8 @@ const mapState2Props = (state) => {
         processes: processesSelector(state),
         states: statesSelector(state),
         fetching: fetchingSelector(state),
+        supervisors: supervisorsSelector(state),
+        lessons: lessonsSelector(state),
     }
 }
 

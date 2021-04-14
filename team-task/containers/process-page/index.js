@@ -46,6 +46,7 @@ function ProcessEditor(props) {
     useEffect(() => {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
+        $("body").addClass("_no-horizontal-scroll")
 
         $(window).bind('resize scroll toggle-elements-visible', _scrollHandler)
 
@@ -54,6 +55,7 @@ function ProcessEditor(props) {
             actions.showSideBarMenu()
 
             $(window).unbind('resize scroll toggle-elements-visible', _scrollHandler)
+            $("body").removeClass("_no-horizontal-scroll")
         }
     }, [])
 
