@@ -23,11 +23,11 @@ function CreateProcessForm(props) {
     return <form className="modal-form" action={"javascript:void(0)"}>
         <div className="element-editor__dialog">
             <h6 className="process-elements-grid__title _grey100">Созднание нового процесса</h6>
-            <Field component={Select} name={"Lesson"} label={"Лекция"} options={_getLessons()}/>
+            <Field component={Select} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
             <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
-            <Field component={Checkbox} name={"UseMusic"} label={"Музыка "}/>
-            <Field component={Select} name={"ExecutorMusic"} label={"Исполнитель - Звук"} options={_getUsers()}/>
-            <Field component={Select} name={"ExecutorMusicControl"} label={"Исполнитель - Звук контроль"} options={_getUsers()}/>
+            <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
+            <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>
+            <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={_getUsers()}/>
