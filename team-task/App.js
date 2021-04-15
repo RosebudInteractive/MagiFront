@@ -15,17 +15,23 @@ import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
+import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
 
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, isUserAuthorized, hasSupervisorRights, user} = props
+    const {fetching, actions, isUserAuthorized, hasSupervisorRights} = props
 
     let location = useLocation();
 
     useEffect(() => {
-        actions.whoAmI()
-    },[location])
+        actions.whoAmI();
+    }, [location]);
+
+    useEffect(() => {
+        isUserAuthorized && actions.getAllDictionaryData();
+
+    }, [isUserAuthorized]);
 
     return isUserAuthorized ?
         <React.Fragment>
@@ -47,13 +53,13 @@ function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state)
+        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state) || dictionaryFetching(state)
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI,}, dispatch),
+        actions: bindActionCreators({whoAmI, getAllDictionaryData}, dispatch),
     }
 }
 

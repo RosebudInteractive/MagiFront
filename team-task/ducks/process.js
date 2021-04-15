@@ -4,7 +4,7 @@ import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {showError} from "tt-ducks/messages";
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
@@ -197,7 +197,7 @@ function* createProcessSaga() {
         yield put({type: CREATE_PROCESS_SUCCESS})
     } catch (e) {
         yield put({type: CREATE_PROCESS_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 
@@ -237,7 +237,7 @@ function* getProcessSaga(data) {
         yield put({type: GET_PROCESS_SUCCESS, payload: _process})
     } catch (e) {
         yield put({type: GET_PROCESS_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 
