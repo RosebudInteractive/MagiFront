@@ -17,5 +17,6 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/task/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/dictionaries/:dictionaryName'} render={() => {return props.hasSupervisorRights ? <React.Fragment>DictionaryPlaceHolder</React.Fragment> : <AccessDeniedPlaceholder/>}}/>// todo add real component
     </Switch>
 }
