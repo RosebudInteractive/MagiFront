@@ -6,6 +6,8 @@ import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
 import {reset} from "redux-form";
 import {all, takeEvery, put, call} from "@redux-saga/core/effects";
 
+import {LOAD_ALL} from 'tt-ducks/dictionary'
+
 /**
  * Constants
  * */

@@ -6,6 +6,7 @@ import {saga as processTaskSaga} from 'tt-ducks/process-task'
 import {saga as processSaga} from 'tt-ducks/process'
 import {saga as processesSaga} from 'tt-ducks/processes'
 import {saga as routeSaga} from 'tt-ducks/route'
+import {saga as dictionarySaga} from 'tt-ducks/dictionary'
 
 export default function* rootSaga() {
     yield all([
@@ -16,5 +17,6 @@ export default function* rootSaga() {
         processSaga(),
         processesSaga(),
         routeSaga(),
+        dictionarySaga()
     ])
 }

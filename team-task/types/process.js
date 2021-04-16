@@ -3,7 +3,20 @@ export type CreatingProcess = {
     StructId: number,
     SupervisorId: number,
     DueDate: string,
-    LessonId: number
+    LessonId: number,
+    Params: CreatingProcessParams
+}
+
+export type CreatingProcessParams = {
+    UseAuthorPictures: boolean,
+    UseMusic: boolean,
+    ExecutorSound: number,
+    ExecutorSoundControl: number,
+    ExecutorTranscript: number,
+    ExecutorPictures: number,
+    ExecutorPicturesControl: number,
+    ExecutorText: number,
+    ExecutorLiterature: number
 }
 
 export type UpdatingProcess = {

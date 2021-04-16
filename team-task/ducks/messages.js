@@ -61,20 +61,20 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 
 export const showErrorMessage = (message) => {
-    alert(message)
-    return {type: SHOW_ERROR, payload: {content: message}}
+    alert(message);
+    return {type: SHOW_ERROR, payload: {content: message, type: MESSAGE_TYPE.ERROR}}
 };
 
 export const showInfo = (message) => {
-    return {type: SHOW_INFO, payload: message}
+    return {type: SHOW_INFO, payload: {type: MESSAGE_TYPE.INFO, ...message}}
 };
 
 export const showError = (message) => {
-    return {type: SHOW_ERROR, payload: message}
+    return {type: SHOW_ERROR, payload: {type: MESSAGE_TYPE.ERROR, ...message}}
 };
 
 export const showWarning = (message) => {
-    return {type: SHOW_WARNING, payload: message}
+    return {type: SHOW_WARNING, payload: {type: MESSAGE_TYPE.WARNING, ...message}}
 };
 
 export const showUserConfirmation = (message: Message) => {
@@ -83,18 +83,16 @@ export const showUserConfirmation = (message: Message) => {
 
 export const acceptAction = () => {
     return { type: MODAL_MESSAGE_ACCEPT }
-}
+};
 
 export const declineAction = () => {
     return { type: MODAL_MESSAGE_DECLINE }
-}
+};
 
 //visible: boolean
 export const toggleMessage = (visible) => {
     return {type: TOGGLE_MESSAGE_VISIBILITY, payload: visible}
 };
-
-
 
 
 /**
