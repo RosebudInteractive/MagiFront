@@ -100,6 +100,10 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
+export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
+    return [...state.users.a, state.users.pma, state.users.pms]
+});
 
 // actions
 //forceLoad: boolean

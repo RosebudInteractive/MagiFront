@@ -4,7 +4,7 @@ import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {showError, showErrorMessage} from "tt-ducks/messages";
 
 import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";

@@ -4,11 +4,17 @@ import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showError} from "tt-ducks/messages";
+import {showError, showErrorMessage} from "tt-ducks/messages";
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {CreatingElement, CreatingProcess, UpdatingElement, UpdatingProcess} from "../types/process";
+import type {
+    CreatingElement,
+    CreatingProcess,
+    CreatingProcessParams,
+    UpdatingElement,
+    UpdatingProcess
+} from "../types/process";
 import {push} from "react-router-redux/src";
 import {goToProcess} from "tt-ducks/processes";
 
@@ -134,8 +140,8 @@ export const lessonsSelector = createSelector(stateSelector, state => state.less
 /**
  * Action Creators
  * */
-export const createProcess = () => {
-    return {type: CREATE_PROCESS_REQUEST}
+export const createProcess = (data: CreatingProcess) => {
+    return {type: CREATE_PROCESS_REQUEST, payload: data}
 }
 
 export const getProcess = (processId: number) => {
@@ -181,14 +187,13 @@ export const saga = function* () {
     ])
 }
 
-function* createProcessSaga() {
+function* createProcessSaga({payload}) {
     const data: CreatingProcess = {
-        "Name": "Новый процесс",
-        "StructId": 1,
-        "SupervisorId": 2,
-        "DueDate": "2021-12-31T21:00:00.000Z",
-        "LessonId": 1,
+        ...payload,
+        "StructName": "Lesson Process Proto"
     }
+
+    console.log(data)
 
     yield put({type: CREATE_PROCESS_START})
     try {
