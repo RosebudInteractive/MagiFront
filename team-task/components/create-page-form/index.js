@@ -56,7 +56,7 @@ function CreateProcessForm(props) {
 
     return <form className="modal-form" action={"javascript:void(0)"}>
         <div className="element-editor__dialog">
-            <h6 className="process-elements-grid__title _grey100">Созднание нового процесса</h6>
+            <h6 className="process-elements-grid__title _grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"}/>
             <Field component={Select} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
             <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getUsers()}/>
