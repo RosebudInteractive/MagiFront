@@ -26,6 +26,7 @@ function CreateProcessForm(props) {
                     ExecutorPicturesControl: editorValues.ExecutorPicturesControl ? +editorValues.ExecutorPicturesControl : null,
                     ExecutorText: editorValues.ExecutorText ? +editorValues.ExecutorText : null,
                     ExecutorLiterature: editorValues.ExecutorLiterature ? +editorValues.ExecutorLiterature : null,
+                    StructName: "Lesson Process Proto"
                 }
             })
         }

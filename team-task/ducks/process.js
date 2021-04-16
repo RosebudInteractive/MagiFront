@@ -188,10 +188,7 @@ export const saga = function* () {
 }
 
 function* createProcessSaga({payload}) {
-    const data: CreatingProcess = {
-        ...payload,
-        "StructName": "Lesson Process Proto"
-    }
+    const data: CreatingProcess = payload
 
     console.log(data)
 
