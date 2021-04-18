@@ -6,6 +6,7 @@ import Processes from "./containers/processes";
 import {FullPageTaskEditor} from "./containers/task-page"
 import ProcessEditor from "./containers/process-page";
 import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
+import DictionaryUsers from "./components/dictionaries/users/users";
 
 type RouterProps = {
     hasSupervisorRights: boolean
@@ -17,6 +18,16 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/task/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
-        <Route path={'/dictionaries/:dictionaryName'} render={() => {return props.hasSupervisorRights ? <React.Fragment>DictionaryPlaceHolder</React.Fragment> : <AccessDeniedPlaceholder/>}}/>// todo add real component
+        <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {
+            if(props.hasSupervisorRights){
+                switch (match.params.dictionaryName) {
+                    case 'users':
+                        return <DictionaryUsers/>;
+                    default:
+                        return;
+                }
+            }
+
+        }}/>
     </Switch>
 }

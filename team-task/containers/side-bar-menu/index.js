@@ -25,8 +25,8 @@ function SideBarMenu(props) {
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
         <MenuList Icon={DictionariesIco} title={"Справочники"}>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/1"} title={"Элемент 1"}/>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/2"} title={"Элемент 2"}/>
+            <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
+            <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
             <MenuLink Icon={ElementIco} url={"/dictionaries/3"} title={"Элемент 3"}/>
         </MenuList>
     </nav>

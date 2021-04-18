@@ -10,6 +10,7 @@ import processReducer, {moduleName as processModule} from "tt-ducks/process";
 import processesReducer, {moduleName as processesModule} from "tt-ducks/processes";
 import routeReducer, {moduleName as routeModule} from "tt-ducks/route";
 import messageReducer, {moduleName as messageModule} from "tt-ducks/messages";
+import usersDictionaryReducer, {moduleName as usersDictionaryModule} from "tt-ducks/users-dictionary";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -21,6 +22,7 @@ export default combineReducers({
     [processesModule]: processesReducer,
     [routeModule]: routeReducer,
     [messageModule]: messageReducer,
+    [usersDictionaryModule]: usersDictionaryReducer,
 
     routing: routerReducer,
     form: formReducer,
