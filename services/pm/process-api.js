@@ -312,16 +312,18 @@ const SQL_GET_ALL_PELEMS_MYSQL =
     "order by ep.`Index`";
 
 const SQL_GET_ALL_PSELEMS_MSSQL =
-    "select e.[Id], e.[Name], e.[WriteFields], e.[ViewFields]\n" +
+    "select e.[Id], e.[Name], e.[WriteFields], e.[ViewFields], e.[SupervisorId], u.[DisplayName], s.[Name] SName, e.[StructId]\n" +
     "from [PmProcessStruct] s\n" +
     "  join [PmElement] e on e.[StructId] = s.[Id]\n" +
+    "  left join [User] u on u.[SysParentId] = e.[SupervisorId]\n" +
     "where s.[Id] = <%= id %>\n" +
     "order by e.[Index]";
 
 const SQL_GET_ALL_PSELEMS_MYSQL =
-    "select e.`Id`, e.`Name`, e.`WriteFields`, e.`ViewFields`\n" +
+    "select e.`Id`, e.`Name`, e.`WriteFields`, e.`ViewFields`, e.`SupervisorId`, u.`DisplayName`, s.`Name` SName, e.`StructId`\n" +
     "from `PmProcessStruct` s\n" +
     "  join `PmElement` e on e.`StructId` = s.`Id`\n" +
+    "  left join `User` u on u.`SysParentId` = e.`SupervisorId`\n" +
     "where s.`Id` = <%= id %>\n" +
     "order by e.`Index`";
 
@@ -341,12 +343,19 @@ const SQL_GET_PFIELDS_MYSQL =
     "  left join `LessonLng` ll on ll.`LessonId` = p.`LessonId`\n" +
     "where p.`Id` = <%= id %>";
 
+const SQL_GET_PS_ID_BY_NAME_MSSQL = "select [Id] from [PmProcessStruct] where [Name] = '<%= name %>'";
+const SQL_GET_PS_ID_BY_NAME_MYSQL = "select `Id` from `PmProcessStruct` where `Name` = '<%= name %>'";
+
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
 
 const LOCK_KEY_PREFIX = "_process_edt:";
 const STRUCT_KEY_PREFIX = "_pstruct:";
 const STRUCT_TTL_SEC = 1 * 60 * 60; // 1 hour
+
+const PROCESS_PROTO_TABLE = {
+    "Lesson Process Proto": require('./process-types/lesson')
+};
 
 const ProcessAPI = class ProcessAPI extends DbObject {
 
@@ -828,6 +837,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 result.push({
                     Id: elem.Id,
                     Name: elem.Name,
+                    StructName: elem.SName,
+                    StructId: elem.StructId,
+                    SupervisorId: elem.SupervisorId,
+                    Supervisor: elem.SupervisorId ? {
+                        Id: elem.SupervisorId,
+                        DisplayName: elem.DisplayName
+                    } : undefined,
                     WriteFields: elem.WriteFields ? JSON.parse(elem.WriteFields) : null,
                     ViewFields: elem.ViewFields ? JSON.parse(elem.ViewFields) : null
                 });
@@ -2320,6 +2336,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         });
     }
 
+    async _newProcessStructByName(name, options) {
+        let elem = PROCESS_PROTO_TABLE[name];
+        if (!elem)
+            throw new Error(`Unknown process struct name: "${name}"`);
+        return this.newProcessStruct(elem.structure, options);
+    }
+
     async newProcess(data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
@@ -2357,9 +2380,26 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         pstruct = await this.getProcessStruct(inpFields.StructId, opts);
                     }
                     else
-                        throw new Error(`Missing field "StructId"`);
+                        if (inpFields.Params && inpFields.Params.StructName) {
+                            opts.silent = true;
+                            opts.byName = true;
+                            pstruct = await this.getProcessStruct(inpFields.Params.StructName, opts);
+                            if (!pstruct) {
+                                try {
+                                    await this._newProcessStructByName(inpFields.Params.StructName, opts);
+                                }
+                                catch (err) {
+                                    console.error(buildLogString(`ProcessAPI::_newProcessStructByName: ${err.message}`));
+                                }
+                                delete opts.silent;
+                                pstruct = await this.getProcessStruct(inpFields.Params.StructName, opts);
+                            }
+                            fields.StructId = pstruct.Id;
+                        }
+                        else
+                            throw new Error(`Missing field "StructId"`);
 
-                    if ((typeof (inpFields.SupervisorId) === "number") && (inpFields.SupervisorId!== opts.user.Id)) {
+                    if ((typeof (inpFields.SupervisorId) === "number") && (inpFields.SupervisorId !== opts.user.Id)) {
                         fields.SupervisorId = inpFields.SupervisorId;
                         await this._checkIfPmSupervisor(inpFields.SupervisorId);
                     }
@@ -2373,88 +2413,135 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     fields.Id = newId;
                     this._setFieldValues(processObj, inpFields, fields);
 
+                    let elements = {};
                     if (pstruct && pstruct.Elements && (pstruct.Elements.length > 0)) {
                         let root_elems = processObj.getDataRoot("PmElemProcess");
                         for (let i = 0; i < pstruct.Elements.length; i++) {
                             let elem = pstruct.Elements[i];
-                            let efields = { State: ElemState.NotReady, ProcessId: newId, Index: i + 1, ElemId: elem.Id };
-                            await root_elems.newObject({
+                            let efields = {
+                                State: ElemState.NotReady,
+                                ProcessId: newId,
+                                Index: i + 1,
+                                ElemId: elem.Id,
+                                SupervisorId: elem.SupervisorId
+                            };
+                            let { keyValue: elemId } = await root_elems.newObject({
                                 fields: efields
                             }, dbOpts);
+                            elements[elem.Name] = {
+                                Id: elemId,
+                                SupervisorId: efields.SupervisorId
+                            }
                         }
                     }
 
                     await root_obj.save(dbOpts);
+                    let warning;
+                    if (inpFields.Params && inpFields.Params.StructName) {
+                        let elem = PROCESS_PROTO_TABLE[inpFields.Params.StructName];
+                        if (elem && elem.script)
+                            try {
+                                await elem.script(this, newId, fields.SupervisorId, elements, inpFields.Params, options);
+                            }
+                            catch (err) {
+                                warning = `При формировании задач процесса произошла ошибка: ${err.message}`;
+                            }
+                     }
+
                     if (logModif)
                         console.log(buildLogString(`Process created: Id="${newId}".`));
-                    return { result: "OK", id: newId };
+                    return { result: "OK", id: newId, warning: warning };
                 })
         }, memDbOptions);
     }
 
-    async getProcessStruct(id, options) {
+    async getProcessStruct(id_struct, options) {
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
-        let key = `${STRUCT_KEY_PREFIX}${id}`;
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let id = id_struct;
+        try {
+            if ((opts.byName === "true") || (opts.byName === true)) {
+                let records = await $data.execSql({
+                    dialect: {
+                        mysql: _.template(SQL_GET_PS_ID_BY_NAME_MYSQL)({ name: id.replace(/'/g, "''") }),
+                        mssql: _.template(SQL_GET_PS_ID_BY_NAME_MSSQL)({ name: id.replace(/'/g, "''") })
+                    }
+                }, dbOpts)
+                if (records && records.detail && (records.detail.length === 1))
+                    id = records.detail[0].Id
+                else
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Name ="${id}") не найдено.`);
+            }
+            opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
+            let key = `${STRUCT_KEY_PREFIX}${id}`;
 
-        let result = null;
-        let redis_ts = await this.cacheHget(key, "ts", { json: true });
-        if (redis_ts) {
-            if ((!this._struct_cache) || (this._struct_cache.ts !== redis_ts)) {
-                let val = await this.cacheHgetAll(key, { json: true });
-                if (val && val.ts && val.data) {
-                    this._struct_cache = val;
-                    result = val.data;
+            let result = null;
+            let redis_ts = await this.cacheHget(key, "ts", { json: true });
+            if (redis_ts) {
+                if ((!this._struct_cache) || (this._struct_cache.ts !== redis_ts)) {
+                    let val = await this.cacheHgetAll(key, { json: true });
+                    if (val && val.ts && val.data) {
+                        this._struct_cache = val;
+                        result = val.data;
+                    }
                 }
+                else
+                    result = this._struct_cache.data ? this._struct_cache.data : null;
+            }
+            if (!result) {
+                this._struct_cache = null;
+                let root_obj = await this._getObjById(id, PROCESS_STRUCT_EXPRESSION, dbOpts);
+                try {
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Id =${id}) не найдено.`);
+
+                    let pstruct_obj = collection.get(0);
+                    result = {
+                        Id: pstruct_obj.id(),
+                        Name: pstruct_obj.name(),
+                        Script: pstruct_obj.script() ? pstruct_obj.script() : null,
+                        ProcessFields: pstruct_obj.processFields() ? JSON.parse(pstruct_obj.processFields()) : null,
+                        Elements: []
+                    }
+
+                    let root_elems = pstruct_obj.getDataRoot("PmElement");
+                    let col_elems = root_elems.getCol("DataElements");
+                    for (let i = 0; i < col_elems.count(); i++) {
+                        let elem = col_elems.get(i);
+                        result.Elements.push({
+                            Id: elem.id(),
+                            Name: elem.name(),
+                            SupervisorId: elem.supervisorId(),
+                            Index: elem.index(),
+                            WriteFields: elem.writeFields() ? JSON.parse(elem.writeFields()) : null,
+                            ViewFields: elem.viewFields() ? JSON.parse(elem.viewFields()) : null
+                        });
+                    }
+                    result.Elements.sort((a, b) => a.Index - b.Index);
+                    result.Elements.forEach(elem => delete elem.Index);
+
+                    await this.cacheHset(key, "data", result, { json: true });
+                    let ts = 't' + ((new Date()) - 0);
+                    await this.cacheHset(key, "ts", ts, { json: true });
+                    await this.cacheExpire(key, STRUCT_TTL_SEC);
+                    this._struct_cache = { ts: ts, data: result };
+                }
+                finally {
+                    if (root_obj)
+                        this._db._deleteRoot(root_obj.getRoot());
+                }
+            }
+            return result;
+        }
+        catch (err) {
+            if ((opts.silent === true) && (err instanceof HttpError)
+                && (err.statusCode === HttpCode.ERR_NOT_FOUND)) {
+                return null;
             }
             else
-                result = this._struct_cache.data ? this._struct_cache.data : null;
+                throw err;
         }
-        if (!result) {
-            this._struct_cache = null;
-            let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
-            let root_obj = await this._getObjById(id, PROCESS_STRUCT_EXPRESSION, dbOpts);
-            try {
-                let collection = root_obj.getCol("DataElements");
-                if (collection.count() != 1)
-                    throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Id =${id}) не найдено.`);
-
-                let pstruct_obj = collection.get(0);
-                result = {
-                    Id: pstruct_obj.id(),
-                    Name: pstruct_obj.name(),
-                    Script: pstruct_obj.script() ? pstruct_obj.script() : null,
-                    ProcessFields: pstruct_obj.processFields() ? JSON.parse(pstruct_obj.processFields()) : null,
-                    Elements: []
-                }
-
-                let root_elems = pstruct_obj.getDataRoot("PmElement");
-                let col_elems = root_elems.getCol("DataElements");
-                for (let i = 0; i < col_elems.count(); i++) {
-                    let elem = col_elems.get(i);
-                    result.Elements.push({
-                        Id: elem.id(),
-                        Name: elem.name(),
-                        Index: elem.index(),
-                        WriteFields: elem.writeFields() ? JSON.parse(elem.writeFields()) : null,
-                        ViewFields: elem.viewFields() ? JSON.parse(elem.viewFields()) : null
-                    });
-                }
-                result.Elements.sort((a, b) => a.Index - b.Index);
-                result.Elements.forEach(elem => delete elem.Index);
-
-                await this.cacheHset(key, "data", result, { json: true });
-                let ts = 't' + ((new Date()) - 0);
-                await this.cacheHset(key, "ts", ts, { json: true });
-                await this.cacheExpire(key, STRUCT_TTL_SEC);
-                this._struct_cache = { ts: ts, data: result };
-            }
-            finally {
-                if (root_obj)
-                    this._db._deleteRoot(root_obj.getRoot());
-            }
-        }
-        return result;
     }
 
     async newProcessStruct(data, options) {
@@ -2518,6 +2605,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             if (typeof (elem.WriteFields) !== "undefined") {
                                 efields.WriteFields = JSON.stringify(elem.WriteFields);
                             }
+                            if (typeof (elem.SupervisorId) !== "undefined")
+                                efields.SupervisorId = elem.SupervisorId
 
                             await root_elems.newObject({
                                 fields: efields

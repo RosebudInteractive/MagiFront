@@ -308,6 +308,15 @@
                 "mysql": "./build_36/upgrade_36_mysql.sql"
             },
             "upgrader": "./build_36"
+        },
+        "37": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_37/upgrade_37_mssql.sql",
+                "mysql": "./build_37/upgrade_37_mysql.sql"
+            },
+            "upgrader": "./build_37"
         }
     }
 }
