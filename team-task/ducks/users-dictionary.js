@@ -7,6 +7,7 @@ import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
 import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
+import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 
 
 //constants
@@ -100,7 +101,9 @@ export const saga = function* () {
 function* getUsersSaga(){
     try {
         yield put({type: START_REQUEST});
-        const users = yield call(_getUsers);
+        const params = yield select(paramsSelector)
+
+        const users = yield call(_getUsers, params);
 
         //map userRoles
 
@@ -119,15 +122,20 @@ function* getUsersSaga(){
 
         yield put({type: SET_USERS, payload: users});
         yield put({type: SUCCESS_REQUEST});
+        yield put(clearLocationGuard())
     } catch (e) {
         yield put({type: FAIL_REQUEST});
+        yield put(clearLocationGuard())
         yield put(showErrorMessage(e.message));
     }
 }
 
 
-const _getUsers = () => {
-    return commonGetQuery("/api/users/list?role=a,pma,pms,pme,pmu")
+const _getUsers = (params) => {
+    const _url = `/api/users/list?role=a,pma,pms,pme,pmu${params ? `&${params}` : ""}`
+    console.log("USERS URL:", _url)
+
+    return commonGetQuery(_url)
 };
 
 

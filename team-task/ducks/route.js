@@ -132,6 +132,10 @@ export const setInitState = (data) => {
     return {type: SET_INIT_STATE_REQUEST, payload: data}
 }
 
+export const clearLocationGuard = () => {
+    return { type: CLEAR_GUARD }
+}
+
 
 /**
  * Sagas

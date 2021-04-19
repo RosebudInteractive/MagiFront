@@ -29,9 +29,9 @@ const DictionaryUsers = (props) => {
         resizeHandler(_usersCount)
     });
 
-    useEffect(() => {
-        actions.getUsers()
-    }, []);
+    // useEffect(() => {
+    //     actions.getUsers()
+    // }, []);
 
     useEffect(() => {
         setFilteredUsers(users);
@@ -61,7 +61,9 @@ const DictionaryUsers = (props) => {
         initState.pathname = location.pathname
         actions.setInitState(initState)
 
-    }, [location])
+        actions.getUsers()
+
+    }, [0])
 
     const _onResize = useCallback(() => {
         resizeHandler(users.length)
