@@ -276,7 +276,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #6
-    let supervisor_pic = elements["Иллюстрации"] ? elements["Иллюстрации"].SupervisorId : supervisor_id;
+    let supervisor_pic = elements["Иллюстрации"] && elements["Иллюстрации"].SupervisorId ? elements["Иллюстрации"].SupervisorId : supervisor_id;
     res = await pm.newTask({
         "Name": "Иллюстрирование с поиском картинок - постановка задачи",
         "ProcessId": p_id,
