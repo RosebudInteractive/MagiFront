@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from "react"
+import {horizontalProcess} from "tt-ducks/app";
 
 export const ARROW_TYPE = {
     DEFAULT: "DEFAULT",
@@ -18,7 +19,7 @@ type ArrowProps = {
 }
 
 export default function LineArrow(props: ArrowProps) {
-    const {source, dest, type, scrollPosition, delay} = props
+    const {source, dest, type, scrollPosition, delay, horizontalProcess} = props
     const line = useRef(),
         svgContainer = useRef()
 
@@ -69,6 +70,15 @@ export default function LineArrow(props: ArrowProps) {
     useEffect(() => {
         if (line.current) {line.current.position()}
     }, [scrollPosition])
+
+    useEffect(() => {
+        if (line.current) {
+            line.current.setOptions({
+                startSocket: horizontalProcess ? 'right' : "bottom",
+                endSocket: horizontalProcess ? 'left' : "top"
+            })
+        }
+    }, [horizontalProcess])
 
     const toggleArrowActive = () => {
         if (!svgContainer.current) return

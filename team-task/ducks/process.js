@@ -227,7 +227,7 @@ function* getProcessSaga(data) {
         const [_supervisors, _editors, _elements, _lessons] = yield all([
             call(_getSupervisors),
             call(_getEditors),
-            call(_getElements, _process.Id),
+            call(_getElements, _process.StructId),
             call(_getLessons),
         ])
 
