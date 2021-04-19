@@ -21,21 +21,12 @@ let _usersCount = 0;
 const DictionaryUsers = (props) => {
     const {users, fetching, actions} = props;
     const location = useLocation();
-    const [filteredUsers, setFilteredUsers] = useState(users);
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
     useWindowSize(() => {
         resizeHandler(_usersCount)
     });
-
-    // useEffect(() => {
-    //     actions.getUsers()
-    // }, []);
-
-    useEffect(() => {
-        setFilteredUsers(users);
-    }, [users]);
 
     useEffect(() => {
         _usersCount = props.users.length;
@@ -58,12 +49,15 @@ const DictionaryUsers = (props) => {
             filter.current = null
         }
 
-        initState.pathname = location.pathname
-        actions.setInitState(initState)
+        initState.pathname = location.pathname;
+        actions.setInitState(initState);
 
-        actions.getUsers()
+        if(!fetching){
+            actions.getUsers()
+        }
 
-    }, [0])
+
+    }, [location]);
 
     const _onResize = useCallback(() => {
         resizeHandler(users.length)
@@ -72,7 +66,7 @@ const DictionaryUsers = (props) => {
     const GRID_CONFIG = {
         view: "datatable",
         id: 'dictionary-users-grid',
-        css: 'tt-grid',
+        css: 'tt-grid ',
         hover: "row-hover",
         scroll: 'none',
         headerRowHeight: 40,
@@ -80,12 +74,13 @@ const DictionaryUsers = (props) => {
         height: 1000,
         select: true,
         editable: false,
+        // adjust: true,
         columns: [
-            {id: 'Id', header: 'Id', width: 150, fillspace: 10},
-            {id: 'DisplayName', header: 'Имя пользователя', width: 150, fillspace: 25},
-            {id: 'Email', header: 'Почта', width: 150, fillspace: 25},
+            {id: 'Id', header: 'Id', minWidth: 50, fillspace: 10},
+            {id: 'DisplayName', header: 'Имя пользователя', minWidth: 100, fillspace: 25},
+            {id: 'Email', header: 'Почта', minWidth: 100, fillspace: 25},
             {
-                id: 'Role', header: 'Роль пользователя', width: 200, fillspace: 30,editor: 'select',
+                id: 'Role', header: 'Роль пользователя', minWidth: 100, fillspace: 35,editor: 'select',
                 options: [
                     {id: 'pma', value: USER_ROLE_STRINGS.pma},
                     {id: 'pms', value: USER_ROLE_STRINGS.pms},
@@ -95,8 +90,8 @@ const DictionaryUsers = (props) => {
                 ],
             },
             {
-                id: '',
-                template: "<button class='process-elements-grid__button elem-delete'/>"
+                id: '', width: 50,
+                template: "<button class='process-elements-grid__button elem-delete remove-user-button'/>"
             },
         ],
         on: {
@@ -132,8 +127,8 @@ const DictionaryUsers = (props) => {
         <div className="dictionary-users-page form _scrollable-y">
             <h5 className="form-header _grey70">Справочник пользователей</h5>
             <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-            <div className="grid-container">
-                <Webix ui={GRID_CONFIG} data={filteredUsers}/>
+            <div className="grid-container users-table" >
+                <Webix ui={GRID_CONFIG} data={users}/>
             </div>
         </div>
     )
@@ -144,7 +139,7 @@ const mapState2Props = (state) => {
         users: usersDictionarySelector(state),
         fetching: fetchingSelector(state),
     }
-}
+};
 
 const mapDispatch2Props = (dispatch) => {
     return {

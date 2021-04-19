@@ -29,7 +29,6 @@ export const getFilterConfig = (filter) => {
 
 export const parseParams = () => {
     const paramsData = {};
-
     const _params = new URLSearchParams(location.search),
         role = _params.get("role"),
         displayName = _params.get("displayName"),
@@ -53,7 +52,7 @@ const convertParam2Filter = ({role, displayName, email}) => {
     if (!(role || displayName || email)) return null;
 
     const filter = {};
-    filter.Role = role ? role : '';
+    filter.Role = role ? role.split(",") : '';
     filter.Email = email ? email : '';
     filter.DisplayName = displayName ? displayName : '';
 
@@ -65,8 +64,8 @@ export const resizeHandler = (rowCount: number) => {
         _height = _form.height(),
         _width = _form.width()
 
-    if (window.$$('tasks-grid')) {
-        const _headerHeight = window.$$('tasks-grid').config.headerRowHeight
+    if (window.$$('dictionary-users-grid')) {
+        const _headerHeight = window.$$('dictionary-users-grid').config.headerRowHeight
 
 
         setTimeout(() => {
@@ -74,7 +73,7 @@ export const resizeHandler = (rowCount: number) => {
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            window.$$('tasks-grid').$setSize(_width, _gridHeight)
+            window.$$('dictionary-users-grid').$setSize(_width, _gridHeight)
         }, 0)
 
     }
@@ -84,7 +83,7 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if (filter.Role) {_data.role = filter.Role}
+        _data.role = typeof filter.Role === 'string' ? filter.Role  : [...filter.Role].join(',');
         if (filter.DisplayName) {_data.displayName = filter.DisplayName}
         if (filter.Email) {_data.email = filter.Email}
     }

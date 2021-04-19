@@ -1,10 +1,8 @@
 import {appName} from "../config";
 import {Record} from "immutable";
 import {createSelector} from 'reselect'
-import {MESSAGE_TYPE} from "../constants/messages"
-import type {Message} from "../types/messages";
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
+import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
 import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
@@ -84,9 +82,6 @@ export const getUsers = () => {
 
 export const saga = function* () {
     yield all([
-        // takeEvery(START_REQUEST, toggleFetchingSaga),
-        // takeEvery(SUCCESS_REQUEST, toggleFetchingSaga),
-        // takeEvery(FAIL_REQUEST, toggleFetchingSaga),
         takeEvery(LOAD_USERS, getUsersSaga)
     ])
 };
@@ -101,8 +96,7 @@ export const saga = function* () {
 function* getUsersSaga(){
     try {
         yield put({type: START_REQUEST});
-        const params = yield select(paramsSelector)
-
+        const params = yield select(paramsSelector);
         const users = yield call(_getUsers, params);
 
         //map userRoles
@@ -132,10 +126,14 @@ function* getUsersSaga(){
 
 
 const _getUsers = (params) => {
-    const _url = `/api/users/list?role=a,pma,pms,pme,pmu${params ? `&${params}` : ""}`
-    console.log("USERS URL:", _url)
+    let _urlString = '';
+    if(params.includes('role=')){
+        _urlString = `/api/users/list?${params}`;
+    } else {
+        _urlString = `/api/users/list?role=a,pma,pms,pme,pmu&${params}`;
+    }
 
-    return commonGetQuery(_url)
+    return commonGetQuery(_urlString)
 };
 
 

@@ -96,13 +96,20 @@ const refreshGuardSelector = createSelector(stateSelector, state => state.refres
 export const activeTaskIdSelector = createSelector(stateSelector, state => state.activeTask)
 export const paramsSelector = createSelector(stateSelector, (state) => {
     const params = {...state.filter},
-        order = state.order
+        order = state.order;
 
     if (order) { params.order = order }
     if (state.activeTask) { params.activeTask = state.activeTask }
 
-    return  $.param(params)
-})
+    return  $.param(params);
+});
+
+//get non-parametrized filter
+export const filterSelector = createSelector(stateSelector, (state) => {
+    const params = {...state.filter};
+    console.log('u-params');
+    return params;
+});
 
 
 /**
