@@ -31,7 +31,7 @@ class AuthApple {
                     name_arr.push(profile.familyName);
             }
             profile.displayName = name_arr.length > 0 ? name_arr.join(" ") : null; // profile.identifier;
-            profile.username = profile.nickname ? profile.nickname : (profile.givenName ? profile.givenName : profile.identifier);
+            profile.username = profile.nickname ? profile.nickname : (profile.givenName ? profile.givenName : null /*profile.identifier*/);
             profile.firstName = profile.givenName;
             profile.lastName = profile.familyName;
 
