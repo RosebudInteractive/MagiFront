@@ -104,7 +104,8 @@ export const _scrollHandler = () => {
 
     if (st  < 242) {
         _wrapper.removeClass('_fixed');
-        _wrapper.width("auto")
+        _wrapper.removeClass('_bottom');
+        _wrapper.css("width", "100%")
     }
 
     if (st > _containerBottom - _wrapper.height()) {
