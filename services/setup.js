@@ -106,7 +106,8 @@ function setupAPI(express, app) {
             if (req.user) {
                 if (req.session && req.session.cookie
                     && (typeof (req.session.cookie.maxAge) === "number")) {
-                    if ((sessionOpts.cookie.maxAge - req.session.cookie.maxAge) >= updPeriod) {
+                    if ((req.session.cookie.originalMaxAge !== sessionOpts.cookie.maxAge) ||
+                        ((sessionOpts.cookie.maxAge - req.session.cookie.maxAge) >= updPeriod)) {
                         if (typeof (req.session.rollingId) === "undefined")
                             req.session.rollingId = 0;
                         req.session.rollingId++; // We should change session data to renew cookie on the client side
