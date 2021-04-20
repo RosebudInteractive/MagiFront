@@ -1,7 +1,7 @@
 const path = require('path');
 const defer = require('config/defer').deferConfig;
 
-const SESSION_MAX_AGE = 20 * 24 * 3600 * 1000; // 20 days
+const SESSION_MAX_AGE = 365 * 24 * 3600 * 1000; // 365 days
 const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 hour
 
 module.exports = {
