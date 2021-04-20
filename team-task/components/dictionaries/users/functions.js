@@ -6,11 +6,10 @@ import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";
 export const getFilterConfig = (filter) => {
     return [
         {
-            name: "Role",
-            placeholder: "Роль",
-            type: FILTER_FIELD_TYPE.COMBO,
-            options: Object.entries(USER_ROLE_STRINGS).map(role => ({value: role[0], label: role[1]})),
-            value: filter ? filter.Role : null
+            name: "DisplayName",
+            placeholder: "Имя",
+            type: FILTER_FIELD_TYPE.TEXT,
+            value: filter ? filter.DisplayName : null
         },
         {
             name: "Email",
@@ -19,10 +18,11 @@ export const getFilterConfig = (filter) => {
             value: filter ? filter.Email : null
         },
         {
-            name: "DisplayName",
-            placeholder: "Имя",
-            type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.DisplayName : null
+            name: "Role",
+            placeholder: "Роль",
+            type: FILTER_FIELD_TYPE.COMBO,
+            options: Object.entries(USER_ROLE_STRINGS).map(role => ({value: role[0], label: role[1]})),
+            value: filter ? filter.Role : null
         }
     ]
 }
@@ -83,7 +83,7 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        _data.role = typeof filter.Role === 'string' ? filter.Role  : [...filter.Role].join(',');
+        if(filter.Role) { _data.role = filter.Role.join(',')}
         if (filter.DisplayName) {_data.displayName = filter.DisplayName}
         if (filter.Email) {_data.email = filter.Email}
     }

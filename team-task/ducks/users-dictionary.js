@@ -1,9 +1,9 @@
 import {appName} from "../config";
-import {Record} from "immutable";
+import {List, Record} from "immutable";
 import {createSelector} from 'reselect'
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {showErrorMessage, showInfo} from "tt-ducks/messages";
 import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 
@@ -20,7 +20,15 @@ const LOAD_USERS = `${prefix}/LOAD_USERS`;
 const START_REQUEST = `${prefix}/START_REQUEST`;
 const SUCCESS_REQUEST = `${prefix}/SUCCESS_REQUEST`;
 const FAIL_REQUEST = `${prefix}/FAIL_REQUEST`;
-const TOGGLE_FETCHING = `${prefix}/TOGGLE_FETCHING`;
+const TOGGLE_USER_FORM_VISIBILITY = `${prefix}/TOGGLE_USER_FORM_VISIBILITY`;
+
+const SELECT_USER_REQUEST = `${prefix}/SELECT_USER_REQUEST`;
+const SET_SELECTED_USER = `${prefix}/SET_SELECTED_USER`;
+const CLEAN_SELECTED_USER = `${prefix}/CLEAN_SELECTED_USER`;
+const FIND_USER_BY_EMAIL = `${prefix}/FIND_USER_BY_EMAIL`;
+const FIND_USER_BY_ID = `${prefix}/FIND_USER_BY_ID`;
+const CHANGE_USER = `${prefix}/CHANGE_USER`; // runs before request
+const UPDATE_USER = `${prefix}/CHANGE_USER`; // runs after request complete succesfully
 
 //store
 
@@ -39,9 +47,15 @@ const defaultExampleUsers = [
     }
 ]
 
+//store
+
+const UsersRecord = List([]);
+
 export const ReducerRecord = Record({
-    users: [],
-    fetching: false
+    users: UsersRecord,
+    fetching: false,
+    selectedUser: null,
+    userFormOpened: false
 });
 
 // reducer
@@ -59,6 +73,27 @@ export default function reducer(state = new ReducerRecord(), action) {
         case FAIL_REQUEST:
             return state
                 .set('fetching', false);
+        case SET_SELECTED_USER: {
+            return state
+                .set('selectedUser', payload);
+        }
+        case UPDATE_USER: {
+            // const userIndex = state.users.findIndex(user => user.Id === payload.Id); //todo move to sagas
+            // const updatedUser = payload;
+            // if(userIndex > 0) {
+            //     return state.users.set(userIndex, updatedUser);
+            // } else {
+            //     return state;
+            // }
+
+            return state.users.set(payload.index, payload.updatedUser);
+
+
+        }
+        case CLEAN_SELECTED_USER:
+            return state.set('selectedUser', null);
+        case TOGGLE_USER_FORM_VISIBILITY:
+            return state.set('userFormOpened', payload);
         default:
             return state;
     }
@@ -69,11 +104,41 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName];
 export const usersDictionarySelector = createSelector(stateSelector, state => state.users);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
+export const selectedUserSelector = createSelector(stateSelector, state => state.selectedUser);
+export const userFormOpenedSelector = createSelector(stateSelector, state => state.userFormOpened);
 
 //actions
 
 export const getUsers = () => {
     return {type: LOAD_USERS}
+};
+
+export const selectUser = (userId) => {
+    return {type: SELECT_USER_REQUEST, payload: userId}
+};
+
+export const saveUserChanges = (userId, userData) => {
+    return {type: CHANGE_USER, payload: {userId, userData}}
+};
+
+export const updateUser = (newUserData) => {
+    return {type: UPDATE_USER, payload: newUserData};
+};
+
+export const toggleUserForm = (isOn) => {
+    return {type: TOGGLE_USER_FORM_VISIBILITY, payload: isOn}
+};
+
+export const findUserByEmail = (email) => {
+    return {type: FIND_USER_BY_EMAIL, payload: email}
+};
+
+export const setSelectedUser = (user) => {
+    return {type: SET_SELECTED_USER, payload: user}
+};
+
+export const cleanSelectedUser = () => {
+  return {type: CLEAN_SELECTED_USER}
 };
 
 
@@ -82,7 +147,9 @@ export const getUsers = () => {
 
 export const saga = function* () {
     yield all([
-        takeEvery(LOAD_USERS, getUsersSaga)
+        takeEvery(LOAD_USERS, getUsersSaga),
+        takeEvery(SELECT_USER_REQUEST, selectUserById),
+        takeEvery(FIND_USER_BY_EMAIL, selectUserEmail)
     ])
 };
 
@@ -124,6 +191,28 @@ function* getUsersSaga(){
     }
 }
 
+function* selectUserById(data){
+    try {
+        const users = yield select(usersDictionarySelector);
+        const findedUser = users.find(user => user.Id === data.payload);
+        yield put(setSelectedUser(findedUser));
+    } catch (e) {
+        yield put(showInfo({content: e}));
+    }
+}
+
+function* selectUserEmail(data){
+    try {
+        const users = yield select(usersDictionarySelector);
+        const findedUser = users.find(user => user.Email === data.payload);
+        if(findedUser){
+            yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
+            yield put(setSelectedUser(findedUser));
+        }
+    } catch (e) {
+        yield put(showInfo({content: 'Ошибка при выборе пользователя', title: 'Ошибка при выборе пользователя'}));
+    }
+}
 
 const _getUsers = (params) => {
     let _urlString = '';

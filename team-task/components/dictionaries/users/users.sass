@@ -1,6 +1,7 @@
 @import "~tt-assets/styles/colors.sass"
 
 .dictionary-users-page
+  position: relative
 
   &.form
     min-height: calc(100vh - 64px)
@@ -20,3 +21,15 @@
 
 .users-table
   width: calc(98% - 24px)
+
+.open-form-button
+  width: 48px
+  height: 48px
+  display: flex
+  align-items: center
+  justify-content: center
+  background: none
+  opacity: .4
+  transition: opacity 300ms ease-in-out
+  &:hover
+    opacity: 1
