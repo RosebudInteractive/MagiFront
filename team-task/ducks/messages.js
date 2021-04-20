@@ -95,8 +95,6 @@ export const toggleMessage = (visible) => {
 };
 
 
-
-
 /**
  * Selectors
  * */

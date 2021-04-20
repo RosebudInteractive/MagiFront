@@ -3,14 +3,8 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select, take} from "@redux-saga/core/effects";
-import {
-    MODAL_MESSAGE_ACCEPT,
-    MODAL_MESSAGE_DECLINE,
-    showErrorMessage,
-    showUserConfirmation,
-    toggleMessage
-} from "tt-ducks/messages";
+import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
+import {showError, showErrorMessage} from "tt-ducks/messages";
 
 import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
@@ -428,7 +422,7 @@ function* deleteTaskSaga({payload}) {
         yield put({type: DELETE_TASK_SUCCESS,})
     } catch (e) {
         yield put({type: DELETE_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 
@@ -466,7 +460,7 @@ function* saveDependenciesSaga({payload}) {
         yield put({type: SAVE_TASK_LINKS_SUCCESS})
     } catch (e) {
         yield put({type: SAVE_TASK_LINKS_FAIL})
-        yield put(showErrorMessage(e.message))
+        yield put(showError({content: e.message}))
     }
 }
 

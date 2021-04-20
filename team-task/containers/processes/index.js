@@ -2,7 +2,8 @@ import React, {useMemo, useEffect, useRef, useCallback, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
-import {createProcess, lessonsSelector, supervisorsSelector} from "tt-ducks/process";
+import {createProcess,} from "tt-ducks/process";
+import {lessonsSelector, userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import "./processes.sass"
 import Webix from "../../components/Webix";
@@ -14,6 +15,7 @@ import {useLocation,} from "react-router-dom"
 import {useWindowSize} from "../../tools/window-resize-hook";
 import PlusIco from "tt-assets/svg/plus.svg"
 import CreateProcessForm from "../../components/create-page-form";
+import {getAllDictionaryData} from "tt-ducks/dictionary";
 
 let _rowCount = 0
 
@@ -57,6 +59,7 @@ function Processes(props) {
 
         if (!fetching) {
             actions.getProcesses()
+            actions.getAllDictionaryData()
         }
     }, [location])
 
@@ -147,14 +150,14 @@ const mapState2Props = (state) => {
         processes: processesSelector(state),
         states: statesSelector(state),
         fetching: fetchingSelector(state),
-        supervisors: supervisorsSelector(state),
+        supervisors: userWithSupervisorRightsSelector(state),
         lessons: lessonsSelector(state),
     }
 }
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({createProcess, getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname}, dispatch)
+        actions: bindActionCreators({createProcess, getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname, getAllDictionaryData}, dispatch)
     }
 }
 

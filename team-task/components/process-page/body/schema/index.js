@@ -25,8 +25,7 @@ export default function Schema(props: SchemaProps) {
 
     const [active, setActive] = useState(0),
         [scrollPosition, setScrollPosition] = useState(0),
-        [mounted, setMounted] = useState(false),
-        [myRender, setRender] = useState(false)
+        [mounted, setMounted] = useState(false)
 
     const canvas = useRef()
 
@@ -79,7 +78,10 @@ export default function Schema(props: SchemaProps) {
     // }, [active, tree])
 
     const toggleElems = () => {
-        setRender(!myRender)
+        if (canvas && canvas.current) {
+            setScrollPosition(canvas.current.scrollLeft + 1)
+            setScrollPosition(canvas.current.scrollLeft)
+        }
     }
 
     useEffect(() => {

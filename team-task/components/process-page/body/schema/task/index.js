@@ -17,7 +17,7 @@ type TaskProps = {
 
 export default function SchemaTask(props: TaskProps) {
 
-    const {node, active, onClick,} = props
+    const {node, active, onClick, horizontalProcess} = props
 
     const _onEditLinks = () => {
         if (props.onEditLinks) {
@@ -47,9 +47,9 @@ export default function SchemaTask(props: TaskProps) {
     const style = useMemo(() => {return {
         width: "100%",
         height: "100%",
-        gridColumnStart: props.horizontalProcess ? node.weight + 1 : node.rowNumber + 1,
-        gridRowStart: props.horizontalProcess ?  node.rowNumber + 1 : node.weight + 1,
-    }}, [node])
+        gridColumnStart: horizontalProcess ? node.weight + 1 : node.rowNumber + 1,
+        gridRowStart: horizontalProcess ?  node.rowNumber + 1 : node.weight + 1,
+    }}, [node, horizontalProcess])
 
     const state = useMemo(() => {
         const isExpired = node && moment(node.dueDate).isBefore(moment()),
