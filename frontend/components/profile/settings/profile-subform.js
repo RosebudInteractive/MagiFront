@@ -7,7 +7,7 @@ const validate = values => {
     const errors = {}
 
     if (!values.name) {
-        errors.password = 'Required'
+        errors.name = 'Required'
     }
     return errors
 }

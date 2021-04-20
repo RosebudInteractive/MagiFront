@@ -84,7 +84,11 @@ export default function app(state = initialState, action) {
         case SEND_NEW_PASSWORD_SUCCESS:
         case GET_ACTIVATION_USER_SUCCESS: {
             let _user = Object.assign({}, payload)
-            
+
+            if (!_user.DisplayName) {
+                _user.DisplayName = "Профиль"
+            }
+
             _user.isAdmin = _isUserAdmin(payload)
             return {...state,
                 loading: false,
