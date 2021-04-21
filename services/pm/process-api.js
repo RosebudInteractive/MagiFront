@@ -2,6 +2,7 @@
 const _ = require('lodash');
 const config = require('config');
 const { DbObject } = require('../../database/db-object');
+const { DbUtils } = require('../../database/db-utils');
 const { HttpError } = require('../../errors/http-error');
 const { HttpCode } = require("../../const/http-codes");
 const { AccessFlags } = require('../../const/common');
@@ -352,6 +353,22 @@ const SQL_GET_PFIELDS_MYSQL =
 
 const SQL_GET_PS_ID_BY_NAME_MSSQL = "select [Id] from [PmProcessStruct] where [Name] = '<%= name %>'";
 const SQL_GET_PS_ID_BY_NAME_MYSQL = "select `Id` from `PmProcessStruct` where `Name` = '<%= name %>'";
+
+const SQL_DEL_PROCESS_MSSQL_SCRIPT = [
+    "delete [PmTaskLog] where [TaskId] in (select Id from [PmTask] where [ProcessId] = <%= id %>)",
+    "delete [PmDepTask] where [TaskId] in (select Id from [PmTask] where [ProcessId] = <%= id %>)",
+    "delete [PmTask] where [ProcessId] = <%= id %>",
+    "delete [PmElemProcess] where [ProcessId] = <%= id %>",
+    "delete [PmProcess] where [Id] = <%= id %>"
+];
+
+const SQL_DEL_PROCESS_MYSQL_SCRIPT = [
+    "delete `PmTaskLog` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>)",
+    "delete `PmDepTask` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>)",
+    "delete `PmTask` where `ProcessId` = <%= id %>",
+    "delete `PmElemProcess` where `ProcessId` = <%= id %>",
+    "delete `PmProcess` where `Id` = <%= id %>"
+];
 
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
@@ -2330,6 +2347,54 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             }
         }
         return result;
+    }
+
+    async deleteProcess(id, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
+
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+
+        return this._lockProcess(id, async () => {
+            let proc = await this.getProcess(id, options);
+            if (proc.State !== ProcessState.Draft)
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить процесс, который не находится в состоянии "Черновик".`);
+ 
+            for (let i = 0; i < proc.Elements.length; i++){
+                if (proc.Elements[i].State !== ElemState.NotReady)
+                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить процесс, в котором есть элементы не в исходном состоянии.`);
+            }
+
+            for (let i = 0; i < proc.Tasks.length; i++) {
+                if ((proc.Tasks[i].State !== TaskState.Draft) && (proc.Tasks[i].State !== TaskState.ReadyToStart))
+                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить процесс, в котором есть задачи не в исходном состоянии.`);
+            }
+
+
+            let tran = await $data.tranStart(dbOpts);
+            let transactionId = tran.transactionId;
+            dbOpts.transactionId = tran.transactionId;
+            try {
+                let mysql_script = [];
+                SQL_DEL_PROCESS_MYSQL_SCRIPT.forEach((elem) => {
+                    mysql_script.push(_.template(elem)({ id: id }));
+                });
+                let mssql_script = [];
+                SQL_DEL_PROCESS_MSSQL_SCRIPT.forEach((elem) => {
+                    mssql_script.push(_.template(elem)({ id: id }));
+                });
+                await DbUtils.execSqlScript(mysql_script, mssql_script, dbOpts);
+                await $data.tranCommit(transactionId)
+            }
+            catch (err) {
+                await $data.tranRollback(transactionId);
+                throw err;
+            }
+
+            if (logModif)
+                console.log(buildLogString(`Process deleted: Id="${id}".`));
+            return { result: "OK", id: id };
+        });
     }
 
     async updateProcess(id, data, options) {

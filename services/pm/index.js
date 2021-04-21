@@ -198,6 +198,17 @@ function setupProcesses(app) {
                 next(err);
             }
         });
+        
+        app.delete(`${ROUTE_PREFIX}process/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().deleteProcess(parseInt(req.params.id), opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
 
         app.put(`${ROUTE_PREFIX}process/:id`, async (req, res, next) => {
             try {
