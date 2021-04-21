@@ -1,12 +1,13 @@
 import React from 'react'
 
-import {Switch, Route,} from 'react-router-dom'
+import {Route, Switch,} from 'react-router-dom'
 import Tasks from "./containers/tasks";
 import Processes from "./containers/processes";
 import {FullPageTaskEditor} from "./containers/task-page"
 import ProcessEditor from "./containers/process-page";
 import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 import DictionaryUsers from "./components/dictionaries/users/users";
+import DictionaryComponents from "./components/dictionaries/components/components"
 
 type RouterProps = {
     hasSupervisorRights: boolean
@@ -23,6 +24,8 @@ export default function AppRouter(props: RouterProps) {
                 switch (match.params.dictionaryName) {
                     case 'users':
                         return <DictionaryUsers/>;
+                    case 'components':
+                        return <DictionaryComponents/>;
                     default:
                         return;
                 }
