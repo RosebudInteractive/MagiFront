@@ -730,6 +730,14 @@ const DbUser = class DbUser extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
+        if (opts.email) {
+            mssql_conds.push(`(u.[Email] like N'%${opts.email}%')`);
+            mysql_conds.push(`(u.${'`'}Email${'`'} like '%${opts.email}%')`);
+        }
+        if (opts.name) {
+            mssql_conds.push(`(u.[DisplayName] like N'%${opts.name}%')`);
+            mysql_conds.push(`(u.${'`'}DisplayName${'`'} like '%${opts.name}%')`);
+        }
         if (opts.role) {
             let roles = Array.isArray(opts.role) ? opts.role : opts.role.split(',');
             for (let i = 0; i < roles.length; i++)

@@ -377,7 +377,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Финализация",
         "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
+        "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
         "Description": "",
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : null,
         "WriteFieldSet": "Финализировать",

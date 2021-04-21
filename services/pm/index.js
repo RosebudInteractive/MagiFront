@@ -34,6 +34,17 @@ function setupProcesses(app) {
             }
         });
 
+        app.put(`${ROUTE_PREFIX}process-struct-elem/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().setElemStruct(parseInt(req.params.id), req.body, opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.get(`${ROUTE_PREFIX}process-elem/:id`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
@@ -213,7 +224,19 @@ function setupProcesses(app) {
         app.get(`${ROUTE_PREFIX}process-struct/:id/elements`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
-                let rows = await ProcessService().getProcessStructElems(parseInt(req.params.id), opts);
+                opts.id = parseInt(req.params.id);
+                let rows = await ProcessService().getProcessStructElems(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.get(`${ROUTE_PREFIX}process-struct/elements`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().getProcessStructElems(opts);
                 res.send(rows);
             }
             catch (err) {

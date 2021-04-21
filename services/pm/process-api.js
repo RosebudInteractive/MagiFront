@@ -103,6 +103,14 @@ const TASKLOG_EXPRESSION = {
 const PROC_ELEM_EXPRESSION = {
     expr: {
         model: {
+            name: "PmElement"
+        }
+    }
+};
+
+const PROC_ELEM_STRUCT_EXPRESSION = {
+    expr: {
+        model: {
             name: "PmElemProcess"
         }
     }
@@ -315,17 +323,13 @@ const SQL_GET_ALL_PSELEMS_MSSQL =
     "select e.[Id], e.[Name], e.[WriteFields], e.[ViewFields], e.[SupervisorId], u.[DisplayName], s.[Name] SName, e.[StructId]\n" +
     "from [PmProcessStruct] s\n" +
     "  join [PmElement] e on e.[StructId] = s.[Id]\n" +
-    "  left join [User] u on u.[SysParentId] = e.[SupervisorId]\n" +
-    "where s.[Id] = <%= id %>\n" +
-    "order by e.[Index]";
+    "  left join [User] u on u.[SysParentId] = e.[SupervisorId]";
 
 const SQL_GET_ALL_PSELEMS_MYSQL =
     "select e.`Id`, e.`Name`, e.`WriteFields`, e.`ViewFields`, e.`SupervisorId`, u.`DisplayName`, s.`Name` SName, e.`StructId`\n" +
     "from `PmProcessStruct` s\n" +
     "  join `PmElement` e on e.`StructId` = s.`Id`\n" +
-    "  left join `User` u on u.`SysParentId` = e.`SupervisorId`\n" +
-    "where s.`Id` = <%= id %>\n" +
-    "order by e.`Index`";
+    "  left join `User` u on u.`SysParentId` = e.`SupervisorId`";
 
 const SQL_GET_PFIELDS_MSSQL =
     "select s.[ProcessFields], p.[SupervisorId], u.[DisplayName], ll.[Name]\n" +
@@ -820,25 +824,83 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         return result;
     }
 
-    async getProcessStructElems(id, options) {
+    async getProcessStructElems(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
 
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let sql_mysql = SQL_GET_ALL_PSELEMS_MYSQL;
+        let sql_mssql = SQL_GET_ALL_PSELEMS_MSSQL;
+
+        let mssql_conds = [];
+        let mysql_conds = [];
+
+        if ((typeof (opts.id) === "number") && (!isNaN(opts.id))) {
+            mssql_conds.push(`(s.[Id] = ${opts.id})`);
+            mysql_conds.push(`(s.${'`'}Id${'`'} = ${opts.id})`);
+        }
+
+        if (opts.name) {
+            mssql_conds.push(`(e.[Name] like N'%${opts.name}%')`);
+            mysql_conds.push(`(e.${'`'}Name${'`'} like '%${opts.name}%')`);
+        }
+
+        if (opts.struct) {
+            mssql_conds.push(`(s.[Name] like N'%${opts.struct}%')`);
+            mysql_conds.push(`(s.${'`'}Name${'`'} like '%${opts.struct}%')`);
+        }
+
+        if (opts.supervisor) {
+            mssql_conds.push(`(u.[DisplayName] like N'%${opts.supervisor}%')`);
+            mysql_conds.push(`(u.${'`'}DisplayName${'`'} like '%${opts.supervisor}%')`);
+        }
+
+        if (mysql_conds.length > 0) {
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
+        }
+
+        if (opts.order) {
+            let ord_arr = opts.order.split(',');
+            let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
+            let mysql_field;
+            let mssql_field;
+            switch (ord_arr[0]) {
+                case "name":
+                    mssql_field = "e.[Name]";
+                    mysql_field = "e.`Name`";
+                    break;
+                case "struct":
+                    mssql_field = "s.[Name]";
+                    mysql_field = "s.`Name`";
+                    break;
+                case "supervisor":
+                    mssql_field = "u.[DisplayName]";
+                    mysql_field = "u.`DisplayName`";
+                    break;
+            }
+            if (mysql_field) {
+                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
+                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+            }
+        }
+
         let records = await $data.execSql({
             dialect: {
-                mysql: _.template(SQL_GET_ALL_PSELEMS_MYSQL)({ id: id }),
-                mssql: _.template(SQL_GET_ALL_PSELEMS_MSSQL)({ id: id })
+                mysql: _.template(sql_mysql)(),
+                mssql: _.template(sql_mssql)()
             }
-        }, dbOpts)
+        }, dbOpts);
         if (records && records.detail && (records.detail.length > 0)) {
             records.detail.forEach(elem => {
                 result.push({
                     Id: elem.Id,
                     Name: elem.Name,
-                    StructName: elem.SName,
-                    StructId: elem.StructId,
+                    Struct: {
+                        Id: elem.StructId,
+                        Name: elem.SName
+                    },
                     SupervisorId: elem.SupervisorId,
                     Supervisor: elem.SupervisorId ? {
                         Id: elem.SupervisorId,
@@ -1224,6 +1286,43 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }
     }
 
+    async setElemStruct(id, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let inpFields = data || {};
+
+        return Utils.editDataWrapper(() => {
+
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, PROC_ELEM_EXPRESSION, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Элемент (Id =${id}) не найден.`);
+                    let procElemObj = collection.get(0);
+
+                    await procElemObj.edit();
+                    if (typeof (inpFields.SupervisorId) === "number") {
+                        procElemObj.supervisorId(inpFields.SupervisorId);
+                        if (inpFields.SupervisorId !== opts.user.Id)
+                            await this._checkIfPmElemManager(inpFields.SupervisorId);
+                    }
+
+                    await procElemObj.save();
+                    if (logModif)
+                        console.log(buildLogString(`Element updated: Id="${id}".`));
+                    return { result: "OK", id: id };
+                })
+        }, memDbOptions);
+    }
+
     async setElemProc(id, data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
@@ -1596,7 +1695,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let dep_id = dep_to_del.id();
                         collection._del(dep_to_del);
-                        if (taskObj.state() === TaskState.Draft) {
+                        if ((taskObj.state() === TaskState.Draft) && (process.State !== ProcessState.Draft)) {
                             let is_ready = true;
                             for (let i = 0; i < collection.count(); i++) {
                                 let dep = collection.get(i);
@@ -1917,7 +2016,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 && (inpFields.State <= Object.keys(TaskState).length)) {
                                 if (taskObj.state() !== inpFields.State) {
                                     if (inpFields.State === TaskState.Draft)
-                                        throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                        throw new HttpError(HttpCode.ERR_BAD_REQ,
                                             `Невозможно принудительно перевести задачу в состояние "${TaskStateStr[inpFields.State]}".`);
 
                                     if (processObj.state() === ProcessState.Draft)
@@ -1975,7 +2074,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
                             let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
-                                throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                             wr_set.forEach(elem => {
                                 allowed_fields.push(elem);
@@ -2108,7 +2207,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
                             let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
-                                throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                         }
 
@@ -2445,12 +2544,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                             catch (err) {
                                 warning = `При формировании задач процесса произошла ошибка: ${err.message}`;
+                                console.error(buildLogString(`ProcessAPI::newProcess: WARNING: ${warning}`));
                             }
                      }
 
                     if (logModif)
                         console.log(buildLogString(`Process created: Id="${newId}".`));
-                    return { result: "OK", id: newId, warning: warning };
+                    return { result: warning ? "WARNING" : "OK", id: newId, warning: warning };
                 })
         }, memDbOptions);
     }
