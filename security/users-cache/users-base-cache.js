@@ -589,6 +589,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             if (user_data.alter.PData.isAdmin) {
                                 roles["a"] = 1;
                             }
+                            newPdata.isAdmin = user_data.alter.PData.isAdmin ? true : false;
                             let root_role = user.getDataRoot("UserRole");
                             let col_role = root_role.getCol("DataElements");
                             let to_delete = [];
