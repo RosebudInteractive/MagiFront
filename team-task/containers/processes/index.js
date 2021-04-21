@@ -116,8 +116,9 @@ function Processes(props) {
 
     const FILTER_CONFIG : Array<FilterField> = useMemo(() => getFilterConfig(filter.current, states),[filter.current, states])
 
-    const _onApplyFilter = (filter) => {
-        actions.applyFilter(convertFilter2Params(filter))
+    const _onApplyFilter = (filterData) => {
+        filter.current = filterData
+        actions.applyFilter(convertFilter2Params(filterData))
     }
 
     const _onResize = useCallback(() => {
@@ -134,7 +135,7 @@ function Processes(props) {
 
     return <div className="processes-page form">
         <h5 className="form-header _grey70">Процессы</h5>
-        <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
+        <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
         <button className="process-button _add" onClick={onAddProcess}>
             <PlusIco/>
         </button>

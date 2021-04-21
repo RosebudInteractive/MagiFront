@@ -112,7 +112,10 @@ function Tasks(props) {
 
     const FILTER_CONFIG : Array<FilterField> = useMemo(() => getFilterConfig(filter.current, states),[filter.current, states])
 
-    const _onApplyFilter = (filter) => { actions.applyFilter(convertFilter2Params(filter)) }
+    const _onApplyFilter = (filterData) => {
+        filter.current = filterData
+        actions.applyFilter(convertFilter2Params(filterData))
+    }
 
     const _onResize = useCallback(() => {
         resizeHandler(tasks.length)

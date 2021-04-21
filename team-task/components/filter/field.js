@@ -1,7 +1,7 @@
 import React from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
-import {CheckPicker, TagPicker, Checkbox} from 'rsuite';
+import {CheckPicker, Checkbox} from 'rsuite';
 import 'rsuite/dist/styles/rsuite-default.css'
 
 type FieldProps = {
@@ -46,13 +46,19 @@ function TextField(props) {
         props.onChange({field: props.name, value: e.currentTarget.value})
     }
 
-    return <input className="filter-row__field-input _text" type="text" placeholder={props.placeholder}
-                  onChange={_onChange} value={props.value}/>
+    const _onClean = () => {
+        if (props.onClean) props.onClean(props.name)
+    }
+
+    return <div className="filter-row__field-wrapper">
+        <input className="filter-row__field-input _text" type="text" placeholder={props.placeholder}
+               onChange={_onChange} value={props.value}/>
+        { props.value && <button className="field-input__clear-button" onClick={_onClean}/> }
+    </div>
 }
 
 function ComboField(props) {
     const _onClean = () => {
-        // props.value = []
         if (props.onClean) props.onClean(props.name)
     }
 
@@ -76,16 +82,21 @@ function UserField(props) {
         props.onChange({field: props.name, value: {...props.value, hasNoExecutor: checked}})
     }
 
+    const _onClean = () => {
+        if (props.onClean) props.onClean(props.name)
+    }
+
     const _onTextChange = (e) => {
         props.onChange({field: props.name, value: {...props.value, userName: e.currentTarget.value}})
     }
 
-    return <React.Fragment>
+    return <div className="filter-row__field-wrapper">
         <input className="filter-row__field-input _text" type="text"
                placeholder={props.placeholder}
                onChange={_onTextChange}
                value={props.value.userName}
                disabled={props.value.hasNoExecutor}/>
         <Checkbox onChange={_onCheckboxChange} checked={props.value.hasNoExecutor}>Не назначен</Checkbox>
-    </React.Fragment>
+        {props.value && <button className="field-input__clear-button" onClick={_onClean}/>}
+    </div>
 }

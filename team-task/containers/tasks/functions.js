@@ -90,7 +90,7 @@ export const convertFilter2Params = (filter) => {
     let _data = {}
 
     if (filter) {
-        if (filter.Executor) {
+        if (filter.Executor && (filter.Executor.hasNoExecutor || filter.Executor.userName)) {
             _data.hasExecutor = !filter.Executor.hasNoExecutor
             if (_data.hasExecutor) {
                 _data.executor = filter.Executor.userName

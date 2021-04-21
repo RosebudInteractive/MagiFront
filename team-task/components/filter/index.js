@@ -28,10 +28,12 @@ export default function Filter(props: FilterProps) {
     }
 
     const _onChange = (data) => { filterValueRef.current[data.field] = data.value }
-    const _onClean = (fieldName) => { if (filterValueRef.current[fieldName]) {
-        delete filterValueRef.current[fieldName]
-        props.onApply(filterValueRef.current)
-    } }
+    const _onClean = (fieldName) => {
+        if (filterValueRef.current[fieldName]) {
+            delete filterValueRef.current[fieldName]
+            props.onApply(filterValueRef.current)
+        }
+    }
 
     const _onApply = () => { props.onApply(filterValueRef.current) }
     const _onClear = () => { props.onApply() }

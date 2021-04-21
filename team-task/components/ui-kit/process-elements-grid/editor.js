@@ -63,7 +63,7 @@ function ElementEditor(props: ElementEditorProps) {
 
 
     return <form className="modal-form" action={"javascript:void(0)"}>
-        <div className="element-editor__dialog">
+        <div className="element-editor__dialog modal-form__dialog">
             <h6 className="process-elements-grid__title _grey100">Настройка элемента</h6>
             <Field component={Select} name={"Name"} label={"Имя элемента"} disabled={editMode} readOnly={editMode} options={getElementsForSelect()}/>
             <Field component={Select} name={"SupervisorId"} options={getEditorsForSelect()}/>
@@ -71,7 +71,7 @@ function ElementEditor(props: ElementEditorProps) {
             <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!props.hasChanges}>
                 Применить
             </button>
-            <button type="button" className="element-editor__close-button" onClick={onClose}>Закрыть</button>
+            <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>
         </div>
     </form>
 }

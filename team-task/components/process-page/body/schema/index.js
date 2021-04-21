@@ -157,7 +157,7 @@ export default function Schema(props: SchemaProps) {
             </button>
         </h6>
 
-            <div className="process-schema__canvas-background" ref={canvas}>
+            <div className="process-schema__canvas-background _with-custom-scroll" ref={canvas}>
                 <div className="process-schema__canvas" style={style}>
                     {getCells()}
                     {mounted && getLines()}

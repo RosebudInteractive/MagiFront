@@ -26,6 +26,7 @@ function CreateProcessForm(props) {
                     ExecutorPicturesControl: editorValues.ExecutorPicturesControl ? +editorValues.ExecutorPicturesControl : null,
                     ExecutorText: editorValues.ExecutorText ? +editorValues.ExecutorText : null,
                     ExecutorLiterature: editorValues.ExecutorLiterature ? +editorValues.ExecutorLiterature : null,
+                    ExecutorReadyComponents: editorValues.ExecutorReadyComponents ? +editorValues.ExecutorReadyComponents : null,
                     StructName: "Lesson Process Proto"
                 }
             })
@@ -55,8 +56,8 @@ function CreateProcessForm(props) {
     }, [props.editorValues && props.editorValues.LessonId])
 
     return <form className="modal-form" action={"javascript:void(0)"}>
-        <div className="element-editor__dialog">
-            <h6 className="process-elements-grid__title _grey100">Создание нового процесса</h6>
+        <div className="modal-form__dialog create-process-dialog _with-custom-scroll">
+            <h6 className="_grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"}/>
             <Field component={Select} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
             <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getUsers()}/>
@@ -67,12 +68,13 @@ function CreateProcessForm(props) {
             <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={_getUsers()}/>
-            <Field component={Select} name={"ExecutorText"} label={"Исполнитель - тех. стенограмма"} options={_getUsers()}/>
+            <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={_getUsers()}/>
             <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getUsers()}/>
+            <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getUsers()}/>
             <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!props.hasChanges}>
                 Применить
             </button>
-            <button type="button" className="element-editor__close-button" onClick={onClose}>Закрыть</button>
+            <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>
         </div>
     </form>
 }
