@@ -2,6 +2,8 @@ const _ = require('lodash');
 const { HttpCode } = require("../const/http-codes");
 const { UsersService } = require('../database/db-user');
 const { InvoiceService } = require('../database/db-invoice');
+const { AccessFlags } = require('../const/common');
+const { AccessRights } = require('../security/access-rights');
 
 const ALLOWED_TO_EDIT = {
     "Name": true,
@@ -299,6 +301,28 @@ function setupUsers(app) {
                 .catch(err => {
                     next(err);
                 });
+    });
+
+    app.put('/api/users/:id', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let isAdmin = AccessRights.checkPermissions(req.user, AccessFlags.PmSupervisor) !== 0;
+                if (isAdmin) {
+                    req.body.allowedToEdit = _.cloneDeep(ALLOWED_TO_EDIT);
+                    req.body.canEditRole = true;
+                    let rows = await UsersService()
+                        .update(parseInt(req.params.id), req.body, { userId: req.user.Id });
+                    res.send(rows);
+                }
+                else
+                    res.status(HttpCode.ERR_FORBIDDEN).json({ message: 'Access denied!' })
+            }
+        }
+        catch (err) {
+            next(err);
+        }
     });
 
     app.put('/api/users', (req, res, next) => {

@@ -1596,7 +1596,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let dep_id = dep_to_del.id();
                         collection._del(dep_to_del);
-                        if (taskObj.state() === TaskState.Draft) {
+                        if ((taskObj.state() === TaskState.Draft) && (process.State !== ProcessState.Draft)) {
                             let is_ready = true;
                             for (let i = 0; i < collection.count(); i++) {
                                 let dep = collection.get(i);
@@ -1917,7 +1917,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 && (inpFields.State <= Object.keys(TaskState).length)) {
                                 if (taskObj.state() !== inpFields.State) {
                                     if (inpFields.State === TaskState.Draft)
-                                        throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                        throw new HttpError(HttpCode.ERR_BAD_REQ,
                                             `Невозможно принудительно перевести задачу в состояние "${TaskStateStr[inpFields.State]}".`);
 
                                     if (processObj.state() === ProcessState.Draft)
@@ -1975,7 +1975,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
                             let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
-                                throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                             wr_set.forEach(elem => {
                                 allowed_fields.push(elem);
@@ -2108,7 +2108,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (taskObj.elementId() && taskObj.writeFieldSet()) {
                             let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
-                                throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                         }
 
@@ -2445,12 +2445,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                             catch (err) {
                                 warning = `При формировании задач процесса произошла ошибка: ${err.message}`;
+                                console.error(buildLogString(`ProcessAPI::newProcess: WARNING: ${warning}`));
                             }
                      }
 
                     if (logModif)
                         console.log(buildLogString(`Process created: Id="${newId}".`));
-                    return { result: "OK", id: newId, warning: warning };
+                    return { result: warning ? "WARNING" : "OK", id: newId, warning: warning };
                 })
         }, memDbOptions);
     }
