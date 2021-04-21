@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react'
+import React, {useEffect,} from 'react'
 import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
-import {hasSupervisorRights, userAuthSelector, whoAmI} from "tt-ducks/auth";
+import {hasSupervisorRights, userAuthSelector, initializedSelector, whoAmI, hasPmRights} from "tt-ducks/auth";
 import './assets/styles/app.sass'
 import './assets/styles/grid.sass'
 import * as webix from 'webix/webix.js';
@@ -16,11 +16,12 @@ import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
+import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, isUserAuthorized, hasSupervisorRights} = props
+    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights} = props
 
     let location = useLocation();
 
@@ -30,10 +31,9 @@ function App(props) {
 
     useEffect(() => {
         isUserAuthorized && actions.getAllDictionaryData();
-
     }, [isUserAuthorized]);
 
-    return isUserAuthorized ?
+    return isUserAuthorized && hasPmRights ?
         <React.Fragment>
             <div className="team-task tt-main-area">
                 { fetching && <LoadingPage/> }
@@ -43,16 +43,20 @@ function App(props) {
                     <AppRouter hasSupervisorRights={hasSupervisorRights}/>
                 </div>
             </div>
-
             <ReduxModalDialog/>
-        </React.Fragment> :
-        null;
+        </React.Fragment>
+        :
+        <React.Fragment>
+            { userInitialized && <AccessDeniedPlaceholder/> }
+        </React.Fragment>
 }
 
 function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
+        userInitialized: initializedSelector(state),
+        hasPmRights: hasPmRights(state),
         fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state) || dictionaryFetching(state)
     }
 }

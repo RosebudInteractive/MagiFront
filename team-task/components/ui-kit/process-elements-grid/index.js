@@ -41,6 +41,12 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
 
     const _gridData = useRef(new GridData())
 
+    const allElementsInValues = useMemo(() => {
+        return values.every((value) => {
+            return elements.find(element => element.Id === value.ElemId)
+        })
+    }, [values])
+
     useEffect(() => {
         $(window).on('resize toggle-elements-visible', resizeHandler);
         setTimeout(resizeHandler, 300);
@@ -209,7 +215,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
         <div className="grid-wrapper">
             <Webix ui={gridConfig.current} data={myValues}/>
         </div>
-        <button className="process-page__save-button orange-button small-button" disabled={props.disabled}
+        <button className="process-page__save-button orange-button small-button" disabled={props.disabled || allElementsInValues}
                 onClick={onAddElement}>
             Новый элемент
         </button>

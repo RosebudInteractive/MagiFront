@@ -6,8 +6,6 @@ import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
 import {reset} from "redux-form";
 import {all, takeEvery, put, call} from "@redux-saga/core/effects";
 
-import {LOAD_ALL} from 'tt-ducks/dictionary'
-
 /**
  * Constants
  * */
@@ -100,6 +98,12 @@ export const userAuthSelector = createSelector(stateSelector, state => state.aut
 export const initializedSelector = createSelector(stateSelector, state => state.initialized)
 export const hasSupervisorRights = createSelector(userSelector, (user) => {
     return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms)
+})
+export const hasPmRights = createSelector(userSelector, (user) => {
+    return user && user.PData && (
+        user.PData.isAdmin ||
+        user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms || user.PData.roles.pme || user.PData.roles.pmu)
+    )
 })
 
 export const errorSelector = createSelector(stateSelector, state => state.error)

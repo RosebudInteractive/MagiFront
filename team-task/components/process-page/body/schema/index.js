@@ -58,24 +58,15 @@ export default function Schema(props: SchemaProps) {
     useEffect(() => {
         if (active !== activeTaskId) {
             setActive(activeTaskId)
-
-            if (activeTaskId && $("#js-task_" + activeTaskId).length) {
-                setTimeout(() => {
-                    $("#js-task_" + activeTaskId)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
-                }, 300)
-
-            }
+            // if (activeTaskId && $("#js-task_" + activeTaskId).length) {
+            //     setTimeout(() => {
+            //         setActive(activeTaskId)
+            //         $("#js-task_" + activeTaskId)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
+            //     }, 2000)
+            //
+            // }
         }
     }, [activeTaskId, tree])
-
-    // useEffect(() => {
-    //     if (active && $("#js-task_" + active).length) {
-    //         setTimeout(() => {
-    //             $("#js-task_" + active)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
-    //         }, 300)
-    //
-    //     }
-    // }, [active, tree])
 
     const toggleElems = () => {
         if (canvas && canvas.current) {

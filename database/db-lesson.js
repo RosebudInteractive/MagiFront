@@ -757,20 +757,24 @@ const CHECK_IF_CAN_DEL_EPI_MYSQL =
     "where (e.`Id` = <%= id %>) and (eln.`State` = 'R')";
 
 const GET_LESSON_LIST_MSSQL =
-    "select l.[Id], ll.[Name], l.[CourseId], cl.[Name] as [CourseName], al.[AuthorId],\n" +
+    "select distinct l.[Id], ll.[Name], l.[CourseId], cl.[Name] as [CourseName], al.[AuthorId],\n" +
     "  al.[FirstName], al.[LastName]\n" +
     "from [CourseLng] cl\n" +
     "  join [Lesson] l on l.[CourseId] = cl.[CourseId]\n" +
     "  join [LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
-    "  join [AuthorLng] al on al.[AuthorId] = l.[AuthorId]";
+    "  join [AuthorLng] al on al.[AuthorId] = l.[AuthorId]\n" +
+    "  join [LessonCourse] lc on lc.[LessonId] = l.[Id]\n" +
+    "  left join [PmProcess] p on p.[LessonId] = l.[Id]";
 
 const GET_LESSON_LIST_MYSQL =
-    "select l.`Id`, ll.`Name`, l.`CourseId`, cl.`Name` as `CourseName`, al.`AuthorId`,\n" +
+    "select distinct l.`Id`, ll.`Name`, l.`CourseId`, cl.`Name` as `CourseName`, al.`AuthorId`,\n" +
     "  al.`FirstName`, al.`LastName`\n" +
     "from `CourseLng` cl\n" +
     "  join `Lesson` l on l.`CourseId` = cl.`CourseId`\n" +
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
-    "  join `AuthorLng` al on al.`AuthorId` = l.`AuthorId`";
+    "  join `AuthorLng` al on al.`AuthorId` = l.`AuthorId`\n" +
+    "  join `LessonCourse` lc on lc.`LessonId` = l.`Id`\n" +
+    "  left join `PmProcess` p on p.`LessonId` = l.`Id`";
 
 const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
 const { IdxLessonService } = require('./elastic/indices/idx-lesson');
@@ -1041,6 +1045,14 @@ const DbLesson = class DbLesson extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
+        if ((opts.woProc === true) || (opts.woProc === "true")) {
+            mssql_conds.push(`(p.[Id] is NULL)`);
+            mysql_conds.push("(p.`Id` is NULL)");
+        }
+        if ((opts.draft === true) || (opts.draft === "true")) {
+            mssql_conds.push(`(lc.[State] = 'D')`);
+            mysql_conds.push("(lc.`State` = 'D')");
+        }
         if (opts.course) {
             mssql_conds.push(`(cl.[Name] like N'%${opts.course}%')`);
             mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course}%')`);

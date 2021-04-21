@@ -550,7 +550,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 predicate
                     .addCondition({ field: "Id", op: "=", value: id });
 
-                let exp_filtered = { expr: { model: { name: "User" } } };
+                let exp_filtered = user_data.canEditRole &&
+                    user_data.alter && user_data.alter.PData ? Object.assign({}, USER_USERROLE_EXPRESSION) : { expr: { model: { name: "User" } } };
                 exp_filtered.expr.predicate = predicate.serialize(true);
                 this._db._deleteRoot(predicate.getRoot());
 
@@ -568,7 +569,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                     return root_obj.edit();
                 })
-                .then(() => {
+                .then(async () => {
                     let collection = root_obj.getCol("DataElements");
                     if (collection.count() !== 1)
                         throw new Error("UsersBaseCache::editUser: User doesn't exist.");
@@ -577,11 +578,39 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     let rc = Promise.resolve();
                     let editableFields = user_data.allowedToEdit ? user_data.allowedToEdit : ALLOWED_TO_EDIT;
                     if (user_data.alter) {
-                        for (let key in user_data.alter){
+                        for (let key in user_data.alter) {
                             if (editableFields[key]) {
                                 user[this._genGetterName(key)](user_data.alter[key]);
                             }
                         };
+                        if (user_data.canEditRole && user_data.alter.PData) {
+                            let newPdata = _.cloneDeep(user_data.alter.PData);
+                            let roles = _.cloneDeep(user_data.alter.PData.roles)
+                            if (user_data.alter.PData.isAdmin) {
+                                roles["a"] = 1;
+                            }
+                            newPdata.isAdmin = user_data.alter.PData.isAdmin ? true : false;
+                            let root_role = user.getDataRoot("UserRole");
+                            let col_role = root_role.getCol("DataElements");
+                            let to_delete = [];
+                            for (let i = 0; i < col_role.count(); i++) {
+                                let obj = col_role.get(i);
+                                let role = await this.getRoleById(obj.roleId());
+                                if (!roles[role.ShortCode])
+                                    to_delete.push(obj);
+                                else
+                                    delete roles[role.ShortCode];
+                            }
+                            for (let i = 0; i < to_delete.length; i++)
+                                col_role._del(to_delete[i]);
+                            for (let key in roles) {
+                                let role = await this.getRoleByCode(key);
+                                if (!role)
+                                    throw new Error(`UsersBaseCache::editUser:Role "${key}" doesn't exist!`);
+                                await root_role.newObject({ fields: { AccountId: ACCOUNT_ID, RoleId: role.Id } }, dbopts);
+                            }
+                            user.pData(JSON.stringify(newPdata));
+                        }
                     }
                     else {
                         if (user_data.DisplayName)
