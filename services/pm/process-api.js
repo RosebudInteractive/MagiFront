@@ -836,6 +836,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
+        if ((typeof (opts.id) === "number") && (!isNaN(opts.id))) {
+            mssql_conds.push(`(s.[Id] = ${opts.id})`);
+            mysql_conds.push(`(s.${'`'}Id${'`'} = ${opts.id})`);
+        }
+
         if (opts.name) {
             mssql_conds.push(`(e.[Name] like N'%${opts.name}%')`);
             mysql_conds.push(`(e.${'`'}Name${'`'} like '%${opts.name}%')`);
