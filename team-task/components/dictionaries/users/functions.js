@@ -31,7 +31,7 @@ export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
         role = _params.get("role"),
-        displayName = _params.get("displayName"),
+        name = _params.get("name"),
         email = _params.get("email");
 
     let _order = _params.get('order');
@@ -40,7 +40,7 @@ export const parseParams = () => {
         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
     }
 
-    const _filter = convertParam2Filter({role, displayName, email});
+    const _filter = convertParam2Filter({role, name, email});
     if (_filter) {
         paramsData.filter = _filter
     }
@@ -48,13 +48,13 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({role, displayName, email}) => {
-    if (!(role || displayName || email)) return null;
+const convertParam2Filter = ({role, name, email}) => {
+    if (!(role || name || email)) return null;
 
     const filter = {};
     filter.Role = role ? role.split(",") : '';
     filter.Email = email ? email : '';
-    filter.DisplayName = displayName ? displayName : '';
+    filter.DisplayName = name ? name : '';
 
     return filter
 };
@@ -84,9 +84,9 @@ export const convertFilter2Params = (filter) => {
 
     if (filter) {
         if(filter.Role) { _data.role = filter.Role.join(',')}
-        if (filter.DisplayName) {_data.displayName = filter.DisplayName}
+        if (filter.DisplayName) {_data.name = filter.DisplayName}
         if (filter.Email) {_data.email = filter.Email}
-    }
+    }q
 
     return _data
-}
+};

@@ -67,6 +67,16 @@ export const commonGetQuery = (url) => {
         .then(parseJSON)
 }
 
+export const update = (url, data) => {
+    return fetch(url,{
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT',
+        body: data
+    });
+};
+
 export const mockFetch = (resultData) => {
     return new Promise((resolve) => {
             resolve({

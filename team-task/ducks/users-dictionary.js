@@ -1,7 +1,7 @@
 import {appName} from "../config";
-import {List, Record} from "immutable";
+import {Record} from "immutable";
 import {createSelector} from 'reselect'
-import {commonGetQuery} from "common-tools/fetch-tools";
+import {commonGetQuery, update} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage, showInfo} from "tt-ducks/messages";
 import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
@@ -28,7 +28,7 @@ const CLEAN_SELECTED_USER = `${prefix}/CLEAN_SELECTED_USER`;
 const FIND_USER_BY_EMAIL = `${prefix}/FIND_USER_BY_EMAIL`;
 const FIND_USER_BY_ID = `${prefix}/FIND_USER_BY_ID`;
 const CHANGE_USER = `${prefix}/CHANGE_USER`; // runs before request
-const UPDATE_USER = `${prefix}/CHANGE_USER`; // runs after request complete succesfully
+const UPDATE_USER = `${prefix}/UPDATE_USER`; // runs after request complete succesfully
 
 //store
 
@@ -49,10 +49,10 @@ const defaultExampleUsers = [
 
 //store
 
-const UsersRecord = List([]);
+// const UsersRecord = List([]);
 
 export const ReducerRecord = Record({
-    users: UsersRecord,
+    users: [],
     fetching: false,
     selectedUser: null,
     userFormOpened: false
@@ -78,17 +78,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('selectedUser', payload);
         }
         case UPDATE_USER: {
-            // const userIndex = state.users.findIndex(user => user.Id === payload.Id); //todo move to sagas
-            // const updatedUser = payload;
-            // if(userIndex > 0) {
-            //     return state.users.set(userIndex, updatedUser);
-            // } else {
-            //     return state;
-            // }
-
-            return state.users.set(payload.index, payload.updatedUser);
-
-
+            return state.set('users', payload);
         }
         case CLEAN_SELECTED_USER:
             return state.set('selectedUser', null);
@@ -117,13 +107,10 @@ export const selectUser = (userId) => {
     return {type: SELECT_USER_REQUEST, payload: userId}
 };
 
-export const saveUserChanges = (userId, userData) => {
-    return {type: CHANGE_USER, payload: {userId, userData}}
+export const saveUserChanges = (userData) => {
+    return {type: CHANGE_USER, payload: {userData}}
 };
 
-export const updateUser = (newUserData) => {
-    return {type: UPDATE_USER, payload: newUserData};
-};
 
 export const toggleUserForm = (isOn) => {
     return {type: TOGGLE_USER_FORM_VISIBILITY, payload: isOn}
@@ -149,7 +136,8 @@ export const saga = function* () {
     yield all([
         takeEvery(LOAD_USERS, getUsersSaga),
         takeEvery(SELECT_USER_REQUEST, selectUserById),
-        takeEvery(FIND_USER_BY_EMAIL, selectUserEmail)
+        takeEvery(FIND_USER_BY_EMAIL, selectUserEmail),
+        takeEvery(CHANGE_USER, changeUser)
     ])
 };
 
@@ -214,7 +202,26 @@ function* selectUserEmail(data){
     }
 }
 
+function* changeUser(data){
+    try {
+        const users = yield select(usersDictionarySelector);
+        const userIndex = users.findIndex(user => user.Id === data.payload.userData.Id);
+        if ((userIndex) && userIndex >= 0) {
+            users[userIndex] = data.payload.userData;
+            yield put({type: UPDATE_USER, payload: users});
+            yield put({type:START_REQUEST});
+            yield call(_updateUser, data.payload.userData);
+            yield put({type:SUCCESS_REQUEST});
+        }
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        yield put(showInfo({content: 'Ошибка при обновлении пользователя', title: 'Ошибка при обновлении пользователя'}));
+    }
+}
+
 const _getUsers = (params) => {
+
+
     let _urlString = '';
     if(params.includes('role=')){
         _urlString = `/api/users/list?${params}`;
@@ -224,6 +231,21 @@ const _getUsers = (params) => {
 
     return commonGetQuery(_urlString)
 };
+
+const _updateUser = (newUserData) => {
+    const userDataRoles = newUserData.PData.roles;
+    const data = {
+        "alter":  {
+            "PData": {
+                "roles": {
+                    ...userDataRoles
+                }
+            }
+        }
+    };
+    const jsoned = JSON.stringify(data);
+    return update(`/api/users/${newUserData.Id}`, jsoned);
+}
 
 
 

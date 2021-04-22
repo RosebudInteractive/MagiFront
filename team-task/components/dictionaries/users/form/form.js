@@ -6,9 +6,10 @@ import {Select, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedUser,
     findUserByEmail,
+    saveUserChanges,
     selectedUserSelector,
     toggleUserForm,
-    userFormOpenedSelector
+    userFormOpenedSelector,
 } from "tt-ducks/users-dictionary";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -41,6 +42,12 @@ const UserForm = (props) => {
 
     const handleSubmit = (userInfo) => {
         //save logic here
+        const data = {...userData,
+            PData: {
+                roles: (userInfo.role && (userInfo.role.length > 0)) ? Object.fromEntries([[userInfo.role, 1]]) : userData.PData.roles,
+                isAdmin: userData.PData.isAdmin
+            }};
+        actions.saveUserChanges(data);
         closeModalForm()
     };
 
@@ -85,6 +92,7 @@ const UserForm = (props) => {
                                             placeholder="Почта"
                                             label={"Почта"}
                                             validate={ComposeValidators(vRequired, vMustBeEmail)}
+                                            disabled={true}
                                         />
 
                                     {(createAction) &&
@@ -99,6 +107,7 @@ const UserForm = (props) => {
                                         type="text"
                                         placeholder="Имя"
                                         label={"Имя"}
+                                        disabled={true}
                                     />
                                 </div>
                                 <div className='user-form__field'>
@@ -135,7 +144,8 @@ const mapDispatch2Props = (dispatch) => {
         actions: bindActionCreators({
             toggleUserForm,
             cleanSelectedUser,
-            findUserByEmail
+            findUserByEmail,
+            saveUserChanges
         }, dispatch)
     }
 };
