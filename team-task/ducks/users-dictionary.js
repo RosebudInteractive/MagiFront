@@ -206,7 +206,7 @@ function* changeUser(data){
     try {
         const users = yield select(usersDictionarySelector);
         const userIndex = users.findIndex(user => user.Id === data.payload.userData.Id);
-        if ((userIndex) && userIndex >= 0) {
+        if (userIndex >= 0) {
             users[userIndex] = data.payload.userData;
             yield put({type: UPDATE_USER, payload: users});
             yield put({type:START_REQUEST});
@@ -233,13 +233,14 @@ const _getUsers = (params) => {
 };
 
 const _updateUser = (newUserData) => {
-    const userDataRoles = newUserData.PData.roles;
+    const {roles, isAdmin} = newUserData.PData;
     const data = {
         "alter":  {
             "PData": {
                 "roles": {
-                    ...userDataRoles
-                }
+                    ...roles
+                },
+                "isAdmin": isAdmin
             }
         }
     };

@@ -7,6 +7,7 @@ import {saga as processSaga} from 'tt-ducks/process'
 import {saga as processesSaga} from 'tt-ducks/processes'
 import {saga as routeSaga} from 'tt-ducks/route'
 import {saga as usersDictionarySaga} from 'tt-ducks/users-dictionary'
+import {saga as componentsDictionarySaga} from 'tt-ducks/components-dictionary'
 import {saga as dictionarySaga} from 'tt-ducks/dictionary'
 
 export default function* rootSaga() {
@@ -19,6 +20,7 @@ export default function* rootSaga() {
         processesSaga(),
         routeSaga(),
         usersDictionarySaga(),
-        dictionarySaga()
+        dictionarySaga(),
+        componentsDictionarySaga()
     ])
 }

@@ -45,7 +45,7 @@ const UserForm = (props) => {
         const data = {...userData,
             PData: {
                 roles: (userInfo.role && (userInfo.role.length > 0)) ? Object.fromEntries([[userInfo.role, 1]]) : userData.PData.roles,
-                isAdmin: userData.PData.isAdmin
+                isAdmin: (userInfo.role && (userInfo.role === 'a'))
             }};
         actions.saveUserChanges(data);
         closeModalForm()
