@@ -314,7 +314,7 @@ const _getLessons = () => {
 };
 
 const _getAvailableForCreationLessons = () => {
-    return commonGetQuery("/api/lessons-list?woProc=true&draft=true")
+    return commonGetQuery("/api/lessons-list?woProc=true&draft=true&order=Lesson")
 };
 
 const _getAUsers = () => {
