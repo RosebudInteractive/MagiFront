@@ -42,9 +42,15 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     const _gridData = useRef(new GridData())
 
     const allElementsInValues = useMemo(() => {
-        return values.every((value) => {
+        const _allValuesInElements = values.every((value) => {
             return elements.find(element => element.Id === value.ElemId)
         })
+
+        const _allElementsInValue = elements.every((element) => {
+            return values.find(value => element.Id === value.ElemId)
+        })
+
+        return _allValuesInElements && _allElementsInValue
     }, [values])
 
     useEffect(() => {
@@ -198,8 +204,6 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     }
 
     const onApply = (value) => {
-        console.log(value)
-
         if (elementInEditMode) {
             onUpdate(value)
         } else {

@@ -102,5 +102,8 @@ const CssFormControlLabel = withStyles({
 })(FormControlLabel);
 
 export default function UiCheckbox(props) {
-    return <CssFormControlLabel control={<Checkbox {...props.input} />} label={props.label}/>
+
+    const _value = !!props.input.value
+
+    return <CssFormControlLabel control={<Checkbox checked={_value} {...props.input} />} label={props.label}/>
 }
