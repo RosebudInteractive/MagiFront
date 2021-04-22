@@ -2027,7 +2027,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             taskObj.elementId(inpFields.ElementId);
                         }
 
-                        if ((typeof (inpFields.IsElemReady) === "boolean") && (taskObj.isElemReady() !== inpFields.ElementId)) {
+                        if ((typeof (inpFields.IsElemReady) === "boolean") && (taskObj.isElemReady() !== inpFields.IsElemReady)) {
                             if (!isSupervisor)
                                 throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять зависимость элемента задачи.`);
                             taskObj.isElemReady(inpFields.IsElemReady);
@@ -2101,13 +2101,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Недопустимое значение или тип поля "State": ${inpFields.State} тип: "${typeof (inpFields.State)}".`);
 
+                        let newAlertId = null;
                         if (typeof (inpFields.Comment) === "string") {
                             let root_log = taskObj.getDataRoot("PmTaskLog");
                             let newHandler = await root_log.newObject({
                                 fields: { Text: inpFields.Comment, UserId: opts.user.Id }
                             }, dbOpts);
                             if (taskObj.state() === TaskState.Alert)
-                                taskObj.alertId(newHandler.keyValue);
+                                newAlertId = newHandler.keyValue;
                         }
 
                         if ((typeof (inpFields.WriteFieldSet) !== "undefined") && (taskObj.writeFieldSet() !== inpFields.WriteFieldSet)) {
@@ -2147,6 +2148,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             for (let i = 0; i < child_tasks.length; i++)
                                 await child_tasks[i].save(dbOpts);
                             await taskObj.save(dbOpts);
+                            if (newAlertId) {
+                                await taskObj.edit();
+                                taskObj.alertId(newAlertId);
+                                await taskObj.save(dbOpts);
+                            }
                             await processObj.save(dbOpts);
                             if (elemObj)
                                 await elemObj.save(dbOpts);
