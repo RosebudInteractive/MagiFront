@@ -4,14 +4,13 @@ import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
 import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showError, showErrorMessage} from "tt-ducks/messages";
+import {showError, showErrorMessage, showWarning} from "tt-ducks/messages";
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import type {
     CreatingElement,
     CreatingProcess,
-    CreatingProcessParams,
     UpdatingElement,
     UpdatingProcess
 } from "../types/process";
@@ -190,11 +189,13 @@ export const saga = function* () {
 function* createProcessSaga({payload}) {
     const data: CreatingProcess = payload
 
-    console.log(data)
-
     yield put({type: CREATE_PROCESS_START})
     try {
         const result = yield call(_postProcess, data)
+
+        if (result.result === "WARNING") {
+            yield put(showWarning(result.warning))
+        }
         yield put(goToProcess(result.id))
         yield put({type: CREATE_PROCESS_SUCCESS})
     } catch (e) {

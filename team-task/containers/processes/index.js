@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
 import {createProcess,} from "tt-ducks/process";
-import {lessonsSelector, userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
+import {availableForCreationLessons, userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
 import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
 import "./processes.sass"
 import Webix from "../../components/Webix";
@@ -142,7 +142,7 @@ function Processes(props) {
         <div className="grid-container">
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
-        {createFormVisible && <CreateProcessForm onApply={actions.createProcess} onClose={closeProcessForm} lessons={props.lessons} users={props.supervisors}/>}
+        {createFormVisible && <CreateProcessForm onApply={actions.createProcess} onClose={closeProcessForm} lessons={props.availableForCreationLessons} users={props.supervisors}/>}
     </div>
 }
 
@@ -152,7 +152,7 @@ const mapState2Props = (state) => {
         states: statesSelector(state),
         fetching: fetchingSelector(state),
         supervisors: userWithSupervisorRightsSelector(state),
-        lessons: lessonsSelector(state),
+        availableForCreationLessons: availableForCreationLessons(state),
     }
 }
 

@@ -53,6 +53,7 @@ export const UsersRecord = Record({
 
 export const ReducerRecord = Record({
     lessons: [],
+    availableForCreationLessons: [],
     users: new UsersRecord(),
     processStructures: [],
     nextTimeToLoadData: 0,
@@ -74,7 +75,8 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pms'], payload.pms)
                 .setIn(['users', 'pme'], payload.pme)
                 .setIn(['users', 'pmu'], payload.pmu)
-                .set('lessons', payload.lessons);
+                .set('lessons', payload.lessons)
+                .set('availableForCreationLessons', payload.availableForCreationLessons)
         case SET_NEXT_TIME_TO_LOAD:
             return state.set('nextTimeToLoadData', payload);
         case SET_LESSONS:
@@ -101,6 +103,7 @@ const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+export const availableForCreationLessons = createSelector(stateSelector, state => state.availableForCreationLessons);
 export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
     return [...state.users.a, state.users.pma, state.users.pms]
 });
@@ -134,7 +137,6 @@ export const saga = function* () {
     yield all([
         takeEvery(LOAD_ALL, getDictionaryDataSaga),
         takeEvery(LOAD_LESSONS, getLessonsDataSaga),
-        // takeEvery(LOAD_PROCESS_STRUCTURES, deleteElementSaga),
         takeEvery(LOAD_USERS, getUsersDataSaga),
         takeEvery(REQUEST_FAIL_WITH_ERROR, showErrorMessage),
         takeEvery(REQUEST_START, fetchingToggle),
@@ -165,7 +167,8 @@ function* getDictionaryDataSaga(data) {
                 _pms,
                 _pme,
                 _pmu,
-                _lessons
+                _lessons,
+                _availableForCreationLessons
             ] = yield all([
                 call(_getAUsers),
                 call(_getPmaUsers),
@@ -173,6 +176,7 @@ function* getDictionaryDataSaga(data) {
                 call(_getPmeUsers),
                 call(_getPmuUsers),
                 call(_getLessons),
+                call(_getAvailableForCreationLessons),
             ]);
 
             if(_a && _pma && _pms && _pme && _pmu && _lessons){
@@ -185,7 +189,8 @@ function* getDictionaryDataSaga(data) {
                         pms: _pms,
                         pme: _pme,
                         pmu: _pmu,
-                        lessons: _lessons
+                        lessons: _lessons,
+                        availableForCreationLessons: _availableForCreationLessons
                     }
                 });
 
@@ -306,6 +311,10 @@ const _getAllUsers = () => {
 
 const _getLessons = () => {
     return commonGetQuery("/api/lessons-list")
+};
+
+const _getAvailableForCreationLessons = () => {
+    return commonGetQuery("/api/lessons-list?woProc=true&draft=true&order=Lesson")
 };
 
 const _getAUsers = () => {
