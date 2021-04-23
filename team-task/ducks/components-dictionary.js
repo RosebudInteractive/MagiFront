@@ -170,6 +170,7 @@ function* changeComponent(data) {
             }
             yield put({type: SUCCESS_REQUEST});
             yield put({type: UPDATE_COMPONENT, payload: components});
+            yield put(getComponents());
         }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
