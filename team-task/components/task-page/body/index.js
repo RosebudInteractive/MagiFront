@@ -11,6 +11,7 @@ type TaskBodyProps = {
     currentWriteFieldSet: ?string,
     users: Array,
     isSupervisor: boolean,
+    onStartClick: Function,
 }
 
 export default function TaskBody(props: TaskBodyProps) {
@@ -21,7 +22,9 @@ export default function TaskBody(props: TaskBodyProps) {
             isSupervisor={isSupervisor}
             elements={props.elements}
             currentElement={currentElement}
-            currentWriteFieldSet={props.currentWriteFieldSet}/>
+            currentWriteFieldSet={props.currentWriteFieldSet}
+            taskState={task.State}
+            onStartClick={props.onStartClick}/>
         <RightBlock task={task} users={props.users} isSupervisor={isSupervisor}/>
     </div>
 }
