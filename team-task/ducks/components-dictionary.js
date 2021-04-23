@@ -118,8 +118,8 @@ export const saga = function* () {
 };
 
 function* getComponentsSaga() {
+    yield put({type: START_REQUEST});
     try {
-        yield put({type: START_REQUEST});
         const params = yield select(paramsSelector);
         const components = yield call(_getComponents, params);
 
@@ -178,7 +178,6 @@ function* changeComponent(data) {
 }
 
 const _getComponents = (params) => {
-
     let _urlString = `/api/pm/process-struct/elements?${params}`;
     return commonGetQuery(_urlString)
 };

@@ -24,7 +24,6 @@ import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import './components.sass'
-import PlusIco from "tt-assets/svg/plus.svg";
 import ComponentForm from "./form/form";
 
 let _componentsCount = 0;
@@ -73,6 +72,10 @@ const DictionaryComponents = (props) => {
         initState.pathname = location.pathname;
         actions.setInitState(initState);
 
+        if(!fetching && supervisors.length > 0){
+            actions.getComponents();
+        }
+
 
     }, [location]);
 
@@ -98,10 +101,6 @@ const DictionaryComponents = (props) => {
             {id: 'Name', header: 'Имя компонента', minWidth: 100, fillspace: 25},
             {id: 'SupervisorName', header: 'Ответственный', minWidth: 100, fillspace: 25},
             {id: 'StructName', header: 'Структура Проекта', minWidth: 100, fillspace: 35},
-            {
-                id: '', width: 50,
-                template: "<button class='process-elements-grid__button elem-delete remove-component-button'/>"
-            },
         ],
         on: {
             onHeaderClick: function (header) {
@@ -133,10 +132,14 @@ const DictionaryComponents = (props) => {
         },
     };
 
-    const FILTER_CONFIG: Array<FilterField> = useMemo(() => getFilterConfig(filter.current), [filter.current]);
+    const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
+            return getFilterConfig(filter.current)
+    }, [filter.current]);
 
-    const _onApplyFilter = (filter) => {
-        let params = convertFilter2Params(filter);
+    const _onApplyFilter = (filterData) => {
+        filter.current = filterData;
+        let params = convertFilter2Params(filterData);
+        console.log('_onApplyFilter')
         actions.applyFilter(params)
     };
 
@@ -144,11 +147,8 @@ const DictionaryComponents = (props) => {
     return (
         <React.Fragment>
             <div className="dictionary-components-page form _scrollable-y">
-                <h5 className="form-header _grey70">Справочник пользователей</h5>
+                <h5 className="form-header _grey70">Справочник компонентов</h5>
                 <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-                <button className="open-form-button" onClick={openUserForm}>
-                    <PlusIco/>
-                </button>
                 <div className="grid-container components-table">
                     <Webix ui={GRID_CONFIG} data={components}/>
                 </div>
