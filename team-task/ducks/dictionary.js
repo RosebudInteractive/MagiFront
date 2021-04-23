@@ -3,12 +3,9 @@ import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {hasSupervisorRights} from "tt-ducks/auth";
-import {SHOW_ERROR} from "tt-ducks/messages";
+import {SHOW_ERROR, showError} from "tt-ducks/messages";
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {showError} from "tt-ducks/messages";
 import moment from 'moment';
-
-
 
 
 //todo processStructures after request-query completed
@@ -103,6 +100,10 @@ export const dictionaryFetching = createSelector(stateSelector, state => state.f
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
 export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
     return [...state.users.a, state.users.pma, state.users.pms]
+});
+
+export const userWithSupervisorRightsSelectorFlatten = createSelector(stateSelector, (state) => {
+    return [...state.users.a, ...state.users.pma, ...state.users.pms]
 });
 
 // actions

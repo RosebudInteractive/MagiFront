@@ -12,38 +12,42 @@ import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
 import type {FilterField} from "../../filter/types";
-// import { getTasks, goToTask, statesSelector, tasksSelector} from "tt-ducks/tasks";
 import {
     componentsDictionarySelector,
     fetchingSelector,
     getComponents,
     selectComponent,
-    toggleComponentForm
-} from "tt-ducks/users-dictionary";
+    toggleComponentForm,
+} from "tt-ducks/components-dictionary";
+import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary"
 import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
-// import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";
 import './components.sass'
 import PlusIco from "tt-assets/svg/plus.svg";
+import ComponentForm from "./form/form";
 
 let _componentsCount = 0;
 
-//TODO rename functions/constants etc...
-
 const DictionaryComponents = (props) => {
-    const {components, fetching, actions} = props;
+    const {components, fetching, actions, supervisors} = props;
     const location = useLocation();
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
     const openUserForm = () => {
-        actions.toggleUserForm(true);
+        actions.toggleComponentForm(true);
     };
 
     useWindowSize(() => {
         resizeHandler(_componentsCount)
     });
+
+    useEffect(() => {
+        if(!fetching &&  supervisors.length > 0 && supervisors.some(sup => sup.hasOwnProperty('Id'))) {
+            actions.getComponents();
+        }
+    },[supervisors]);
 
     useEffect(() => {
         _componentsCount = props.components.length;
@@ -69,12 +73,10 @@ const DictionaryComponents = (props) => {
         initState.pathname = location.pathname;
         actions.setInitState(initState);
 
-        if (!fetching) {
-            actions.getUsers()
-        }
-
 
     }, [location]);
+
+
 
     const _onResize = useCallback(() => {
         resizeHandler(components.length)
@@ -93,18 +95,9 @@ const DictionaryComponents = (props) => {
         editable: false,
         columns: [
             {id: 'Id', header: 'Id', minWidth: 50, fillspace: 10},
-            {id: 'DisplayName', header: 'Имя пользователя', minWidth: 100, fillspace: 25},
-            {id: 'Email', header: 'Почта', minWidth: 100, fillspace: 25},
-            {
-                id: 'Role', header: 'Роль пользователя', minWidth: 100, fillspace: 35, editor: 'select',
-                options: [
-                    {id: 'pma', value: USER_ROLE_STRINGS.pma},
-                    {id: 'pms', value: USER_ROLE_STRINGS.pms},
-                    {id: 'pme', value: USER_ROLE_STRINGS.pme},
-                    {id: 'pmu', value: USER_ROLE_STRINGS.pmu},
-                    {id: 'a', value: USER_ROLE_STRINGS.a}
-                ],
-            },
+            {id: 'Name', header: 'Имя компонента', minWidth: 100, fillspace: 25},
+            {id: 'SupervisorName', header: 'Ответственный', minWidth: 100, fillspace: 25},
+            {id: 'StructName', header: 'Структура Проекта', minWidth: 100, fillspace: 35},
             {
                 id: '', width: 50,
                 template: "<button class='process-elements-grid__button elem-delete remove-component-button'/>"
@@ -127,8 +120,8 @@ const DictionaryComponents = (props) => {
             onItemClick: function (id) {
                 const item = this.getItem(id);
                 if (item && item.Id) {
-                    actions.selectUser(item.Id);
-                    actions.toggleUserForm(true);
+                    actions.selectComponent(item.Id);
+                    actions.toggleComponentForm(true);
                 }
 
             }
@@ -159,7 +152,7 @@ const DictionaryComponents = (props) => {
                 <div className="grid-container components-table">
                     <Webix ui={GRID_CONFIG} data={components}/>
                 </div>
-                <UserForm/>
+                <ComponentForm/>
             </div>
 
         </React.Fragment>
@@ -170,6 +163,7 @@ const mapState2Props = (state) => {
     return {
         components: componentsDictionarySelector(state),
         fetching: fetchingSelector(state),
+        supervisors: userWithSupervisorRightsSelectorFlatten(state)
     }
 };
 

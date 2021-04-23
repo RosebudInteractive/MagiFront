@@ -1,18 +1,18 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form} from "react-final-form";
-import {USER_ROLE_STRINGS} from "../../../../constants/dictionary-users";
 import "./form.sass"
 import {Select, TextBox} from '../../../ui-kit'
 import {
-    cleanSelectedUser,
-    findUserByEmail,
-    selectedUserSelector,
-    toggleUserForm,
-    userFormOpenedSelector
-} from "tt-ducks/users-dictionary";
+    cleanSelectedComponent,
+    componentFormOpenedSelector,
+    saveComponentChanges,
+    selectedComponentSelector,
+    toggleComponentForm
+} from "tt-ducks/components-dictionary";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
+import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
 
 const vRequired = value => (value ? undefined : 'Обязательное поле');
 const vMinValue = min => value =>
@@ -22,51 +22,58 @@ const ComposeValidators = (...validators) => value =>
     validators.reduce((error, validator) => error || validator(value), undefined);
 
 
-const UserForm = (props) => {
+const ComponentForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const { userData, visible, actions} = props;
+    const { componentData, visible, actions, supervisors} = props;
 
     useEffect(()=>{
-        setActionCreate(!(userData && userData.Id));
-    }, [userData]);
+        setActionCreate(!(componentData && componentData.Id));
+    }, [componentData]);
 
     const closeModalForm = () => {
-        actions.toggleUserForm(false);
-        actions.cleanSelectedUser();
+        actions.toggleComponentForm(false);
+        actions.cleanSelectedComponent();
     };
 
-    const userRoles = () => {
-        return Object.entries(USER_ROLE_STRINGS).map(val => ({id: val[0], name: val[1]}));
-    };
+    const responsibles = useMemo(() => {
+        if(supervisors.length > 0 && supervisors.some(sup => sup.hasOwnProperty('Id'))){
+            return supervisors.map(sup => ({id: sup.Id, name: sup.DisplayName}))
+        }
+    }, [supervisors]);
 
-    const handleSubmit = (userInfo) => {
-        //save logic here
+    const handleSubmit = (componentInfo) => {
+        const newComponentData = {...componentData,
+            SupervisorId: componentInfo.supervisorId,
+            Name: componentInfo.name,
+            };
+        if(createAction){
+            //create new component logic
+        } else {
+            actions.saveComponentChanges(componentData.Id, newComponentData);
+        }
+
         closeModalForm()
     };
 
-    const findUserByEmail = (formInfo) => {
-        actions.findUserByEmail(formInfo.values.email);
-    };
-
-    const userFormData = useMemo(() => ({
-        displayName: (userData && userData.DisplayName) ? userData.DisplayName : '',
-        email: (userData && userData.Email) ? userData.Email : '',
-        role: (userData && userData.Role) ? userData.Role : ''
-    }), [userData]);
+    const componentFormData = useMemo(() => ({
+        name: (componentData && componentData.Name) ? componentData.Name : '',
+        supervisorId: (componentData && componentData.SupervisorId) ? componentData.SupervisorId : '',
+        structName: (componentData && componentData.StructName) ? componentData.StructName : ''
+    }), [componentData]);
 
     return (
-        visible &&
+        (visible && (supervisors && supervisors.length > 0)) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="element-editor__close-button" onClick={closeModalForm}>Закрыть</button>
                 <div className="title">
                     <h6>
-                        {createAction ? 'Создание' : 'Редактирование'} пользователя
+                        {createAction ? 'Создание' : 'Редактирование'} Компонента
                     </h6>
                 </div>
                 < Form
                     initialValues={
-                        userFormData
+                        componentFormData
                     }
                      onSubmit={values => {
                      }}
@@ -74,43 +81,41 @@ const UserForm = (props) => {
                     }
                     }>
                     {
-                        (userForm) => (
-                            <form className='user-form' onSubmit={e => {e.preventDefault(); handleSubmit(userForm.values)}}>
+                        (componentForm) => (
+                            <form className='component-form' onSubmit={e => {e.preventDefault(); handleSubmit(componentForm.values)}}>
 
-                                <div className='user-form__field email-field'>
+                                <div className='component-form__field email-field'>
                                         <Field
-                                            name="email"
+                                            name="name"
                                             component={TextBox}
                                             type="text"
-                                            placeholder="Почта"
-                                            label={"Почта"}
-                                            validate={ComposeValidators(vRequired, vMustBeEmail)}
+                                            placeholder="Имя компонента"
+                                            label={"Имя компонента"}
+                                            validate={vRequired}
                                         />
-
-                                    {(createAction) &&
-                                    <button type="button" className="search-button" onClick={() => findUserByEmail(userForm)}>
-                                        Поиск
-                                    </button>}
                                 </div>
-                                <div className='user-form__field'>
+                                <div className='component-form__field'>
                                     <Field
-                                        name="displayName"
-                                        component={TextBox}
-                                        type="text"
-                                        placeholder="Имя"
-                                        label={"Имя"}
-                                    />
+                                        name="supervisorId"
+                                        component={Select}
+                                        // type="text"
+                                        placeholder="Ответственный"
+                                        label={"Ответственный"}
+                                        options = {responsibles}
+                                        defaultValue={componentData && componentData.SupervisorId ? componentData.SupervisorId : ''}
+                                        multiple={false}
+                                        />
                                 </div>
-                                <div className='user-form__field'>
-                                    <Field name="role"
-                                           component={Select}
-                                           label={"Роль"}
-                                           options={userRoles()}
-                                           validate={ComposeValidators(vRequired)}>
+                                <div className='component-form__field'>
+                                    <Field name="structName"
+                                           component={TextBox}
+                                           label={"Структура Проекта"}
+                                           placeholder="Структура Проекта"
+                                           validate={vRequired}>
                                     </Field>
                                 </div>
 
-                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid}>
+                                <button type='submit' className="component-form__confirm-button orange-button big-button" disabled={!componentForm.valid}>
                                    Применить
                                 </button>
 
@@ -125,20 +130,21 @@ const UserForm = (props) => {
 
 const mapState2Props = (state) => {
     return {
-        userData: selectedUserSelector(state),
-        visible: userFormOpenedSelector(state)
+        componentData: selectedComponentSelector(state),
+        visible: componentFormOpenedSelector(state),
+        supervisors: userWithSupervisorRightsSelectorFlatten(state)
     }
 };
 
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
-            toggleUserForm,
-            cleanSelectedUser,
-            findUserByEmail
+            toggleComponentForm,
+            cleanSelectedComponent,
+            saveComponentChanges
         }, dispatch)
     }
 };
 
-export default connect(mapState2Props, mapDispatch2Props)(UserForm)
+export default connect(mapState2Props, mapDispatch2Props)(ComponentForm)
 

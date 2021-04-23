@@ -1,30 +1,28 @@
 import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
-import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";
 
 //TODO сделать для полей сущности Сomponent
 
 export const getFilterConfig = (filter) => {
     return [
         {
-            name: "DisplayName",
-            placeholder: "Имя",
+            name: "Name",
+            placeholder: "Имя компонента",
             type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.DisplayName : null
+            value: filter ? filter.Name : null
         },
         {
-            name: "Email",
-            placeholder: "Почта",
+            name: "SupervisorName",
+            placeholder: "Ответственный",
             type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.Email : null
+            value: filter ? filter.Responsible : null
         },
         {
-            name: "Role",
-            placeholder: "Роль",
-            type: FILTER_FIELD_TYPE.COMBO,
-            options: Object.entries(USER_ROLE_STRINGS).map(role => ({value: role[0], label: role[1]})),
-            value: filter ? filter.Role : null
+            name: "StructName",
+            placeholder: "Структура Проекта",
+            type: FILTER_FIELD_TYPE.TEXT,
+            value: filter ? filter.ProjectStructure : null
         }
     ]
 }
@@ -32,9 +30,9 @@ export const getFilterConfig = (filter) => {
 export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
-        role = _params.get("role"),
-        displayName = _params.get("displayName"),
-        email = _params.get("email");
+        name = _params.get("name"),
+        supervisorName = _params.get("supervisorName"),
+        structName = _params.get("structName");
 
     let _order = _params.get('order');
     if (_order) {
@@ -42,7 +40,7 @@ export const parseParams = () => {
         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
     }
 
-    const _filter = convertParam2Filter({role, displayName, email});
+    const _filter = convertParam2Filter({name, supervisorName, structName});
     if (_filter) {
         paramsData.filter = _filter
     }
@@ -50,13 +48,13 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({role, displayName, email}) => {
-    if (!(role || displayName || email)) return null;
+const convertParam2Filter = ({name, supervisorName, structName}) => {
+    if (!(name || supervisorName || structName)) return null;
 
     const filter = {};
-    filter.Role = role ? role.split(",") : '';
-    filter.Email = email ? email : '';
-    filter.DisplayName = displayName ? displayName : '';
+    filter.Name = name ? name : '';
+    filter.SupervisorName = supervisorName ? supervisorName : '';
+    filter.StructName = structName ? structName : '';
 
     return filter
 };
@@ -67,7 +65,7 @@ export const resizeHandler = (rowCount: number) => {
         _width = _form.width()
 
     if (window.$$('dictionary-users-grid')) {
-        const _headerHeight = window.$$('dictionary-users-grid').config.headerRowHeight
+        const _headerHeight = window.$$('dictionary-components-grid').config.headerRowHeight
 
 
         setTimeout(() => {
@@ -75,7 +73,7 @@ export const resizeHandler = (rowCount: number) => {
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            window.$$('dictionary-users-grid').$setSize(_width, _gridHeight)
+            window.$$('dictionary-components-grid').$setSize(_width, _gridHeight)
         }, 0)
 
     }
@@ -85,10 +83,10 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if(filter.Role) { _data.role = filter.Role.join(',')}
-        if (filter.DisplayName) {_data.displayName = filter.DisplayName}
-        if (filter.Email) {_data.email = filter.Email}
+        if(filter.Name) { _data.name = filter.Name}
+        if (filter.Responsible) {_data.supervisorName = filter.SupervisorName}
+        if (filter.StructName) {_data.structName = filter.StructName}
     }
 
     return _data
-}
+};

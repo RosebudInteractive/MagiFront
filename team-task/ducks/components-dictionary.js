@@ -1,13 +1,11 @@
 import {appName} from "../config";
 import {List, Record} from "immutable";
 import {createSelector} from 'reselect'
-import {commonGetQuery} from "common-tools/fetch-tools";
+import {checkStatus, commonGetQuery, update} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage, showInfo} from "tt-ducks/messages";
-import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
-
-//TODO rename all для Components вместо users
+import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
 
 //constants
 
@@ -26,37 +24,19 @@ const TOGGLE_COMPONENT_FORM_VISIBILITY = `${prefix}/TOGGLE_COMPONENT_FORM_VISIBI
 const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
 const CLEAN_SELECTED_COMPONENT = `${prefix}/CLEAN_SELECTED_COMPONENT`;
-const FIND_COMPONENT_BY_EMAIL = `${prefix}/FIND_COMPONENT_BY_EMAIL`;
-const FIND_COMPONENT_BY_ID = `${prefix}/FIND_COMPONENT_BY_ID`;
 const CHANGE_COMPONENT = `${prefix}/CHANGE_COMPONENT`; // runs before request
-const UPDATE_COMPONENT = `${prefix}/CHANGE_COMPONENT`; // runs after request complete succesfully
+const UPDATE_COMPONENT = `${prefix}/UPDATE_COMPONENT`; // runs after request complete succesfully
 
-//store
-
-const defaultExampleUsers = [
-    {
-        Id: 1,
-        DisplayName: "User1",
-        Email: 'some@email1.ru',
-        Role: 'role'
-    },
-    {
-        Id: 2,
-        DisplayName: "User2",
-        Email: 'some@email2.ru',
-        Role: 'role2',
-    }
-]
 
 //store
 
 const ComponentsRecord = List([]);
 
 export const ReducerRecord = Record({
-    components: []
-    // name: '',
-    // responsible: '',
-    // projectStructure: ''
+    components: ComponentsRecord,
+    fetching: false,
+    selectedComponent: null,
+    componentFormOpened: false
 });
 
 // reducer
@@ -66,7 +46,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     switch (type) {
         case SET_COMPONENTS:
             return state
-                .set('users', payload);
+                .set('components', payload);
         case START_REQUEST:
             return state
                 .set('fetching', true);
@@ -74,27 +54,15 @@ export default function reducer(state = new ReducerRecord(), action) {
         case FAIL_REQUEST:
             return state
                 .set('fetching', false);
-        case SET_SELECTED_COMPONENT: {
+        case SET_SELECTED_COMPONENT:
             return state
-                .set('selectedUser', payload);
-        }
-        case UPDATE_COMPONENT: {
-            // const userIndex = state.users.findIndex(user => user.Id === payload.Id); //todo move to sagas
-            // const updatedUser = payload;
-            // if(userIndex > 0) {
-            //     return state.users.set(userIndex, updatedUser);
-            // } else {
-            //     return state;
-            // }
-
-            return state.users.set(payload.index, payload.updatedUser);
-
-
-        }
+                .set('selectedComponent', payload);
+        case UPDATE_COMPONENT:
+            return state.set('components', payload);
         case CLEAN_SELECTED_COMPONENT:
-            return state.set('selectedUser', null);
+            return state.set('selectedComponent', null);
         case TOGGLE_COMPONENT_FORM_VISIBILITY:
-            return state.set('userFormOpened', payload);
+            return state.set('componentFormOpened', payload);
         default:
             return state;
     }
@@ -103,42 +71,38 @@ export default function reducer(state = new ReducerRecord(), action) {
 //selectors
 
 const stateSelector = state => state[moduleName];
-export const usersDictionarySelector = createSelector(stateSelector, state => state.users);
+export const componentsDictionarySelector = createSelector(stateSelector, state => state.components);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
-export const selectedUserSelector = createSelector(stateSelector, state => state.selectedUser);
-export const userFormOpenedSelector = createSelector(stateSelector, state => state.userFormOpened);
+export const selectedComponentSelector = createSelector(stateSelector, state => state.selectedComponent);
+export const componentFormOpenedSelector = createSelector(stateSelector, state => state.componentFormOpened);
 
 //actions
 
-export const getUsers = () => {
+export const getComponents = () => {
     return {type: LOAD_COMPONENTS}
 };
 
-export const selectUser = (userId) => {
-    return {type: SELECT_COMPONENT_REQUEST, payload: userId}
+export const selectComponent = (componentId) => {
+    return {type: SELECT_COMPONENT_REQUEST, payload: componentId}
 };
 
-export const saveUserChanges = (userId, userData) => {
-    return {type: CHANGE_COMPONENT, payload: {userId, userData}}
+export const saveComponentChanges = (componentId, componentData) => {
+    return {type: CHANGE_COMPONENT, payload: {componentId, componentData}}
 };
 
-export const updateUser = (newUserData) => {
-    return {type: UPDATE_COMPONENT, payload: newUserData};
+export const updateComponent = (newComponentData) => {
+    return {type: UPDATE_COMPONENT, payload: newComponentData};
 };
 
-export const toggleUserForm = (isOn) => {
+export const toggleComponentForm = (isOn) => {
     return {type: TOGGLE_COMPONENT_FORM_VISIBILITY, payload: isOn}
 };
 
-export const findUserByEmail = (email) => {
-    return {type: FIND_COMPONENT_BY_EMAIL, payload: email}
+export const setSelectedComponent = (component) => {
+    return {type: SET_SELECTED_COMPONENT, payload: component}
 };
 
-export const setSelectedUser = (user) => {
-    return {type: SET_SELECTED_COMPONENT, payload: user}
-};
-
-export const cleanSelectedUser = () => {
+export const cleanSelectedComponent = () => {
     return {type: CLEAN_SELECTED_COMPONENT}
 };
 
@@ -147,41 +111,28 @@ export const cleanSelectedUser = () => {
 
 export const saga = function* () {
     yield all([
-        takeEvery(LOAD_COMPONENTS, getUsersSaga),
-        takeEvery(SELECT_COMPONENT_REQUEST, selectUserById),
-        takeEvery(FIND_COMPONENT_BY_EMAIL, selectUserEmail)
+        takeEvery(LOAD_COMPONENTS, getComponentsSaga),
+        takeEvery(SELECT_COMPONENT_REQUEST, selectComponentById),
+        takeEvery(CHANGE_COMPONENT, changeComponent)
     ])
 };
 
-// DisplayName: "",
-// Email: "test@test.ru"
-// Id: 10169
-// PData: {roles: {pmu: 1}, isAdmin: false}
-// isAdmin: false
-// roles: {pmu: 1}
-
-function* getUsersSaga() {
+function* getComponentsSaga() {
     try {
         yield put({type: START_REQUEST});
         const params = yield select(paramsSelector);
-        const users = yield call(_getUsers, params);
+        const components = yield call(_getComponents, params);
 
-        //map userRoles
+        //map components
+        yield put({type: SUCCESS_REQUEST});
+        const supervisors = yield select(userWithSupervisorRightsSelectorFlatten);
 
-        users.map(user => {
-            user.Role = user.PData.isAdmin ? 'a' : null;
-            if (!user.Role) {
-                if (Object.entries(user.PData.roles).length > 0) {
-                    let roleList = [];
-                    for (let role in user.PData.roles) {
-                        USER_ROLE_STRINGS[role] && roleList.push(role);
-                    }
-                    user.Role = roleList;
-                }
-            }
+        components.forEach(component => {
+            const supervisor = supervisors.find(sup => sup.Id === component.SupervisorId);
+            component.SupervisorName = supervisor ? supervisor.DisplayName : '';
+            component.StructName = component.Struct.Name;
         });
-
-        yield put({type: SET_COMPONENTS, payload: users});
+        yield put({type: SET_COMPONENTS, payload: components});
         yield put({type: SUCCESS_REQUEST});
         yield put(clearLocationGuard())
     } catch (e) {
@@ -191,40 +142,58 @@ function* getUsersSaga() {
     }
 }
 
-function* selectUserById(data) {
+function* selectComponentById(data) {
     try {
-        const users = yield select(usersDictionarySelector);
-        const findedUser = users.find(user => user.Id === data.payload);
-        yield put(setSelectedUser(findedUser));
+        const components = yield select(componentsDictionarySelector);
+        const findedComponent = components.find(component => component.Id === data.payload);
+        yield put(setSelectedComponent(findedComponent));
     } catch (e) {
         yield put(showInfo({content: e}));
     }
 }
 
-function* selectUserEmail(data) {
+function* changeComponent(data) {
     try {
-        const users = yield select(usersDictionarySelector);
-        const findedUser = users.find(user => user.Email === data.payload);
-        if (findedUser) {
-            yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
-            yield put(setSelectedUser(findedUser));
+        const components = yield select(componentsDictionarySelector);
+        const componentIndex = components.findIndex(comp => comp.Id === data.payload.componentId);
+
+        if (componentIndex >= 0) {
+            components[componentIndex] = data.payload.componentData;
+            yield put({type: START_REQUEST});
+
+            const res = yield call(_updateComponent, data.payload.componentData);
+            yield call(checkStatus, res);
+
+            if (res.status === 403) {
+                yield put({type: FAIL_REQUEST});
+                yield put(showErrorMessage(res.message));
+            }
+            yield put({type: SUCCESS_REQUEST});
+            yield put({type: UPDATE_COMPONENT, payload: components});
         }
     } catch (e) {
-        yield put(showInfo({content: 'Ошибка при выборе пользователя', title: 'Ошибка при выборе пользователя'}));
+        yield put({type: FAIL_REQUEST});
+        yield put(showErrorMessage(e.message));
     }
 }
 
-const _getUsers = (params) => {
-    let _urlString = '';
-    if (params.includes('role=')) {
-        _urlString = `/api/users/list?${params}`;
-    } else {
-        _urlString = `/api/users/list?role=a,pma,pms,pme,pmu&${params}`;
-    }
+const _getComponents = (params) => {
 
+    let _urlString = `/api/pm/process-struct/elements?${params}`;
     return commonGetQuery(_urlString)
 };
 
+
+const _updateComponent = (newComponentData) => {
+    const {SupervisorId, Name, Struct} = newComponentData;
+    const data = {
+        "SupervisorId": SupervisorId,
+        "Name": Name,
+        "Struct": Struct
+    };
+    const jsoned = JSON.stringify(data);
+    return update(`/api/pm/process-struct-elem/${newComponentData.Id}`, jsoned);
+};
 
 
 

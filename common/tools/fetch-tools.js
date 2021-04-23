@@ -73,8 +73,9 @@ export const update = (url, data) => {
           'Content-Type': 'application/json'
         },
         method: 'PUT',
-        body: data
-    });
+        body: data,
+        credentials: 'include'
+    })
 };
 
 export const mockFetch = (resultData) => {
