@@ -86,7 +86,7 @@ export const convertFilter2Params = (filter) => {
         if(filter.Role) { _data.role = filter.Role.join(',')}
         if (filter.DisplayName) {_data.name = filter.DisplayName}
         if (filter.Email) {_data.email = filter.Email}
-    }q
+    }
 
     return _data
 };

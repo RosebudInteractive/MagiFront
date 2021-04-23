@@ -6,18 +6,18 @@ import {
     getFilterConfig,
     parseParams,
     resizeHandler
-} from "../../../components/dictionaries/users/functions";
+} from "./functions";
 import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
 import type {FilterField} from "../../filter/types";
-// import { getTasks, goToTask, statesSelector, tasksSelector} from "tt-ducks/tasks";
 import {
     fetchingSelector,
     getUsers,
     selectUser,
     toggleUserForm,
+    deleteUser,
     usersDictionarySelector
 } from "tt-ducks/users-dictionary";
 import {bindActionCreators} from "redux";
@@ -105,7 +105,7 @@ const DictionaryUsers = (props) => {
                 ],
             },
             {
-                id: '', width: 50,
+                id: 'del-btn', header: '', width: 50,
                 template: "<button class='process-elements-grid__button elem-delete remove-user-button'/>"
             },
         ],
@@ -124,6 +124,8 @@ const DictionaryUsers = (props) => {
                 this.markSorting(_sort.field, _sort.direction);
             },
             onItemClick: function (id) {
+                if (id && id.column && (id.column === "del-btn")) return
+
                 const item = this.getItem(id);
                 if (item && item.Id) {
                     actions.selectUser(item.Id);
@@ -134,15 +136,21 @@ const DictionaryUsers = (props) => {
         },
         onClick: {
             "elem-delete": function (e, data) {
-                console.log('user removed')
+                e.preventDefault()
+                const item = this.getItem(data.row)
+                if (item) {
+                    actions.deleteUser(item.Id)
+                }
             }
         },
     };
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => getFilterConfig(filter.current), [filter.current]);
 
-    const _onApplyFilter = (filter) => {
-        let params = convertFilter2Params(filter);
+    const _onApplyFilter = (filterData) => {
+        filter.current = filterData
+
+        let params = convertFilter2Params(filterData);
         actions.applyFilter(params)
     };
 
@@ -181,7 +189,8 @@ const mapDispatch2Props = (dispatch) => {
             setPathname,
             setGridSortOrder,
             selectUser,
-            toggleUserForm
+            toggleUserForm,
+            deleteUser
         }, dispatch)
     }
 };

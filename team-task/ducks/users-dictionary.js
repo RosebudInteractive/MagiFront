@@ -2,10 +2,18 @@ import {appName} from "../config";
 import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {commonGetQuery, update} from "common-tools/fetch-tools";
-import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
-import {showErrorMessage, showInfo} from "tt-ducks/messages";
+import {all, call, put, select, take, takeEvery} from "@redux-saga/core/effects";
+import {
+    MODAL_MESSAGE_ACCEPT,
+    MODAL_MESSAGE_DECLINE,
+    showErrorMessage,
+    showInfo,
+    showUserConfirmation
+} from "tt-ducks/messages";
 import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
+import type {Message} from "../types/messages";
+import {race} from "redux-saga/effects";
 
 
 //constants
@@ -29,6 +37,8 @@ const FIND_USER_BY_EMAIL = `${prefix}/FIND_USER_BY_EMAIL`;
 const FIND_USER_BY_ID = `${prefix}/FIND_USER_BY_ID`;
 const CHANGE_USER = `${prefix}/CHANGE_USER`; // runs before request
 const UPDATE_USER = `${prefix}/UPDATE_USER`; // runs after request complete succesfully
+
+const DELETE_USER = `${prefix}/DELETE_USER`; // runs after request complete succesfully
 
 //store
 
@@ -111,6 +121,9 @@ export const saveUserChanges = (userData) => {
     return {type: CHANGE_USER, payload: {userData}}
 };
 
+export const deleteUser = (userId: number) => {
+    return {type: DELETE_USER, payload: userId}
+}
 
 export const toggleUserForm = (isOn) => {
     return {type: TOGGLE_USER_FORM_VISIBILITY, payload: isOn}
@@ -137,7 +150,8 @@ export const saga = function* () {
         takeEvery(LOAD_USERS, getUsersSaga),
         takeEvery(SELECT_USER_REQUEST, selectUserById),
         takeEvery(FIND_USER_BY_EMAIL, selectUserEmail),
-        takeEvery(CHANGE_USER, changeUser)
+        takeEvery(CHANGE_USER, changeUser),
+        takeEvery(DELETE_USER, deleteUserSaga)
     ])
 };
 
@@ -149,8 +163,8 @@ export const saga = function* () {
 // roles: {pmu: 1}
 
 function* getUsersSaga(){
+    yield put({type: START_REQUEST});
     try {
-        yield put({type: START_REQUEST});
         const params = yield select(paramsSelector);
         const users = yield call(_getUsers, params);
 
@@ -182,8 +196,8 @@ function* getUsersSaga(){
 function* selectUserById(data){
     try {
         const users = yield select(usersDictionarySelector);
-        const findedUser = users.find(user => user.Id === data.payload);
-        yield put(setSelectedUser(findedUser));
+        const user = users.find(user => user.Id === data.payload);
+        yield put(setSelectedUser(user));
     } catch (e) {
         yield put(showInfo({content: e}));
     }
@@ -191,10 +205,20 @@ function* selectUserById(data){
 
 function* selectUserEmail(data){
     try {
-        const foundUser = yield call(_getUserByEmail, data.payload)
-        if(foundUser){
-            yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
-            yield put(setSelectedUser(foundUser));
+        const users = yield call(_getUserByEmail, data.payload)
+        if(users && Array.isArray(users) && users[0]){
+            const user = users[0]
+
+            const hasPMRights = user && user.PData && (
+                user.PData.isAdmin ||
+                user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms || user.PData.roles.pme || user.PData.roles.pmu)
+            )
+
+            if (hasPMRights) {
+                yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
+            }
+
+            yield put(setSelectedUser(user));
         } else {
             yield put(showErrorMessage(`Пользователь с почтой ${data.payload} не найден`))
         }
@@ -204,20 +228,21 @@ function* selectUserEmail(data){
     }
 }
 
-function* changeUser(data){
+function* changeUser(data) {
+    yield put({type: START_REQUEST})
     try {
-        const users = yield select(usersDictionarySelector);
-        const userIndex = users.findIndex(user => user.Id === data.payload.userData.Id);
-        if (userIndex >= 0) {
-            users[userIndex] = data.payload.userData;
-            yield put({type: UPDATE_USER, payload: users});
-            yield put({type:START_REQUEST});
-            yield call(_updateUser, data.payload.userData);
-            yield put({type:SUCCESS_REQUEST});
-        }
+
+        console.log(data.payload)
+
+        yield call(_updateUser, data.payload.userData);
+        yield put({type: SUCCESS_REQUEST});
+        yield put(getUsers())
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showInfo({content: 'Ошибка при обновлении пользователя', title: 'Ошибка при обновлении пользователя'}));
+        yield put(showInfo({
+            content: e.message,
+            title: 'Ошибка при обновлении пользователя'
+        }));
     }
 }
 
@@ -252,9 +277,34 @@ const _updateUser = (newUserData) => {
     return update(`/api/users/${newUserData.Id}`, jsoned);
 }
 
+function* deleteUserSaga({payload}) {
+    const message: Message = {
+        content: `Вы действительно хотите удалить пользователя из системы?`,
+        title: "Подтверждение удаления"
+    }
 
+    yield put(showUserConfirmation(message))
 
+    const {accept} = yield race({
+        accept: take(MODAL_MESSAGE_ACCEPT),
+        decline: take(MODAL_MESSAGE_DECLINE)
+    })
 
+    if (!accept) return
 
+    yield put({type: START_REQUEST});
+    try {
+        yield call(_deleteUser, payload)
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        yield put(showInfo({
+            content: e.message,
+            title: 'Ошибка при удалении пользователя'
+        }));
+    }
+}
 
-
+const _deleteUser = (userId) => {
+    const _body = {alter: {PData: {roles: {}}}}
+    return update(`/api/users/${userId}`, JSON.stringify(_body));
+}

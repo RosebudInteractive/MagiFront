@@ -3,8 +3,14 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
-import {showError, showErrorMessage} from "tt-ducks/messages";
+import {all, takeEvery, take, put, call, select} from "@redux-saga/core/effects";
+import {
+    MODAL_MESSAGE_ACCEPT,
+    MODAL_MESSAGE_DECLINE,
+    showError,
+    showErrorMessage,
+    showUserConfirmation
+} from "tt-ducks/messages";
 
 import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
@@ -409,8 +415,6 @@ function* deleteTaskSaga({payload}) {
         accept: take(MODAL_MESSAGE_ACCEPT),
         decline: take(MODAL_MESSAGE_DECLINE)
     })
-
-    console.log(accept)
 
     if (!accept) return
 
