@@ -2,9 +2,7 @@ import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 
-//TODO сделать для полей сущности Сomponent
-
-export const getFilterConfig = (filter) => {
+export const getFilterConfig = (filter, supervisors) => {
     return [
         {
             name: "Name",
@@ -16,13 +14,13 @@ export const getFilterConfig = (filter) => {
             name: "SupervisorName",
             placeholder: "Ответственный",
             type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.Responsible : null
+            value: filter ? filter.SupervisorName : null
         },
         {
             name: "StructName",
             placeholder: "Структура Проекта",
             type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.ProjectStructure : null
+            value: filter ? filter.StructName : null
         }
     ]
 }
@@ -31,7 +29,7 @@ export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
         name = _params.get("name"),
-        supervisorName = _params.get("supervisorName"),
+        supervisor = _params.get("supervisor"),
         structName = _params.get("structName");
 
     let _order = _params.get('order');
@@ -40,7 +38,7 @@ export const parseParams = () => {
         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
     }
 
-    const _filter = convertParam2Filter({name, supervisorName, structName});
+    const _filter = convertParam2Filter({name, supervisor, structName});
     if (_filter) {
         paramsData.filter = _filter
     }
@@ -48,12 +46,12 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({name, supervisorName, structName}) => {
-    if (!(name || supervisorName || structName)) return null;
+const convertParam2Filter = ({name, supervisor, structName}) => {
+    if (!(name || supervisor || structName)) return null;
 
     const filter = {};
     filter.Name = name ? name : '';
-    filter.SupervisorName = supervisorName ? supervisorName : '';
+    filter.SupervisorName = supervisor ? supervisor : '';
     filter.StructName = structName ? structName : '';
 
     return filter
@@ -84,7 +82,7 @@ export const convertFilter2Params = (filter) => {
 
     if (filter) {
         if(filter.Name) { _data.name = filter.Name}
-        if (filter.Responsible) {_data.supervisorName = filter.SupervisorName}
+        if (filter.SupervisorName) {_data.supervisor = filter.SupervisorName}
         if (filter.StructName) {_data.structName = filter.StructName}
     }
 

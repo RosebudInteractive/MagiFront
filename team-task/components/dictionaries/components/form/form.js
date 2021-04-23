@@ -5,6 +5,7 @@ import {Select, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedComponent,
     componentFormOpenedSelector,
+    getComponents,
     saveComponentChanges,
     selectedComponentSelector,
     toggleComponentForm
@@ -50,6 +51,7 @@ const ComponentForm = (props) => {
             //create new component logic
         } else {
             actions.saveComponentChanges(componentData.Id, newComponentData);
+            actions.getComponents();
         }
 
         closeModalForm()
@@ -65,7 +67,7 @@ const ComponentForm = (props) => {
         (visible && (supervisors && supervisors.length > 0)) &&
         <div className='outer-background'>
             <div className='inner-content'>
-                <button type="button" className="element-editor__close-button" onClick={closeModalForm}>Закрыть</button>
+                <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
                 <div className="title">
                     <h6>
                         {createAction ? 'Создание' : 'Редактирование'} Компонента
@@ -91,14 +93,13 @@ const ComponentForm = (props) => {
                                             type="text"
                                             placeholder="Имя компонента"
                                             label={"Имя компонента"}
-                                            validate={vRequired}
+                                            disabled={true}
                                         />
                                 </div>
                                 <div className='component-form__field'>
                                     <Field
                                         name="supervisorId"
                                         component={Select}
-                                        // type="text"
                                         placeholder="Ответственный"
                                         label={"Ответственный"}
                                         options = {responsibles}
@@ -111,11 +112,11 @@ const ComponentForm = (props) => {
                                            component={TextBox}
                                            label={"Структура Проекта"}
                                            placeholder="Структура Проекта"
-                                           validate={vRequired}>
+                                           disabled={true}>
                                     </Field>
                                 </div>
 
-                                <button type='submit' className="component-form__confirm-button orange-button big-button" disabled={!componentForm.valid}>
+                                <button type='submit' className="component-form__confirm-button orange-button big-button" disabled={!componentForm.valid || componentForm.pristine}>
                                    Применить
                                 </button>
 
@@ -141,7 +142,8 @@ const mapDispatch2Props = (dispatch) => {
         actions: bindActionCreators({
             toggleComponentForm,
             cleanSelectedComponent,
-            saveComponentChanges
+            saveComponentChanges,
+            getComponents
         }, dispatch)
     }
 };

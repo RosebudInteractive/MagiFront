@@ -115,7 +115,7 @@ const UserForm = (props) => {
                                     </Field>
                                 </div>
 
-                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid && userForm.pristine}>
+                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid || userForm.pristine}>
                                    Применить
                                 </button>
                             </form>
