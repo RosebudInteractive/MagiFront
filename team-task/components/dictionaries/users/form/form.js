@@ -65,7 +65,7 @@ const UserForm = (props) => {
         visible &&
         <div className='outer-background'>
             <div className='inner-content'>
-                <button type="button" className="element-editor__close-button" onClick={closeModalForm}>Закрыть</button>
+                <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
                 <div className="title">
                     <h6>
                         {createAction ? 'Создание' : 'Редактирование'} пользователя
@@ -82,33 +82,29 @@ const UserForm = (props) => {
                     }>
                     {
                         (userForm) => (
-                            <form className='user-form' onSubmit={e => {e.preventDefault(); handleSubmit(userForm.values)}}>
-
+                            <form className='user-form' onSubmit={ e => {e.preventDefault(); handleSubmit(userForm.values)} }>
                                 <div className='user-form__field email-field'>
-                                        <Field
-                                            name="email"
-                                            component={TextBox}
-                                            type="text"
-                                            placeholder="Почта"
-                                            label={"Почта"}
-                                            validate={ComposeValidators(vRequired, vMustBeEmail)}
-                                            disabled={true}
-                                        />
-
-                                    {(createAction) &&
-                                    <button type="button" className="search-button" onClick={() => findUserByEmail(userForm)}>
-                                        Поиск
-                                    </button>}
+                                    <Field name="email"
+                                           component={TextBox}
+                                           type="text"
+                                           placeholder="Почта"
+                                           label={"Почта"}
+                                           validate={ComposeValidators(vRequired, vMustBeEmail)}
+                                           disabled={!createAction}/>
+                                    {
+                                        (createAction) &&
+                                        <button type="button" className="search-button" onClick={() => findUserByEmail(userForm)}>
+                                            Поиск
+                                        </button>
+                                    }
                                 </div>
                                 <div className='user-form__field'>
-                                    <Field
-                                        name="displayName"
-                                        component={TextBox}
-                                        type="text"
-                                        placeholder="Имя"
-                                        label={"Имя"}
-                                        disabled={true}
-                                    />
+                                    <Field name="displayName"
+                                           component={TextBox}
+                                           type="text"
+                                           placeholder="Имя"
+                                           label={"Имя"}
+                                           disabled={true}/>
                                 </div>
                                 <div className='user-form__field'>
                                     <Field name="role"
@@ -119,10 +115,9 @@ const UserForm = (props) => {
                                     </Field>
                                 </div>
 
-                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid}>
+                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid && userForm.pristine}>
                                    Применить
                                 </button>
-
                             </form>
                         )
                     }

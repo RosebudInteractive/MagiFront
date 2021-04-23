@@ -191,12 +191,14 @@ function* selectUserById(data){
 
 function* selectUserEmail(data){
     try {
-        const users = yield select(usersDictionarySelector);
-        const findedUser = users.find(user => user.Email === data.payload);
-        if(findedUser){
+        const foundUser = yield call(_getUserByEmail, data.payload)
+        if(foundUser){
             yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
-            yield put(setSelectedUser(findedUser));
+            yield put(setSelectedUser(foundUser));
+        } else {
+            yield put(showErrorMessage(`Пользователь с почтой ${data.payload} не найден`))
         }
+
     } catch (e) {
         yield put(showInfo({content: 'Ошибка при выборе пользователя', title: 'Ошибка при выборе пользователя'}));
     }
@@ -220,8 +222,6 @@ function* changeUser(data){
 }
 
 const _getUsers = (params) => {
-
-
     let _urlString = '';
     if(params.includes('role=')){
         _urlString = `/api/users/list?${params}`;
@@ -230,6 +230,10 @@ const _getUsers = (params) => {
     }
 
     return commonGetQuery(_urlString)
+};
+
+const _getUserByEmail = (email) => {
+    return commonGetQuery(`/api/users/list?email=${email}`)
 };
 
 const _updateUser = (newUserData) => {
