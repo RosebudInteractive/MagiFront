@@ -34,6 +34,7 @@ const ComponentForm = (props) => {
     const closeModalForm = () => {
         actions.toggleComponentForm(false);
         actions.cleanSelectedComponent();
+        props.history.push(`/dictionaries/components`);
     };
 
     const responsibles = useMemo(() => {

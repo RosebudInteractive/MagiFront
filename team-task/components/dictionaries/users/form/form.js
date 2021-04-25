@@ -34,6 +34,7 @@ const UserForm = (props) => {
     const closeModalForm = () => {
         actions.toggleUserForm(false);
         actions.cleanSelectedUser();
+        props.history.push(`/dictionaries/users`);
     };
 
     const userRoles = () => {

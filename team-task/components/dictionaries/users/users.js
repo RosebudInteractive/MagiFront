@@ -1,23 +1,19 @@
 import React, {useCallback, useEffect, useMemo, useRef} from "react";
-import {useLocation} from 'react-router-dom';
+import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
-import {
-    convertFilter2Params,
-    getFilterConfig,
-    parseParams,
-    resizeHandler
-} from "./functions";
+import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
 import type {FilterField} from "../../filter/types";
 import {
+    deleteUser,
     fetchingSelector,
     getUsers,
     selectUser,
     toggleUserForm,
-    deleteUser,
+    userFormOpenedSelector,
     usersDictionarySelector
 } from "tt-ducks/users-dictionary";
 import {bindActionCreators} from "redux";
@@ -43,6 +39,18 @@ const DictionaryUsers = (props) => {
     useWindowSize(() => {
         resizeHandler(_usersCount)
     });
+
+    useEffect(() => {
+        if(users.length > 0){
+            const splitedPathname = location.pathname.split('/');
+            const locationComponentId = +(splitedPathname[splitedPathname.length - 1]);
+
+            if(Number.isInteger(locationComponentId)){
+                actions.selectUser(locationComponentId);
+                actions.toggleUserForm(true);
+            }
+        }
+    },[users]);
 
     useEffect(() => {
         _usersCount = props.users.length;
@@ -130,6 +138,7 @@ const DictionaryUsers = (props) => {
                 if (item && item.Id) {
                     actions.selectUser(item.Id);
                     actions.toggleUserForm(true);
+                    props.history.push(`/dictionaries/users/${item.Id}`);
                 }
 
             }
@@ -166,7 +175,11 @@ const DictionaryUsers = (props) => {
                 <div className="grid-container users-table">
                     <Webix ui={GRID_CONFIG} data={users}/>
                 </div>
-                <UserForm/>
+
+                {props.modalVisible
+                    ? <Route exact path="/dictionaries/users/:id" component={UserForm} />
+                    : null
+                }
             </div>
 
         </React.Fragment>
@@ -177,6 +190,7 @@ const mapState2Props = (state) => {
     return {
         users: usersDictionarySelector(state),
         fetching: fetchingSelector(state),
+        modalVisible: userFormOpenedSelector(state)
     }
 };
 
@@ -195,4 +209,4 @@ const mapDispatch2Props = (dispatch) => {
     }
 };
 
-export default connect(mapState2Props, mapDispatch2Props)(DictionaryUsers)
+export default connect(mapState2Props, mapDispatch2Props)(withRouter(DictionaryUsers))

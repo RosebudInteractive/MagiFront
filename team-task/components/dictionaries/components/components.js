@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef} from "react";
-import {useLocation} from 'react-router-dom';
+import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {
     convertFilter2Params,
@@ -13,6 +13,7 @@ import FilterRow from "../../filter";
 import Webix from "../../Webix";
 import type {FilterField} from "../../filter/types";
 import {
+    componentFormOpenedSelector,
     componentsDictionarySelector,
     fetchingSelector,
     getComponents,
@@ -75,9 +76,19 @@ const DictionaryComponents = (props) => {
         if(!fetching && supervisors.length > 0){
             actions.getComponents();
         }
-
-
     }, [location]);
+
+    useEffect(() => {
+        if(components.length > 0){
+            const splitedPathname = location.pathname.split('/');
+            const locationComponentId = +(splitedPathname[splitedPathname.length - 1]);
+
+            if(Number.isInteger(locationComponentId)){
+                actions.selectComponent(locationComponentId);
+                actions.toggleComponentForm(true);
+            }
+        }
+    },[components]);
 
 
 
@@ -121,6 +132,14 @@ const DictionaryComponents = (props) => {
                 if (item && item.Id) {
                     actions.selectComponent(item.Id);
                     actions.toggleComponentForm(true);
+                    console.log('pathname id')
+                    console.log(location.pathname);
+                    console.log(item.Id);
+                    props.history.push(`/dictionaries/components/${item.Id}`);
+                    // const newPath = `${location.pathname}/${item.Id}`;
+                    // console.log(newPath);
+                    // history.pushState(item.Id,null,`/dictionaries/components/${item.Id}`);
+                    // actions.setPathname(newPath);
                 }
 
             }
@@ -139,7 +158,6 @@ const DictionaryComponents = (props) => {
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
-        console.log('_onApplyFilter')
         actions.applyFilter(params)
     };
 
@@ -152,7 +170,11 @@ const DictionaryComponents = (props) => {
                 <div className="grid-container components-table">
                     <Webix ui={GRID_CONFIG} data={components}/>
                 </div>
-                <ComponentForm/>
+                {props.modalVisible
+                    ? <Route exact path="/dictionaries/components/:id" component={ComponentForm} />
+                    : null
+                }
+
             </div>
 
         </React.Fragment>
@@ -163,7 +185,8 @@ const mapState2Props = (state) => {
     return {
         components: componentsDictionarySelector(state),
         fetching: fetchingSelector(state),
-        supervisors: userWithSupervisorRightsSelectorFlatten(state)
+        supervisors: userWithSupervisorRightsSelectorFlatten(state),
+        modalVisible: componentFormOpenedSelector(state)
     }
 };
 
@@ -181,4 +204,4 @@ const mapDispatch2Props = (dispatch) => {
     }
 };
 
-export default connect(mapState2Props, mapDispatch2Props)(DictionaryComponents)
+export default connect(mapState2Props, mapDispatch2Props)(withRouter(DictionaryComponents));
