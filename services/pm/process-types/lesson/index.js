@@ -246,7 +246,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Редактура звука - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : supervisor_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
         "Description": "",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Выложить отредактированный звук",
@@ -268,7 +268,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Транскрипт - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : supervisor_id,
+        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
         "Description": "",
         "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
         "WriteFieldSet": "Сдать транскрипт",
@@ -276,7 +276,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #6
-    let supervisor_pic = elements["Иллюстрации"] && elements["Иллюстрации"].SupervisorId ? elements["Иллюстрации"].SupervisorId : supervisor_id;
+    let supervisor_pic = elements["Иллюстрации"] && elements["Иллюстрации"].SupervisorId ? elements["Иллюстрации"].SupervisorId : null;
     res = await pm.newTask({
         "Name": "Иллюстрирование с поиском картинок - постановка задачи",
         "ProcessId": p_id,
@@ -313,7 +313,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : supervisor_id,
+        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
         "Description": "",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
@@ -324,9 +324,9 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
+        "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "",
-        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
+        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
@@ -356,7 +356,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : supervisor_id,
+        "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
         "Description": "",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Сдать тайм-коды",
@@ -367,7 +367,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Ознакомиться с замечаниями к обработке звука",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : supervisor_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
         "Description": "",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "IsElemReady": false,
@@ -379,7 +379,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
         "Description": "",
-        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : null,
+        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res.id]
