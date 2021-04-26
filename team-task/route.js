@@ -16,7 +16,7 @@ type RouterProps = {
 export default function AppRouter(props: RouterProps) {
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
-        <Route path={'/task/:taskId'} component={FullPageTaskEditor}/>
+        <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {

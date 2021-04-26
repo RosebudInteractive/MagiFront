@@ -132,14 +132,7 @@ const DictionaryComponents = (props) => {
                 if (item && item.Id) {
                     actions.selectComponent(item.Id);
                     actions.toggleComponentForm(true);
-                    console.log('pathname id')
-                    console.log(location.pathname);
-                    console.log(item.Id);
                     props.history.push(`/dictionaries/components/${item.Id}`);
-                    // const newPath = `${location.pathname}/${item.Id}`;
-                    // console.log(newPath);
-                    // history.pushState(item.Id,null,`/dictionaries/components/${item.Id}`);
-                    // actions.setPathname(newPath);
                 }
 
             }
