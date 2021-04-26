@@ -21,6 +21,7 @@ import "./task-page.sass"
 import {COMMENT_ACTION} from "../../constants/common";
 import moment from "moment";
 import {Prompt} from "react-router-dom";
+import {TASK_STATE} from "../../constants/states";
 
 const EDITOR_NAME = "TASK_EDITOR"
 
@@ -74,7 +75,7 @@ function TaskEditor(props: EditorProps) {
             Description: editorValues.Description,
             IsElemReady: !!editorValues.IsElemReady,
             WriteFieldSet: editorValues.WriteFieldSet,
-            Comment: !task.UserLastComment ? _commentText  : null,
+            Comment: !task.UserLastComment ? _commentText : null,
         }
 
         if (editorValues.DueDate) {
@@ -132,6 +133,13 @@ function TaskEditor(props: EditorProps) {
 
     }
 
+    const _onStartClick = () => {
+        const _task = {}
+        _task.Id = task.Id
+        _task.ElementId = task.Element && task.Element.Id
+        _task.State = TASK_STATE.EXECUTING.value
+        actions.saveTask({task: _task})
+    }
 
     return !fetching && task &&
         <React.Fragment>
@@ -146,7 +154,8 @@ function TaskEditor(props: EditorProps) {
                           currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
                           users={props.users}
                           currentElement={currentElement}
-                          onChangeElement={_onChangeElement}/>
+                          onChangeElement={_onChangeElement}
+                          onStartClick={_onStartClick}/>
             </form>
         </React.Fragment>
 }

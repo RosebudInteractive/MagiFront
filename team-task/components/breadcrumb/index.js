@@ -1,34 +1,43 @@
 import React, {useMemo} from "react"
 import "./breadcrumb.sass"
 import {Breadcrumb} from 'rsuite';
-import {Link} from "react-router-dom";
-import {useLocation} from "react-router-dom"
+import {Link, useLocation} from "react-router-dom";
+import NON_LINKED_ROUTES from "../../constants/nonLinkedRoutes";
 
 const PATHES = {
     processes: "Процессы",
     tasks: "Задачи",
     task: "Задача",
     notifications: "Уведомления",
-    dictionaries: "Справочники"
-}
+    dictionaries: "Справочники",
+    components: "Компоненты",
+    users: "Пользователи"
+};
 
-const BreadcrumbLink = props => <Breadcrumb.Item componentClass={Link} {...props} key={props.index}/>;
+const BreadcrumbLink = props => <Breadcrumb.Item {...props} key={props.index}/>;
 
 export default function BreadcrumbPane(props) {
 
     const location = useLocation(),
-        paths = location.pathname.split("/")
+        paths = location.pathname.split("/");
 
     const parsePath = () => {
-        let _result = []
+        let _result = [];
+        let keyVal = 0;
 
         paths
             .filter(item => !!item)
             .reduce((acc, item, index) => {
-                let _newValue = "/" + acc + item,
-                    _label = PATHES[item] ? PATHES[item] : item
+                keyVal += 1;
+                let _newValue = acc + "/" + item,
+                    _label = PATHES[item] ? PATHES[item] : item;
 
-                _result.push(<BreadcrumbLink to={_newValue} index={index} key={index}>{_label}</BreadcrumbLink>)
+                if (NON_LINKED_ROUTES[item]) {
+                    _result.push(<BreadcrumbLink index={keyVal} key={keyVal}>{_label}</BreadcrumbLink>)
+                } else {
+                    _result.push(<BreadcrumbLink componentClass={Link} to={_newValue} index={keyVal}
+                                                 key={keyVal}>{_label}</BreadcrumbLink>)
+                }
                 return _newValue
             }, "")
 

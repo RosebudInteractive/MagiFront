@@ -3,13 +3,12 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
+import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
-
-import TASKS from "../mock-data/tasks"
 import {TASK_STATE} from "../constants/states";
 import {paramsSelector} from "tt-ducks/route";
 import {push} from "react-router-redux/src";
+
 /**
  * Constants
  * */
@@ -132,5 +131,5 @@ const _fetchTasks = (params) => {
 }
 
 function* goToTaskSaga(data) {
-    yield put(push(`/task/${data.payload}`))
+    yield put(push(`/tasks/${data.payload}`))
 }

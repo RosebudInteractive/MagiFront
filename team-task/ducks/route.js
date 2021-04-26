@@ -1,13 +1,14 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
-import {all, takeEvery, put, select} from "@redux-saga/core/effects";
+import {all, put, select, takeEvery} from "@redux-saga/core/effects";
 import type {GridSortOrder} from "../types/grid";
 import {GRID_SORT_DIRECTION} from "../constants/common";
 import {push} from "react-router-redux/src";
 import $ from "jquery";
 import {GET_TASKS_FAIL, GET_TASKS_SUCCESS} from "tt-ducks/tasks";
 import {GET_PROCESSES_FAIL, GET_PROCESSES_SUCCESS} from "tt-ducks/processes";
+
 /**
  * Constants
  * */
@@ -96,13 +97,19 @@ const refreshGuardSelector = createSelector(stateSelector, state => state.refres
 export const activeTaskIdSelector = createSelector(stateSelector, state => state.activeTask)
 export const paramsSelector = createSelector(stateSelector, (state) => {
     const params = {...state.filter},
-        order = state.order
+        order = state.order;
 
     if (order) { params.order = order }
     if (state.activeTask) { params.activeTask = state.activeTask }
 
-    return  $.param(params)
-})
+    return  $.param(params);
+});
+
+//get non-parametrized filter
+export const filterSelector = createSelector(stateSelector, (state) => {
+    const params = {...state.filter};
+    return params;
+});
 
 
 /**
@@ -130,6 +137,10 @@ export const buildLocation = () => {
 
 export const setInitState = (data) => {
     return {type: SET_INIT_STATE_REQUEST, payload: data}
+}
+
+export const clearLocationGuard = () => {
+    return { type: CLEAR_GUARD }
 }
 
 
