@@ -28,6 +28,27 @@ class AuthJWT {
         });
     }
 
+    static initGetDisposableToken(app) {
+        app.get("/api/get-disposable-token", async (req, res) => {
+            if (req.user) {
+                try {
+                    let token = await AuthJWT.genTokenFunc(req.user, {
+                        type: TokenType.Disposable,
+                        expTime: DISPOSABLE_TOKEN_EXP,
+                        sign: { expiresIn: `${DISPOSABLE_TOKEN_EXP}ms` }
+                    });
+                    res.json({ token: token });
+                }
+                catch (err) {
+                    res.status(err instanceof HttpError ? err.statusCode : HttpCode.ERR_INTERNAL)
+                        .json({ message: err.message });
+                }
+            }
+            else
+                res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
+        });
+    }
+
     constructor() {
         const ExtractJwt = passportJWT.ExtractJwt;
 
@@ -45,25 +66,6 @@ class AuthJWT {
     init(app){
         if (!this._initFlag) {
             this._initFlag = true;
-
-            app.get("/api/get-disposable-token", async (req, res) => {
-                if (req.user) {
-                    try {
-                        let token = await AuthJWT.genTokenFunc(req.user, {
-                            type: TokenType.Disposable,
-                            expTime: DISPOSABLE_TOKEN_EXP,
-                            sign: { expiresIn: `${DISPOSABLE_TOKEN_EXP}ms` }
-                        });
-                        res.json({ token: token });
-                    }
-                    catch (err) {
-                        res.status(err instanceof HttpError ? err.statusCode : HttpCode.ERR_INTERNAL)
-                            .json({ message: err.message });
-                    }
-                }
-                else
-                    res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
-            });
 
             const JwtStrategy = passportJWT.Strategy;
             const strategy = new JwtStrategy(this._jwtOptions,
@@ -172,6 +174,7 @@ let processAuth = (user, isAuthRequired, accessRights, res, next, info) => {
     next();
 }
 
+exports.InitGetDisposableToken = AuthJWT.initGetDisposableToken;
 exports.AuthJWTInit = AuthJWTInit;
 exports.GenTokenFunc = AuthJWT.genTokenFunc;
 exports.AuthenticateJWT = (app, isAuthRequired, accessRights) => {

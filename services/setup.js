@@ -14,7 +14,7 @@ const methodOverride = require('method-override');
 const { HttpCode } = require("../const/http-codes");
 const { HttpError } = require('../errors/http-error');
 const { AccessFlags } = require('../const/common');
-const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
+const { AuthJWTInit, AuthenticateJWT, InitGetDisposableToken } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI, SetupLogOut } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
 const { AuthFBInit } = require('../security/fb-auth');
@@ -183,6 +183,9 @@ function setupAPI(express, app) {
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
+    if (useJWT)
+        InitGetDisposableToken(app);
+    
     SetupLogOut(app);
     SetupWhoAmI(app);
     app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
