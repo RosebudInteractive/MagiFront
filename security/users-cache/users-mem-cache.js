@@ -1,5 +1,6 @@
 'use strict'
 const { UsersBaseCache }= require('./users-base-cache');
+const { TokenType } = require('../../const/common');
 
 class UsersMemCache extends UsersBaseCache {
 
@@ -21,26 +22,37 @@ class UsersMemCache extends UsersBaseCache {
         }).bind(this));
     }
 
-    _checkToken(token, isNew) {
+    _checkToken(token, isNew, options) {
         return new Promise(((resolve, reject) => {
-            let res = this._users[token];
+            let opts = options || {};
+            let ttype = opts.type ? opts.type : TokenType.Renewable;
+            let expTime = opts.expTime ? opts.expTime : this._tokenExpTime;
+            let res = this._users[token] ? this._users[token].ttype : 0;
             let now = (new Date()) - 0;
-            if (!res && isNew)
-                res = this._users[token] = { exp: now + this._tokenExpTime, last: now }
-            else
-                if (res) {
-                    if (now > res.exp) {
+            if (!res && isNew) {
+                this._users[token] = { exp: now + expTime, last: now, type: ttype }
+                res = ttype;
+            }
+            else {
+                let tdata = this._users[token];
+                if (tdata) {
+                    if (now > tdata.exp) {
                         delete this._users[token];
-                        res = null;
+                        res = 0;
                     }
                     else
-                        if ((now - res.last) >= this._tokenUpdTime) {
-                            res.exp = now + this._tokenExpTime;
-                            res.last = now;
+                        if ((tdata.type === TokenType.Renewable) && ((now - tdata.last) >= this._tokenUpdTime)) {
+                            tdata.exp = now + this._tokenExpTime;
+                            tdata.last = now;
                         }
                 }
-            resolve(res ? true : false);
+            }
+            resolve(res);
         }).bind(this));
+    }
+
+    _setToken(token, data, options) {
+        return Promise.resolve();
     }
 
     _destroyToken(token) {

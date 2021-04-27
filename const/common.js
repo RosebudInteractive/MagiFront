@@ -32,3 +32,8 @@ exports.AccessFlags = {
     PmElemManager: 64,
     PmTaskExecutor: 128
 };
+
+exports.TokenType = {
+    Renewable: 1,
+    Disposable: 2
+};

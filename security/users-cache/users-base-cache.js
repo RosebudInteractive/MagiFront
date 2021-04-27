@@ -1033,8 +1033,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
             }).bind(this));
     }
 
-    checkToken(token, isNew) {
-        return this._checkToken(token, isNew);
+    checkToken(token, isNew, options) {
+        return this._checkToken(token, isNew, options);
+    }
+
+    setToken(token, data, options) {
+        return this._setToken(token, data, options);
     }
 
     destroyToken(token) {
@@ -1049,8 +1053,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         Promise.reject(new Error("UsersBaseCache::_getUser should be implemented in descendant."));
     }
 
-    _checkToken(token, isNew) {
+    _checkToken(token, isNew, options) {
         Promise.reject(new Error("UsersBaseCache::_checkToken should be implemented in descendant."));
+    }
+
+    _setToken(token, data, options) {
+        Promise.reject(new Error("UsersBaseCache::_setToken should be implemented in descendant."));
     }
 
     _destroyToken(token) {

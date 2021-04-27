@@ -3,6 +3,7 @@
 const config = require('config');
 const { UsersBaseCache } = require('./users-base-cache');
 const { RedisConnections, ConnectionWrapper } = require('../../database/providers/redis/redis-connections');
+const { TokenType } = require('../../const/common');
 
 class UsersRedisCache extends UsersBaseCache {
 
@@ -30,23 +31,42 @@ class UsersRedisCache extends UsersBaseCache {
         }).bind(this));
     }
 
-    _checkToken(token, isNew) {
-        let conn;
-        return ConnectionWrapper(((connection) => {
-            conn = connection;
-            return conn.pttlAsync(token)
-                .then(((time) => {
-                    let addToken = isNew;
-                    let result = time >= 0;
-                    if (result)
-                        addToken = (this._tokenExpTime - time) >= this._tokenUpdTime;
-                    if (addToken)
-                        result = conn.setAsync(token, 1, "px", this._tokenExpTime)
-                            .then(() => true);
-                    return result;
-                }).bind(this));
-        }).bind(this));
+    _setToken(token, data, options) {
+        return ConnectionWrapper(async (conn) => {
+            let opts = options || {};
+            let expTime = opts.expTime ? opts.expTime : this._tokenExpTime;
+            let _data = data;
+            if (opts.json)
+                _data = JSON.stringify(data);
+            await conn.setAsync(token, _data, "px", expTime);
+        });
     }
+
+    _checkToken(token, isNew, options) {
+        return ConnectionWrapper(async (conn) => {
+            let opts = options || {};
+            let ttype = opts.type ? opts.type : TokenType.Renewable;
+            let expTime = opts.expTime ? opts.expTime : this._tokenExpTime;
+            let time = await conn.pttlAsync(token);
+            let renewToken = false;
+            let result = 0;
+            if ((time >= 0) && (!isNew)) {
+                let val = await conn.getAsync(token);
+                if (val) {
+                    ttype = +val;
+                    if (ttype === TokenType.Renewable)
+                        renewToken = (this._tokenExpTime - time) >= this._tokenUpdTime;
+                    result = ttype;
+                }
+            }
+            if (renewToken || isNew) {
+                await conn.setAsync(token, ttype, "px", expTime);
+                result = ttype;
+            }
+            return result;
+        });
+    }
+
     _destroyToken(token) {
         return ConnectionWrapper(((connection) => {
             return connection.delAsync(token);
