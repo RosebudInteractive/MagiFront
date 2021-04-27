@@ -203,6 +203,10 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                                 result.html = `<sup><a href="#_edn${refId}" name="_ednref${refId}">${result.text}</a></sup>`;
                             }
                             break;
+                        case "w:noBreakHyphen":
+                            result.text += "-";
+                            result.html += "-"; // TODO: Put here HTML non break heaphen 
+                            break;
                         case "w:t":
                             if (elem.elements && (elem.elements.length === 1) && elem.elements[0].text) {
                                 let text = elem.elements[0].text;
