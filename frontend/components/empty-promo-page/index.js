@@ -21,6 +21,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "Магистерия на iOS",
         "android-app": "Магистерия на Android",
         "sales-march-2021": "Весна идет, весне дорогу!",
+        "may-2021": "В ногу со знаниями",
     },
     DESCRIPTION = {
         "sales2020": DEFAULT_DESCRIPTION,
@@ -32,6 +33,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "Курсы лекций у вас в кармане. Скачивайте, запускайте, слушайте и смотрите!",
         "android-app": "Курсы лекций у вас в кармане. Скачивайте, запускайте, слушайте и смотрите!",
         "sales-march-2021": "Блиц-распродажа с 5 по 8 марта.",
+        "may-2021": "Большая майская распродажа на Магистерии",
     },
     OG_IMAGE = {
         "sales2020": DEFAULT_OG_IMAGE,
@@ -43,6 +45,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "2021/01/fb-ios-app-jan-2021-1610868066035.png",
         "android-app": "2021/03/fb-android-app-ab317ac9-1044-4533-abd4-225119f9e634.jpg",
         "sales-march-2021": "2021/03/fb-2021-8March-sell-1614935266798.jpg",
+        "may-2021": "2021/04/fb_sales_may21_01-1619772193921.jpg",
     },
     TW_IMAGE = {
         "sales2020": DEFAULT_TW_IMAGE,
@@ -54,6 +57,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "2021/01/tw-ios-app-jan-2021-1610868098951.png",
         "android-app": "2021/03/tw-android-app-91b93bcf-5abe-4950-9f27-d2ff5fd43d3f.jpg",
         "sales-march-2021": "2021/03/tw-2021-8March-sell-1614935413591.jpg",
+        "smay-2021": "2021/04/tw_sales_may21_01-1619772224675.jpg",
     },
     URL = {
         "sales2020": ROOT_URL,
@@ -65,6 +69,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "https://apps.apple.com/ru/app/%D0%BC%D0%B0%D0%B3%D0%B8%D1%81%D1%82%D0%B5%D1%80%D0%B8%D1%8F/id1543015350",
         "android-app": "https://play.google.com/store/apps/details?id=ru.magisteria.magisteria_app",
         "sales-march-2021": ROOT_URL,
+        "may-2021": ROOT_URL,
     }
 
 
