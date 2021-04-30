@@ -57,7 +57,7 @@ const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-ку�
         "ios-app": "2021/01/tw-ios-app-jan-2021-1610868098951.png",
         "android-app": "2021/03/tw-android-app-91b93bcf-5abe-4950-9f27-d2ff5fd43d3f.jpg",
         "sales-march-2021": "2021/03/tw-2021-8March-sell-1614935413591.jpg",
-        "smay-2021": "2021/04/tw_sales_may21_01-1619772224675.jpg",
+        "may-2021": "2021/04/tw_sales_may21_01-1619772224675.jpg",
     },
     URL = {
         "sales2020": ROOT_URL,
