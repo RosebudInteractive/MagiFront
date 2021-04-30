@@ -12,10 +12,10 @@ import $ from "jquery";
 export const moduleName = 'app_ver_2'
 const prefix = `${appName}/${moduleName}`
 
-export const GET_OPTIONS_REQUEST = `${prefix}/GET_OPTIONS_REQUEST`
-export const GET_OPTIONS_START = `${prefix}/GET_OPTIONS_START`
-export const GET_OPTIONS_SUCCESS = `${prefix}/GET_OPTIONS_SUCCESS`
-export const GET_OPTIONS_FAIL = `${prefix}/GET_OPTIONS_FAIL`
+const GET_OPTIONS_REQUEST = `${prefix}/GET_OPTIONS_REQUEST`
+const GET_OPTIONS_START = `${prefix}/GET_OPTIONS_START`
+const GET_OPTIONS_SUCCESS = `${prefix}/GET_OPTIONS_SUCCESS`
+const GET_OPTIONS_FAIL = `${prefix}/GET_OPTIONS_FAIL`
 
 export const CALC_BILLING_ENABLE_REQUEST = `${prefix}/CALC_BILLING_ENABLE_REQUEST`
 export const DISABLE_BILLING = `${prefix}/DISABLE_BILLING`
@@ -85,7 +85,8 @@ export const ReducerRecord = Record({
     currentUrl: null,
     debug: new DebugRecord(),
     stat: new StatRecord(),
-    localSettings: new LocalSettings()
+    localSettings: new LocalSettings(),
+    tokenGuardEnable: true,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -109,10 +110,12 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('fetching', false)
                 .set('debug', new DebugRecord(payload.debug))
                 .set('stat', new StatRecord(payload.stat))
+                .set('tokenGuardEnable', false)
 
         case GET_OPTIONS_FAIL:
             return state
                 .set('fetching', false)
+                .set('tokenGuardEnable', false)
 
         case ENABLE_BILLING:
             return state
@@ -181,13 +184,14 @@ export const analyticsDebugModeSelector = createSelector(stateSelector, state =>
 const currentUrlSelector = createSelector(stateSelector, state => state.currentUrl)
 export const paymentPingIntervalSelector = createSelector(stateSelector, state => state.getIn(['stat', 'clientTimeout']))
 export const localSettingsSelector = createSelector(stateSelector, state => state.localSettings)
+export const tokenGuardEnable = createSelector(stateSelector, state => state.tokenGuardEnable)
 
 
 /**
  * Action Creators
  * */
-export const getAppOptions = () => {
-    return {type: GET_OPTIONS_REQUEST}
+export const getAppOptions = (token) => {
+    return {type: GET_OPTIONS_REQUEST, payload: {token: token}}
 }
 
 export const calcBillingEnable = () => {
@@ -264,15 +268,14 @@ function* changeCurrentPageSaga(data) {
         if (!!_currentUrl) { yield put({type: NOTIFY_GA_CHANGE_PAGE, payload: _newUrl}) }
 
         yield put({type: SET_CURRENT_GA_URL, payload: _newUrl})
-
     }
 }
 
 
-function* getOptionsSaga() {
+function* getOptionsSaga({payload}) {
     yield put({type: GET_OPTIONS_START})
     try {
-        let _options = yield call(fetchOptions)
+        let _options = yield call(fetchOptions, payload.token)
 
         yield put({type: GET_OPTIONS_SUCCESS, payload: _options})
 
@@ -282,8 +285,12 @@ function* getOptionsSaga() {
     }
 }
 
-const fetchOptions = () => {
-    return fetch("/api/options", {method: 'GET', credentials: 'include'})
+const fetchOptions = (token) => {
+    const _url = "/api/options" + (token ? `?token=${token}` : "")
+
+    console.log(_url)
+
+    return fetch(_url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
