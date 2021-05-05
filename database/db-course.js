@@ -542,6 +542,7 @@ const COURSE_MYSQL_LSN_COVER_REQ =
 const DFLT_ADDRESS_BOOK = "Магистерия";
 const DFLT_SENDER_NAME = "Magisteria.ru";
 const DFLT_IOS_PRICE_COEFF = 1.0;
+const DFLT_ANDROID_PRICE_COEFF = 1.0;
 
 const { ElasticConWrapper } = require('./providers/elastic/elastic-connections');
 const { IdxLessonService } = require('./elastic/indices/idx-lesson');
@@ -562,6 +563,7 @@ const DbCourse = class DbCourse extends DbObject {
         this._partnerLink = new PartnerLink();
         this._productService = ProductService();
         this._ios_coeffs = config.has('mobileApp.ios.priceCoeffs') ? config.get('mobileApp.ios.priceCoeffs') : null;
+        this._android_coeffs = config.has('mobileApp.android.priceCoeffs') ? config.get('mobileApp.android.priceCoeffs') : null;
     }
 
     async _updateSearchIndex(id, affected_list) {
@@ -1705,16 +1707,22 @@ const DbCourse = class DbCourse extends DbObject {
 
     _getPriceCoeff(platform, price) {
         let coeff = 1.0;
+        let coeffs = [];
         switch (platform) {
             case "ios":
                 coeff = DFLT_IOS_PRICE_COEFF;
-                if (this._ios_coeffs) {
-                    for (let i = 0; i < this._ios_coeffs.length; i++){
-                        let elem = this._ios_coeffs[i];
-                        coeff = price > elem.price ? elem.coeff : coeff;
-                    }
-                }
+                if (this._ios_coeffs)
+                    coeffs = this._ios_coeffs;
                 break;
+            case "android":
+                coeff = DFLT_ANDROID_PRICE_COEFF;
+                if (this._android_coeffs)
+                    coeffs = this._android_coeffs;
+                break;
+        }
+        for (let i = 0; i < coeffs.length; i++) {
+            let elem = coeffs[i];
+            coeff = price > elem.price ? elem.coeff : coeff;
         }
         return coeff;
     }
@@ -1762,16 +1770,20 @@ const DbCourse = class DbCourse extends DbObject {
 
     async _getInAppPricers(options) {
         let result = null;
+        let service = null;
         if (options && options.mobile_app) {
             switch (options.mobile_app) {
                 case "ios":
-                    let ios = this.getService("iosInApp", true);
-                    if (ios) {
-                        result = {};
-                        result.ios = await ios.getInAppPricer();
-                    }
+                    service = this.getService("iosInApp", true);
+                    break;
+                case "android":
+                    service = this.getService("androidInApp", true);
                     break;
             }
+        }
+        if (service) {
+            result = {};
+            result[options.mobile_app] = await service.getInAppPricer();
         }
         return result;
     }
