@@ -14,6 +14,7 @@ module.exports = {
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
+    testAppUrl: '/test-app',
     testUrl: '/test',
     testInstUrl: '/test-instance',
     proxyServer: {
