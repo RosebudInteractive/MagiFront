@@ -26,7 +26,7 @@ const GET_STAT_MYSQL =
 const GET_USER_PURCHASE_MSSQL =
     "select c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], coalesce(upd.[Qty], 0) Qty, u.[DisplayName],\n" +
     "  u.[Email], ii.[Name] [Название курса], N''[Подарок], p.[Price] PriceIni, (case when c.[PaymentType] = 1 then (p.[Price] - ii.[Price]) else 0 end) Discount,\n" +
-    "  ii.[Price], (case when c.[PaymentType] = 2 then ii.[Price] else 0 end) PriceApple, coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign,\n" +
+    "  ii.[Price], (case when c.[PaymentType] = 2 then ii.[Price] else 0 end) PriceApple, (case when c.[PaymentType] = 3 then ii.[Price] else 0 end) PriceAndroid, coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign,\n" +
     "  coalesce(gr.[Campaign] + ' (' + gr.[Source] + '+' + gr.[Medium] + ')', '') CampaignReg, coalesce(c.[PromoCode], '') as Promo,\n" +
     "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
     "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0 / cd.[Duration], 2) as LsnPart,\n" +
@@ -57,7 +57,7 @@ const GET_USER_PURCHASE_MSSQL =
     "  c.[PaymentType], gr.[Campaign], gr.[Source], gr.[Medium]\n" +
     "union all\n" +
     "select c.[Id], c.[ChequeDate], u.[RegDate], c.[UserId], coalesce(upd.[Qty], 0) Qty, u.[DisplayName],\n" +
-    "  u.[Email], N'Курс: ' + cl.[Name] Course, N'да'[Подарок], p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price], 0 PriceApple,\n" +
+    "  u.[Email], N'Курс: ' + cl.[Name] Course, N'да'[Подарок], p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price], 0 PriceApple, 0 PriceAndroid,\n" +
     "  coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign,\n" +
     "  coalesce(gr.[Campaign] + ' (' + gr.[Source] + '+' + gr.[Medium] + ')', '') CampaignReg, coalesce(c.[PromoCode], '') as Promo,\n" +
     "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
@@ -95,13 +95,14 @@ const GET_USER_PURCHASE_MSSQL =
 
 const GET_USER_PURCHASE_MYSQL =
     "select t.`Id`, t.`ChequeDate`, t.`RegDate`, t.`UserId`, t.`Qty`, t.`DisplayName`, t.`Email`, t.`Course` `Название курса`, t.`Подарок`,\n" +
-    "  t.`PriceIni`, t.`Discount`, t.`Price`, t.`PriceApple`, coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign,\n" +
+    "  t.`PriceIni`, t.`Discount`, t.`Price`, t.`PriceApple`, t.`PriceAndroid`, coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign,\n" +
     "  coalesce(concat(gr.`Campaign`, ' (', gr.`Source`, '+', gr.`Medium`, ')'), '') CampaignReg, t.`Promo`, t.`LsnTime`, t.`CourseDuration`,\n" +
     "  t.`LsnPart`, t.`ThisLastTime`, t.`LastTime`\n" +
     "from\n" +
     "(select c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, coalesce(upd.`Qty`, 0) Qty, u.`DisplayName`,\n" +
     "  u.`Email`, ii.`Name` Course, '' `Подарок`, p.`Price` PriceIni, (case when c.`PaymentType` = 1 then (p.`Price` - ii.`Price`) else 0 end) Discount,\n" +
-    "  ii.`Price`, (case when c.`PaymentType` = 2 then ii.`Price` else 0 end) PriceApple, c.`CampaignId`,\n" +
+    "  ii.`Price`, (case when c.`PaymentType` = 2 then ii.`Price` else 0 end) PriceApple,\n" +
+    "  (case when c.`PaymentType` = 3 then ii.`Price` else 0 end) PriceAndroid, c.`CampaignId`,\n" +
     "  u.`CampaignId` as UCampaignId, coalesce(c.`PromoCode`, '') as Promo,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart,\n" +
@@ -130,7 +131,7 @@ const GET_USER_PURCHASE_MYSQL =
     "union all\n" +
     "select c.`Id`, c.`ChequeDate`, u.`RegDate`, c.`UserId`, coalesce(upd.`Qty`, 0) Qty, u.`DisplayName`,\n" +
     "  u.`Email`, concat('Курс: ', cl.`Name`) Course, 'да' `Подарок`, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
-    "  0 PriceApple, c.`CampaignId`,\n" +
+    "  0 PriceApple, 0 PriceAndroid, c.`CampaignId`,\n" +
     "  u.`CampaignId` as UCampaignId, coalesce(c.`PromoCode`, '') as Promo,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart,\n" +
@@ -165,9 +166,10 @@ const GET_USER_PURCHASE_MYSQL =
     "order by 2 desc";
 
 const GET_COURSE_PURCHASE_MSSQL =
-    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.GiftQty) GiftQty\n" +
+    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
     "from\n" +
     "  (select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, sum(case when c.[PaymentType] = 2 then (ii.[Price] * ii.[Qty]) else 0 end) TotIosSum,\n" +
+    "    sum(case when c.[PaymentType] = 3 then (ii.[Price] * ii.[Qty]) else 0 end) TotAndroidSum,\n" +
     "    0 as GiftQty\n" +
     "  from[Cheque] c\n" +
     "    join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
@@ -178,7 +180,7 @@ const GET_COURSE_PURCHASE_MSSQL =
     "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
     "  group by cl.[Name]\n" +
     "  union all\n" +
-    "  select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, 0 as TotIosSum, 0 as GiftQty\n" +
+    "  select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
     "  from[PromoCode] ppc\n" +
     "    join[InvoiceItem] ii on ii.[ProductId] = ppc.[PromoProductId]\n" +
     "    join[Invoice] i on i.[Id] = ii.[InvoiceId]\n" +
@@ -191,7 +193,7 @@ const GET_COURSE_PURCHASE_MSSQL =
     "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
     "  group by cl.[Name]\n" +
     "  union all\n" +
-    "  select cl.[Name] Course, 0, 0, 0, count(*)\n" +
+    "  select cl.[Name] Course, 0, 0, 0, 0, count(*)\n" +
     "  from[UserGiftCourse] gc\n" +
     "    join[CourseLng] cl on cl.[CourseId] = gc.[CourseId]\n" +
     "  where(gc.[TimeCr] >= convert(datetime, '<%= first_date %>'))\n" +
@@ -201,9 +203,10 @@ const GET_COURSE_PURCHASE_MSSQL =
     "order by 3 desc";
 
 const GET_COURSE_PURCHASE_MYSQL =
-    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.GiftQty) GiftQty\n" +
+    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
     "from\n" +
-    "  (select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, sum(case when c.`PaymentType` = 2 then (ii.`Price` * ii.`Qty`) else 0 end) TotIosSum,\n"+
+    "  (select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, sum(case when c.`PaymentType` = 2 then (ii.`Price` * ii.`Qty`) else 0 end) TotIosSum,\n" +
+    "    sum(case when c.`PaymentType` = 3 then (ii.`Price` * ii.`Qty`) else 0 end) TotAndroidSum,\n" +
     "    0 as GiftQty\n" +
     "  from`Cheque` c\n" +
     "    join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
@@ -214,7 +217,7 @@ const GET_COURSE_PURCHASE_MYSQL =
     "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
     "  group by cl.`Name`\n" +
     "  union all\n" +
-    "  select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, 0 as TotIosSum, 0 as GiftQty\n" +
+    "  select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
     "  from`PromoCode` ppc\n" +
     "    join`InvoiceItem` ii on ii.`ProductId` = ppc.`PromoProductId`\n" +
     "    join`Invoice` i on i.`Id` = ii.`InvoiceId`\n" +
@@ -227,7 +230,7 @@ const GET_COURSE_PURCHASE_MYSQL =
     "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
     "  group by cl.`Name`\n" +
     "  union all\n" +
-    "  select cl.`Name` Course, 0, 0, 0, count(*)\n" +
+    "  select cl.`Name` Course, 0, 0, 0, 0, count(*)\n" +
     "  from`UserGiftCourse` gc\n" +
     "    join`CourseLng` cl on cl.`CourseId` = gc.`CourseId`\n" +
     "  where(gc.`TimeCr` >= '<%= first_date %>')\n" +

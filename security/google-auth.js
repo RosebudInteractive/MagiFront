@@ -39,9 +39,11 @@ class AuthGoogle {
                     name_arr.push(profile.name.familyName);
             }
             profile.displayName = name_arr.length > 0 ? name_arr.join(" ") : profile.emails[0];
-            profile.username = profile.name.givenName;
-            profile.firstName = profile.name.givenName;
-            profile.lastName = profile.name.familyName;
+            if (profile.name) {
+                profile.username = profile.name.givenName;
+                profile.firstName = profile.name.givenName;
+                profile.lastName = profile.name.familyName;
+            }
             profile.identifier = profile.id;
 
             if (req.campaignId)
