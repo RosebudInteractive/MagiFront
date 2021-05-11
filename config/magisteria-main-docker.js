@@ -357,6 +357,9 @@ module.exports = {
             template: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.template ? pk.mobileApp.ios.template : undefined,
             sharedSecret: pk.mobileApp && pk.mobileApp.ios && pk.mobileApp.ios.sharedSecret ? pk.mobileApp.ios.sharedSecret : undefined,
             environment: 'production'
+        },
+        android: {
+            credentialsPath: pk.mobileApp.android.credentialsPath
         }
     }
 };
