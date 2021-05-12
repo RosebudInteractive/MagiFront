@@ -543,6 +543,8 @@ const DbTest = class DbTest extends DbObject {
         let opts = options || {};
         let dbOpts = opts.dbOptions || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let absPathUrl = opts.mobile_app ? this._absTestAppUrl : this._absTestUrl;
+        let absTestInstUrl = opts.mobile_app ? this._absTestInstAppUrl : this._absTestInstUrl;
 
         let tests = { Course: [], Lessons: {} };
         let result = await $data.execSql({
@@ -562,7 +564,7 @@ const DbTest = class DbTest extends DbObject {
                         Id: elem.Id,
                         Name: elem.Name,
                         TestTypeId: elem.TestTypeId,
-                        URL: isAbsPath ? this._absTestUrl + elem.URL : elem.URL,
+                        URL: isAbsPath ? absPathUrl + elem.URL : elem.URL,
                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                         AnswTime: 0,
                         Qty: 0
@@ -595,7 +597,7 @@ const DbTest = class DbTest extends DbObject {
                             if (currTest)
                                 currTest.Instance = {
                                     Id: elem.Id,
-                                    URL: isAbsPath ? `${this._absTestInstUrl}${elem.Id}` : `${elem.Id}`,
+                                    URL: isAbsPath ? `${absTestInstUrl}${elem.Id}` : `${elem.Id}`,
                                     Score: elem.Score,
                                     MaxScore: elem.MaxScore,
                                     AnswNum: elem.AnswNum,
@@ -614,6 +616,7 @@ const DbTest = class DbTest extends DbObject {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+        let absPathUrl = opts.mobile_app ? this._absTestAppUrl : this._absTestUrl;
 
         let id = url;
         let isInt = (typeof (id) === "number");
@@ -652,7 +655,7 @@ const DbTest = class DbTest extends DbObject {
                     testData.IsTimeLimited = elem.IsTimeLimited ? true : false;
                     testData.FromLesson = elem.FromLesson ? true : false;
                     testData.IsAuthRequired = elem.IsAuthRequired ? true : false;
-                    testData.URL = isAbsPath ? this._absTestUrl + elem.URL : elem.URL;
+                    testData.URL = isAbsPath ? absPathUrl + elem.URL : elem.URL;
                     testData.CourseURL = elem.CourseURL && isAbsPath ? this._absCourseUrl + elem.CourseURL : elem.CourseURL;
                     testData.LsnURL = elem.LsnURL && isAbsPath ? this._baseUrl + elem.CourseURL + '/' + elem.LsnURL : elem.LsnURL;
                     testData.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
