@@ -2,38 +2,58 @@ import React, {useEffect,} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from "redux";
 import AppRouter from "./route";
-// import {whoAmI} from "tt-ducks/auth";
-// import {getAllDictionaryData} from "tt-ducks/dictionary";
+import {fetchingSelector, tokenGuardEnable, getAppOptions} from "ducks/app";
+import {whoAmI} from "actions/user-actions";
+import {useLocation, useHistory} from "react-router-dom";
 
 function App(props) {
 
+    const {actions, fetching, tokenGuardEnable, userAuthorized} = props
+
+    let location = useLocation();
+    let history = useHistory();
+
     useEffect(() => {
-        const _params = new URLSearchParams(this.props.location.search),
+        const _params = new URLSearchParams(location.search),
             _token = _params.get('token')
 
         if (_token) {
             _params.delete('token')
-            this.props.history.replace({
+            history.replace({
                 search: _params.toString(),
             })
         }
 
-        this.props.getAppOptions(_token)
+        actions.getAppOptions(_token)
     }, [])
 
+    useEffect(() => {
+        if (!tokenGuardEnable) {
+            actions.whoAmI()
+        }
+    }, [tokenGuardEnable])
 
-    return <div>
-        <AppRouter/>
-    </div>
+
+    return !fetching && userAuthorized ?
+        <div>
+            {/*HI*/}
+            <AppRouter/>
+        </div>
+        :
+        null
 }
 
 const mapStateToProps = (state) => {
-    return {}
+    return {
+        fetching: fetchingSelector(state),
+        tokenGuardEnable: tokenGuardEnable(state),
+        userAuthorized: !!state.user.user
+    }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        actions: bindActionCreators({}, dispatch),
+        actions: bindActionCreators({getAppOptions, whoAmI}, dispatch),
     }
 }
 

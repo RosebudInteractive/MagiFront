@@ -18,8 +18,11 @@ import BookmarksMiddleware from './bookmarks-middleware';
 import GoogleAnalyticsMiddleware from './google-analytics-middleware';
 import AppOptionsMiddleware from './app-options-middleware';
 import VersionMiddleware from './version-middleware';
+import {attachStore} from "tools/course-discount";
 
 export const store = configureStore();
+
+attachStore(store)
 
 function configureStore(initialState) {
     // const logger = NODE_ENV === 'development' ? createLogger() : null;

@@ -45,6 +45,7 @@ class TestPage extends React.Component {
 
     static propTypes = {
         type: PropTypes.string,
+        isMobileApp: PropTypes.bool
     }
 
     constructor(props) {
@@ -87,8 +88,10 @@ class TestPage extends React.Component {
     UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.whoAmI()
-        this.props.refreshStorage();
-        this.props.headerSetPage(pages.test);
+        if (!this.props.isMobileApp) {
+            this.props.refreshStorage();
+            this.props.headerSetPage(pages.test);
+        }
 
         switch (this._getPageType(this.props)) {
             case TEST_PAGE_TYPE.TEST: {
@@ -188,7 +191,7 @@ class TestPage extends React.Component {
                 :
                 <div className={_className}>
                     {this._getMetaTags()}
-                    <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/>
+                    { !this.props.isMobileApp && <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/> }
                     <div className={ "test-page__content" + ((this._getPageType(this.props) === TEST_PAGE_TYPE.RESULT) ? " _result" : "") }>
                         <div className="content-wrapper">
                             {this._getContent()}

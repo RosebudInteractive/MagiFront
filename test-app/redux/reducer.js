@@ -1,32 +1,29 @@
 import {combineReducers} from 'redux'
 import {routerReducer} from 'react-router-redux';
 import {reducer as formReducer} from "redux-form";
-import appReducer, {moduleName as appModule} from "tt-ducks/app";
-import authReducer, {moduleName as authModule} from "tt-ducks/auth";
-import taskReducer, {moduleName as taskModule} from "tt-ducks/task";
-import tasksReducer, {moduleName as tasksModule} from "tt-ducks/tasks";
-import processTaskReducer, {moduleName as processTaskModule} from "tt-ducks/process-task";
-import processReducer, {moduleName as processModule} from "tt-ducks/process";
-import processesReducer, {moduleName as processesModule} from "tt-ducks/processes";
-import routeReducer, {moduleName as routeModule} from "tt-ducks/route";
-import messageReducer, {moduleName as messageModule} from "tt-ducks/messages";
-import usersDictionaryReducer, {moduleName as usersDictionaryModule} from "tt-ducks/users-dictionary";
-import componentsDictionaryReducer, {moduleName as componentDictionaryModule} from "tt-ducks/components-dictionary";
-import dictionaryReducer, {moduleName as dictionaryModule} from "tt-ducks/dictionary";
+import user from '../../frontend/reducers/user'
+import appReducer, {moduleName as appModule} from 'ducks/app'
+import TestReducer, {moduleName as TestModule} from "ducks/test";
+import TestInstanceReducer, {moduleName as TestInstanceModule} from "ducks/test-instance";
+import TestResultReducer, {moduleName as TestResultModule} from "ducks/test-result";
+import LessonMenuReducer, {moduleName as LessonMenuModule} from "ducks/lesson-menu";
+import app from "../../frontend/reducers/app";
+import billingReducer, {moduleName as billingModule} from "ducks/billing";
+import messageReducer, {moduleName as messageModule} from "ducks/message";
+import profileReducer, {moduleName as profileModule} from "ducks/profile";
+
 
 export default combineReducers({
+    user,
+    app,
     [appModule]: appReducer,
-    [authModule]: authReducer,
-    [taskModule]: taskReducer,
-    [tasksModule]: tasksReducer,
-    [processTaskModule]: processTaskReducer,
-    [processModule]: processReducer,
-    [processesModule]: processesReducer,
-    [routeModule]: routeReducer,
+    [TestModule]: TestReducer,
+    [TestInstanceModule]: TestInstanceReducer,
+    [TestResultModule]: TestResultReducer,
+    [LessonMenuModule]: LessonMenuReducer,
+    [billingModule]: billingReducer,
     [messageModule]: messageReducer,
-    [usersDictionaryModule]: usersDictionaryReducer,
-    [dictionaryModule]: dictionaryReducer,
-    [componentDictionaryModule]: componentsDictionaryReducer,
+    [profileModule]: profileReducer,
 
     routing: routerReducer,
     form: formReducer,
