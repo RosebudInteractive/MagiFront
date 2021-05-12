@@ -751,6 +751,35 @@ const DbUser = class DbUser extends DbObject {
             sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
         }
 
+        if (opts.order) {
+            let ord_arr = opts.order.split(',');
+            let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
+            let mysql_field;
+            let mssql_field;
+            switch (ord_arr[0]) {
+                case "Id":
+                    mssql_field = "s.[Id]";
+                    mysql_field = "s.`Id`";
+                    break;
+                case "DisplayName":
+                    mssql_field = "u.[DisplayName]";
+                    mysql_field = "u.`DisplayName`";
+                    break;
+                case "Email":
+                    mssql_field = "u.[Email]";
+                    mysql_field = "u.`Email`";
+                    break;
+                case "Role":
+                    mssql_field = "r.[Name]";
+                    mysql_field = "r.`Name`";
+                    break;
+            }
+            if (mysql_field) {
+                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
+                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+            }
+        }
+
         sql_mysql = `${sql_mysql}\nlimit ${limit}`;
 
         let records = await $data.execSql({

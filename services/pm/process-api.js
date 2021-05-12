@@ -793,8 +793,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     mysql_field = "t.`Name`";
                     break;
                 case "ProcessName":
-                    mssql_field = "p.[ProcessName]";
-                    mysql_field = "p.`ProcessName`";
+                    mssql_field = "p.[Name]";
+                    mysql_field = "p.`Name`";
                     break;
                 case "State":
                     mssql_field = "t.[State]";
@@ -807,6 +807,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 case "UserName":
                     mssql_field = "u.[DisplayName]";
                     mysql_field = "u.`DisplayName`";
+                    break;
+                case "ElementName":
+                    mssql_field = "el.[Name]";
+                    mysql_field = "el.`Name`";
                     break;
             }
             if (mysql_field) {
@@ -887,15 +891,19 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             let mysql_field;
             let mssql_field;
             switch (ord_arr[0]) {
-                case "name":
+                case "Id":
+                    mssql_field = "e.[Id]";
+                    mysql_field = "e.`Id`";
+                    break;
+                case "Name":
                     mssql_field = "e.[Name]";
                     mysql_field = "e.`Name`";
                     break;
-                case "struct":
+                case "StructName":
                     mssql_field = "s.[Name]";
                     mysql_field = "s.`Name`";
                     break;
-                case "supervisor":
+                case "SupervisorName":
                     mssql_field = "u.[DisplayName]";
                     mysql_field = "u.`DisplayName`";
                     break;
