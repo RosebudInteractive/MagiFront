@@ -42,10 +42,21 @@ const UserForm = (props) => {
     };
 
     const handleSubmit = (userInfo) => {
+        const _oldRoles = {...userData.PData.roles}
+
+        if (userInfo.role && (userInfo.role.length > 0)) {
+            if (_oldRoles.pma) delete _oldRoles.pma
+            if (_oldRoles.pms) delete _oldRoles.pms
+            if (_oldRoles.pme) delete _oldRoles.pme
+            if (_oldRoles.pmu) delete _oldRoles.pmu
+
+            _oldRoles[userInfo.role] = 1
+        }
+
         //save logic here
         const data = {...userData,
             PData: {
-                roles: (userInfo.role && (userInfo.role.length > 0)) ? Object.fromEntries([[userInfo.role, 1]]) : userData.PData.roles,
+                roles: _oldRoles,
                 isAdmin: (userInfo.role && (userInfo.role === 'a'))
             }};
         actions.saveUserChanges(data);
