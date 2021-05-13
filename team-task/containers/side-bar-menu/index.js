@@ -25,8 +25,8 @@ function SideBarMenu(props) {
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
         <MenuList Icon={DictionariesIco} title={"Справочники"}>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
+            <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
+            <MenuLink Icon={ElementIco}  nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
         </MenuList>
     </nav>
 }
@@ -35,12 +35,13 @@ type MenuLinkProps = {
     Icon: any,
     url: string,
     title: string,
+    nested?: boolean
 };
 
 function MenuLink(props: MenuLinkProps) {
-    const {Icon, url, title,} = props
+    const {Icon, url, title, nested} = props
 
-    return <NavLink to={url} className={"side-bar-menu__item title-font"} activeClassName={"_active"}>
+    return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested' : ''}`} activeClassName={"_active"}>
         <Icon/>
         <div className="side-bar-menu__item-title">{title}</div>
     </NavLink>
