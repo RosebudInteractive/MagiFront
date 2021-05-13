@@ -39,8 +39,10 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absAuthorUrl = config.proxyServer.siteHost + config.authorUrl + "/";
         this._absCategoryUrl = config.proxyServer.siteHost + config.categoryUrl + "/";
         this._absTestUrl = config.proxyServer.siteHost + config.testUrl + "/";
+        this._absTestAppUrl = config.proxyServer.siteHost + config.testAppUrl + "/";
         this._absTestInstUrl = config.proxyServer.siteHost + config.testInstUrl + "/";
-        
+        this._absTestInstAppUrl = config.proxyServer.siteHost + config.testAppUrl + config.testInstUrl + "/";
+
     }
 
     _removeTrailingSlash(path) {
@@ -59,6 +61,10 @@ exports.DbObject = class DbObject extends CacheableObject {
 
     _getAbsTestUrl(baseUrl) {
         return this._getAbsUrl(config.testUrl, baseUrl);
+    }
+
+    _getAbsTestAppUrl(baseUrl) {
+        return this._getAbsUrl(config.testAppUrl, baseUrl);
     }
 
     _getAbsDataUrl(baseUrl) {

@@ -34,6 +34,7 @@ const DictionaryUsers = (props) => {
 
     const openUserForm = () => {
         actions.toggleUserForm(true);
+        props.history.push(`/dictionaries/users/new`);
     };
 
     useWindowSize(() => {

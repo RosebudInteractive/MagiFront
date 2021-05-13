@@ -54,7 +54,7 @@ import BillingWrapper from "./components/messages/billing/subscription-window";
 import CoursePaymentWrapper from "./components/messages/billing-ver-2";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import {getAppOptions, loadLocalSettings, pageChanged, waitingSelector} from 'ducks/app'
+import {getAppOptions, loadLocalSettings, pageChanged, tokenGuardEnable, waitingSelector} from 'ducks/app'
 import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
@@ -93,11 +93,21 @@ class App extends Component {
             this.props.appActions.setAppTypeMobile()
         }
 
-        this.props.getAppOptions()
+        const _params = new URLSearchParams(this.props.location.search),
+            _token = _params.get('token')
+
+        if (_token) {
+            _params.delete('token')
+            this.props.history.replace({
+                search: _params.toString(),
+            })
+        }
+
+        this.props.getAppOptions(_token)
         window.callback_payment = callbackPayment
     }
 
-    UNSAFE_componentWillMount() {
+    _actionOnMount() {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
@@ -224,6 +234,9 @@ class App extends Component {
             }
         }
 
+        if (this.props.tokenGuardEnable && !nextProps.tokenGuardEnable) {
+            this._actionOnMount()
+        }
 
         if ((!this.props.showFeedbackWindow && !this.props.showFeedbackResultMessage) && (nextProps.showFeedbackWindow || nextProps.showFeedbackResultMessage)) {
             $('body').addClass('modal-open')
@@ -390,6 +403,7 @@ function mapStateToProps(state, ownProps) {
         showFeedbackResultMessage: showFeedbackResultMessageSelector(state),
         isWaiting: waitingSelector(state),
         filterScrollGuard: scrollGuardSelector(state),
+        tokenGuardEnable: tokenGuardEnable(state),
         ownProps,
     }
 }

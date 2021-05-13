@@ -76,24 +76,32 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_USERS:
             return state
                 .set('users', payload);
+
         case START_REQUEST:
             return state
                 .set('fetching', true);
+
         case SUCCESS_REQUEST:
         case FAIL_REQUEST:
             return state
                 .set('fetching', false);
-        case SET_SELECTED_USER: {
+
+        case SET_SELECTED_USER:
             return state
                 .set('selectedUser', payload);
-        }
-        case UPDATE_USER: {
-            return state.set('users', payload);
-        }
+
+        case UPDATE_USER:
+            return state
+                .set('users', payload);
+
         case CLEAN_SELECTED_USER:
-            return state.set('selectedUser', null);
+            return state
+                .set('selectedUser', null);
+
         case TOGGLE_USER_FORM_VISIBILITY:
-            return state.set('userFormOpened', payload);
+            return state
+                .set('userFormOpened', payload);
+
         default:
             return state;
     }
@@ -138,9 +146,8 @@ export const setSelectedUser = (user) => {
 };
 
 export const cleanSelectedUser = () => {
-  return {type: CLEAN_SELECTED_USER}
+    return {type: CLEAN_SELECTED_USER}
 };
-
 
 
 //sagas
@@ -162,7 +169,7 @@ export const saga = function* () {
 // isAdmin: false
 // roles: {pmu: 1}
 
-function* getUsersSaga(){
+function* getUsersSaga() {
     yield put({type: START_REQUEST});
     try {
         const params = yield select(paramsSelector);
@@ -172,10 +179,10 @@ function* getUsersSaga(){
 
         users.map(user => {
             user.Role = user.PData.isAdmin ? 'a' : null;
-            if(!user.Role){
-                if(Object.entries(user.PData.roles).length > 0){
+            if (!user.Role) {
+                if (Object.entries(user.PData.roles).length > 0) {
                     let roleList = [];
-                    for(let role in user.PData.roles){
+                    for (let role in user.PData.roles) {
                         USER_ROLE_STRINGS[role] && roleList.push(role);
                     }
                     user.Role = roleList;
@@ -193,7 +200,7 @@ function* getUsersSaga(){
     }
 }
 
-function* selectUserById(data){
+function* selectUserById(data) {
     try {
         const users = yield select(usersDictionarySelector);
         const user = users.find(user => user.Id === data.payload);
@@ -203,10 +210,10 @@ function* selectUserById(data){
     }
 }
 
-function* selectUserEmail(data){
+function* selectUserEmail(data) {
     try {
         const users = yield call(_getUserByEmail, data.payload)
-        if(users && Array.isArray(users) && users[0]){
+        if (users && Array.isArray(users) && users[0]) {
             const user = users[0]
 
             const hasPMRights = user && user.PData && (
@@ -248,7 +255,7 @@ function* changeUser(data) {
 
 const _getUsers = (params) => {
     let _urlString = '';
-    if(params.includes('role=')){
+    if (params.includes('role=')) {
         _urlString = `/api/users/list?${params}`;
     } else {
         _urlString = `/api/users/list?role=a,pma,pms,pme,pmu&${params}`;
@@ -264,7 +271,7 @@ const _getUserByEmail = (email) => {
 const _updateUser = (newUserData) => {
     const {roles, isAdmin} = newUserData.PData;
     const data = {
-        "alter":  {
+        "alter": {
             "PData": {
                 "roles": {
                     ...roles

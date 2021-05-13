@@ -14,6 +14,7 @@ module.exports = {
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
+    testAppUrl: '/test-app',
     testUrl: '/test',
     testInstUrl: '/test-instance',
     proxyServer: {
@@ -339,6 +340,13 @@ module.exports = {
     },
     mobileApp: {
         ios: {
+            priceCoeffs: [
+                { price: 0, coeff: 1.15 },
+                { price: 1300, coeff: 1.1 },
+                { price: 3000, coeff: 1.05 }
+            ]
+        },
+        android: {
             priceCoeffs: [
                 { price: 0, coeff: 1.15 },
                 { price: 1300, coeff: 1.1 },
