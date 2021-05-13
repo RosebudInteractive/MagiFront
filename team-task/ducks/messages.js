@@ -28,8 +28,8 @@ const initialButtonsText = {
 export const ReducerRecord = Record({
     visible: false,
     type: MESSAGE_TYPE.INFO,
-    content: 'Вы увидели это сообщение, потому что что-то произошло',
-    title: 'Упс! похоже что-то случилось',
+    content: 'Ошибка',
+    title: 'Ошибка',
     confirmButtonText: initialButtonsText.confirmButtonText,
     declineButtonText: initialButtonsText.declineButtonText
 });

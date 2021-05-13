@@ -105,7 +105,7 @@ const UserForm = (props) => {
                                            disabled={!createAction}/>
                                     {
                                         (createAction) &&
-                                        <button type="button" className="search-button" onClick={() => findUserByEmail(userForm)}>
+                                        <button disabled={vMustBeEmail(userForm.values.email) !== undefined} type="button" className='search-button' onClick={() => findUserByEmail(userForm)}>
                                             Поиск
                                         </button>
                                     }
