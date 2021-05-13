@@ -27,8 +27,8 @@ function SideBarMenu(props) {
         {
             hasSupervisorRights &&
             <MenuList Icon={DictionariesIco} title={"Справочники"}>
-                <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
-                <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
             </MenuList>
         }
     </nav>
