@@ -38,12 +38,13 @@ type MenuLinkProps = {
     Icon: any,
     url: string,
     title: string,
+    nested?: boolean
 };
 
 function MenuLink(props: MenuLinkProps) {
-    const {Icon, url, title,} = props
+    const {Icon, url, title, nested} = props
 
-    return <NavLink to={url} className={"side-bar-menu__item title-font"} activeClassName={"_active"}>
+    return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested' : ''}`} activeClassName={"_active"}>
         <Icon/>
         <div className="side-bar-menu__item-title">{title}</div>
     </NavLink>

@@ -1604,8 +1604,8 @@ label.webix_required:after{padding-left:4px;content:"*";color:red}
 .webix_dtable .webix_hcell.webix_div_filter{padding:3px 5px}
 .webix_dtable .webix_ss_filter input,.webix_dtable .webix_ss_filter select{height:32px;vertical-align:middle;border-radius:6px}
 .webix_ss_sort_asc,.webix_ss_sort_desc{font-size:14px;font-family:FontAwesome;top:50%;line-height:1px;bottom:auto;right:3px;float:none;width:12px}
-.webix_ss_sort_asc:before{content:'\f106'}
-.webix_ss_sort_desc:before{content:'\f107'}
+.webix_ss_sort_asc:before{content: '\f107'}
+.webix_ss_sort_desc:before{content:'\f106'}
 .dtBodyCell{border-bottom:1px solid #ebebeb}
 .webix_dtable .webix_ss_vscroll_header{border-bottom:1px solid #b0cee3}
 .webix_view .webix_dt_editor input,.webix_view .webix_dt_editor select{border:1px solid #3498db}
