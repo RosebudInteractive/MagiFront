@@ -24,10 +24,13 @@ function SideBarMenu(props) {
         { hasSupervisorRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
-        <MenuList Icon={DictionariesIco} title={"Справочники"}>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
-        </MenuList>
+        {
+            hasSupervisorRights &&
+            <MenuList Icon={DictionariesIco} title={"Справочники"}>
+                <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
+                <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
+            </MenuList>
+        }
     </nav>
 }
 

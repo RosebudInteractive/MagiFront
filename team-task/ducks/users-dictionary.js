@@ -301,7 +301,18 @@ function* deleteUserSaga({payload}) {
 
     yield put({type: START_REQUEST});
     try {
-        yield call(_deleteUser, payload)
+        const users = yield select(usersDictionarySelector);
+        const _user = users.find(user => user.Id === payload);
+
+        if (_user) {
+            const _roles = {..._user.PData.roles}
+            if (_roles.pma) delete _roles.pma
+            if (_roles.pms) delete _roles.pms
+            if (_roles.pme) delete _roles.pme
+            if (_roles.pmu) delete _roles.pmu
+
+            yield call(_deleteUser, payload, _roles)
+        }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showInfo({
@@ -311,7 +322,7 @@ function* deleteUserSaga({payload}) {
     }
 }
 
-const _deleteUser = (userId) => {
-    const _body = {alter: {PData: {roles: {}}}}
+const _deleteUser = (userId, roles) => {
+    const _body = {alter: {PData: {roles: roles}}}
     return update(`/api/users/${userId}`, JSON.stringify(_body));
 }

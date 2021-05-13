@@ -20,7 +20,7 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {
-            if(props.hasSupervisorRights){
+            if (props.hasSupervisorRights) {
                 switch (match.params.dictionaryName) {
                     case 'users':
                         return <DictionaryUsers/>;
@@ -29,6 +29,8 @@ export default function AppRouter(props: RouterProps) {
                     default:
                         return;
                 }
+            } else {
+                return <AccessDeniedPlaceholder/>
             }
 
         }}/>
