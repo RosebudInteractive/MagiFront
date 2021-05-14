@@ -13,7 +13,7 @@ import {
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
-import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
+import {componentOwnersSelector} from "tt-ducks/dictionary";
 
 const vRequired = value => (value ? undefined : 'Обязательное поле');
 const vMinValue = min => value =>
@@ -25,7 +25,7 @@ const ComposeValidators = (...validators) => value =>
 
 const ComponentForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const { componentData, visible, actions, supervisors} = props;
+    const { componentData, visible, actions, componentOwners} = props;
 
     useEffect(()=>{
         setActionCreate(!(componentData && componentData.Id));
@@ -38,10 +38,10 @@ const ComponentForm = (props) => {
     };
 
     const responsibles = useMemo(() => {
-        if(supervisors.length > 0 && supervisors.some(sup => sup.hasOwnProperty('Id'))){
-            return supervisors.map(sup => ({id: sup.Id, name: sup.DisplayName}))
+        if(componentOwners.length > 0 && componentOwners.some(sup => sup.hasOwnProperty('Id'))){
+            return componentOwners.map(sup => ({id: sup.Id, name: sup.DisplayName}))
         }
-    }, [supervisors]);
+    }, [componentOwners]);
 
     const handleSubmit = (componentInfo) => {
         const newComponentData = {...componentData,
@@ -65,7 +65,7 @@ const ComponentForm = (props) => {
     }), [componentData]);
 
     return (
-        (visible && (supervisors && supervisors.length > 0)) &&
+        (visible && (componentOwners && componentOwners.length > 0)) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
@@ -134,7 +134,7 @@ const mapState2Props = (state) => {
     return {
         componentData: selectedComponentSelector(state),
         visible: componentFormOpenedSelector(state),
-        supervisors: userWithSupervisorRightsSelectorFlatten(state)
+        componentOwners: componentOwnersSelector(state)
     }
 };
 

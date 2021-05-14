@@ -121,6 +121,13 @@ export const userWithSupervisorRightsSelectorFlatten = createSelector(stateSelec
     return uniqIds.map(id => allUsers.find(u => u.Id === id));
 });
 
+export const componentOwnersSelector = createSelector(stateSelector, (state) => {
+    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme];
+    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
+
+    return uniqIds.map(id => allUsers.find(u => u.Id === id));
+});
+
 
 
 // actions
