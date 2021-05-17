@@ -10,18 +10,18 @@ import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 
 import Logo from "tt-assets/svg/logo.svg"
-import {hasAdminRights,} from "tt-ducks/auth";
+import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 
 function SideBarMenu(props) {
 
-    const {hasAdminRights, sideBarMenuVisible} = props
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
             <Logo/>
         </div>
-        { hasAdminRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
+        { hasSupervisorRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
         {
@@ -75,6 +75,7 @@ function MenuList(props: MenuListProps) {
 
 const mapState2Props = (state) => {
     return {
+        hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
     }
