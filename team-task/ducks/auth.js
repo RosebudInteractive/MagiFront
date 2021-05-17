@@ -5,6 +5,7 @@ import 'whatwg-fetch';
 import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
 import {reset} from "redux-form";
 import {all, takeEvery, put, call} from "@redux-saga/core/effects";
+import {USER_ROLE} from "../constants/common";
 
 /**
  * Constants
@@ -104,6 +105,32 @@ export const hasPmRights = createSelector(userSelector, (user) => {
         user.PData.isAdmin ||
         user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms || user.PData.roles.pme || user.PData.roles.pmu)
     )
+})
+export const userRoleSelector = createSelector(userSelector, (user) => {
+    if (user && user.PData && user.PData.roles) {
+      return user.PData.isAdmin ?
+          USER_ROLE.ADMIN
+          :
+          user.PData.roles.pma ?
+              USER_ROLE.PMA
+              :
+              user.PData.roles.pms ?
+                  USER_ROLE.PMS
+                  :
+                  user.PData.roles.pme ?
+                      USER_ROLE.PME
+                      :
+                      user.PData.roles.pmu ?
+                          USER_ROLE.PMU
+                          :
+                          null
+    } else {
+        return null
+    }
+})
+
+export const hasAdminRights = createSelector(userRoleSelector, (userRole) => {
+    return userRole && ((userRole === USER_ROLE.ADMIN) || (userRole === USER_ROLE.PMA))
 })
 
 export const errorSelector = createSelector(stateSelector, state => state.error)

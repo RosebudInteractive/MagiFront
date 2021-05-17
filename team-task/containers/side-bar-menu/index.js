@@ -10,22 +10,22 @@ import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 
 import Logo from "tt-assets/svg/logo.svg"
-import {hasSupervisorRights} from "tt-ducks/auth";
+import {hasAdminRights,} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 
 function SideBarMenu(props) {
 
-    const {hasSupervisorRights, sideBarMenuVisible} = props
+    const {hasAdminRights, sideBarMenuVisible} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
             <Logo/>
         </div>
-        { hasSupervisorRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
+        { hasAdminRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
         {
-            hasSupervisorRights &&
+            hasAdminRights &&
             <MenuList Icon={DictionariesIco} title={"Справочники"}>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
@@ -75,7 +75,7 @@ function MenuList(props: MenuListProps) {
 
 const mapState2Props = (state) => {
     return {
-        hasSupervisorRights: hasSupervisorRights(state),
+        hasAdminRights: hasAdminRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
     }
 }

@@ -3,7 +3,14 @@ import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
-import {hasSupervisorRights, userAuthSelector, initializedSelector, whoAmI, hasPmRights} from "tt-ducks/auth";
+import {
+    hasSupervisorRights,
+    userAuthSelector,
+    initializedSelector,
+    whoAmI,
+    hasPmRights,
+    userRoleSelector
+} from "tt-ducks/auth";
 import './assets/styles/app.sass'
 import './assets/styles/grid.sass'
 import * as webix from 'webix/webix.js';
@@ -21,7 +28,7 @@ import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights} = props
+    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
 
@@ -40,7 +47,7 @@ function App(props) {
                 <SideBarMenu/>
                 <div className="tt-main-area__info-panel">
                     <Breadcrumb/>
-                    <AppRouter hasSupervisorRights={hasSupervisorRights}/>
+                    <AppRouter hasSupervisorRights={hasSupervisorRights} userRole={userRole}/>
                 </div>
             </div>
             <ReduxModalDialog/>
@@ -57,6 +64,7 @@ function mapStateToProps(state,) {
         hasSupervisorRights: hasSupervisorRights(state),
         userInitialized: initializedSelector(state),
         hasPmRights: hasPmRights(state),
+        userRole: userRoleSelector(state),
         fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state) || dictionaryFetching(state)
     }
 }
