@@ -4,11 +4,12 @@ import {Checkbox, Select, TextBox} from "../ui-kit";
 import "./create-page-form.sass"
 import {compose} from "redux";
 import {connect} from "react-redux";
+import $ from "jquery";
 
 const EDITOR_NAME = "CREATE_PROCESS_FORM"
 
 function CreateProcessForm(props) {
-    const {supervisors, users, onClose, lessons, editorValues} = props
+    const {supervisors, users, onClose, lessons, editorValues, userId, canChangeSupervisor} = props
 
     const _onApply = () => {
         if (props.editorValid) {
@@ -49,7 +50,14 @@ function CreateProcessForm(props) {
         props.initialize({
             Name: "",
             LessonId: null,
+            SupervisorId: userId
         })
+
+        $("body").addClass("_no-vertical-scroll")
+
+        return () => {
+            $("body").removeClass("_no-vertical-scroll")
+        }
     }, [])
 
     useEffect(() => {
@@ -64,7 +72,7 @@ function CreateProcessForm(props) {
             <h6 className="_grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"}/>
             <Field component={Select} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
-            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getSupervisors()}/>
+            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getSupervisors()} required={true} readOnly={!canChangeSupervisor} disabled={!canChangeSupervisor}/>
             <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
             <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
             <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>

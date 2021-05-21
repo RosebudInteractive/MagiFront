@@ -14,6 +14,7 @@ import {
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
+import {hasAdminRights} from "tt-ducks/auth";
 
 const vRequired = value => (value ? undefined : 'Обязательное поле');
 const vMinValue = min => value =>
@@ -25,7 +26,7 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const { userData, visible, actions} = props;
+    const { userData, visible, actions, isAdmin} = props;
 
     useEffect(()=>{
         setActionCreate(!(userData && userData.Id));
@@ -37,9 +38,16 @@ const UserForm = (props) => {
         props.history.push(`/dictionaries/users`);
     };
 
-    const userRoles = () => {
-        return Object.entries(USER_ROLE_STRINGS).map(val => ({id: val[0], name: val[1]}));
-    };
+    const userRoles = useMemo(() => {
+        return Object.entries(USER_ROLE_STRINGS)
+            .map((val) => {
+                return (val !== USER_ROLE_STRINGS.a) || ((val === USER_ROLE_STRINGS) && isAdmin) ?
+                    {id: val[0], name: val[1]}
+                    :
+                    null
+            })
+            .filter(item => !!item);
+    }, [isAdmin])
 
     const handleSubmit = (userInfo) => {
         const _oldRoles = {...userData.PData.roles}
@@ -122,7 +130,8 @@ const UserForm = (props) => {
                                     <Field name="role"
                                            component={Select}
                                            label={"Роль"}
-                                           options={userRoles()}
+                                           required={true}
+                                           options={userRoles}
                                            validate={ComposeValidators(vRequired)}>
                                     </Field>
                                 </div>
@@ -142,7 +151,8 @@ const UserForm = (props) => {
 const mapState2Props = (state) => {
     return {
         userData: selectedUserSelector(state),
-        visible: userFormOpenedSelector(state)
+        visible: userFormOpenedSelector(state),
+        isAdmin: hasAdminRights(state),
     }
 };
 

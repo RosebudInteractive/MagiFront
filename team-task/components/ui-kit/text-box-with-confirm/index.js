@@ -81,7 +81,7 @@ const CssTextField = withStyles({
                 "line-height": "18px",
                 "letter-spacing": "0.15px",
                 "color": "#19191D",
-
+                // "max-width": "calc(100% - 75px)",
             },
             '&:hover input:not(.Mui-disabled)': {
                 backgroundColor: "#E5E5E7",
@@ -100,7 +100,7 @@ const CssTextField = withStyles({
 
 export default function TextBoxWithConfirm(props) {
 
-    const [readOnly, setReadOnly] = useState(true)
+    const [editMode, setEditMode] = useState(false)
     const [myValue, setMyValue] = useState("")
 
     useEffect(() => {
@@ -109,44 +109,56 @@ export default function TextBoxWithConfirm(props) {
 
     let _className = props.extClass ? "ui-kit__text-box-with_confirm " + props.extClass : "ui-kit__text-box-with_confirm"
 
-    if (readOnly) {
+    if (!editMode) {
         _className = _className + " _read-only"
     }
 
-    const toggleReadOnly = () => {
-        setReadOnly(false)
+    const switchOnEditMode = () => {
+        setEditMode(true)
     }
 
     const apply = () => {
         props.input.onChange(myValue)
-        setReadOnly(true)
+        setEditMode(false)
     }
 
     const cancel = () => {
         setMyValue(props.input.value)
-        setReadOnly(true)
+        setEditMode(false)
     }
 
     const onChange = (e) => {
         setMyValue(e.currentTarget.value)
     }
 
+    useEffect(() => {
+        if (_inputRef && _inputRef.current) {
+            _inputRef.current.style.width =myValue.length + 'ch'
+        }
+    }, [myValue])
+
+    const _inputRef = useRef(null)
+
+    const _needShowIcons = !(props.disabled || props.readOnly)
+
     return <div className={_className}>
-        <CssTextField disabled={props.disabled || readOnly}
+        <CssTextField disabled={props.disabled || props.readOnly || !editMode}
                       label={props.label}
                       variant="outlined"
                       multiline={false}
                       value={myValue}
                       onChange={onChange}
-                      className={"input-field _with-confirm"}/>
+                      inputRef={_inputRef}
+                      className={"input-field _with-confirm"}
+        style={{color: "red"}}/>
         {
-            readOnly &&
-            <div className="text-box-with_confirm__button _pen" onClick={toggleReadOnly}>
+            !editMode && _needShowIcons &&
+            <div className="text-box-with_confirm__button _pen" onClick={switchOnEditMode}>
                 <Pen/>
             </div>
         }
         {
-            !readOnly &&
+            editMode && _needShowIcons &&
             <React.Fragment>
                 <div className="text-box-with_confirm__button _apply" onClick={apply}>
                     <Apply/>

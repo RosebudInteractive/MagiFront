@@ -21,6 +21,7 @@ import {COMMENT_ACTION} from "../constants/common";
 import {getProcess} from "tt-ducks/process";
 import {race} from "redux-saga/effects";
 import type {Message} from "../types/messages";
+import taskController from "../tools/task-controller";
 
 /**
  * Constants
@@ -225,6 +226,9 @@ function* getTaskSaga(data) {
             _isUserComment = _lastComment && _lastComment.User.Id === _user.Id
 
         _task.UserLastComment = _isUserComment ? { Id: _lastComment.Id, Text: _lastComment.Text } : null
+
+        taskController.setUser(_user)
+        taskController.setTask(_task)
 
         yield put({type: GET_TASK_SUCCESS, payload: _task})
     } catch (e) {

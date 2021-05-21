@@ -20,6 +20,7 @@ import {useLocation,} from "react-router-dom"
 import {useWindowSize} from "../../tools/window-resize-hook";
 import PlusIco from "tt-assets/svg/plus.svg"
 import CreateProcessForm from "../../components/create-page-form";
+import {hasAdminRights, userSelector} from "tt-ducks/auth";
 
 let _rowCount = 0
 
@@ -147,6 +148,8 @@ function Processes(props) {
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
         {createFormVisible && <CreateProcessForm
+            userId={props.user.Id}
+            canChangeSupervisor={props.isAdmin}
             onApply={actions.createProcess}
             onClose={closeProcessForm}
             lessons={props.availableForCreationLessons}
@@ -163,6 +166,8 @@ const mapState2Props = (state) => {
         supervisors: userWithSupervisorRightsSelector(state),
         allUsers: allUsersDSelector(state),
         availableForCreationLessons: availableForCreationLessons(state),
+        user: userSelector(state),
+        isAdmin: hasAdminRights(state),
     }
 }
 

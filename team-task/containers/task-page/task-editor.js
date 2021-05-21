@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useMemo, useState} from "react"
+import React, {useEffect,} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -16,12 +16,13 @@ import {
 import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import TaskBody from "../../components/task-page/body";
-import {hasSupervisorRights, userRoleSelector, userSelector,} from "tt-ducks/auth";
+import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import "./task-page.sass"
 import {COMMENT_ACTION} from "../../constants/common";
 import moment from "moment";
 import {Prompt} from "react-router-dom";
 import {TASK_STATE} from "../../constants/states";
+import AccessDeniedPlaceholder from "../../components/access-denied-placeholder";
 
 const EDITOR_NAME = "TASK_EDITOR"
 
@@ -149,8 +150,6 @@ function TaskEditor(props: EditorProps) {
             <form className="task-editor-page form form-with-header__main-block" onSubmit={e => e.preventDefault()}>
                 <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name} onSave={_save}/>
                 <TaskBody task={task}
-                          isSupervisor={isSupervisor}
-                          userRole={userRole}
                           elements={props.elements}
                           currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
                           users={props.users}
@@ -179,7 +178,6 @@ const mapState2Props = (state) => {
         editorValues: getFormValues(EDITOR_NAME)(state),
         editorValid: isValid(EDITOR_NAME)(state),
         user: userSelector(state),
-        userRole: userRoleSelector(state),
     }
 }
 

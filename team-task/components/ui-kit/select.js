@@ -134,7 +134,7 @@ export default function UiSelect(props) {
                 transformOrigin: { vertical: 'top', horizontal: 'left' }
             }}
         >
-            <MenuItem value="" classes={ {root: classes.listItem} }/>
+            { !props.required && <MenuItem value="" classes={ {root: classes.listItem} }/> }
             {
                 props.options && props.options.map((item, index) => {return <MenuItem classes={ {root: classes.listItem} } value={item.id} key={index}>{item.name}</MenuItem>})
             }

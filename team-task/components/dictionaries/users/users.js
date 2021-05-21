@@ -23,11 +23,12 @@ import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";
 import './users.sass'
 import PlusIco from "tt-assets/svg/plus.svg";
 import UserForm from "./form/form";
+import {hasAdminRights} from "tt-ducks/auth";
 
 let _usersCount = 0;
 
 const DictionaryUsers = (props) => {
-    const {users, fetching, actions} = props;
+    const {users, fetching, actions, isAdmin} = props;
     const location = useLocation();
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
@@ -149,7 +150,9 @@ const DictionaryUsers = (props) => {
                 e.preventDefault()
                 const item = this.getItem(data.row)
                 if (item) {
-                    actions.deleteUser(item.Id)
+                    if (!item.Role.includes("a") || (item.Role.includes("a")  && isAdmin)) {
+                        actions.deleteUser(item.Id)
+                    }
                 }
             }
         },
@@ -191,7 +194,8 @@ const mapState2Props = (state) => {
     return {
         users: usersDictionarySelector(state),
         fetching: fetchingSelector(state),
-        modalVisible: userFormOpenedSelector(state)
+        modalVisible: userFormOpenedSelector(state),
+        isAdmin: hasAdminRights(state),
     }
 };
 
