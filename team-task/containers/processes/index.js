@@ -1,10 +1,15 @@
-import React, {useMemo, useEffect, useRef, useCallback, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {processesSelector, statesSelector, fetchingSelector, getProcesses, goToProcess} from "tt-ducks/processes";
+import {fetchingSelector, getProcesses, goToProcess, processesSelector, statesSelector} from "tt-ducks/processes";
 import {createProcess,} from "tt-ducks/process";
-import {availableForCreationLessons, userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
-import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
+import {
+    allUsersDSelector,
+    availableForCreationLessons,
+    getAllDictionaryData,
+    userWithSupervisorRightsSelector
+} from "tt-ducks/dictionary"
+import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import "./processes.sass"
 import Webix from "../../components/Webix";
 import type {FilterField} from "../../components/filter/types";
@@ -15,7 +20,6 @@ import {useLocation,} from "react-router-dom"
 import {useWindowSize} from "../../tools/window-resize-hook";
 import PlusIco from "tt-assets/svg/plus.svg"
 import CreateProcessForm from "../../components/create-page-form";
-import {getAllDictionaryData} from "tt-ducks/dictionary";
 
 let _rowCount = 0
 
@@ -142,7 +146,12 @@ function Processes(props) {
         <div className="grid-container">
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
-        {createFormVisible && <CreateProcessForm onApply={actions.createProcess} onClose={closeProcessForm} lessons={props.availableForCreationLessons} users={props.supervisors}/>}
+        {createFormVisible && <CreateProcessForm
+            onApply={actions.createProcess}
+            onClose={closeProcessForm}
+            lessons={props.availableForCreationLessons}
+            supervisors={props.supervisors}
+            users={props.allUsers}/>}
     </div>
 }
 
@@ -152,6 +161,7 @@ const mapState2Props = (state) => {
         states: statesSelector(state),
         fetching: fetchingSelector(state),
         supervisors: userWithSupervisorRightsSelector(state),
+        allUsers: allUsersDSelector(state),
         availableForCreationLessons: availableForCreationLessons(state),
     }
 }

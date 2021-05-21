@@ -129,6 +129,8 @@ export default function UiDatePicker(props) {
         KeyboardButtonProps={{
             'aria-label': 'change date',
         }}
+        readOnly={props.readOnly}
+        disabled={props.disabled}
         InputProps={{
             disableUnderline: true,
         }}

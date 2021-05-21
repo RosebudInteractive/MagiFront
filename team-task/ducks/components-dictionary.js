@@ -5,7 +5,7 @@ import {checkStatus, commonGetQuery, update} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage, showInfo} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
-import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
+import {allUsersDSelector, userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
 
 //constants
 
@@ -125,7 +125,7 @@ function* getComponentsSaga() {
 
         //map components
         yield put({type: SUCCESS_REQUEST});
-        const supervisors = yield select(userWithSupervisorRightsSelectorFlatten);
+        const supervisors = yield select(allUsersDSelector);
 
         components.forEach(component => {
             const supervisor = supervisors.find(sup => sup.Id === component.SupervisorId);

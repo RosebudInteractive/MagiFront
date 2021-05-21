@@ -10,12 +10,12 @@ import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 
 import Logo from "tt-assets/svg/logo.svg"
-import {hasSupervisorRights} from "tt-ducks/auth";
+import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 
 function SideBarMenu(props) {
 
-    const {hasSupervisorRights, sideBarMenuVisible} = props
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -24,10 +24,13 @@ function SideBarMenu(props) {
         { hasSupervisorRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
         <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
-        <MenuList Icon={DictionariesIco} title={"Справочники"}>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/components"} title={"Компоненты"}/>
-            <MenuLink Icon={ElementIco} url={"/dictionaries/users"} title={"Пользователи"}/>
-        </MenuList>
+        {
+            hasAdminRights &&
+            <MenuList Icon={DictionariesIco} title={"Справочники"}>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
+            </MenuList>
+        }
     </nav>
 }
 
@@ -35,12 +38,13 @@ type MenuLinkProps = {
     Icon: any,
     url: string,
     title: string,
+    nested?: boolean
 };
 
 function MenuLink(props: MenuLinkProps) {
-    const {Icon, url, title,} = props
+    const {Icon, url, title, nested} = props
 
-    return <NavLink to={url} className={"side-bar-menu__item title-font"} activeClassName={"_active"}>
+    return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested' : ''}`} activeClassName={"_active"}>
         <Icon/>
         <div className="side-bar-menu__item-title">{title}</div>
     </NavLink>
@@ -72,6 +76,7 @@ function MenuList(props: MenuListProps) {
 const mapState2Props = (state) => {
     return {
         hasSupervisorRights: hasSupervisorRights(state),
+        hasAdminRights: hasAdminRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
     }
 }

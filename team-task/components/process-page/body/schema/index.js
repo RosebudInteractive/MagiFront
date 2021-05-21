@@ -57,14 +57,24 @@ export default function Schema(props: SchemaProps) {
 
     useEffect(() => {
         if (active !== activeTaskId) {
-            setActive(activeTaskId)
-            // if (activeTaskId && $("#js-task_" + activeTaskId).length) {
-            //     setTimeout(() => {
-            //         setActive(activeTaskId)
-            //         $("#js-task_" + activeTaskId)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
-            //     }, 2000)
-            //
-            // }
+            // setActive(activeTaskId)
+
+            if (activeTaskId && $("#js-task_" + activeTaskId).length) {
+                setTimeout(() => {
+                    setActive(activeTaskId)
+                    const _container = $("#schema_container"),
+                        _task = $("#js-task_" + activeTaskId).parent()
+
+                    const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
+                        _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
+
+                    console.log(_task.offset(), _container.scrollLeft())
+                    _container.scrollLeft(_scrollLeft)
+                    _container.scrollTop(_scrollTop)
+                    console.log(_task.offset(), _container.scrollLeft())
+                }, 0)
+
+            }
         }
     }, [activeTaskId, tree])
 
@@ -148,8 +158,6 @@ export default function Schema(props: SchemaProps) {
     }
 
     return <div className="process-body__schema" onClick={onClick}>
-        {/*<div className="schema__left-screen"/>*/}
-        {/*<div className="schema__right-screen"/>*/}
         <h6 className="process-schema__title">
             <span>Схема процесса</span>
             <button className="process-schema__rotate-button" onClick={changeRotation}>
@@ -157,7 +165,7 @@ export default function Schema(props: SchemaProps) {
             </button>
         </h6>
 
-            <div className="process-schema__canvas-background _with-custom-scroll" ref={canvas}>
+            <div className="process-schema__canvas-background _with-custom-scroll" id="schema_container" ref={canvas}>
                 <div className="process-schema__canvas" style={style}>
                     {getCells()}
                     {mounted && getLines()}

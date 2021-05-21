@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useMemo, useState} from "react"
-import {Field, getFormValues, isDirty, isValid, reduxForm, change} from "redux-form";
-import {Select, Checkbox, TextBox} from "../ui-kit";
+import React, {useEffect} from "react"
+import {change, Field, getFormValues, isDirty, isValid, reduxForm} from "redux-form";
+import {Checkbox, Select, TextBox} from "../ui-kit";
 import "./create-page-form.sass"
 import {compose} from "redux";
 import {connect} from "react-redux";
@@ -8,7 +8,7 @@ import {connect} from "react-redux";
 const EDITOR_NAME = "CREATE_PROCESS_FORM"
 
 function CreateProcessForm(props) {
-    const {users, onClose, lessons, editorValues} = props
+    const {supervisors, users, onClose, lessons, editorValues} = props
 
     const _onApply = () => {
         if (props.editorValid) {
@@ -31,6 +31,10 @@ function CreateProcessForm(props) {
                 }
             })
         }
+    }
+
+    const _getSupervisors = () => {
+        return supervisors && supervisors.map((item) => {return {id: item.Id, name: item.DisplayName}})
     }
 
     const _getUsers = () => {
@@ -60,7 +64,7 @@ function CreateProcessForm(props) {
             <h6 className="_grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"}/>
             <Field component={Select} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
-            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getUsers()}/>
+            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getSupervisors()}/>
             <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
             <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
             <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>

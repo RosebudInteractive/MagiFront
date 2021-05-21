@@ -100,14 +100,35 @@ const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+export const allUsersDSelector = createSelector(stateSelector, state => {
+    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
+    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
+
+    return uniqIds.map(id => allUsers.find(u => u.Id === id));
+});
 export const availableForCreationLessons = createSelector(stateSelector, state => state.availableForCreationLessons);
 export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
-    return [...state.users.a, state.users.pma, state.users.pms]
+    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
+    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
+
+    return uniqIds.map(id => allUsers.find(u => u.Id === id));
 });
 
 export const userWithSupervisorRightsSelectorFlatten = createSelector(stateSelector, (state) => {
-    return [...state.users.a, ...state.users.pma, ...state.users.pms]
+    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
+    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
+
+    return uniqIds.map(id => allUsers.find(u => u.Id === id));
 });
+
+export const componentOwnersSelector = createSelector(stateSelector, (state) => {
+    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme];
+    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
+
+    return uniqIds.map(id => allUsers.find(u => u.Id === id));
+});
+
+
 
 // actions
 //forceLoad: boolean
