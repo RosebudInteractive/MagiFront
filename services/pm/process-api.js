@@ -244,6 +244,7 @@ const SQL_GET_TASK_LIST_MYSQL =
 const SQL_GET_TASK_MSSQL =
     "select t.[Id], t.[Name], t.[ProcessId], t.[TimeCr], t.[DueDate], t.[ExecutorId], u.[DisplayName] as [UserName], p.[Name] as [ProcessName],\n" +
     "  t.[Description], t.[AlertId], t.[IsElemReady], t.[WriteFieldSet], t.[ElementId], t.[State], ep.[State] as [EState],\n" +
+    "  p.[SupervisorId] as [ProcessSupervisorId],\n" +
     "  ep.[SupervisorId], eu.[DisplayName] as [EUserName], e.[Name] as [EName], e.[WriteFields], e.[ViewFields], ps.[ProcessFields]\n" +
     "from [PmTask] t\n" +
     "  join [PmProcess] p on t.[ProcessId] = p.[Id]\n" +
@@ -257,6 +258,7 @@ const SQL_GET_TASK_MSSQL =
 const SQL_GET_TASK_MYSQL =
     "select t.`Id`, t.`Name`, t.`ProcessId`, t.`TimeCr`, t.`DueDate`, t.`ExecutorId`, u.`DisplayName` as `UserName`, p.`Name` as `ProcessName`,\n" +
     "  t.`Description`, t.`AlertId`, t.`IsElemReady`, t.`WriteFieldSet`, t.`ElementId`, t.`State`, ep.`State` as `EState`,\n" +
+    "  p.`SupervisorId` as `ProcessSupervisorId`,\n" +
     "  ep.`SupervisorId`, eu.`DisplayName` as `EUserName`, e.`Name` as `EName`, e.`WriteFields`, e.`ViewFields`, ps.`ProcessFields`\n" +
     "from `PmTask` t\n" +
     "  join `PmProcess` p on t.`ProcessId` = p.`Id`\n" +
@@ -653,6 +655,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         let result;
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
+        let isAdmin = opts.user.PData.isAdmin || (AccessRights.checkPermissions(opts.user, AccessFlags.PmAdmin) !== 0);
+        let isSupervisor = AccessRights.checkPermissions(opts.user, AccessFlags.PmSupervisor) !== 0;
+        let isElemElemManager = AccessRights.checkPermissions(opts.user, AccessFlags.PmElemManager) !== 0;
 
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
 
@@ -663,6 +668,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             }
         }, dbOpts)
         if (records && records.detail && (records.detail.length === 1)) {
+            let user_id = opts.user.Id;
             let elem = records.detail[0];
             result = {
                 Id: elem.Id,
@@ -680,6 +686,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 },
                 Log: []
             };
+
+            if (!isAdmin)
+                if (!(isSupervisor && (user_id === elem.ProcessSupervisorId)))
+                    if (!((isSupervisor || isElemElemManager) && (user_id === elem.SupervisorId)))
+                        if (!(user_id === elem.ExecutorId))
+                            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для получения данных.`);
+
             if (elem.ExecutorId)
                 result.Executor = { Id: elem.ExecutorId, DisplayName: elem.UserName };
 
@@ -977,6 +990,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         let result = { Elements: [], Tasks: [], Deps: [] };
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
+        let isAdmin = opts.user.PData.isAdmin || (AccessRights.checkPermissions(opts.user, AccessFlags.PmAdmin) !== 0);
+        let isSupervisor = AccessRights.checkPermissions(opts.user, AccessFlags.PmSupervisor) !== 0;
+        let user_id = opts.user.Id;
 
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
         let root_obj = await this._getObjById(id, { expr: { model: { name: "PmProcess" } } }, dbOpts);
@@ -987,6 +1003,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
             let process_obj = collection.get(0);
             await this._getFieldValues(process_obj, result, ["GuidVer", "SysTypeId", "SupervisorId"]);
+
+            if (!isAdmin)
+                if (!(isSupervisor && (user_id === process_obj.supervisorId())))
+                    throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для получения данных.`);
 
             let records = await $data.execSql({
                 dialect: {
@@ -1922,15 +1942,20 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         });
     }
 
-    _getListToGoBack(process, id) {
+    _getListToGoBack(process, id, isSupervisor) {
         let result = [];
         this._get_proc_deps(process);
         let childs = process._childs[id];
         if (childs) {
             for (let child in childs) {
                 let task = this._getProcessTask(process, child);
-                if (task && (task.State === TaskState.ReadyToStart))
-                    result.push(task.Id);
+                if (task) {
+                    if (task.State === TaskState.ReadyToStart)
+                        result.push(task.Id);
+                    if ((!isSupervisor) && (!((task.State === TaskState.Draft) || (task.State === TaskState.ReadyToStart))))
+                        throw new HttpError(HttpCode.ERR_BAD_REQ,
+                            `Не все зависимые задачи находятся в состоянии "В ожидании" или "Можно приступать".`);
+                }
             }
         }
         return result;
@@ -1979,7 +2004,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
     async updateTask(id, data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
-        let isSupervisor = AccessRights.checkPermissions(opts.user, AccessFlags.PmSupervisor) !== 0;
 
         let memDbOptions = { dbRoots: [] };
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
@@ -2001,13 +2025,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${id}) не найдена.`);
                         let taskObj = collection.get(0);
 
-                        if (!(isSupervisor || (taskObj.executorId() === opts.user.Id)))
-                            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
-
-                        if ((!isSupervisor) && ((taskObj.state() === TaskState.Draft) || (taskObj.state() === TaskState.Finished)))
-                            throw new HttpError(HttpCode.ERR_FORBIDDEN,
-                                `Пользователь не может менять задачу в состоянии "${TaskStateStr[taskObj.state()]}".`);
-
                         await taskObj.edit();
 
                         root_obj = await this._getObjById(taskObj.processId(), PROCESS_ONLY_EXPRESSION, dbOpts);
@@ -2022,6 +2039,26 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let process = await this._get_process(taskObj.processId(), opts);
                         let pstruct = await this.getProcessStruct(process.StructId, opts);
+
+                        let curr_user_id = opts.user.Id;
+                        let isSupervisor = opts.user.PData.isAdmin || (AccessRights.checkPermissions(opts.user, AccessFlags.PmAdmin) !== 0);
+                        if (!isSupervisor)
+                            isSupervisor = (AccessRights.checkPermissions(opts.user, AccessFlags.PmSupervisor) !== 0) &&
+                                (curr_user_id === processObj.supervisorId());
+                        let isElemElemManager = AccessRights.checkPermissions(opts.user, AccessFlags.PmElemManager) !== 0;
+                        if (isElemElemManager && taskObj.elementId()) {
+                            let elem = this._getProcessElement(process, taskObj.elementId());
+                            if (elem)
+                                isElemElemManager = elem.SupervisorId === curr_user_id;
+                        }
+                        let isExecutor = taskObj.executorId() === curr_user_id;
+                        
+                        if (!(isSupervisor || isElemElemManager || isExecutor))
+                            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
+
+                        if ((!isSupervisor) && (taskObj.state() === TaskState.Draft))
+                            throw new HttpError(HttpCode.ERR_FORBIDDEN,
+                                `Пользователь не может менять задачу в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
                         if (((typeof (inpFields.ElementId) === "number") || (inpFields.ElementId === null)) &&
                             (taskObj.elementId() !== inpFields.ElementId)) {
@@ -2055,7 +2092,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             let old_executor = taskObj.executorId();
                             let new_executor = (typeof (inpFields.ExecutorId) === "number") && (inpFields.ExecutorId > 0) ? inpFields.ExecutorId : null;
                             if (old_executor !== new_executor) {
-                                if (!isSupervisor)
+                                if (!(isSupervisor || isElemElemManager))
                                     throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять исполнителя задачи.`);
                                 taskObj.executorId(new_executor);
                                 if (new_executor)
@@ -2067,6 +2104,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"]);
 
                         let child_tasks = [];
+                        let old_state = taskObj.state();
                         if (typeof (inpFields.State) !== "undefined")
                             if ((typeof (inpFields.State) === "number") && (inpFields.State > 0)
                                 && (inpFields.State <= Object.keys(TaskState).length)) {
@@ -2081,8 +2119,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     let task_ids = [];
                                     let task_state;
                                     if (taskObj.state() === TaskState.Finished) {
+                                        if ((!isSupervisor) && (inpFields.State !== TaskState.InProgess))
+                                            throw new HttpError(HttpCode.ERR_BAD_REQ,
+                                                `Задачу можно перевести только в состояние "${TaskStateStr[TaskState.InProgess]}".`);
                                         task_state = TaskState.Draft;
-                                        task_ids = this._getListToGoBack(process, id);
+                                        task_ids = this._getListToGoBack(process, id, isSupervisor);
                                     }
                                     else
                                         if (inpFields.State === TaskState.Finished) {
@@ -2113,7 +2154,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (typeof (inpFields.Comment) === "string") {
                             let root_log = taskObj.getDataRoot("PmTaskLog");
                             let newHandler = await root_log.newObject({
-                                fields: { Text: inpFields.Comment, UserId: opts.user.Id }
+                                fields: { Text: inpFields.Comment, UserId: curr_user_id }
                             }, dbOpts);
                             if (taskObj.state() === TaskState.Alert)
                                 newAlertId = newHandler.keyValue;
@@ -2127,15 +2168,15 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         await processObj.edit();
 
-                        let allowed_fields = [];
-                        if (taskObj.elementId() && taskObj.writeFieldSet()) {
+                        let allowed_fields = isSupervisor ? undefined : [];
+                        if ((!isSupervisor) && taskObj.elementId() && taskObj.writeFieldSet()) {
                             let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
                             if (!wr_set)
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
                             wr_set.forEach(elem => {
                                 allowed_fields.push(elem);
-                            });
+                            })
                         }
 
                         if (typeof (inpFields.Fields) !== "undefined") {
@@ -2145,8 +2186,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         if (elemObj)
                             await elemObj.edit();
-                        if (taskObj.isElemReady() && (taskObj.state() === TaskState.Finished) && elemObj) {
-                            elemObj.state(ElemState.Ready);
+                        if (taskObj.isElemReady() && elemObj) {
+                            if (taskObj.state() === TaskState.Finished)
+                                elemObj.state(ElemState.Ready)
+                            else
+                                if ((old_state === TaskState.Finished) && (elemObj.state() === ElemState.Ready))
+                                    elemObj.state(ElemState.NotReady);
                         }
 
                         let tran = await $data.tranStart(dbOpts);
