@@ -1,11 +1,20 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {connect} from 'react-redux';
 import TaskEditor from "./task-editor";
 import {editorVisibleSelector, taskIdSelector, parentTaskIdSelector, processIdSelector, closeTaskEditor} from "tt-ducks/process-task";
 import {bindActionCreators} from "redux";
+import $ from "jquery";
 
 function ModalTaskEditor(props) {
     const {taskId, processId, actions, parentTaskId} = props
+
+    useEffect(() => {
+        $("body").addClass("_no-vertical-scroll")
+
+        return () => {
+            $("body").removeClass("_no-vertical-scroll")
+        }
+    }, [])
 
     return props.editorVisible ?
         <div className="modal-form tak-editor__modal-form">

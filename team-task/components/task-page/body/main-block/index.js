@@ -1,38 +1,35 @@
-import React, {useEffect, useRef, useMemo} from "react"
+import React from "react"
 import {Field} from "redux-form";
 import {TextBox} from "../../../ui-kit";
 import SupervisorBlock from "./supervisor-block";
 import ProcessFields from "./process-fields";
 import "./main-block.sass"
-import {TASK_STATE} from "../../../../constants/states";
 import {UserStartBlock} from "./user-start-block";
-import {USER_ROLE} from "../../../../constants/common";
+import taskController from "../../../../tools/task-controller";
 
 type TaskBodyProps = {
     elements: Array,
     currentElement: any,
     currentWriteFieldSet: string,
-    isSupervisor: boolean,
-    taskState: number,
-    userRole: string,
     onStartClick: Function
 }
 
 export default function TaskMainBlock(props: TaskBodyProps) {
-    const {isSupervisor, currentElement, elements, currentWriteFieldSet, taskState, userRole, isReadOnly} = props
+    const { currentElement, elements, currentWriteFieldSet, } = props
 
     const _enabledFields = currentWriteFieldSet && currentElement.WriteSets[currentWriteFieldSet]
 
-    const _showUserStartBlock = !isSupervisor && taskState === TASK_STATE.DRAFT.value
-
-    const _isUserRole = userRole === USER_ROLE.PMU
+    const _lock = {
+        description: !taskController.fieldsEnable.form || !taskController.fieldsEnable.description,
+        processFields: !taskController.fieldsEnable.form || !taskController.fieldsEnable.processFields
+    }
 
     return <div className="body__main-block">
         <div className={"task-main-block__description"}>
-            <Field component={TextBox} name={"Description"} label={"Описание"} disabled={_isUserRole || isReadOnly} readOnly={_isUserRole || isReadOnly}/>
+            <Field component={TextBox} name={"Description"} label={"Описание"} disabled={_lock.description} readOnly={_lock.description}/>
         </div>
-        { _showUserStartBlock && <UserStartBlock onStartClick={props.onStartClick} isReadOnly={isReadOnly}/> }
-        { isSupervisor && <SupervisorBlock elements={elements} currentElement={currentElement}/> }
-        { !_showUserStartBlock && <ProcessFields fields={currentElement.Fields} enabledFields={_enabledFields || isReadOnly} /> }
+        { taskController.visibility.startButton && <UserStartBlock onStartClick={props.onStartClick}/> }
+        { <SupervisorBlock elements={elements} currentElement={currentElement}/> }
+        { taskController.visibility.processFields && <ProcessFields fields={currentElement.Fields} enabledFields={_enabledFields} readOnly={_lock.processFields}/> }
     </div>
 }

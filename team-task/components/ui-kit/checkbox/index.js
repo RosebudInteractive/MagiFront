@@ -1,5 +1,5 @@
 import React from "react"
-import {FormControlLabel, Checkbox, withStyles, FormControl, TextField} from "@material-ui/core"
+import {FormControlLabel, Checkbox, withStyles, FormControl, TextField, Select} from "@material-ui/core"
 
 const CssFormControlLabel = withStyles({
     root: {
@@ -105,5 +105,7 @@ export default function UiCheckbox(props) {
 
     const _value = !!props.input.value
 
-    return <CssFormControlLabel control={<Checkbox checked={_value} {...props.input} />} label={props.label}/>
+    return <CssFormControlLabel control={<Checkbox checked={_value} {...props.input} />} label={props.label}
+                                disabled={props.disabled}
+                                readOnly={props.readOnly}/>
 }
