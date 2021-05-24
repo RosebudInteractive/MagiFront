@@ -146,19 +146,24 @@ class IosInApp extends BaseInApp {
 
                 if (res && Array.isArray(res.data)) {
                     result = [];
+                    let prices = {};
                     for (let i = 0; i < res.data.length; i++) {
                         let elem = res.data[i];
                         let price = +elem.attributes.customerPrice;
-                        let id = +elem.relationships.priceTier.data.id;
-                        if (id > this._max_id)
-                            break;
-                        if (id >= this._min_id) {
-                            result.push({
-                                Price: price,
-                                Code: _.template(this._template)({ id: id })
-                            })
+                        if ((typeof (price) === "number") && (!isNaN(price)) && (!prices[price])) {
+                            let id = +elem.relationships.priceTier.data.id;
+                            if (id > this._max_id)
+                                break;
+                            if (id >= this._min_id) {
+                                result.push({
+                                    Price: price,
+                                    Code: _.template(this._template)({ id: id })
+                                });
+                                prices[price] = true;
+                            }
                         }
                     }
+                    result.sort((a, b) => { return a.Price - b.Price; });
                 }
             }
             catch (err) {

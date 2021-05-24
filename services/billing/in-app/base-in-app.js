@@ -227,7 +227,8 @@ exports.BaseInApp = class BaseInApp extends Payment {
                     result = _find(data, new_min, new_max, price);
             return result;
         }
-        return this._table_cache ? _find(this._table_cache.data, 0, this._table_cache.data.length - 1, price) : null;
+        return this._table_cache && (this._table_cache.data.length > 0) ?
+            _find(this._table_cache.data, 0, this._table_cache.data.length - 1, price) : null;
     }
 
     async _getInAppTable(options) {
