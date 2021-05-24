@@ -110,7 +110,7 @@ function Processes(props) {
                 actions.setGridSortOrder(_sort)
                 this.markSorting(_sort.field, _sort.direction)
             },
-            onItemClick: function (id) {
+            onItemDblClick: function (id) {
                 const item = this.getItem(id)
                 if (item && item.Id) {
                     actions.goToProcess(item.Id)

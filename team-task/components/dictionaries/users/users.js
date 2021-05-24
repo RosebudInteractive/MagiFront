@@ -133,7 +133,7 @@ const DictionaryUsers = (props) => {
                 actions.setGridSortOrder(_sort);
                 this.markSorting(_sort.field, _sort.direction);
             },
-            onItemClick: function (id) {
+            onItemDblClick: function (id) {
                 if (id && id.column && (id.column === "del-btn")) return
 
                 const item = this.getItem(id);

@@ -11,7 +11,7 @@ import {
     usersSelector,
     elementsSelector,
     fetchingSelector,
-    currentElementSelector
+    currentElementSelector, accessDeniedSelector
 } from "tt-ducks/task";
 import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
@@ -33,7 +33,7 @@ type EditorProps = {
 }
 
 function TaskEditor(props: EditorProps) {
-    const {actions, task, fetching, isSupervisor, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, userRole} = props
+    const {actions, task, fetching, accessDenied, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, userRole} = props
 
     useEffect(() => {
         if (taskId === -1) {
@@ -142,22 +142,32 @@ function TaskEditor(props: EditorProps) {
         actions.saveTask({task: _task})
     }
 
-    return !fetching && task &&
+    return !fetching ?
         <React.Fragment>
-            <Prompt when={hasChanges}
-                    message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+            {
+                task && <React.Fragment>
+                    <Prompt when={hasChanges}
+                            message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
 
-            <form className="task-editor-page form form-with-header__main-block" onSubmit={e => e.preventDefault()}>
-                <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name} onSave={_save}/>
-                <TaskBody task={task}
-                          elements={props.elements}
-                          currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
-                          users={props.users}
-                          currentElement={currentElement}
-                          onChangeElement={_onChangeElement}
-                          onStartClick={_onStartClick}/>
-            </form>
+                    <form className="task-editor-page form form-with-header__main-block"
+                          onSubmit={e => e.preventDefault()}>
+                        <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name}
+                                    onSave={_save}/>
+                        <TaskBody task={task}
+                                  elements={props.elements}
+                                  currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
+                                  users={props.users}
+                                  currentElement={currentElement}
+                                  onChangeElement={_onChangeElement}
+                                  onStartClick={_onStartClick}/>
+                    </form>
+                </React.Fragment>
+            }
+            {
+                accessDenied && <AccessDeniedPlaceholder/>
+            }
         </React.Fragment>
+        : null
 }
 
 const validate = (values) => {
@@ -169,6 +179,7 @@ const validate = (values) => {
 const mapState2Props = (state) => {
     return {
         task: taskSelector(state),
+        accessDenied: accessDeniedSelector(state),
         users: usersSelector(state),
         elements: elementsSelector(state),
         fetching: fetchingSelector(state),

@@ -63,6 +63,8 @@ const SAVE_TASK_LINKS_START = `${prefix}/SAVE_TASK_LINKS_START`
 export const SAVE_TASK_LINKS_SUCCESS = `${prefix}/SAVE_TASK_LINKS_SUCCESS`
 const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
 
+const SET_ACCESS_DENIED = `${prefix}/SET_ACCESS_DENIED`
+
 const Element = Record({
     Id: null,
     Name: null,
@@ -79,6 +81,7 @@ const Element = Record({
  * */
 export const ReducerRecord = Record({
     task: null,
+    accessDenied: false,
     users: [],
     elements: [],
     fetching: false,
@@ -96,6 +99,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("fetching", true)
                 .set("task", null)
+                .set("accessDenied", false)
                 .set("currentElement", new Element())
 
         case GET_TASK_SUCCESS:
@@ -152,6 +156,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("currentElement", new Element())
 
+        case SET_ACCESS_DENIED:
+            return state
+                .set("accessDenied", true)
+
         default:
             return state
     }
@@ -167,6 +175,7 @@ export const taskSelector = createSelector(stateSelector, state => state.task)
 export const usersSelector = createSelector(stateSelector, state => state.users)
 export const elementsSelector = createSelector(stateSelector, state => state.elements)
 export const currentElementSelector = createSelector(stateSelector, state => state.currentElement)
+export const accessDeniedSelector = createSelector(stateSelector, state => state.accessDenied)
 
 
 /**
@@ -233,7 +242,12 @@ function* getTaskSaga(data) {
         yield put({type: GET_TASK_SUCCESS, payload: _task})
     } catch (e) {
         yield put({type: GET_TASK_FAIL})
-        yield put(showErrorMessage(e.message))
+
+        if (e.status === 403) {
+            yield put({type: SET_ACCESS_DENIED})
+        } else {
+            yield put(showErrorMessage(e.message))
+        }
     }
 }
 
@@ -367,7 +381,7 @@ function* createTaskSaga({payload}) {
             Id: -1,
             Process: {Id: payload},
             Executor: {Id: _user.Id, DisplayName: _user.DisplayName},
-            Name: "",
+            Name: "Новая задача",
             Element: {Id: null},
             IsElemReady: false,
             Description: "",
@@ -375,6 +389,9 @@ function* createTaskSaga({payload}) {
             Dependencies: [],
             Log: [],
         }
+
+        taskController.setUser(_user)
+        taskController.setTask(_newTask)
 
         yield call(getDictionaryData, _newTask)
 
