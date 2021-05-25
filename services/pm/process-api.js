@@ -270,7 +270,7 @@ const SQL_GET_TASK_MYSQL =
     "where t.`Id` = <%= id %>";
 
 const SQL_GET_TASK_LOG_MSSQL =
-    "select l.[Id], l.[TimeCr], l.[Text], l.[UserId], u.[DisplayName]\n" +
+    "select l.[Id], l.[TimeMdf] as [TimeCr], l.[Text], l.[UserId], u.[DisplayName]\n" +
     "from [PmTask] t\n" +
     "  join [PmTaskLog] l on l.[TaskId] = t.[Id]\n" +
     "  join [User] u on u.[SysParentId] = l.[UserId]\n" +
@@ -278,7 +278,7 @@ const SQL_GET_TASK_LOG_MSSQL =
     "order by l.[TimeCr]";
 
 const SQL_GET_TASK_LOG_MYSQL =
-    "select l.`Id`, l.`TimeCr`, l.`Text`, l.`UserId`, u.`DisplayName`\n" +
+    "select l.`Id`, l.`TimeMdf` as `TimeCr`, l.`Text`, l.`UserId`, u.`DisplayName`\n" +
     "from `PmTask` t\n" +
     "  join `PmTaskLog` l on l.`TaskId` = t.`Id`\n" +
     "  join `User` u on u.`SysParentId` = l.`UserId`\n" +
@@ -2156,7 +2156,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             let newHandler = await root_log.newObject({
                                 fields: { Text: inpFields.Comment, UserId: curr_user_id }
                             }, dbOpts);
-                            if (taskObj.state() === TaskState.Alert)
+                            if ((old_state !== taskObj.state()) && (taskObj.state() === TaskState.Alert))
                                 newAlertId = newHandler.keyValue;
                         }
 
@@ -2200,6 +2200,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         try {
                             for (let i = 0; i < child_tasks.length; i++)
                                 await child_tasks[i].save(dbOpts);
+                            if (!newAlertId)
+                                taskObj.alertId(null);
                             await taskObj.save(dbOpts);
                             if (newAlertId) {
                                 await taskObj.edit();
@@ -2637,7 +2639,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (inpFields.Params && inpFields.Params.StructName) {
                             opts.silent = true;
                             opts.byName = true;
-                            pstruct = await this.getProcessStruct(inpFields.Params.StructName, opts);
+                            let struct_name = PROCESS_PROTO_TABLE[inpFields.Params.StructName] &&
+                                PROCESS_PROTO_TABLE[inpFields.Params.StructName].structure ?
+                                PROCESS_PROTO_TABLE[inpFields.Params.StructName].structure.Name : null;
+                            if(!struct_name)
+                                throw new Error(`Unknown process struct name: "${inpFields.Params.StructName}"`);
+                            pstruct = await this.getProcessStruct(struct_name, opts);
                             if (!pstruct) {
                                 try {
                                     await this._newProcessStructByName(inpFields.Params.StructName, opts);
@@ -2646,7 +2653,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     console.error(buildLogString(`ProcessAPI::_newProcessStructByName: ${err.message}`));
                                 }
                                 delete opts.silent;
-                                pstruct = await this.getProcessStruct(inpFields.Params.StructName, opts);
+                                pstruct = await this.getProcessStruct(struct_name, opts);
                             }
                             fields.StructId = pstruct.Id;
                         }
