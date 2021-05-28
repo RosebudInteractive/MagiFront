@@ -372,6 +372,9 @@ const SQL_DEL_PROCESS_MYSQL_SCRIPT = [
     "delete `PmProcess` where `Id` = <%= id %>"
 ];
 
+const DFLT_TASK_SORT_ORDER = "TimeCr,desc";
+const DFLT_PROCESS_SORT_ORDER = "TimeCr,desc";
+
 const DFLT_LOCK_TIMEOUT_SEC = 180;
 const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
 
@@ -498,6 +501,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
         }
 
+        opts.order = opts.order ? opts.order : DFLT_PROCESS_SORT_ORDER;
         if (opts.order) {
             let ord_arr = opts.order.split(',');
             let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
@@ -787,6 +791,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
         }
 
+        opts.order = opts.order ? opts.order : DFLT_TASK_SORT_ORDER;
         if (opts.order) {
             let ord_arr = opts.order.split(',');
             let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
@@ -1898,15 +1903,29 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if ((taskObj.state() !== TaskState.Draft) && (taskObj.state() !== TaskState.ReadyToStart))
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить задачу в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
-                        let proot_obj = await this._getObjById(taskObj.processId(), PROCESS_ONLY_EXPRESSION, dbOpts);
-                        memDbOptions.dbRoots.push(proot_obj); // Remember DbRoot to delete it finally in editDataWrapper
-                        let pcollection = proot_obj.getCol("DataElements");
-                        if (pcollection.count() != 1)
+                        let process = await this._get_process(taskObj.processId(), opts);
+                        if (!process)
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Процесс (Id =${taskObj.processId()}) не найден.`);
-                        let processObj = pcollection.get(0);
-
-                        if (processObj.state() === ProcessState.Finished)
+                        if (process.State === ProcessState.Finished)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить задачу из завершившегося процесса.`);
+
+                        let child_tasks = [];
+                        if (process.State === ProcessState.Executing) {
+                            let task_ids = this._getTaskChildList(process, id, TaskState.Draft);
+                            if (task_ids.length > 0) {
+                                for (let i = 0; i < task_ids.length; i++) {
+                                    let ch_root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
+                                    memDbOptions.dbRoots.push(ch_root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                    let child_collection = ch_root_obj.getCol("DataElements");
+                                    if (child_collection.count() != 1)
+                                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Дочерняя задача (Id =${task_ids[i]}) не найдена.`);
+                                    let ctask = child_collection.get(0);
+                                    await ctask.edit();
+                                    ctask.state(TaskState.ReadyToStart);
+                                    child_tasks.push(ctask);
+                                }
+                            }
+                        }
 
                         await root_obj.edit();
                         collection._del(taskObj);
@@ -1928,6 +1947,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 }
                             }, dbOpts);
                             await root_obj.save(dbOpts);
+                            for (let i = 0; i < child_tasks.length; i++)
+                                await child_tasks[i].save(dbOpts);
                             await $data.tranCommit(transactionId)
                         }
                         catch (err) {
@@ -1940,6 +1961,22 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     })
             }, memDbOptions);
         });
+    }
+
+    _getTaskChildList(process, id, task_state) {
+        let result = [];
+        this._get_proc_deps(process);
+        let childs = process._childs[id];
+        if (childs) {
+            for (let child in childs) {
+                let task = this._getProcessTask(process, child);
+                if (task) {
+                    if ((!task_state) || (task.State === task_state))
+                        result.push(task.Id);
+                }
+            }
+        }
+        return result;
     }
 
     _getListToGoBack(process, id, isSupervisor) {
