@@ -46,7 +46,6 @@ class TaskController {
     }
 
     setTask(task) {
-        console.log(task)
         this.task = task
         this.calcAvailability()
     }
@@ -137,6 +136,10 @@ class TaskController {
         this._enable.elements = true
 
         this._visibility.writeFieldSet = true
+
+        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+            this._visibility.startButton = true
+        }
     }
 
     _calcSupervisor() {
@@ -152,6 +155,10 @@ class TaskController {
         this._enable.elements = true
 
         this._visibility.writeFieldSet = true
+
+        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+            this._visibility.startButton = true
+        }
     }
 
     _calcElementResponsible() {
@@ -165,6 +172,15 @@ class TaskController {
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
+
+        if (this.task.State === TASK_STATE.QUESTION.value) {
+            this._enable.state = true
+        }
+
+        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+            this._visibility.startButton = true
+            this._visibility.processFields = false
+        }
     }
 
     _calcUser() {
@@ -173,12 +189,16 @@ class TaskController {
         if ((this.task.State !== TASK_STATE.WAITING.value) && (this.task.State !== TASK_STATE.DONE.value)) {
             this._enable.form = true
             this._enable.processFields = true
-            this._enable.state = true
+            this._enable.state = this.task.State !== TASK_STATE.DRAFT.value
         }
 
         if (this.task.State === TASK_STATE.DRAFT.value) {
             this._visibility.startButton = true
             this._visibility.processFields = false
+        }
+
+        if (this.task.State === TASK_STATE.QUESTION.value) {
+            this._enable.state = true
         }
 
         if (this.task.State === TASK_STATE.DONE.value) {

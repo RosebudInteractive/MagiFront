@@ -6,17 +6,15 @@ import {bindActionCreators} from "redux";
 import $ from "jquery";
 
 function ModalTaskEditor(props) {
-    const {taskId, processId, actions, parentTaskId} = props
+    const {taskId, processId, actions, parentTaskId, editorVisible} = props
 
     useEffect(() => {
-        $("body").addClass("_no-vertical-scroll")
+        const _body = $("body")
 
-        return () => {
-            $("body").removeClass("_no-vertical-scroll")
-        }
-    }, [])
+        editorVisible ? _body.addClass("_no-vertical-scroll") : _body.removeClass("_no-vertical-scroll")
+    }, [editorVisible])
 
-    return props.editorVisible ?
+    return editorVisible ?
         <div className="modal-form tak-editor__modal-form">
             <div className="tak-editor__modal-wrapper">
                 <TaskEditor taskId={taskId} processId={processId} parentTaskId={parentTaskId}/>

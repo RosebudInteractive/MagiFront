@@ -16,13 +16,8 @@ export type UpdatingTask = {
 
 export type UpdatingCommentData = {
     id: number,
-    text: ?string,
+    text?: string,
     action: $Values<typeof COMMENT_ACTION>
-}
-
-export type UpdatingTaskData = {
-    task: UpdatingTask,
-    comment: ?UpdatingCommentData,
 }
 
 export type ProcessTask = {

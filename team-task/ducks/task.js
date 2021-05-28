@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, take, put, call, select} from "@redux-saga/core/effects";
+import {all, call, put, select, take, takeEvery} from "@redux-saga/core/effects";
 import {
     MODAL_MESSAGE_ACCEPT,
     MODAL_MESSAGE_DECLINE,
@@ -11,17 +11,17 @@ import {
     showErrorMessage,
     showUserConfirmation
 } from "tt-ducks/messages";
-
-import TASK from "../mock-data/task-3"
 import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {ProcessTask, UpdatingCommentData, UpdatingTask, UpdatingTaskData} from "../types/task";
+import type {ProcessTask, UpdatingCommentData, UpdatingTask,} from "../types/task";
 import {COMMENT_ACTION} from "../constants/common";
 import {getProcess} from "tt-ducks/process";
 import {race} from "redux-saga/effects";
 import type {Message} from "../types/messages";
 import taskController from "../tools/task-controller";
+import moment from "moment";
+import {TASK_STATE} from "../constants/states";
 
 /**
  * Constants
@@ -64,6 +64,12 @@ export const SAVE_TASK_LINKS_SUCCESS = `${prefix}/SAVE_TASK_LINKS_SUCCESS`
 const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
 
 const SET_ACCESS_DENIED = `${prefix}/SET_ACCESS_DENIED`
+
+const SAVE_COMMENT_REQUEST = `${prefix}/SAVE_COMMENT_REQUEST`
+const SAVE_COMMENT_START = `${prefix}/SAVE_COMMENT_START`
+const SET_COMMENT = `${prefix}/SET_COMMENT`
+const DELETE_COMMENT = `${prefix}/DELETE_COMMENT`
+const SAVE_COMMENT_FAIL = `${prefix}/SAVE_COMMENT_FAIL`
 
 const Element = Record({
     Id: null,
@@ -160,6 +166,36 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("accessDenied", true)
 
+        case SET_COMMENT:
+            return state
+                .update("task", (task) => {
+                    const _comment = task.Log.find(item => item.Id === payload.id)
+
+                    if (_comment) {
+                        const _newValue = {...task}
+                        _comment.Text = payload.text
+
+                        return _newValue
+                    } else {
+                        return task
+                    }
+                })
+
+        case DELETE_COMMENT:
+            return state
+                .update("task", (task) => {
+                    const _index = task.Log.findIndex(item => item.Id === payload.id)
+
+                    if (_index > -1) {
+                        const _newValue = {...task}
+                        _newValue.Log.splice(_index, 1)
+
+                        return _newValue
+                    } else {
+                        return task
+                    }
+                })
+
         default:
             return state
     }
@@ -189,8 +225,8 @@ export const createTask = (processId: number) => {
     return {type: CREATE_TASK_REQUEST, payload: processId}
 }
 
-export const saveTask = (data: UpdatingTaskData) => {
-    return {type: SAVE_TASK_REQUEST, payload: data}
+export const saveTask = (task: UpdatingTask) => {
+    return {type: SAVE_TASK_REQUEST, payload: task}
 }
 
 export const deleteTask = (data: ProcessTask) => {
@@ -199,11 +235,14 @@ export const deleteTask = (data: ProcessTask) => {
 
 export const getProcessElement = (elementId: number) => {
     return {type: GET_PROCESS_ELEMENT_REQUEST, payload: elementId}
-
 }
 
 export const saveDependencies = (data) => {
     return {type: SAVE_TASK_LINKS_REQUEST, payload: data}
+}
+
+export const saveComment = (comment: UpdatingCommentData) => {
+    return {type: SAVE_COMMENT_REQUEST, payload: comment}
 }
 
 
@@ -217,7 +256,8 @@ export const saga = function* () {
         takeEvery(SAVE_TASK_REQUEST, saveTaskSaga),
         takeEvery(DELETE_TASK_REQUEST, deleteTaskSaga),
         takeEvery(GET_PROCESS_ELEMENT_REQUEST, getProcessElementSaga),
-        takeEvery(SAVE_TASK_LINKS_REQUEST, saveDependenciesSaga)
+        takeEvery(SAVE_TASK_LINKS_REQUEST, saveDependenciesSaga),
+        takeEvery(SAVE_COMMENT_REQUEST, saveCommentSaga),
     ])
 }
 
@@ -231,10 +271,16 @@ function* getTaskSaga(data) {
 
         yield call(getDictionaryData, _task)
 
-        const _lastComment = _task.Log && _task.Log.length && _task.Log[_task.Log.length - 1],
-            _isUserComment = _lastComment && _lastComment.User.Id === _user.Id
+        if (_task.Log && _task.Log.length) {
+            _task.Log = _task.Log.sort((a, b) => {return moment(a).isBefore(b) ? 1 : -1})
+            const _lastComment = _task.Log[0]
 
-        _task.UserLastComment = _isUserComment ? { Id: _lastComment.Id, Text: _lastComment.Text } : null
+            _task.isUserLastComment = _lastComment && _lastComment.User.Id === _user.Id
+        } else {
+            _task.isUserLastComment = false
+        }
+
+
 
         taskController.setUser(_user)
         taskController.setTask(_task)
@@ -267,24 +313,23 @@ function* saveTaskSaga({payload}) {
     yield put({type: SAVE_TASK_START})
     try {
 
-        const data: UpdatingTaskData = payload,
-            _creatingTask = data.task.Id === -1,
+        const task: UpdatingTask = payload
+
+        if ((task.State === TASK_STATE.QUESTION.value) && !task.Comment) {
+            yield put({type: SAVE_TASK_FAIL})
+            yield put(showErrorMessage("Необходимо указать вопрос в тексте комментария"))
+            return
+        }
+
+        const _creatingTask = task.Id === -1,
             result =  _creatingTask ?
-                yield call(_postTask, data.task)
+                yield call(_postTask, task)
                 :
-                yield call(_putTask, data.task),
-            id = data.task.Id,
-            elementId = data.task.ElementId
+                yield call(_putTask, task),
+            id = task.Id,
+            elementId = task.ElementId
 
         yield put({type: SAVE_TASK_SUCCESS, payload: result})
-
-        if (data.comment) {
-            if (data.comment.action === COMMENT_ACTION.UPDATE) {
-                yield call(_updateComment, data.comment)
-            } else if (data.comment.action === COMMENT_ACTION.DELETE) {
-                yield call(_deleteComment, data.comment.id)
-            }
-        }
 
         yield put(reset('TASK_EDITOR'))
 
@@ -322,29 +367,6 @@ const _postTask = (data) => {
             "Content-type": "application/json"
         },
         body: JSON.stringify(data),
-        credentials: 'include'
-    })
-        .then(checkStatus)
-        .then(parseJSON)
-}
-
-const _updateComment = (comment: UpdatingCommentData) => {
-    return fetch(`/api/pm/task-log/${comment.id}`, {
-        method: 'PUT',
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: JSON.stringify({Text: comment.text}),
-        credentials: 'include'
-    })
-        .then(checkStatus)
-        .then(parseJSON)
-}
-
-const _deleteComment = (commentId: number) => {
-    return fetch(`/api/pm/task-log/${commentId}`, {
-        method: 'DELETE',
-        headers: { "Content-type": "application/json" },
         credentials: 'include'
     })
         .then(checkStatus)
@@ -506,6 +528,52 @@ const _deleteDependence = (body) => {
         headers: { "Content-type": "application/json" },
         credentials: 'include',
         body: JSON.stringify(body),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* saveCommentSaga({payload}) {
+    const comment: UpdatingCommentData = payload
+
+    yield put({type: SAVE_COMMENT_START})
+    try {
+        if (comment) {
+            if (comment.action === COMMENT_ACTION.UPDATE) {
+                yield call(_updateComment, comment)
+
+                yield put({type: SET_COMMENT, payload: comment})
+            } else if (comment.action === COMMENT_ACTION.DELETE) {
+                yield call(_deleteComment, comment.id)
+
+                yield put({type: DELETE_COMMENT, payload: comment})
+            }
+        }
+    } catch (e) {
+        yield put({type: SAVE_COMMENT_FAIL})
+        yield put(showError({content: e.message}))
+    }
+
+}
+
+const _updateComment = (comment: UpdatingCommentData) => {
+    return fetch(`/api/pm/task-log/${comment.id}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({Text: comment.text}),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _deleteComment = (commentId: number) => {
+    return fetch(`/api/pm/task-log/${commentId}`, {
+        method: 'DELETE',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include'
     })
         .then(checkStatus)
         .then(parseJSON)

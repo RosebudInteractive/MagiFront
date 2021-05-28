@@ -21,6 +21,7 @@ import {useWindowSize} from "../../tools/window-resize-hook";
 import PlusIco from "tt-assets/svg/plus.svg"
 import CreateProcessForm from "../../components/create-page-form";
 import {hasAdminRights, userSelector} from "tt-ducks/auth";
+import {sideBarMenuVisible} from "tt-ducks/app";
 
 let _rowCount = 0
 
@@ -39,7 +40,10 @@ function Processes(props) {
 
     useEffect(() => {
         _rowCount = processes.length
-        _onResize();
+        if (props.sideBarMenuVisible) { _onResize() }
+        else {
+            setTimeout(() => {_onResize()}, 200)
+        }
     }, [processes])
 
     useEffect(() => {
@@ -84,7 +88,7 @@ function Processes(props) {
                     let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
                     return value ? fn(new Date(value)) : '';
                 }},
-            {id: 'Id', header: 'ID процесса', width: 105},
+            {id: 'Id', header: 'ID процесса', adjust:true},
             {
                 id: 'State', header: 'СОСТОЯНИЕ', width: 150,
                 template: function(data) {
@@ -92,9 +96,9 @@ function Processes(props) {
                 }
             },
             {id: 'UserName', header: 'Супервизор', width: 170},
-            {id: 'Name', header: 'Название', width: 250, fillspace: 30},
-            {id: 'CourseName', header: 'Курс', width: 80, fillspace: 30},
-            {id: 'LessonName', header: 'Лекция', width: 115, fillspace: 30},
+            {id: 'Name', header: 'Название', width: 250, fillspace: 30, adjust:true},
+            {id: 'CourseName', header: 'Курс', width: 80, fillspace: 30, adjust:true},
+            {id: 'LessonName', header: 'Лекция', width: 115, fillspace: 30, adjust:true},
         ],
         on: {
             onHeaderClick: function(header,) {
@@ -115,9 +119,9 @@ function Processes(props) {
                 if (item && item.Id) {
                     actions.goToProcess(item.Id)
                 }
-            }
+            },
         }
-    };
+    }
 
     const FILTER_CONFIG : Array<FilterField> = useMemo(() => getFilterConfig(filter.current, states),[filter.current, states])
 
@@ -138,7 +142,7 @@ function Processes(props) {
         setCreateFormVisible(false)
     }
 
-    return <div className="processes-page form">
+    return <div className="processes-page form _scrollable-y">
         <h5 className="form-header _grey70">Процессы</h5>
         <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
         <button className="process-button _add" onClick={onAddProcess}>
@@ -168,6 +172,7 @@ const mapState2Props = (state) => {
         availableForCreationLessons: availableForCreationLessons(state),
         user: userSelector(state),
         isAdmin: hasAdminRights(state),
+        sideBarMenuVisible: sideBarMenuVisible(state),
     }
 }
 

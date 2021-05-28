@@ -1,6 +1,13 @@
 .create-process-dialog
   max-height: calc(100% - 100px)
-  overflow-y: auto
+  .dialog__fields-wrapper
+    margin: 12px 0
+    max-height: 50vh
+    width: calc(100% + 9px)
+    box-sizing: content-box
+    padding-right: 8px
+    overflow-y: scroll
+
   &._with-custom-scroll
     &::-webkit-scrollbar-track
       border-radius: 8px 64px 64px 8px

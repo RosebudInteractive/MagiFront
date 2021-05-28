@@ -27,10 +27,8 @@ class GridData {
     }
 }
 
-// const _gridData = new GridData()
-
 export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
-    const {onDelete, onAdd, onUpdate, values, editors, elements, disabled, activeElementId} = props
+    const {onDelete, onAdd, onUpdate, values, editors, elements,} = props
 
     const [editorVisible, setEditorVisible] = useState(false)
     const [currentElement, setCurrentElement] = useState(null)
@@ -52,6 +50,12 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
 
         return _allValuesInElements && _allElementsInValue
     }, [values])
+
+    useEffect(() => {
+        const _body = $("body")
+
+        editorVisible ? _body.addClass("_no-vertical-scroll") : _body.removeClass("_no-vertical-scroll")
+    }, [editorVisible])
 
     useEffect(() => {
         $(window).on('resize toggle-elements-visible', resizeHandler);

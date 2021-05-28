@@ -8,6 +8,22 @@
   .task-page__body
     min-height: calc(100% - 121px)
 
+  .task-editor-page
+    &::-webkit-scrollbar
+      width: 8px
+      height: 8px
+      visibility: hidden
+
+
+    &::-webkit-scrollbar-track
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
+      border-radius: 8px
+
+    &::-webkit-scrollbar-thumb
+      background-color: rgba(169, 169, 169, 100)
+      outline: none
+      border-radius: 8px
+
 
 .tak-editor__modal-wrapper
   position: relative

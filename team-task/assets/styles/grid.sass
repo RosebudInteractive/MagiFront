@@ -4,6 +4,7 @@
   &.webix_view
     border: none
     background-color: transparent
+    box-sizing: border-box
 
   .webix_ss_header, .webix_ss_body
     background-color: $grey01
@@ -52,6 +53,22 @@
   .row-hover
     background-color: rgba(25, 25, 29, .03)
 
+  .webix_column
+    &>div.webix_row_select
+      background-color: inherit
+      color: inherit
+    .webix_row_select
+      border-bottom: 1px solid #61BF76
+      border-top: 1px solid #61BF76
+    &.webix_last
+      .webix_row_select
+        border-right: 1px solid #61BF76
+    &.webix_first
+      .webix_row_select
+        border-left: 1px solid #61BF76
+
+
+
 
   //.row-hover:after
     content: ""
@@ -80,15 +97,15 @@
   transition: transform 0.3s ease, -webkit-transform 0.3s ease
 
 .webix_ss_sort_desc:before
-  -webkit-transform: translateY(-50%) rotate(-135deg)
-  -ms-transform: translateY(-50%) rotate(-135deg)
-  transform: translateY(-50%) rotate(-135deg)
-
-
-.webix_ss_sort_asc:before
   -webkit-transform: translateY(-50%) rotate(45deg)
   -ms-transform: translateY(-50%) rotate(45deg)
   transform: translateY(-50%) rotate(45deg)
+
+
+.webix_ss_sort_asc:before
+  -webkit-transform: translateY(-50%) rotate(-135deg)
+  -ms-transform: translateY(-50%) rotate(-135deg)
+  transform: translateY(-50%) rotate(-135deg)
   margin-top: -3px
 
 .webix_ss_sort_single .webix_ss_sort_num

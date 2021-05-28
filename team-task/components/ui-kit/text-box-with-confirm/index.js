@@ -4,6 +4,7 @@ import Pen from "tt-assets/svg/pen.svg"
 import Apply from "tt-assets/svg/edit-apply.svg"
 import Cancel from "tt-assets/svg/edit-cancel.svg"
 import "./text-box.sass"
+import {getWidthOfText} from "../../../tools/text-functions";
 
 const CssTextField = withStyles({
     root: {
@@ -79,9 +80,8 @@ const CssTextField = withStyles({
                 "font-weight": "normal",
                 "font-size": "13px",
                 "line-height": "18px",
-                "letter-spacing": "0.15px",
+                "letter-spacing": "normal",
                 "color": "#19191D",
-                // "max-width": "calc(100% - 75px)",
             },
             '&:hover input:not(.Mui-disabled)': {
                 backgroundColor: "#E5E5E7",
@@ -133,7 +133,13 @@ export default function TextBoxWithConfirm(props) {
 
     useEffect(() => {
         if (_inputRef && _inputRef.current) {
-            _inputRef.current.style.width =myValue.length + 'ch'
+            const _style = window.getComputedStyle(_inputRef.current),
+                _fontName = _style.getPropertyValue('font-family'),
+                _fontSize = _style.getPropertyValue('font-size')
+
+            const _width = getWidthOfText(myValue, _fontName, _fontSize)
+
+            _inputRef.current.style.width = Math.round(_width + 5) + 'px'
         }
     }, [myValue])
 
@@ -149,8 +155,7 @@ export default function TextBoxWithConfirm(props) {
                       value={myValue}
                       onChange={onChange}
                       inputRef={_inputRef}
-                      className={"input-field _with-confirm"}
-        style={{color: "red"}}/>
+                      className={"input-field _with-confirm"}/>
         {
             !editMode && _needShowIcons &&
             <div className="text-box-with_confirm__button _pen" onClick={switchOnEditMode}>

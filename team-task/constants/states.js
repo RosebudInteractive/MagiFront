@@ -1,6 +1,6 @@
 export const PROCESS_STATE = {
     DRAFT: {value: 1, label: "Черновик", css: "_draft"},
-    EXECUTING: {value: 2, label: "В процессе", css: "_executing"},
+    EXECUTING: {value: 2, label: "Выполняется", css: "_executing"},
     DONE: {value: 3, label: "Завершен", css: "_done"}
 }
 

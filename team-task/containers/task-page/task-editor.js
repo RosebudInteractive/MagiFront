@@ -6,6 +6,7 @@ import {
     getTask,
     createTask,
     saveTask,
+    saveComment,
     getProcessElement,
     taskSelector,
     usersSelector,
@@ -23,6 +24,7 @@ import moment from "moment";
 import {Prompt} from "react-router-dom";
 import {TASK_STATE} from "../../constants/states";
 import AccessDeniedPlaceholder from "../../components/access-denied-placeholder";
+import type {UpdatingCommentData} from "../../types/task";
 
 const EDITOR_NAME = "TASK_EDITOR"
 
@@ -54,7 +56,7 @@ function TaskEditor(props: EditorProps) {
                 WriteFieldSet: task.WriteFieldSet,
                 ElementId: task.Element && task.Element.Id,
                 ExecutorId: task.Executor && task.Executor.Id,
-                LastComment: task.UserLastComment ? task.UserLastComment.Text : "",
+                LastComment: "",
             }
 
             task.Fields && task.Fields.forEach((field) => {
@@ -76,7 +78,7 @@ function TaskEditor(props: EditorProps) {
             Description: editorValues.Description,
             IsElemReady: !!editorValues.IsElemReady,
             WriteFieldSet: editorValues.WriteFieldSet,
-            Comment: !task.UserLastComment ? _commentText : null,
+            Comment: _commentText,
         }
 
         if (editorValues.DueDate) {
@@ -115,7 +117,17 @@ function TaskEditor(props: EditorProps) {
             }
         }
 
-        actions.saveTask({task: _value, comment: userCommentAction})
+        actions.saveTask(_value)
+    }
+
+    const _saveComment = (id, text) => {
+        const userComment: UpdatingCommentData = {
+            id: id,
+            text: text,
+            action: text && text.trim() ? COMMENT_ACTION.UPDATE : COMMENT_ACTION.DELETE
+        }
+
+        actions.saveComment(userComment)
     }
 
     useEffect(() => {
@@ -159,7 +171,8 @@ function TaskEditor(props: EditorProps) {
                                   users={props.users}
                                   currentElement={currentElement}
                                   onChangeElement={_onChangeElement}
-                                  onStartClick={_onStartClick}/>
+                                  onStartClick={_onStartClick}
+                                  onSaveComment={_saveComment}/>
                     </form>
                 </React.Fragment>
             }
@@ -194,7 +207,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getTask, createTask, saveTask, getProcessElement}, dispatch)
+        actions: bindActionCreators({getTask, createTask, saveTask, saveComment, getProcessElement}, dispatch)
     }
 }
 
