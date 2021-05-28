@@ -68,7 +68,10 @@ export default function SchemaTask(props: TaskProps) {
 
     return node ?
         <div className="process-schema__cell" style={style}>
-            <div className={"process-schema__task" + (active ? " _active" : "") + (state.isExpired ? " _expired" : "")} id={"js-task_" + node.id} onClick={_onClick}>
+            <div className={"process-schema__task" + (active ? " _active" : "") + (state.isExpired ? " _expired" : "")}
+                 id={"js-task_" + node.id}
+                 onClick={_onClick}
+                 onDoubleClick={_onEdit}>
                 <div className="task__first-row">
                     <div className="task__id _grey50">{node.id}</div>
                     { node.dueDate && <div className="task__due-date _black">{(new Date(node.dueDate)).toLocaleDateString("ru-RU")}</div> }

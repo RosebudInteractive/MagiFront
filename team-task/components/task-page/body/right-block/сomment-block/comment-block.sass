@@ -1,5 +1,42 @@
 .body__comment-block
   margin-top: 28px
 
+  .comment-block__item
+    margin-bottom: 20px
+
 .comment-block__item
-  margin-bottom: 20px
+  .comment__text
+    resize: none
+    //height: auto
+    width: 100%
+    border: none
+    overflow: hidden
+    outline: none
+    border-radius: 8px
+    padding: 9px 14px
+    height: 10px
+
+    &._alert
+      background-color: #FEEDEC
+
+  ._first-line
+    display: flex
+    align-items: center
+
+  .comment__user-name
+    flex: 1 0 auto
+    margin-right: auto
+
+  ._button
+    cursor: pointer
+    margin-left: 14px
+    display: flex
+    align-items: center
+    justify-content: center
+    &:only-of-type
+      margin-left: 20px
+      margin-right: 5px
+    &:first-of-type
+      margin-left: 20px
+    &:last-of-type
+      margin-right: 5px

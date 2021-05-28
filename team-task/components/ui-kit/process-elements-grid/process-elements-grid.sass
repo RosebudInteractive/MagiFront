@@ -12,6 +12,14 @@
     top: 50%
     left: 50%
     transform: translate(-50%, -50%)
+    &._not-ready
+      background: #2979FF99
+
+    &._part-ready
+      background: #D1941A99
+    &._ready
+      background: #43A04799
+
 
 .process-elements-grid__button
   height: 48px
@@ -104,15 +112,15 @@
   transition: transform 0.3s ease, -webkit-transform 0.3s ease
 
 .webix_ss_sort_desc:before
-  -webkit-transform: translateY(-50%) rotate(-135deg)
-  -ms-transform: translateY(-50%) rotate(-135deg)
-  transform: translateY(-50%) rotate(-135deg)
-
-
-.webix_ss_sort_asc:before
   -webkit-transform: translateY(-50%) rotate(45deg)
   -ms-transform: translateY(-50%) rotate(45deg)
   transform: translateY(-50%) rotate(45deg)
+
+
+.webix_ss_sort_asc:before
+  -webkit-transform: translateY(-50%) rotate(-135deg)
+  -ms-transform: translateY(-50%) rotate(-135deg)
+  transform: translateY(-50%) rotate(-135deg)
   margin-top: -3px
 
 .webix_ss_sort_single .webix_ss_sort_num

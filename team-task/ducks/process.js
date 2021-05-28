@@ -39,6 +39,11 @@ const SAVE_PROCESS_START = `${prefix}/SAVE_PROCESS_START`
 const SAVE_PROCESS_SUCCESS = `${prefix}/SAVE_PROCESS_SUCCESS`
 const SAVE_PROCESS_FAIL = `${prefix}/SAVE_PROCESS_FAIL`
 
+const DELETE_PROCESS_REQUEST = `${prefix}/DELETE_PROCESS_REQUEST`
+const DELETE_PROCESS_START = `${prefix}/DELETE_PROCESS_START`
+const DELETE_PROCESS_SUCCESS = `${prefix}/DELETE_PROCESS_SUCCESS`
+const DELETE_PROCESS_FAIL = `${prefix}/DELETE_PROCESS_FAIL`
+
 const ADD_ELEMENT_REQUEST = `${prefix}/ADD_ELEMENT_REQUEST`
 const UPDATE_ELEMENT_REQUEST = `${prefix}/UPDATE_ELEMENT_REQUEST`
 const DELETE_ELEMENT_REQUEST = `${prefix}/DELETE_ELEMENT_REQUEST`
@@ -151,6 +156,10 @@ export const saveProcess = (process: UpdatingProcess) => {
     return {type: SAVE_PROCESS_REQUEST, payload: process}
 }
 
+export const deleteProcess = (processId: number) => {
+    return {type: DELETE_PROCESS_REQUEST, payload: processId}
+}
+
 export const addElement = (element: CreatingElement) => {
     return {type: ADD_ELEMENT_REQUEST, payload: element}
 }
@@ -179,6 +188,7 @@ export const saga = function* () {
         takeEvery(CREATE_PROCESS_REQUEST, createProcessSaga),
         takeEvery(GET_PROCESS_REQUEST, getProcessSaga),
         takeEvery(SAVE_PROCESS_REQUEST, saveProcessSaga),
+        takeEvery(DELETE_PROCESS_REQUEST, deleteProcessSaga),
         takeEvery(GO_BACK_REQUEST, goBackSaga),
         takeEvery(ADD_ELEMENT_REQUEST, addElementSaga),
         takeEvery(UPDATE_ELEMENT_REQUEST, updateElementSaga),
@@ -192,9 +202,8 @@ function* createProcessSaga({payload}) {
     yield put({type: CREATE_PROCESS_START})
     try {
         const result = yield call(_postProcess, data)
-
         if (result.result === "WARNING") {
-            yield put(showWarning(result.warning))
+            yield put(showWarning({content: result.warning, title: "Внимание"}))
         }
         yield put(goToProcess(result.id))
         yield put({type: CREATE_PROCESS_SUCCESS})
@@ -372,6 +381,32 @@ const _updateElement = (element: UpdatingElement) => {
 
 const _deleteElement = (elementId: number) => {
     return fetch(`/api/pm/process-elem/${elementId}`, {
+        method: 'DELETE',
+        headers: {
+            "Content-type": "application/json"
+        },
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* deleteProcessSaga({payload}) {
+    yield put({type: DELETE_PROCESS_START})
+    try {
+        const processId: number = payload
+
+        yield call(_deleteProcess, processId)
+
+        yield put({type: DELETE_PROCESS_SUCCESS})
+    } catch (e) {
+        yield put({type: DELETE_PROCESS_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const _deleteProcess = (id: number) => {
+    return fetch(`/api/pm/process/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-type": "application/json"

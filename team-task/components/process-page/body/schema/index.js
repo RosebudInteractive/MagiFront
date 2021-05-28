@@ -57,7 +57,6 @@ export default function Schema(props: SchemaProps) {
 
     useEffect(() => {
         if (active !== activeTaskId) {
-            // setActive(activeTaskId)
 
             if (activeTaskId && $("#js-task_" + activeTaskId).length) {
                 setTimeout(() => {
@@ -68,10 +67,8 @@ export default function Schema(props: SchemaProps) {
                     const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
                         _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
 
-                    console.log(_task.offset(), _container.scrollLeft())
                     _container.scrollLeft(_scrollLeft)
                     _container.scrollTop(_scrollTop)
-                    console.log(_task.offset(), _container.scrollLeft())
                 }, 0)
 
             }
@@ -98,7 +95,12 @@ export default function Schema(props: SchemaProps) {
             return Object.values(tree.nodes).map((item, index) => {
                 const _active = active === item.id
 
-                return <SchemaTask horizontalProcess={props.horizontalProcess} onClick={onTaskClick} onEdit={editTask} onDelete={deleteTask} onEditLinks={editTaskLinks} onAddNewTask={addTaskWithLink}
+                return <SchemaTask horizontalProcess={props.horizontalProcess}
+                                   onClick={onTaskClick}
+                                   onEdit={editTask}
+                                   onDelete={deleteTask}
+                                   onEditLinks={editTaskLinks}
+                                   onAddNewTask={addTaskWithLink}
                                    active={_active} node={item} key={index}/>
             })
         } else {
