@@ -126,14 +126,16 @@ class AndroidInApp extends BaseInApp {
                     let prices = {};
                     for (let i = 0; i < res.data.inappproduct.length; i++) {
                         let elem = res.data.inappproduct[i];
-                        let price = (0 + elem.prices.RU.priceMicros) / 1e6;
-                        if ((typeof (price) === "number") && (!isNaN(price))) {
-                            if (!prices[price]) {
-                                result.push({
-                                    Price: price,
-                                    Code: elem.sku
-                                });
-                                prices[price] = true;
+                        if (elem.status === 'active') {
+                            let price = (0 + elem.prices.RU.priceMicros) / 1e6;
+                            if ((typeof (price) === "number") && (!isNaN(price))) {
+                                if (!prices[price]) {
+                                    result.push({
+                                        Price: price,
+                                        Code: elem.sku
+                                    });
+                                    prices[price] = true;
+                                }
                             }
                         }
                     }
