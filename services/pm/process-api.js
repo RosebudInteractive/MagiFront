@@ -2150,7 +2150,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Недопустимое значение или тип поля "State": ${inpFields.State} тип: "${typeof (inpFields.State)}".`);
 
-                        let newAlertId = taskObj.alertId() ? taskObj.alertId() : null;
+                        let newAlertId = taskObj.alertId() && (taskObj.state() === TaskState.Alert) ? taskObj.alertId() : null;
                         if (typeof (inpFields.Comment) === "string") {
                             let root_log = taskObj.getDataRoot("PmTaskLog");
                             let newHandler = await root_log.newObject({
