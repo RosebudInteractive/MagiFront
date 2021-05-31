@@ -16,6 +16,7 @@ import {getDomain} from "tools/page-tools";
 import {Link} from "react-router-dom";
 import {lessonsSelector, courseSelector} from "ducks/lesson-menu";
 import {LESSON_STATE, TEST_TYPE} from "../../../../constants/common-consts";
+import ShareIcon from "../../share-icon.svg";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
@@ -78,18 +79,31 @@ class Cover extends React.Component {
                     <div className="reinit-button" onClick={::this._createInstance}>
                         <div className="button _white">Пройти тест заново</div>
                     </div>
+                    {
+                        this.props.isMobileApp &&
+                        <Link href={"/share-action"} className="button btn--brown share-button">
+                            <div className="share-icon">
+                                <ShareIcon/>
+                            </div>
+                            Поделиться
+                        </Link>
+                    }
                 </div>
-
-                <div className="social-block__title">Поделиться результатом с друзьями</div>
-                <div className="social-block__wrapper">
-                    <SocialBlock beforeOnClick={::this._beforeOnClick} shareUrl={urlCreated ? shareUrl : null} urlCreated={urlCreated}/>
-                    <div className="reinit-button" onClick={::this._createInstance}>
-                        <span>
-                            <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
-                        </span>
-                        Пройти тест заново
-                    </div>
-                </div>
+                {
+                    !this.props.isMobileApp &&
+                    <React.Fragment>
+                        <div className="social-block__title">Поделиться результатом с друзьями</div>
+                        <div className="social-block__wrapper">
+                            <SocialBlock beforeOnClick={::this._beforeOnClick} shareUrl={urlCreated ? shareUrl : null} urlCreated={urlCreated}/>
+                            <div className="reinit-button" onClick={::this._createInstance}>
+                                <span>
+                                    <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
+                                </span>
+                                Пройти тест заново
+                            </div>
+                        </div>
+                    </React.Fragment>
+                }
             </div>
         </div>
     }

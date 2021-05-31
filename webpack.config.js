@@ -18,6 +18,7 @@ const _prodConfig = {
         'player-app-test': './scripts/native-app-player/example',
         'workshop-main': './scripts/workshop-main',
         "team-task": './team-task/index',
+        "test-app": './test-app/index',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -152,6 +153,7 @@ const _devConfig = {
         adm: ['./src/index', hotMiddlewareScript],
         mailing: ['./mailing/index', hotMiddlewareScript],
         "team-task": ['./team-task/index', hotMiddlewareScript],
+        "test-app": ['./test-app/index', hotMiddlewareScript],
         'player-main': ['./scripts/player-main', hotMiddlewareScript],
         'player-app': ['./scripts/native-app-player/player-app', hotMiddlewareScript],
         'player-app-test': ['./scripts/native-app-player/example', hotMiddlewareScript],

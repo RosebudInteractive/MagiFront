@@ -288,8 +288,6 @@ function* getOptionsSaga({payload}) {
 const fetchOptions = (token) => {
     const _url = "/api/options" + (token ? `?token=${token}` : "")
 
-    console.log(_url)
-
     return fetch(_url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)

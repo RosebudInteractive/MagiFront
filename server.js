@@ -239,6 +239,10 @@ Promise.resolve()
                 res.sendFile(path.join(__dirname, "team-task", "index.html"));
             });
 
+        app.get(`${config.testAppUrl}/*`, function (req, res) {
+            res.sendFile(path.join(__dirname, "test-app", "index.html"));
+        })
+
         PrerenderInit(app);
 
         // if (config.has("server.adminEnabled") && (config.server.adminEnabled === true))

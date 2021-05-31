@@ -1,13 +1,19 @@
 import {getMinutesBetween} from "tools/time-tools";
 import {getCountDaysTitle, getCounterTitle, getCountHoursTitle,} from "tools/word-tools";
 import moment from "moment";
-import {store} from "../store/configureStore"
+// import {store} from "../store/configureStore"
 import {showDynamicDiscountPopup} from "ducks/message";
 
 const KEY = "mag_dyn_disc"
 
 let _instance = null,
-    discountCode = null
+    discountCode = null,
+    store = null
+
+export const attachStore = (reduxStore) => {
+    store = reduxStore
+}
+
 
 export default class CourseDiscounts {
 

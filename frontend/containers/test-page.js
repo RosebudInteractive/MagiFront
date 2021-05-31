@@ -32,6 +32,7 @@ import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-re
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
+import '../components/test-page/test-page-mobile-app.sass'
 import Cover from "../components/test-page/cover";
 import Instance from "../components/test-page/instance";
 import ResultCover from "../components/test-page/result/cover";
@@ -45,6 +46,7 @@ class TestPage extends React.Component {
 
     static propTypes = {
         type: PropTypes.string,
+        isMobileApp: PropTypes.bool
     }
 
     constructor(props) {
@@ -56,6 +58,8 @@ class TestPage extends React.Component {
         }
 
         this._resizeHandler = function () {
+            if (this.props.isMobileApp) return
+
             let _div = $('.test-page'),
                 _content = $('.js-test-content'),
                 _wrapper = $('.test-page__content')
@@ -87,8 +91,10 @@ class TestPage extends React.Component {
     UNSAFE_componentWillMount() {
         window.scrollTo(0, 0)
         this.props.whoAmI()
-        this.props.refreshStorage();
-        this.props.headerSetPage(pages.test);
+        if (!this.props.isMobileApp) {
+            this.props.refreshStorage();
+            this.props.headerSetPage(pages.test);
+        }
 
         switch (this._getPageType(this.props)) {
             case TEST_PAGE_TYPE.TEST: {
@@ -177,7 +183,7 @@ class TestPage extends React.Component {
     render() {
         let {fetching, notFound, test, testLoaded,} = this.props,
             _className = "test-page" +
-                (this.state.isMobile ? " _mobile" : " _desktop") +
+                (this.props.isMobileApp ? " _mobile-app" : this.state.isMobile ? " _mobile" : " _desktop") +
                 (this._getPageType(this.props) === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
         return (fetching || !testLoaded) && !notFound ?
@@ -188,7 +194,7 @@ class TestPage extends React.Component {
                 :
                 <div className={_className}>
                     {this._getMetaTags()}
-                    <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/>
+                    { !this.props.isMobileApp && <Header test={test} showRestartButton={this._getPageType(this.props) !== TEST_PAGE_TYPE.TEST}/> }
                     <div className={ "test-page__content" + ((this._getPageType(this.props) === TEST_PAGE_TYPE.RESULT) ? " _result" : "") }>
                         <div className="content-wrapper">
                             {this._getContent()}
@@ -204,13 +210,13 @@ class TestPage extends React.Component {
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
-                return <Cover/>
+                return <Cover isMobileApp={this.props.isMobileApp}/>
 
             case TEST_PAGE_TYPE.INSTANCE:
-                return <Instance/>
+                return <Instance isMobileApp={this.props.isMobileApp}/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <ResultCover/>
+                return <ResultCover isMobileApp={this.props.isMobileApp}/>
 
             default:
                 return <Cover/>
@@ -322,11 +328,15 @@ class TestPage extends React.Component {
     }
 
     _addEventListeners() {
-        $(window).bind('resize', this._resizeHandler)
+        if (!this.props.isMobileApp) {
+            $(window).bind('resize', this._resizeHandler)
+        }
     }
 
     _removeEventListeners() {
-        $(window).unbind('resize', this._resizeHandler)
+        if (!this.props.isMobileApp) {
+            $(window).unbind('resize', this._resizeHandler)
+        }
     }
 
     _isLandscape() {
