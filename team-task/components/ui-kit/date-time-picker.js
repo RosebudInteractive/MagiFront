@@ -120,6 +120,7 @@ export default function UiDatePicker(props) {
         variant="inline"
         format={"DD.MM.yyyy"}
         margin="normal"
+        autoOk={true}
 
         label={props.label}
         {...props.input}
