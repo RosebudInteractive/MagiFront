@@ -365,11 +365,11 @@ const SQL_DEL_PROCESS_MSSQL_SCRIPT = [
 ];
 
 const SQL_DEL_PROCESS_MYSQL_SCRIPT = [
-    "delete `PmTaskLog` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>)",
-    "delete `PmDepTask` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>)",
-    "delete `PmTask` where `ProcessId` = <%= id %>",
-    "delete `PmElemProcess` where `ProcessId` = <%= id %>",
-    "delete `PmProcess` where `Id` = <%= id %>"
+    "delete from `PmTaskLog` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>) and (`Id`> 0)",
+    "delete from `PmDepTask` where `TaskId` in (select Id from `PmTask` where `ProcessId` = <%= id %>) and (`Id`> 0)",
+    "delete from `PmTask` where `ProcessId` = <%= id %> and (`Id`> 0)",
+    "delete from `PmElemProcess` where `ProcessId` = <%= id %> and (`Id`> 0)",
+    "delete from `PmProcess` where `Id` = <%= id %>"
 ];
 
 const DFLT_TASK_SORT_ORDER = "TimeCr,desc";
