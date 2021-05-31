@@ -1,0 +1,82 @@
+@import "~tools/variables"
+
+.test-page
+  &._mobile-app
+    .test-page__content
+      height: 100vh
+
+    .test-page__info
+      max-width: none
+      width: 100%
+
+    .title
+      font-size: 26px
+
+    .start-button__block
+      max-width: none
+
+    .button
+      border-radius: 21px
+      height: 42px
+      padding: 0
+      display: flex
+      align-items: center
+      justify-content: center
+      max-width: 320px
+      width: 100%
+
+
+    .start-button__block
+      flex-direction: column
+      align-items: center
+
+      .start-button
+        flex-basis: auto
+        width: 100%
+        height: 42px
+
+    .share-button
+      margin-bottom: 12px
+      background-color: rgba(255, 255, 255, 0.2)
+
+    .share-icon
+      position: absolute
+      left: 12px
+
+
+    .answer-button__wrapper
+      display: flex
+      justify-content: center
+
+    .next-lesson__buttons-block
+      .button
+        height: 42px
+
+      .reinit-button
+        color: $color-main-dark
+        background-color: $color-white
+        position: relative
+        display: -webkit-box
+        display: -webkit-flex
+        display: -moz-box
+        display: -ms-flexbox
+        display: flex
+        -webkit-box-align: center
+        -webkit-align-items: center
+        -moz-box-align: center
+        -ms-flex-align: center
+        align-items: center
+        -webkit-box-pack: center
+        -webkit-justify-content: center
+        -moz-box-pack: center
+        -ms-flex-pack: center
+        justify-content: center
+        font-family: "Fira Sans", Arial, sans-serif
+        font-weight: 700
+        font-size: 15px
+        line-height: 20px
+        border-radius: 21px
+        margin-bottom: 15px
+
+    .test-result__info
+      margin-bottom: 90px
