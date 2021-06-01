@@ -10,12 +10,14 @@ export type TaskFieldsEnable = {
     dueDate: boolean,
     executor: boolean,
     elements: boolean,
+    comments: boolean,
 }
 
 export type TaskFieldsVisibility = {
     startButton: boolean,
     processFields: boolean,
     writeFieldSet: boolean,
+    elementField: boolean,
 }
 
 class TaskController {
@@ -134,11 +136,14 @@ class TaskController {
         this._enable.dueDate = true
         this._enable.executor = true
         this._enable.elements = true
+        this._enable.comments = true
 
         this._visibility.writeFieldSet = true
 
         if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
+            this._visibility.elementField = false
+            this._visibility.processFields = false
         }
     }
 
@@ -153,32 +158,35 @@ class TaskController {
         this._enable.dueDate = true
         this._enable.executor = true
         this._enable.elements = true
+        this._enable.comments = true
 
         this._visibility.writeFieldSet = true
 
         if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
+            this._visibility.elementField = false
+            this._visibility.processFields = false
         }
     }
 
     _calcElementResponsible() {
         if (!this.task) return
 
-        this._enable.form = true
-        this._enable.executor = true
-        this._enable.dueDate = true
-
-        if (this.task.State === TASK_STATE.DONE.value) {
+        if (this.task.State !== TASK_STATE.DONE.value) {
+            this._enable.form = true
+            this._enable.executor = true
+            this._enable.dueDate = true
+            this._enable.state = true
+            this._enable.description = true
+            this._enable.comments = true
+        } else {
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
 
-        if (this.task.State === TASK_STATE.QUESTION.value) {
-            this._enable.state = true
-        }
-
         if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
+            this._visibility.elementField = false
             this._visibility.processFields = false
         }
     }
@@ -186,20 +194,22 @@ class TaskController {
     _calcUser() {
         if (!this.task) return
 
-        if ((this.task.State !== TASK_STATE.WAITING.value) && (this.task.State !== TASK_STATE.DONE.value)) {
+        if ((this.task.State > TASK_STATE.DRAFT.value) && (this.task.State !== TASK_STATE.DONE.value)) {
             this._enable.form = true
             this._enable.processFields = true
-            this._enable.state = this.task.State !== TASK_STATE.DRAFT.value
+            this._enable.state = true
+            this._enable.comments = true
         }
 
         if (this.task.State === TASK_STATE.DRAFT.value) {
             this._visibility.startButton = true
+            this._visibility.elementField = false
             this._visibility.processFields = false
         }
 
-        if (this.task.State === TASK_STATE.QUESTION.value) {
-            this._enable.state = true
-        }
+        // if (this.task.State === TASK_STATE.QUESTION.value) {
+        //     this._enable.state = true
+        // }
 
         if (this.task.State === TASK_STATE.DONE.value) {
             this._enable.form = true
@@ -218,12 +228,14 @@ class TaskController {
             dueDate: false,
             executor: false,
             elements: false,
+            comments: false,
         }
 
         this._visibility = {
             startButton: false,
             processFields: true,
-            writeFieldSet: false
+            writeFieldSet: false,
+            elementField: true,
         }
     }
 }

@@ -101,7 +101,7 @@ const DictionaryUsers = (props) => {
         select: true,
         editable: false,
         columns: [
-            {id: 'Id', header: 'Id', minWidth: 50, fillspace: 10},
+            {id: 'Id', header: 'Id', minWidth: 40, fillspace: 7, css: "_number-field"},
             {id: 'DisplayName', header: 'Имя пользователя', minWidth: 100, fillspace: 25},
             {id: 'Email', header: 'Почта', minWidth: 100, fillspace: 25},
             {

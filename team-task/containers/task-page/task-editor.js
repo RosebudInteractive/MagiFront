@@ -101,22 +101,6 @@ function TaskEditor(props: EditorProps) {
             _value.Fields[field.name] = editorValues[field.name]
         })
 
-        // Если есть последний комментарий пользователя и он его поменял, то
-        // при смене статуса этот комментарий будет новым в логе, если статус не поменялся, а комментарий изменился, то
-        // если новый комментарий пустой, запись надо удалить, иначе обновить
-        let userCommentAction = null
-        if (task.UserLastComment && (task.UserLastComment !== _commentText)) {
-            if (task.State !== _value.State) {
-                _value.Comment = _commentText
-            } else {
-                userCommentAction = {
-                    id: task.UserLastComment.Id,
-                    text: _commentText,
-                    action: _commentText && _commentText.trim() ? COMMENT_ACTION.UPDATE : COMMENT_ACTION.DELETE
-                }
-            }
-        }
-
         actions.saveTask(_value)
     }
 
@@ -151,7 +135,7 @@ function TaskEditor(props: EditorProps) {
         _task.Id = task.Id
         _task.ElementId = task.Element && task.Element.Id
         _task.State = TASK_STATE.EXECUTING.value
-        actions.saveTask({task: _task})
+        actions.saveTask(_task)
     }
 
     return !fetching ?

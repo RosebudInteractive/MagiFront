@@ -39,7 +39,7 @@ export default function Filter(props: FilterProps) {
     const _onClear = () => { props.onApply() }
 
     return <React.Fragment>
-        <Button onClick={_onFilterClick}/>
+        <Button onClick={_onFilterClick} opened={visible}/>
         <Row fields={fields}
              onChangeField={_onChange}
              onCleanField={_onClean}

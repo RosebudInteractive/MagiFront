@@ -4,12 +4,12 @@ import Pen from "tt-assets/svg/pen.svg";
 import Apply from "tt-assets/svg/edit-apply.svg";
 import Cancel from "tt-assets/svg/edit-cancel.svg";
 
-type TaskBodyProps = {
+type CommentBlockProps = {
     task: any,
     onSaveComment?: Function,
 }
 
-export default function CommentBlock(props: TaskBodyProps) {
+export default function CommentBlock(props: CommentBlockProps) {
     const {task,} = props
 
     return <div className="body__comment-block">
@@ -69,8 +69,9 @@ export function Comment(props: CommentProps) {
 
     const _recalcHeight = () => {
         if (_textarea && _textarea.current) {
-            _textarea.current.style.height = "auto"
+            _textarea.current.style.maxHeight = "1em"
             _textarea.current.style.height = (_textarea.current.scrollHeight) + "px";
+            _textarea.current.style.maxHeight = "none"
         }
     }
 

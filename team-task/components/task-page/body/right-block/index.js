@@ -10,11 +10,10 @@ type TaskBodyProps = {
     users: Array,
     task: any,
     onSaveComment: Function,
-    onDeleteComment: Function,
 }
 
 export default function RightBlock(props: TaskBodyProps) {
-    const {task, users, onDeleteComment, onSaveComment} = props
+    const {task, users, onSaveComment} = props
 
     const _stateOptions = useMemo(() => {
         return Object.values(TASK_STATE)
@@ -32,7 +31,7 @@ export default function RightBlock(props: TaskBodyProps) {
         executor: !taskController.fieldsEnable.form || !taskController.fieldsEnable.executor,
         state: !taskController.fieldsEnable.form || !taskController.fieldsEnable.state,
         dueDate: !taskController.fieldsEnable.form || !taskController.fieldsEnable.dueDate,
-        comments: !taskController.fieldsEnable.form
+        comments: !taskController.fieldsEnable.form || !taskController.fieldsEnable.comments
     }
 
     const _alertLog = useMemo(() => {
@@ -44,7 +43,6 @@ export default function RightBlock(props: TaskBodyProps) {
                 isAlert: true,
                 onSaveComment: onSaveComment,
                 key: _index
-                // onDeleteComment: onDeleteComment,
             }
         } else {
             return null
@@ -57,6 +55,6 @@ export default function RightBlock(props: TaskBodyProps) {
         { _alertLog && <Comment {..._alertLog}/> }
         <Field component={DatePicker} name={"DueDate"} label={"Дата исполнения"} disabled={_lock.dueDate} readOnly={_lock.dueDate}/>
         <Field component={TextBox} name={"LastComment"} label={"Комментарий"} disabled={_lock.comments} readOnly={_lock.comments}/>
-        <CommentBlock task={task}/>
+        <CommentBlock task={task} onSaveComment={onSaveComment}/>
     </div>
 }

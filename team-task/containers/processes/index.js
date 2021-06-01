@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {fetchingSelector, getProcesses, goToProcess, processesSelector, statesSelector} from "tt-ducks/processes";
-import {createProcess,} from "tt-ducks/process";
+import {createProcess, deleteProcess} from "tt-ducks/process";
 import {
     allUsersDSelector,
     availableForCreationLessons,
@@ -88,9 +88,9 @@ function Processes(props) {
                     let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
                     return value ? fn(new Date(value)) : '';
                 }},
-            {id: 'Id', header: 'ID процесса', adjust:true},
+            {id: 'Id', header: 'ID процесса', adjust:true, css: "_number-field"},
             {
-                id: 'State', header: 'СОСТОЯНИЕ', width: 150,
+                id: 'State', header: 'СОСТОЯНИЕ', width: 150, css: "_container",
                 template: function(data) {
                     return `<div class="process-state ${data.css}">${data.label}</div>`
                 }
@@ -99,6 +99,10 @@ function Processes(props) {
             {id: 'Name', header: 'Название', width: 250, fillspace: 30, adjust:true},
             {id: 'CourseName', header: 'Курс', width: 80, fillspace: 30, adjust:true},
             {id: 'LessonName', header: 'Лекция', width: 115, fillspace: 30, adjust:true},
+            {
+                id: 'del-btn', header: '', width: 50, css: "_container",
+                template: "<button class='grid-button _delete js-delete'/>"
+            },
         ],
         on: {
             onHeaderClick: function(header,) {
@@ -120,7 +124,16 @@ function Processes(props) {
                     actions.goToProcess(item.Id)
                 }
             },
-        }
+        },
+        onClick: {
+            "js-delete": function (e, data) {
+                e.preventDefault()
+                const item = this.getItem(data.row)
+                if (item) {
+                    actions.deleteProcess(item.Id)
+                }
+            }
+        },
     }
 
     const FILTER_CONFIG : Array<FilterField> = useMemo(() => getFilterConfig(filter.current, states),[filter.current, states])
@@ -178,7 +191,17 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({createProcess, getProcesses, goToProcess, setGridSortOrder, applyFilter, setInitState, setPathname, getAllDictionaryData}, dispatch)
+        actions: bindActionCreators({
+            createProcess,
+            deleteProcess,
+            getProcesses,
+            goToProcess,
+            setGridSortOrder,
+            applyFilter,
+            setInitState,
+            setPathname,
+            getAllDictionaryData
+        }, dispatch)
     }
 }
 

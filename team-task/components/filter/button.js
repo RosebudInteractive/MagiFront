@@ -1,15 +1,14 @@
-import React, {useState, useEffect} from "react"
-import Icon from "tt-assets/svg/filter-button.svg"
+import React from "react"
 import "./filter.sass"
 
 type ButtonProps = {
+    opened: boolean,
     onClick: Function
 }
 
 export default function FilterButton(props: ButtonProps) {
 
-    return <div className="filter-button" onClick={props.onClick}>
-        <Icon/>
+    return <div className={"filter-button" + (props.opened ? " _opened" : " _closed")} onClick={props.onClick}>
         <div className="filter-button__title">Фильтры</div>
     </div>
 }

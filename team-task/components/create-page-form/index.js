@@ -68,7 +68,7 @@ function CreateProcessForm(props) {
     }, [props.editorValues && props.editorValues.LessonId])
 
     return <form className="modal-form" action={"javascript:void(0)"}>
-        <div className="modal-form__dialog create-process-dialog">
+        <div className="modal-form__dialog create-process-dialog _with-custom-scroll">
             <h6 className="_grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"}/>
             <Field component={Autocomplete} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>

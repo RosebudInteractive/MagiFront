@@ -73,7 +73,7 @@ function Tasks(props) {
             }},
             {id: 'ProcessName', header: 'ПРОЦЕСС', fillspace: 11},
             {id: 'Name', header: 'Название', fillspace: 25},
-            {id: 'Id', header: 'ID ЗАДАЧИ', autofill: 10, css: "number-field"},
+            {id: 'Id', header: 'ID ЗАДАЧИ', autofill: 10, css: "_number-field"},
             {id: 'ElementName', header: 'ЭЛЕМЕНТ', autofill: 8}, // Нет сортировки
             {id: 'UserName', header: 'ИСПОЛНИТЕЛЬ', width: 170, autofill: 20}, // UserName
             {id: 'DueDate', header: 'ВЫПОЛНИТЬ ДО', autofill: 11, format: function(value) {
@@ -81,7 +81,7 @@ function Tasks(props) {
                     return value ? fn(new Date(value)) : '';
                 }},
             {
-                id: 'State', header: 'СОСТОЯНИЕ', width: 150,
+                id: 'State', header: 'СОСТОЯНИЕ', width: 150, css: "_container",
                 template: function(data) {
                     return `<div class="task-state ${data.css}">${data.label}</div>`
                 }

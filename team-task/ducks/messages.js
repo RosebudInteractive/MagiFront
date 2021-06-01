@@ -61,7 +61,7 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 
 export const showErrorMessage = (message) => {
-    return {type: SHOW_ERROR, payload: {content: message, type: MESSAGE_TYPE.ERROR}}
+    return {type: SHOW_ERROR, payload: {content: message, title: "Ошибка", type: MESSAGE_TYPE.ERROR}}
 };
 
 export const showInfo = (message) => {

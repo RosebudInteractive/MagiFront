@@ -29,7 +29,7 @@ export default function TaskMainBlock(props: TaskBodyProps) {
             <Field component={TextBox} name={"Description"} label={"Описание"} disabled={_lock.description} readOnly={_lock.description}/>
         </div>
         { taskController.visibility.startButton && <UserStartBlock onStartClick={props.onStartClick}/> }
-        { <SupervisorBlock elements={elements} currentElement={currentElement}/> }
+        { taskController.visibility.elementField && <SupervisorBlock elements={elements} currentElement={currentElement}/> }
         { taskController.visibility.processFields && <ProcessFields fields={currentElement.Fields} enabledFields={_enabledFields} readOnly={_lock.processFields}/> }
     </div>
 }
