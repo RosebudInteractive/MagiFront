@@ -140,7 +140,7 @@ class TaskController {
 
         this._visibility.writeFieldSet = true
 
-        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+        if (this.task.Executor && (this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
             this._visibility.elementField = false
             this._visibility.processFields = false
@@ -162,7 +162,7 @@ class TaskController {
 
         this._visibility.writeFieldSet = true
 
-        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+        if (this.task.Executor && (this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
             this._visibility.elementField = false
             this._visibility.processFields = false
@@ -184,7 +184,7 @@ class TaskController {
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
 
-        if ((this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
+        if (this.task.Executor && (this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
             this._visibility.startButton = true
             this._visibility.elementField = false
             this._visibility.processFields = false

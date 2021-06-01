@@ -7,6 +7,7 @@ import ProcessFields from "./fields";
 
 type ProcessBodyProps = {
     process: any,
+    isAdmin: boolean,
     horizontalProcess: boolean,
     hasChanges: boolean,
     editors: Array,
@@ -27,7 +28,7 @@ type ProcessBodyProps = {
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
-    const {process, supervisors, editors, elements, lessons} = props
+    const {process, supervisors, editors, elements, lessons, isAdmin} = props
 
     const [activeElementId, setActiveElementId] = useState(null)
 
@@ -47,7 +48,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
     }
 
     return <div className="process-page__body">
-        <HeaderRow users={supervisors} lessons={lessons}/>
+        <HeaderRow users={supervisors} lessons={lessons} isAdmin={isAdmin}/>
         <div className="work-area__left-screen"/>
         <div className="work-area__right-screen"/>
         <div className="process-page__work-area">

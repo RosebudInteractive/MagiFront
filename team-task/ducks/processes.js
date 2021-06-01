@@ -11,6 +11,7 @@ import PROCESSES from "../mock-data/processes"
 import {PROCESS_STATE} from "../constants/states";
 import {paramsSelector} from "tt-ducks/route";
 import {push} from "react-router-redux/src";
+import {DELETE_PROCESS_SUCCESS} from "tt-ducks/process";
 
 /**
  * Constants
@@ -53,6 +54,20 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_PROCESSES_FAIL:
             return state
                 .set("fetching", false)
+
+        case DELETE_PROCESS_SUCCESS:
+            return state
+                .update("processes", (processes) => {
+                    const _index = processes.findIndex(item => item.Id === payload)
+
+                    if (_index > -1) {
+                        processes.splice(_index, 1)
+
+                        return [...processes]
+                    } else {
+                        return processes
+                    }
+                })
 
         default:
             return state

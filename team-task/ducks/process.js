@@ -50,7 +50,7 @@ const SAVE_PROCESS_FAIL = `${prefix}/SAVE_PROCESS_FAIL`
 
 const DELETE_PROCESS_REQUEST = `${prefix}/DELETE_PROCESS_REQUEST`
 const DELETE_PROCESS_START = `${prefix}/DELETE_PROCESS_START`
-const DELETE_PROCESS_SUCCESS = `${prefix}/DELETE_PROCESS_SUCCESS`
+export const DELETE_PROCESS_SUCCESS = `${prefix}/DELETE_PROCESS_SUCCESS`
 const DELETE_PROCESS_FAIL = `${prefix}/DELETE_PROCESS_FAIL`
 
 const ADD_ELEMENT_REQUEST = `${prefix}/ADD_ELEMENT_REQUEST`
@@ -421,7 +421,7 @@ function* deleteProcessSaga({payload}) {
 
         yield call(_deleteProcess, processId)
 
-        yield put({type: DELETE_PROCESS_SUCCESS})
+        yield put({type: DELETE_PROCESS_SUCCESS, payload})
     } catch (e) {
         yield put({type: DELETE_PROCESS_FAIL})
         yield put(showErrorMessage(e.message))

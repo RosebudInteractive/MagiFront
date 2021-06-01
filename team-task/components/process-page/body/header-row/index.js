@@ -7,11 +7,12 @@ import {PROCESS_STATE} from "../../../../constants/states";
 type HeaderRowProps = {
     lessons: Array,
     users: Array,
+    isAdmin: boolean,
 }
 
 export default function HeaderRow(props: HeaderRowProps) {
 
-    const {lessons, users} = props
+    const {lessons, users, isAdmin} = props
 
     const _getStateOptions = () => {
         return Object.values(PROCESS_STATE).map(item => ({id: item.value, name: item.label}))
@@ -26,8 +27,8 @@ export default function HeaderRow(props: HeaderRowProps) {
     }
 
     return <div className="process-body__header-row">
-        <Field component={Select} name={"LessonId"} label={"Лекция"} extClass={"_lesson-field"} options={_getLessons()} required={true}/>
+        <Field component={Select} name={"LessonId"} label={"Лекция"} extClass={"_lesson-field"} options={_getLessons()} disabled={true} required={true}/>
         <Field component={Select} name={"State"} label={"Состояние"} extClass={"_state-field"} options={_getStateOptions()} required={true}/>
-        <Field component={Select} name={"SupervisorId"} label={"Супервизор"} extClass={"_user-field"} options={_getUsers()} required={true}/>
+        <Field component={Select} name={"SupervisorId"} label={"Супервизор"} extClass={"_user-field"} options={_getUsers()} required={true} disabled={!isAdmin}/>
     </div>
 }

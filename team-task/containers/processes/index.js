@@ -22,6 +22,7 @@ import PlusIco from "tt-assets/svg/plus.svg"
 import CreateProcessForm from "../../components/create-page-form";
 import {hasAdminRights, userSelector} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
+import {PROCESS_STATE} from "../../constants/states";
 
 let _rowCount = 0
 
@@ -101,7 +102,7 @@ function Processes(props) {
             {id: 'LessonName', header: 'Лекция', width: 115, fillspace: 30, adjust:true},
             {
                 id: 'del-btn', header: '', width: 50, css: "_container",
-                template: "<button class='grid-button _delete js-delete'/>"
+                template: function(data){ return data && data.State === PROCESS_STATE.DRAFT.value ? "<button class='grid-button _delete js-delete'/>" : ""}
             },
         ],
         on: {

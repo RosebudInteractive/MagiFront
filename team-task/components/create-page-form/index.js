@@ -50,7 +50,9 @@ function CreateProcessForm(props) {
         props.initialize({
             Name: "",
             LessonId: null,
-            SupervisorId: userId
+            SupervisorId: userId,
+            UseAuthorPictures: false,
+            UseMusic: false,
         })
 
         $("body").addClass("_no-vertical-scroll")
@@ -85,7 +87,7 @@ function CreateProcessForm(props) {
                 <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getUsers()}/>
             </div>
-            <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!props.hasChanges}>
+            <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!(props.hasChanges && props.editorValid)}>
                 Применить
             </button>
             <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>

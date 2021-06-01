@@ -36,6 +36,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
     const [render, setRender] = useState(false)
     const [sort, setSort] = useState({field: null, direction: null})
     const [elementInEditMode, setElementInEditMode] = useState(false)
+    const [elementsForEditor, setElementsForEditor] = useState(false)
 
     const _gridData = useRef(new GridData())
 
@@ -194,6 +195,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
                     const item = this.getItem(data.row)
                     if (item) {
                         setCurrentElement(item)
+                        setElementsForEditor(elements)
                         setElementInEditMode(true)
                         setEditorVisible(true)
                     }
@@ -202,7 +204,14 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
         })
 
     const onAddElement = () => {
+        const _elements = elements
+            .map((element) => {
+                return !(values && values.some(value => value.ElemId === element.Id)) && element
+            })
+            .filter(item => item)
+        setElementsForEditor(_elements)
         setCurrentElement({Name: null, SupervisorId: null, State: 1})
+
         setElementInEditMode(false)
         setEditorVisible(true)
     }
@@ -231,7 +240,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
             editorVisible &&
             <ElementEditor value={currentElement}
                            editors={editors}
-                           elements={elements}
+                           elements={elementsForEditor}
                            editMode={elementInEditMode}
                            onApply={onApply}
                            onClose={closeEditor}/>}

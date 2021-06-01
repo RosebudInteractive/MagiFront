@@ -19,7 +19,7 @@ import {
     fetchingSelector,
 } from "tt-ducks/process";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
-import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
+import {hasAdminRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, horizontalProcess, showSideBarMenu, changeProcessRotation} from "tt-ducks/app";
 import {activeTaskIdSelector, setActiveTaskId, setInitState} from "tt-ducks/route";
 import {deleteTask,} from "tt-ducks/task";
@@ -36,7 +36,7 @@ import $ from "jquery";
 const EDITOR_NAME = "PROCESS_EDITOR"
 
 function ProcessEditor(props) {
-    const {actions, process, fetching, hasChanges, editorValues,} = props
+    const {actions, process, fetching, hasChanges, editorValues, isAdmin} = props
 
     const params = useParams()
     const location = useLocation()
@@ -139,6 +139,7 @@ function ProcessEditor(props) {
             <form className="process-editor-page form" onSubmit={e => e.preventDefault()}>
                 <ProcessHeader hasChanges={hasChanges} state={process.State} onSave={_save} onBack={_back}/>
                 <ProcessBody process={process}
+                             isAdmin={isAdmin}
                              horizontalProcess={props.horizontalProcess}
                              tree={tree.current}
                              supervisors={props.supervisors}
@@ -178,7 +179,7 @@ const mapState2Props = (state) => {
         lessons: lessonsSelector(state),
         fetching: fetchingSelector(state),
         user: userSelector(state),
-        isSupervisor: hasSupervisorRights(state),
+        isAdmin: hasAdminRights(state),
         activeTaskId: activeTaskIdSelector(state),
         hasChanges: isDirty(EDITOR_NAME)(state),
         editorValues: getFormValues(EDITOR_NAME)(state),
