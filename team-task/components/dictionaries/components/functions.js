@@ -1,4 +1,4 @@
-import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
+import {FILTER_FIELD_TYPE} from "../../filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 
@@ -30,7 +30,7 @@ export const parseParams = () => {
     const _params = new URLSearchParams(location.search),
         name = _params.get("name"),
         supervisor = _params.get("supervisor"),
-        structName = _params.get("structName");
+        struct = _params.get("struct");
 
     let _order = _params.get('order');
     if (_order) {
@@ -38,7 +38,7 @@ export const parseParams = () => {
         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
     }
 
-    const _filter = convertParam2Filter({name, supervisor, structName});
+    const _filter = convertParam2Filter({name, supervisor, struct});
     if (_filter) {
         paramsData.filter = _filter
     }
@@ -46,13 +46,13 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({name, supervisor, structName}) => {
-    if (!(name || supervisor || structName)) return null;
+const convertParam2Filter = ({name, supervisor, struct}) => {
+    if (!(name || supervisor || struct)) return null;
 
     const filter = {};
     filter.Name = name ? name : '';
     filter.SupervisorName = supervisor ? supervisor : '';
-    filter.StructName = structName ? structName : '';
+    filter.StructName = struct ? struct : '';
 
     return filter
 };
@@ -83,7 +83,7 @@ export const convertFilter2Params = (filter) => {
     if (filter) {
         if(filter.Name) { _data.name = filter.Name}
         if (filter.SupervisorName) {_data.supervisor = filter.SupervisorName}
-        if (filter.StructName) {_data.structName = filter.StructName}
+        if (filter.StructName) {_data.struct = filter.StructName}
     }
 
     return _data
