@@ -62,7 +62,7 @@ export const resizeHandler = (rowCount: number) => {
         _height = _form.height(),
         _width = _form.width()
 
-    if (window.$$('dictionary-users-grid')) {
+    if (window.$$('dictionary-components-grid')) {
         const _headerHeight = window.$$('dictionary-components-grid').config.headerRowHeight
 
 

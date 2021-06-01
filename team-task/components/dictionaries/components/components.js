@@ -6,7 +6,7 @@ import {
     getFilterConfig,
     parseParams,
     resizeHandler
-} from "../../../components/dictionaries/components/functions";
+} from "./functions";
 import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
