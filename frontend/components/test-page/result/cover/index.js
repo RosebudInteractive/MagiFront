@@ -81,12 +81,15 @@ class Cover extends React.Component {
                     </div>
                     {
                         this.props.isMobileApp &&
-                        <Link href={"/share-action"} className="button btn--brown share-button">
+                        <a href={"/#share-social"} className="button btn--brown share-button">
                             <div className="share-icon">
                                 <ShareIcon/>
                             </div>
                             Поделиться
-                        </Link>
+                        </a>
+                    }
+                    {
+                        this.props.isMobileApp && <div className="test-result__arrow"/>
                     }
                 </div>
                 {
@@ -104,6 +107,7 @@ class Cover extends React.Component {
                         </div>
                     </React.Fragment>
                 }
+
             </div>
         </div>
     }

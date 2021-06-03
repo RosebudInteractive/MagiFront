@@ -5,6 +5,7 @@ import AppRouter from "./route";
 import {fetchingSelector, tokenGuardEnable, getAppOptions} from "ducks/app";
 import {whoAmI} from "actions/user-actions";
 import {useLocation, useHistory} from "react-router-dom";
+import "./app.sass"
 
 function App(props) {
 
