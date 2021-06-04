@@ -70,18 +70,27 @@ class Cover extends React.Component {
                 <div className="next-lesson__buttons-block">
                     {
                         _nextLessonUrl &&
-                        <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
-                            <div className="button _brown next-lesson-button">
-                                { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
-                            </div>
-                        </Link>
+                        (
+                            this.props.isMobileApp ?
+                                <a href={"#open-next-lesson"} className="next-lesson-button__wrapper">
+                                    <div className="button _brown next-lesson-button">
+                                        { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
+                                    </div>
+                                </a>
+                                :
+                                <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
+                                    <div className="button _brown next-lesson-button">
+                                        { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
+                                    </div>
+                                </Link>
+                        )
                     }
                     <div className="reinit-button" onClick={::this._createInstance}>
                         <div className="button _white">Пройти тест заново</div>
                     </div>
                     {
                         this.props.isMobileApp &&
-                        <a href={"/#share-social"} className="button btn--brown share-button">
+                        <a href={"#share-social"} className="button btn--brown share-button">
                             <div className="share-icon">
                                 <ShareIcon/>
                             </div>
