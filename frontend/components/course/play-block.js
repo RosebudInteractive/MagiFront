@@ -15,6 +15,7 @@ import {
     SVG
 } from "../common/play-block-functions";
 import {unlockLesson} from "ducks/player";
+import browserHistory from "../../history";
 
 class PlayBlock extends React.Component {
 
@@ -76,12 +77,14 @@ class PlayBlock extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + course.URL + '/' + lesson.URL + '?play'}/>;
+            browserHistory.push('/' + course.URL + '/' + lesson.URL + '?play')
+            return null//<Redirect push to={'/' + course.URL + '/' + lesson.URL + '?play'}/>;
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
-            return <Redirect push to={'/' + course.URL + '/' + lesson.URL}/>;
+            browserHistory.push('/' + course.URL + '/' + lesson.URL)
+            return null//<Redirect push to={'/' + course.URL + '/' + lesson.URL}/>;
         }
 
         const _lessonLocked = (lesson.IsAuthRequired && !authorized),
