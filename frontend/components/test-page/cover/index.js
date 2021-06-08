@@ -63,7 +63,7 @@ class Cover extends React.Component {
                 <div className="start-button__block">
                     {
                         this.props.isMobileApp &&
-                        <a href={"/#share-social"} className="button btn--brown share-button">
+                        <a href={"#share-social"} className="button btn--brown share-button">
                             <div className="share-icon">
                                 <ShareIcon/>
                             </div>

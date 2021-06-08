@@ -8,7 +8,7 @@ const { HttpCode } = require("../../const/http-codes");
 const { AccessFlags } = require('../../const/common');
 const { AccessRights } = require('../../security/access-rights');
 const { getTimeStr, buildLogString } = require('../../utils');
-const { ProcessState, TaskState, ElemState, TaskStateStr, ProcessStateStr } = require('./const');
+const { ProcessState, TaskState, ElemState, TaskStateStr, ProcessStateStr, NotificationType } = require('./const');
 
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
@@ -386,30 +386,15 @@ const PROCESS_PROTO_TABLE = {
     "Lesson Process Proto": require('./process-types/lesson')
 };
 
+const TASK_START_NOTIF = "Можно приступать к выполнению задачи #<%= id %> \"<%= name %>\".";
+const TASK_ALERT_NOTIF = "Возник вопрос по задаче #<%= id %> \"<%= name %>\".";
+const TASK_CONTINUE_NOTIF = "Можно продолжить выполнение задачи #<%= id %> \"<%= name %>\".";
+
 const ProcessAPI = class ProcessAPI extends DbObject {
 
     constructor(options) {
         super(options);
         this._struct_cache = null;
-    }
-
-    async _getUser(options) {
-        let opts = options || {};
-        let user = opts.user;
-        let userService = this.getService("users", true);
-        if (!user)
-            throw new HttpError(HttpCode.ERR_BAD_REQ, `ProcessAPI::_getUser: Missing user argument.`);
-        if (typeof (user) === "number")
-            user = await userService.getUserInfo({ id: user });
-        return user;
-    }
-
-    async _checkPermissions(permissions, options) {
-        let opts = options || {};
-        let user = await this._getUser(opts);
-        if (AccessRights.checkPermissions(user, permissions) === 0)
-            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
-        return user;
     }
 
     async _lockProcess(id, func, timeout) {
@@ -1776,6 +1761,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let dep_id = dep_to_del.id();
                         collection._del(dep_to_del);
+                        let notifications = [];
                         if ((taskObj.state() === TaskState.Draft) && (process.State !== ProcessState.Draft)) {
                             let is_ready = true;
                             for (let i = 0; i < collection.count(); i++) {
@@ -1786,10 +1772,36 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     break;
                                 }
                             }
-                            if (is_ready)
+                            if (is_ready) {
                                 taskObj.state(TaskState.ReadyToStart);
+                                let user_id = taskObj.executorId() ? taskObj.executorId() : process.SupervisorId;
+                                notifications.push({
+                                    UserId: user_id,
+                                    NotifType: NotificationType.TaskCanStart,
+                                    URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                    Subject: _.template(TASK_START_NOTIF)({
+                                        id: taskObj.id(),
+                                        name: taskObj.name()
+                                    })
+                                })
+                            }
                         }
-                        await taskObj.save(dbOpts);
+                        if (notifications.length > 0) {
+                            let tran = await $data.tranStart(dbOpts);
+                            let transactionId = tran.transactionId;
+                            dbOpts.transactionId = tran.transactionId;
+                            try {
+                                await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
+                                await taskObj.save(dbOpts);
+                                await $data.tranCommit(transactionId)
+                            }
+                            catch (err) {
+                                await $data.tranRollback(transactionId);
+                                throw err;
+                            }
+                        }
+                        else
+                            await taskObj.save(dbOpts);
 
                         if (logModif)
                             console.log(buildLogString(`Dependency deleted: Id="${dep_id}".`));
@@ -1910,6 +1922,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить задачу из завершившегося процесса.`);
 
                         let child_tasks = [];
+                        let notifications = [];
                         if (process.State === ProcessState.Executing) {
                             let task_ids = this._getTaskChildList(process, id, TaskState.Draft);
                             if (task_ids.length > 0) {
@@ -1923,6 +1936,16 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     await ctask.edit();
                                     ctask.state(TaskState.ReadyToStart);
                                     child_tasks.push(ctask);
+                                    let user_id = ctask.executorId() ? ctask.executorId() : process.SupervisorId;
+                                    notifications.push({
+                                        UserId: user_id,
+                                        NotifType: NotificationType.TaskCanStart,
+                                        URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                        Subject: _.template(TASK_START_NOTIF)({
+                                            id: ctask.id(),
+                                            name: ctask.name()
+                                        })
+                                    })
                                 }
                             }
                         }
@@ -1949,6 +1972,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             await root_obj.save(dbOpts);
                             for (let i = 0; i < child_tasks.length; i++)
                                 await child_tasks[i].save(dbOpts);
+                            if (notifications.length > 0)
+                                await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
                             await $data.tranCommit(transactionId)
                         }
                         catch (err) {
@@ -2034,6 +2059,16 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             let elem = this._getProcessElement(pstruct, elem_proc.ElemId);
             if (elem && elem.WriteFields)
                 result = elem.WriteFields[set_name];
+        }
+        return result;
+    }
+
+    _getElemSupervisorByTaskId(task_id, process, rebuild) {
+        let result = null;
+        let task = this._getProcessTask(process, task_id, rebuild);
+        if (task && task.ElementId) {
+            let elem = this._getProcessElement(process, task.ElementId, rebuild);
+            result = elem && elem.SupervisorId ? elem.SupervisorId : null;
         }
         return result;
     }
@@ -2125,12 +2160,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             elemObj = collection.get(0);
                         }
 
+                        let is_executor_changed = false;
                         if (typeof (inpFields.ExecutorId) !== "undefined") {
                             let old_executor = taskObj.executorId();
                             let new_executor = (typeof (inpFields.ExecutorId) === "number") && (inpFields.ExecutorId > 0) ? inpFields.ExecutorId : null;
                             if (old_executor !== new_executor) {
                                 if (!(isSupervisor || isElemElemManager))
                                     throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять исполнителя задачи.`);
+                                is_executor_changed = true;
                                 taskObj.executorId(new_executor);
                                 if (new_executor)
                                     await this._checkIfPmTaskExecutor(new_executor);
@@ -2141,6 +2178,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"]);
 
                         let child_tasks = [];
+                        let notifications = [];
                         let old_state = taskObj.state();
                         if (typeof (inpFields.State) !== "undefined")
                             if ((typeof (inpFields.State) === "number") && (inpFields.State > 0)
@@ -2178,6 +2216,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                             await ctask.edit();
                                             ctask.state(task_state);
                                             child_tasks.push(ctask);
+                                            if (task_state === TaskState.ReadyToStart) {
+                                                let user_id = ctask.executorId() ? ctask.executorId() : processObj.supervisorId();
+                                                notifications.push({
+                                                    UserId: user_id,
+                                                    NotifType: NotificationType.TaskCanStart,
+                                                    URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                                    Subject: _.template(TASK_START_NOTIF)({
+                                                        id: ctask.id(),
+                                                        name: ctask.name()
+                                                    })
+                                                })
+                                            }
                                         }
                                     }
                                     taskObj.state(inpFields.State);
@@ -2186,6 +2236,46 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             else
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Недопустимое значение или тип поля "State": ${inpFields.State} тип: "${typeof (inpFields.State)}".`);
+
+                        if (is_executor_changed && (taskObj.state() === TaskState.ReadyToStart)) {
+                            let user_id = taskObj.executorId() ? taskObj.executorId() : processObj.supervisorId();
+                            notifications.push({
+                                UserId: user_id,
+                                NotifType: NotificationType.TaskCanStart,
+                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                Subject: _.template(TASK_START_NOTIF)({
+                                    id: taskObj.id(),
+                                    name: taskObj.name()
+                                })
+                            })
+                        }
+
+                        if ((old_state !== taskObj.state()) && (taskObj.state() === TaskState.Alert)) {
+                            let elem_supervisor_id = this._getElemSupervisorByTaskId(taskObj.id(), process);
+                            let user_id = elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId();
+                            notifications.push({
+                                UserId: user_id,
+                                NotifType: NotificationType.TaskQuestionRaised,
+                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                Subject: _.template(TASK_ALERT_NOTIF)({
+                                    id: taskObj.id(),
+                                    name: taskObj.name()
+                                })
+                            })
+                        }
+
+                        if ((old_state === TaskState.Alert) && (taskObj.state() === TaskState.InProgess)) {
+                            let user_id = taskObj.executorId() ? taskObj.executorId() : processObj.supervisorId();
+                            notifications.push({
+                                UserId: user_id,
+                                NotifType: NotificationType.TaskQuestionRaised,
+                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                Subject: _.template(TASK_CONTINUE_NOTIF)({
+                                    id: taskObj.id(),
+                                    name: taskObj.name()
+                                })
+                            })
+                        }
 
                         let newAlertId = taskObj.alertId() && (taskObj.state() === TaskState.Alert) ? taskObj.alertId() : null;
                         if (typeof (inpFields.Comment) === "string") {
@@ -2237,6 +2327,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         try {
                             for (let i = 0; i < child_tasks.length; i++)
                                 await child_tasks[i].save(dbOpts);
+                            if (notifications.length > 0)
+                                await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
                             if (!newAlertId)
                                 taskObj.alertId(null);
                             await taskObj.save(dbOpts);
@@ -2379,6 +2471,20 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                         }
 
+                        let notifications = [];
+                        if (taskObj.state() === TaskState.ReadyToStart) {
+                            let user_id = taskObj.executorId() ? taskObj.executorId() : process.SupervisorId;
+                            notifications.push({
+                                UserId: user_id,
+                                NotifType: NotificationType.TaskCanStart,
+                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                Subject: _.template(TASK_START_NOTIF)({
+                                    id: taskObj.id(),
+                                    name: taskObj.name()
+                                })
+                            })
+                        }
+
                         let tran = await $data.tranStart(dbOpts);
                         let transactionId = tran.transactionId;
                         dbOpts.transactionId = tran.transactionId;
@@ -2386,6 +2492,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             await root_obj.save(dbOpts);
                             if (elemObj)
                                 await elemObj.save(dbOpts);
+                            if (notifications.length > 0)
+                                await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
                             await $data.tranCommit(transactionId)
                         }
                         catch (err) {
@@ -2495,6 +2603,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         });
     }
 
+    async sendNotifications(data, options) {
+        let notificationService = this.getService("notifications", true);
+        if (notificationService)
+            await notificationService.newNotification(data, options);
+    }
+
     async updateProcess(id, data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
@@ -2522,7 +2636,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         await procObj.edit();
 
+                        if (typeof (inpFields.SupervisorId) === "number") {
+                            procObj.supervisorId(inpFields.SupervisorId);
+                            if (inpFields.SupervisorId !== opts.user.Id)
+                                await this._checkIfPmSupervisor(inpFields.SupervisorId);
+                        }
+
                         let ready_tasks = [];
+                        let notifications = [];
                         if (typeof (inpFields.State) !== "undefined")
                             if ((typeof (inpFields.State) === "number") && (inpFields.State > 0)
                                 && (inpFields.State <= Object.keys(ProcessState).length)) {
@@ -2585,6 +2706,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                 await ctask.edit();
                                                 ctask.state(task_state);
                                                 ready_tasks.push(ctask);
+                                                if (task_state === TaskState.ReadyToStart) {
+                                                    let user_id = ctask.executorId() ? ctask.executorId() : procObj.supervisorId();
+                                                    notifications.push({
+                                                        UserId: user_id,
+                                                        NotifType: NotificationType.TaskCanStart,
+                                                        URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                                        Subject: _.template(TASK_START_NOTIF)({
+                                                            id: ctask.id(),
+                                                            name: ctask.name()
+                                                        })
+                                                    })
+                                                }
                                             }
                                         }
                                         procObj.state(inpFields.State);
@@ -2599,12 +2732,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Недопустимое значение или тип поля "State": ${inpFields.State} тип: "${typeof (inpFields.State)}".`);
 
-                        if (typeof (inpFields.SupervisorId) === "number") {
-                            procObj.supervisorId(inpFields.SupervisorId);
-                            if (inpFields.SupervisorId !== opts.user.Id)
-                                await this._checkIfPmSupervisor(inpFields.SupervisorId);
-                        }
-
                         this._setFieldValues(procObj, inpFields, ["Id", "State", "SupervisorId", "StructId", "LessonId"]);
 
                         let tran = await $data.tranStart(dbOpts);
@@ -2613,6 +2740,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         try {
                             for (let i = 0; i < ready_tasks.length; i++)
                                 await ready_tasks[i].save(dbOpts);
+                            if (notifications.length > 0)
+                                await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
                             await procObj.save(dbOpts);
                             await $data.tranCommit(transactionId)
                         }

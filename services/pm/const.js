@@ -1,5 +1,15 @@
 'use strict';
 
+exports.NotificationType = {
+    TaskCanStart: 1,
+    TaskQuestionResolved: 2,
+    TaskQuestionRaised: 3
+};
+
+exports.NotificationParams = {
+    ParamName: "notification"
+};
+
 exports.ProcessState = {
     Draft: 1,
     Executing: 2,

@@ -5,6 +5,7 @@ const request = require('request');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { CacheableObject } = require('../utils/cache-base');
+const { AccessRights } = require('../security/access-rights');
 const { DbUtils: { intFmtWithLeadingZeros, fmtDuration } } = require('./db-utils');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
@@ -32,6 +33,7 @@ exports.DbObject = class DbObject extends CacheableObject {
         }
         super(optsCache);
         this._db = $memDataBase;
+        this._siteHost = config.proxyServer.siteHost;
         this._baseUrl = config.proxyServer.siteHost + "/";
         this._absDataUrl = config.proxyServer.siteHost + config.dataUrl + "/";
         this._absDownLoadUrl = config.proxyServer.siteHost + config.downLoadUrl + "/";
@@ -42,7 +44,28 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absTestAppUrl = config.proxyServer.siteHost + config.testAppUrl + "/";
         this._absTestInstUrl = config.proxyServer.siteHost + config.testInstUrl + "/";
         this._absTestInstAppUrl = config.proxyServer.siteHost + config.testAppUrl + config.testInstUrl + "/";
+        this._absPmProcessUrl = config.proxyServer.siteHost + config.pmProcessUrl + "/";
+        this._absPmTaskUrl = config.proxyServer.siteHost + config.pmTaskUrl + "/";
 
+    }
+
+    async _getUser(options) {
+        let opts = options || {};
+        let user = opts.user;
+        let userService = this.getService("users", true);
+        if (!user)
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `DbObject::_getUser: Missing user argument.`);
+        if (typeof (user) === "number")
+            user = await userService.getUserInfo({ id: user });
+        return user;
+    }
+
+    async _checkPermissions(permissions, options) {
+        let opts = options || {};
+        let user = await this._getUser(opts);
+        if (AccessRights.checkPermissions(user, permissions) === 0)
+            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
+        return user;
     }
 
     _removeTrailingSlash(path) {
