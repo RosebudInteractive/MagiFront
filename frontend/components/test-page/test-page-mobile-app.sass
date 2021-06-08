@@ -1,6 +1,9 @@
 @import "~tools/variables"
 
 .test-page
+  *
+    -webkit-tap-highlight-color: transparent !important
+
   &._mobile-app
     .test-page__content
       height: 100vh
@@ -24,6 +27,7 @@
       justify-content: center
       max-width: 320px
       width: 100%
+
 
 
     .start-button__block
