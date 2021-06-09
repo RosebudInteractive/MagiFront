@@ -2812,14 +2812,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 throw new Error(`Unknown process struct name: "${inpFields.Params.StructName}"`);
                             pstruct = await this.getProcessStruct(struct_name, opts);
                             if (!pstruct) {
+                                let creation_err = null;
                                 try {
                                     await this._newProcessStructByName(inpFields.Params.StructName, opts);
                                 }
                                 catch (err) {
+                                    creation_err = err;
                                     console.error(buildLogString(`ProcessAPI::_newProcessStructByName: ${err.message}`));
                                 }
-                                delete opts.silent;
                                 pstruct = await this.getProcessStruct(struct_name, opts);
+                                if (!pstruct)
+                                    throw creation_err;
+                                delete opts.silent;
                             }
                             fields.StructId = pstruct.Id;
                         }
@@ -3026,11 +3030,26 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             else
                                 throw new Error(`Missing field "Name" in element #${i} description.`);
                             if (typeof (elem.ViewFields) !== "undefined") {
+                                if (!Array.isArray(elem.ViewFields))
+                                    throw new Error(`Invalid field "ViewFields" of element "${elem.Name}"`);
+                                for (let j = 0; j < elem.ViewFields.length; j++){
+                                    if (!inpFields.ProcessFields[elem.ViewFields[j]])
+                                        throw new Error(`Unknown field "${elem.ViewFields[j]}" in "ViewFields" of element "${elem.Name}"`);
+                                }
                                 efields.ViewFields = JSON.stringify(elem.ViewFields);
                             }
                             else
                                 throw new Error(`Missing field "ViewFields" in element #${i} description.`);
                             if (typeof (elem.WriteFields) !== "undefined") {
+                                for (let key in elem.WriteFields) {
+                                    let write_set = elem.WriteFields[key];
+                                    if (!(write_set && Array.isArray(write_set)))
+                                        throw new Error(`Invalid write set "${key}" of element "${elem.Name}"`);
+                                    for (let j = 0; j < write_set.length; j++) {
+                                        if (!inpFields.ProcessFields[write_set[j]])
+                                            throw new Error(`Unknown field "${write_set[j]}" in write set "${key}" of element "${elem.Name}"`);
+                                    }
+                                }
                                 efields.WriteFields = JSON.stringify(elem.WriteFields);
                             }
                             if (typeof (elem.SupervisorId) !== "undefined")

@@ -1,7 +1,7 @@
 'use strict';
 
 exports.structure = {
-    Name: "Lesson Process Proto ver. 2.0",
+    Name: "Lesson Process Proto ver. 3.0",
     ProcessFields: {
         "AudioIniURL": {
             "caption": "Исходный звук",
@@ -113,7 +113,7 @@ exports.structure = {
                     "AudioProcURL"
                 ],
                 "Сдать транскрипт": [
-                    "TranscriptURL "
+                    "TranscriptURL"
                 ]
             }
         },
