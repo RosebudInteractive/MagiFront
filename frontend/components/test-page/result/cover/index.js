@@ -13,10 +13,10 @@ import {
     setShareUrl,
 } from "ducks/test-instance";
 import {getDomain} from "tools/page-tools";
-import {Link} from "react-router-dom";
 import {lessonsSelector, courseSelector} from "ducks/lesson-menu";
 import {LESSON_STATE, TEST_TYPE} from "../../../../constants/common-consts";
 import ShareIcon from "../../share-icon.svg";
+import LessonButton from "./lesson-button";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
@@ -68,23 +68,7 @@ class Cover extends React.Component {
                         </div>
                 </div>
                 <div className="next-lesson__buttons-block">
-                    {
-                        _nextLessonUrl &&
-                        (
-                            this.props.isMobileApp ?
-                                <a href={"#open-next-lesson"} className="next-lesson-button__wrapper">
-                                    <div className="button _brown next-lesson-button">
-                                        { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
-                                    </div>
-                                </a>
-                                :
-                                <Link to={_nextLessonUrl} className="next-lesson-button__wrapper">
-                                    <div className="button _brown next-lesson-button">
-                                        { _isLessonStartTest ? "Перейти к лекции" : "Следующая лекция" }
-                                    </div>
-                                </Link>
-                        )
-                    }
+                    <LessonButton isMobileApp={this.props.isMobileApp} isLessonStartTest={_isLessonStartTest} nextLessonUrl={_nextLessonUrl}/>
                     <div className="reinit-button" onClick={::this._createInstance}>
                         <div className="button _white">Пройти тест заново</div>
                     </div>
