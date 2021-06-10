@@ -36,7 +36,9 @@ function App(props) {
     }, [tokenGuardEnable])
 
     useEffect(() => {
-        sendMessage({ isLoaded: true })
+        if (userAuthorized) {
+            sendMessage({ isLoaded: true })
+        }
     }, [userAuthorized])
 
 
