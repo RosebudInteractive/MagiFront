@@ -9,6 +9,7 @@ import {createNewTestInstance, unlockTest} from "ducks/test-instance";
 import './cover.sass'
 import {SocialBlock} from "../social-block";
 import ShareIcon from "../share-icon.svg"
+import {Link} from "react-router-dom";
 
 const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 
@@ -63,12 +64,12 @@ class Cover extends React.Component {
                 <div className="start-button__block">
                     {
                         this.props.isMobileApp &&
-                        <a href={"#share-social"} className="button btn--brown share-button">
+                        <Link to={"#share-social"} className="button btn--brown share-button">
                             <div className="share-icon">
                                 <ShareIcon/>
                             </div>
                             Поделиться
-                        </a>
+                        </Link>
                     }
                     <div className="button btn--brown start-button" onClick={::this._createInstance}>
                         Начать тест

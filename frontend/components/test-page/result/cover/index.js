@@ -17,6 +17,7 @@ import {lessonsSelector, courseSelector} from "ducks/lesson-menu";
 import {LESSON_STATE, TEST_TYPE} from "../../../../constants/common-consts";
 import ShareIcon from "../../share-icon.svg";
 import LessonButton from "./lesson-button";
+import {Link} from "react-router-dom";
 
 const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
@@ -74,12 +75,12 @@ class Cover extends React.Component {
                     </div>
                     {
                         this.props.isMobileApp &&
-                        <a href={"#share-social"} className="button btn--brown share-button">
+                        <Link to={"#share-social"} className="button btn--brown share-button">
                             <div className="share-icon">
                                 <ShareIcon/>
                             </div>
                             Поделиться
-                        </a>
+                        </Link>
                     }
                     {
                         this.props.isMobileApp && <div className="test-result__arrow"/>

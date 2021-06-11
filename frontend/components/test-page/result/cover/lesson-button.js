@@ -13,9 +13,9 @@ export default function LessonButton(props) {
 
     return nextLessonUrl ?
         isMobileApp ?
-            <a href={isLessonStartTest ? "#open-lesson" : "#open-next-lesson"} className="next-lesson-button__wrapper">
+            <Link to={isLessonStartTest ? "#open-lesson" : "#open-next-lesson"} className="next-lesson-button__wrapper">
                 {_button}
-            </a>
+            </Link>
             :
             <Link to={nextLessonUrl} className="next-lesson-button__wrapper">
                 {_button}
