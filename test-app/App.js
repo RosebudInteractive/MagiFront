@@ -37,7 +37,9 @@ function App(props) {
 
     useEffect(() => {
         if (userAuthorized) {
-            sendMessage({ isLoaded: true })
+            setTimeout(() => {
+                sendMessage({ isLoaded: true })
+            }, 300)
         }
     }, [userAuthorized])
 
