@@ -7,6 +7,7 @@ import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools
 import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
 import {queryUserConfirmationSaga} from "adm-ducks/messages";
+import {CREATE_NEW_COURSE} from "../constants/course/singleCourse";
 
 /**
  * Constants
@@ -69,6 +70,10 @@ export default function reducer(state = new ReducerRecord(), action) {
         case DELETE_TEST_SUCCESS:
             return state
                 .update('entries', entries => entries.delete(payload))
+
+        case CREATE_NEW_COURSE:
+            return state
+                .set('entries', new OrderedMap([]))
 
         default:
             return state

@@ -61,7 +61,7 @@ class ImageLink extends React.Component {
         }
 
         let _resource = this.props.resources.find((item) => {
-            return item.Id === resourceId
+            return item.Id === _id
         })
 
         return _resource ? {name : _resource.Name, fileName: _resource.FileName} : {name: "", fileName: ""}

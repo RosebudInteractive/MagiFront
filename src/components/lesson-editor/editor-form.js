@@ -287,11 +287,11 @@ class LessonEditorForm extends React.Component {
             _obj.Images = [];
 
             if (editorValues.ogImageResourceId) {
-                _obj.Images.push({Id: ogImageId, Type: 'og', ResourceId: editorValues.ogImageResourceId})
+                _obj.Images.push({Id: ogImageId, Type: 'og', ResourceId: +editorValues.ogImageResourceId})
             }
 
             if (editorValues.twitterImageResourceId) {
-                _obj.Images.push({Id: twitterImageId, Type: 'twitter', ResourceId: editorValues.twitterImageResourceId})
+                _obj.Images.push({Id: twitterImageId, Type: 'twitter', ResourceId: +editorValues.twitterImageResourceId})
             }
         }
 
