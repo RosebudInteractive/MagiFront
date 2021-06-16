@@ -10,6 +10,7 @@ import './cover.sass'
 import {SocialBlock} from "../social-block";
 import ShareIcon from "../share-icon.svg"
 import {Link} from "react-router-dom";
+import {sendMessage} from "../../../../scripts/native-app-player/message-handler";
 
 const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 
@@ -88,6 +89,11 @@ class Cover extends React.Component {
             _canCreateInstance = test && test.IsAuthRequired && !authorized
 
         if (!_canCreateInstance) {
+            if (this.props.isMobileApp) {
+                setTimeout(() => {
+                    sendMessage({ isTestStarted: true })
+                }, 0)
+            }
             this.props.createNewTestInstance(test.URL)
         } else {
             this.props.unlockTest(test.URL)
