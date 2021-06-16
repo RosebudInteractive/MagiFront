@@ -3,7 +3,8 @@
 exports.NotificationType = {
     TaskCanStart: 1,
     TaskQuestionResolved: 2,
-    TaskQuestionRaised: 3
+    TaskQuestionRaised: 3,
+    TaskAssigned: 4
 };
 
 exports.NotificationParams = {
