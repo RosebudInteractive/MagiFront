@@ -1774,7 +1774,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                             if (is_ready) {
                                 taskObj.state(TaskState.ReadyToStart);
-                                let user_id = taskObj.executorId() ? taskObj.executorId() : process.SupervisorId;
+                                let elem_supervisor_id = this._getElemSupervisorByTaskId(taskObj.id(), process);
+                                let user_id = taskObj.executorId() ? taskObj.executorId() :
+                                    (elem_supervisor_id ? elem_supervisor_id : process.SupervisorId);
                                 notifications.push({
                                     UserId: user_id,
                                     NotifType: NotificationType.TaskCanStart,
@@ -1936,7 +1938,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     await ctask.edit();
                                     ctask.state(TaskState.ReadyToStart);
                                     child_tasks.push(ctask);
-                                    let user_id = ctask.executorId() ? ctask.executorId() : process.SupervisorId;
+                                    let elem_supervisor_id = this._getElemSupervisorByTaskId(ctask.id(), process);
+                                    let user_id = ctask.executorId() ? ctask.executorId() :
+                                        (elem_supervisor_id ? elem_supervisor_id : process.SupervisorId);
                                     notifications.push({
                                         UserId: user_id,
                                         NotifType: NotificationType.TaskCanStart,
@@ -2113,7 +2117,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         let pstruct = await this.getProcessStruct(process.StructId, opts);
 
                         let curr_user_id = opts.user.Id;
-                        let isSupervisor = opts.user.PData.isAdmin || (AccessRights.checkPermissions(opts.user, AccessFlags.PmAdmin) !== 0);
+                        let isAdmin = opts.user.PData.isAdmin || (AccessRights.checkPermissions(opts.user, AccessFlags.PmAdmin) !== 0);
+                        let isSupervisor = isAdmin;
                         if (!isSupervisor)
                             isSupervisor = (AccessRights.checkPermissions(opts.user, AccessFlags.PmSupervisor) !== 0) &&
                                 (curr_user_id === processObj.supervisorId());
@@ -2217,7 +2222,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                             ctask.state(task_state);
                                             child_tasks.push(ctask);
                                             if (task_state === TaskState.ReadyToStart) {
-                                                let user_id = ctask.executorId() ? ctask.executorId() : processObj.supervisorId();
+                                                let elem_supervisor_id = this._getElemSupervisorByTaskId(ctask.id(), process);
+                                                let user_id = ctask.executorId() ? ctask.executorId() :
+                                                    (elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId());
                                                 notifications.push({
                                                     UserId: user_id,
                                                     NotifType: NotificationType.TaskCanStart,
@@ -2237,11 +2244,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 throw new HttpError(HttpCode.ERR_BAD_REQ,
                                     `Недопустимое значение или тип поля "State": ${inpFields.State} тип: "${typeof (inpFields.State)}".`);
 
-                        if (is_executor_changed && (taskObj.state() === TaskState.ReadyToStart)) {
-                            let user_id = taskObj.executorId() ? taskObj.executorId() : processObj.supervisorId();
+                        let elem_supervisor_id = this._getElemSupervisorByTaskId(taskObj.id(), process);
+                        if (is_executor_changed &&
+                            ((taskObj.state() === TaskState.InProgess) || (taskObj.state() === TaskState.ReadyToStart))) {
+                            let user_id = taskObj.executorId() ? taskObj.executorId() :
+                                (elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId());
                             notifications.push({
                                 UserId: user_id,
-                                NotifType: NotificationType.TaskCanStart,
+                                NotifType: NotificationType.TaskAssigned,
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_START_NOTIF)({
                                     id: taskObj.id(),
@@ -2251,7 +2261,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         if ((old_state !== taskObj.state()) && (taskObj.state() === TaskState.Alert)) {
-                            let elem_supervisor_id = this._getElemSupervisorByTaskId(taskObj.id(), process);
                             let user_id = elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId();
                             notifications.push({
                                 UserId: user_id,
@@ -2473,7 +2482,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         let notifications = [];
                         if (taskObj.state() === TaskState.ReadyToStart) {
-                            let user_id = taskObj.executorId() ? taskObj.executorId() : process.SupervisorId;
+                            let elem_supervisor_id = this._getElemSupervisorByTaskId(taskObj.id(), process);
+                            let user_id = taskObj.executorId() ? taskObj.executorId() :
+                                (elem_supervisor_id ? elem_supervisor_id : process.SupervisorId);
                             notifications.push({
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskCanStart,
@@ -2707,7 +2718,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                 ctask.state(task_state);
                                                 ready_tasks.push(ctask);
                                                 if (task_state === TaskState.ReadyToStart) {
-                                                    let user_id = ctask.executorId() ? ctask.executorId() : procObj.supervisorId();
+                                                    let elem_supervisor_id = this._getElemSupervisorByTaskId(ctask.id(), process);
+                                                    let user_id = ctask.executorId() ? ctask.executorId() :
+                                                        (elem_supervisor_id ? elem_supervisor_id : procObj.supervisorId());
                                                     notifications.push({
                                                         UserId: user_id,
                                                         NotifType: NotificationType.TaskCanStart,

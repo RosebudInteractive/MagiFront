@@ -26,8 +26,17 @@ const SQL_GET_UNREAD_MYSQL =
 const SQL_SET_READ_MSSQL = "update [Notification] set [IsRead] = 1 where [Id] = <%= id %>";
 const SQL_SET_READ_MYSQL = "update `Notification` set `IsRead` = 1 where `Id` = <%= id %>";
 
-const SQL_GET_LIST_MSSQL = "select [Id], [NotifType], [Subject], [URL], [IsRead], [IsUrgent], [TimeCr] from [Notification]";
-const SQL_GET_LIST_MYSQL = "select `Id`, `NotifType`, `Subject`, `URL`, `IsRead`, `IsUrgent`, `TimeCr` from `Notification`";
+const SQL_GET_LIST_MSSQL =
+    "select n.[Id], n.[NotifType], n.[Subject], n.[URL], n.[IsRead], n.[IsUrgent], n.[TimeCr],\n" +
+    "  n.[UserId], u.[DisplayName]\n" +
+    "from [Notification] n\n" +
+    "  join [User] u on n.UserId = u.[SysParentId]";
+
+const SQL_GET_LIST_MYSQL =
+    "select n.`Id`, n.`NotifType`, n.`Subject`, n.`URL`, n.`IsRead`, n.`IsUrgent`, n.`TimeCr`,\n" +
+    "  n.`UserId`, u.`DisplayName`\n" +
+    "from `Notification` n\n" +
+    "  join `User` u on n.UserId = u.`SysParentId`";
 
 const DFLT_SORT_ORDER = "TimeCr,desc";
 const logModif = false;
@@ -57,22 +66,28 @@ const Notification = class Notification extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
-        // For current user only
-        mssql_conds.push(`([UserId] = ${opts.user.Id})`);
-        mysql_conds.push(`(${'`'}UserId${'`'} = ${opts.user.Id})`);
+        if (!(access_rights & (AccessFlags.Administrator | AccessFlags.PmAdmin))) {
+            // For current user only
+            mssql_conds.push(`(n.[UserId] = ${opts.user.Id})`);
+            mysql_conds.push(`(n.${'`'}UserId${'`'} = ${opts.user.Id})`);
+        }
 
         if ((opts.notRead === "true") || (opts.notRead === true)) {
-            mssql_conds.push(`([IsRead] = 0)`);
-            mysql_conds.push(`(${'`'}IsRead${'`'} = 0)`);
+            mssql_conds.push(`(n.[IsRead] = 0)`);
+            mysql_conds.push(`(n.${'`'}IsRead${'`'} = 0)`);
         }
         if ((opts.urgent === "true") || (opts.urgent === true)) {
-            mssql_conds.push(`([IsUrgent] = 1)`);
-            mysql_conds.push(`(${'`'}IsUrgent${'`'} = 1)`);
+            mssql_conds.push(`(n.[IsUrgent] = 1)`);
+            mysql_conds.push(`(n.${'`'}IsUrgent${'`'} = 1)`);
         }
         if (opts.type) {
             let types = Array.isArray(opts.type) ? opts.type : opts.type.split(',');
-            mssql_conds.push(`([NotifType] in (${types.join(',')}))`);
-            mysql_conds.push(`(${'`'}NotifType${'`'} in (${types.join(',')}))`);
+            mssql_conds.push(`(n.[NotifType] in (${types.join(',')}))`);
+            mysql_conds.push(`(n.${'`'}NotifType${'`'} in (${types.join(',')}))`);
+        }
+        if (opts.userName) {
+            mssql_conds.push(`(u.[DisplayName] like N'%${opts.userName.replace(/'/g, "''")}%')`);
+            mysql_conds.push(`(u.${'`'}DisplayName${'`'} like '%${opts.userName.replace(/'/g, "''")}%')`);
         }
 
         if (mysql_conds.length > 0) {
@@ -88,24 +103,28 @@ const Notification = class Notification extends DbObject {
             let mssql_field;
             switch (ord_arr[0]) {
                 case "NotifType":
-                    mssql_field = "[NotifType]";
-                    mysql_field = "`NotifType`";
+                    mssql_field = "n.[NotifType]";
+                    mysql_field = "n.`NotifType`";
                     break;
                 case "TimeCr":
-                    mssql_field = "[TimeCr]";
-                    mysql_field = "`TimeCr`";
+                    mssql_field = "n.[TimeCr]";
+                    mysql_field = "n.`TimeCr`";
                     break;
                 case "Subject":
-                    mssql_field = "[Subject]";
-                    mysql_field = "`Subject`";
+                    mssql_field = "n.[Subject]";
+                    mysql_field = "n.`Subject`";
                     break;
                 case "IsRead":
-                    mssql_field = "[IsRead]";
-                    mysql_field = "`IsRead`";
+                    mssql_field = "n.[IsRead]";
+                    mysql_field = "n.`IsRead`";
                     break;
                 case "IsUrgent":
-                    mssql_field = "[IsUrgent]";
-                    mysql_field = "`IsUrgent`";
+                    mssql_field = "n.[IsUrgent]";
+                    mysql_field = "n.`IsUrgent`";
+                    break;
+                case "UserName":
+                    mssql_field = "u.[DisplayName]";
+                    mysql_field = "u.`DisplayName`";
                     break;
             }
             if (mysql_field) {
@@ -128,7 +147,11 @@ const Notification = class Notification extends DbObject {
                     URL: this._siteHost + elem.URL,
                     TimeCr: elem.TimeCr,
                     IsRead: elem.IsRead ? true : false,
-                    IsUrgent: elem.IsUrgent ? true : false
+                    IsUrgent: elem.IsUrgent ? true : false,
+                    User: {
+                        Id: elem.UserId,
+                        DisplayName: elem.DisplayName
+                    }
                 };
                 result.push(notif);
             });
