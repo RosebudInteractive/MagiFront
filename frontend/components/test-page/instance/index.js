@@ -14,6 +14,7 @@ import AnswerBlock from "./answer-block";
 
 import "./instance.sass"
 import {ANSWER_TYPES} from "../../../constants/common-consts";
+import {sendMessage} from "../../../../scripts/native-app-player/message-handler";
 
 class Instance extends React.Component {
     static propTypes = {
@@ -105,6 +106,11 @@ class Instance extends React.Component {
         } else {
             // завершение теста
             setAnswerAndFinish({...answer, questionId: questions[currentIndex].Question.Id})
+            if (this.props.isMobileApp) {
+                setTimeout(() => {
+                    sendMessage({ isTestFinished: true })
+                }, 0)
+            }
         }
     }
 
