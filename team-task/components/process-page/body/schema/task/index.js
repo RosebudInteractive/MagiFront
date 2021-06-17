@@ -2,6 +2,7 @@ import React, {useMemo, useRef,} from "react"
 import "./task.sass"
 import {getTaskState} from "../../../../../tools/tasks";
 import moment from "moment";
+import {TASK_STATE} from "../../../../../constants/states";
 
 
 type TaskProps = {
@@ -52,7 +53,7 @@ export default function SchemaTask(props: TaskProps) {
     }}, [node, horizontalProcess])
 
     const state = useMemo(() => {
-        const isExpired = node && moment(node.dueDate).isBefore(moment()),
+        const isExpired = node && (node.state !== TASK_STATE.DONE.value) && moment(node.dueDate).isBefore(moment()),
             _state = getTaskState(node.state)
 
         return isExpired ? { isExpired, css: "_expired", caption: _state.caption } : { isExpired, ..._state}

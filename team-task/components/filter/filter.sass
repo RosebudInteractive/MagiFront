@@ -29,6 +29,19 @@
     transform: translateY(-50%) rotate(-135deg)
     top: 11px
 
+  &:after
+    content: ""
+    width: 6px
+    height: 6px
+    border-radius: 50%
+    position: absolute
+    background-color: $grey20
+    top: 0
+    right: 0
+    transition: background-color 300ms ease-in-out
+  &._active:after
+    background-color: $orange
+
 
 .filter-button__title
   color: #C8684C
@@ -39,6 +52,7 @@
   line-height: 17px
   letter-spacing: 0.75px
   margin-left: 10px
+  margin-right: 8px
 
 .filter-block
   max-height: 0
