@@ -23,6 +23,7 @@ import CreateProcessForm from "../../components/create-page-form";
 import {hasAdminRights, userSelector} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 import {PROCESS_STATE} from "../../constants/states";
+import savedFilters, {FILTER_KEY} from "../../tools/saved-filters";
 
 let _rowCount = 0
 
@@ -33,7 +34,8 @@ function Processes(props) {
 
     const location = useLocation()
     const _sortRef = useRef({field: null, direction: null}),
-        filter = useRef(null)
+        filter = useRef(null),
+        isMounted = useRef(false)
 
     useWindowSize(() => {
         resizeHandler(_rowCount)
@@ -48,7 +50,16 @@ function Processes(props) {
     }, [processes])
 
     useEffect(() => {
-        const initState = parseParams()
+        let initState = parseParams()
+
+        if (!isMounted.current && (Object.keys(initState).length === 0)) {
+            initState = savedFilters.getFor(FILTER_KEY.PROCESSES)
+            initState.replacePath = true
+            isMounted.current = true
+        } else {
+            savedFilters.setFor(FILTER_KEY.PROCESSES, {...initState})
+        }
+
         if (initState.order) {
             _sortRef.current = initState.order
             const _grid = window.webix.$$("processes-grid")

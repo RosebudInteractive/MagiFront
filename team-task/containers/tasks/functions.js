@@ -1,6 +1,7 @@
 import {FILTER_FIELD_TYPE} from "../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../constants/common";
+import savedFilters, {FILTER_KEY} from "../../tools/saved-filters";
 
 export const getFilterConfig = (filter, states) => {
     return [
@@ -46,7 +47,7 @@ export const parseParams = () => {
         paramsData.filter = _filter
     }
 
-    return paramsData
+    return paramsData ? paramsData : savedFilters.getFor(FILTER_KEY.TASKS)
 }
 
 const convertParam2Filter = ({hasExecutor, executor, state, process}) => {

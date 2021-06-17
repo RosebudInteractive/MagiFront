@@ -14,7 +14,7 @@ type ArrowProps = {
     dest: string,
     scrollPosition: number,
     type: ArrowType,
-    delay: ?number,
+    delay?: number,
     horizontalProcess: boolean,
 }
 

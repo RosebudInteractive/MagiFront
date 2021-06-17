@@ -4,6 +4,8 @@ import {LineArrow} from "../../../ui-kit";
 import {ARROW_TYPE} from "../../../ui-kit/line-arrow";
 import SchemaTask from "./task";
 import RotateIcon from "tt-assets/svg/rotate.svg"
+import type {Tree} from "../../../../types/process";
+import {TASK_STATE} from "../../../../constants/states";
 
 
 type SchemaProps = {
@@ -14,7 +16,7 @@ type SchemaProps = {
     onDeleteTask: Function,
     onSetActiveTask: Function,
     onChangeRotation: Function,
-    tree: any,
+    tree: Tree,
     activeTaskId: ?number,
     horizontalProcess: boolean,
 }
@@ -61,19 +63,28 @@ export default function Schema(props: SchemaProps) {
             if (activeTaskId && $("#js-task_" + activeTaskId).length) {
                 setTimeout(() => {
                     setActive(activeTaskId)
-                    const _container = $("#schema_container"),
-                        _task = $("#js-task_" + activeTaskId).parent()
-
-                    const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
-                        _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
-
-                    _container.scrollLeft(_scrollLeft)
-                    _container.scrollTop(_scrollTop)
+                    _scrollToTask(activeTaskId)
                 }, 0)
-
             }
         }
-    }, [activeTaskId, tree])
+    }, [activeTaskId, tree, horizontalProcess])
+
+    const _scrollToTask = (taskId) => {
+        if (horizontalProcess) {
+            const _container = $("#schema_container"),
+                _task = $("#js-task_" + taskId).parent()
+
+            const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
+                _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
+
+            _container.scrollLeft(_scrollLeft)
+            _container.scrollTop(_scrollTop)
+        } else {
+            setTimeout(() => {
+                $("#js-task_" + taskId)[0].scrollIntoView({block: "center",  inline: "center",  behavior: "auto"})
+            }, 0)
+        }
+    }
 
     const toggleElems = () => {
         if (canvas && canvas.current) {
@@ -88,7 +99,7 @@ export default function Schema(props: SchemaProps) {
         return () => {
             $(window).unbind("toggle-elements-visible", toggleElems)
         }
-    })
+    }, [])
 
     const getCells = () => {
         if (tree) {
@@ -143,6 +154,16 @@ export default function Schema(props: SchemaProps) {
             canvas.current.removeEventListener('scroll', onCanvasScroll);
         }
     }, [])
+
+    useEffect(() => {
+        if (tree && !props.activeTaskId) {
+            const _firstActiveTask = Object.values(tree.nodes).find(task => task.state !== TASK_STATE.DONE.value)
+
+            if (_firstActiveTask) {
+                _scrollToTask(_firstActiveTask.id)
+            }
+        }
+    }, [tree, horizontalProcess])
 
     const onCanvasScroll = (e) => { setScrollPosition(e.target.scrollLeft) }
 

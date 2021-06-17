@@ -27,7 +27,6 @@ class TaskController {
         this._enable = { }
         this._visibility = { }
         this._setInitState()
-        this._newStates = [TASK_STATE.EXECUTING.value, TASK_STATE.QUESTION.value, TASK_STATE.DONE.value]
     }
 
     get fieldsEnable(): TaskFieldsEnable{
@@ -42,12 +41,8 @@ class TaskController {
         return this._newStates
     }
 
-    setUser(user) {
+    calc({user, task}) {
         this.user = user
-        this.calcAvailability()
-    }
-
-    setTask(task) {
         this.task = task
         this.calcAvailability()
     }
@@ -237,6 +232,8 @@ class TaskController {
             writeFieldSet: false,
             elementField: true,
         }
+
+        this._newStates = [TASK_STATE.EXECUTING.value, TASK_STATE.QUESTION.value, TASK_STATE.DONE.value]
     }
 }
 

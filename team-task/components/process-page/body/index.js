@@ -69,7 +69,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
                     onEditTaskLinks={props.onEditTaskLinks}
                     onEditTask={props.onEditTask}
                     onDeleteTask={props.onDeleteTask}
-                    onChangeRotation={props.onChangeRotation}            />
+                    onChangeRotation={props.onChangeRotation}/>
 
         </div>
         <ProcessFields fields={process.ProcessFields}/>

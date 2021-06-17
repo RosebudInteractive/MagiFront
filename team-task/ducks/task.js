@@ -265,7 +265,11 @@ export const saga = function* () {
 function* getTaskSaga(data) {
     yield put({type: GET_TASK_START})
     try {
-        let _task = yield call(_fetchTask, data.payload)
+        const _taskId = data.payload
+
+        console.log(_taskId)
+
+        let _task = yield call(_fetchTask, _taskId)
 
         const _user = yield select(userSelector)
 
@@ -280,10 +284,7 @@ function* getTaskSaga(data) {
             _task.isUserLastComment = false
         }
 
-
-
-        taskController.setUser(_user)
-        taskController.setTask(_task)
+        taskController.calc({user: _user, task: _task})
 
         yield put({type: GET_TASK_SUCCESS, payload: _task})
     } catch (e) {
@@ -412,8 +413,7 @@ function* createTaskSaga({payload}) {
             Log: [],
         }
 
-        taskController.setUser(_user)
-        taskController.setTask(_newTask)
+        taskController.calc({user: _user, task: _newTask})
 
         yield call(getDictionaryData, _newTask)
 

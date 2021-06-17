@@ -12,6 +12,7 @@ import {useLocation,} from "react-router-dom"
 import type {GridSortOrder} from "../../types/grid";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import {useWindowSize} from "../../tools/window-resize-hook";
+import savedFilters, {FILTER_KEY} from "../../tools/saved-filters";
 
 let _taskCount = 0
 
@@ -20,7 +21,9 @@ function Tasks(props) {
 
     const location = useLocation()
     const _sortRef = useRef({field: null, direction: null}),
-        filter = useRef(null)
+        filter = useRef(null),
+        isMounted = useRef(false)
+
 
     useWindowSize(() => {
         resizeHandler(_taskCount)
@@ -32,7 +35,16 @@ function Tasks(props) {
     }, [tasks])
 
     useEffect(() => {
-        const initState = parseParams()
+        let initState = parseParams()
+
+        if (!isMounted.current && (Object.keys(initState).length === 0)) {
+            initState = savedFilters.getFor(FILTER_KEY.TASKS)
+            initState.replacePath = true
+            isMounted.current = true
+        } else {
+            savedFilters.setFor(FILTER_KEY.TASKS, {...initState})
+        }
+
         if (initState.order) {
             _sortRef.current = initState.order
             const _grid = window.webix.$$("tasks-grid")

@@ -131,8 +131,8 @@ export const setActiveTaskId = (taskId: number) => {
     return {type: SET_ACTIVE_TASK_ID_REQUEST, payload: taskId}
 }
 
-export const buildLocation = () => {
-    return {type: BUILD_LOCATION_REQUEST}
+export const buildLocation = (replace: boolean = false) => {
+    return {type: BUILD_LOCATION_REQUEST, payload: replace}
 }
 
 export const setInitState = (data) => {
@@ -225,5 +225,9 @@ function* setInitStateSaga({payload}) {
             _value = _sort.direction === GRID_SORT_DIRECTION.ACS ? _sort.field : `${_sort.field},${_sort.direction}`
 
         yield put({type: SET_GRID_SORT_ORDER, payload: _value})
+    }
+
+    if (payload.replacePath) {
+        yield put(buildLocation(true))
     }
 }
