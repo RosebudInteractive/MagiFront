@@ -46,6 +46,7 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absTestInstAppUrl = config.proxyServer.siteHost + config.testAppUrl + config.testInstUrl + "/";
         this._absPmProcessUrl = config.proxyServer.siteHost + config.pmProcessUrl + "/";
         this._absPmTaskUrl = config.proxyServer.siteHost + config.pmTaskUrl + "/";
+        this._absPmTaskNotificationUrl = config.proxyServer.siteHost + config.pmTaskNotificationUrl + "/";
 
     }
 
