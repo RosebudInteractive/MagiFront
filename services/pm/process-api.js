@@ -1780,7 +1780,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 notifications.push({
                                     UserId: user_id,
                                     NotifType: NotificationType.TaskCanStart,
-                                    URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                    URL: `${this._absPmTaskNotificationUrl}${taskObj.id()}`,
                                     Subject: _.template(TASK_START_NOTIF)({
                                         id: taskObj.id(),
                                         name: taskObj.name()
@@ -1944,7 +1944,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     notifications.push({
                                         UserId: user_id,
                                         NotifType: NotificationType.TaskCanStart,
-                                        URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                        URL: `${this._absPmTaskNotificationUrl}${ctask.id()}`,
                                         Subject: _.template(TASK_START_NOTIF)({
                                             id: ctask.id(),
                                             name: ctask.name()
@@ -2228,7 +2228,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                 notifications.push({
                                                     UserId: user_id,
                                                     NotifType: NotificationType.TaskCanStart,
-                                                    URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                                    URL: `${this._absPmTaskNotificationUrl}${ctask.id()}`,
                                                     Subject: _.template(TASK_START_NOTIF)({
                                                         id: ctask.id(),
                                                         name: ctask.name()
@@ -2252,7 +2252,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             notifications.push({
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskAssigned,
-                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                URL: `${this._absPmTaskNotificationUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_START_NOTIF)({
                                     id: taskObj.id(),
                                     name: taskObj.name()
@@ -2265,7 +2265,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             notifications.push({
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskQuestionRaised,
-                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                URL: `${this._absPmTaskNotificationUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_ALERT_NOTIF)({
                                     id: taskObj.id(),
                                     name: taskObj.name()
@@ -2278,7 +2278,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             notifications.push({
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskQuestionRaised,
-                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                URL: `${this._absPmTaskNotificationUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_CONTINUE_NOTIF)({
                                     id: taskObj.id(),
                                     name: taskObj.name()
@@ -2488,7 +2488,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             notifications.push({
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskCanStart,
-                                URL: `${this._absPmTaskUrl}${taskObj.id()}`,
+                                URL: `${this._absPmTaskNotificationUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_START_NOTIF)({
                                     id: taskObj.id(),
                                     name: taskObj.name()
@@ -2724,7 +2724,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                     notifications.push({
                                                         UserId: user_id,
                                                         NotifType: NotificationType.TaskCanStart,
-                                                        URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                                        URL: `${this._absPmTaskNotificationUrl}${ctask.id()}`,
                                                         Subject: _.template(TASK_START_NOTIF)({
                                                             id: ctask.id(),
                                                             name: ctask.name()

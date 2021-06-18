@@ -19,6 +19,7 @@ module.exports = {
     testInstUrl: '/test-instance',
     pmTaskUrl: '/pm/tasks',
     pmProcessUrl: '/pm/process',
+    pmTaskNotificationUrl: '/pm/notifications/task',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',
