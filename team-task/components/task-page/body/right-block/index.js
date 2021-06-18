@@ -54,7 +54,7 @@ export default function RightBlock(props: TaskBodyProps) {
         <Field component={Select} name={"State"} label={"Состояние"} options={_stateOptions} disabled={_lock.state} readOnly={_lock.state} required={true}/>
         { _alertLog && <Comment {..._alertLog}/> }
         <Field component={DatePicker} name={"DueDate"} label={"Дата исполнения"} disabled={_lock.dueDate} readOnly={_lock.dueDate}/>
-        <Field component={TextBox} name={"LastComment"} label={"Комментарий"} disabled={_lock.comments} readOnly={_lock.comments}/>
+        <Field component={TextBox} name={"LastComment"} multiline={true} label={"Комментарий"} disabled={_lock.comments} readOnly={_lock.comments}/>
         <CommentBlock task={task} onSaveComment={onSaveComment}/>
     </div>
 }

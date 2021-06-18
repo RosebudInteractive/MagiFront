@@ -6,7 +6,7 @@ import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
 import {reset} from "redux-form";
 import {all, takeEvery, put, call} from "@redux-saga/core/effects";
 import {USER_ROLE} from "../constants/common";
-import taskController from "../tools/task-controller";
+import {showErrorMessage} from "tt-ducks/messages";
 
 /**
  * Constants
@@ -19,15 +19,15 @@ const WHO_AM_I_START = `${prefix}/WHO_AM_I_START`
 const WHO_AM_I_SUCCESS = `${prefix}/WHO_AM_I_SUCCESS`
 const WHO_AM_I_FAIL = `${prefix}/WHO_AM_I_FAIL`
 
-export const SIGN_IN_START = `${prefix}/SIGN_IN_START`
-export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
-export const SIGN_IN_FAIL = `${prefix}/SIGN_IN_FAIL`
+const SIGN_IN_REQUEST = `${prefix}/SIGN_IN_REQUEST`
+const SIGN_IN_START = `${prefix}/SIGN_IN_START`
+const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
+const SIGN_IN_FAIL = `${prefix}/SIGN_IN_FAIL`
 
-export const LOGOUT_START = `${prefix}/LOGOUT_START`
-export const LOGOUT_SUCCESS = `${prefix}/LOGOUT_SUCCESS`
-export const LOGOUT_FAIL = `${prefix}/LOGOUT_FAIL`
-
-export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
+const LOGOUT_REQUEST = `${prefix}/LOGOUT_REQUEST`
+const LOGOUT_START = `${prefix}/LOGOUT_START`
+const LOGOUT_SUCCESS = `${prefix}/LOGOUT_SUCCESS`
+const LOGOUT_FAIL = `${prefix}/LOGOUT_FAIL`
 
 /**
  * Reducer
@@ -80,10 +80,6 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('error', payload.error.message)
-
-        case CLEAR_ERROR:
-            return state
-                .set('error', null)
 
         default:
             return state
@@ -144,12 +140,22 @@ export const whoAmI = () => {
     return {type: WHO_AM_I_REQUEST}
 }
 
+export const sighIn = (data) => {
+    return {type: SIGN_IN_REQUEST, payload: data}
+}
+
+export const logout = () => {
+    return {type: LOGOUT_REQUEST,}
+}
+
 /**
  * Sagas
  */
 export const saga = function* () {
     yield all([
-        takeEvery(WHO_AM_I_REQUEST, whoAmISaga)
+        takeEvery(WHO_AM_I_REQUEST, whoAmISaga),
+        takeEvery(SIGN_IN_REQUEST, sighInSaga),
+        takeEvery(LOGOUT_REQUEST, logoutSaga)
     ])
 }
 
@@ -174,75 +180,44 @@ function* whoAmISaga() {
     }
 }
 
-export const login = (values) => {
-    return (dispatch) => {
+function* sighInSaga({payload}) {
 
-        dispatch({
-            type: SIGN_IN_START,
-            payload: null
-        });
+    yield put({ type: SIGN_IN_START });
 
-        fetch("/api/login", {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(values),
-            credentials: 'include'
-        })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                if (_isPmUser(data)) {
-                    dispatch({
-                        type: SIGN_IN_SUCCESS,
-                        payload: data
-                    });
+    try {
+        const _authData = yield call(_postLogin, payload)
+        if (_isPmUser(_authData)) {
+            yield put({ type: SIGN_IN_SUCCESS, payload: _authData })
+        } else {
+            throw new Error('Недостаточно прав')
+        }
 
-                    dispatch(reset('SignInForm'));
-                } else {
-                    throw new Error('Not enough rights')
-                }
-            })
-            .catch((error) => {
-                dispatch({
-                    type: SIGN_IN_FAIL,
-                    payload: {error}
-                });
-            });
+    } catch (e) {
+        yield put({ type: SIGN_IN_FAIL, payload: {error: e}})
+        yield put(showErrorMessage(e.message))
     }
 }
 
-export const clearError = () => {
-    return {
-        type: CLEAR_ERROR,
-        payload: null
-    };
+const _postLogin = (values) => {
+    return fetch("/api/login", {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(values),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
 }
 
-export const logout = () => {
-    return (dispatch) => {
+function* logoutSaga() {
+    yield put({type: LOGOUT_START})
+    try {
+        yield call(commonGetQuery,"/api/logout")
 
-        dispatch({
-            type: LOGOUT_START,
-            payload: null
-        });
-
-        fetch("/api/logout", {method: 'GET', credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                dispatch({
-                    type: LOGOUT_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: LOGOUT_FAIL,
-                    payload: {error}
-                });
-            });
+        yield put({ type: LOGOUT_SUCCESS })
+    } catch (e) {
+        yield put({ type: LOGOUT_FAIL, payload: {e}})
     }
 }
-

@@ -267,8 +267,6 @@ function* getTaskSaga(data) {
     try {
         const _taskId = data.payload
 
-        console.log(_taskId)
-
         let _task = yield call(_fetchTask, _taskId)
 
         const _user = yield select(userSelector)

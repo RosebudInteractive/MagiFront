@@ -17,7 +17,7 @@ export default function ProcessFields(props: ProcessFieldsProps) {
         {
             fields.map((item, index) => {
                 const enable = !readOnly && enabledFields && enabledFields.includes(item.name)
-                return <Field component={TextBox} name={item.name} label={item.caption} disabled={!enable} readOnly={!enable} key={index}/>
+                return <Field component={TextBox} multiline={true} name={item.name} label={item.caption} disabled={!enable} readOnly={!enable} key={index}/>
             })
         }
     </div>

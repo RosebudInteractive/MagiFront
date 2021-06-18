@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useMemo, useState} from "react"
+import React, {useEffect, useRef,} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -28,7 +28,7 @@ import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
 import {UpdatingProcess} from "../../types/process"
 import {buildTree, parseParams, _scrollHandler} from "./functions";
-import {ModalTaskEditor} from "../task-page";
+import ProcessTaskEditor from "../../components/process-page/editors/process-task-editor";
 import type {ProcessTask} from "../../types/task";
 import TaskLinksEditor from "../../components/process-page/editors/task-link-editor";
 import $ from "jquery";
@@ -158,7 +158,7 @@ function ProcessEditor(props) {
                              onEditTask={onEditTask}
                              onDeleteTask={onDeleteTask}
                              onChangeRotation={actions.changeProcessRotation}/>
-                <ModalTaskEditor/>
+                <ProcessTaskEditor/>
                 <TaskLinksEditor/>
             </form>
         </React.Fragment>

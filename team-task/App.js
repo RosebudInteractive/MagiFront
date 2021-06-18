@@ -20,10 +20,11 @@ import {fetchingSelector as taskFetching} from "tt-ducks/task";
 import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
+import {fetchingSelector as appFetching, getAppOptions} from "tt-ducks/app";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
-import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
+import Auth from "./containers/auth";
 
 window.webix = webix
 
@@ -31,6 +32,8 @@ function App(props) {
     const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
+
+    useEffect(() => {actions.getAppOptions()}, [])
 
     useEffect(() => {
         actions.whoAmI();
@@ -54,7 +57,13 @@ function App(props) {
         </React.Fragment>
         :
         <React.Fragment>
-            { userInitialized && <AccessDeniedPlaceholder/> }
+            {
+                fetching ?
+                    <LoadingPage/>
+                    :
+                    userInitialized && <Auth/>
+            }
+            <ReduxModalDialog/>
         </React.Fragment>
 }
 
@@ -65,13 +74,18 @@ function mapStateToProps(state,) {
         userInitialized: initializedSelector(state),
         hasPmRights: hasPmRights(state),
         userRole: userRoleSelector(state),
-        fetching: tasksFetching(state) || processesFetching(state) || taskFetching(state) || processFetching(state) || dictionaryFetching(state)
+        fetching: tasksFetching(state)
+            || processesFetching(state)
+            || taskFetching(state)
+            || processFetching(state)
+            || dictionaryFetching(state)
+            || appFetching(state)
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI, getAllDictionaryData}, dispatch),
+        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions}, dispatch),
     }
 }
 

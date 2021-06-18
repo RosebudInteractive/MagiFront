@@ -98,6 +98,6 @@ export default function UiTextBox(props) {
                          disabled={props.disabled}
                          label={props.label}
                          variant="outlined"
-                         multiline={true}
+                         // multiline={true}
                          className={"input-field"}/>
 }

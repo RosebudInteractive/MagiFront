@@ -26,7 +26,7 @@ export default function TaskMainBlock(props: TaskBodyProps) {
 
     return <div className="body__main-block">
         <div className={"task-main-block__description"}>
-            <Field component={TextBox} name={"Description"} label={"Описание"} disabled={_lock.description} readOnly={_lock.description}/>
+            <Field component={TextBox} name={"Description"} label={"Описание"} multiline={true} disabled={_lock.description} readOnly={_lock.description}/>
         </div>
         { taskController.visibility.startButton && <UserStartBlock onStartClick={props.onStartClick}/> }
         { taskController.visibility.elementField && <SupervisorBlock elements={elements} currentElement={currentElement}/> }

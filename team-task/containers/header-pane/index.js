@@ -5,15 +5,16 @@ import "./header-pane.sass"
 import {userSelector} from "tt-ducks/auth";
 import Breadcrumb from "../../components/breadcrumb";
 import {sideBarMenuVisible} from "tt-ducks/app";
+import {logout} from "tt-ducks/auth";
 
 function HeaderPane(props) {
-    const {user, sideBarMenuVisible} = props
+    const {user, sideBarMenuVisible, actions} = props
 
     return <nav className={"header-pane" + (sideBarMenuVisible ? "" : " _full-width")}>
         <Breadcrumb/>
         <div className="user-block">
             <div className="user-block__name">{user.DisplayName}</div>
-            <button className="grey-button logout-button">Выйти</button>
+            <button className="grey-button logout-button" onClick={actions.logout}>Выйти</button>
         </div>
     </nav>
 }
@@ -27,7 +28,7 @@ const mapState2Props = (state) => {
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({}, dispatch)
+        actions: bindActionCreators({logout}, dispatch)
     }
 }
 
