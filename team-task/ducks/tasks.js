@@ -95,9 +95,9 @@ export const saga = function* () {
 function* getTasksSaga() {
     yield put({type: GET_TASKS_START})
     try {
-        const params = yield select(paramsSelector)
+        const params = yield select(paramsSelector);
 
-        let _tasks = yield call(_fetchTasks, params)
+        let _tasks = yield call(_fetchTasks, params);
 
         _tasks = _tasks.map((task) => {
             return {

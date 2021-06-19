@@ -73,7 +73,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pme'], payload.pme)
                 .setIn(['users', 'pmu'], payload.pmu)
                 .set('lessons', payload.lessons)
-                .set('availableForCreationLessons', payload.availableForCreationLessons)
+                .set('availableForCreationLessons', payload.availableForCreationLessons);
         case SET_NEXT_TIME_TO_LOAD:
             return state.set('nextTimeToLoadData', payload);
         case SET_LESSONS:
@@ -107,6 +107,8 @@ export const allUsersDSelector = createSelector(stateSelector, state => {
     return uniqIds.map(id => allUsers.find(u => u.Id === id));
 });
 export const availableForCreationLessons = createSelector(stateSelector, state => state.availableForCreationLessons);
+
+//todo duplicate
 export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
     const uniqIds = [...new Set(allUsers.map(u => u.Id))];
@@ -114,6 +116,7 @@ export const userWithSupervisorRightsSelector = createSelector(stateSelector, (s
     return uniqIds.map(id => allUsers.find(u => u.Id === id));
 });
 
+//todo duplicate - remove duplicates here and in components
 export const userWithSupervisorRightsSelectorFlatten = createSelector(stateSelector, (state) => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
     const uniqIds = [...new Set(allUsers.map(u => u.Id))];
@@ -165,7 +168,7 @@ export const saga = function* () {
         takeEvery(REQUEST_SUCCESS, fetchingToggle),
         takeEvery(REQUEST_FAIL, fetchingToggle),
     ])
-}
+};
 
 function* fetchingToggle(isOn){
     try {
@@ -327,9 +330,6 @@ function* getLessonsDataSaga(data) {
 const _getAllUsers = () => {
     return commonGetQuery("/api/users/list?role=a,pma,pms,pmu,pme");
 };
-
-// const _processStructures = () => { //todo add request after request-query completed
-// };
 
 const _getLessons = () => {
     return commonGetQuery("/api/lessons-list")

@@ -10,6 +10,7 @@ import {saga as routeSaga} from 'tt-ducks/route'
 import {saga as usersDictionarySaga} from 'tt-ducks/users-dictionary'
 import {saga as componentsDictionarySaga} from 'tt-ducks/components-dictionary'
 import {saga as dictionarySaga} from 'tt-ducks/dictionary'
+import {saga as notificationsSaga} from 'tt-ducks/notifications'
 
 export default function* rootSaga() {
     yield all([
@@ -23,6 +24,7 @@ export default function* rootSaga() {
         routeSaga(),
         usersDictionarySaga(),
         dictionarySaga(),
-        componentsDictionarySaga()
+        componentsDictionarySaga(),
+        notificationsSaga()
     ])
 }

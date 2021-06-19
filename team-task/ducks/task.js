@@ -217,8 +217,8 @@ export const accessDeniedSelector = createSelector(stateSelector, state => state
 /**
  * Action Creators
  * */
-export const getTask = (taskId: number) => {
-    return {type: GET_TASK_REQUEST, payload: taskId}
+export const getTask = (taskId: number, notificationUuid?: string = null) => {
+    return {type: GET_TASK_REQUEST, payload: {taskId, notificationUuid}}
 }
 
 export const createTask = (processId: number) => {
@@ -265,9 +265,7 @@ export const saga = function* () {
 function* getTaskSaga(data) {
     yield put({type: GET_TASK_START})
     try {
-        const _taskId = data.payload
-
-        let _task = yield call(_fetchTask, _taskId)
+        let _task = yield call(_fetchTask, data.payload.taskId, data.payload.notificationUuid);
 
         const _user = yield select(userSelector)
 
@@ -286,7 +284,7 @@ function* getTaskSaga(data) {
 
         yield put({type: GET_TASK_SUCCESS, payload: _task})
     } catch (e) {
-        yield put({type: GET_TASK_FAIL})
+        yield put({type: GET_TASK_FAIL});
 
         if (e.status === 403) {
             yield put({type: SET_ACCESS_DENIED})
@@ -296,8 +294,10 @@ function* getTaskSaga(data) {
     }
 }
 
-const _fetchTask = (taskId) => {
-    return commonGetQuery(`/api/pm/task/${taskId}`)
+const _fetchTask = (taskId, notificationUuid = null) => {
+    // todo tested: notificationUuid is null, should will insure that we completely pass the notificationUuid
+    return commonGetQuery(`/api/pm/task/${taskId}${notificationUuid ? '?notification='+notificationUuid : ''}`)
+
 }
 
 const _getUsers = () => {

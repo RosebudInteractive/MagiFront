@@ -9,6 +9,7 @@
   filter: drop-shadow(0px 4px 7px rgba(0, 0, 0, 0.05))
   transition: max-width 300ms ease-in
   max-width: 1000px
+
   &._hidden
     max-width: 0
     padding: 0
@@ -35,12 +36,14 @@
   cursor: pointer
   margin-bottom: 24px
   transition: color ease 300ms
+
   svg
     fill: $grey40
     transition: fill ease 300ms
 
   &:hover, &._active
     color: $grey100
+
     svg
       fill: $grey100
 
@@ -59,6 +62,7 @@
   overflow: hidden
   max-height: 0
   transition: max-height 300ms ease
+
   &._expanded
     max-height: 1000px
 
@@ -75,3 +79,18 @@
 
 .nested
   margin-left: 15px
+
+.new-notifications-count
+  position: relative
+  width: 18px
+  height: 18px
+  border-radius: 50%
+  background: #ffcb00
+  text-align: center
+  font-size: 13px
+  display: none
+  align-items: center
+  justify-content: center
+
+.notif-c-active
+  display: flex

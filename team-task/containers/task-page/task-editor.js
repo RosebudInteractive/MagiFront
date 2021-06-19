@@ -1,18 +1,18 @@
 import React, {useEffect,} from "react"
-import {compose} from "redux"
+import {bindActionCreators, compose} from "redux"
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import {
-    getTask,
+    accessDeniedSelector,
     createTask,
-    saveTask,
-    saveComment,
-    getProcessElement,
-    taskSelector,
-    usersSelector,
+    currentElementSelector,
     elementsSelector,
     fetchingSelector,
-    currentElementSelector, accessDeniedSelector
+    getProcessElement,
+    getTask,
+    saveComment,
+    saveTask,
+    taskSelector,
+    usersSelector
 } from "tt-ducks/task";
 import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
@@ -43,7 +43,7 @@ function TaskEditor(props: EditorProps) {
         } else {
             actions.getTask(taskId)
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         if (task) {

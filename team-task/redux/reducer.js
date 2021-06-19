@@ -13,6 +13,7 @@ import messageReducer, {moduleName as messageModule} from "tt-ducks/messages";
 import usersDictionaryReducer, {moduleName as usersDictionaryModule} from "tt-ducks/users-dictionary";
 import componentsDictionaryReducer, {moduleName as componentDictionaryModule} from "tt-ducks/components-dictionary";
 import dictionaryReducer, {moduleName as dictionaryModule} from "tt-ducks/dictionary";
+import notificationsReducer, {moduleName as notificationsModule} from "tt-ducks/notifications";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -27,6 +28,7 @@ export default combineReducers({
     [usersDictionaryModule]: usersDictionaryReducer,
     [dictionaryModule]: dictionaryReducer,
     [componentDictionaryModule]: componentsDictionaryReducer,
+    [notificationsModule]: notificationsReducer,
 
     routing: routerReducer,
     form: formReducer,

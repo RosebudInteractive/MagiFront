@@ -8,6 +8,7 @@ import ProcessEditor from "./containers/process-page";
 import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 import DictionaryUsers from "./components/dictionaries/users/users";
 import DictionaryComponents from "./components/dictionaries/components/components"
+import Notifications from "./components/notifications"
 import {USER_ROLE} from "./constants/common";
 
 type RouterProps = {
@@ -25,6 +26,8 @@ export default function AppRouter(props: RouterProps) {
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
+        <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
+        <Route exact path={'/notifications/task/:taskId'} render={() => (<Notifications showModal={true}/>)}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {
             if (_hasAdminRights) {

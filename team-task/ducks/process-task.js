@@ -2,10 +2,10 @@ import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
-import {all, takeEvery, put, take, call, select, takeLatest} from "@redux-saga/core/effects";
+import {all, call, put, select, take, takeEvery} from "@redux-saga/core/effects";
 import type {ProcessTask,} from "../types/task";
 import {getProcess} from "tt-ducks/process";
-import {SAVE_TASK_SUCCESS, DELETE_TASK_SUCCESS, SAVE_TASK_LINKS_SUCCESS} from "tt-ducks/task";
+import {DELETE_TASK_SUCCESS, SAVE_TASK_LINKS_SUCCESS, SAVE_TASK_SUCCESS} from "tt-ducks/task";
 import {setActiveTaskId} from "tt-ducks/route";
 
 /**
@@ -116,7 +116,7 @@ export const saga = function* () {
 }
 
 function* showTaskEditorSaga({payload}) {
-    yield put({type: SHOW_TASK_EDITOR_START, payload: payload})
+    yield put({type: SHOW_TASK_EDITOR_START, payload: payload});
 
     const {payload: data} = yield take(SAVE_TASK_SUCCESS)
 

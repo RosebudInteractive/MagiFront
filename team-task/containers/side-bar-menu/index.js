@@ -12,10 +12,11 @@ import {NavLink} from "react-router-dom";
 import Logo from "tt-assets/svg/logo.svg"
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
+import {newNotifsCountSelector} from "tt-ducks/notifications";
 
 function SideBarMenu(props) {
 
-    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible} = props
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, newNotifsCount} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -23,7 +24,7 @@ function SideBarMenu(props) {
         </div>
         { hasSupervisorRights && <MenuLink Icon={ProcessesIco} url={"/processes"} title={"Процессы"}/> }
         <MenuLink Icon={TasksIco} url={"/tasks"} title={"Задачи"}/>
-        <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"}/>
+        <MenuLink Icon={NotificationsIco} url={"/notifications"} title={"Уведомления"} notifsCount={newNotifsCount}/>
         {
             hasAdminRights &&
             <MenuList Icon={DictionariesIco} title={"Справочники"}>
@@ -42,11 +43,14 @@ type MenuLinkProps = {
 };
 
 function MenuLink(props: MenuLinkProps) {
-    const {Icon, url, title, nested} = props
+    const {Icon, url, title, nested, notifsCount} = props
 
     return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested' : ''}`} activeClassName={"_active"}>
         <Icon/>
         <div className="side-bar-menu__item-title">{title}</div>
+        <div className={`new-notifications-count ${notifsCount > 0 ? 'notif-c-active' : ''}`}>
+            {notifsCount}
+        </div>
     </NavLink>
 }
 
@@ -78,6 +82,7 @@ const mapState2Props = (state) => {
         hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
+        newNotifsCount: newNotifsCountSelector(state)
     }
 }
 
