@@ -217,7 +217,7 @@ export const accessDeniedSelector = createSelector(stateSelector, state => state
 /**
  * Action Creators
  * */
-export const getTask = (taskId: number, notificationUuid?: string = null) => {
+export const getTask = (taskId: number, notificationUuid = null) => {
     return {type: GET_TASK_REQUEST, payload: {taskId, notificationUuid}}
 }
 

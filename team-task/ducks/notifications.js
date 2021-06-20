@@ -5,6 +5,7 @@ import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import {commonGetQuery} from "tools/fetch-tools";
+import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 
 export const moduleName = 'notifications';
 const prefix = `${appName}/${moduleName}`;
@@ -14,6 +15,7 @@ const LOAD_NOTIFICATIONS = `${prefix}/LOAD_NOTIFICATIONS`;
 const REQUEST_START = `${prefix}/REQUEST_START`;
 const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
 const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
+const MARK_NOTIFICATIONS_AS_READ = `${prefix}/MARK_NOTIFICATIONS_AS_READ}`;
 
 export const ReducerRecord = Record({
     notifications: [],
@@ -46,14 +48,31 @@ export const getNotifications = (notRead = null, urgent = null, type) => {
     return {type: LOAD_NOTIFICATIONS, payload: {notRead, urgent, type}}
 };
 
+export const markNotifsAsRead = (notifIds = []) => {
+    return {type: MARK_NOTIFICATIONS_AS_READ, payload: notifIds}
+};
+
 
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_NOTIFICATIONS, getNotificationsSaga),
+        takeEvery(MARK_NOTIFICATIONS_AS_READ, updateNotificationsAsRead)
     ])
 };
 
-function* getNotificationsSaga(data) {
+function* updateNotificationsAsRead(data) {
+    yield put({type: REQUEST_START});
+    try {
+        yield call(updateNotificationAsRead,data.payload); //response.result might be 'OK'
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        yield put(clearLocationGuard());
+        yield put(showErrorMessage(e.message));
+    }
+}
+
+function* getNotificationsSaga() {
     yield put({type: REQUEST_START});
     try {
         const params = yield select(paramsSelector);
@@ -66,7 +85,10 @@ function* getNotificationsSaga(data) {
 
         const notifications = yield call(_getNotifications, paramsQuery);
 
-        yield put({type: SET_NOTIFICATIONS, payload: notifications});
+        yield put({
+            type: SET_NOTIFICATIONS,
+            payload: notifications.map(notif => ({...notif, NotRead: !notif.IsRead, UserName: notif.User.DisplayName}))
+        });
         yield put({type: REQUEST_SUCCESS});
         yield put(clearLocationGuard());
     } catch (e) {
@@ -79,5 +101,17 @@ function* getNotificationsSaga(data) {
 const _getNotifications = (params) => {
     let urlString = `/api/pm/notification-list?${params}`;
     return commonGetQuery(urlString);
+};
+
+const updateNotificationAsRead = (notifIds = []) => {
+    return fetch(`/api/pm/notification/mark-as-read`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(notifIds),
+        credentials: 'include'
+    }).then(checkStatus)
+        .then(parseJSON);
 };
 

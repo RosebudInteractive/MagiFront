@@ -35,13 +35,13 @@ type EditorProps = {
 }
 
 function TaskEditor(props: EditorProps) {
-    const {actions, task, fetching, accessDenied, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, userRole} = props
+    const {actions, task, fetching, accessDenied, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, notifUuid } = props
 
     useEffect(() => {
         if (taskId === -1) {
             actions.createTask(processId)
         } else {
-            actions.getTask(taskId)
+            actions.getTask(taskId, notifUuid ? notifUuid : null);
         }
     }, []);
 

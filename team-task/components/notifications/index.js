@@ -14,13 +14,14 @@ import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import './notifications.sass';
-import {fetchingSelector, getNotifications, notificationsSelector} from "tt-ducks/notifications";
+import {fetchingSelector, getNotifications, markNotifsAsRead, notificationsSelector} from "tt-ducks/notifications";
 import {NOTIFICATION_TYPES} from "../../constants/notifications";
+import {hasAdminRights} from "tt-ducks/auth";
 
 let notificationsCount = 0;
 
 const Notifications = (props) => {
-    const {fetching, actions, notifications, showModal} = props;
+    const {fetching, actions, notifications, showModal, hasAdminRights} = props;
 
     const location = useLocation();
 
@@ -28,6 +29,7 @@ const Notifications = (props) => {
         filter = useRef(null);
 
     const [modalInfo, setModalInfo] = useState({});
+    const [notificationUuid, setNotifUuid] = useState(null);
 
     useWindowSize(() => {
         resizeHandler(notificationsCount)
@@ -76,6 +78,10 @@ const Notifications = (props) => {
         resizeHandler(notificationsCount.length)
     }, [notifications]);
 
+    function getUpdatedNotifications() {
+        actions.getNotifications();
+    }
+
     const GRID_CONFIG = {
         view: "datatable",
         id: 'notifications-grid',
@@ -109,15 +115,14 @@ const Notifications = (props) => {
                     {id: '3', value: NOTIFICATION_TYPES["4"]}
                 ]
             },
-            {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: 45},
+            {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: !hasAdminRights ? 45 : 30},
             {
-                id: 'Urgent', header: 'Срочность', minWidth: 100, fillspace: 10, format: function (value) {
+                id: 'Urgent', header: 'Срочность', minWidth: 100, fillspace: 8, format: function (value) {
                     return value ? 'Срочно' : 'Не Срочно'
                 }
             },
             {id: 'NotRead', header: 'Непрочитано', hidden: true},
-            {id: 'TargetUserId', header: 'Адресат уведомления', hidden: true}
-            //todo add column for UserName only for administrators and supervisers(pms or like same)
+            {id: 'UserName', header: 'Пользователь', hidden: !hasAdminRights, fillspace: 25}
         ],
         on: {
             onHeaderClick: function (header) {
@@ -139,7 +144,9 @@ const Notifications = (props) => {
                 if (item && item.Id) {
                     console.log(item);
                     props.history.push(`/notifications/task/${item.URL.split('tasks/')[1].match(/\d+/)[0]}`);
+                    setNotifUuid(item.URL.split('notification=')[1]);
                     actions.showTaskEditor({taskId: item.URL.split('tasks/')[1].match(/\d+/)[0]});
+                    actions.markNotifsAsRead([item.Id]);
                 }
 
             }
@@ -174,8 +181,12 @@ const Notifications = (props) => {
 
             {showModal && modalInfo.taskId}
             {
-                showModal && modalInfo.taskId
-                && <ModalTaskEditor taskId={modalInfo.taskId} editorVisible={showModal}/>
+                notificationUuid && notificationUuid.length > 0
+                && showModal && modalInfo.taskId
+                && <ModalTaskEditor taskId={modalInfo.taskId}
+                                    editorVisible={showModal}
+                                    notifUuid={notificationUuid}
+                                    beforeCloseCallback={getUpdatedNotifications}/>
             }
         </React.Fragment>
     )
@@ -185,7 +196,8 @@ const mapState2Props = (state) => {
     return {
         notifications: notificationsSelector(state),
         fetching: fetchingSelector(state),
-        selectedTask: taskSelector(state)
+        selectedTask: taskSelector(state),
+        hasAdminRights: hasAdminRights(state)
     }
 };
 
@@ -197,7 +209,8 @@ const mapDispatch2Props = (dispatch) => {
             setInitState,
             setPathname,
             setGridSortOrder,
-            showTaskEditor
+            showTaskEditor,
+            markNotifsAsRead
         }, dispatch)
     }
 };

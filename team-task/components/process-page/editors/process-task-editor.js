@@ -2,19 +2,23 @@ import React from "react"
 import {connect} from 'react-redux';
 import {ModalTaskEditor} from "../../../containers/task-page";
 import {
+    closeTaskEditor,
     editorVisibleSelector,
-    taskIdSelector,
     parentTaskIdSelector,
     processIdSelector,
-    closeTaskEditor
+    taskIdSelector
 } from "tt-ducks/process-task";
 import {bindActionCreators} from "redux";
 
 function ProcessTaskEditor(props) {
-    const {taskId, processId, actions, parentTaskId, editorVisible} = props
+    const {taskId, processId, actions, parentTaskId, editorVisible, notifUuid, beforeCloseCallback} = props
 
-    return <ModalTaskEditor taskId={taskId} processId={processId} onClose={actions.closeTaskEditor}
-                            editorVisible={editorVisible} parentTaskId={parentTaskId}/>
+    return <ModalTaskEditor taskId={taskId} processId={processId}
+                            onClose={actions.closeTaskEditor}
+                            beforeCloseCallback={beforeCloseCallback}
+                            editorVisible={editorVisible}
+                            parentTaskId={parentTaskId}
+                            notifUuid={notifUuid}/>
 }
 
 const mapState2Props = (state) => {

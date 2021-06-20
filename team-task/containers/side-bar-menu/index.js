@@ -1,4 +1,4 @@
-import React, {useState,} from "react"
+import React, {useEffect, useState,} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ProcessesIco from "tt-assets/svg/processes.svg"
@@ -12,11 +12,18 @@ import {NavLink} from "react-router-dom";
 import Logo from "tt-assets/svg/logo.svg"
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
-import {newNotifsCountSelector} from "tt-ducks/notifications";
+import {newNotifsCountSelector, notificationsSelector} from "tt-ducks/notifications";
 
 function SideBarMenu(props) {
 
-    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, newNotifsCount} = props
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, newNotifsCount, notifications} = props
+
+    useEffect(() => {
+        if(notifications.length > 0){
+            console.log('newNotifsCount', newNotifsCount)
+            console.log('notifications:', notifications)
+        }
+    }, [notifications]);
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -82,7 +89,8 @@ const mapState2Props = (state) => {
         hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
-        newNotifsCount: newNotifsCountSelector(state)
+        newNotifsCount: newNotifsCountSelector(state),
+        notifications: notificationsSelector(state)
     }
 }
 
