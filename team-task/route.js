@@ -8,7 +8,7 @@ import ProcessEditor from "./containers/process-page";
 import AccessDeniedPlaceholder from "./components/access-denied-placeholder";
 import DictionaryUsers from "./components/dictionaries/users/users";
 import DictionaryComponents from "./components/dictionaries/components/components"
-import Notifications from "./components/notifications"
+import Notifications from "./containers/notifications"
 import {USER_ROLE} from "./constants/common";
 
 type RouterProps = {

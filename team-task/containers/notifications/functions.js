@@ -1,17 +1,16 @@
-import {FILTER_FIELD_TYPE} from "../filter/types";
+import {FILTER_FIELD_TYPE} from "../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../constants/common";
 import {NOTIFICATION_TYPES} from "../../constants/notifications";
 
-export const getFilterConfig = (filter) => {
-    return [
+export const getFilterConfig = (filter, disableFields = []) => {
+    const initialFields = [
         {
             name: "NotRead",
             placeholder: "Актуальность",
-            type: FILTER_FIELD_TYPE.COMBO, //todo change to SELECT
+            type: FILTER_FIELD_TYPE.SELECT,
             options: [{value: 1, label: 'Непрочитанные'},{value: 2, label: 'Все'}], //1 = true, 2 = false
-            value: filter ? filter.NotRead : null,
-            // defaultValue: 2 //todo maybe add this after SELECT
+            value: filter ? filter.NotRead : 2
         },
         {
             name: "Urgent",
@@ -27,13 +26,18 @@ export const getFilterConfig = (filter) => {
             options: Object.entries(NOTIFICATION_TYPES).map(ent => ({value: +ent[0], label: ent[1]})), // +ent - parse to Number
             value: filter ? filter.NotifType : null
         },
+
         {
             name: "UserName",
             placeholder: 'Имя пользователя',
             type: FILTER_FIELD_TYPE.TEXT,
             value: filter ? filter.UserName : null
         }
-    ]
+    ];
+
+    const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
+
+    return [...resultFields];
 };
 
 export const parseParams = () => {
@@ -63,7 +67,7 @@ const convertParam2Filter = ({notRead, urgent, notifType, userName}) => {
     if (!(notRead || urgent || notifType || userName)) return null;
 
     const filter = {};
-    filter.NotRead = (notRead !== null && notRead !== undefined) ? notRead.split(',').map(pr => +pr) : '';
+    filter.NotRead = (notRead !== null && notRead !== undefined) ? +notRead : '';
     filter.Urgent = (urgent !== null && urgent !== undefined) ? urgent.split(',').map(pr => +pr) : '';
     filter.NotifType = (notifType !== null &&  notifType !== undefined) ? notifType.split(',').map(pr => +pr) : '';
     filter.UserName = userName && userName.length > 0 ? userName : '';
@@ -95,7 +99,10 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if(filter.NotRead) {_data.notRead = filter.NotRead.join(',')}
+        if(filter.NotRead) {
+            filter.NotRead === 1 ?
+                _data.notRead = +filter.NotRead : delete _data.notRead;
+        } //cause its for SELECT (+filter.NotRead) and delete for not perform to pass param 'notRead'
         if(filter.Urgent) {_data.urgent = filter.Urgent.join(',')}
         if(filter.NotifType) {_data.notifType = filter.NotifType.join(',')}
         if(filter.UserName) {_data.userName = filter.UserName}

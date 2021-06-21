@@ -4,9 +4,9 @@ import {useWindowSize} from "../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import type {GridSortOrder} from "../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../constants/common";
-import FilterRow from "../filter";
-import Webix from "../Webix";
-import type {FilterField} from "../filter/types";
+import FilterRow from "../../components/filter";
+import Webix from "../../components/Webix";
+import type {FilterField} from "../../components/filter/types";
 import {showTaskEditor} from "tt-ducks/process-task";
 import ModalTaskEditor from '../../components/process-page/editors/process-task-editor'
 import {taskSelector} from "tt-ducks/task";
@@ -159,7 +159,7 @@ const Notifications = (props) => {
     };
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
-        return getFilterConfig(filter.current)
+        return getFilterConfig(filter.current, !(hasSupervisorRights && hasAdminRights) ? ["UserName"] : [])
     }, [filter.current]);
 
     const _onApplyFilter = (filterData) => {

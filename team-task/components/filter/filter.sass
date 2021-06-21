@@ -1,5 +1,9 @@
 @import "~tt-assets/styles/colors.sass"
 
+
+.rs-picker-select-menu-item.rs-picker-select-menu-item-active, .rs-picker-select-menu-item.rs-picker-select-menu-item-active:hover
+  color: $grey50 !important
+
 .filter-button
   position: relative
   display: flex
@@ -115,6 +119,8 @@
     padding: 9px 8px
   &._select
     padding-top: 2px
+    .rs-picker-toggle-value
+      color: $grey50 !important
 
   .rs-picker-toggle
     border: none !important
