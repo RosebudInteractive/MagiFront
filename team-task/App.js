@@ -4,12 +4,12 @@ import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
 import {
-    hasSupervisorRights,
-    userAuthSelector,
-    initializedSelector,
-    whoAmI,
     hasPmRights,
-    userRoleSelector
+    hasSupervisorRights,
+    initializedSelector,
+    userAuthSelector,
+    userRoleSelector,
+    whoAmI
 } from "tt-ducks/auth";
 import './assets/styles/app.sass'
 import './assets/styles/grid.sass'
@@ -21,6 +21,7 @@ import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import {fetchingSelector as appFetching, getAppOptions} from "tt-ducks/app";
+import {fetchingSelector as notificationsFetching, getNotifications} from "tt-ducks/notifications";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
@@ -41,6 +42,7 @@ function App(props) {
 
     useEffect(() => {
         isUserAuthorized && actions.getAllDictionaryData();
+        isUserAuthorized && actions.getNotifications();
     }, [isUserAuthorized]);
 
     return isUserAuthorized && hasPmRights ?
@@ -80,12 +82,13 @@ function mapStateToProps(state,) {
             || processFetching(state)
             || dictionaryFetching(state)
             || appFetching(state)
+            || notificationsFetching(state)
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions}, dispatch),
+        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions, getNotifications}, dispatch),
     }
 }
 

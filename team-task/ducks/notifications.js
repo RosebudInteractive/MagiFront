@@ -81,6 +81,7 @@ function* getNotificationsSaga() {
         paramsQuery = paramsQuery.replace('notRead=2', 'notRead=false');
         paramsQuery = paramsQuery.replace('urgent=2', 'urgent=false');
         paramsQuery = paramsQuery.replace('urgent=1', 'urgent=true');
+        paramsQuery = paramsQuery.replace('notifType', 'type');
         paramsQuery = `${paramsQuery !== '' ? paramsQuery : ''}`;
 
         const notifications = yield call(_getNotifications, paramsQuery);

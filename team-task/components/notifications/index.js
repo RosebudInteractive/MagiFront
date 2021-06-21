@@ -16,12 +16,12 @@ import {connect} from "react-redux";
 import './notifications.sass';
 import {fetchingSelector, getNotifications, markNotifsAsRead, notificationsSelector} from "tt-ducks/notifications";
 import {NOTIFICATION_TYPES} from "../../constants/notifications";
-import {hasAdminRights} from "tt-ducks/auth";
+import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 
 let notificationsCount = 0;
 
 const Notifications = (props) => {
-    const {fetching, actions, notifications, showModal, hasAdminRights} = props;
+    const {fetching, actions, notifications, showModal, hasAdminRights, hasSupervisorRights} = props;
 
     const location = useLocation();
 
@@ -115,14 +115,14 @@ const Notifications = (props) => {
                     {id: '3', value: NOTIFICATION_TYPES["4"]}
                 ]
             },
-            {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: !hasAdminRights ? 45 : 30},
+            {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: (!hasAdminRights || !hasSupervisorRights) ? 45 : 30},
             {
-                id: 'Urgent', header: 'Срочность', minWidth: 100, fillspace: 8, format: function (value) {
+                id: 'Urgent', header: 'Приоритет', minWidth: 100, fillspace: 8, format: function (value) {
                     return value ? 'Срочно' : 'Не Срочно'
                 }
             },
             {id: 'NotRead', header: 'Непрочитано', hidden: true},
-            {id: 'UserName', header: 'Пользователь', hidden: !hasAdminRights, fillspace: 25}
+            {id: 'UserName', header: 'Пользователь', hidden: (!hasAdminRights || !hasSupervisorRights), fillspace: 25}
         ],
         on: {
             onHeaderClick: function (header) {
@@ -197,7 +197,8 @@ const mapState2Props = (state) => {
         notifications: notificationsSelector(state),
         fetching: fetchingSelector(state),
         selectedTask: taskSelector(state),
-        hasAdminRights: hasAdminRights(state)
+        hasAdminRights: hasAdminRights(state),
+        hasSupervisorRights: hasSupervisorRights(state)
     }
 };
 

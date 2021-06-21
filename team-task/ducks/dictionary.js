@@ -6,6 +6,7 @@ import {hasSupervisorRights} from "tt-ducks/auth";
 import {SHOW_ERROR, showError} from "tt-ducks/messages";
 import {commonGetQuery} from "common-tools/fetch-tools";
 import moment from 'moment';
+import {getNotifications} from "tt-ducks/notifications";
 
 
 //todo processStructures after request-query completed
@@ -186,6 +187,7 @@ function* getDictionaryDataSaga(data) {
     if ((_nextTimeToLoad === 0 || (_nextTimeToLoad <= moment(Date.now()))) || data.payload.forceLoad) {
         try {
             yield put({type: REQUEST_START, payload: true});
+            yield put(getNotifications());
             const [
                 _a,
                 _pma,
