@@ -1,7 +1,7 @@
 import React from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
-import {Checkbox, CheckPicker} from 'rsuite';
+import {Checkbox, CheckPicker, SelectPicker} from 'rsuite';
 import 'rsuite/dist/styles/rsuite-default.css'
 
 type FieldProps = {
@@ -25,6 +25,9 @@ export default function Field(props: FieldProps) {
 
             case FILTER_FIELD_TYPE.COMBO:
                 return <ComboField {...props}/>
+
+            case FILTER_FIELD_TYPE.SELECT:
+                return <SelectField {...props}/>
 
             case FILTER_FIELD_TYPE.USER:
                 return <UserField {...props}/>
@@ -67,6 +70,25 @@ function ComboField(props) {
     };
 
     return <CheckPicker className="filter-row__field-input _select"
+                        data={props.options}
+                        placeholder={props.placeholder}
+                        searchable={false}
+                        value={props.value}
+                        defaultValue={props.defaultValue}
+                        onSelect={_onChange}
+                        onClean={_onClean}/>
+}
+
+function SelectField(props) {
+    const _onClean = () => {
+        if (props.onClean) props.onClean(props.name)
+    }
+
+    const _onChange = (value) => {
+        props.onChange({field: props.name, value})
+    };
+
+    return <SelectPicker className="filter-row__field-input _select"
                         data={props.options}
                         placeholder={props.placeholder}
                         searchable={false}
