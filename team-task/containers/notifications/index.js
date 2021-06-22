@@ -65,12 +65,22 @@ const Notifications = (props) => {
     }, [location]);
 
     useEffect(() => {
-        if (showModal) {
+        const notificationIdentifier = localStorage.getItem('notification_modal_uuid');
+
+        if(notificationIdentifier && notificationIdentifier.length > 0 && location.pathname.includes('task/')){
+            const taskId = location.pathname.split('task/')[1].match(/\d+/)[0];
+            setNotifUuid(notificationIdentifier);
+            setModalInfo({...modalInfo, taskId: taskId});
+            actions.showTaskEditor({taskId: taskId});
+        }
+    }, []);
+
+    useEffect(() => {
+        if (showModal && location.pathname.split('task/') !== undefined) {
             setModalInfo({
                 ...modalInfo,
-                taskId: location.pathname.split('tasks/')[0].match(/\d+/)[0]
+                taskId: location.pathname.split('task/')[1].match(/\d+/)[0]
             });
-
         }
     }, [showModal]);
 
@@ -80,6 +90,9 @@ const Notifications = (props) => {
 
     function getUpdatedNotifications() {
         actions.getNotifications();
+        setNotifUuid(null);
+        props.history.push(`/notifications`);
+        localStorage.removeItem('notification_modal_uuid');
     }
 
     const GRID_CONFIG = {
@@ -107,7 +120,7 @@ const Notifications = (props) => {
                 }
             },
             {
-                id: 'NotifType', header: 'Тип', minWidth: 50, fillspace: 35, editor: 'select',
+                id: 'NotifType', header: 'Тип', minWidth: 50, fillspace: 20, editor: 'select',
                 options: [
                     {id: '1', value: NOTIFICATION_TYPES["1"]},
                     {id: '2', value: NOTIFICATION_TYPES["2"]},
@@ -117,7 +130,7 @@ const Notifications = (props) => {
             },
             {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: (!hasAdminRights || !hasSupervisorRights) ? 45 : 30},
             {
-                id: 'Urgent', header: 'Приоритет', minWidth: 100, fillspace: 8, format: function (value) {
+                id: 'Urgent', header: 'Приоритет', minWidth: 100, fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8, format: function (value) {
                     return value ? 'Срочно' : 'Не Срочно'
                 }
             },
@@ -142,20 +155,17 @@ const Notifications = (props) => {
                 const item = this.getItem(id);
 
                 if (item && item.Id) {
-                    console.log(item);
-                    props.history.push(`/notifications/task/${item.URL.split('tasks/')[1].match(/\d+/)[0]}`);
+                    const taskId = item.URL.split('task/')[1].match(/\d+/)[0];
+                    props.history.push(`/notifications/task/${taskId}`);
                     setNotifUuid(item.URL.split('notification=')[1]);
-                    actions.showTaskEditor({taskId: item.URL.split('tasks/')[1].match(/\d+/)[0]});
-                    actions.markNotifsAsRead([item.Id]);
+
+                    localStorage.setItem('notification_modal_uuid', item.URL.split('notification=')[1]);
+                    actions.showTaskEditor({taskId: taskId});
+                    item.NotRead && actions.markNotifsAsRead([item.Id]) ;
                 }
 
             }
-        },
-        onClick: {
-            "elem-delete": function (e, data) {
-                console.log('component removed')
-            }
-        },
+        }
     };
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {

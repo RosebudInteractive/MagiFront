@@ -238,9 +238,6 @@ function* selectUserEmail(data) {
 function* changeUser(data) {
     yield put({type: START_REQUEST})
     try {
-
-        console.log(data.payload)
-
         yield call(_updateUser, data.payload.userData);
         yield put({type: SUCCESS_REQUEST});
         yield put(getUsers())

@@ -1,4 +1,4 @@
-import React, {useEffect, useState,} from "react"
+import React, {useState,} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ProcessesIco from "tt-assets/svg/processes.svg"
@@ -17,13 +17,6 @@ import {newNotifsCountSelector, notificationsSelector} from "tt-ducks/notificati
 function SideBarMenu(props) {
 
     const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, newNotifsCount, notifications} = props
-
-    useEffect(() => {
-        if(notifications.length > 0){
-            console.log('newNotifsCount', newNotifsCount)
-            console.log('notifications:', notifications)
-        }
-    }, [notifications]);
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
