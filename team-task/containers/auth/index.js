@@ -20,12 +20,20 @@ function Auth(props) {
     const {serverError, recaptchaSiteKey} = props
 
     const [captchaError, setCaptchaError] = useState(false)
-    const [captchaReloading, setCaptchaReloading] = useState(true)
-    let login = useRef(null).current
-    let password = useRef(null).current
+    let login = useRef(null)
+    let password = useRef(null)
+    const form = useRef(null)
 
     const recaptcha = useRef(null)
 
+
+    useEffect(() => {
+        return () => {
+            if (form.current) {
+                form.current.reset()
+            }
+        }
+    }, [])
 
     const sighIn = (values) => {
         if (captchaError || serverError) {
@@ -33,12 +41,11 @@ function Auth(props) {
             // this.props.clearSubmitErrors('SignInForm')
 
             setCaptchaError(false)
-            setCaptchaReloading(true)
         }
 
         if (values.login && values.password) {
-            login = values.login
-            password = values.password
+            login.current = values.login
+            password.current = values.password
 
             recaptcha.current.execute();
         } else {
@@ -48,11 +55,10 @@ function Auth(props) {
 
     const _onResolved = function(){
         setCaptchaError(false)
-        setCaptchaReloading(false)
 
         props.actions.sighIn({
-            login: login,
-            password: password,
+            login: login.current,
+            password: password.current,
             'g-recaptcha-response': recaptcha.current.getResponse()
         })
     }
@@ -73,6 +79,7 @@ function Auth(props) {
             </div>
             <Form onSubmit={sighIn}
                   render={(props) => {
+                      form.current = props.form
                       return <form className="auth-page__window" onSubmit={props.handleSubmit}>
                           <h5 className="auth-page__window-title">
                               Вход в панель управления
