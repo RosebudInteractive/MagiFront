@@ -244,7 +244,7 @@ const SQL_GET_TASK_LIST_MYSQL =
 const SQL_GET_TASK_MSSQL =
     "select t.[Id], t.[Name], t.[ProcessId], t.[TimeCr], t.[DueDate], t.[ExecutorId], u.[DisplayName] as [UserName], p.[Name] as [ProcessName],\n" +
     "  t.[Description], t.[AlertId], t.[IsElemReady], t.[WriteFieldSet], t.[ElementId], t.[State], ep.[State] as [EState],\n" +
-    "  p.[SupervisorId] as [ProcessSupervisorId],\n" +
+    "  p.[SupervisorId] as [ProcessSupervisorId], t.[GuidVer],\n" +
     "  ep.[SupervisorId], eu.[DisplayName] as [EUserName], e.[Name] as [EName], e.[WriteFields], e.[ViewFields], ps.[ProcessFields]\n" +
     "from [PmTask] t\n" +
     "  join [PmProcess] p on t.[ProcessId] = p.[Id]\n" +
@@ -258,7 +258,7 @@ const SQL_GET_TASK_MSSQL =
 const SQL_GET_TASK_MYSQL =
     "select t.`Id`, t.`Name`, t.`ProcessId`, t.`TimeCr`, t.`DueDate`, t.`ExecutorId`, u.`DisplayName` as `UserName`, p.`Name` as `ProcessName`,\n" +
     "  t.`Description`, t.`AlertId`, t.`IsElemReady`, t.`WriteFieldSet`, t.`ElementId`, t.`State`, ep.`State` as `EState`,\n" +
-    "  p.`SupervisorId` as `ProcessSupervisorId`,\n" +
+    "  p.`SupervisorId` as `ProcessSupervisorId`, t.`GuidVer`,\n" +
     "  ep.`SupervisorId`, eu.`DisplayName` as `EUserName`, e.`Name` as `EName`, e.`WriteFields`, e.`ViewFields`, ps.`ProcessFields`\n" +
     "from `PmTask` t\n" +
     "  join `PmProcess` p on t.`ProcessId` = p.`Id`\n" +
@@ -661,6 +661,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             let elem = records.detail[0];
             result = {
                 Id: elem.Id,
+                GuidVer: elem.GuidVer,
                 Name: elem.Name,
                 TimeCr: elem.TimeCr,
                 State: elem.State,
@@ -2100,6 +2101,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (collection.count() != 1)
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${id}) не найдена.`);
                         let taskObj = collection.get(0);
+
+                        if (inpFields.GuidVer && (inpFields.GuidVer !== taskObj.guidVer()))
+                            throw new HttpError(HttpCode.ERR_CONFLICT, `Задача (Id =${id}) была изменена другим пользователем.`);
 
                         await taskObj.edit();
 
