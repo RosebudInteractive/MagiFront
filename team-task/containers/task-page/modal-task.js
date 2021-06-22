@@ -8,10 +8,11 @@ type Props = {
     onClose: Function,
     processId?: number,
     parentTaskId?: number,
+    beforeCloseCallback?: Function
 }
 
 export default function ModalTaskEditor(props: Props) {
-    const {taskId, processId, parentTaskId, editorVisible, onClose, notifUuid, beforeCloseCallback} = props
+    const {taskId, processId, parentTaskId, editorVisible, onClose, notifUuid, beforeCloseCallback} = props;
 
     useEffect(() => {
         const _body = $("body")
@@ -20,7 +21,7 @@ export default function ModalTaskEditor(props: Props) {
     }, [editorVisible]);
 
     function closeActions(){
-        beforeCloseCallback();
+        beforeCloseCallback && beforeCloseCallback();
         onClose();
     }
 

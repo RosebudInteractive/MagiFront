@@ -65,9 +65,9 @@ const Notifications = (props) => {
     }, [location]);
 
     useEffect(() => {
-        const notificationIdentifier = localStorage.getItem('notification_modal_uuid');
+        const notificationIdentifier = location.search.split('notification=')[1];
 
-        if(notificationIdentifier && notificationIdentifier.length > 0 && location.pathname.includes('task/')){
+        if (notificationIdentifier && notificationIdentifier.length > 0 && location.pathname.includes('task/')) {
             const taskId = location.pathname.split('task/')[1].match(/\d+/)[0];
             setNotifUuid(notificationIdentifier);
             setModalInfo({...modalInfo, taskId: taskId});
@@ -92,7 +92,6 @@ const Notifications = (props) => {
         actions.getNotifications();
         setNotifUuid(null);
         props.history.push(`/notifications`);
-        localStorage.removeItem('notification_modal_uuid');
     }
 
     const GRID_CONFIG = {
@@ -125,12 +124,21 @@ const Notifications = (props) => {
                     {id: '1', value: NOTIFICATION_TYPES["1"]},
                     {id: '2', value: NOTIFICATION_TYPES["2"]},
                     {id: '3', value: NOTIFICATION_TYPES["3"]},
-                    {id: '3', value: NOTIFICATION_TYPES["4"]}
+                    {id: '4', value: NOTIFICATION_TYPES["4"]}
                 ]
             },
-            {id: 'Subject', header: 'Описание', minWidth: 100, fillspace: (!hasAdminRights || !hasSupervisorRights) ? 45 : 30},
             {
-                id: 'Urgent', header: 'Приоритет', minWidth: 100, fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8, format: function (value) {
+                id: 'Subject',
+                header: 'Описание',
+                minWidth: 100,
+                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 45 : 30
+            },
+            {
+                id: 'Urgent',
+                header: 'Приоритет',
+                minWidth: 100,
+                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8,
+                format: function (value) {
                     return value ? 'Срочно' : 'Не Срочно'
                 }
             },
@@ -156,12 +164,10 @@ const Notifications = (props) => {
 
                 if (item && item.Id) {
                     const taskId = item.URL.split('task/')[1].match(/\d+/)[0];
-                    props.history.push(`/notifications/task/${taskId}`);
+                    props.history.push(`/notifications/task/${taskId}?notification=${item.URL.split('notification=')[1]}`);
                     setNotifUuid(item.URL.split('notification=')[1]);
-
-                    localStorage.setItem('notification_modal_uuid', item.URL.split('notification=')[1]);
                     actions.showTaskEditor({taskId: taskId});
-                    item.NotRead && actions.markNotifsAsRead([item.Id]) ;
+                    item.NotRead && actions.markNotifsAsRead([item.Id]);
                 }
 
             }
