@@ -30,6 +30,17 @@ function setupProcesses(app) {
 
     if (app) {
 
+        app.get(`${ROUTE_PREFIX}notification-count`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ is_counter: true, user: req.user }, req.query);
+                let rows = await NotificationService().getList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.get(`${ROUTE_PREFIX}notification-list`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);

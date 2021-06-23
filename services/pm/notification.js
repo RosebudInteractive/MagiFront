@@ -26,11 +26,21 @@ const SQL_GET_UNREAD_MYSQL =
 const SQL_SET_READ_MSSQL = "update [Notification] set [IsRead] = 1 where [Id] = <%= id %>";
 const SQL_SET_READ_MYSQL = "update `Notification` set `IsRead` = 1 where `Id` = <%= id %>";
 
+const SQL_GET_COUNTER_MSSQL =
+    "select count(*) Cnt\n" +
+    "from [Notification] n\n" +
+    "  join [User] u on n.UserId = u.[SysParentId]";
+
 const SQL_GET_LIST_MSSQL =
     "select n.[Id], n.[NotifType], n.[Subject], n.[URL], n.[IsRead], n.[IsUrgent], n.[TimeCr],\n" +
     "  n.[UserId], u.[DisplayName]\n" +
     "from [Notification] n\n" +
     "  join [User] u on n.UserId = u.[SysParentId]";
+
+const SQL_GET_COUNTER_MYSQL =
+    "select count(*) Cnt\n" +
+    "from `Notification` n\n" +
+    "  join `User` u on n.UserId = u.`SysParentId`";
 
 const SQL_GET_LIST_MYSQL =
     "select n.`Id`, n.`NotifType`, n.`Subject`, n.`URL`, n.`IsRead`, n.`IsUrgent`, n.`TimeCr`,\n" +
@@ -60,8 +70,8 @@ const Notification = class Notification extends DbObject {
 
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
 
-        let sql_mysql = SQL_GET_LIST_MYSQL;
-        let sql_mssql = SQL_GET_LIST_MSSQL;
+        let sql_mysql = opts.is_counter ? SQL_GET_COUNTER_MYSQL : SQL_GET_LIST_MYSQL;
+        let sql_mssql = opts.is_counter ? SQL_GET_COUNTER_MSSQL : SQL_GET_LIST_MSSQL;
 
         let mssql_conds = [];
         let mysql_conds = [];
@@ -95,7 +105,7 @@ const Notification = class Notification extends DbObject {
             sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
         }
 
-        opts.order = opts.order ? opts.order : DFLT_SORT_ORDER;
+        opts.order = opts.is_counter ? null : (opts.order ? opts.order : DFLT_SORT_ORDER);
         if (opts.order) {
             let ord_arr = opts.order.split(',');
             let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
@@ -138,23 +148,29 @@ const Notification = class Notification extends DbObject {
                 mssql: _.template(sql_mssql)()
             }
         }, dbOpts)
+        if (opts.is_counter)
+            result = { count: 0 };
         if (records && records.detail && (records.detail.length > 0)) {
-            records.detail.forEach(elem => {
-                let notif = {
-                    Id: elem.Id,
-                    NotifType: elem.NotifType,
-                    Subject: elem.Subject,
-                    URL: this._siteHost + elem.URL,
-                    TimeCr: elem.TimeCr,
-                    IsRead: elem.IsRead ? true : false,
-                    IsUrgent: elem.IsUrgent ? true : false,
-                    User: {
-                        Id: elem.UserId,
-                        DisplayName: elem.DisplayName
-                    }
-                };
-                result.push(notif);
-            });
+            if (opts.is_counter) {
+                result.count = records.detail[0].Cnt;
+            }
+            else
+                records.detail.forEach(elem => {
+                    let notif = {
+                        Id: elem.Id,
+                        NotifType: elem.NotifType,
+                        Subject: elem.Subject,
+                        URL: this._siteHost + elem.URL,
+                        TimeCr: elem.TimeCr,
+                        IsRead: elem.IsRead ? true : false,
+                        IsUrgent: elem.IsUrgent ? true : false,
+                        User: {
+                            Id: elem.UserId,
+                            DisplayName: elem.DisplayName
+                        }
+                    };
+                    result.push(notif);
+                });
         }
 
         return result;
