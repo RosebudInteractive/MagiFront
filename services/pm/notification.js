@@ -33,7 +33,7 @@ const SQL_GET_COUNTER_MSSQL =
 
 const SQL_GET_LIST_MSSQL =
     "select n.[Id], n.[NotifType], n.[Subject], n.[URL], n.[IsRead], n.[IsUrgent], n.[TimeCr],\n" +
-    "  n.[UserId], u.[DisplayName]\n" +
+    "  n.[UserId], n.[Data], u.[DisplayName]\n" +
     "from [Notification] n\n" +
     "  join [User] u on n.UserId = u.[SysParentId]";
 
@@ -44,7 +44,7 @@ const SQL_GET_COUNTER_MYSQL =
 
 const SQL_GET_LIST_MYSQL =
     "select n.`Id`, n.`NotifType`, n.`Subject`, n.`URL`, n.`IsRead`, n.`IsUrgent`, n.`TimeCr`,\n" +
-    "  n.`UserId`, u.`DisplayName`\n" +
+    "  n.`UserId`, n.`Data`, u.`DisplayName`\n" +
     "from `Notification` n\n" +
     "  join `User` u on n.UserId = u.`SysParentId`";
 
@@ -164,6 +164,7 @@ const Notification = class Notification extends DbObject {
                         TimeCr: elem.TimeCr,
                         IsRead: elem.IsRead ? true : false,
                         IsUrgent: elem.IsUrgent ? true : false,
+                        Data: elem.Data ? JSON.parse(elem.Data) : undefined,
                         User: {
                             Id: elem.UserId,
                             DisplayName: elem.DisplayName
@@ -254,6 +255,8 @@ const Notification = class Notification extends DbObject {
                             fields.IsSent = inpFields.IsSent;
 
                         if (typeof (inpFields.Data) !== "undefined") {
+                            if (fields.NotifKey && (!inpFields.Data.notifKey))
+                                inpFields.Data.notifKey = fields.NotifKey;
                             fields.Data = JSON.stringify(inpFields.Data);
                         };
 
@@ -278,10 +281,10 @@ const Notification = class Notification extends DbObject {
         let result= 0;
         let opts = _.cloneDeep(options || {});
         let is_admin = false;
+        opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
         if (opts.is_from_request === true) {
             delete opts.is_from_request;
-            opts.user = await this._checkPermissions(AccessFlags.Administrator, opts);
-            is_admin = true;
+            is_admin = AccessRights.checkPermissions(opts.user, AccessFlags.Administrator | AccessFlags.PmAdmin) !== 0 ? true : false;
         }
         if (!opts.user)
             throw new HttpError(HttpCode.ERR_UNAUTH, `Notification::markAsRead: Authorization required.`);
