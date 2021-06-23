@@ -295,7 +295,6 @@ function* getTaskSaga(data) {
 }
 
 const _fetchTask = (taskId, notificationUuid = null) => {
-    // todo tested: notificationUuid is null, should will insure that we completely pass the notificationUuid
     return commonGetQuery(`/api/pm/task/${taskId}${notificationUuid ? '?notification='+notificationUuid : ''}`)
 
 }
@@ -313,9 +312,11 @@ function* saveTaskSaga({payload}) {
     try {
 
         const task: UpdatingTask = payload
+        const oldTask = yield select(taskSelector);
 
-        if ((task.State === TASK_STATE.QUESTION.value) && !task.Comment) {
-            yield put({type: SAVE_TASK_FAIL})
+        if ((task.State === TASK_STATE.QUESTION.value) &&
+            !task.Comment && oldTask.State !== TASK_STATE.QUESTION.value) {
+            yield put({type: SAVE_TASK_FAIL});
             yield put(showErrorMessage("Необходимо указать вопрос в тексте комментария"))
             return
         }

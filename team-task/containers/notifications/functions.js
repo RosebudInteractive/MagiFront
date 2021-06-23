@@ -10,7 +10,7 @@ export const getFilterConfig = (filter, disableFields = []) => {
             placeholder: "Актуальность",
             type: FILTER_FIELD_TYPE.SELECT,
             options: [{value: 1, label: 'Непрочитанные'},{value: 2, label: 'Все'}], //1 = true, 2 = false
-            value: filter ? filter.NotRead : 2
+            value: filter ? filter.NotRead : null
         },
         {
             name: "Urgent",
