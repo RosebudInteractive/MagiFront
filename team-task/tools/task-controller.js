@@ -174,6 +174,7 @@ class TaskController {
             this._enable.state = true
             this._enable.description = true
             this._enable.comments = true
+
         } else {
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]

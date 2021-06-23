@@ -36,7 +36,7 @@ const Notifications = (props) => {
     });
 
     useEffect(() => {
-        notificationsCount = props.notifications.length;
+        notificationsCount = notifications.length;
         _onResize();
     }, [notifications]);
 
@@ -85,7 +85,7 @@ const Notifications = (props) => {
     }, [showModal]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(notificationsCount.length)
+        resizeHandler(notificationsCount)
     }, [notifications]);
 
     function getUpdatedNotifications() {
