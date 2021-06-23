@@ -167,7 +167,6 @@ const Notifications = (props) => {
                     props.history.push(`/notifications/task/${taskId}?notification=${item.URL.split('notification=')[1]}`);
                     setNotifUuid(item.URL.split('notification=')[1]);
                     actions.showTaskEditor({taskId: taskId});
-                    item.NotRead && actions.markNotifsAsRead([item.Id]);
                 }
 
             }
