@@ -16,10 +16,13 @@ const REQUEST_START = `${prefix}/REQUEST_START`;
 const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
 const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
 const MARK_NOTIFICATIONS_AS_READ = `${prefix}/MARK_NOTIFICATIONS_AS_READ}`;
+const GET_UNREADED_COUNT = `${prefix}/GET_UNREADED_COUNT}`;
+const SET_UNREADED_COUNT = `${prefix}/SET_UNREADED_COUNT}`;
 
 export const ReducerRecord = Record({
     notifications: [],
     fetching: false,
+    unreadedCount: []
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -33,6 +36,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('fetching', false);
         case SET_NOTIFICATIONS:
             return state.set('notifications', payload);
+        case SET_UNREADED_COUNT:
+            return state.set('unreadedCount', payload);
         default:
             return state
     }
@@ -42,6 +47,7 @@ const stateSelector = state => state[moduleName];
 export const notificationsSelector = createSelector(stateSelector, state => state.notifications);
 export const newNotifsCountSelector = createSelector(stateSelector, state => state.notifications.filter(notif => notif.NotRead === true).length);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
+export const unreadedCountSelector = createSelector(stateSelector, state => state.unreadedCount);
 
 //params: notRead,urgent,type
 export const getNotifications = (notRead = null, urgent = null, type) => {
@@ -52,13 +58,33 @@ export const markNotifsAsRead = (notifIds = []) => {
     return {type: MARK_NOTIFICATIONS_AS_READ, payload: notifIds}
 };
 
+export const getOnlyUnreaded = () => {
+    return {type: GET_UNREADED_COUNT}
+};
+
 
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_NOTIFICATIONS, getNotificationsSaga),
-        takeEvery(MARK_NOTIFICATIONS_AS_READ, updateNotificationsAsRead)
+        takeEvery(MARK_NOTIFICATIONS_AS_READ, updateNotificationsAsRead),
+        takeEvery(GET_UNREADED_COUNT, getUnreadedCount)
     ])
 };
+
+function* getUnreadedCount() {
+    yield put({type: REQUEST_START});
+    try {
+
+        const params = yield select(paramsSelector);
+        const res = yield call(getUnreadCount, params);
+        yield put({type: SET_UNREADED_COUNT, payload: res.count});//response.result might be 'OK'
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        yield put(clearLocationGuard());
+        yield put(showErrorMessage(e.message));
+    }
+}
 
 function* updateNotificationsAsRead(data) {
     yield put({type: REQUEST_START});
@@ -115,4 +141,8 @@ const updateNotificationAsRead = (notifIds = []) => {
     }).then(checkStatus)
         .then(parseJSON);
 };
+
+const getUnreadCount = (params) => {
+    return commonGetQuery(`/api/pm/notification-count?notRead=true?${params}`)
+}
 

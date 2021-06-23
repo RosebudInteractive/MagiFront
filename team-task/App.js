@@ -1,4 +1,4 @@
-import React, {useEffect,} from 'react'
+import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
@@ -21,7 +21,7 @@ import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import {fetchingSelector as appFetching, getAppOptions} from "tt-ducks/app";
-import {fetchingSelector as notificationsFetching, getNotifications} from "tt-ducks/notifications";
+import {fetchingSelector as notificationsFetching, getNotifications, getOnlyUnreaded} from "tt-ducks/notifications";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
@@ -33,8 +33,19 @@ function App(props) {
     const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
+    const [intervalId, setInteralId] = useState(null);
 
-    useEffect(() => {actions.getAppOptions()}, [])
+    useEffect(() => {
+        actions.getAppOptions();
+        setInteralId(setInterval(function (){
+            actions.getOnlyUnreaded();
+        }, 120000));
+
+        return function () {
+            clearInterval(intervalId);
+            setInteralId(null);
+        }
+    }, []);
 
     useEffect(() => {
         actions.whoAmI();
@@ -88,7 +99,7 @@ function mapStateToProps(state,) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions, getNotifications}, dispatch),
+        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions, getNotifications, getOnlyUnreaded}, dispatch),
     }
 }
 
