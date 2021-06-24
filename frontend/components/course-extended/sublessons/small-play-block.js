@@ -8,6 +8,7 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 import * as userActions from "../../../actions/user-actions"
 
 import {TooltipTitles} from "../../../tools/page-tools";
+import browserHistory from "../../../history";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -128,7 +129,8 @@ class LessonPlayBlockSmall extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL + '?play'}/>;
+            browserHistory.push('/' + lesson.courseUrl + '/' + lesson.URL + '?play')
+            return null
         }
 
         return <div className='sublesson__play-block__wrapper'>

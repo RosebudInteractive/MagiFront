@@ -3,12 +3,14 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import {Link} from 'react-router-dom';
-import {Redirect} from 'react-router';
+// import {Redirect} from 'react-router';
+// import { useHistory } from "react-router-dom";
 import Swipeable from 'react-swipeable';
 import $ from 'jquery'
 
 import * as playerStartActions from '../actions/player-start-actions'
 import * as playerActions from '../actions/player-actions'
+import browserHistory from "../history";
 
 class SmallPlayer extends React.Component {
 
@@ -68,7 +70,9 @@ class SmallPlayer extends React.Component {
 
         if ((this.state.redirect) && (this.props.playingLesson)) {
             this.setState({redirect: false})
-            return <Redirect push to={'/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play'}/>;
+
+            browserHistory.push('/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play')
+            return null
         }
 
         let _link = (playingLesson) ? '/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play' : '#',

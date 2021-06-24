@@ -35,6 +35,7 @@ import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
 import {OverflowHandler} from "tools/page-tools";
 import {notifyAnalyticsChangePage} from 'ducks/app';
+import browserHistory from "../history";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -201,7 +202,8 @@ class CoursesPage extends React.Component {
     render() {
         if (this._needRedirectToCourses) {
             this._needRedirectToCourses = false;
-            return <Redirect push to={'/'}/>;
+            browserHistory.push('/')
+            return null
         }
 
         const { fetching,} = this.props

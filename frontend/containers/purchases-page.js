@@ -9,6 +9,7 @@ import {whoAmI, showSignInForm} from "../actions/user-actions";
 import {refreshState} from "../actions/lesson-info-storage-actions";
 import CoursesBlock from '../components/purchases/courses-block'
 import {Redirect} from 'react-router';
+import browserHistory from "../history";
 
 class PurchasesPage extends React.Component {
     constructor(props) {
@@ -47,7 +48,8 @@ class PurchasesPage extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/'}/>;
+            browserHistory.push('/')
+            return null
         }
 
         return (

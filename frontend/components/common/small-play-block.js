@@ -18,6 +18,7 @@ import {
 } from "./small-play-block-functions";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {unlockLesson} from "ducks/player";
+import browserHistory from "../../history";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -97,12 +98,14 @@ class LessonPlayBlockSmall extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL + '?play'}/>;
+            browserHistory.push('/' + lesson.courseUrl + '/' + lesson.URL + '?play')
+            return null
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
-            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL}/>;
+            browserHistory.push('/' + lesson.courseUrl + '/' + lesson.URL)
+            return null
         }
 
         return (

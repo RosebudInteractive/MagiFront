@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Redirect} from 'react-router';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -8,6 +7,7 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import {_play, _goToLesson, _getTooltip, _calcIsFinishedAndPlayedPart, _unlock, SVG} from "./play-block-functions";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {unlockLesson,} from "ducks/player";
+import browserHistory from "../../history";
 
 class PlayBlock extends React.Component {
 
@@ -61,12 +61,14 @@ class PlayBlock extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + course.URL + '/' + lesson.URL + '?play'}/>;
+            browserHistory.push('/' + course.URL + '/' + lesson.URL + '?play')
+            return null
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
-            return <Redirect push to={'/' + course.URL + '/' + lesson.URL}/>;
+            browserHistory.push('/' + course.URL + '/' + lesson.URL)
+            return null
         }
 
         const _lessonLocked = (lesson.IsAuthRequired && !authorized),

@@ -78,13 +78,13 @@ class PlayBlock extends React.Component {
         if (this._redirect) {
             this._redirect = false;
             browserHistory.push('/' + course.URL + '/' + lesson.URL + '?play')
-            return null//<Redirect push to={'/' + course.URL + '/' + lesson.URL + '?play'}/>;
+            return null
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
             browserHistory.push('/' + course.URL + '/' + lesson.URL)
-            return null//<Redirect push to={'/' + course.URL + '/' + lesson.URL}/>;
+            return null
         }
 
         const _lessonLocked = (lesson.IsAuthRequired && !authorized),

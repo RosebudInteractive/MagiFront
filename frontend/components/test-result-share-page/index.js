@@ -10,6 +10,7 @@ import {getShareResult, shareResultSelector, loadingSelector, loadedSelector, no
 import NotFoundPage from "../not-found";
 import {setShareUrl} from "ducks/test-instance";
 import {testSelector} from "ducks/test";
+import browserHistory from "../../history";
 
 
 class TestResultSharePage extends React.Component{
@@ -39,8 +40,13 @@ class TestResultSharePage extends React.Component{
                 _url = this._getRedirectUrl() + (ownProps && ownProps.location ? ownProps.location.search + ownProps.location.hash : "")
 
             this._setShareUrl()
-            
-            return notFound ? <NotFoundPage/> : <Redirect to={_url}/>
+
+            if (notFound) {
+                return <NotFoundPage/>
+            } else {
+                browserHistory.replace(_url)
+                return null
+            }
         } else {
             let _url = getPageUrl(),
                 _domain = getDomain(),

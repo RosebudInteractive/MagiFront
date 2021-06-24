@@ -8,6 +8,7 @@ import * as storageActions from "actions/lesson-info-storage-actions";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {notifyCourseLinkClicked, notifyLessonLinkClicked} from "ducks/google-analytics";
+import browserHistory from "../../history";
 
 const RATIO = 2.2875
 
@@ -66,12 +67,14 @@ class PlayerBlock extends React.Component {
     render() {
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+            browserHistory.push('/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play')
+            return null
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}/>;
+            browserHistory.push('/' + this.props.courseUrl + '/' + this.props.lessonUrl)
+            return null
         }
 
         return (

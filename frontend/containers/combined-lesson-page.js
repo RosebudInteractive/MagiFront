@@ -34,6 +34,7 @@ import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 import "../components/combined-lesson-page/lesson-page.sass"
 import GallerySlider from "../components/combined-lesson-page/desktop/gallery-slider";
+import browserHistory from "../history";
 
 let _scrollTop = 0;
 
@@ -373,7 +374,8 @@ class CombineLessonPage extends React.Component {
             _galleryHasItems = lessonText && lessonText.gallery && Array.isArray(lessonText.gallery) && (lessonText.gallery.length > 0)
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+            browserHistory.push('/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play')
+            return null
         }
 
         return (

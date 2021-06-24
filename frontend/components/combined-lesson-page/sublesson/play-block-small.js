@@ -15,6 +15,7 @@ import {
     _isPaidCourse, _unlock, SMALL_SVG
 } from "../../common/small-play-block-functions";
 import {unlockLesson} from "ducks/player";
+import browserHistory from "../../../history";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -109,7 +110,8 @@ class PlayBlock extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + _courseUrl + '/' + _lessonUrl + '?play'}/>;
+            browserHistory.push('/' + _courseUrl + '/' + _lessonUrl + '?play')
+            return null
         }
 
         return (

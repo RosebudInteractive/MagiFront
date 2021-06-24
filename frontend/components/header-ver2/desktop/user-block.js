@@ -8,6 +8,7 @@ import {Link} from 'react-router-dom';
 import * as pageHeaderActions from "../../../actions/page-header-actions";
 import {OverflowHandler, widthLessThan900} from "tools/page-tools";
 import {enabledPaidCoursesSelector,} from "ducks/app";
+import browserHistory from "../../../history";
 
 class UserBlock extends React.Component {
 
@@ -79,12 +80,14 @@ class UserBlock extends React.Component {
 
         if (this._redirectToHistory) {
             this._redirectToHistory = false;
-            return <Redirect push to={'/history'}/>;
+            browserHistory.push('/history')
+            return null
         }
 
         if (this._redirectToProfile) {
             this._redirectToProfile = false;
-            return <Redirect push to={'/profile'}/>;
+            browserHistory.push('/profile')
+            return null
         }
 
         return this.props.authorized &&

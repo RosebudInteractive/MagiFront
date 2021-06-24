@@ -15,6 +15,7 @@ import HistoryBlock from '../components/profile/history/history-block'
 import ProfileBlock from '../components/profile/settings/profile-block'
 
 import {pages} from '../tools/page-tools';
+import browserHistory from "../history";
 
 class ProfilePage extends React.Component {
 
@@ -110,7 +111,8 @@ class ProfilePage extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/'}/>;
+            browserHistory.push('/')
+            return null
         }
 
         return (

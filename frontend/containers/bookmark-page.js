@@ -15,6 +15,7 @@ import LessonsBlock from '../components/bookmarks/lessons-block'
 import CoursesBlock from '../components/bookmarks/courses-block'
 import {Redirect} from 'react-router';
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
+import browserHistory from "../history";
 
 class BookmarksPage extends React.Component {
     constructor(props) {
@@ -91,7 +92,8 @@ class BookmarksPage extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/'}/>;
+            browserHistory.push('/')
+            return null
         }
 
         return (

@@ -5,6 +5,7 @@ import $ from "jquery";
 import MetaTags from "react-meta-tags";
 import {getDomain, getPageUrl} from "tools/page-tools";
 import {facebookAppIdSelector} from "ducks/app";
+import browserHistory from "../../history";
 
 const DEFAULT_DESCRIPTION = "Иллюстрированные онлайн-курсы для всей семьи",
     DEFAULT_TITLE = "Каникулы здорового человека",
@@ -101,7 +102,8 @@ class EmptyPromoPage extends React.Component{
                 window.location = _url
                 return null
             } else {
-                return  <Redirect to={_url}/>
+                browserHistory.replace(_url)
+                return null
             }
         } else {
             let _url = getPageUrl(),
