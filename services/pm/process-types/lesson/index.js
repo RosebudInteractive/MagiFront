@@ -1,7 +1,7 @@
 'use strict';
 
 exports.structure = {
-    Name: "Lesson Process Proto ver. 4.0",
+    Name: "Lesson Process Proto ver. 5.0",
     ProcessFields: {
         "AudioIniURL": {
             "caption": "Исходный звук",
@@ -140,9 +140,10 @@ exports.structure = {
                 "Сдать подобранные иллюстрации": [
                     "PicDescriptionURL",
                     "PicSrcURL",
-                    "PicFinalURL"
+                    "PicFinalURL",
+                    "TechTransTiterURL"
                 ],
-                "Сдать иллюстрации": [
+                "Сдать обработанные иллюстрации": [
                     "PicDescriptionURL",
                     "PicSrcURL",
                     "TechTransTiterURL"
@@ -176,6 +177,10 @@ exports.structure = {
                     "TechTransEditURL"
                 ],
                 "Расставить тайм-коды": [
+                    "AudioProcURL",
+                    "TechTransEditURL"
+                ],
+                "Подготовить монтаж музыки": [
                     "AudioProcURL",
                     "TechTransEditURL"
                 ],
@@ -277,7 +282,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Транскрипт - постановка задачи",
         "ProcessId": p_id,
         "ExecutorId": supervisor_id,
-        "Description": "",
+        "Description": "Дать задание на расшифровку.",
         "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
         "WriteFieldSet": "Сделать расшифровку",
         "IsElemReady": false,
@@ -311,7 +316,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPictures ? data.ExecutorPictures : supervisor_pic,
-        "Description": "Возьмите, пожалуйста, на иллюстрирование следующие материалы.",
+        "Description": "Подберите, пожалуйста, иллюстрации для следующей темы.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Сдать подобранные иллюстрации",
         "IsElemReady": false,
@@ -322,7 +327,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - проверка",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPicturesControl ? data.ExecutorPicturesControl : supervisor_pic,
-        "Description": "",
+        "Description": "Проверка иллюстраций и технической стенограммы.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Проверить иллюстрации",
         "IsElemReady": true,
@@ -333,7 +338,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
-        "Description": "Возьмите, пожалуйста, на редактуру следующий текст.",
+        "Description": "Отредактируйте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
         "IsElemReady": false,
@@ -344,7 +349,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
-        "Description": "",
+        "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
         "Dependencies": [res.id]
@@ -354,7 +359,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
-        "Description": "",
+        "Description": "Ссылка на список литературы и/или техническую стенограмму с добавленным списком.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
@@ -376,28 +381,28 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
-        "Description": "Сделайте, пожалуйста, расстановку тайм-кодов для следующей записи.",
+        "Description": "Проверьте, пожалуйста, качество обработки звукозаписи и расставьте таймкоды в технической стенограмме.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Сдать тайм-коды",
         "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
-    // Задача #14
-    res = await pm.newTask({
+    // Задача #13a
+    await pm.newTask({
         "Name": "Ознакомиться с замечаниями к обработке звука",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
-        "Description": "",
+        "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
-    // Задача #15
+    // Задача #14
     res = await pm.newTask({
         "Name": "Финализация",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
-        "Description": "Выполните, пожалуйста, финализацию следующего эпизода.",
+        "Description": "Подготовка к публикации.",
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
@@ -445,7 +450,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Транскрипт - постановка задачи",
         "ProcessId": p_id,
         "ExecutorId": supervisor_id,
-        "Description": "",
+        "Description": "Дать задание на расшифровку.",
         "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
         "WriteFieldSet": "Сделать расшифровку",
         "IsElemReady": false,
@@ -468,7 +473,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование с картинками от автора - постановка задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPicturesControl ? data.ExecutorPicturesControl : supervisor_pic,
-        "Description": "",
+        "Description": "Передать иллюстрации от автора и видео.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Передать иллюстрации от автора",
         "IsElemReady": false,
@@ -479,9 +484,9 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPictures ? data.ExecutorPictures : supervisor_pic,
-        "Description": "Возьмите, пожалуйста, на иллюстрирование следующие материалы.",
+        "Description": "Обработайте, пожалуйста, иллюстрации от автора.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
-        "WriteFieldSet": "Сдать иллюстрации",
+        "WriteFieldSet": "Сдать обработанные иллюстрации",
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
@@ -490,7 +495,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - проверка",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPicturesControl ? data.ExecutorPicturesControl : supervisor_pic,
-        "Description": "",
+        "Description": "Проверка иллюстраций и технической стенограммы.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Проверить иллюстрации",
         "IsElemReady": true,
@@ -501,7 +506,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
-        "Description": "Возьмите, пожалуйста, на редактуру следующий текст.",
+        "Description": "Проверьте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
         "IsElemReady": false,
@@ -512,7 +517,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
-        "Description": "",
+        "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
         "Dependencies": [res.id]
@@ -522,7 +527,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
-        "Description": "",
+        "Description": "Ссылка на список литературы и/или техническую стенограмму с добавленным списком литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
@@ -544,10 +549,20 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
-        "Description": "Сделайте, пожалуйста, расстановку тайм-кодов для следующей записи.",
+        "Description": "Проверьте, пожалуйста, качество обработки звукозаписи и расставьте таймкоды в технической стенограмме.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Сдать тайм-коды",
         "IsElemReady": true,
+        "Dependencies": [res.id]
+    }, options);
+    // Задача #13a
+    await pm.newTask({
+        "Name": "Ознакомиться с замечаниями к обработке звука",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
+        "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
+        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
+        "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
     // Задача #14
@@ -555,7 +570,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Финализация",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
-        "Description": "Выполните, пожалуйста, финализацию следующего эпизода.",
+        "Description": "Подготовка к публикации.",
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
@@ -603,7 +618,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Транскрипт - постановка задачи",
         "ProcessId": p_id,
         "ExecutorId": supervisor_id,
-        "Description": "",
+        "Description": "Дать задание на расшифровку.",
         "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
         "WriteFieldSet": "Сделать расшифровку",
         "IsElemReady": false,
@@ -637,7 +652,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPictures ? data.ExecutorPictures : supervisor_pic,
-        "Description": "Возьмите, пожалуйста, на иллюстрирование следующие материалы.",
+        "Description": "Подберите, пожалуйста, иллюстрации для следующей темы.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Сдать подобранные иллюстрации",
         "IsElemReady": false,
@@ -648,7 +663,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Иллюстрирование - проверка",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorPicturesControl ? data.ExecutorPicturesControl : supervisor_pic,
-        "Description": "",
+        "Description": "Проверка иллюстраций и технической стенограммы.",
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Проверить иллюстрации",
         "IsElemReady": true,
@@ -659,7 +674,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
-        "Description": "Возьмите, пожалуйста, на редактуру следующий текст.",
+        "Description": "Отредактируйте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
         "IsElemReady": false,
@@ -670,7 +685,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
-        "Description": "",
+        "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
         "Dependencies": [res.id]
@@ -680,7 +695,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
-        "Description": "",
+        "Description": "Ссылка на список литературы и/или техническую стенограмму с добавленным списком литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
@@ -691,7 +706,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Контроль звука, монтаж музыки и расстановка тайм-кодов - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": supervisor_id,
-        "Description": "",
+        "Description": "Запросить у автора расстановку музыкальных фрагментов.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Запросить роспись музыки",
         "IsElemReady": false,
@@ -702,9 +717,9 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Name": "Контроль звука и расстановка тайм-кодов - постановка задачи",
         "ProcessId": p_id,
         "ExecutorId": supervisor_id,
-        "Description": "",
+        "Description": "Запустить монтаж музыки, проверку звука и расстановку таймкодов.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
-        "WriteFieldSet": "Расставить тайм-коды",
+        "WriteFieldSet": "Подготовить монтаж музыки",
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
@@ -719,12 +734,22 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+    // Задача #14b
+    await pm.newTask({
+        "Name": "Ознакомиться с замечаниями к обработке звука",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
+        "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
+        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
+        "IsElemReady": false,
+        "Dependencies": [res.id]
+    }, options);
     // Задача #15
     res = await pm.newTask({
         "Name": "Финализация",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
-        "Description": "Выполните, пожалуйста, финализацию следующего эпизода.",
+        "Description": "Подготовка к публикации.",
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
