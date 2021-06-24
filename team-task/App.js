@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
@@ -33,22 +33,34 @@ function App(props) {
     const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
-    const [intervalId, setInteralId] = useState(null);
+    const intervalId = useRef(null);
 
     useEffect(() => {
-        actions.getAppOptions();
-        setInteralId(setInterval(function (){
-            actions.getOnlyUnreaded();
-        }, 120000));
-
         return function () {
-            clearInterval(intervalId);
-            setInteralId(null);
+            intervalId.current && clearInterval(intervalId.current);
         }
     }, []);
 
     useEffect(() => {
-        actions.whoAmI();
+        actions.getAppOptions();
+    }, []);
+
+    useEffect(() => {
+        actions.whoAmI()
+
+            if(location.pathname.includes('notifications')){
+               intervalId.current && clearInterval(intervalId.current);
+               intervalId.current = setInterval(() => {
+                   actions.getNotifications();
+               }, 120000)
+            } else {
+                intervalId.current && clearInterval(intervalId.current);
+                intervalId.current = setInterval(() => {
+                    actions.getOnlyUnreaded()
+                }, 120000)
+            }
+
+
     }, [location]);
 
     useEffect(() => {
@@ -59,7 +71,7 @@ function App(props) {
     return isUserAuthorized && hasPmRights ?
         <React.Fragment>
             <div className="team-task tt-main-area">
-                { fetching && <LoadingPage/> }
+                {fetching && <LoadingPage/>}
                 <SideBarMenu/>
                 <div className="tt-main-area__info-panel">
                     <Breadcrumb/>
@@ -99,7 +111,13 @@ function mapStateToProps(state,) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({whoAmI, getAllDictionaryData, getAppOptions, getNotifications, getOnlyUnreaded}, dispatch),
+        actions: bindActionCreators({
+            whoAmI,
+            getAllDictionaryData,
+            getAppOptions,
+            getNotifications,
+            getOnlyUnreaded
+        }, dispatch),
     }
 }
 
