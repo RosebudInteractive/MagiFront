@@ -163,10 +163,9 @@ const Notifications = (props) => {
                 const item = this.getItem(id);
 
                 if (item && item.Id) {
-                    const taskId = item.URL.split('task/')[1].match(/\d+/)[0];
-                    props.history.push(`/notifications/task/${taskId}?notification=${item.URL.split('notification=')[1]}`);
-                    setNotifUuid(item.URL.split('notification=')[1]);
-                    actions.showTaskEditor({taskId: taskId});
+                    props.history.push(`/notifications/task/${item.Data.taskId}?notification=${item.Data.notifKey}`);
+                    setNotifUuid(item.Data.notifKey);
+                    actions.showTaskEditor({taskId: item.Data.taskId});
                 }
 
             }

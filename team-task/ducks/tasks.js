@@ -76,8 +76,8 @@ export const getTasks = () => {
     return {type: GET_TASKS_REQUEST}
 }
 
-export const goToTask = (taskId) => {
-    return {type: GO_TO_TASK_REQUEST, payload: taskId}
+export const goToTask = (taskId, notificationUuid) => {
+    return {type: GO_TO_TASK_REQUEST, payload: {taskId: taskId, notificationUuid: notificationUuid}}
 }
 
 
@@ -131,5 +131,5 @@ const _fetchTasks = (params) => {
 }
 
 function* goToTaskSaga(data) {
-    yield put(push(`/tasks/${data.payload}`))
+    yield put(push(`/tasks/${data.payload.taskId}${data.payload.notificationUuid ? `?notification=${data.payload.notificationUuid}` : ''}`))
 }
