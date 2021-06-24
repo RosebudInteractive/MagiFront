@@ -180,10 +180,8 @@ class TaskController {
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
 
-        if (this.task.Executor && (this.task.Executor.Id === this.user.Id) && (this.task.State === TASK_STATE.DRAFT.value)) {
-            this._visibility.startButton = true
-            this._visibility.elementField = false
-            this._visibility.processFields = false
+        if (this.task.Executor && (this.task.Executor.Id === this.user.Id)) {
+            this._calcUser()
         }
     }
 
