@@ -1,14 +1,12 @@
 import {useEffect,} from "react"
 import {useLocation} from "react-router-dom"
 
-const TIME_INTERVAL = 2 * 60 * 1000
+const TIME_INTERVAL = .2 * 60 * 1000
 
 type Props = {
     getList: Function,
     getUnreadCount: Function
 }
-
-
 
 class Timer {
     init({getList, getUnreadCount}) {
@@ -24,7 +22,6 @@ class Timer {
     }
 
     _getData() {
-        console.log(location.pathname)
         if(location.pathname.includes('notifications')){
             this.getList()
         } else {
