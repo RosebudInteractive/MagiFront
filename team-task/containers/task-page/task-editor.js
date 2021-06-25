@@ -30,8 +30,9 @@ const EDITOR_NAME = "TASK_EDITOR"
 
 type EditorProps = {
     taskId: number,
-    parentTaskId: ?number,
-    processId: ?number,
+    parentTaskId?: number,
+    processId?: number,
+    notifUuid? : string
 }
 
 function TaskEditor(props: EditorProps) {

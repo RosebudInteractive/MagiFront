@@ -1,7 +1,7 @@
 import {useEffect,} from "react"
 import {useLocation} from "react-router-dom"
 
-const TIME_INTERVAL = .2 * 60 * 1000
+const TIME_INTERVAL = 2 * 60 * 1000
 
 type Props = {
     getList: Function,

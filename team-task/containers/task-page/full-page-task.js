@@ -1,9 +1,17 @@
-import React from "react"
-import {useParams} from "react-router-dom"
+import React, {useMemo,} from "react"
+import {useLocation, useParams} from "react-router-dom"
 import TaskEditor from "./task-editor";
 
 export default function FullPageTaskEditor() {
-    const params = useParams()
+    const location = useLocation(),
+        params = useParams()
 
-    return <TaskEditor taskId={params.taskId}/>
+    const notificationUid = useMemo(() => {
+        const _params = new URLSearchParams(location.search),
+            _uid = _params.get('notification')
+
+        return _uid ? _uid : null
+    }, [location])
+
+    return <TaskEditor taskId={params.taskId} notifUuid={notificationUid}/>
 }

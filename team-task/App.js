@@ -26,7 +26,6 @@ import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
 import Auth from "./containers/auth";
-import {Notification} from "rsuite";
 import NotificationRefresher from "./components/notification-refresher";
 
 window.webix = webix
@@ -35,13 +34,6 @@ function App(props) {
     const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
-    // const intervalId = useRef(null);
-
-    // useEffect(() => {
-    //     return function () {
-    //         intervalId.current && clearInterval(intervalId.current);
-    //     }
-    // }, []);
 
     useEffect(() => {
         actions.getAppOptions();
@@ -49,20 +41,6 @@ function App(props) {
 
     useEffect(() => {
         actions.whoAmI()
-
-            // if(location.pathname.includes('notifications')){
-            //    intervalId.current && clearInterval(intervalId.current);
-            //    intervalId.current = setInterval(() => {
-            //        actions.getNotifications();
-            //    }, 120000)
-            // } else {
-            //     intervalId.current && clearInterval(intervalId.current);
-            //     intervalId.current = setInterval(() => {
-            //         actions.getOnlyUnreaded()
-            //     }, 120000)
-            // }
-
-
     }, [location]);
 
     useEffect(() => {
