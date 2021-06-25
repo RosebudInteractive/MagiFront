@@ -16,7 +16,7 @@ const REQUEST_START = `${prefix}/REQUEST_START`;
 const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
 const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
 const MARK_NOTIFICATIONS_AS_READ = `${prefix}/MARK_NOTIFICATIONS_AS_READ}`;
-const GET_UNREADED_COUNT = `${prefix}/GET_UNREADED_COUNT}`;
+const GET_UNREAD_COUNT = `${prefix}/GET_UNREADED_COUNT}`;
 const SET_UNREADED_COUNT = `${prefix}/SET_UNREADED_COUNT}`;
 
 export const ReducerRecord = Record({
@@ -58,8 +58,8 @@ export const markNotifsAsRead = (notifIds = []) => {
     return {type: MARK_NOTIFICATIONS_AS_READ, payload: notifIds}
 };
 
-export const getOnlyUnreaded = () => {
-    return {type: GET_UNREADED_COUNT}
+export const getOnlyUnread = () => {
+    return {type: GET_UNREAD_COUNT}
 };
 
 
@@ -67,12 +67,12 @@ export const saga = function* () {
     yield all([
         takeEvery(LOAD_NOTIFICATIONS, getNotificationsSaga),
         takeEvery(MARK_NOTIFICATIONS_AS_READ, updateNotificationsAsRead),
-        takeEvery(GET_UNREADED_COUNT, getUnreadedCount)
+        takeEvery(GET_UNREAD_COUNT, getUnreadCountSaga)
     ])
 };
 
-function* getUnreadedCount() {
-    yield put({type: REQUEST_START});
+function* getUnreadCountSaga() {
+    // yield put({type: REQUEST_START});
     try {
 
         const params = yield select(paramsSelector);

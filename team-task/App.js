@@ -21,11 +21,13 @@ import {fetchingSelector as tasksFetching} from "tt-ducks/tasks";
 import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import {fetchingSelector as appFetching, getAppOptions} from "tt-ducks/app";
-import {fetchingSelector as notificationsFetching, getNotifications, getOnlyUnreaded} from "tt-ducks/notifications";
+import {fetchingSelector as notificationsFetching, getNotifications, getOnlyUnread} from "tt-ducks/notifications";
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";
 import Auth from "./containers/auth";
+import {Notification} from "rsuite";
+import NotificationRefresher from "./components/notification-refresher";
 
 window.webix = webix
 
@@ -33,13 +35,13 @@ function App(props) {
     const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
 
     let location = useLocation();
-    const intervalId = useRef(null);
+    // const intervalId = useRef(null);
 
-    useEffect(() => {
-        return function () {
-            intervalId.current && clearInterval(intervalId.current);
-        }
-    }, []);
+    // useEffect(() => {
+    //     return function () {
+    //         intervalId.current && clearInterval(intervalId.current);
+    //     }
+    // }, []);
 
     useEffect(() => {
         actions.getAppOptions();
@@ -48,17 +50,17 @@ function App(props) {
     useEffect(() => {
         actions.whoAmI()
 
-            if(location.pathname.includes('notifications')){
-               intervalId.current && clearInterval(intervalId.current);
-               intervalId.current = setInterval(() => {
-                   actions.getNotifications();
-               }, 120000)
-            } else {
-                intervalId.current && clearInterval(intervalId.current);
-                intervalId.current = setInterval(() => {
-                    actions.getOnlyUnreaded()
-                }, 120000)
-            }
+            // if(location.pathname.includes('notifications')){
+            //    intervalId.current && clearInterval(intervalId.current);
+            //    intervalId.current = setInterval(() => {
+            //        actions.getNotifications();
+            //    }, 120000)
+            // } else {
+            //     intervalId.current && clearInterval(intervalId.current);
+            //     intervalId.current = setInterval(() => {
+            //         actions.getOnlyUnreaded()
+            //     }, 120000)
+            // }
 
 
     }, [location]);
@@ -79,6 +81,7 @@ function App(props) {
                 </div>
             </div>
             <ReduxModalDialog/>
+            <NotificationRefresher getList={actions.getNotifications} getUnreadCount={actions.getOnlyUnread}/>
         </React.Fragment>
         :
         <React.Fragment>
@@ -116,7 +119,7 @@ function mapDispatchToProps(dispatch) {
             getAllDictionaryData,
             getAppOptions,
             getNotifications,
-            getOnlyUnreaded
+            getOnlyUnread
         }, dispatch),
     }
 }
