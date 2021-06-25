@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useMemo, useCallback} from "react"
-import {connect, useSelector} from 'react-redux';
+import React, {useCallback, useEffect, useMemo, useRef} from "react"
+import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {getTasks, goToTask, statesSelector, tasksSelector, fetchingSelector} from "tt-ducks/tasks";
-import {setGridSortOrder, applyFilter, setInitState, setPathname} from "tt-ducks/route";
+import {fetchingSelector, getTasks, goToTask, statesSelector, tasksSelector} from "tt-ducks/tasks";
+import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import Webix from "../../components/Webix";
 import "./tasks.sass"
 import FilterRow from "../../components/filter";
@@ -116,7 +116,8 @@ function Tasks(props) {
             onItemDblClick: function (id) {
                 const item = this.getItem(id)
                 if (item && item.Id) {
-                    actions.goToTask(item.Id)
+                    const notifUuid = location.search.split('notification=')[1];
+                    actions.goToTask(item.Id, notifUuid)
                 }
             }
         }
