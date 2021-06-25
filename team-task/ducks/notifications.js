@@ -143,6 +143,6 @@ const updateNotificationAsRead = (notifIds = []) => {
 };
 
 const getUnreadCount = (params) => {
-    return commonGetQuery(`/api/pm/notification-count?notRead=true?${params}`)
-}
+    return commonGetQuery(`/api/pm/notification-count?notRead=true${params ? `&${params}` : ''}`)
+};
 

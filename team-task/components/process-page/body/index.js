@@ -28,15 +28,15 @@ type ProcessBodyProps = {
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
-    const {process, supervisors, editors, elements, lessons, isAdmin} = props
+    const {process, supervisors, editors, elements, lessons, isAdmin} = props;
 
-    const [activeElementId, setActiveElementId] = useState(null)
+    const [activeElementId, setActiveElementId] = useState(null);
 
     const onSetActiveTask = (taskId) => {
         if (!taskId) {
             setActiveElementId(null)
         } else {
-            const _task = process.Tasks.find(item => item.Id === taskId)
+            const _task = process.Tasks.find(item => item.Id === taskId);
             if (_task && _task.ElementId) {
                 setActiveElementId(_task.ElementId)
             } else {
