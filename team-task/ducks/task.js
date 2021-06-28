@@ -11,7 +11,7 @@ import {
     showErrorMessage,
     showUserConfirmation
 } from "tt-ducks/messages";
-import {hasSupervisorRights, userSelector} from "tt-ducks/auth";
+import {hasElementEditorRights, userSelector} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import type {ProcessTask, UpdatingCommentData, UpdatingTask,} from "../types/task";
@@ -425,10 +425,10 @@ function* createTaskSaga({payload}) {
 
 
 function* getDictionaryData(task) {
-    const _hasSupervisorRights = yield select(hasSupervisorRights)
+    const _hasRights = yield select(hasElementEditorRights)
 
     let _users = []
-    if (_hasSupervisorRights) {
+    if (_hasRights) {
         _users = yield call(_getUsers)
     } else {
         if (task.Executor) {

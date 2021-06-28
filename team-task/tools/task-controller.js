@@ -171,13 +171,18 @@ class TaskController {
             this._enable.form = true
             this._enable.executor = true
             this._enable.dueDate = true
-            this._enable.state = true
             this._enable.description = true
             this._enable.comments = true
-
         } else {
+            this._enable.form = true
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
+        }
+
+        if (this.task.Element && this.task.Element.Supervisor && this.task.Element.Supervisor.Id === this.user.Id) {
+            this._enable.form = true
+            this._enable.executor = true
+            this._enable.state = true
         }
 
         if (this.task.Executor && (this.task.Executor.Id === this.user.Id)) {
@@ -200,10 +205,6 @@ class TaskController {
             this._visibility.elementField = false
             this._visibility.processFields = false
         }
-
-        // if (this.task.State === TASK_STATE.QUESTION.value) {
-        //     this._enable.state = true
-        // }
 
         if (this.task.State === TASK_STATE.DONE.value) {
             this._enable.form = true
