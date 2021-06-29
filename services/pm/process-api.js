@@ -2286,7 +2286,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             let user_id = taskObj.executorId() ? taskObj.executorId() : processObj.supervisorId();
                             notifications.push({
                                 UserId: user_id,
-                                NotifType: NotificationType.TaskQuestionRaised,
+                                NotifType: NotificationType.TaskQuestionResolved,
                                 Data: { taskId: taskObj.id() },
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_CONTINUE_NOTIF)({
