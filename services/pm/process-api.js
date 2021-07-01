@@ -13,7 +13,7 @@ const { ProcessState, TaskState, ElemState, TaskStateStr, ProcessStateStr, Notif
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
-const logModif = config.has("pm.logModif") ? config.get("pm.logModif") : false;
+const logModif = config.has("debug.pm.logModif") ? config.get("debug.pm.logModif") : false;
 
 const PROCESS_STRUCT_EXPRESSION = {
     expr: {
@@ -2815,7 +2815,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                     await root_obj.edit();
 
-                    let fields = { State: 1, SupervisorId: opts.user.Id }; // State = Draft
+                    let fields = { State: ProcessState.Draft, SupervisorId: opts.user.Id }; // State = Draft
 
                     if (typeof (inpFields.Name) !== "undefined")
                         fields.Name = inpFields.Name

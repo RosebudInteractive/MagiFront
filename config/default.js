@@ -123,6 +123,12 @@ module.exports = {
             regtest: true,
             pushtest: true,
             testrecovery: true
+        },
+        pm: {
+            logModif: true
+        },
+        timeline: {
+            logModif: true
         }
     },
     general: {
