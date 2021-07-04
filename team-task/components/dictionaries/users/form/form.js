@@ -61,7 +61,6 @@ const UserForm = (props) => {
             _oldRoles[userInfo.role] = 1
         }
 
-        //save logic here
         const data = {...userData,
             PData: {
                 roles: _oldRoles,
@@ -91,7 +90,7 @@ const UserForm = (props) => {
                         {createAction ? 'Создание' : 'Редактирование'} пользователя
                     </h6>
                 </div>
-                < Form
+                <Form
                     initialValues={
                         userFormData
                     }

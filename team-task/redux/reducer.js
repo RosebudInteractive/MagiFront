@@ -14,6 +14,7 @@ import usersDictionaryReducer, {moduleName as usersDictionaryModule} from "tt-du
 import componentsDictionaryReducer, {moduleName as componentDictionaryModule} from "tt-ducks/components-dictionary";
 import dictionaryReducer, {moduleName as dictionaryModule} from "tt-ducks/dictionary";
 import notificationsReducer, {moduleName as notificationsModule} from "tt-ducks/notifications";
+import timelinesReducer, {moduleName as timelinesModule} from "tt-ducks/timelines";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -29,6 +30,7 @@ export default combineReducers({
     [dictionaryModule]: dictionaryReducer,
     [componentDictionaryModule]: componentsDictionaryReducer,
     [notificationsModule]: notificationsReducer,
+    [timelinesModule]: timelinesReducer,
 
     routing: routerReducer,
     form: formReducer,

@@ -5,6 +5,7 @@ import ProcessesIco from "tt-assets/svg/processes.svg"
 import TasksIco from "tt-assets/svg/tasks.svg"
 import NotificationsIco from "tt-assets/svg/notifications.svg"
 import DictionariesIco from "tt-assets/svg/dictionaries.svg"
+import TimelinesIco from "tt-assets/svg/timelines.svg"
 import ElementIco from "tt-assets/svg/element-arrow.svg"
 import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
@@ -32,6 +33,9 @@ function SideBarMenu(props) {
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
             </MenuList>
         }
+
+        <MenuLink Icon={TimelinesIco} url={"/timelines"}
+                  title={'Таймлайны'}/>
     </nav>
 }
 

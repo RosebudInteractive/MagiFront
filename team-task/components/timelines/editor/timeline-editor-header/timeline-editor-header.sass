@@ -1,0 +1,41 @@
+@import "~tt-assets/styles/colors.sass"
+
+.timeline-editor__field-name
+  width: fit-content
+  margin-left: 52px
+  max-width: calc(100% - 350px)
+
+.timeline-editor-header
+  display: flex
+  flex-direction: row
+  align-items: center
+  min-height: 50px
+  gap: 10px
+
+.timeline-editor-header__save-button
+  margin-left: auto
+  margin-right: 0
+
+.header__back-arrow
+  cursor: pointer
+
+.header__timeline-state
+  color: $color-main-light
+  box-sizing: border-box
+  border-radius: 4px
+  padding: 3px 10px
+  margin-left: 21px
+  max-height: 30px
+
+  &._draft
+    background-color: $blue
+
+  &._executing
+    background-color: $yellow
+
+  &._done
+    background-color: $green
+
+  &._error
+    background-color: $red
+

@@ -17,3 +17,8 @@ export const ELEMENT_STATE = {
     PART_READY: {value: 2, label: "Частично готов", css: "_part-ready"},
     READY: {value: 3, label: "Готов", css: "_ready"}
 }
+
+export const TIMELINE_STATE = {
+    DRAFT: {value: 1, label: "Черновик", css: "_draft"},
+    PUBLIC: {value: 2, label: "Опубликован", css: "_done"},
+};
