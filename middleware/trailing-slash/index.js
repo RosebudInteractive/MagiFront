@@ -10,7 +10,7 @@ module.exports = (options) => {
     async function _processor(req, res, next) {
         try {
             let path = req.path;
-            let hasTrailingSlash = ((path.length > 1) && (path !== "/adm/") && (path[path.length - 1] === "/")) ? true : false;
+            let hasTrailingSlash = ((path.length > 1) && (path !== "/adm/") && (path !== "/pm/") && (path[path.length - 1] === "/")) ? true : false;
             if (hasTrailingSlash) {
                 path = path.substr(0, path.length - 1);
                 let url = new URL(path, config.proxyServer.siteHost);

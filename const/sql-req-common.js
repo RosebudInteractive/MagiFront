@@ -5,6 +5,9 @@ module.exports = {
         AUDIO: 1,
         VIDEO: 2
     },
+    EntityType: {
+        Event: 1
+    },
     AUTHORS_BY_ID_MSSQL_PUBLIC_REQ:
         "select a.[Id], l.[FirstName], l.[LastName], l.[Occupation], l.[Employment], l.[Description], l.[ShortDescription], a.[Portrait], a.[PortraitMeta], a.[URL] from [Author] a\n" +
         "  join[AuthorLng] l on l.[AuthorId] = a.[Id]\n" +

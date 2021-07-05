@@ -21,6 +21,7 @@ module.exports = {
         port: 3000,
         publicEnabled: true,
         adminEnabled: true,
+        pmEnabled: true,
         pushNotifications: false,
         prerender: {
             usePrerender: true,
