@@ -25,10 +25,43 @@ function setupEvents(app) {
                 }
             });
 
+            app.get(`/api/pm/event/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().getEvent(parseInt(req.params.id), opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
             app.post(`/api/pm/event`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
                     let rows = await EventService().newEvent(req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/event/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().updateEvent(parseInt(req.params.id), req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.delete(`/api/pm/event/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().deleteEvent(parseInt(req.params.id), req.body, opts);
                     res.send(rows);
                 }
                 catch (err) {

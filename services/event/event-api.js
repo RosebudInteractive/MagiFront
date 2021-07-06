@@ -13,6 +13,7 @@ const { EventState, EventStateStr } = require('./const');
 
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
+const DataObject = require(UCCELLO_CONFIG.uccelloPath + 'dataman/data-object');
 
 const logModif = config.has("debug.event.logModif") ? config.get("debug.event.logModif") : false;
 
@@ -34,7 +35,42 @@ const SQL_GET_EVENT_LIST_MYSQL =
     "  left join `Timeline` tcr on tcr.`Id` = e.`TlCreationId`\n" +
     "  left join `Timeline` tpb on tpb.`Id` = e.`TlPublicId`";
 
+const EVENT_DELETE = {
+    expr: {
+        model: {
+            name: "Event",
+            childs: [
+                {
+                    dataObject: {
+                        name: "TimelineEvent"
+                    }
+                }
+            ]
+        }
+    }
+};
+
 const EVENT_CREATE = {
+    expr: {
+        model: {
+            name: "Event",
+            childs: [
+                {
+                    dataObject: {
+                        name: "EntityLng"
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "TimelineEvent"
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const EVENT_MODIFY = {
     expr: {
         model: {
             name: "Event",
@@ -106,6 +142,13 @@ const EventApi = class EventApi extends DbObject {
             if ((typeof (id) === "number") && (!isNaN(id))) {
                 mssql_conds.push(`(te.[TimelineId] = ${opts.TimelineId})`);
                 mysql_conds.push(`(te.${'`'}TimelineId${'`'} = ${opts.TimelineId})`);
+            }
+        }
+        if (opts.Id) {
+            let id = +opts.Id;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(et.[Id] = ${opts.Id})`);
+                mysql_conds.push(`(et.${'`'}Id${'`'} = ${opts.Id})`);
             }
         }
 
@@ -180,6 +223,17 @@ const EventApi = class EventApi extends DbObject {
         return result;
     }
 
+    async getEvent(id, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.Id = id;
+        let result = await this.getEventList(opts);
+        if (result && Array.isArray(result) && (result.length === 1))
+            result = result[0]
+        else
+            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Событие (Id =${id}) не найдено.`);
+        return result;
+    }
+
     _prepareDateField(inp, out, dsc) {
         let _dsc = dsc ? dsc : {
             EffDate: "EffDate",
@@ -187,17 +241,31 @@ const EventApi = class EventApi extends DbObject {
             Month: "Month",
             Year: "Year"
         };
-        out[_dsc.EffDate] = null;
-        out[_dsc.Date] = null;
-        out[_dsc.Month] = null;
-        out[_dsc.Year] = null;
+        let setOut = (field, val) => {
+            if (out instanceof DataObject)
+                out[this._genGetterName(field)](val)
+            else
+                out[field] = val;
+        };
+        let getOut = (field) => {
+            let res;
+            if (out instanceof DataObject)
+                res = out[this._genGetterName(field)]()
+            else
+                res = out[field];
+            return res;
+        };
+        setOut(_dsc.EffDate, null);
+        setOut(_dsc.Date, null);
+        setOut(_dsc.Month, null);
+        setOut(_dsc.Year, null);
         if (inp[_dsc.Date]) {
             if (inp[_dsc.Date] instanceof Date)
-                out[_dsc.EffDate] = inp[_dsc.Date]
+                setOut(_dsc.EffDate, inp[_dsc.Date])
             else
-            if(typeof (inp[_dsc.Date])==="string")
-                out[_dsc.EffDate] = new Date(inp[_dsc.Date])
-            out[_dsc.Date] = out[_dsc.EffDate];
+                if (typeof (inp[_dsc.Date]) === "string")
+                    setOut(_dsc.EffDate, new Date(inp[_dsc.Date]));
+            setOut(_dsc.Date, getOut(_dsc.EffDate));
         }
         else
         {
@@ -205,7 +273,7 @@ const EventApi = class EventApi extends DbObject {
             if ((month !== null) && (typeof (month) !== "undefined")) {
                 if (typeof (month) === "number") {
                     if ((month >= 1) && (month < 12))
-                        out[_dsc.Month] = inp[_dsc.Month]
+                        setOut(_dsc.Month, inp[_dsc.Month])
                     else
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "${_dsc.Month}": ${inp[_dsc.Month]}.`);
                     month--;
@@ -218,16 +286,16 @@ const EventApi = class EventApi extends DbObject {
             let year = inp[_dsc.Year];
             if ((year !== null) && (typeof (year) !== "undefined")) {
                 if (typeof (year) === "number")
-                    out[_dsc.Year] = inp[_dsc.Year]
+                    setOut(_dsc.Year, inp[_dsc.Year])
                 else
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid type of field "${_dsc.Year}": ${typeof (year)}.`);
-                out[_dsc.EffDate] = new Date(year, month);
+                setOut(_dsc.EffDate, new Date(year, month));
             }
             else
-                if (out[_dsc.Month] !== null)
+                if (getOut(_dsc.Month) !== null)
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing field "${_dsc.Year}".`);
         }
-        return out[_dsc.EffDate];
+        return getOut(_dsc.EffDate);
     }
 
     async newEvent(data, options) {
@@ -290,6 +358,7 @@ const EventApi = class EventApi extends DbObject {
 
                     eventObj = this._db.getObj(newHandler.newObject);
                     newId = newHandler.keyValue;
+
                     let lng_root = eventObj.getDataRoot("EntityLng");
                     await lng_root.newObject({
                         fields: {
@@ -298,11 +367,149 @@ const EventApi = class EventApi extends DbObject {
                         }
                     }, dbOpts);
 
+                    let tl_root = eventObj.getDataRoot("TimelineEvent");
+                    if (eventObj.tlCreationId())
+                        await tl_root.newObject({
+                            fields: {
+                                TimelineId: eventObj.tlCreationId()
+                            }
+                        }, dbOpts);
+
                     await root_obj.save(dbOpts);
 
                     if (logModif)
-                        console.log(buildLogString(`Timeline created: Id="${newId}".`));
+                        console.log(buildLogString(`Event created: Id="${newId}".`));
                     return { result: "OK", id: newId };
+                })
+        }, memDbOptions);
+
+    }
+
+    async updateEvent(id, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let inpFields = data || {};
+        let eventObj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, EVENT_MODIFY, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Событие (Id =${id}) не найдено.`);
+                    eventObj = collection.get(0);
+
+                    await eventObj.edit();
+
+                    if (typeof (inpFields.State) === "number") {
+                        let valid_states = {};
+                        for (let key in EventState)
+                            valid_states[EventState[key]] = true;
+                        if (valid_states[inpFields.State])
+                            eventObj.state(inpFields.State)
+                        else
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "State": ${inpFields.State}.`);
+                    }
+
+                    let eff_date = this._prepareDateField(inpFields, eventObj)
+                    if (!eff_date)
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing event date.`);
+
+                    if (typeof (inpFields.ShortName) !== "undefined")
+                        eventObj.shortName(inpFields.ShortName)
+
+                    if (typeof (inpFields.Description) !== "undefined")
+                        eventObj.description(inpFields.Description)
+
+                    if (typeof (inpFields.TlCreationId) === "number")
+                        eventObj.tlCreationId(inpFields.TlCreationId)
+
+                    if (typeof (inpFields.TlPublicId) === "number")
+                        eventObj.tlPublicId(inpFields.TlPublicId)
+
+                    let lng_root = eventObj.getDataRoot("EntityLng");
+                    collection = lng_root.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new Error(`EventApi::updateEvent: Inconsistent "LNG" part of EVENT Id="${id}".`);
+                    let eventLngObj = collection.get(0);
+                    if (typeof (inpFields.Name) !== "undefined") {
+                        eventObj.name(inpFields.Name)
+                        eventLngObj.name(inpFields.Name)
+                    }
+
+                    await eventObj.save(dbOpts);
+
+                    if (logModif)
+                        console.log(buildLogString(`Event updated: Id="${id}".`));
+                    return { result: "OK", id: id };
+                })
+        }, memDbOptions);
+
+    }
+
+    async deleteEvent(id, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let inpFields = data || {};
+        let eventObj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, EVENT_DELETE, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Событие (Id =${id}) не найдено.`);
+                    eventObj = collection.get(0);
+
+                    await root_obj.edit();
+
+                    let tl_root = eventObj.getDataRoot("TimelineEvent");
+                    let col_tl = tl_root.getCol("DataElements");
+                    let timelineId = inpFields.timelineId;
+                    let deleted_from_timeline = false;
+                    if (timelineId) {
+                        for (let i = 0; i < col_tl.count(); i++) {
+                            let obj = col_tl.get(i);
+                            if (obj.timelineId() === timelineId) {
+                                if ((eventObj.state() === EventState.Draft) && (col_tl.count() === 1))
+                                    collection._del(eventObj)
+                                else {
+                                    col_tl._del(obj);
+                                    deleted_from_timeline = true;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else
+                        if (col_tl.count() === 0)
+                            collection._del(eventObj)
+                        else
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Событие используется в других таймлайнах.`);
+
+                    await root_obj.save(dbOpts);
+
+                    if (logModif)
+                        console.log(buildLogString(`Event deleted ${deleted_from_timeline ? 'from timeline ' + timelineId : ''}: Id="${id}".`));
+                    return { result: "OK", id: id };
                 })
         }, memDbOptions);
 

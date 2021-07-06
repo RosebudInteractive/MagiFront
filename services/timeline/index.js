@@ -25,10 +25,32 @@ function setupTimelines(app) {
                 }
             });
 
+            app.get(`/api/pm/timeline/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().getTimeline(parseInt(req.params.id), opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
             app.post(`/api/pm/timeline`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
                     let rows = await TimelineService().newTimeline(req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/timeline/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().updateTimeline(parseInt(req.params.id), req.body, opts);
                     res.send(rows);
                 }
                 catch (err) {
