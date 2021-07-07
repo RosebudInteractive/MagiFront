@@ -48,6 +48,7 @@ const { SetupRoute: setupFeedback } = require('./feedback');
 const { SetupRoute: setupBilling } = require('./billing');
 const { setupProcesses } = require('./pm');
 const { setupTimelines } = require('./timeline');
+const { setupEvents } = require('./event');
 const { buildLogString } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams, ImportTest, ImportTestParams } = require('../database/import');
@@ -220,6 +221,7 @@ function setupAPI(express, app) {
     setupSearch(app);
     if (pmEnabled)
         setupProcesses(app);
+    setupEvents(app);
     setupTimelines(app);
     
     //

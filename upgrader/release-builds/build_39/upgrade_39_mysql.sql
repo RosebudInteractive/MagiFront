@@ -35,3 +35,7 @@ CREATE INDEX `idx_Command_Code` ON `Command`(`Code`);
 GO
 CREATE INDEX `idx_CommandEvent_Number` ON `CommandEvent`(`Number`);
 GO
+CREATE UNIQUE INDEX `u_Idx_TimelineEvent_TimelineId_EventId` ON `TimelineEvent`(`TimelineId`,`EventId`);
+GO
+CREATE UNIQUE INDEX `u_Idx_TimelinePeriod_TimelineId_PeriodId` ON `TimelinePeriod`(`TimelineId`,`PeriodId`);
+GO

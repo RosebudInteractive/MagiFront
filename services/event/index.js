@@ -1,23 +1,23 @@
 const _ = require('lodash');
 const config = require('config');
-const { TimelineService } = require('./timeline-api');
+const { EventService } = require('./event-api');
 const { getTimeStr, buildLogString } = require('../../utils');
 
-function setupTimelines(app) {
+function setupEvents(app) {
 
     const pmEnabled = config.has("server.pmEnabled") && (config.server.pmEnabled === true) ? true : false;
 
     if (!global.$Services)
         global.$Services = {};
-    global.$Services.timelines = TimelineService;
+    global.$Services.events = EventService;
 
     if (app) {
 
         if (pmEnabled) {
-            app.get(`/api/pm/timeline-list`, async (req, res, next) => {
+            app.get(`/api/pm/event-list`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().getTimelineList(opts);
+                    let rows = await EventService().getEventList(opts);
                     res.send(rows);
                 }
                 catch (err) {
@@ -25,10 +25,10 @@ function setupTimelines(app) {
                 }
             });
 
-            app.get(`/api/pm/timeline/:id`, async (req, res, next) => {
+            app.get(`/api/pm/event/:id`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().getTimeline(parseInt(req.params.id), opts);
+                    let rows = await EventService().getEvent(parseInt(req.params.id), opts);
                     res.send(rows);
                 }
                 catch (err) {
@@ -36,10 +36,10 @@ function setupTimelines(app) {
                 }
             });
 
-            app.post(`/api/pm/timeline`, async (req, res, next) => {
+            app.post(`/api/pm/event`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().newTimeline(req.body, opts);
+                    let rows = await EventService().newEvent(req.body, opts);
                     res.send(rows);
                 }
                 catch (err) {
@@ -47,10 +47,10 @@ function setupTimelines(app) {
                 }
             });
 
-            app.put(`/api/pm/timeline/add-item/:id`, async (req, res, next) => {
+            app.put(`/api/pm/event/:id`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().addItem(parseInt(req.params.id), req.body, opts);
+                    let rows = await EventService().updateEvent(parseInt(req.params.id), req.body, opts);
                     res.send(rows);
                 }
                 catch (err) {
@@ -58,21 +58,10 @@ function setupTimelines(app) {
                 }
             });
 
-            app.put(`/api/pm/timeline/delete-item/:id`, async (req, res, next) => {
+            app.delete(`/api/pm/event/:id`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().deleteItem(parseInt(req.params.id), req.body, opts);
-                    res.send(rows);
-                }
-                catch (err) {
-                    next(err);
-                }
-            });
-
-            app.put(`/api/pm/timeline/:id`, async (req, res, next) => {
-                try {
-                    let opts = _.defaultsDeep({ user: req.user }, req.query);
-                    let rows = await TimelineService().updateTimeline(parseInt(req.params.id), req.body, opts);
+                    let rows = await EventService().deleteEvent(parseInt(req.params.id), req.body, opts);
                     res.send(rows);
                 }
                 catch (err) {
@@ -83,4 +72,4 @@ function setupTimelines(app) {
     }
 }
 
-exports.setupTimelines = setupTimelines;
+exports.setupEvents = setupEvents;

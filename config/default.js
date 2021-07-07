@@ -129,6 +129,9 @@ module.exports = {
         },
         timeline: {
             logModif: true
+        },
+        event: {
+            logModif: true
         }
     },
     general: {
