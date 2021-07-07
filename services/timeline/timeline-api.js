@@ -51,6 +51,14 @@ const TL_CREATE = {
     }
 };
 
+const TL_ADD_EVENT = {
+    expr: {
+        model: {
+            name: "TimelineEvent"
+        }
+    }
+};
+
 const TimelineAPI = class TimelineAPI extends DbObject {
 
     constructor(options) {
@@ -284,7 +292,7 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     if (typeof (inpFields.Name) !== "undefined")
                         fields.Name = inpFields.Name
                     else
-                        throw new Error(`Missing field "Name"`);
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing field "Name"`);
 
                     if (typeof (inpFields.State) === "number") {
                         let valid_states = {};
@@ -293,7 +301,7 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                         if(valid_states[inpFields.State])
                             fields.State = inpFields.State
                         else
-                            throw new Error(`Invalid value of field "State": ${inpFields.State}.`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "State": ${inpFields.State}.`);
                     }
 
                     if (typeof (inpFields.SpecifCode) !== "undefined")
@@ -330,7 +338,7 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                         fields.LessonId = inpFields.LessonId
 
                     if ((fields.CourseId && fields.LessonId) || ((!fields.CourseId) && (!fields.LessonId)))
-                        throw new Error(`Inconsistent combination of "CourseId" and "LessonId" fields.`);
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Inconsistent combination of "CourseId" and "LessonId" fields.`);
 
                     let newHandler = await root_obj.newObject({
                         fields: fields
@@ -386,7 +394,7 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                         if (valid_states[inpFields.State])
                             timelineObj.state(inpFields.State)
                         else
-                            throw new Error(`Invalid value of field "State": ${inpFields.State}.`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "State": ${inpFields.State}.`);
                     }
 
                     if (typeof (inpFields.SpecifCode) !== "undefined")
@@ -423,7 +431,7 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                         timelineObj.lessonId(inpFields.LessonId)
 
                     if ((timelineObj.courseId() && timelineObj.lessonId()) || ((!timelineObj.courseId()) && (!timelineObj.lessonId())))
-                        throw new Error(`Inconsistent combination of "CourseId" and "LessonId" fields.`);
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Inconsistent combination of "CourseId" and "LessonId" fields.`);
 
                     if ((old_state === TimelineState.Draft) && (timelineObj.state() === TimelineState.Published)) {
                         let tran = await $data.tranStart(dbOpts);
@@ -450,6 +458,76 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     if (logModif)
                         console.log(buildLogString(`Timeline updated: Id="${id}".`));
                     return { result: "OK", id: id };
+                })
+        }, memDbOptions);
+
+    }
+
+    async deleteItem(id, data, options) {
+        let inpFields = data || {};
+        let result;
+        let eventService = this.getService("events", true);
+        if (!eventService)
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Service "events" is unavailable.`);
+        if (typeof (inpFields.eventId) === "number") {
+            let req = {
+                timelineId: id
+            };
+            await eventService.deleteEvent(inpFields.eventId, req, options);
+            result = { result: "OK", id: id, eventId: inpFields.eventId };
+        }
+        else
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId".`);
+        return result;
+    }
+
+    async addItem(id, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let inpFields = data || {};
+        let timelineObj = null;
+        let newId;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this.getTimeline(id, options));
+            })
+                .then(async (timeline) => {
+                    let is_event;
+                    let expr;
+                    if (typeof (inpFields.eventId) === "number") {
+                        is_event = true;
+                        expr = TL_ADD_EVENT;
+                    }
+                    else
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId".`);
+
+                    let result = await this._getObjById(-1, expr, dbOpts);
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    let fields = {
+                        TimelineId: timeline.Id,
+                        EventId: is_event ? inpFields.eventId : undefined
+                    };
+
+                    let newHandler = await root_obj.newObject({
+                        fields: fields
+                    }, dbOpts);
+
+                    timelineObj = this._db.getObj(newHandler.newObject);
+                    newId = newHandler.keyValue;
+                    await root_obj.save(dbOpts);
+
+                    if (logModif)
+                        console.log(buildLogString(`${is_event ? "Event" : "Period"} item created: Id="${newId}".`));
+                    return { result: "OK", id: newId };
                 })
         }, memDbOptions);
 

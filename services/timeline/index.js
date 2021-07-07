@@ -47,6 +47,28 @@ function setupTimelines(app) {
                 }
             });
 
+            app.put(`/api/pm/timeline/add-item/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().addItem(parseInt(req.params.id), req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/timeline/delete-item/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().deleteItem(parseInt(req.params.id), req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
             app.put(`/api/pm/timeline/:id`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);

@@ -498,6 +498,8 @@ const EventApi = class EventApi extends DbObject {
                                 break;
                             }
                         }
+                        if (!deleted_from_timeline)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Событие ${id} не найдено в таймлайне ${timelineId}.`);
                     }
                     else
                         if (col_tl.count() === 0)
