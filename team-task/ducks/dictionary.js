@@ -101,6 +101,7 @@ const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+
 export const allUsersDSelector = createSelector(stateSelector, state => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
     const uniqIds = [...new Set(allUsers.map(u => u.Id))];
@@ -109,16 +110,7 @@ export const allUsersDSelector = createSelector(stateSelector, state => {
 });
 export const availableForCreationLessons = createSelector(stateSelector, state => state.availableForCreationLessons);
 
-//todo duplicate
 export const userWithSupervisorRightsSelector = createSelector(stateSelector, (state) => {
-    const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
-    const uniqIds = [...new Set(allUsers.map(u => u.Id))];
-
-    return uniqIds.map(id => allUsers.find(u => u.Id === id));
-});
-
-//todo duplicate - remove duplicates here and in components
-export const userWithSupervisorRightsSelectorFlatten = createSelector(stateSelector, (state) => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms];
     const uniqIds = [...new Set(allUsers.map(u => u.Id))];
 
@@ -144,8 +136,8 @@ export const getAllUsers = (forceLoad = false) => {
     return {type: LOAD_USERS, payload: {forceLoad}}
 };
 
-export const getAllLessons = (forceLoad = false) => {
-    return {type: LOAD_LESSONS, payload: {forceLoad}}
+export const getAllLessons = (forceLoad = false, checkSupervisorRights = true) => {
+    return {type: LOAD_LESSONS, payload: {forceLoad, checkSupervisorRights}}
 };
 
 const setAllData = (data) => {
@@ -180,7 +172,7 @@ function* fetchingToggle(isOn){
 }
 
 function* getDictionaryDataSaga(data) {
-    const _hasSupervisorRights = yield select(hasSupervisorRights); //todo return this after it loaded before
+    const _hasSupervisorRights = yield select(hasSupervisorRights);
     const _nextTimeToLoad = yield select(nextTimeSelector);
     if (!_hasSupervisorRights) return;
 
@@ -299,7 +291,7 @@ function* getLessonsDataSaga(data) {
     const _hasSupervisorRights = yield select(hasSupervisorRights);
     const _nextDataToLoad = yield select(nextTimeSelector);
 
-    if (!_hasSupervisorRights) return;
+    if (!_hasSupervisorRights && data.payload.checkSupervisorRights) return;
     if ((_nextDataToLoad === 0 || (_nextDataToLoad <= moment(Date.now()))) || data.payload.forceLoad) {
         try {
             yield put({type: REQUEST_START, payload: true});

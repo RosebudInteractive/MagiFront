@@ -6,12 +6,9 @@ import './timeline-editor-header.sass'
 import {Field, Form, FormSpy} from "react-final-form";
 
 export default function TimelineEditorHeader(props) {
-    const {name, state, mainFormPristine, onBack} = props;
+    const {name, state, mainFormPristine, onBack, onSave} = props;
     const [headerPristine, setHeaderPristine] = useState(true);
-
-    const handleSubmit = (val) => {
-        //todo finish this
-    };
+    const [currentValues, setCurrentValues] = useState({});
 
     const _state = useMemo(()=>{
     const result = Object.values(TIMELINE_STATE).find(item => item.value === state); //todo uncomment this after all complete
@@ -30,18 +27,17 @@ export default function TimelineEditorHeader(props) {
             }}
             subscription={{values: true, pristine: true}}
             render={({headerForm, submitting, pristine, values}) => (
-                <form className='header-form' onSubmit={e => {
-                    e.preventDefault();
-                    handleSubmit(headerForm.values)
-                }}>
+                <form className='header-form' >
                     <div className='timeline-form__field'>
-                        <Field name="name"
-                               component={TextBoxWithConfirm}
-                               label={"Название таймлайна"}
-                               placeholder="Название таймлайна"
-                               initialValue={name}
-                               disabled={false}>
-                        </Field>
+                        <div className="timeline-name">
+                            <Field name="name"
+                                   component={TextBoxWithConfirm}
+                                   label={"Название таймлайна"}
+                                   placeholder="Название таймлайна"
+                                   initialValue={name}
+                                   disabled={false}>
+                            </Field>
+                        </div>
                     </div>
 
                     <div className='timeline-form__field'>
@@ -60,7 +56,10 @@ export default function TimelineEditorHeader(props) {
 
                     <FormSpy subscription={{values: true, pristine: true}}
                              onChange={({values, pristine}) => {
-                                 setHeaderPristine(pristine)
+                                 setTimeout(() => {
+                                     setCurrentValues(values);
+                                     setHeaderPristine(pristine);
+                                 }, 0);
                              }}/>
                 </form>
             )
@@ -69,8 +68,8 @@ export default function TimelineEditorHeader(props) {
         <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
 
         <button className="timeline-editor-header__save-button orange-button big-button"
-                disabled={(headerPristine && mainFormPristine)}
-                onClick={props.onSave}>
+                disabled={!(!(headerPristine === true) && !(mainFormPristine === true))}
+                onClick={() => {currentValues && onSave(currentValues)}}>
             Сохранить
         </button>
     </div>

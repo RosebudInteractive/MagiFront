@@ -46,36 +46,7 @@ export const getFilterConfig = (filter, disableFields = []) => {
                 {value: 1, label: 'Да'},
                 {value: 2, label: 'Нет'}
             ]
-        },
-
-        // {
-        //     name: "NotRead",
-        //     placeholder: "Актуальность",
-        //     type: FILTER_FIELD_TYPE.SELECT,
-        //     options: [{value: 1, label: 'Непрочитанные'}], //1 = true, 2 = false
-        //     value: filter ? filter.NotRead : null
-        // },
-        // {
-        //     name: "Urgent",
-        //     placeholder: "Приоритет",
-        //     type: FILTER_FIELD_TYPE.COMBO,
-        //     options: [{value: 1, label: 'Срочные'},{value: 2, label: 'Не срочные'}], //1 = true, 2 = false
-        //     value: filter ? filter.Urgent : null
-        // },
-        // {
-        //     name: "NotifType",
-        //     placeholder: "Тип уведомления",
-        //     type: FILTER_FIELD_TYPE.COMBO,
-        //     options: Object.entries(NOTIFICATION_TYPES).map(ent => ({value: +ent[0], label: ent[1]})), // +ent - parse to Number
-        //     value: filter ? filter.NotifType : null
-        // },
-        //
-        // {
-        //     name: "UserName",
-        //     placeholder: 'Имя пользователя',
-        //     type: FILTER_FIELD_TYPE.TEXT,
-        //     value: filter ? filter.UserName : null
-        // }
+        }
     ];
 
     const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
@@ -142,7 +113,7 @@ export const resizeHandler = (rowCount: number) => {
         _height = _form.height(),
         _width = _form.width()
 
-    if (window.$$('notifications-grid')) {
+    if (window.$$('timelines-grid')) {
         const _headerHeight = window.$$('timelines-grid').config.headerRowHeight;
 
 

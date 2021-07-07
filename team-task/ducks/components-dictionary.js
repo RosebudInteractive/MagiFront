@@ -5,7 +5,7 @@ import {checkStatus, commonGetQuery, update} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage, showInfo} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
-import {allUsersDSelector, userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary";
+import {allUsersDSelector} from "tt-ducks/dictionary";
 
 //constants
 

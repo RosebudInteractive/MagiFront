@@ -1,12 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
-import {
-    convertFilter2Params,
-    getFilterConfig,
-    parseParams,
-    resizeHandler
-} from "./functions";
+import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
 import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
@@ -20,7 +15,7 @@ import {
     selectComponent,
     toggleComponentForm,
 } from "tt-ducks/components-dictionary";
-import {userWithSupervisorRightsSelectorFlatten} from "tt-ducks/dictionary"
+import {userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
 import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
@@ -178,7 +173,7 @@ const mapState2Props = (state) => {
     return {
         components: componentsDictionarySelector(state),
         fetching: fetchingSelector(state),
-        supervisors: userWithSupervisorRightsSelectorFlatten(state),
+        supervisors: userWithSupervisorRightsSelector(state),
         modalVisible: componentFormOpenedSelector(state)
     }
 };
