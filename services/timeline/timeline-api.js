@@ -85,9 +85,10 @@ const TimelineAPI = class TimelineAPI extends DbObject {
     async getTimelineList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+        if (!opts.allow_unauth)
+            opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
 
-        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
 
         let sql_mysql = SQL_GET_TL_LIST_MYSQL;
         let sql_mssql = SQL_GET_TL_LIST_MSSQL;
@@ -132,6 +133,20 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             if ((typeof (order) === "number") && (!isNaN(order))) {
                 mssql_conds.push(`(t.[Order] = ${opts.Order})`);
                 mysql_conds.push(`(t.${'`'}Order${'`'} = ${opts.Order})`);
+            }
+        }
+        if (opts.CourseId) {
+            let id = +opts.CourseId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(t.[CourseId] = ${opts.CourseId})`);
+                mysql_conds.push(`(t.${'`'}CourseId${'`'} = ${opts.CourseId})`);
+            }
+        }
+        if (opts.LessonId) {
+            let id = +opts.LessonId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(t.[LessonId] = ${opts.LessonId})`);
+                mysql_conds.push(`(t.${'`'}LessonId${'`'} = ${opts.LessonId})`);
             }
         }
         if (opts.TypeOfUse) {
@@ -226,7 +241,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             }
         }, dbOpts)
         if (records && records.detail && (records.detail.length > 0)) {
-            records.detail.forEach(elem => {
+            for (let i = 0; i < records.detail.length; i++){
+                let elem = records.detail[i];
                 let timeline = {
                     Id: elem.Id,
                     Name: elem.Name,
@@ -236,6 +252,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     TimeCr: elem.TimeCr,
                     HasScript: elem.TimelineId ? true : false,
                     TypeOfUse: elem.CourseId ? 1 : 2,
+                    CourseId: elem.CourseId,
+                    LessonId: elem.LessonId,
                     Course: elem.CourseId ? {
                         Id: elem.CourseId,
                         Name: elem.CourseName
@@ -250,10 +268,38 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     Options: is_detailed ? (elem.Options ? JSON.parse(elem.Options) : null) : undefined,
                     ProcessId: is_detailed ? elem.ProcessId : undefined
                 };
+                if (is_detailed)
+                    await this._getTimelineItems(timeline.Id, timeline, opts)
                 result.push(timeline);
-            });
+            }
         }
         return result;
+    }
+
+    async _getTimelineItems(id, out, options) {
+        let opts = options || {};
+        out.Events = [];
+        out.Periods = [];
+
+        let eventService = this.getService("events", true);
+        if (eventService) {
+            let eopts = {
+                user: opts.user,
+                allow_unauth: opts.allow_unauth,
+                TimelineId: id,
+                SortOrder: "Date",
+                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
+            };
+            out.Events = await eventService.getEventList(eopts);
+            let popts = {
+                user: opts.user,
+                allow_unauth: opts.allow_unauth,
+                TimelineId: id,
+                SortOrder: "LbDate",
+                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
+            };
+            out.Periods = await eventService.getPeriodList(popts);
+        }
     }
 
     async getTimeline(id, options) {
@@ -265,27 +311,6 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             result = result[0]
         else
             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Таймлайн (Id =${id}) не найден.`);
-
-        result.Events = [];
-        result.Periods = [];
-
-        let eventService = this.getService("events", true);
-        if (eventService) {
-            let eopts = {
-                user: opts.user,
-                TimelineId: result.Id,
-                SortOrder: "Date",
-                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
-            };
-            result.Events = await eventService.getEventList(eopts);
-            let popts = {
-                user: opts.user,
-                TimelineId: result.Id,
-                SortOrder: "LbDate",
-                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
-            };
-            result.Periods = await eventService.getPeriodList(popts);
-        }
         return result;
     }
 

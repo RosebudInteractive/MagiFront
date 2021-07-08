@@ -153,9 +153,10 @@ const EventApi = class EventApi extends DbObject {
     async getPeriodList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+        if (!opts.allow_unauth)
+            opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
 
-        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
 
         let sql_mysql = SQL_GET_PERIOD_LIST_MYSQL;
         let sql_mssql = SQL_GET_PERIOD_LIST_MSSQL;
@@ -295,6 +296,8 @@ const EventApi = class EventApi extends DbObject {
                     RbDate: elem.RbDate,
                     RbMonth: elem.RbMonth,
                     RbYear: elem.RbYear,
+                    TlCreationId: elem.TlCreationId,
+                    TlPublicId: elem.TlPublicId,
                     TlCreation: elem.TlCreationId ? {
                         Id: elem.TlCreationId,
                         Name: elem.TlCrName
@@ -325,9 +328,10 @@ const EventApi = class EventApi extends DbObject {
     async getEventList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+        if (!opts.allow_unauth)
+            opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
 
-        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
 
         let sql_mysql = SQL_GET_EVENT_LIST_MYSQL;
         let sql_mssql = SQL_GET_EVENT_LIST_MSSQL;
@@ -437,6 +441,8 @@ const EventApi = class EventApi extends DbObject {
                     Date: elem.Date,
                     Month: elem.Month,
                     Year: elem.Year,
+                    TlCreationId: elem.TlCreationId,
+                    TlPublicId: elem.TlPublicId,
                     TlCreation: elem.TlCreationId ? {
                         Id: elem.TlCreationId,
                         Name: elem.TlCrName
@@ -580,8 +586,7 @@ const EventApi = class EventApi extends DbObject {
                     })
                     if ((!lb_eff_date) && (!rb_eff_date))
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Both boundary dates are missing.`);
-                    let min_date = (new Date(100, 0)) * (-1);
-                    if (lb_eff_date && rb_eff_date && ((lb_eff_date - 0 + min_date) > (rb_eff_date - 0 + min_date)))
+                    if (lb_eff_date && rb_eff_date && ((lb_eff_date - 0) > (rb_eff_date - 0)))
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Inconsistent interval boundary.`);
 
                     if (typeof (inpFields.ShortName) !== "undefined")
@@ -670,8 +675,7 @@ const EventApi = class EventApi extends DbObject {
                     })
                     if ((!lb_eff_date) && (!rb_eff_date))
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Both boundary dates are missing.`);
-                    let min_date = (new Date(100, 0)) * (-1);
-                    if (lb_eff_date && rb_eff_date && ((lb_eff_date - 0 + min_date) > (rb_eff_date - 0 + min_date)))
+                    if (lb_eff_date && rb_eff_date && ((lb_eff_date - 0) > (rb_eff_date - 0)))
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Inconsistent interval boundary.`);
 
                     if (typeof (inpFields.ShortName) !== "undefined")

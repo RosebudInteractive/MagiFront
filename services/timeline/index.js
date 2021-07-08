@@ -13,6 +13,39 @@ function setupTimelines(app) {
 
     if (app) {
 
+        app.get(`/api/timelines/course/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ CourseId: req.params.id, State: [2], SortOrder: "Order", isDetailed: true, allow_unauth: true }, req.query);
+                let rows = await TimelineService().getTimelineList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.get(`/api/timelines/lesson/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ LessonId: req.params.id, State: [2],SortOrder: "Order", isDetailed: true, allow_unauth: true }, req.query);
+                let rows = await TimelineService().getTimelineList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.get(`/api/timelines/:id`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ Id: req.params.id, isDetailed: true, allow_unauth: true }, req.query);
+                let rows = await TimelineService().getTimelineList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         if (pmEnabled) {
             app.get(`/api/pm/timeline-list`, async (req, res, next) => {
                 try {
