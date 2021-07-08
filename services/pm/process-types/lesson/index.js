@@ -289,7 +289,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #5
-    res = await pm.newTask({
+    let res5 = await pm.newTask({
         "Name": "Транскрипт - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
@@ -309,7 +309,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Отправить на иллюстрирование",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #7
     res = await pm.newTask({
@@ -345,17 +345,17 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #10
-    res = await pm.newTask({
+    let res2 = await pm.newTask({
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #11
-    res = await pm.newTask({
+    res2 = await pm.newTask({
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
@@ -363,7 +363,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res2.id]
     }, options);
     // Задача #12
     res = await pm.newTask({
@@ -406,7 +406,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res.id, res2.id]
     }, options);
 }
 
@@ -457,7 +457,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #5
-    res = await pm.newTask({
+    let res5 = await pm.newTask({
         "Name": "Транскрипт - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
@@ -477,7 +477,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Передать иллюстрации от автора",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #7
     res = await pm.newTask({
@@ -513,17 +513,17 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #10
-    res = await pm.newTask({
+    let res2 = await pm.newTask({
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #11
-    res = await pm.newTask({
+    res2 = await pm.newTask({
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
@@ -531,7 +531,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res2.id]
     }, options);
     // Задача #12
     res = await pm.newTask({
@@ -574,7 +574,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res.id, res2.id]
     }, options);
 }
 
@@ -625,7 +625,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #5
-    res = await pm.newTask({
+    let res5 = await pm.newTask({
         "Name": "Транскрипт - выполнение задачи",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
@@ -645,7 +645,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Иллюстрации"] ? elements["Иллюстрации"].Id : null,
         "WriteFieldSet": "Отправить на иллюстрирование",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #7
     res = await pm.newTask({
@@ -681,17 +681,17 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res.id]
     }, options);
     // Задача #10
-    res = await pm.newTask({
+    let res2 = await pm.newTask({
         "Name": "Список материалов и литературы - запрос автору",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": [res5.id]
     }, options);
     // Задача #11
-    res = await pm.newTask({
+    res2 = await pm.newTask({
         "Name": "Список материалов и литературы - добавление списка литературы",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : supervisor_id,
@@ -699,7 +699,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "WriteFieldSet": "Добавить литературу",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res2.id]
     }, options);
     // Задача #12
     res = await pm.newTask({
@@ -753,7 +753,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
-        "Dependencies": [res.id]
+        "Dependencies": [res.id, res2.id]
     }, options);
 }
 
