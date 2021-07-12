@@ -94,33 +94,37 @@ const Timelines = (props) => {
                 }
             },
             {
-              id: 'Name', header: 'Название',  minWidth: 50
+              id: 'Name', header: 'Название',  minWidth: 50, fillspace: 10
             },
             {
                 id: 'TypeOfUse',
                 header: 'Тип использования',
+                fillspace: 10,
                 options: Object.entries(TimelineTypesOfUse).map((ent) => ({id: ent[0], value: ent[1]}))
                 ,  minWidth: 50
             },
             {
                 id: 'Code',
-                header: 'Код'
-                ,  minWidth: 50
+                header: 'Код',
+                minWidth: 50,
+                fillspace: 10
             },
             {
-                id: 'NameOfLectionOrCourse', header: 'Название курса или лекции',  minWidth: 50
+                id: 'NameOfLectionOrCourse', header: 'Название курса или лекции',  minWidth: 20, fillspace: 20
             },
             {
                 id: 'State',
                 header: 'Состояние',
                 editor: "select",
                 options: Object.entries(TimelineStatuses).map((ent) => ({id: ent[0], value: ent[1]}))
-                ,  minWidth: 50
+                ,  minWidth: 50,
+                fillspace: 12
             },
             {
                 id: 'OrderNumber',
                 header: 'Номер'
-                ,  minWidth: 50
+                ,  minWidth: 50,
+                fillspace: 8
             },
             {
                 id: 'HasScript',
@@ -128,6 +132,7 @@ const Timelines = (props) => {
                 format: (value) => {return value ? 'Да' : 'Нет'},
                 css: "_container",
                 minWidth: 50,
+                fillspace: 10,
                 template: function(data) {
                     return `<div class='${'check-box-block'} ${data.HasScript ? 'checked' : ''}'>
                         <div class=${data.HasScript ? 'check-mark' : ''}></div>
@@ -135,13 +140,13 @@ const Timelines = (props) => {
                 }
             },
             {
-                id: 'publish-btn', header: '', width: 50, css: "_container",
+                id: 'publish-btn', header: '', width: 50, css: "_container", fillspace: 5,
                 template: function(data){
                     return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : ""
                 }
             },
             {
-                id: 'copy-btn', header: '', width: 50, css: "_container",
+                id: 'copy-btn', header: '', width: 50, css: "_container", fillspace: 5,
                 template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
             },
         ],

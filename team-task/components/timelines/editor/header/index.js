@@ -13,7 +13,7 @@ export default function TimelineEditorHeader(props) {
     const _state = useMemo(()=>{
     const result = Object.values(TIMELINE_STATE).find(item => item.value === state); //todo uncomment this after all complete
     return result ? result : {label: "Ошибка", css: "_error"}
-    }, [state]);
+    }, [state, name]);
 
     return <div className="timeline-editor-header">
 
@@ -21,12 +21,17 @@ export default function TimelineEditorHeader(props) {
             <BackArrow/>
         </div>
         <Form
+            initialValues={{
+                name: name,
+                state: state
+            }}
             onSubmit={values => {
             }}
             validate={values => {
             }}
             subscription={{values: true, pristine: true}}
             render={({headerForm, submitting, pristine, values}) => (
+
                 <form className='header-form' >
                     <div className='timeline-form__field'>
                         <div className="timeline-name">
@@ -34,7 +39,8 @@ export default function TimelineEditorHeader(props) {
                                    component={TextBoxWithConfirm}
                                    label={"Название таймлайна"}
                                    placeholder="Название таймлайна"
-                                   initialValue={name}
+                                   // initialValue={name} todo mayby use it
+                                   // defaultValue={name}
                                    disabled={false}>
                             </Field>
                         </div>
@@ -44,7 +50,8 @@ export default function TimelineEditorHeader(props) {
                         <Field name="state"
                                label={"Состояние"}
                                placeholder="Состояние"
-                               initialValue={state}
+                               // initialValue={state} todo mayby use it
+                               // value={state}
                                disabled={true}>
                             {props => (
                                 <div className={`state`}>

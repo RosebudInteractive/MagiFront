@@ -7,7 +7,7 @@ import validators, {ComposeValidators} from "../../../../tools/validators";
 import Uploader from "../../../../tools/uploader/uploader";
 
 function TimelineForm(props) {
-    const [createAction, setActionCreate] = useState(true); //finish it later
+    const [createAction, setActionCreate] = useState(true); //todo maybu finish it later
     const [image, setImage] = useState(null);
     const {data, lessons, courses} = props;
 
@@ -28,7 +28,7 @@ function TimelineForm(props) {
     }, [data]);
 
     const closeModalForm = () => {
-        //todo close form action here
+        //todo close form action here ot not???
 
         // actions.toggleUserForm(false);
         // actions.cleanSelectedUser();
@@ -39,13 +39,6 @@ function TimelineForm(props) {
         if (dataObj) {
             let fileInfo = JSON.parse(dataObj);
             setImage({file: fileInfo[0].file, meta: fileInfo[0].info});
-
-            console.log('fileInfo', fileInfo);
-            console.log('timelineFormData', timelineFormData)
-            // this.props.input.onChange({
-            //     file: _fileInfo[0].file,
-            //     meta: _fileInfo[0].info
-            // })
         }
     }
 
@@ -172,8 +165,8 @@ function TimelineForm(props) {
                         <Field name="orderNumber"
                                component={TextBox}
                                type={"number"}
-                               label={"Порядковый номер"}
-                               placeholder="Порядковый номер"
+                               label={"Номер"}
+                               placeholder="Номер"
                                disabled={false}
                                defaultValue={data.OrderNumber}
                                validate={ComposeValidators(validators.required, validators.minValue.bind(validators.minValue, 1))}>

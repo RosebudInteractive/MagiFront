@@ -15,12 +15,16 @@
   width: 100%
 
   .file-name
-    position: fixed
+    position: relative
     margin: 10px
     outline: none
     border: none
     min-width: 12em
-    width: 71%
+    grid-column: 1 / 5
+    grid-row: 1 / 1
+    z-index: 2
+    background: transparent
+    pointer-events: none //to disable input to change value dirrectly
 
   form
     color: #19191D
@@ -37,6 +41,10 @@
     min-height: 3.6em
     display: flex
     justify-content: flex-end
+    position: relative
+    grid-column: 1 / 6
+    grid-row: 1 / 1
+    z-index: 1
 
     button
       height: 100%
@@ -48,6 +56,8 @@
       font-size: 9px !important
 
 .file-field
+  display: grid
+  grid-template: 1fr / 1fr 1fr 1fr 1fr 1fr
   grid-column-start: 1
   grid-column-end: 3
 

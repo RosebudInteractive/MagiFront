@@ -9,80 +9,6 @@ import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 
-
-const fakeTimelines = [
-    {
-        Id: 1,
-        Name: 'Таймлайн 1',
-        ShortName: 'Тм1',
-        Code: 1,
-        TypeOfUse: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 1,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 2,
-        Name: 'Таймлайн 2',
-        ShortName: 'Тм2',
-        TypeOfUse: 2,
-        Code: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 2,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 3,
-        Name: 'Таймлайн 3',
-        ShortName: 'Тм3',
-        TypeOfUse: 2,
-        Code: 3,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 3,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 4,
-        Name: 'Таймлайн 4',
-        ShortName: 'Тм4',
-        TypeOfUse: 2,
-        Code: 4,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 4,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 5,
-        Name: 'Таймлайн 5',
-        ShortName: 'Тм5',
-        TypeOfUse: 2,
-        Code: 5,
-        Course: null,
-        Lesson: null,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 5,
-        HasScript: true,
-        TimeCr: new Date()
-    }
-];
-
 //constants
 
 export const moduleName = 'timelines';
@@ -91,6 +17,7 @@ const prefix = `${appName}/${moduleName}`;
 //action types
 const SET_TIMELINES = `${prefix}/SET_TIMELINES`;
 const LOAD_TIMELINES = `${prefix}/LOAD_TIMELINES`;
+const GET_TIMELINE = `${prefix}/GET_TIMELINE`;
 
 const SET_TIMELINE_TO_EDIT = `${prefix}/SET_TIMELINE_TO_EDIT`;
 const CLEAR_SELECTED_TIMELINE = `${prefix}/CLEAR_SELECTED_TIMELINE`;
@@ -108,6 +35,8 @@ const OPEN_EDITOR =  `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
+const UPDATE_TIMELINE = `${prefix}/UPDATE_TIMELINE`;
+const LINK_EVENT = `${prefix}/LINK_EVENT`;
 
 // const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 // const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
@@ -177,8 +106,20 @@ export const getTimelines = () => {
     return {type: LOAD_TIMELINES}
 };
 
+export const getOneTimeline = ({id, setToEditor = true}) => {
+    return {type: GET_TIMELINE, payload: {id, setToEditor}}
+};
+
+export const linkEvent = ({eventId, timelineId}) => {
+    return {type: LINK_EVENT, payload: {eventId, timelineId}}
+};
+
 export const createNewTimeline = (timeline) => {
     return {type: CREATE_NEW_TIMELINE, payload: timeline};
+};
+
+export const updateTimeline = (timelineId, timelineData) => {
+    return {type: UPDATE_TIMELINE, payload: {timelineId, timelineData}};
 };
 
 export const selectTimeline = (timelineId) => {
@@ -203,8 +144,54 @@ export const saga = function* () {
         takeEvery(OPEN_EDITOR, openEditorSaga),
         takeEvery(SELECT_TIMELINE, selectTimelineSaga),
         takeEvery(GO_BACK, goBackSaga),
+        takeEvery(GET_TIMELINE, getTimelineSaga),
+        takeEvery(UPDATE_TIMELINE, updateTimelineSaga),
+        takeEvery(LINK_EVENT, linkEventSaga),
     ])
 };
+
+function* linkEventSaga(data) {
+    try {
+        console.log('dat')
+        yield put({type: START_REQUEST});
+
+        yield call(addEventToTimeline, {
+            eventId: data.payload.eventId,
+            timelineId: data.payload.timelineId
+        });
+
+        yield put({type: SUCCESS_REQUEST});
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e);
+        showErrorMessage(e)
+    }
+}
+
+function* updateTimelineSaga(data) {
+    try {
+        yield put({type: START_REQUEST});
+        const mappedTimeline = {
+            Name: data.payload.timelineData.Name,
+            // Course: data.payload.Course,
+            // Lesson: data.payload.Lesson,
+            SpecifCode: data.payload.timelineData.SpecifCode,
+            State:data.payload.timelineData.State,
+            Order: data.payload.timelineData.OrderNumber,
+            Image: data.payload.timelineData.Image.file,
+            ImageMeta:  JSON.stringify(data.payload.timelineData.Image.meta),
+            TypeOfUse: data.payload.TypeOfUse
+        };
+
+        yield call(changeTimeline, data.payload.timelineId, mappedTimeline);
+
+        yield put({type: SUCCESS_REQUEST});
+    }catch (e) {
+        yield put({type: FAIL_REQUEST})
+        console.log(e);
+        showErrorMessage(e);
+    }
+}
 
 function* createTimelineSaga(data) {
     try {
@@ -256,6 +243,22 @@ function* selectTimelineSaga(data) {
 
         if(timelineToSetInEditor) {
             yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineToSetInEditor});
+        } else {
+            yield put({type: SET_TIMELINE_TO_EDIT, payload: {
+                    Name: '',
+                    ShortName: '',
+                    TypeOfUse: 1,
+                    Code: 123,
+                    NameOfLectionOrCourse: '',
+                    State: 1,
+                    OrderNumber: 0,
+                    Course: null,
+                    Lesson: null,
+                    CourseId: null,
+                    LessonId: null,
+                    HasScript: false,
+                    TimeCr: new Date()
+                }});
         }
     } catch (e) {
         console.log(e);
@@ -286,8 +289,18 @@ function* getTimelinesSaga() {
         const timelines = yield call(_getTimelines, params);
 
         //todo map timelines
+        const mappedTimelines = timelines.map(tm => {
+            const nameOfLectionOrCourse = tm.Lesson ? tm.Lesson.Name :
+                tm.Course ? tm.Course.Name : '';
+           return {
+                    ...tm,
+                    NameOfLectionOrCourse: nameOfLectionOrCourse,
+                    OrderNumber: tm.Order,
+                    Code: tm.SpecifCode
+                }
+        });
 
-        yield put({type: SET_TIMELINES, payload: timelines});
+        yield put({type: SET_TIMELINES, payload: mappedTimelines});
         yield put({type: SUCCESS_REQUEST});
         yield put(clearLocationGuard())
     } catch (e) {
@@ -297,6 +310,30 @@ function* getTimelinesSaga() {
     }
 }
 
+function* getTimelineSaga(data) {
+    try {
+        yield put({type: START_REQUEST});
+
+        const timeline = yield call(getTimeline, data.payload.id);
+        yield timeline && put({type: SUCCESS_REQUEST});
+        const timelineData = {...timeline,
+            CourseId: timeline.Course ? timeline.Course.Id : null,
+            LessonId: timeline.Lesson ? timeline.Lesson.Id : null
+        };
+        if(data.payload.setToEditor){
+            yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineData});
+        }
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e);
+        yield put(showErrorMessage(e))
+    }
+}
+
+const getTimeline = (timelineId) => {
+    return commonGetQuery(`/api/pm/timeline/${timelineId}`);
+};
+
 const createTimeline = (timeline) => {
     console.log('timeline before request');
     console.log(timeline);
@@ -305,6 +342,34 @@ const createTimeline = (timeline) => {
         headers: { "Content-type": "application/json" },
         credentials: 'include',
         body: JSON.stringify(timeline),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+};
+
+// /api/pm/event
+
+const changeTimeline = (timelineId, timeline) => {
+    return fetch(`/api/pm/timeline/${timelineId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(timeline),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+};
+
+const addEventToTimeline = ({eventId, timelineId}) => {
+    return fetch(`/api/pm/timeline/add-item/${timelineId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({eventId: eventId}),
+        credentials: 'include'
     })
         .then(checkStatus)
         .then(parseJSON)

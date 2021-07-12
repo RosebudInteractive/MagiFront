@@ -12,15 +12,14 @@ import {
 } from "tt-ducks/components-dictionary";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
 import {componentOwnersSelector} from "tt-ducks/dictionary";
 
-const vRequired = value => (value ? undefined : 'Обязательное поле');
-const vMinValue = min => value =>
-    isNaN(value) || value >= min ? undefined : `Необходимое количество символов ${min}`;
-const vMustBeEmail = value => (EMAIL_REGEXP.test(value) ? undefined : 'Не соответствует формату почты');
-const ComposeValidators = (...validators) => value =>
-    validators.reduce((error, validator) => error || validator(value), undefined);
+// const vRequired = value => (value ? undefined : 'Обязательное поле'); todo use it and import from tools/validators
+// const vMinValue = min => value =>
+//     isNaN(value) || value >= min ? undefined : `Необходимое количество символов ${min}`;
+// const vMustBeEmail = value => (EMAIL_REGEXP.test(value) ? undefined : 'Не соответствует формату почты');
+// const ComposeValidators = (...validators) => value =>
+//     validators.reduce((error, validator) => error || validator(value), undefined);
 
 
 const ComponentForm = (props) => {
