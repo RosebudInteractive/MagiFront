@@ -14,6 +14,62 @@ function setupEvents(app) {
     if (app) {
 
         if (pmEnabled) {
+
+            app.get(`/api/pm/period-list`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().getPeriodList(opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.get(`/api/pm/period/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().getPeriod(parseInt(req.params.id), opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.post(`/api/pm/period`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().newPeriod(req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/period/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().updatePeriod(parseInt(req.params.id), req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.delete(`/api/pm/period/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await EventService().deletePeriod(parseInt(req.params.id), req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
             app.get(`/api/pm/event-list`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);

@@ -35,13 +35,21 @@ const SQL_GET_TL_LIST_MYSQL =
     "  left join `LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
     "  left join (select distinct `TimelineId` from `Command`) c on c.`TimelineId` = t.`Id`";
 
-const SQL_PUBLISH_TL_MSSQL =
+const SQL_PUBLISH_TL_EVENT_MSSQL =
     "update [Event] set [State] = 2, [TlPublicId] = <%= id %> where ([State] = 1)\n" +
     "  and([SysParentId] in (select [EventId] from [TimelineEvent] where [TimelineId] = <%= id %>))";
 
-const SQL_PUBLISH_TL_MYSQL =
+const SQL_PUBLISH_TL_EVENT_MYSQL =
     "update `Event` set `State` = 2, `TlPublicId` = <%= id %> where (`State` = 1)\n" +
     "  and(`SysParentId` in (select `EventId` from `TimelineEvent` where `TimelineId` = <%= id %>))";
+
+const SQL_PUBLISH_TL_PERIOD_MSSQL =
+    "update [Period] set [State] = 2, [TlPublicId] = <%= id %> where ([State] = 1)\n" +
+    "  and([Id] in (select [PeriodId] from [TimelinePeriod] where [TimelineId] = <%= id %>))";
+
+const SQL_PUBLISH_TL_PERIOD_MYSQL =
+    "update `Period` set `State` = 2, `TlPublicId` = <%= id %> where (`State` = 1)\n" +
+    "  and(`Id` in (select `PeriodId` from `TimelinePeriod` where `TimelineId` = <%= id %>))";
 
 const TL_CREATE = {
     expr: {
@@ -59,6 +67,14 @@ const TL_ADD_EVENT = {
     }
 };
 
+const TL_ADD_PERIOD = {
+    expr: {
+        model: {
+            name: "TimelinePeriod"
+        }
+    }
+};
+
 const TimelineAPI = class TimelineAPI extends DbObject {
 
     constructor(options) {
@@ -69,9 +85,10 @@ const TimelineAPI = class TimelineAPI extends DbObject {
     async getTimelineList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+        if (!opts.allow_unauth)
+            opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
 
-        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
 
         let sql_mysql = SQL_GET_TL_LIST_MYSQL;
         let sql_mssql = SQL_GET_TL_LIST_MSSQL;
@@ -116,6 +133,20 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             if ((typeof (order) === "number") && (!isNaN(order))) {
                 mssql_conds.push(`(t.[Order] = ${opts.Order})`);
                 mysql_conds.push(`(t.${'`'}Order${'`'} = ${opts.Order})`);
+            }
+        }
+        if (opts.CourseId) {
+            let id = +opts.CourseId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(t.[CourseId] = ${opts.CourseId})`);
+                mysql_conds.push(`(t.${'`'}CourseId${'`'} = ${opts.CourseId})`);
+            }
+        }
+        if (opts.LessonId) {
+            let id = +opts.LessonId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(t.[LessonId] = ${opts.LessonId})`);
+                mysql_conds.push(`(t.${'`'}LessonId${'`'} = ${opts.LessonId})`);
             }
         }
         if (opts.TypeOfUse) {
@@ -210,7 +241,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             }
         }, dbOpts)
         if (records && records.detail && (records.detail.length > 0)) {
-            records.detail.forEach(elem => {
+            for (let i = 0; i < records.detail.length; i++){
+                let elem = records.detail[i];
                 let timeline = {
                     Id: elem.Id,
                     Name: elem.Name,
@@ -220,6 +252,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     TimeCr: elem.TimeCr,
                     HasScript: elem.TimelineId ? true : false,
                     TypeOfUse: elem.CourseId ? 1 : 2,
+                    CourseId: elem.CourseId,
+                    LessonId: elem.LessonId,
                     Course: elem.CourseId ? {
                         Id: elem.CourseId,
                         Name: elem.CourseName
@@ -234,10 +268,38 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     Options: is_detailed ? (elem.Options ? JSON.parse(elem.Options) : null) : undefined,
                     ProcessId: is_detailed ? elem.ProcessId : undefined
                 };
+                if (is_detailed)
+                    await this._getTimelineItems(timeline.Id, timeline, opts)
                 result.push(timeline);
-            });
+            }
         }
         return result;
+    }
+
+    async _getTimelineItems(id, out, options) {
+        let opts = options || {};
+        out.Events = [];
+        out.Periods = [];
+
+        let eventService = this.getService("events", true);
+        if (eventService) {
+            let eopts = {
+                user: opts.user,
+                allow_unauth: opts.allow_unauth,
+                TimelineId: id,
+                SortOrder: "Date",
+                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
+            };
+            out.Events = await eventService.getEventList(eopts);
+            let popts = {
+                user: opts.user,
+                allow_unauth: opts.allow_unauth,
+                TimelineId: id,
+                SortOrder: "LbDate",
+                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
+            };
+            out.Periods = await eventService.getPeriodList(popts);
+        }
     }
 
     async getTimeline(id, options) {
@@ -249,20 +311,6 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             result = result[0]
         else
             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Таймлайн (Id =${id}) не найден.`);
-
-        result.Events = [];
-        result.Periods = [];
-
-        let eventService = this.getService("events", true);
-        if (eventService) {
-            let eopts = {
-                user: opts.user,
-                TimelineId: result.Id,
-                SortOrder: "Date",
-                dbOptions: opts.dbOptions ? opts.dbOptions : undefined
-            };
-            result.Events = await eventService.getEventList(eopts);
-        }
         return result;
     }
 
@@ -441,8 +489,14 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                             await timelineObj.save(dbOpts);
                             await $data.execSql({
                                 dialect: {
-                                    mysql: _.template(SQL_PUBLISH_TL_MYSQL)({ id: timelineObj.id() }),
-                                    mssql: _.template(SQL_PUBLISH_TL_MSSQL)({ id: timelineObj.id() })
+                                    mysql: _.template(SQL_PUBLISH_TL_EVENT_MYSQL)({ id: timelineObj.id() }),
+                                    mssql: _.template(SQL_PUBLISH_TL_EVENT_MSSQL)({ id: timelineObj.id() })
+                                }
+                            }, dbOpts);
+                            await $data.execSql({
+                                dialect: {
+                                    mysql: _.template(SQL_PUBLISH_TL_PERIOD_MYSQL)({ id: timelineObj.id() }),
+                                    mssql: _.template(SQL_PUBLISH_TL_PERIOD_MSSQL)({ id: timelineObj.id() })
                                 }
                             }, dbOpts);
                             await $data.tranCommit(transactionId)
@@ -477,7 +531,15 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             result = { result: "OK", id: id, eventId: inpFields.eventId };
         }
         else
-            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId".`);
+            if (typeof (inpFields.periodId) === "number") {
+                let req = {
+                    timelineId: id
+                };
+                await eventService.deletePeriod(inpFields.periodId, req, options);
+                result = { result: "OK", id: id, periodId: inpFields.periodId };
+            }
+            else
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId" or "periodId".`);
         return result;
     }
 
@@ -497,14 +559,18 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                 resolve(this.getTimeline(id, options));
             })
                 .then(async (timeline) => {
-                    let is_event;
-                    let expr;
+                    let is_event, expr;
                     if (typeof (inpFields.eventId) === "number") {
                         is_event = true;
                         expr = TL_ADD_EVENT;
                     }
                     else
-                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId".`);
+                        if (typeof (inpFields.periodId) === "number") {
+                            is_event = false;
+                            expr = TL_ADD_PERIOD;
+                        }
+                        else
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid field "eventId" or "periodId".`);
 
                     let result = await this._getObjById(-1, expr, dbOpts);
                     root_obj = result;
@@ -514,7 +580,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
 
                     let fields = {
                         TimelineId: timeline.Id,
-                        EventId: is_event ? inpFields.eventId : undefined
+                        EventId: is_event ? inpFields.eventId : undefined,
+                        PeriodId: is_event ? undefined : inpFields.periodId
                     };
 
                     let newHandler = await root_obj.newObject({

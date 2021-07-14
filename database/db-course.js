@@ -1297,6 +1297,7 @@ const DbCourse = class DbCourse extends DbObject {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+        let withTimeline = opts.timeline && ((opts.timeline === "true") || (opts.timeline === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let baseUrl;
         let pendingCourses = {};
@@ -1658,6 +1659,13 @@ const DbCourse = class DbCourse extends DbObject {
                                 result.detail.forEach(elem => {
                                     course.Reviews.push(elem);
                                 });
+                            }
+                            if (withTimeline) {
+                                let timelineService = this.getService("timelines", true);
+                                if (timelineService) {
+                                    let tl_opts = { user: user, CourseId: course.Id, State: [2], SortOrder: "Order", isDetailed: true, allow_unauth: true };
+                                    course.Timelines = await timelineService.getTimelineList(tl_opts);
+                                }
                             }
                         }
                         return course;

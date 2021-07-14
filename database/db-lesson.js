@@ -1555,6 +1555,7 @@ const DbLesson = class DbLesson extends DbObject {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+        let withTimeline = opts.timeline && ((opts.timeline === "true") || (opts.timeline === true)) ? true : false;
         let hostUrl;
         let courseUrl;
         let condMSSQL;
@@ -1919,6 +1920,13 @@ const DbLesson = class DbLesson extends DbObject {
                                 let cats = await ctgService.getCourseCategories([data.Course.Id], isAbsPath);
                                 for (let cat in cats.Categories)
                                     data.Course.Categories.push(cats.Categories[cat]);
+                            }
+                        }
+                        if (data && withTimeline) {
+                            let timelineService = this.getService("timelines", true);
+                            if (timelineService) {
+                                let tl_opts = { user: user, LessonId: data.Id, State: [2], SortOrder: "Order", isDetailed: true, allow_unauth: true };
+                                data.Timelines = await timelineService.getTimelineList(tl_opts);
                             }
                         }
                         return data;
