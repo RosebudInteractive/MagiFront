@@ -6,32 +6,32 @@ import {useWindowSize} from "../../../tools/window-resize-hook";
 import {resizeHandler} from "../../../tools/resize-handler";
 import Webix from "../../Webix";
 
-import './event-find-form.sass'
+import './period-find-form.sass'
 
 
-let findedEventsCount = 0;
+let findedPeriodsCount = 0;
 
 
-export default function EventsFindForm(props) {
-    const {findedData, addEventsAction, findAction, closeAction} = props;
-    const selectedEvents = useRef([]);
+export default function PeriodsFindForm(props) {
+    const {findedData, addPeriodsAction, findAction, closeAction} = props;
+    const selectedPeriods = useRef([]);
 
     useWindowSize(() => {
-        resizeHandler(findedEventsCount, 'events-find-form');
+        resizeHandler(findedPeriodsCount, 'periods-find-form');
     });
 
     useEffect(() => {
-        findedEventsCount = findedData ? findedData.length : findedEventsCount;
+        findedPeriodsCount = findedData ? findedData.length : findedPeriodsCount;
         _onResize();
     }, [findedData]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(findedEventsCount, 'events-find-form')
+        resizeHandler(findedPeriodsCount, 'periods-find-form')
     }, [findedData]);
 
     const GRID_CONFIG = {
         view: "datatable",
-        id: `events-find-form-grid`,
+        id: `periods-find-form-grid`,
         css: 'tt-grid',
         hover: "row-hover",
         scroll: 'none',
@@ -54,13 +54,13 @@ export default function EventsFindForm(props) {
             },
             {
                 id: 'State', header: 'Состояние', minWidth: 100, fillspace: 20,
-                options: EVENT_STATES
+                options: EVENT_STATES //
             },
         ],
         on: {
             onSelectChange: function (data) {
                 const selectedRowIds = this.getSelectedId(true).map(sl => sl.id);
-                selectedEvents.current = selectedRowIds.map(slId => this.getItem(slId).Id);
+                selectedPeriods.current = selectedRowIds.map(slId => this.getItem(slId).Id);
             },
             onHeaderClick: function (header) {
                 // actions.headerClick();
@@ -86,7 +86,7 @@ export default function EventsFindForm(props) {
     });
 
     return (
-        <div className="events-find-form">
+        <div className="periods-find-form">
             <Form
                 initialValues={
                     searchFormData
@@ -100,7 +100,7 @@ export default function EventsFindForm(props) {
                     <form onSubmit={e => {
                         e.preventDefault();
                     }}>
-                        <div className='events-find-form__field'>
+                        <div className='periods-find-form__field'>
                             <Field name="textValue"
                                    component={TextBox}
                                    type="text"
@@ -119,13 +119,13 @@ export default function EventsFindForm(props) {
                     </form>)}/>
 
 
-            <div className="grid-container finded-events-table">
+            <div className="grid-container finded-periods-table">
                 <Webix ui={GRID_CONFIG} data={findedData}/>
             </div>
 
             <button disabled={false} type="button" className="orange-button big-button add-selected" onClick={() => {
-                if (selectedEvents.current.length > 0) {
-                    addEventsAction(selectedEvents.current)
+                if (selectedPeriods.current.length > 0) {
+                    addPeriodsAction(selectedPeriods.current)
                 }
             }}>
                 Добавить выделенные
