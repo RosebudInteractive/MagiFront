@@ -13,6 +13,7 @@ import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks
 import {connect} from "react-redux";
 import './timelines.sass';
 import {
+    clearSelectedTimeline,
     currentTimelineSelector,
     getTimelines,
     openTimelineEditor,
@@ -21,9 +22,11 @@ import {
     timelinesFetchingSelector,
     timelinesSelector
 } from "tt-ducks/timelines";
+import {setTemporaryEvents} from "tt-ducks/events-timeline";
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {TimelineStatuses, TimelineTypesOfUse} from "../../constants/timelines";
 import {hideSideBarMenu} from "tt-ducks/app";
+import PlusIco from "tt-assets/svg/plus.svg";
 
 let timelinesCount = 0;
 
@@ -64,6 +67,8 @@ const Timelines = (props) => {
         actions.setInitState(initState);
 
         if (!fetching) {
+            actions.setTemporaryEvents(null);
+            actions.clearSelectedTimeline();
             actions.getTimelines();
         }
     }, [location]);
@@ -181,14 +186,14 @@ const Timelines = (props) => {
                 e.preventDefault()
                 const item = this.getItem(data.row);
                 if (item) {
-                    //todo publish action
+                    //todo publish action after api complete
                 }
             },
             "js-copy": function (e, data) {
                 e.preventDefault();
                 const item = this.getItem(data.row);
                 if (item) {
-                    //todo copy action
+                    //todo copy action after api complete
                 }
             }
         },
@@ -204,6 +209,12 @@ const Timelines = (props) => {
         actions.applyFilter(params)
     };
 
+    const openTimelineForm = () => {
+        // actions.selectTimeline(item.Id);
+        actions.hideSideBarMenu();
+        props.history.push(`timelines/new`);
+    };
+
 
     return (
         <React.Fragment>
@@ -212,6 +223,9 @@ const Timelines = (props) => {
                 <FilterRow fields={FILTER_CONFIG}
                            onApply={_onApplyFilter}
                            onChangeVisibility={_onResize}/>
+                <button className="open-form-button" onClick={openTimelineForm}>
+                    <PlusIco/>
+                </button>
                 <div className="grid-container timelines-table">
                     <Webix ui={GRID_CONFIG} data={timelines}/>
                 </div>
@@ -243,7 +257,9 @@ const mapDispatch2Props = (dispatch) => {
             setGridSortOrder,
             openTimelineEditor,
             selectTimeline,
-            hideSideBarMenu
+            hideSideBarMenu,
+            setTemporaryEvents,
+            clearSelectedTimeline
         }, dispatch)
     }
 };

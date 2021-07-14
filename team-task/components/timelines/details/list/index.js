@@ -10,15 +10,15 @@ let _itemsCount = 0;
 
 //todo finish this
 export default function DetailsList(props) {
-    const {actions, items, columnsConfig, idGrid, title, findedEl} = props;
+    const {actions, items, columnsConfig, idGrid, title, findedEl, addCompletelyCreated} = props;
 
     useWindowSize(() => {
-        idGrid && resizeHandler(_itemsCount, idGrid, 580)
+        idGrid && resizeHandler(_itemsCount, idGrid, 560)
     });
 
     useEffect(() => {
         _itemsCount = items.length;
-        idGrid && resizeHandler(_itemsCount, idGrid);
+        idGrid && resizeHandler(_itemsCount, idGrid, 560);
         _onResize();
     }, [items, idGrid]);
 
@@ -27,7 +27,7 @@ export default function DetailsList(props) {
     }, [location]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(items.length, idGrid)
+        resizeHandler(items.length, idGrid, 560)
     }, [items]);
     //
     const GRID_CONFIG = {
@@ -81,7 +81,7 @@ export default function DetailsList(props) {
                 <button className="open-form-button" onClick={actions.createAction}>
                     <PlusIco/>
                 </button>
-                <button className="open-form-button" onClick={actions.openFindFormAction}>
+                <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated}>
                     <PlusOrangeIco/>
                 </button>
 

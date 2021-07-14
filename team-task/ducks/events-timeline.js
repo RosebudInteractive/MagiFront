@@ -110,6 +110,8 @@ const REMOVE_EVENT = `${prefix}/REMOVE_EVENT`;
 const GET_EVENT = `${prefix}/GET_EVENT`;
 const FIND_EVENT = `${prefix}/FIND_EVENT`;
 const SET_FINDED = `${prefix}/SET_FINDED`;
+const SET_TEMPORARY_EVENTS = `${prefix}/SET_TEMPORARY_EVENTS`;
+const CREATE_EVENTS = `${prefix}/CREATE_EVENTS`;
 
 // const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 // const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
@@ -129,7 +131,8 @@ export const ReducerRecord = Record({
     fetching: false,
     selectedEvent: EventRecord,
     editorOpened: false,
-    finded: null
+    finded: null,
+    temporary: null, // temporary events willbe save later after timeline is save
 });
 
 // reducer
@@ -157,8 +160,11 @@ export default function reducer(state = new ReducerRecord(), action) {
             console.log('TOGGLE_EDITOR', payload);
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            console.log('SET_FINDED,', payload)
+            console.log('SET_FINDED,', payload);
             return state.set('finded', payload);
+        case SET_TEMPORARY_EVENTS:
+            console.log('payload', payload);
+            return state.set('temporary', payload);
         default:
             return state;
     }
@@ -173,6 +179,7 @@ export const eventsFetchingSelector = createSelector(stateSelector, state => sta
 export const eventsSelector = createSelector(stateSelector, state => state.events);
 export const eventEditorOpenedSelector = createSelector(stateSelector, state => state.editorOpened);
 export const findedEventsSelector = createSelector(stateSelector, state => state.finded);
+export const temporaryEventsSelector = createSelector(stateSelector, state => state.temporary);
 
 //actions
 
@@ -180,8 +187,19 @@ export const requestEvents = () => {
     return {type: LOAD_EVENTS}
 };
 
+export const setTemporaryEvents = (data) => {
+    console.log('setTemporaryEvents');
+    return {type: SET_TEMPORARY_EVENTS, payload: data}
+};
+
 export const createNewEvent = (event) => {
     return {type: CREATE_NEW_EVENT, payload: event};
+};
+
+export const createEvents = ({events, timelineId}) => {
+    console.log('createEvents, events', events);
+    console.log('createEvents, timelineId', timelineId);
+    return {type: CREATE_EVENTS, payload: {events, timelineId}};
 };
 
 // export const selectEvent = (timelineId) => {
@@ -226,9 +244,60 @@ export const saga = function* () {
         takeEvery(UPDATE_EVENT, updateEventSaga),
         takeEvery(REMOVE_EVENT, removeEventSaga),
         takeEvery(GET_EVENT, getEventSaga),
-        takeEvery(FIND_EVENT, findEventSaga)
+        takeEvery(FIND_EVENT, findEventSaga),
+        takeEvery(CREATE_EVENTS, createEventsSaga),
     ])
 };
+
+function* createEventsSaga(data) {
+    try {
+
+        let eventsToCreate =  [];
+        if(data.payload.events && data.payload.events.length > 0){
+            eventsToCreate = data.payload.events;
+        } else {
+            eventsToCreate = yield select(temporaryEventsSelector);
+        }
+
+        console.log('events to set', eventsToCreate);
+        yield put({type: START_REQUEST});
+        console.log('createEventsSaga START_REQUEST');
+
+        // const currTimeline = yield timelineId && select(currentTimelineSelector);
+        // const tmId = timelineId ? timelineId : currTimeline.Id;
+        if(data.payload.timelineId){
+            console.log('timelineId ', data.payload.timelineId);
+
+            const finalEvents = [...eventsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
+
+            console.log('after create final events,', finalEvents);
+
+            yield all(
+                finalEvents.map((ev) => {
+                    console.log(ev);
+                    return call(createEvent, ev)})
+            );
+            // yield finalEvents.map(ev => {
+            //     console.log('ev,', ev);
+            //      put(createEvent, ev); //todo check it
+            // });
+            // for (let event of eventsToCreate){
+            //     const eventWithTimeline = {...event, tlCreationId: data.payload.timelineId};
+            //     yield call({type: CREATE_NEW_EVENT, eventWithTimeline}); //todo check it
+            // }
+        }
+
+
+        console.log('createEventsSaga SUCCESS_REQUEST')
+
+        yield put({type: SUCCESS_REQUEST});
+
+    }catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e);
+        yield put(showErrorMessage(e.toString()))
+    }
+}
 
 function* findEventSaga(data) {
     try {
@@ -302,6 +371,8 @@ function* createEventSaga(data) {
         yield put({type: START_REQUEST});
 
         yield call(createEvent, data.payload);
+
+        console.log('createEventSaga, data:', data);
 
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -421,18 +492,22 @@ const findEventBy = ({name, year, date}) => {
 };
 
 const createEvent = (event) => {
-    const dateObject = (event.date && event.month && event.year) ? moment(`${event.year}-${event.month}-${event.date}`) : null;
-    const eventData = {
-        Name: event.name,
-        TlCreationId: event.tlCreationId,
+    // let dateObject;
+    // if(event.Date) {
+    //     dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.year}-${event.month}-${event.date}`) : null;
+    // }
+     const dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.Date}`) : null;
+    let eventData = {
+        Name: event.Name,
+        TlCreationId:  event.TlCreationId,
         Date: dateObject,
-        Month: event.month,
-        Year: event.year,
-        ShortName: event.shortName,
-        Description: event.description
+        Month: event.Month,
+        Year: event.Year,
+        ShortName: event.ShortName,
+        Description: event.Description
     };
-    console.log('create event');
-    console.log(event)
+    console.log('create eventData');
+    console.log(eventData, event);
     return fetch("/api/pm/event", {
         method: 'POST',
         headers: {"Content-type": "application/json"},

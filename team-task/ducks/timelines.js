@@ -8,6 +8,7 @@ import {Timeline} from "../types/timeline";
 import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
+import {createEvents} from "tt-ducks/events-timeline";
 
 //constants
 
@@ -31,12 +32,14 @@ const TOGGLE_COMPONENT_FORM_VISIBILITY = `${prefix}/TOGGLE_COMPONENT_FORM_VISIBI
 const TOGGLE_EDITOR = `${prefix}/TOGGLE_EDITOR`;
 
 const SELECT_TIMELINE =  `${prefix}/SELECT_TIMELINE`;
+// const UNSELECT_TIMELINE =  `${prefix}/UNSELECT_TIMELINE`;
 const OPEN_EDITOR =  `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
 const UPDATE_TIMELINE = `${prefix}/UPDATE_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
+const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
 
 // const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 // const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
@@ -77,13 +80,15 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('selectedTimeline', payload);
         case CLEAR_SELECTED_TIMELINE:
-            return state.set('selectedTimeline', payload);
+            return state.set('selectedTimeline', {});
+        // case UNSELECT_TIMELINE:
+        //     return state.set('selectedTimeline', {});
         // case UPDATE_COMPONENT:
         //     return state.set('components', payload);
         // case CLEAN_SELECTED_COMPONENT:
         //     return state.set('selectedComponent', null);
         case TOGGLE_EDITOR:
-            return state.set('editorOpened', true);
+            return state.set('editorOpened', payload);
         case TOGGLE_COMPONENT_FORM_VISIBILITY:
             return state.set('componentFormOpened', payload);
         default:
@@ -109,13 +114,20 @@ export const getTimelines = () => {
 export const getOneTimeline = ({id, setToEditor = true}) => {
     return {type: GET_TIMELINE, payload: {id, setToEditor}}
 };
+export const clearSelectedTimeline = () => {
+    return {type: CLEAR_SELECTED_TIMELINE}
+};
 
 export const linkEvent = ({eventId, timelineId}) => {
     return {type: LINK_EVENT, payload: {eventId, timelineId}}
 };
 
-export const createNewTimeline = (timeline) => {
-    return {type: CREATE_NEW_TIMELINE, payload: timeline};
+export const linkPeriod = ({periodId, timelineId}) => {
+    return {type: LINK_PERIOD, payload: {periodId, timelineId}}
+};
+
+export const createNewTimeline = (timeline, setToSelected = false, events = [], periods = []) => {
+    return {type: CREATE_NEW_TIMELINE, payload: {timeline, setToSelected, events, periods}};
 };
 
 export const updateTimeline = (timelineId, timelineData) => {
@@ -147,6 +159,7 @@ export const saga = function* () {
         takeEvery(GET_TIMELINE, getTimelineSaga),
         takeEvery(UPDATE_TIMELINE, updateTimelineSaga),
         takeEvery(LINK_EVENT, linkEventSaga),
+        takeEvery(LINK_PERIOD, linkPeriodSaga),
     ])
 };
 
@@ -157,6 +170,24 @@ function* linkEventSaga(data) {
 
         yield call(addEventToTimeline, {
             eventId: data.payload.eventId,
+            timelineId: data.payload.timelineId
+        });
+
+        yield put({type: SUCCESS_REQUEST});
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e);
+        showErrorMessage(e)
+    }
+}
+
+function* linkPeriodSaga(data) {
+    try {
+        console.log('dat')
+        yield put({type: START_REQUEST});
+
+        yield call(addPeriodToTimeline, {
+            periodId: data.payload.periodId,
             timelineId: data.payload.timelineId
         });
 
@@ -196,26 +227,25 @@ function* updateTimelineSaga(data) {
 function* createTimelineSaga(data) {
     try {
         yield put({type: START_REQUEST});
-        console.log('createTimelineSaga, payload: ', data.payload);
+        console.log('createTimelineSaga, payload: ', data.payload.timeline);
         // data.CourseId ? delete data.LessonId : delete data.CourseId;
         const mappedTimeline = {
-            Name: data.payload.Name,
+            Name: data.payload.timeline.Name,
             // Course: data.payload.Course,
             // Lesson: data.payload.Lesson,
-            SpecifCode: data.payload.SpecifCode,
-            State: data.payload.State,
-            Order: data.payload.OrderNumber,
-            Image: data.payload.Image,
-            TypeOfUse: data.payload.TypeOfUse
+            SpecifCode: data.payload.timeline.SpecifCode,
+            State: data.payload.timeline.State,
+            Order: data.payload.timeline.OrderNumber,
+            Image: data.payload.timeline.Image ? data.payload.timeline.Image.file : null,
+            ImageMeta:  data.payload.timeline.Image ? JSON.stringify(data.payload.timeline.Image.meta) : null,
+            TypeOfUse: data.payload.timeline.TypeOfUse
         };
 
-        if(data.payload.CourseId || data.payload.LessonId){
-            if(data.payload.CourseId){
-                console.log('data.payload.CourseId:' , data.payload.CourseId)
-                mappedTimeline.CourseId = data.payload.CourseId
+        if(data.payload.timeline.CourseId || data.payload.timeline.LessonId){
+            if(data.payload.timeline.CourseId){
+                mappedTimeline.CourseId = data.payload.timeline.CourseId
             } else {
-                console.log('data.payload.LessonId:' , data.payload.LessonId)
-                mappedTimeline.LessonId = data.payload.LessonId
+                mappedTimeline.LessonId = data.payload.timeline.LessonId
             }
         }
 
@@ -226,7 +256,43 @@ function* createTimelineSaga(data) {
         //     Image: data.payload.BackgroundImage,
         //
         // };
-        yield call(createTimeline, mappedTimeline);
+        const res = yield call(createTimeline, mappedTimeline);
+
+        console.log('id after creating timeline');
+
+        if(res && res.id){
+            if(data.payload.events && data.payload.events.length > 0) {
+                yield put(createEvents({events: data.payload.periods, timelineId: res.id}));
+            }
+
+            // if(data.payload.events && data.payload.events.length > 0) { //todo do same for periods
+            //     yield put(createEvents({events: data.payload.periods, timelineId: id}));
+            // }
+
+            if(data.payload.setToSelected){
+                yield put({type: GET_TIMELINE, payload: {id: res.id, setToEditor: true}});
+            }
+
+        }
+
+        // yield data.payload.setToSelected &&
+        //
+        // if(data.payload.setToSelected && res && res.id){
+        //     console.log('here is work1, id', id)
+        //
+        //     console.log('here is work3')
+        //     if(data.payload.events.length > 0) {
+        //
+        //     }
+        //
+        //     console.log('here is work3')
+        //     // yield data.payload.periods.length > 0 && put(createPeriods({events: data.payload.periods, timelineId: id}))//todo finish later
+        // }
+
+
+        // yield call(createTimeline, );
+
+        // yield put({type: SELECT_TIMELINE, value})
 
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -375,9 +441,22 @@ const addEventToTimeline = ({eventId, timelineId}) => {
         .then(parseJSON)
 };
 
+const addPeriodToTimeline = ({periodId, timelineId}) => {
+    return fetch(`/api/pm/timeline/add-item/${timelineId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({periodId: periodId}),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+};
+
 const _getTimelines = (params) => {
-    let _urlString = `/api/pm/timeline-list${params ? `?${params}` : ''}`;// todo finishi this after backend is done
-    return commonGetQuery(_urlString);// todo uncomment this later
+    let _urlString = `/api/pm/timeline-list${params ? `?${params}` : ''}`;
+    return commonGetQuery(_urlString);
     // return fakeTimelines;
 };
 

@@ -16,6 +16,7 @@ import dictionaryReducer, {moduleName as dictionaryModule} from "tt-ducks/dictio
 import notificationsReducer, {moduleName as notificationsModule} from "tt-ducks/notifications";
 import timelinesReducer, {moduleName as timelinesModule} from "tt-ducks/timelines";
 import eventsReducer, {moduleName as eventsModule} from "tt-ducks/events-timeline";
+import periodsReducer, {moduleName as periodsModule} from "tt-ducks/periods-timeline";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -33,6 +34,7 @@ export default combineReducers({
     [notificationsModule]: notificationsReducer,
     [timelinesModule]: timelinesReducer,
     [eventsModule]: eventsReducer,
+    [periodsModule]: periodsReducer,
 
     routing: routerReducer,
     form: formReducer,

@@ -12,6 +12,7 @@
 
 
 .sticky-header
+
   .webix_ss_header
     position: sticky
     top: 0
@@ -24,6 +25,7 @@
   margin-top: 12px
 
 .details-list-table
+  margin-top: 28px
   width: calc(98% - 24px)
 
 .open-form-button
@@ -35,11 +37,21 @@
   background: none
   opacity: .4
   transition: opacity 300ms ease-in-out
+
   &:hover
     opacity: 1
 
+.add-fully-created // todo it's for add created(comlpete/fully created) events/periods
+  align-items: center
+  justify-content: space-around
+  width: 145px
+  font-size: 8px !important
+  line-height: 8px !important
+  padding: 0 !important
 
 .sticky-block
+  display: flex
+  flex-flow: wrap row
   z-index: 5
   position: sticky
   top: 0
@@ -47,4 +59,12 @@
   border-radius: 10px
   border: none
   box-shadow: 1px 1px 1px 1px rgb(239, 239, 239)
+
+  h5
+    margin-left: 10px
+    flex: 1 0 100%
+
+  button
+    //flex: 1 0 10%
+
 

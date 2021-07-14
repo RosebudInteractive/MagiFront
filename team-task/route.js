@@ -29,8 +29,9 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
-        <Route exact path={'/timelines'}  render={() => (<Timelines />)}/>
-        <Route exact path={'/timelines/:timelineId'}  render={() => (<TimelineEditorContainer />)}/>
+        <Route exact path={'/timelines'}  render={() => (<Timelines/>)}/>
+        <Route exact path={'/timelines/:timelineId'}  render={() => (<TimelineEditorContainer/>)}/>
+        <Route exact path={'/timelines/new'}  render={() => (<TimelineEditorContainer/>)}/>
         <Route exact path={'/notifications/task/:taskId'} render={() => (<Notifications showModal={true}/>)}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {

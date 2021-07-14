@@ -21,7 +21,7 @@ export default function EventForm(props) {
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
-                    {(eventData && eventData.Id) ? 'Редактирование' : 'Созданиее'} события
+                    {(eventData && eventData.Id) ? 'Редактирование' : 'Создание'} события
                 </h6>
             </div>
 
@@ -78,7 +78,7 @@ export default function EventForm(props) {
                                    label={"Привязка к таймлайну"}
                                    placeholder="Привязка к таймлайну"
                                    initialValue={timelineId}
-                                   disabled={false}>
+                                   disabled={!timelineId}>
                             </Field>
                         </div>
 
