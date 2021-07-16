@@ -57,12 +57,12 @@ export const getFilterConfig = (filter, disableFields = []) => {
 export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
-        name = _params.get("name"),
-        typeOfUse = _params.get("typeOfUse"),
+        Name = _params.get("Name"),
+        TypeOfUse = _params.get("TypeOfUse"),
         nameOfLectionOrCourse = _params.get("nameOfLectionOrCourse"),
-        state = _params.get("state"),
-        orderNumber = _params.get("orderNumber"),
-        hasScript = _params.get("hasScript");
+        State = _params.get("State"),
+        OrderNumber = _params.get("OrderNumber"),
+        HasScript = _params.get("HasScript");
 
     let _order = _params.get('order');
     if (_order) {
@@ -72,12 +72,12 @@ export const parseParams = () => {
 
     const _filter = convertParam2Filter(
         {
-            name,
-            typeOfUse,
+            Name,
+            TypeOfUse,
             nameOfLectionOrCourse,
-            state,
-            orderNumber,
-            hasScript
+            State,
+            OrderNumber,
+            HasScript
         });
 
     if (_filter) {
@@ -87,22 +87,22 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({name, typeOfUse, nameOfLectionOrCourse, state, orderNumber, hasScript}) => {
+const convertParam2Filter = ({Name, TypeOfUse, nameOfLectionOrCourse, State, OrderNumber, HasScript}) => {
 
-    if (!(name ||
-        typeOfUse ||
+    if (!(Name ||
+        TypeOfUse ||
         nameOfLectionOrCourse ||
-        state ||
-        orderNumber ||
-        hasScript)) return null;
+        State ||
+        OrderNumber ||
+        HasScript)) return null;
 
     const filter = {};
-    filter.Name = name && name.length > 0 ? name : '';
-    filter.TypeOfUse = (typeOfUse !== null && typeOfUse !== undefined) ? +typeOfUse : '';
+    filter.Name = Name && Name.length > 0 ? Name : '';
+    filter.TypeOfUse = (TypeOfUse !== null && TypeOfUse !== undefined) ? +TypeOfUse : '';
     filter.NameOfLectionOrCourse = nameOfLectionOrCourse ? nameOfLectionOrCourse : '';
-    filter.State = (state !== null && state !== undefined) ? +state : '';
-    filter.OrderNumber = orderNumber ? +orderNumber : '';
-    filter.HasScript = (hasScript !== null && hasScript !== undefined) ? +hasScript : '';
+    filter.State = (State !== null && State !== undefined) ? +State : '';
+    filter.OrderNumber = OrderNumber ? +OrderNumber : '';
+    filter.HasScript = (HasScript !== null && HasScript !== undefined) ? +HasScript : '';
 
 
     return filter
@@ -132,17 +132,17 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if(filter.Name) { _data.name = filter.Name }
+        if(filter.Name) { _data.Name = filter.Name }
 
-        if(filter.TypeOfUse !== null && filter.TypeOfUse !== undefined) { _data.typeOfUse = filter.TypeOfUse}
+        if(filter.TypeOfUse !== null && filter.TypeOfUse !== undefined) { _data.TypeOfUse = filter.TypeOfUse}
 
         if(filter.NameOfLectionOrCourse) { _data.nameOfLectionOrCourse = filter.NameOfLectionOrCourse }
 
-        if(filter.State) { _data.state = filter.State }
+        if(filter.State) { _data.State = filter.State }
 
-        if(filter.OrderNumber) { _data.orderNumber = filter.OrderNumber }
+        if(filter.OrderNumber) { _data.OrderNumber = filter.OrderNumber }
 
-        if(filter.HasScript !== null && filter.HasScript !== undefined ) { _data.hasScript = filter.HasScript }
+        if(filter.HasScript !== null && filter.HasScript !== undefined ) { _data.HasScript = filter.HasScript }
     }
 
     return _data
