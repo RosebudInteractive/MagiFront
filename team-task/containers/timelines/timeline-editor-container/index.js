@@ -20,7 +20,7 @@ import {
     timelinesSelector,
     updateTimeline
 } from "../../../ducks/timelines";
-import {getAllLessons, lessonsSelector} from "../../../ducks/dictionary";
+import {coursesSelector, getAllLessons, lessonsSelector} from "../../../ducks/dictionary";
 import {
     createEvents,
     createNewEvent,
@@ -35,11 +35,13 @@ import {
     setTemporaryEvents,
     temporaryEventsSelector,
     toggleEditorTo,
-    updateEventData
+    updateEventData,
 } from "tt-ducks/events-timeline";
 import {useLocation,} from "react-router-dom"
 import Modal from "../../../components/events/modal"
 import EventForm from "../../../components/events/form"
+import PeriodForm from "../../../components/periods/form"
+import PeriodsFindForm from "../../../components/periods/find-form";
 import EventsFindForm from "../../../components/events/find-form";
 
 import {
@@ -68,8 +70,10 @@ const DEFAULT_TIMELINE = {
     SpecifCode: 'specif-code-string',
     State: 1,
     Image: null,
-    TypeOfUse: 2
+    TypeOfUse: 1
 };
+
+let sTimeline = null;
 
 function TimelineEditorContainer(props) {
     const {
@@ -82,76 +86,69 @@ function TimelineEditorContainer(props) {
     const [mainFormPristine, setMainFormPristine] = useState(true);
     const [timeline, setTimeline] = useState(null);
     const [changedValues, setChangedValues] = useState({});
-    // const [periods, setPeriods] = useState([]); //todo finish for periods, remove it
-    const [events, setEvents] = useState([]);
     const detailsEditor = useRef(null);
     const finderForm = useRef(null);
-    // const [detailsEditor, setDetailsEditor] = useState(null)
     const [finderFormOpened, setFinderFormOpened] = useState(false);
     const location = useLocation();
 
-
     const formChangedCb = (pristine, {values}) => {
-        console.log('values is:', values)
         values && setChangedValues(values);
         setMainFormPristine(pristine)
     };
 
     const closeModal = () => {
         actions.toggleEditorTo(false);
+        actions.toggleEditorToPeriod(false);
+    };
+
+    const doubleClickAction = function ({id, type}) {
+        if (id && type) {
+            if (type === 'periods') {
+
+                detailsEditor.current = PeriodForm;
+                if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
+                    const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
+                    actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
+                } else {
+                    actions.openPeriodEditor({periodId: id});
+                }
+            }
+            if (type === 'events') {
+                detailsEditor.current = EventForm;
+                if (sTimeline.Events && sTimeline.Events.length > 0 && sTimeline.Events.find(pr => (pr.Id) && pr.Id === id)) {
+                    const eventToSet = sTimeline.Events.find(pr => (pr.Id) && pr.Id === id);
+                    actions.openEventEditor({eventId: id, event: eventToSet, timelineId: sTimeline.Id});
+                } else {
+                    actions.openEventEditor({eventId: id});
+                }
+            }
+        }
     };
 
     useEffect(() => {
-        console.log('temporary events changed: , ', temporaryEvents)
-    }, [temporaryEvents])
-
-    useEffect(() => {
-        if (events && events.length > 0) {
-            console.log('events:', events);
-        }
-    }, [events]);
-
-    useEffect(() => {
-        console.log('location, ', location)
-
         const search = parseInt(location.pathname.split("/timelines/")[1]);
 
         if (search) {
-            console.log("search", search);
             actions.getOneTimeline({id: search});
         }
 
         actions.getTimelines()
-        // timelinesAll
     }, [location]);
 
     useEffect(() => {
-
+        sTimeline = selectedTimeline.Id && selectedTimeline;
         setTimeline(selectedTimeline.hasOwnProperty('State') ? selectedTimeline : DEFAULT_TIMELINE);
     }, [selectedTimeline]);
 
-    useEffect(() => {
-        console.log('eventEditorOpened', eventEditorOpened)
-    }, [eventEditorOpened]);
 
     useEffect(() => {
         if (timeline && timeline.hasOwnProperty('State')) {
             actions.hideSideBarMenu();
             (!lessons || lessons.length === 0) && actions.getAllLessons(true, false);
-
-            // const eventsAndPeriods = (id) => {
-            //     actions.requestEvents(id);
-            //     (() => {
-            //     })() // todo actions.getPeriods()
-            // };
-            // timeline.Id && actions.getOneTimeline(timeline.Id);
-
+            (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses
         }
     }, [timeline, lessons, courses]);
 
-    useEffect(() => {
-        console.log("selectedEvent", selectedEvent)
-    }, [selectedEvent]);
 
     useEffect(() => {
 
@@ -170,9 +167,8 @@ function TimelineEditorContainer(props) {
                                       state={timeline.State}
                                       mainFormPristine={mainFormPristine}
                                       onBack={() => actions.goBack()}
+                                      isCreate={!timeline.Id}
                                       onSave={(timelineFormData) => {
-                                          console.log('timelineFormData:', timelineFormData);
-                                          console.log('changedValues:', changedValues);
 
                                           if (timeline.Id) {
                                               actions.updateTimeline(timeline.Id, {
@@ -185,7 +181,8 @@ function TimelineEditorContainer(props) {
                                                   Image: changedValues.image
                                               });
                                           } else {
-                                              actions.createNewTimeline({...timeline,
+                                              actions.createNewTimeline({
+                                                      ...timeline,
                                                       Name: timelineFormData.name,
                                                       CourseId: changedValues.courseId,
                                                       LessonId: changedValues.lessonId,
@@ -195,29 +192,14 @@ function TimelineEditorContainer(props) {
                                                   },
                                                   true,
                                                   temporaryEvents && temporaryEvents.length > 0 ? temporaryEvents : [],
-                                                  temporaryPeriods && temporaryPeriods.length > 0 ? temporaryPeriods : []);
-
-                                              // if(temporaryEvents && temporaryEvents.length > 0){
-                                              // (temporaryEvents && temporaryEvents.length > 0) && actions.createEvents(
-                                              //     {
-                                              //         events: temporaryEvents,
-                                              //         timelineId: (timeline && timeline.Id) ? timeline.Id : null
-                                              //     });
-
-                                              // (temporaryPeriods && temporaryPeriods.length > 0) && actions.createPeriods( //todo uncomment after creating method createPeriods in duck
-                                              //     {
-                                              //         events: temporaryEvents,
-                                              //         timelineId: (timeline && timeline.Id) ? timeline.Id : null
-                                              //     });
+                                                  temporaryPeriods && temporaryPeriods.length > 0 ? temporaryPeriods : [])
                                           }
-                                          // actions.setTemporaryEvents(null);
-                                          // actions.clearSelectedTimeline();
                                           actions.goBack();
-
+                                          actions.getTimelines();
                                       }}
                 />
 
-                {(lessons || courses) &&
+                {(lessons && courses) &&
                 <TimelineForm data={timeline}
                               onChangeFormCallback={formChangedCb}
                               lessons={lessons}
@@ -230,14 +212,9 @@ function TimelineEditorContainer(props) {
                     events: {
                         headerClickAction: () => {
                         },
-                        doubleClickAction: (eventId) => {
-                            detailsEditor.current = EventForm;
-                            actions.openEventEditor({eventId: eventId});
-                        },
+                        doubleClickAction: (id) => doubleClickAction({id: id, type: 'events'}),
                         deleteAction: (id) => {
                             id && actions.removeEvent(id);
-                            // !id && actions.setTemporaryEvents([# new_temporary_array #])//todo remove from temporary by....choise the field to identify
-                            timeline.Id && actions.getOneTimeline(timeline.Id);
                         },
                         createAction: () => {
                             detailsEditor.current = EventForm;
@@ -245,46 +222,36 @@ function TimelineEditorContainer(props) {
 
                             actions.openEventEditor({timelineId: timelineId});
                         },
-                        // openFindFormAction: () => {
-                        //
-                        // },
-                        // findElementAction: (elData) => {
-                        //     actions.findEvent(elData);
-                        // },
                         openFindFormAction: () => {
                             finderForm.current = EventsFindForm;
-                            // detailsEditor.current = EventsFindForm;
                             setFinderFormOpened(true);
                         }
                     }
                     , periods: {
                         headerClickAction: () => {
                         },
-                        doubleClickAction: (periodId) => {
-                            // detailsEditor.current = PeriodForm; todo create it
-                            actions.openPeriodEditor({periodId: periodId});
-                        },
+                        doubleClickAction: (id) => doubleClickAction({id: id, type: 'periods'})
+                        ,
                         deleteAction: (id) => {
                             actions.removePeriod(id);
-                            timeline.Id && actions.getOneTimeline(timeline.Id);
                         },
                         createAction: () => {
-                            // detailsEditor.current = PeriodForm;// todo create it
+                            detailsEditor.current = PeriodForm;
                             const timelineId = (timeline && timeline.Id) ? timeline.Id : null;
                             actions.openPeriodEditor({timelineId: timelineId});
                         },
                         openFindFormAction: () => {
-                            // finderForm.current = PeriodsFindForm//todo create it
+                            finderForm.current = PeriodsFindForm;
                             setFinderFormOpened(true);
                         }
                     }
                 }} events={timeline.Id ? timeline.Events :
                     temporaryEvents ? temporaryEvents : []}
-                   periods={timeline.Id ? timeline.Periods :
-                       temporaryPeriods ? temporaryPeriods : []}
+                                 periods={timeline.Id ? timeline.Periods :
+                                     temporaryPeriods ? temporaryPeriods : []}
                                  findedEvents={findedEvents}
                                  findedPeriods={findedPeriods}
-                                timelineId={timeline.Id}/>
+                                 timelineId={timeline.Id}/>
             </React.Fragment>
             }
 
@@ -308,7 +275,8 @@ function TimelineEditorContainer(props) {
                                     Name: values.name,
                                     ShortName: values.shortName,
                                     Year: values.year,
-                                    State: 1
+                                    State: 1,
+                                    TlCreationId: values.tlCreationId
                                 })
                             } else {
                                 const evs = temporaryEvents ? temporaryEvents : [];
@@ -332,9 +300,13 @@ function TimelineEditorContainer(props) {
                             if (timeline && timeline.Id) {
                                 actions.createNewPeriod(values)
                             } else {
-
                                 const prds = temporaryPeriods ? temporaryPeriods : [];
-                                actions.setTemporaryPeriods([...prds, {...values}])
+                                actions.setTemporaryPeriods([...prds, {
+                                    ...values, Name: values.name,
+                                    ShortName: values.shortName,
+                                    Year: values.year,
+                                    State: 1
+                                }]) //half pammed inside method setTemporary
                             }
 
                         }
@@ -342,25 +314,18 @@ function TimelineEditorContainer(props) {
 
                     actions.toggleEditorTo(false);
                     actions.toggleEditorToPeriod(false);
-
-                    // if(detailsEditor.current !== null) {
-                    //     if(detailsEditor.current === Event)
-                    // }
-                    // console.log('onSave!')
-                    // console.log(values)
-
                 }
             }}/>
             }
 
-            {finderFormOpened && <Modal WrappedComponent={EventsFindForm}
+            {finderFormOpened && <Modal WrappedComponent={finderForm.current}
                                         commonHeader={true}
                                         closeAction={() => {
                                             (timeline && timeline.Id) && actions.getOneTimeline({id: timeline.Id});
                                             setFinderFormOpened(false);
                                         }}
                                         wrappedProps={{
-                                            findedData: findedEvents,
+                                            findedData: finderForm.current === PeriodsFindForm ? findedPeriods : findedEvents,
                                             addEventsAction: (eventsData) => {
                                                 if (timeline && timeline.Id) {
                                                     eventsData.forEach(id => actions.linkEvent({
@@ -372,16 +337,29 @@ function TimelineEditorContainer(props) {
                                                     actions.setTemporaryEvents([...tEvs].push(eventsData));
                                                 }
                                             },
+
+                                            addPeriodsAction: (eventsData) => {
+                                                if (timeline && timeline.Id) {
+                                                    eventsData.forEach(id => actions.linkEvent({
+                                                        eventId: id,
+                                                        timelineId: timeline.Id
+                                                    }));
+                                                } else {
+                                                    const tEvs = temporaryEvents ? temporaryEvents : [];
+                                                    actions.setTemporaryEvents([...tEvs].push(eventsData));
+                                                }
+                                            },
                                             findAction: (elData) => {
-                                                console.log('find event')
-                                                actions.findEvent(elData);
+                                                finderForm === PeriodsFindForm ?
+                                                    actions.findPeriod(elData) :
+                                                    actions.findEvent(elData);
                                             },
                                             closeAction: () => {
                                                 (timeline && timeline.Id) && actions.getOneTimeline({id: timeline.Id});
                                                 setFinderFormOpened(false);
+                                                finderForm.current = null
                                             }
                                         }}/>}
-
         </div>
     )
 }
@@ -401,9 +379,8 @@ const mapState2Props = (state) => {
         selectedPeriod: currentPeriodSelector(state),
         findedPeriods: findedPeriodsSelector(state),
         temporaryEvents: temporaryEventsSelector(state),
-        temporaryPeriods: temporaryPeriodsSelector(state)
-
-        //todo add selectors
+        temporaryPeriods: temporaryPeriodsSelector(state),
+        courses: coursesSelector(state),
     }
 };
 
@@ -438,7 +415,6 @@ const mapDispatch2Props = (dispatch) => {
             setTemporaryPeriods,
             createEvents,
             clearSelectedTimeline
-            //todo add actions
         }, dispatch)
     }
 };

@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Select, TextBox} from "../../../ui-kit";
 import {TIMELINE_TYPES_OF_USE} from "../../../../constants/timelines";
 import {Field, Form, FormSpy} from "react-final-form";
@@ -7,32 +7,34 @@ import validators, {ComposeValidators} from "../../../../tools/validators";
 import Uploader from "../../../../tools/uploader/uploader";
 
 function TimelineForm(props) {
-    const [createAction, setActionCreate] = useState(true); //todo maybu finish it later
+    const [isCreate, setActionCreate] = useState(true); //todo maybu finish it later
     const [image, setImage] = useState(null);
     const {data, lessons, courses} = props;
+    const [typeOfUse, setTypeOfUse] = useState(1);
+    const pristineFlag = useRef(true);
 
     const timelineFormData = useMemo(() => ({
-        name: (data && data.Name) ? data.Name : '',
         timeCr: (data && data.TimeCr) ? new Date(data.TimeCr).toLocaleDateString() : new Date().toLocaleDateString(),
-        typeOfUse: (data && data.TypeOfUse) ? data.TypeOfUse : '',
+        typeOfUse: parseInt(data && data.TypeOfUse ? data.TypeOfUse : null),
         orderNumber: (data && data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : '',
         state: (data && data.State) ? data.State : '',
-        role: (data && data.Role) ? data.Role : '',
         image: (data && data.Image) ? data.Image : '',
         courseId: data.CourseId,
         lessonId: data.LessonId
     }), [data]);
 
+
+
+
     useEffect(() => {
-        setActionCreate(!(data));
+        setActionCreate(!(data.Id));
     }, [data]);
+
+
+
 
     const closeModalForm = () => {
         //todo close form action here ot not???
-
-        // actions.toggleUserForm(false);
-        // actions.cleanSelectedUser();
-        // props.history.push(`/dictionaries/users`);
     };
 
     function setFileInfo(dataObj) {
@@ -51,11 +53,11 @@ function TimelineForm(props) {
     };
 
     const lessonsOptions = useMemo(() => {
-        return lessons && lessons.map(lesson => ({id: lesson.Id, name: lesson.Name}));
+        return lessons && lessons.map(lesson => ({id: parseInt(lesson.Id), name: lesson.Name}));
     }, [lessons]);
 
     const coursesOptions = useMemo(() => {
-        return courses && courses.map(course => ({id: course.Id, name: course.Name}));
+        return courses && courses.map(course => ({id: parseInt(course.Id), name: course.Name}));
     }, [courses]);
 
     return <div className="timeline-form-block">
@@ -68,7 +70,7 @@ function TimelineForm(props) {
             validate={values => {
             }}
             subscription={{values: true, pristine: true}}
-            render={({timelineForm, submitting, pristine, values}) => (
+            render={({timelineForm, submitting, pristine, values, hasValidationErrors, valid, formValue, dirtyFields, errors, formError}) => (
                 <form className='timeline-form' onSubmit={e => {
                     e.preventDefault();
                     handleSubmit(timelineForm.values)
@@ -81,11 +83,11 @@ function TimelineForm(props) {
                                options={_getUseTypes()}
                                defaultValue={data && data.TypeOfUse ? data.TypeOfUse : ''}
                                validate={validators.required}
-                               disabled={true}>
+                               disabled={false}>
                         </Field>
                     </div>
 
-                    {(lessons && values.typeOfUse === 2) &&
+                    {(lessons && typeOfUse === 2) &&
                     <div className='timeline-form__field'>
                         <Field name="lessonId"
                                component={Select}
@@ -93,21 +95,21 @@ function TimelineForm(props) {
                                placeholder="Лекция"
                                disabled={false}
                                options={lessonsOptions}
-                               validate={validators.required}
+                               validate={typeOfUse === 1 ? null : validators.required}
                         >
                         </Field>
                     </div>
                     }
 
-                    {(courses && values.typeOfUse === 1) &&
+                    {(courses && typeOfUse === 1) &&
                     <div className='timeline-form__field'>
-                        <Field name="lessonId"
+                        <Field name="courseId"
                                component={Select}
                                label={"Курс"}
                                placeholder="Курс"
                                disabled={false}
                                options={coursesOptions}
-                               validate={validators.required}>
+                               validate={typeOfUse === 2 ? null : validators.required}>
                         </Field>
                     </div>
                     }
@@ -134,7 +136,8 @@ function TimelineForm(props) {
                             placeholder={"Фоновое изображение"}
                             disabled={false}
                             defaultValue={data.Image}
-                            multiple={false} upload={'/api/adm/upload'}>
+                            multiple={false} upload={'/api/adm/upload'}
+                            >
                             {({input, meta}) => {
                                 return (
 
@@ -150,8 +153,10 @@ function TimelineForm(props) {
                                             upload={'/api/adm/upload'}
                                             buttonText={'Выбрать файл'}
                                             onUploadFile={function (val) {
+                                                pristineFlag.current = !!image;
                                                 setFileInfo(val);
-                                                input.onChange(val)
+
+                                                input.onChange(val);
                                             }.bind(this)}
                                         />
                                     </React.Fragment>
@@ -169,18 +174,19 @@ function TimelineForm(props) {
                                placeholder="Номер"
                                disabled={false}
                                defaultValue={data.OrderNumber}
-                               validate={ComposeValidators(validators.required, validators.minValue.bind(validators.minValue, 1))}>
+                               validate={ComposeValidators(validators.minValue.bind(validators.minValue, 1))}>
                         </Field>
                     </div>
 
 
-                    <FormSpy subscription={{values: true, pristine: true}}
-                             onChange={({pristine, values}) => {
+                    <FormSpy subscription={{formData: true, formValues: true, values: true, pristine: true, valid: true, hasValidationErrors: true,  formValue: true, submitErrors: true}}
+                             onChange={(propes) => {
+                                 setTypeOfUse(parseInt(values.typeOfUse));
                                  const valuesIs = {
                                      ...values,
                                      image: image
                                  };
-                                 setTimeout(() => props.onChangeFormCallback(pristine, {values: valuesIs}), 0);
+                                 setTimeout(() => props.onChangeFormCallback(pristine || pristineFlag.current, {values: valuesIs}), 0);
                              }}/>
                 </form>)}/>
     </div>

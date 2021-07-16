@@ -51,6 +51,7 @@ export const UsersRecord = Record({
 
 export const ReducerRecord = Record({
     lessons: [],
+    courses: [],
     availableForCreationLessons: [],
     users: new UsersRecord(),
     processStructures: [],
@@ -67,6 +68,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case SET_ALL_DATA:
+            console.log('payload courses', payload)
             return state
                 .setIn(['users', 'a'], payload.a)
                 .setIn(['users', 'pma'], payload.pma)
@@ -74,6 +76,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pme'], payload.pme)
                 .setIn(['users', 'pmu'], payload.pmu)
                 .set('lessons', payload.lessons)
+                .set('courses', payload.courses.Courses)
                 .set('availableForCreationLessons', payload.availableForCreationLessons);
         case SET_NEXT_TIME_TO_LOAD:
             return state.set('nextTimeToLoadData', payload);
@@ -101,6 +104,7 @@ const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+export const coursesSelector = createSelector(stateSelector, state => state.courses);
 
 export const allUsersDSelector = createSelector(stateSelector, state => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
@@ -187,7 +191,8 @@ function* getDictionaryDataSaga(data) {
                 _pme,
                 _pmu,
                 _lessons,
-                _availableForCreationLessons
+                _availableForCreationLessons,
+                _courses
             ] = yield all([
                 call(_getAUsers),
                 call(_getPmaUsers),
@@ -196,9 +201,10 @@ function* getDictionaryDataSaga(data) {
                 call(_getPmuUsers),
                 call(_getLessons),
                 call(_getAvailableForCreationLessons),
+                call(_getCourses),
             ]);
 
-            if(_a && _pma && _pms && _pme && _pmu && _lessons){
+            if(_a && _pma && _pms && _pme && _pmu && _lessons && _courses){
                 yield put({type: REQUEST_SUCCESS, payload: false});
                 yield put({
                     type: SET_ALL_DATA,
@@ -209,7 +215,8 @@ function* getDictionaryDataSaga(data) {
                         pme: _pme,
                         pmu: _pmu,
                         lessons: _lessons,
-                        availableForCreationLessons: _availableForCreationLessons
+                        availableForCreationLessons: _availableForCreationLessons,
+                        courses: _courses
                     }
                 });
 
@@ -351,6 +358,10 @@ const _getPmuUsers = () => {
 
 const _getPmeUsers = () => {
     return commonGetQuery("/api/users/list?role=pme");
+};
+
+const _getCourses = () => {
+    return commonGetQuery('/api/courses');
 };
 
 

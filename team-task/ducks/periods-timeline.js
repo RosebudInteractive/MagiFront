@@ -1,88 +1,16 @@
 import {appName} from "../config";
 import {List, Record} from "immutable";
 import {createSelector} from 'reselect'
-import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {all, call, put, race, select, take, takeEvery} from "@redux-saga/core/effects";
+import {MODAL_MESSAGE_ACCEPT, MODAL_MESSAGE_DECLINE, showErrorMessage, showUserConfirmation} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {Period} from "../types/periods";
 import moment from "moment";
-
-
-const fakeTimelines = [
-    {
-        Id: 1,
-        Name: 'Таймлайн 1',
-        ShortName: 'Тм1',
-        Code: 1,
-        TypeOfUse: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 1,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 2,
-        Name: 'Таймлайн 2',
-        ShortName: 'Тм2',
-        TypeOfUse: 2,
-        Code: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 2,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 3,
-        Name: 'Таймлайн 3',
-        ShortName: 'Тм3',
-        TypeOfUse: 2,
-        Code: 3,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 3,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 4,
-        Name: 'Таймлайн 4',
-        ShortName: 'Тм4',
-        TypeOfUse: 2,
-        Code: 4,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 4,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 5,
-        Name: 'Таймлайн 5',
-        ShortName: 'Тм5',
-        TypeOfUse: 2,
-        Code: 5,
-        Course: null,
-        Lesson: null,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 5,
-        HasScript: true,
-        TimeCr: new Date()
-    }
-];
+import {getOneTimeline} from "tt-ducks/timelines";
+import type {Message} from "../types/messages";
 
 //constants
 
@@ -111,16 +39,10 @@ const GET_PERIOD = `${prefix}/GET_PERIOD`;
 const FIND_PERIOD = `${prefix}/FIND_PERIOD`;
 const SET_FINDED = `${prefix}/SET_FINDED`;
 const SET_TEMPORARY_PERIODS = `${prefix}/SET_TEMPORARY_PERIODS`;
-
-// const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
-// const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
-// const CLEAN_SELECTED_COMPONENT = `${prefix}/CLEAN_SELECTED_COMPONENT`;
-// const CHANGE_COMPONENT = `${prefix}/CHANGE_COMPONENT`; // runs before request
-// const UPDATE_COMPONENT = `${prefix}/UPDATE_COMPONENT`; // runs after request complete succesfully
-
+const CREATE_PERIODS = `${prefix}/CREATE_PERIODS`;
+const SET_SELECTED_PERIOD = `${prefix}/SET_SELECTED_PERIOD`;
 
 //store
-
 
 const PeriodsRecord = List<Period>([]);
 const PeriodRecord: Period = {};
@@ -149,24 +71,35 @@ export default function reducer(state = new ReducerRecord(), action) {
         case FAIL_REQUEST:
             return state
                 .set('fetching', false);
-        case SELECT_PERIOD:
-            console.log('selected event:', payload);
+        case SET_SELECTED_PERIOD:
             return state
                 .set('selectedPeriod', payload);
         case UNSELECT_PERIOD:
             return state.set('selectedPeriod', payload);
         case TOGGLE_EDITOR:
-            console.log('TOGGLE_EDITOR', payload);
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            console.log('SET_FINDED,', payload);
             return state.set('finded', payload);
         case SET_TEMPORARY_PERIODS:
-            return state.set('temporary', payload);
+            const mapped = payload.map(pr => ({
+                ...pr,
+                Name: pr.name,
+                ShortName: pr.shortName,
+                Description: pr.description,
+                StartDate: pr.startDate,
+                StartMonth: pr.startMonth,
+                StartYear: pr.startYear,
+                EndDate: pr.endDate,
+                EndMonth: pr.endMonth,
+                EndYear: pr.endYear
+            }));
+            return state.set('temporary', mapped);
         default:
             return state;
     }
 }
+
+
 
 //selectors
 
@@ -182,6 +115,10 @@ export const temporaryPeriodsSelector = createSelector(stateSelector, state => s
 
 //actions
 
+export const createPeriods = ({periods, timelineId}) => {
+    return {type: CREATE_PERIODS, payload: {periods, timelineId}};
+};
+
 export const requestPeriods = () => {
     return {type: LOAD_PERIODS}
 };
@@ -189,10 +126,6 @@ export const requestPeriods = () => {
 export const createNewPeriod = (period) => {
     return {type: CREATE_NEW_PERIOD, payload: period};
 };
-
-// export const selectPeriod = (timelineId) => {
-//     return {type: SELECT_PERIOD, payload: timelineId}
-// };
 
 export const findPeriod = (data) => {
     return {type: FIND_PERIOD, payload: data}
@@ -202,9 +135,8 @@ export const setTemporaryPeriods = (data) => {
     return {type: SET_TEMPORARY_PERIODS, payload: data}
 };
 
-export const openPeriodEditor = ({periodId = null, timelineId = null}) => {
-    console.log('openEventEditor, {eventId, timelineId}', {periodId, timelineId});
-    return {type: OPEN_EDITOR, payload: {periodId, timelineId}}
+export const openPeriodEditor = ({periodId = null, timelineId = null, period = null}) => {
+    return {type: OPEN_EDITOR, payload: {periodId, timelineId, period}}
 };
 
 export const toggleEditorTo = (isOn) => {
@@ -235,22 +167,53 @@ export const saga = function* () {
         takeEvery(UPDATE_PERIOD, updatePeriodSaga),
         takeEvery(REMOVE_PERIOD, removePeriodSaga),
         takeEvery(GET_PERIOD, getPeriodSaga),
-        takeEvery(FIND_PERIOD, findPeriodSaga)
+        takeEvery(FIND_PERIOD, findPeriodSaga),
+        takeEvery(CREATE_PERIODS, createPeriodsSaga),
     ])
 };
+
+function* createPeriodsSaga(data){
+    try {
+        let periodsToCreate =  [];
+        if(data.payload.periods && data.payload.periods.length > 0){
+            periodsToCreate = data.payload.periods;
+        } else {
+            periodsToCreate = yield select(temporaryPeriodsSelector);
+        }
+
+        yield put({type: START_REQUEST});
+
+        if(data.payload.timelineId){
+
+            const finalPeriods = [...periodsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
+
+
+            yield all(
+                finalPeriods.map((ev) => {
+                    console.log(ev);
+                    return call(createPeriod, ev)})
+            );
+        }
+
+
+
+        yield put({type: SUCCESS_REQUEST});
+
+    }catch (e) {
+        yield put({type: FAIL_REQUEST});
+        yield put(showErrorMessage(e.toString()))
+    }
+}
 
 function* findPeriodSaga(data) {
     try {
         yield put({type: START_REQUEST});
-        //todo pase data here
-        // const dat
 
         const date = parseInt(data.payload),
             year = parseInt(data.payload),
             name = data.payload;
 
         const response = yield call(findPeriodBy, {name, year, date});
-        console.log('findPeriodSaga response: ', response)
         yield put({type: SET_FINDED, payload: response});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -266,7 +229,7 @@ function* getPeriodSaga(data) {
 
         const period = yield call(getPeriod, data.payload);
 
-        yield put({type: SELECT_PERIOD, payload: period});
+        yield put({type: SET_SELECTED_PERIOD, payload: period});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
@@ -276,17 +239,32 @@ function* getPeriodSaga(data) {
 }
 
 function* removePeriodSaga(data) {
+    const message: Message = {
+        content: `Удалить период #${data.payload}?`,
+        title: "Подтверждение удаления"
+    };
+
+    yield put(showUserConfirmation(message))
+
+    const {accept} = yield race({
+        accept: take(MODAL_MESSAGE_ACCEPT),
+        decline: take(MODAL_MESSAGE_DECLINE)
+    });
+
+    if (!accept) return;
+
+
+
     try {
         yield put({type: START_REQUEST});
 
         const res = yield call(deletePeriod, data.payload);
 
-        console.log('RES', res.Error);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log('EEEEE:,', e);
         console.dir(e);
         yield put(showErrorMessage(e.toString()));
     }
@@ -299,6 +277,7 @@ function* updatePeriodSaga(data) {
         yield call(updatePeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -322,11 +301,11 @@ function* createPeriodSaga(data) {
 
 function* selectPeriodSaga(data) {
     try {
-        const periods = yield select(periodsSelector);
-        const periodToSetInEditor = periods.find(ev => ev.Id === data.payload);
 
-        if (periodToSetInEditor) {
-            yield put({type: SELECT_PERIOD, payload: periodToSetInEditor});
+        if (data.payload && data.payload.Id) {
+            yield put({type: SET_SELECTED_PERIOD, payload: {...data.payload,
+                    startDate: data.payload.LbDate,
+                    endDate: data.payload.RbDate}});
         }
     } catch (e) {
         console.log(e);
@@ -335,45 +314,59 @@ function* selectPeriodSaga(data) {
 
 function* openEditorSaga(data) {
     try {
-        console.log('openEditorSaga: ', data);
         if (data.payload.periodId || data.payload.timelineId) {
             let period = null;
             if (data.payload.periodId) {
                 const periods = yield select(periodsSelector);
-                period = periods.find(ev => ev.Id === data.payload.periodId);
-                console.log('period openEditorSaga:, ', period)
-                yield put({type: SELECT_PERIOD, payload: period});
+                period = periods && periods.length > 0 && periods.find(pr => pr.Id === data.payload.periodId);
+
+
+                if(period){
+                    yield put({type: SET_SELECTED_PERIOD, payload: period});
+                } else {
+                    if(data.payload.period){
+                        yield put({type: SET_SELECTED_PERIOD, payload: data.payload.period});
+                    }
+                }
+
             } else {
                 const date = new Date();
-                console.log('data.payload:, ', data.payload)
+
                 if (data.payload.timelineId) {
-                    console.log("data.payload.timelineId", data.payload.timelineId);
+
                     yield put({
-                        type: SELECT_PERIOD, payload: {
+                        type: SET_SELECTED_PERIOD, payload: {
                             Name: '',
                             ShortName: '',
                             Description: '',
                             TlCreationId: data.payload.timelineId,
                             TlPublicId: null,
-                            EffDate: date.toLocaleDateString(),
-                            Date: date.getDate(),
-                            Month: date.getMonth(),
-                            Year: date.getFullYear()
+                            LbEffDate: date.toLocaleDateString(),
+                            LbDate: date.getDate(),
+                            LbMonth: date.getMonth(),
+                            LbYear: date.getFullYear(),
+                            RbEffDate: date.toLocaleDateString(),
+                            RbDate: date.getDate(),
+                            RbMonth: date.getMonth(),
+                            RbYear: date.getFullYear()
                         }
                     });
                 } else {
-                    console.log("nothing");
                     yield put({
-                        type: SELECT_PERIOD, payload: {
+                        type: SET_SELECTED_PERIOD, payload: {
                             Name: '',
                             ShortName: '',
                             Description: '',
                             TlCreationId: null,
                             TlPublicId: null,
-                            EffDate: date.toLocaleDateString(),
-                            Date: date.getDate(),
-                            Month: date.getMonth(),
-                            Year: date.getFullYear()
+                            LbEffDate: date.toLocaleDateString(),
+                            LbDate: date.getDate(),
+                            LbMonth: date.getMonth(),
+                            LbYear: date.getFullYear(),
+                            RbEffDate: date.toLocaleDateString(),
+                            RbDate: date.getDate(),
+                            RbMonth: date.getMonth(),
+                            RbYear: date.getFullYear()
                         }
                     });
                 }
@@ -383,16 +376,20 @@ function* openEditorSaga(data) {
         } else {
             const date = new Date();
             yield put({
-                type: SELECT_PERIOD, payload: {
+                type: SET_SELECTED_PERIOD, payload: {
                     Name: '',
                     ShortName: '',
                     Description: '',
                     TlCreationId: null,
                     TlPublicId: null,
-                    EffDate: date.toLocaleDateString(),
-                    Date: date.getDay(),
-                    Month: date.getMonth(),
-                    Year: date.getFullYear()
+                    LbEffDate: date.toLocaleDateString(),
+                    LbDate: date.getDate(),
+                    LbMonth: date.getMonth(),
+                    LbYear: date.getFullYear(),
+                    RbEffDate: date.toLocaleDateString(),
+                    RbDate: date.getDate(),
+                    RbMonth: date.getMonth(),
+                    RbYear: date.getFullYear()
                 }
             });
             yield put({type: TOGGLE_EDITOR, payload: true});
@@ -414,7 +411,23 @@ function* getPeriodsSaga() {
 
         //todo map periods if it need
 
-        yield put({type: SET_PERIODS, payload: periods});
+        const mappedPeriods = periods.map(period => ({
+            ...period,
+            startDate: period.LbDate,
+            startMonth: period.LbMonth,
+            startYear: period.LbYear,
+            endDate: period.RbDate,
+            endMonth: period.RbMonth,
+            endYear: period.RbYear,
+            StartDate: period.LbDate,
+            StartMonth: period.LbMonth,
+            StartYear: period.LbYear,
+            EndDate: period.RbDate,
+            EndMonth: period.RbMonth,
+            EndYear: period.RbYear,
+        }));
+
+        yield put({type: SET_PERIODS, payload: mappedPeriods});
         yield put({type: SUCCESS_REQUEST});
         yield put(clearLocationGuard())
     } catch (e) {
@@ -424,24 +437,29 @@ function* getPeriodsSaga() {
     }
 }
 
-const findPeriodBy = ({name, year, date}) => {
+const findPeriodBy = ({name, year, date}) => { //maybe add something else
     let _urlString = `/api/pm/period-list?Name=${name}&Year=${year}&date=${date}`;
     return commonGetQuery(_urlString);
 };
 
+
+
 const createPeriod = (period) => {
-    const dateObject = (period.date && period.month && period.year) ? moment(`${period.year}-${period.month}-${period.date}`) : null;
+    const dateFrom = (period.startDate && period.startMonth && period.startYear) ? moment(`${period.startYear}-${period.startMonth}-${period.startDate}`) : null;
+    const dateTo = (period.endDate && period.endMonth && period.endYear) ? moment(`${period.endYear}-${period.endMonth}-${period.endDate}`) : null;
     const periodData = {
         Name: period.name,
         TlCreationId: period.tlCreationId,
-        Date: dateObject,
-        Month: period.month,
-        Year: period.year,
+        LbDate: dateFrom,
+        RbDate: dateTo,
+        LbYear: period.startYear,
+        LbMonth: period.startMonth,
+        RbMonth: period.endMonth,
+        RbYear: period.endYear,
         ShortName: period.shortName,
         Description: period.description
     };
-    console.log('create period');
-    console.log(period)
+
     return fetch("/api/pm/period", {
         method: 'POST',
         headers: {"Content-type": "application/json"},
@@ -453,14 +471,19 @@ const createPeriod = (period) => {
 };
 
 const updatePeriod = (period) => {
-    const dateObject = (period.date && period.month && period.year) ? moment(`${period.year}-${period.month}-${period.date}`) : null;
+    const dateFrom = (period.startDate && period.startMonth && period.startYear) ? moment(`${period.startYear}-${period.startMonth}-${period.startDate}`) : null;
+    const dateTo = (period.endDate && period.endMonth && period.endYear) ? moment(`${period.endYear}-${period.endMonth}-${period.endDate}`) : null;
+
     const periodData = {
         Id: period.Id,
         Name: period.name,
         TlCreationId: period.tlCreationId,
-        Date: dateObject,
-        Month: parseInt(period.month),
-        Year: parseInt(period.year),
+        LbDate: dateFrom,
+        RbDate: dateTo,
+        LbYear: period.startYear,
+        LbMonth: period.startMonth,
+        RbMonth: period.endMonth,
+        RbYear: period.endYear,
         ShortName: period.shortName,
         Description: period.description
     };

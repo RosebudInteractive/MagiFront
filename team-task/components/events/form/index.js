@@ -46,7 +46,8 @@ export default function EventForm(props) {
                                        label={"Название"}
                                        placeholder="Название"
                                        defaultValue={eventData && eventData.Name ? eventData.Name : ''}
-                                       disabled={false}>
+                                       disabled={false}
+                                >
                                 </Field>
                             </div>
                         </div>
@@ -121,7 +122,8 @@ export default function EventForm(props) {
 
 
                         <FormSpy subscription={{values: true, pristine: true}}
-                                 onChange={({values, pristine}) => {
+                                 onChange={({values, pristine, formValue}) => {
+
                                      //some logic if it need
                                  }}/>
                     </form>

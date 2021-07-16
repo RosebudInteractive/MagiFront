@@ -31,7 +31,9 @@ export default function TimelinePreview(props) {
             <div className="image-filter">
 
             </div>
-            <img onLoad={setVisible} className="normal" src={`/data/${background}`}/>
+            {background &&
+            <img alt={'timeline background'} onLoad={setVisible} className="normal" src={`/data/${background}`}/>
+            }
         </div>
     )
 }

@@ -6,7 +6,7 @@ import './timeline-editor-header.sass'
 import {Field, Form, FormSpy} from "react-final-form";
 
 export default function TimelineEditorHeader(props) {
-    const {name, state, mainFormPristine, onBack, onSave} = props;
+    const {name, state, mainFormPristine, onBack, onSave, isCreate} = props;
     const [headerPristine, setHeaderPristine] = useState(true);
     const [currentValues, setCurrentValues] = useState({});
 
@@ -75,7 +75,7 @@ export default function TimelineEditorHeader(props) {
         <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
 
         <button className="timeline-editor-header__save-button orange-button big-button"
-                disabled={!(!(headerPristine === true) && !(mainFormPristine === true))}
+                disabled={isCreate ? !(!(headerPristine === true) && !(mainFormPristine === true)) : !(!(headerPristine === true) || !(mainFormPristine === true))}
                 onClick={() => {currentValues && onSave(currentValues)}}>
             Сохранить
         </button>

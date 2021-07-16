@@ -9,19 +9,22 @@ export default function PeriodForm(props) {
         name: (periodData && periodData.Name) ? periodData.Name : '',
         shortName: (periodData && periodData.ShortName) ? periodData.ShortName : '',
         description: (periodData && periodData.Description) ? periodData.Description : '',
-        // date: (eventData && eventData.Date) ? new Date(eventData.Date).getDate() : '',
-        // month: (eventData && eventData.Date) ? new Date(eventData.Date).getMonth() + 1 : '',
-        // year: (eventData && eventData.Date) ? new Date(eventData.Date).getFullYear() : '',
+        startDate: (periodData && periodData.startDate) ? new Date(periodData.startDate).getDate() : '',
+        startMonth: (periodData && periodData.startDate) ? new Date(periodData.startDate).getMonth() + 1 : '',
+        startYear: (periodData && periodData.startDate) ? new Date(periodData.startDate).getFullYear() : '',
+        endDate: (periodData && periodData.endDate) ? new Date(periodData.endDate).getDate() : '',
+        endMonth: (periodData && periodData.endDate) ? new Date(periodData.endDate).getMonth() + 1 : '',
+        endYear: (periodData && periodData.endDate) ? new Date(periodData.endDate).getFullYear() : '',
         tlCreationId: (timelineId) ? timelineId : '',
-    }), [eventData]);
+    }), [periodData]);
 
     return (
 
-        (timelines && timelines.length > 0) && <div className="event-form">
+        (timelines && timelines.length > 0) && <div className="period-form">
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
-                    {(eventData && eventData.Id) ? 'Редактирование' : 'Создание'} события
+                    {(periodData && periodData.Id) ? 'Редактирование' : 'Создание'} периода
                 </h6>
             </div>
 
@@ -30,28 +33,28 @@ export default function PeriodForm(props) {
                     formData
                 }
                 onSubmit={e => {
-                    e.preventDefault()
-                    console.log('onSubmit')
+                    e.preventDefault();
+                    // console.log('onSubmit');
                 }}
                 validate={values => {
                 }
                 }
                 subscription={{values: true, pristine: true}}
-                render={({eventForm, submitting, pristine, values}) => (
-                    <form className='event-form-tag'>
-                        <div className='event-form__field'>
-                            <div className="event-name">
+                render={({periodForm, submitting, pristine, values}) => (
+                    <form className='period-form-tag'>
+                        <div className='period-form__field'>
+                            <div className="period-name">
                                 <Field name="name"
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"
-                                       defaultValue={eventData && eventData.Name ? eventData.Name : ''}
+                                       defaultValue={periodData && periodData.Name ? periodData.Name : ''}
                                        disabled={false}>
                                 </Field>
                             </div>
                         </div>
 
-                        <div className='event-form__field'>
+                        <div className='period-form__field'>
                             <Field name="shortName"
                                    component={TextBox}
                                    label={"Краткое название"}
@@ -61,7 +64,7 @@ export default function PeriodForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
+                        <div className='period-form__field'>
                             <Field name="description"
                                    component={TextBox}
                                    label={"Описание"}
@@ -71,7 +74,9 @@ export default function PeriodForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
+
+
+                        <div className='period-form__field'>
                             <Field name="tlCreationId"
                                    component={Select}
                                    options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
@@ -82,40 +87,78 @@ export default function PeriodForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
-                            <Field name="date"
-                                   component={TextBox}
-                                   label={"Дата"}
-                                   placeholder="Дата"
-                                   initialValue={formData.Date}
-                                   disabled={false}>
-                            </Field>
+
+                        <div className="period-start-date">
+                            <div className='period-form__field start-date'>
+                                <Field name="startDate"
+                                       component={TextBox}
+                                       label={"Дата начала"}
+                                       placeholder="Дата начала"
+                                       initialValue={formData.startDate}
+                                       disabled={false}>
+                                </Field>
+                            </div>
+
+                            <div className='period-form__field'>
+                                <Field name="startMonth"
+                                       component={TextBox}
+                                       label={"Месяц начала"}
+                                       placeholder="Месяц начала"
+                                       initialValue={formData.startMonth}
+                                       disabled={false}>
+                                </Field>
+                            </div>
+
+                            <div className='period-form__field'>
+                                <Field name="startYear"
+                                       component={TextBox}
+                                       label={"Год начала"}
+                                       placeholder="Год начала"
+                                       initialValue={formData.startYear}
+                                       disabled={false}>
+                                </Field>
+                            </div>
                         </div>
 
-                        <div className='event-form__field'>
-                            <Field name="month"
-                                   component={TextBox}
-                                   label={"Месяц"}
-                                   placeholder="Месяц"
-                                   initialValue={formData.Month}
-                                   disabled={false}>
-                            </Field>
+                        <div className="period-end-date">
+                            <div className='period-form__field end-date'>
+                                <Field name="endDate"
+                                       component={TextBox}
+                                       label={"Дата окончания"}
+                                       placeholder="Дата окончания"
+                                       initialValue={formData.endDate}
+                                       disabled={false}>
+                                </Field>
+                            </div>
+
+                            <div className='period-form__field end-date'>
+                                <Field name="endMonth"
+                                       component={TextBox}
+                                       label={"Месяц окончания"}
+                                       placeholder="Месяц окончания"
+                                       initialValue={formData.endMonth}
+                                       disabled={false}>
+                                </Field>
+                            </div>
+
+                            <div className='period-form__field end-date'>
+                                <Field name="endYear"
+                                       component={TextBox}
+                                       label={"Год окончания"}
+                                       placeholder="Год окончания"
+                                       initialValue={formData.endYear}
+                                       disabled={false}>
+                                </Field>
+                            </div>
                         </div>
 
-                        <div className='event-form__field'>
-                            <Field name="year"
-                                   component={TextBox}
-                                   label={"Год"}
-                                   placeholder="Год"
-                                   initialValue={formData.Year}
-                                   disabled={false}>
-                            </Field>
-                        </div>
 
 
-                        <div className='event-form__field center'>
+
+
+                        <div className='period-form__field center'>
                             <button type={'button'} className="orange-button big-button" disabled={pristine}
-                                    onClick={() => props.onSave(eventData.Id, values)}>Сохранить
+                                    onClick={() => props.onSave(periodData.Id, values)}>Сохранить
                             </button>
                         </div>
 

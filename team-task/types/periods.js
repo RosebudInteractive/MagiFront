@@ -4,6 +4,12 @@ export type Period = {
     Description: string,
     TlCreationId: number,
     TlPublicId: number,
-    StartDate: string,
-    EndDate: string
+    LbEffDate: string,
+    LbDate: string,
+    LbMonth: string,
+    LbYear: string,
+    RbEffDate: string,
+    RbDate: string,
+    RbMonth: string,
+    RbYear: string
 }

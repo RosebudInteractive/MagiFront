@@ -1,88 +1,16 @@
 import {appName} from "../config";
 import {List, Record} from "immutable";
 import {createSelector} from 'reselect'
-import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {all, call, put, race, select, take, takeEvery} from "@redux-saga/core/effects";
+import {MODAL_MESSAGE_ACCEPT, MODAL_MESSAGE_DECLINE, showErrorMessage, showUserConfirmation} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {Event} from "../types/events";
 import moment from "moment";
-
-
-const fakeTimelines = [
-    {
-        Id: 1,
-        Name: 'Таймлайн 1',
-        ShortName: 'Тм1',
-        Code: 1,
-        TypeOfUse: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 1,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 2,
-        Name: 'Таймлайн 2',
-        ShortName: 'Тм2',
-        TypeOfUse: 2,
-        Code: 2,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 2,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 3,
-        Name: 'Таймлайн 3',
-        ShortName: 'Тм3',
-        TypeOfUse: 2,
-        Code: 3,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 3,
-        Course: null,
-        Lesson: null,
-        HasScript: true,
-        TimeCr: new Date()
-    },
-    {
-        Id: 4,
-        Name: 'Таймлайн 4',
-        ShortName: 'Тм4',
-        TypeOfUse: 2,
-        Code: 4,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 1,
-        OrderNumber: 4,
-        Course: null,
-        Lesson: null,
-        HasScript: false,
-        TimeCr: new Date()
-    },
-    {
-        Id: 5,
-        Name: 'Таймлайн 5',
-        ShortName: 'Тм5',
-        TypeOfUse: 2,
-        Code: 5,
-        Course: null,
-        Lesson: null,
-        NameOfLectionOrCourse: 'Курс для Таймлайна',
-        State: 2,
-        OrderNumber: 5,
-        HasScript: true,
-        TimeCr: new Date()
-    }
-];
+import {getOneTimeline} from "tt-ducks/timelines";
+import type {Message} from "../types/messages";
 
 //constants
 
@@ -112,6 +40,7 @@ const FIND_EVENT = `${prefix}/FIND_EVENT`;
 const SET_FINDED = `${prefix}/SET_FINDED`;
 const SET_TEMPORARY_EVENTS = `${prefix}/SET_TEMPORARY_EVENTS`;
 const CREATE_EVENTS = `${prefix}/CREATE_EVENTS`;
+const SET_SELECTED_EVENT = `${prefix}/SET_SELECTED_EVENT`;
 
 // const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 // const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
@@ -150,20 +79,16 @@ export default function reducer(state = new ReducerRecord(), action) {
         case FAIL_REQUEST:
             return state
                 .set('fetching', false);
-        case SELECT_EVENT:
-            console.log('selected event:', payload);
+        case SET_SELECTED_EVENT:
             return state
                 .set('selectedEvent', payload);
         case UNSELECT_EVENT:
             return state.set('selectedEvent', payload);
         case TOGGLE_EDITOR:
-            console.log('TOGGLE_EDITOR', payload);
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            console.log('SET_FINDED,', payload);
             return state.set('finded', payload);
         case SET_TEMPORARY_EVENTS:
-            console.log('payload', payload);
             return state.set('temporary', payload);
         default:
             return state;
@@ -188,7 +113,6 @@ export const requestEvents = () => {
 };
 
 export const setTemporaryEvents = (data) => {
-    console.log('setTemporaryEvents');
     return {type: SET_TEMPORARY_EVENTS, payload: data}
 };
 
@@ -197,22 +121,15 @@ export const createNewEvent = (event) => {
 };
 
 export const createEvents = ({events, timelineId}) => {
-    console.log('createEvents, events', events);
-    console.log('createEvents, timelineId', timelineId);
     return {type: CREATE_EVENTS, payload: {events, timelineId}};
 };
-
-// export const selectEvent = (timelineId) => {
-//     return {type: SELECT_EVENT, payload: timelineId}
-// };
 
 export const findEvent = (data) => {
     return {type: FIND_EVENT, payload: data}
 }
 
-export const openEventEditor = ({eventId = null, timelineId = null}) => {
-    console.log('openEventEditor, {eventId, timelineId}', {eventId, timelineId});
-    return {type: OPEN_EDITOR, payload: {eventId, timelineId}}
+export const openEventEditor = ({eventId = null, event = null, timelineId = null}) => {
+    return {type: OPEN_EDITOR, payload: {eventId, timelineId, event}}
 };
 
 export const toggleEditorTo = (isOn) => {
@@ -259,39 +176,23 @@ function* createEventsSaga(data) {
             eventsToCreate = yield select(temporaryEventsSelector);
         }
 
-        console.log('events to set', eventsToCreate);
         yield put({type: START_REQUEST});
-        console.log('createEventsSaga START_REQUEST');
 
-        // const currTimeline = yield timelineId && select(currentTimelineSelector);
-        // const tmId = timelineId ? timelineId : currTimeline.Id;
         if(data.payload.timelineId){
-            console.log('timelineId ', data.payload.timelineId);
 
             const finalEvents = [...eventsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
 
-            console.log('after create final events,', finalEvents);
 
             yield all(
                 finalEvents.map((ev) => {
                     console.log(ev);
                     return call(createEvent, ev)})
             );
-            // yield finalEvents.map(ev => {
-            //     console.log('ev,', ev);
-            //      put(createEvent, ev); //todo check it
-            // });
-            // for (let event of eventsToCreate){
-            //     const eventWithTimeline = {...event, tlCreationId: data.payload.timelineId};
-            //     yield call({type: CREATE_NEW_EVENT, eventWithTimeline}); //todo check it
-            // }
         }
 
 
-        console.log('createEventsSaga SUCCESS_REQUEST')
-
         yield put({type: SUCCESS_REQUEST});
-
+        yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
     }catch (e) {
         yield put({type: FAIL_REQUEST});
         console.log(e);
@@ -310,7 +211,6 @@ function* findEventSaga(data) {
             name = data.payload;
 
         const response = yield call(findEventBy, {name, year, date})
-        console.log('findEventSaga response: ', response)
         yield put({type: SET_FINDED, payload: response});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -336,18 +236,30 @@ function* getEventSaga(data) {
 }
 
 function* removeEventSaga(data) {
+    const message: Message = {
+        content: `Удалить событие #${data.payload}?`,
+        title: "Подтверждение удаления"
+    };
+
+    yield put(showUserConfirmation(message))
+
+    const {accept} = yield race({
+        accept: take(MODAL_MESSAGE_ACCEPT),
+        decline: take(MODAL_MESSAGE_DECLINE)
+    });
+
+    if (!accept) return;
+
     try {
         yield put({type: START_REQUEST});
 
         const res = yield call(deleteEvent, data.payload);
 
-        console.log('RES', res.Error);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log('EEEEE:,', e);
-        console.dir(e);
         yield put(showErrorMessage(e.toString()));
     }
 }
@@ -359,6 +271,7 @@ function* updateEventSaga(data) {
         yield call(updateEvent, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -372,9 +285,10 @@ function* createEventSaga(data) {
 
         yield call(createEvent, data.payload);
 
-        console.log('createEventSaga, data:', data);
 
         yield put({type: SUCCESS_REQUEST});
+
+        yield put(getOneTimeline({id: data.payload.TlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -384,11 +298,13 @@ function* createEventSaga(data) {
 
 function* selectEventSaga(data) {
     try {
-        const events = yield select(eventsSelector);
-        const eventToSetInEditor = events.find(ev => ev.Id === data.payload);
 
-        if (eventToSetInEditor) {
-            yield put({type: SELECT_EVENT, payload: eventToSetInEditor});
+        if (data.payload && data.payload.Id){
+            yield put({type: SET_SELECTED_EVENT, payload: {...data.payload,
+                    Name: (data.payload && data.payload.name) ? data.payload.name : '',
+                    ShortName: (data.payload && data.payload.shortName) ? data.payload.shortName : '',
+                    Description: (data.payload && data.payload.description) ? data.payload.description : ''
+                    }});
         }
     } catch (e) {
         console.log(e);
@@ -397,21 +313,24 @@ function* selectEventSaga(data) {
 
 function* openEditorSaga(data) {
     try {
-        console.log('openEditorSaga: ', data);
         if (data.payload.eventId || data.payload.timelineId) {
             let event = null;
             if (data.payload.eventId) {
                 const events = yield select(eventsSelector);
-                event = events.find(ev => ev.Id === data.payload.eventId);
-                console.log('event openEditorSaga:, ', event)
-                yield put({type: SELECT_EVENT, payload: event});
+                event = events && events.length > 0 &&  events.find(ev => ev.Id === data.payload.eventId);
+
+                if(event){
+                    //todo smth ad here maybe
+                } else {
+                    if(data.payload.event){
+                        yield put({type: SET_SELECTED_EVENT, payload: data.payload.event});
+                    }
+                }
             } else {
                 const date = new Date();
-                console.log('data.payload:, ', data.payload)
                 if (data.payload.timelineId) {
-                    console.log("data.payload.timelineId", data.payload.timelineId);
                     yield put({
-                        type: SELECT_EVENT, payload: {
+                        type: SET_SELECTED_EVENT, payload: {
                             Name: '',
                             ShortName: '',
                             Description: '',
@@ -424,9 +343,8 @@ function* openEditorSaga(data) {
                         }
                     });
                 } else {
-                    console.log("nothing");
                     yield put({
-                        type: SELECT_EVENT, payload: {
+                        type: SET_SELECTED_EVENT, payload: {
                             Name: '',
                             ShortName: '',
                             Description: '',
@@ -445,7 +363,7 @@ function* openEditorSaga(data) {
         } else {
             const date = new Date();
             yield put({
-                type: SELECT_EVENT, payload: {
+                type: SET_SELECTED_EVENT, payload: {
                     Name: '',
                     ShortName: '',
                     Description: '',
@@ -492,10 +410,6 @@ const findEventBy = ({name, year, date}) => {
 };
 
 const createEvent = (event) => {
-    // let dateObject;
-    // if(event.Date) {
-    //     dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.year}-${event.month}-${event.date}`) : null;
-    // }
      const dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.Date}`) : null;
     let eventData = {
         Name: event.Name,
@@ -506,8 +420,7 @@ const createEvent = (event) => {
         ShortName: event.ShortName,
         Description: event.Description
     };
-    console.log('create eventData');
-    console.log(eventData, event);
+
     return fetch("/api/pm/event", {
         method: 'POST',
         headers: {"Content-type": "application/json"},
