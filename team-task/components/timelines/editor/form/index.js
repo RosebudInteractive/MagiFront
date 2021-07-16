@@ -23,9 +23,6 @@ function TimelineForm(props) {
         lessonId: data.LessonId
     }), [data]);
 
-
-
-
     useEffect(() => {
         setActionCreate(!(data.Id));
     }, [data]);
@@ -95,7 +92,7 @@ function TimelineForm(props) {
                                placeholder="Лекция"
                                disabled={false}
                                options={lessonsOptions}
-                               validate={typeOfUse === 1 ? null : validators.required}
+                               validate={validators.required}
                         >
                         </Field>
                     </div>
@@ -109,7 +106,7 @@ function TimelineForm(props) {
                                placeholder="Курс"
                                disabled={false}
                                options={coursesOptions}
-                               validate={typeOfUse === 2 ? null : validators.required}>
+                               validate={validators.required}>
                         </Field>
                     </div>
                     }
@@ -180,7 +177,7 @@ function TimelineForm(props) {
 
 
                     <FormSpy subscription={{formData: true, formValues: true, values: true, pristine: true, valid: true, hasValidationErrors: true,  formValue: true, submitErrors: true}}
-                             onChange={(propes) => {
+                             onChange={({values, pristine}) => {
                                  setTypeOfUse(parseInt(values.typeOfUse));
                                  const valuesIs = {
                                      ...values,
