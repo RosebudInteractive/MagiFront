@@ -260,7 +260,6 @@ function* removePeriodSaga(data) {
 
         const res = yield call(deletePeriod, data.payload);
 
-
         yield put({type: SUCCESS_REQUEST});
         yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
@@ -292,6 +291,7 @@ function* createPeriodSaga(data) {
         yield call(createPeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -452,10 +452,10 @@ const createPeriod = (period) => {
         TlCreationId: period.tlCreationId,
         LbDate: dateFrom,
         RbDate: dateTo,
-        LbYear: period.startYear,
-        LbMonth: period.startMonth,
-        RbMonth: period.endMonth,
-        RbYear: period.endYear,
+        LbYear: parseInt(period.startYear),
+        LbMonth: parseInt(period.startMonth),
+        RbMonth: parseInt(period.endMonth),
+        RbYear: parseInt(period.endYear),
         ShortName: period.shortName,
         Description: period.description
     };

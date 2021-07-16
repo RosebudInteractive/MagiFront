@@ -15,7 +15,6 @@ import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import type {Message} from "../types/messages";
 import {race} from "redux-saga/effects";
 
-
 //constants
 
 export const moduleName = 'users-dictionary';

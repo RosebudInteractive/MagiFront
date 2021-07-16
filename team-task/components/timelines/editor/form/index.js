@@ -16,7 +16,7 @@ function TimelineForm(props) {
     const timelineFormData = useMemo(() => ({
         timeCr: (data && data.TimeCr) ? new Date(data.TimeCr).toLocaleDateString() : new Date().toLocaleDateString(),
         typeOfUse: parseInt(data && data.TypeOfUse ? data.TypeOfUse : null),
-        orderNumber: (data && data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : '',
+        orderNumber: (data && data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : data.Order ? data.Order : null,
         state: (data && data.State) ? data.State : '',
         image: (data && data.Image) ? data.Image : '',
         courseId: data.CourseId,
@@ -67,7 +67,7 @@ function TimelineForm(props) {
             validate={values => {
             }}
             subscription={{values: true, pristine: true}}
-            render={({timelineForm, submitting, pristine, values, hasValidationErrors, valid, formValue, dirtyFields, errors, formError}) => (
+            render={({timelineForm, submitting, pristine, values, hasValidationErrors, valid}) => (
                 <form className='timeline-form' onSubmit={e => {
                     e.preventDefault();
                     handleSubmit(timelineForm.values)
@@ -140,7 +140,7 @@ function TimelineForm(props) {
 
                                     <React.Fragment>
                                         <input className="file-name" type="text"
-                                               defaultValue={image && image.file ? image.file.split('/')[2] : ''}/>
+                                               defaultValue={image && image.file ? image.file.split('/')[2] : data.Image ? data.Image.split('/')[2] : ''}/>
                                         <Uploader
                                             type={"file"}
                                             label={"Фоновое изображение"}
@@ -179,11 +179,37 @@ function TimelineForm(props) {
                     <FormSpy subscription={{formData: true, formValues: true, values: true, pristine: true, valid: true, hasValidationErrors: true,  formValue: true, submitErrors: true}}
                              onChange={({values, pristine}) => {
                                  setTypeOfUse(parseInt(values.typeOfUse));
+                                 let prstn;
+                                 if(!isCreate){
+                                     prstn = pristine;
+                                 } else {
+                                     prstn = pristine || pristineFlag.current;
+                                 }
+
                                  const valuesIs = {
                                      ...values,
-                                     image: image
+                                     image: image,
+                                     courseId: null,
+                                     lessonId: null
                                  };
-                                 setTimeout(() => props.onChangeFormCallback(pristine || pristineFlag.current, {values: valuesIs}), 0);
+
+
+                                 if (values.typeOfUse === '1') {
+                                     if (values.courseId) {
+                                         valuesIs.courseId = values.courseId;
+                                     }
+
+                                     if(values.lessonId){
+                                         valuesIs.lessonId = values.lessonId;
+                                     }
+                                 } else {
+                                     if(values.typeOfUse === '2'){
+                                         if(values.lessonId){
+                                             valuesIs.lessonId = values.lessonId;
+                                         }
+                                     }
+                                 }
+                                 setTimeout(() => props.onChangeFormCallback(prstn, {values: valuesIs}), 0);
                              }}/>
                 </form>)}/>
     </div>

@@ -25,16 +25,15 @@ const SET_TIMELINE_TO_EDIT = `${prefix}/SET_TIMELINE_TO_EDIT`;
 const CLEAR_SELECTED_TIMELINE = `${prefix}/CLEAR_SELECTED_TIMELINE`;
 
 
-
 const START_REQUEST = `${prefix}/START_REQUEST`;
 const SUCCESS_REQUEST = `${prefix}/SUCCESS_REQUEST`;
 const FAIL_REQUEST = `${prefix}/FAIL_REQUEST`;
 const TOGGLE_COMPONENT_FORM_VISIBILITY = `${prefix}/TOGGLE_COMPONENT_FORM_VISIBILITY`;
 const TOGGLE_EDITOR = `${prefix}/TOGGLE_EDITOR`;
 
-const SELECT_TIMELINE =  `${prefix}/SELECT_TIMELINE`;
+const SELECT_TIMELINE = `${prefix}/SELECT_TIMELINE`;
 // const UNSELECT_TIMELINE =  `${prefix}/UNSELECT_TIMELINE`;
-const OPEN_EDITOR =  `${prefix}/OPEN_EDITOR`;
+const OPEN_EDITOR = `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
@@ -208,17 +207,43 @@ function* updateTimelineSaga(data) {
         const mappedTimeline = {
             Name: data.payload.timelineData.Name,
             SpecifCode: data.payload.timelineData.SpecifCode,
-            State:data.payload.timelineData.State,
-            Order: data.payload.timelineData.OrderNumber,
-            Image: data.payload.timelineData.Image.file,
-            ImageMeta:  JSON.stringify(data.payload.timelineData.Image.meta),
-            TypeOfUse: data.payload.TypeOfUse
+
+            // State: data.payload.timelineData.State,
+            // Order: (data.payload.timelineData.OrderNumber || data.payload.timelineData.Order,
+            TypeOfUse: parseInt(data.payload.timelineData.TypeOfUse)
         };
+
+        if (data.payload.timelineData.Image) {
+            mappedTimeline.Image = data.payload.timelineData.Image.file;
+            mappedTimeline.ImageMeta = data.payload.timelineData.Image.meta;
+        }
+
+        if(data.payload.timelineData.OrderNumber || data.payload.timelineData.Order) {
+            if(data.payload.timelineData.OrderNumber){
+                mappedTimeline.Order = parseInt(data.payload.timelineData.OrderNumber);
+            }
+
+            if(data.payload.timelineData.Order){
+                mappedTimeline.Order = parseInt(data.payload.timelineData.Order);
+            }
+
+        }
+
+        if (data.payload.timelineData.CourseId || data.payload.timelineData.LessonId) {
+            if (data.payload.timelineData.CourseId) {
+                mappedTimeline.CourseId = data.payload.timelineData.CourseId;
+                mappedTimeline.LessonId = null;
+            } else {
+                mappedTimeline.LessonId = data.payload.timelineData.LessonId;
+                mappedTimeline.CourseId = null;
+            }
+        }
 
         yield call(changeTimeline, data.payload.timelineId, mappedTimeline);
 
         yield put({type: SUCCESS_REQUEST});
-    }catch (e) {
+        yield put(getTimelines());
+    } catch (e) {
         yield put({type: FAIL_REQUEST})
         console.log(e);
         showErrorMessage(e);
@@ -234,12 +259,12 @@ function* createTimelineSaga(data) {
             State: data.payload.timeline.State,
             Order: data.payload.timeline.OrderNumber,
             Image: data.payload.timeline.Image ? data.payload.timeline.Image.file : null,
-            ImageMeta:  data.payload.timeline.Image ? JSON.stringify(data.payload.timeline.Image.meta) : null,
+            ImageMeta: data.payload.timeline.Image ? JSON.stringify(data.payload.timeline.Image.meta) : null,
             TypeOfUse: data.payload.timeline.TypeOfUse
         };
 
-        if(data.payload.timeline.CourseId || data.payload.timeline.LessonId){
-            if(data.payload.timeline.CourseId){
+        if (data.payload.timeline.CourseId || data.payload.timeline.LessonId) {
+            if (data.payload.timeline.CourseId) {
                 mappedTimeline.CourseId = data.payload.timeline.CourseId
             } else {
                 mappedTimeline.LessonId = data.payload.timeline.LessonId
@@ -249,22 +274,23 @@ function* createTimelineSaga(data) {
         const res = yield call(createTimeline, mappedTimeline);
 
 
-        if(res && res.id){
-            if(data.payload.events && data.payload.events.length > 0) {
+        if (res && res.id) {
+            if (data.payload.events && data.payload.events.length > 0) {
                 yield put(createEvents({events: data.payload.events, timelineId: res.id}));
             }
 
-            if(data.payload.periods && data.payload.periods.length > 0) {
+            if (data.payload.periods && data.payload.periods.length > 0) {
                 yield put(createPeriods({events: data.payload.periods, timelineId: res.id}));
             }
 
-            if(data.payload.setToSelected){
+            if (data.payload.setToSelected) {
                 yield put({type: GET_TIMELINE, payload: {id: res.id, setToEditor: true}});
             }
 
         }
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getTimelines());
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -277,10 +303,11 @@ function* selectTimelineSaga(data) {
         const timelines = yield select(timelinesSelector);
         const timelineToSetInEditor = timelines.find(tmln => tmln.Id === data.payload);
 
-        if(timelineToSetInEditor) {
+        if (timelineToSetInEditor) {
             yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineToSetInEditor});
         } else {
-            yield put({type: SET_TIMELINE_TO_EDIT, payload: {
+            yield put({
+                type: SET_TIMELINE_TO_EDIT, payload: {
                     Name: '',
                     ShortName: '',
                     TypeOfUse: 1,
@@ -294,16 +321,17 @@ function* selectTimelineSaga(data) {
                     LessonId: null,
                     HasScript: false,
                     TimeCr: new Date()
-                }});
+                }
+            });
         }
     } catch (e) {
         console.log(e);
     }
 }
 
-function* openEditorSaga(data){
+function* openEditorSaga(data) {
     try {
-        if(data.payload){
+        if (data.payload) {
             yield put({type: SELECT_TIMELINE, payload: data.payload});
             yield put({type: TOGGLE_EDITOR, payload: true});
         } else {
@@ -328,12 +356,12 @@ function* getTimelinesSaga() {
         const mappedTimelines = timelines.map(tm => {
             const nameOfLectionOrCourse = tm.Lesson ? tm.Lesson.Name :
                 tm.Course ? tm.Course.Name : '';
-           return {
-                    ...tm,
-                    NameOfLectionOrCourse: nameOfLectionOrCourse,
-                    OrderNumber: tm.Order,
-                    Code: tm.SpecifCode
-                }
+            return {
+                ...tm,
+                NameOfLectionOrCourse: nameOfLectionOrCourse,
+                OrderNumber: tm.Order,
+                Code: tm.SpecifCode
+            }
         });
 
         yield put({type: SET_TIMELINES, payload: mappedTimelines});
@@ -348,28 +376,34 @@ function* getTimelinesSaga() {
 
 function* getTimelineSaga(data) {
     try {
+        console.log('getTimelineSaga data: ', data)
         yield put({type: START_REQUEST});
 
         const timeline = yield call(getTimeline, data.payload.id);
-        yield timeline && put({type: SUCCESS_REQUEST});
-        const timelineData = {...timeline,
+        console.log('timeline')
+
+        if (timeline) {
+            yield put({type: SUCCESS_REQUEST});
+        }
+        const timelineData = {
+            ...timeline,
             CourseId: timeline.Course ? timeline.Course.Id : null,
             LessonId: timeline.Lesson ? timeline.Lesson.Id : null,
             Periods: timeline.Periods.map(pr => ({
-               ...pr,
-               startDate:  pr.LbDate,
-               StartDate: pr.LbDate,
-               EndDate: pr.RbDate,
-               endDate: pr.RbDate
+                ...pr,
+                startDate: pr.LbDate,
+                StartDate: pr.LbDate,
+                EndDate: pr.RbDate,
+                endDate: pr.RbDate
             }))
         };
-        if(data.payload.setToEditor){
+        if (data.payload.setToEditor) {
             yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineData});
         }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e);
-        yield put(showErrorMessage(e))
+        console.log(e.toString());
+        yield put(showErrorMessage(e.toString()))
     }
 }
 
@@ -380,7 +414,7 @@ const getTimeline = (timelineId) => {
 const createTimeline = (timeline) => {
     return fetch("/api/pm/timeline", {
         method: 'POST',
-        headers: { "Content-type": "application/json" },
+        headers: {"Content-type": "application/json"},
         credentials: 'include',
         body: JSON.stringify(timeline),
     })
