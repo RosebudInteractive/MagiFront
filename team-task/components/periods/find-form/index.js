@@ -47,7 +47,13 @@ export default function PeriodsFindForm(props) {
             {id: 'ShortName', header: 'Краткое название', minWidth: 100, fillspace: 20},
             {id: 'Description', header: 'Описание', minWidth: 100, fillspace: 20},
             {
-                id: 'Date', header: 'Дата события', minWidth: 100, fillspace: 20, format: function (value) {
+                id: 'LbDate', header: 'Дата начала', minWidth: 100, fillspace: 20, format: function (value) {
+                    let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+                    return value ? fn(new Date(value)) : '';
+                }
+            },
+            {
+                id: 'RbDate', header: 'Дата конца', minWidth: 100, fillspace: 20, format: function (value) {
                     let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
                     return value ? fn(new Date(value)) : '';
                 }

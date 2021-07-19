@@ -175,6 +175,7 @@ function* linkEventSaga(data) {
             timelineId: data.payload.timelineId
         });
 
+        yield put({type: GET_TIMELINE, payload: {id: data.payload.timelineId, setToEditor: true}});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
@@ -193,6 +194,7 @@ function* linkPeriodSaga(data) {
             timelineId: data.payload.timelineId
         });
 
+        yield put({type: GET_TIMELINE, payload: {id: data.payload.timelineId, setToEditor: true}});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});

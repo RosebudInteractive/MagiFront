@@ -11,6 +11,7 @@ import {Event} from "../types/events";
 import moment from "moment";
 import {getOneTimeline} from "tt-ducks/timelines";
 import type {Message} from "../types/messages";
+import $ from "jquery";
 
 //constants
 
@@ -203,14 +204,19 @@ function* createEventsSaga(data) {
 function* findEventSaga(data) {
     try {
         yield put({type: START_REQUEST});
-        //todo pase data here
-        // const dat
 
-        const date = moment(data.payload),
-            year = parseInt(data.payload),
-            name = data.payload;
+        const paramsObject = {};
 
-        const response = yield call(findEventBy, {name, year, date})
+        const numberDate = parseInt(data.payload);
+
+        if (!isNaN(numberDate)) {
+            paramsObject.Date = numberDate;
+            paramsObject.Year = numberDate;
+        } else {
+            paramsObject.Name = data.payload;
+        }
+
+        const response = yield call(findEventBy, $.param(paramsObject));
         yield put({type: SET_FINDED, payload: response});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -404,8 +410,8 @@ function* getEventsSaga() {
     }
 }
 
-const findEventBy = ({name, year, date}) => {
-    let _urlString = `/api/pm/event-list?Name=${name}&Year=${year}&date=${date}`;
+const findEventBy = (paramsObject) => {
+    let _urlString = `/api/pm/event-list?${paramsObject}`;
     return commonGetQuery(_urlString);
 };
 

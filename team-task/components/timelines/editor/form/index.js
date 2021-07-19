@@ -46,7 +46,7 @@ function TimelineForm(props) {
     };
 
     const _getUseTypes = () => {
-        return Object.entries(TIMELINE_TYPES_OF_USE).map(type => ({id: type[0], name: type[1]}))
+        return Object.entries(TIMELINE_TYPES_OF_USE).map(type => ({id:  parseInt(type[0]), name: type[1]}))
     };
 
     const lessonsOptions = useMemo(() => {
@@ -194,7 +194,7 @@ function TimelineForm(props) {
                                  };
 
 
-                                 if (values.typeOfUse === '1') {
+                                 if (values.typeOfUse === 1) {
                                      if (values.courseId) {
                                          valuesIs.courseId = values.courseId;
                                      }
@@ -203,7 +203,7 @@ function TimelineForm(props) {
                                          valuesIs.lessonId = values.lessonId;
                                      }
                                  } else {
-                                     if(values.typeOfUse === '2'){
+                                     if(values.typeOfUse === 2){
                                          if(values.lessonId){
                                              valuesIs.lessonId = values.lessonId;
                                          }

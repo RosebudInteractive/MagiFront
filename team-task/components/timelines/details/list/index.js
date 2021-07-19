@@ -88,7 +88,7 @@ export default function DetailsList(props) {
             </div>
 
             <div className="grid-container details-list-table items-table">
-                <Webix ui={GRID_CONFIG} data={items}/>}
+                <Webix ui={GRID_CONFIG} data={items}/>
             </div>
         </div>
     )

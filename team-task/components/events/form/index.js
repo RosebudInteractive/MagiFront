@@ -83,7 +83,7 @@ export default function EventForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
+                        <div className='event-form__field event-date'>
                             <Field name="date"
                                    component={TextBox}
                                    label={"Дата"}
@@ -93,7 +93,7 @@ export default function EventForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
+                        <div className='event-form__field event-date'>
                             <Field name="month"
                                    component={TextBox}
                                    label={"Месяц"}
@@ -103,7 +103,7 @@ export default function EventForm(props) {
                             </Field>
                         </div>
 
-                        <div className='event-form__field'>
+                        <div className='event-form__field event-date'>
                             <Field name="year"
                                    component={TextBox}
                                    label={"Год"}
