@@ -33,7 +33,6 @@ import {
     removeEvent,
     requestEvents,
     setTemporaryEvents,
-    temporaryEventsSelector,
     toggleEditorTo,
     updateEventData,
 } from "tt-ducks/events-timeline";
@@ -55,7 +54,6 @@ import {
     removePeriod,
     requestPeriods,
     setTemporaryPeriods,
-    temporaryPeriodsSelector,
     toggleEditorTo as toggleEditorToPeriod,
     updatePeriodData
 } from "tt-ducks/periods-timeline";
@@ -81,7 +79,7 @@ function TimelineEditorContainer(props) {
         courses, selectedEvent, eventEditorOpened,
         selectedPeriod, findedPeriods,
         timelinesAll, findedEvents, periodEditorOpened
-        , temporaryEvents, temporaryPeriods
+        , events, periods
     } = props;
     const [mainFormPristine, setMainFormPristine] = useState(true);
     const [timeline, setTimeline] = useState(null);
@@ -147,8 +145,8 @@ function TimelineEditorContainer(props) {
                     Image: changedValues.image
                 },
                 true,
-                temporaryEvents && temporaryEvents.length > 0 ? temporaryEvents : [],
-                temporaryPeriods && temporaryPeriods.length > 0 ? temporaryPeriods : [])
+                events && events.length > 0 ? events : [],
+                periods && periods.length > 0 ? periods : [])
         }
         actions.goBack();
         actions.getTimelines();
@@ -188,7 +186,7 @@ function TimelineEditorContainer(props) {
                         TlCreationId: values.tlCreationId
                     })
                 } else {
-                    const evs = temporaryEvents ? temporaryEvents : [];
+                    const evs = events ? events : [];
                     actions.setTemporaryEvents([...evs, {
                         Date: values.date,
                         Description: values.description,
@@ -210,7 +208,7 @@ function TimelineEditorContainer(props) {
                 if (timeline && timeline.Id) {
                     actions.createNewPeriod(values)
                 } else {
-                    const prds = temporaryPeriods ? temporaryPeriods : [];
+                    const prds = periods ? periods : [];
                     actions.setTemporaryPeriods([...prds, {
                         ...values, Name: values.name,
                         ShortName: values.shortName,
@@ -239,7 +237,7 @@ function TimelineEditorContainer(props) {
                     timelineId: timeline.Id
                 }));
             } else {
-                const tEvs = temporaryEvents ? temporaryEvents : [];
+                const tEvs = events ? events : [];
                 actions.setTemporaryEvents([...tEvs].push(data));
             }
         } else {
@@ -249,7 +247,7 @@ function TimelineEditorContainer(props) {
                     timelineId: timeline.Id
                 }));
             } else {
-                const tPer = temporaryPeriods ? temporaryPeriods : [];
+                const tPer = periods ? periods : [];
                 actions.setTemporaryPeriods([...tPer].push(data));
             }
         }
@@ -300,8 +298,8 @@ function TimelineEditorContainer(props) {
     useEffect(() => {
 
         return function () {
-            setTemporaryEvents(null);
-            setTemporaryPeriods(null);
+            setTemporaryEvents([]);
+            setTemporaryPeriods([]);
             actions.showSideBarMenu();
         }
     }, []);
@@ -360,9 +358,9 @@ function TimelineEditorContainer(props) {
                         }
                     }
                 }} events={timeline.Id ? timeline.Events :
-                    temporaryEvents ? temporaryEvents : []}
+                    events ? events : []}
                                  periods={timeline.Id ? timeline.Periods :
-                                     temporaryPeriods ? temporaryPeriods : []}
+                                     periods ? periods : []}
                                  findedEvents={findedEvents}
                                  findedPeriods={findedPeriods}
                                  timelineId={timeline.Id}/>
@@ -408,8 +406,6 @@ const mapState2Props = (state) => {
         periodEditorOpened: periodEditorOpenedSelector(state),
         selectedPeriod: currentPeriodSelector(state),
         findedPeriods: findedPeriodsSelector(state),
-        temporaryEvents: temporaryEventsSelector(state),
-        temporaryPeriods: temporaryPeriodsSelector(state),
         courses: coursesSelector(state),
     }
 };

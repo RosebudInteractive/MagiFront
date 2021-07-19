@@ -53,7 +53,6 @@ export const ReducerRecord = Record({
     selectedPeriod: PeriodRecord,
     editorOpened: false,
     finded: null,
-    temporary: null,
 });
 
 // reducer
@@ -94,7 +93,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 EndMonth: pr.endMonth,
                 EndYear: pr.endYear
             }));
-            return state.set('temporary', mapped);
+            return state.set('periods', mapped);
         default:
             return state;
     }
@@ -111,7 +110,7 @@ export const periodsSelector = createSelector(stateSelector, state => state.peri
 export const periodEditorOpenedSelector = createSelector(stateSelector, state => state.editorOpened);
 
 export const findedPeriodsSelector = createSelector(stateSelector, state => state.finded);
-export const temporaryPeriodsSelector = createSelector(stateSelector, state => state.temporary);
+export const temporaryPeriodsSelector = createSelector(stateSelector, state => state.periods);
 
 //actions
 

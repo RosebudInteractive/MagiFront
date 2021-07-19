@@ -259,7 +259,7 @@ function* createTimelineSaga(data) {
             Name: data.payload.timeline.Name,
             SpecifCode: data.payload.timeline.SpecifCode,
             State: data.payload.timeline.State,
-            Order: data.payload.timeline.OrderNumber,
+            Order: parseInt(data.payload.timeline.OrderNumber || data.payload.timeline.Order),
             Image: data.payload.timeline.Image ? data.payload.timeline.Image.file : null,
             ImageMeta: data.payload.timeline.Image ? JSON.stringify(data.payload.timeline.Image.meta) : null,
             TypeOfUse: data.payload.timeline.TypeOfUse

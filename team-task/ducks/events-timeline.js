@@ -62,7 +62,6 @@ export const ReducerRecord = Record({
     selectedEvent: EventRecord,
     editorOpened: false,
     finded: null,
-    temporary: null, // temporary events willbe save later after timeline is save
 });
 
 // reducer
@@ -90,7 +89,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_FINDED:
             return state.set('finded', payload);
         case SET_TEMPORARY_EVENTS:
-            return state.set('temporary', payload);
+            return state.set('events', payload);
         default:
             return state;
     }
@@ -105,7 +104,7 @@ export const eventsFetchingSelector = createSelector(stateSelector, state => sta
 export const eventsSelector = createSelector(stateSelector, state => state.events);
 export const eventEditorOpenedSelector = createSelector(stateSelector, state => state.editorOpened);
 export const findedEventsSelector = createSelector(stateSelector, state => state.finded);
-export const temporaryEventsSelector = createSelector(stateSelector, state => state.temporary);
+export const temporaryEventsSelector = createSelector(stateSelector, state => state.events);
 
 //actions
 
