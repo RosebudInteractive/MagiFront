@@ -1,6 +1,6 @@
 // import type {TimelineStatus} from "./timeline";
 
-export type Event = {
+export type Event = { //todo should change it and Period type
     Name: string,
     ShortName: string,
     Description: string,

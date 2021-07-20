@@ -22,6 +22,7 @@ import {
     timelinesFetchingSelector,
     timelinesSelector
 } from "tt-ducks/timelines";
+import {setTemporaryPeriods} from "tt-ducks/periods-timeline";
 import {setTemporaryEvents} from "tt-ducks/events-timeline";
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {TimelineStatuses, TimelineTypesOfUse} from "../../constants/timelines";
@@ -67,7 +68,8 @@ const Timelines = (props) => {
         actions.setInitState(initState);
 
         if (!fetching) {
-            actions.setTemporaryEvents(null);
+            actions.setTemporaryEvents([]);
+            actions.setTemporaryPeriods([]);
             actions.clearSelectedTimeline();
             actions.getTimelines();
         }
@@ -259,7 +261,8 @@ const mapDispatch2Props = (dispatch) => {
             selectTimeline,
             hideSideBarMenu,
             setTemporaryEvents,
-            clearSelectedTimeline
+            clearSelectedTimeline,
+            setTemporaryPeriods
         }, dispatch)
     }
 };

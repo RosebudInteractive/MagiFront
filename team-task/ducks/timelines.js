@@ -41,13 +41,6 @@ const UPDATE_TIMELINE = `${prefix}/UPDATE_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
 const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
 
-// const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
-// const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
-// const CLEAN_SELECTED_COMPONENT = `${prefix}/CLEAN_SELECTED_COMPONENT`;
-// const CHANGE_COMPONENT = `${prefix}/CHANGE_COMPONENT`; // runs before request
-// const UPDATE_COMPONENT = `${prefix}/UPDATE_COMPONENT`; // runs after request complete succesfully
-
-
 //store
 
 const TimelinesRecord = List<Timeline>([]);
@@ -80,12 +73,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('selectedTimeline', payload);
         case CLEAR_SELECTED_TIMELINE:
             return state.set('selectedTimeline', {});
-        // case UNSELECT_TIMELINE: //todo need it?
-        //     return state.set('selectedTimeline', {});
-        // case UPDATE_COMPONENT:
-        //     return state.set('components', payload);
-        // case CLEAN_SELECTED_COMPONENT:
-        //     return state.set('selectedComponent', null);
         case TOGGLE_EDITOR:
             return state.set('editorOpened', payload);
         case TOGGLE_COMPONENT_FORM_VISIBILITY:
@@ -166,7 +153,6 @@ export const saga = function* () {
 
 function* linkEventSaga(data) {
     try {
-        console.log('dat')
         yield put({type: START_REQUEST});
 
         yield call(addEventToTimeline, {
@@ -185,7 +171,6 @@ function* linkEventSaga(data) {
 
 function* linkPeriodSaga(data) {
     try {
-        console.log('dat')
         yield put({type: START_REQUEST});
 
         yield call(addPeriodToTimeline, {
@@ -208,9 +193,6 @@ function* updateTimelineSaga(data) {
         const mappedTimeline = {
             Name: data.payload.timelineData.Name,
             SpecifCode: data.payload.timelineData.SpecifCode,
-
-            // State: data.payload.timelineData.State,
-            // Order: (data.payload.timelineData.OrderNumber || data.payload.timelineData.Order,
             TypeOfUse: parseInt(data.payload.timelineData.TypeOfUse)
         };
 
@@ -281,7 +263,7 @@ function* createTimelineSaga(data) {
             }
 
             if (data.payload.periods && data.payload.periods.length > 0) {
-                yield put(createPeriods({events: data.payload.periods, timelineId: res.id}));
+                yield put(createPeriods({periods: data.payload.periods, timelineId: res.id}));
             }
 
             if (data.payload.setToSelected) {
@@ -353,7 +335,6 @@ function* getTimelinesSaga() {
         const params = yield select(paramsSelector);
         const timelines = yield call(_getTimelines, params);
 
-        //todo map timelines
         const mappedTimelines = timelines.map(tm => {
             const nameOfLectionOrCourse = tm.Lesson ? tm.Lesson.Name :
                 tm.Course ? tm.Course.Name : '';
@@ -377,11 +358,9 @@ function* getTimelinesSaga() {
 
 function* getTimelineSaga(data) {
     try {
-        console.log('getTimelineSaga data: ', data)
         yield put({type: START_REQUEST});
 
         const timeline = yield call(getTimeline, data.payload.id);
-        console.log('timeline')
 
         if (timeline) {
             yield put({type: SUCCESS_REQUEST});
@@ -390,13 +369,6 @@ function* getTimelineSaga(data) {
             ...timeline,
             CourseId: timeline.Course ? timeline.Course.Id : null,
             LessonId: timeline.Lesson ? timeline.Lesson.Id : null,
-            Periods: timeline.Periods.map(pr => ({
-                ...pr,
-                startDate: pr.LbDate,
-                StartDate: pr.LbDate,
-                EndDate: pr.RbDate,
-                endDate: pr.RbDate
-            }))
         };
 
         yield put(setEvents(timelineData.Events));
