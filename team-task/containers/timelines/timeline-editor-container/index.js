@@ -323,9 +323,8 @@ function TimelineEditorContainer(props) {
                               courses={courses}/>
                 }
                 <TimelinePreview
-                    background={(changedValues.image && changedValues.image.file) ? changedValues.image.file :
-                        timeline.Image ? timeline.Image :
-                            null}/>
+                    background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
+                    events={events}/>
 
                 <TimelineDetails actions={{
                     events: {

@@ -19,6 +19,7 @@ export const moduleName = 'events-timeline';
 const prefix = `${appName}/${moduleName}`;
 
 //action types
+const SET_EVENTS_REQUEST = `${prefix}/SET_EVENTS_REQUEST`;
 const SET_EVENTS = `${prefix}/SET_EVENTS`;
 const LOAD_EVENTS = `${prefix}/LOAD_EVENTS`;
 
@@ -153,6 +154,9 @@ export const removeEvent = (eventId) => {
   return {type: REMOVE_EVENT, payload: eventId}
 };
 
+export const setEvents = (events) => {
+    return {type: SET_EVENTS_REQUEST, payload: events}
+}
 
 //sagas
 
@@ -169,8 +173,30 @@ export const saga = function* () {
         takeEvery(FIND_EVENT, findEventSaga),
         takeEvery(CREATE_EVENTS, createEventsSaga),
         takeEvery(ADD_TEMPORARY_EVENTS_REQUEST, addTemporaryEventSaga),
+        takeEvery(SET_EVENTS_REQUEST, setEventsSaga),
     ])
 };
+
+const _getColor = () => {
+    return "hsl(" + 360 * Math.random() + ',' +
+        (55 + 45 * Math.random()) + '%,' +
+        (50 + 10 * Math.random()) + '%)'
+}
+
+function* setEventsSaga({payload}) {
+    const _events = payload.map((item) => {
+        let _event = {...item}
+
+        _event.year = item.Year ? item.Year : new Date(item.Date).getFullYear()
+        _event.name = item.Name
+        _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`
+        _event.color = _getColor()
+
+        return _event
+    })
+
+    yield put({type: SET_EVENTS, payload: _events})
+}
 
 function* addTemporaryEventSaga({payload}) {
     const _events = yield select(temporaryEventsSelector)
