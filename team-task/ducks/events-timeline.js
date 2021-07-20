@@ -191,6 +191,7 @@ function* setEventsSaga({payload}) {
         _event.name = item.Name
         _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`
         _event.color = _getColor()
+        _event.visible = true
 
         return _event
     })
