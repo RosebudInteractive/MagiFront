@@ -9,7 +9,7 @@ import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {createEvents, setEvents} from "tt-ducks/events-timeline";
-import {createPeriods} from "tt-ducks/periods-timeline";
+import {createPeriods, setPeriods} from "tt-ducks/periods-timeline";
 
 //constants
 
@@ -399,7 +399,8 @@ function* getTimelineSaga(data) {
             }))
         };
 
-        yield put(setEvents(timelineData.Events))
+        yield put(setEvents(timelineData.Events));
+        yield put(setPeriods(timelineData.Periods));
 
         if (data.payload.setToEditor) {
             yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineData});

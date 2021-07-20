@@ -22,6 +22,7 @@ import {
 } from "tt-ducks/timelines";
 import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
 import {
+    addTemporaryEvent,
     createEvents,
     createNewEvent,
     currentEventSelector,
@@ -32,7 +33,6 @@ import {
     openEventEditor,
     removeEvent,
     requestEvents,
-    addTemporaryEvent,
     setTemporaryEvents,
     toggleEditorTo,
     updateEventData,
@@ -45,6 +45,7 @@ import PeriodsFindForm from "../../../components/periods/find-form";
 import EventsFindForm from "../../../components/events/find-form";
 
 import {
+    addTemporaryPeriod,
     createNewPeriod,
     currentPeriodSelector,
     findedPeriodsSelector,
@@ -150,11 +151,19 @@ function TimelineEditorContainer(props) {
                 periods && periods.length > 0 ? periods : [])
         }
         actions.goBack();
+        actions.setTemporaryEvents([]);
+        actions.setTemporaryPeriods([]);
         actions.getTimelines();
     };
 
     const detailsCreateAction = (type) => {
         const timelineId = timeline.Id ? timeline.Id : null;
+
+        if(!timelineId){
+            // console.log('');
+            actions.setTemporaryEvents([]);
+            actions.setTemporaryPeriods([]);
+        }
 
         if (type === 'events') {
             detailsEditor.current = EventForm;
@@ -168,7 +177,7 @@ function TimelineEditorContainer(props) {
     const detailsOpenFindFormAction = (type) => {
         finderForm.current = type === 'events' ? EventsFindForm : PeriodsFindForm;
         setFinderFormOpened(true);
-    }
+    };
 
     const onSaveModal = (id, values) => {
         if (eventEditorOpened) {
@@ -208,13 +217,7 @@ function TimelineEditorContainer(props) {
                 if (timeline && timeline.Id) {
                     actions.createNewPeriod(values)
                 } else {
-                    const prds = periods ? periods : [];
-                    actions.setTemporaryPeriods([...prds, {
-                        ...values, Name: values.name,
-                        ShortName: values.shortName,
-                        Year: values.year,
-                        State: 1
-                    }]) //half pammed inside method setTemporary
+                    actions.addTemporaryPeriod(values)
                 }
 
             }
@@ -237,8 +240,7 @@ function TimelineEditorContainer(props) {
                     timelineId: timeline.Id
                 }));
             } else {
-                const tEvs = events ? events : [];
-                actions.setTemporaryEvents([...tEvs].push(data));
+                actions.addTemporaryEvent(data);
             }
         } else {
             if (timeline && timeline.Id) {
@@ -247,14 +249,11 @@ function TimelineEditorContainer(props) {
                     timelineId: timeline.Id
                 }));
             } else {
-                const tPer = periods ? periods : [];
-                actions.setTemporaryPeriods([...tPer].push(data));
+                actions.addTemporaryPeriod(data);
             }
         }
 
-        closeFinderAction()
-
-
+        closeFinderAction();
     };
 
     const findAction = (elData) => {
@@ -264,7 +263,6 @@ function TimelineEditorContainer(props) {
     };
 
     const closeFinderAction = () => {
-        // (timeline && timeline.Id) && actions.getOneTimeline({id: timeline.Id});
         setFinderFormOpened(false);
         finderForm.current = null
     };
@@ -277,7 +275,7 @@ function TimelineEditorContainer(props) {
             actions.getOneTimeline({id: search});
         }
 
-        actions.getTimelines()
+        (!timelinesAll || timelinesAll.length === 0) && actions.getTimelines()
     }, [location]);
 
     useEffect(() => {
@@ -356,10 +354,8 @@ function TimelineEditorContainer(props) {
                             detailsOpenFindFormAction('periods')
                         }
                     }
-                }} events={timeline.Id ? timeline.Events :
-                    events ? events : []}
-                                 periods={timeline.Id ? timeline.Periods :
-                                     periods ? periods : []}
+                }} events={events}
+                                 periods={periods}
                                  findedEvents={findedEvents}
                                  findedPeriods={findedPeriods}
                                  timelineId={timeline.Id}/>
@@ -437,6 +433,7 @@ const mapDispatch2Props = (dispatch) => {
             createNewPeriod,
             linkPeriod,
             addTemporaryEvent,
+            addTemporaryPeriod,
             setTemporaryEvents,
             setTemporaryPeriods,
             createEvents,
