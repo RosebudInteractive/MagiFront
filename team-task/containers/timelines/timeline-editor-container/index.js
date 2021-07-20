@@ -19,8 +19,8 @@ import {
     timelineOpenedSelector,
     timelinesSelector,
     updateTimeline
-} from "../../../ducks/timelines";
-import {coursesSelector, getAllLessons, lessonsSelector} from "../../../ducks/dictionary";
+} from "tt-ducks/timelines";
+import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
 import {
     createEvents,
     createNewEvent,
@@ -32,8 +32,8 @@ import {
     openEventEditor,
     removeEvent,
     requestEvents,
+    addTemporaryEvent,
     setTemporaryEvents,
-    temporaryEventsSelector,
     toggleEditorTo,
     updateEventData,
 } from "tt-ducks/events-timeline";
@@ -187,8 +187,7 @@ function TimelineEditorContainer(props) {
                         TlCreationId: values.tlCreationId
                     })
                 } else {
-                    const evs = events ? events : [];
-                    actions.setTemporaryEvents([...evs, {
+                    actions.addTemporaryEvent({
                         Date: values.date,
                         Description: values.description,
                         Month: values.month,
@@ -196,7 +195,7 @@ function TimelineEditorContainer(props) {
                         ShortName: values.shortName,
                         Year: values.year,
                         State: 1
-                    }])
+                    })
                 }
             }
         }
@@ -438,6 +437,7 @@ const mapDispatch2Props = (dispatch) => {
             findPeriod,
             createNewPeriod,
             linkPeriod,
+            addTemporaryEvent,
             setTemporaryEvents,
             setTemporaryPeriods,
             createEvents,
