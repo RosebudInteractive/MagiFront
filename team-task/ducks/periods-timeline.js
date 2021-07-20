@@ -11,7 +11,7 @@ import {Period} from "../types/periods";
 import moment from "moment";
 import {getOneTimeline} from "tt-ducks/timelines";
 import type {Message} from "../types/messages";
-
+import $ from "jquery";
 //constants
 
 export const moduleName = 'periods-timeline';
@@ -53,7 +53,6 @@ export const ReducerRecord = Record({
     selectedPeriod: PeriodRecord,
     editorOpened: false,
     finded: null,
-    temporary: null,
 });
 
 // reducer
@@ -81,6 +80,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_FINDED:
             return state.set('finded', payload);
         case SET_TEMPORARY_PERIODS:
+            console.log('SET_TEMPORARY_PERIODS, payload', payload);
             const mapped = payload.map(pr => ({
                 ...pr,
                 Name: pr.name,
@@ -93,12 +93,11 @@ export default function reducer(state = new ReducerRecord(), action) {
                 EndMonth: pr.endMonth,
                 EndYear: pr.endYear
             }));
-            return state.set('temporary', mapped);
+            return state.set('periods', mapped);
         default:
             return state;
     }
 }
-
 
 
 //selectors
@@ -111,7 +110,7 @@ export const periodsSelector = createSelector(stateSelector, state => state.peri
 export const periodEditorOpenedSelector = createSelector(stateSelector, state => state.editorOpened);
 
 export const findedPeriodsSelector = createSelector(stateSelector, state => state.finded);
-export const temporaryPeriodsSelector = createSelector(stateSelector, state => state.temporary);
+export const temporaryPeriodsSelector = createSelector(stateSelector, state => state.periods);
 
 //actions
 
@@ -172,10 +171,10 @@ export const saga = function* () {
     ])
 };
 
-function* createPeriodsSaga(data){
+function* createPeriodsSaga(data) {
     try {
-        let periodsToCreate =  [];
-        if(data.payload.periods && data.payload.periods.length > 0){
+        let periodsToCreate = [];
+        if (data.payload.periods && data.payload.periods.length > 0) {
             periodsToCreate = data.payload.periods;
         } else {
             periodsToCreate = yield select(temporaryPeriodsSelector);
@@ -183,7 +182,7 @@ function* createPeriodsSaga(data){
 
         yield put({type: START_REQUEST});
 
-        if(data.payload.timelineId){
+        if (data.payload.timelineId) {
 
             const finalPeriods = [...periodsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
 
@@ -191,15 +190,15 @@ function* createPeriodsSaga(data){
             yield all(
                 finalPeriods.map((ev) => {
                     console.log(ev);
-                    return call(createPeriod, ev)})
+                    return call(createPeriod, ev)
+                })
             );
         }
 
 
-
         yield put({type: SUCCESS_REQUEST});
 
-    }catch (e) {
+    } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.toString()))
     }
@@ -209,11 +208,19 @@ function* findPeriodSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        const date = parseInt(data.payload),
-            year = parseInt(data.payload),
-            name = data.payload;
+        const paramsObject = {};
 
-        const response = yield call(findPeriodBy, {name, year, date});
+        const numberDate = parseInt(data.payload);
+
+        if (!isNaN(numberDate)) {
+            paramsObject.Date = numberDate;
+            paramsObject.Year = numberDate;
+        } else {
+            paramsObject.Name = data.payload;
+        }
+
+        const response = yield call(findPeriodBy, $.param(paramsObject));
+
         yield put({type: SET_FINDED, payload: response});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -252,7 +259,6 @@ function* removePeriodSaga(data) {
     });
 
     if (!accept) return;
-
 
 
     try {
@@ -303,9 +309,13 @@ function* selectPeriodSaga(data) {
     try {
 
         if (data.payload && data.payload.Id) {
-            yield put({type: SET_SELECTED_PERIOD, payload: {...data.payload,
+            yield put({
+                type: SET_SELECTED_PERIOD, payload: {
+                    ...data.payload,
                     startDate: data.payload.LbDate,
-                    endDate: data.payload.RbDate}});
+                    endDate: data.payload.RbDate
+                }
+            });
         }
     } catch (e) {
         console.log(e);
@@ -321,10 +331,10 @@ function* openEditorSaga(data) {
                 period = periods && periods.length > 0 && periods.find(pr => pr.Id === data.payload.periodId);
 
 
-                if(period){
+                if (period) {
                     yield put({type: SET_SELECTED_PERIOD, payload: period});
                 } else {
-                    if(data.payload.period){
+                    if (data.payload.period) {
                         yield put({type: SET_SELECTED_PERIOD, payload: data.payload.period});
                     }
                 }
@@ -437,11 +447,10 @@ function* getPeriodsSaga() {
     }
 }
 
-const findPeriodBy = ({name, year, date}) => { //maybe add something else
-    let _urlString = `/api/pm/period-list?Name=${name}&Year=${year}&date=${date}`;
+const findPeriodBy = (paramsObj) => { //maybe add something else
+    let _urlString = `/api/pm/period-list?${paramsObj}`;
     return commonGetQuery(_urlString);
 };
-
 
 
 const createPeriod = (period) => {
@@ -449,7 +458,7 @@ const createPeriod = (period) => {
     const dateTo = (period.endDate && period.endMonth && period.endYear) ? moment(`${period.endYear}-${period.endMonth}-${period.endDate}`) : null;
     const periodData = {
         Name: period.name,
-        TlCreationId: period.tlCreationId,
+        TlCreationId: period.TlCreationId ? period.TlCreationId : period.tlCreationId,
         LbDate: dateFrom,
         RbDate: dateTo,
         LbYear: parseInt(period.startYear),

@@ -190,8 +190,7 @@ export default function PeriodForm(props) {
                                              (values.endYear) &&
                                              (values.endMonth) &&
                                              (values.startMonth) &&
-                                             (values.startYear) &&
-                                             (values.tlCreationId)){
+                                             (values.startYear)){
                                                  setValid(true);
                                              }
                                          } //todo do same crazy shit in event form too
