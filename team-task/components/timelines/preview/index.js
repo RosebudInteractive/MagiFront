@@ -1,39 +1,39 @@
 import React, {useEffect, useRef, useState} from "react";
 import './preview.sass'
 import {Timeline} from "timeline/index";
+import {useWindowSize} from "../../../tools/window-resize-hook";
 
 export default function TimelinePreview(props) {
     const {background, events, periods} = props;
-    const blockRef = useRef();
-    //todo fadeIn fadeOut??
-    const [opacity, setOpacity] = useState(0);
+    const [width, setWidth] = useState(0)
+    const [height, setHeight] = useState(0)
+
+    const _preview = useRef(null)
+
+    useWindowSize(() => {
+        if (_preview.current) {
+            setWidth(_preview.current.clientWidth)
+            setHeight(_preview.current.clientHeight)
+        }
+    });
 
     useEffect(() => {
-        // setOpacity(0);
-        // console.log('blockRef:', blockRef)
-        // setTimeout(() => {
-        //     setOpacity(1);
-        // }, 1500);
-        // if(blockRef.current){
-        //     setOpacity(1)
-        // }
-    }, [background]);
+        setTimeout(() => {
+            if (_preview.current) {
+                setWidth(_preview.current.clientWidth)
+                setHeight(_preview.current.clientHeight)
+            }
+        }, 300)
 
-    function setVisible() {
-        // setOpacity(0);
-        // console.log('onload works setVisible');
-        // setTimeout(() => {
-        //     setOpacity(1)
-        // }, 1500);
-    }
+    }, [])
 
     return (
-        <div ref={blockRef} className="timeline-preview">
+        <div ref={_preview} className="timeline-preview">
             <div className="image-filter">
-            <Timeline width={800} height={500} events={events ? events : []} zoom={1} periods={periods ? periods : []}/>
+            <Timeline width={width} height={height} events={events ? events : []} zoom={1} periods={periods ? periods : []} levelLimit={4}/>
             </div>
             {
-                background && <img alt={'timeline background'} onLoad={setVisible} className="normal" src={`/data/${background}`}/>
+                background && <img alt={'timeline background'} className="normal" src={`/data/${background}`}/>
             }
         </div>
     )
