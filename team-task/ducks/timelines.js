@@ -66,7 +66,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case SET_TIMELINES:
-            console.log(' SET_TIMELINES tinelines', payload);
             return state
                 .set('timelines', payload);
         case START_REQUEST:

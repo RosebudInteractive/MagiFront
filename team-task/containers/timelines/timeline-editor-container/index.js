@@ -33,6 +33,7 @@ import {
     removeEvent,
     requestEvents,
     setTemporaryEvents,
+    addTemporaryEvent,
     temporaryEventsSelector,
     toggleEditorTo,
     updateEventData,
@@ -206,7 +207,9 @@ function TimelineEditorContainer(props) {
                               courses={courses}/>
                 }
                 <TimelinePreview
-                    background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}/>
+                    background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
+                    events={props.events}
+                    periods={props.periods}/>
 
                 <TimelineDetails actions={{
                     events: {
@@ -279,8 +282,7 @@ function TimelineEditorContainer(props) {
                                     TlCreationId: values.tlCreationId
                                 })
                             } else {
-                                const evs = temporaryEvents ? temporaryEvents : [];
-                                actions.setTemporaryEvents([...evs, {
+                                actions.addTemporaryEvent({
                                     Date: values.date,
                                     Description: values.description,
                                     Month: values.month,
@@ -288,7 +290,7 @@ function TimelineEditorContainer(props) {
                                     ShortName: values.shortName,
                                     Year: values.year,
                                     State: 1
-                                }])
+                                })
                             }
                         }
                     }
@@ -412,6 +414,7 @@ const mapDispatch2Props = (dispatch) => {
             createNewPeriod,
             linkPeriod,
             setTemporaryEvents,
+            addTemporaryEvent,
             setTemporaryPeriods,
             createEvents,
             clearSelectedTimeline

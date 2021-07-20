@@ -38,6 +38,7 @@ const REMOVE_EVENT = `${prefix}/REMOVE_EVENT`;
 const GET_EVENT = `${prefix}/GET_EVENT`;
 const FIND_EVENT = `${prefix}/FIND_EVENT`;
 const SET_FINDED = `${prefix}/SET_FINDED`;
+const ADD_TEMPORARY_EVENTS_REQUEST = `${prefix}/ADD_TEMPORARY_EVENTS_REQUEST`;
 const SET_TEMPORARY_EVENTS = `${prefix}/SET_TEMPORARY_EVENTS`;
 const CREATE_EVENTS = `${prefix}/CREATE_EVENTS`;
 const SET_SELECTED_EVENT = `${prefix}/SET_SELECTED_EVENT`;
@@ -61,7 +62,7 @@ export const ReducerRecord = Record({
     selectedEvent: EventRecord,
     editorOpened: false,
     finded: null,
-    temporary: null, // temporary events willbe save later after timeline is save
+    temporary: [], // temporary events willbe save later after timeline is save
 });
 
 // reducer
@@ -101,7 +102,10 @@ const stateSelector = state => state[moduleName];
 
 export const currentEventSelector = createSelector(stateSelector, state => state.selectedEvent);
 export const eventsFetchingSelector = createSelector(stateSelector, state => state.fetching);
-export const eventsSelector = createSelector(stateSelector, state => state.events);
+export const eventsSelector = createSelector(stateSelector, (state) => {
+    console.log(state.events)
+    return state.events
+});
 export const eventEditorOpenedSelector = createSelector(stateSelector, state => state.editorOpened);
 export const findedEventsSelector = createSelector(stateSelector, state => state.finded);
 export const temporaryEventsSelector = createSelector(stateSelector, state => state.temporary);
@@ -111,6 +115,10 @@ export const temporaryEventsSelector = createSelector(stateSelector, state => st
 export const requestEvents = () => {
     return {type: LOAD_EVENTS}
 };
+
+export const addTemporaryEvent = (event) => {
+    return {type: ADD_TEMPORARY_EVENTS_REQUEST, payload: event}
+}
 
 export const setTemporaryEvents = (data) => {
     return {type: SET_TEMPORARY_EVENTS, payload: data}
@@ -163,8 +171,15 @@ export const saga = function* () {
         takeEvery(GET_EVENT, getEventSaga),
         takeEvery(FIND_EVENT, findEventSaga),
         takeEvery(CREATE_EVENTS, createEventsSaga),
+        takeEvery(ADD_TEMPORARY_EVENTS_REQUEST, addTemporaryEventSaga),
     ])
 };
+
+function* addTemporaryEventSaga({payload}) {
+    const _events = yield select(temporaryEventsSelector)
+
+    yield put(SET_TEMPORARY_EVENTS, [..._events, payload])
+}
 
 function* createEventsSaga(data) {
     try {

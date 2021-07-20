@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import './preview.sass'
+import {Timeline} from "timeline/index";
 
 export default function TimelinePreview(props) {
-    const {background} = props;
+    const {background, events, periods} = props;
     const blockRef = useRef();
     //todo fadeIn fadeOut??
     const [opacity, setOpacity] = useState(0);
@@ -29,10 +30,10 @@ export default function TimelinePreview(props) {
     return (
         <div ref={blockRef} className="timeline-preview">
             <div className="image-filter">
-
+            <Timeline width={800} height={500} events={events ? events : []} zoom={1} periods={periods ? periods : []}/>
             </div>
-            {background &&
-            <img alt={'timeline background'} onLoad={setVisible} className="normal" src={`/data/${background}`}/>
+            {
+                background && <img alt={'timeline background'} onLoad={setVisible} className="normal" src={`/data/${background}`}/>
             }
         </div>
     )
