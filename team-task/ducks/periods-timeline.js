@@ -41,6 +41,8 @@ const SET_FINDED = `${prefix}/SET_FINDED`;
 const SET_TEMPORARY_PERIODS = `${prefix}/SET_TEMPORARY_PERIODS`;
 const CREATE_PERIODS = `${prefix}/CREATE_PERIODS`;
 const SET_SELECTED_PERIOD = `${prefix}/SET_SELECTED_PERIOD`;
+const ADD_TEMPORARY_PERIODS_REQUEST = `${prefix}/ADD_TEMPORARY_PERIODS_REQUEST`;
+const SET_PERIODS_REQUEST = `${prefix}/SET_PERIODS_REQUEST`;
 
 //store
 
@@ -114,6 +116,10 @@ export const temporaryPeriodsSelector = createSelector(stateSelector, state => s
 
 //actions
 
+export const addTemporaryPeriod = (period) => {
+    return {type: ADD_TEMPORARY_PERIODS_REQUEST, payload: period}
+};
+
 export const createPeriods = ({periods, timelineId}) => {
     return {type: CREATE_PERIODS, payload: {periods, timelineId}};
 };
@@ -154,6 +160,10 @@ export const removePeriod = (periodId) => {
     return {type: REMOVE_PERIOD, payload: periodId}
 };
 
+export const setPeriods = (periods) => {
+    return {type: SET_PERIODS_REQUEST, payload: periods}
+}
+
 //sagas
 
 export const saga = function* () {
@@ -168,8 +178,52 @@ export const saga = function* () {
         takeEvery(GET_PERIOD, getPeriodSaga),
         takeEvery(FIND_PERIOD, findPeriodSaga),
         takeEvery(CREATE_PERIODS, createPeriodsSaga),
+        takeEvery(ADD_TEMPORARY_PERIODS_REQUEST, addTemporaryPeriodSaga),
+        takeEvery(SET_PERIODS_REQUEST, setPeriodsSaga),
     ])
 };
+
+const _getColor = () => { //todo add to helpers/tools
+    return "hsl(" + 360 * Math.random() + ',' +
+        (55 + 45 * Math.random()) + '%,' +
+        (50 + 10 * Math.random()) + '%)'
+}
+
+function* setPeriodsSaga({payload}) {
+    const _periods = payload.map((item) => {
+        let _period = {...item};
+        console.log('setPeriodsSaga, item,', item);
+
+        _period.year = item.Year ? item.Year : new Date(item.Date).getFullYear();
+        _period.startDate = item.startDate ? new Date(item.startDate).toLocaleDateString("ru-Ru") : `${item.startMonth ? item.startMonth + '.' : ''}${item.startYear}`;
+        _period.endDate = item.endDate ? new Date(item.endDate).toLocaleDateString("ru-Ru") : `${item.endMonth ? item.endMonth + '.' : ''}${item.endYear}`;
+        _period.name = item.Name;
+        _period.color = _getColor();
+
+        return _period
+    });
+
+    yield put({type: SET_PERIODS, payload: _periods})
+}
+
+function* addTemporaryPeriodSaga({payload}) {
+    const _periods = yield select(temporaryPeriodsSelector);
+
+
+
+    console.log('add period', payload)
+    const newPeriod = {
+        ...payload, Name: payload.name,
+        Description: payload.description || payload.Description,
+        ShortName: payload.shortName,
+        Year: payload.year,
+        StartDate: moment(`${payload.startYear}-${payload.startMonth}-${payload.startDate}`),
+        EndDate: moment(`${payload.endYear}-${payload.endMonth}-${payload.endDate}`),
+        State: 1
+    };
+
+    yield put({type: SET_PERIODS_REQUEST, payload: [..._periods, newPeriod]});
+}
 
 function* createPeriodsSaga(data) {
     try {
@@ -282,6 +336,37 @@ function* updatePeriodSaga(data) {
         yield call(updatePeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
+
+
+        const periods = yield select(periodsSelector);
+
+        const periodToUpdateIndex = periods.findIndex(ev => ev.Id === data.payload.Id);
+        const periodToUpdate = periods[periodToUpdateIndex];
+
+        // let updateDataEvent;
+
+        if(periodToUpdate){
+            const dateFrom = (data.payload.startDate && data.payload.startMonth && data.payload.startYear) ? moment(`${data.payload.startYear}-${data.payload.startMonth}-${data.payload.startDate}`) : null;
+            const dateTo = (data.payload.endDate && data.payload.endMonth && data.payload.endYear) ? moment(`${data.payload.endYear}-${data.payload.endMonth}-${data.payload.endDate}`) : null;
+            const updateDataPeriod = {...periodToUpdate, Id: data.payload.Id,
+                Name: data.payload.name,
+                TlCreationId: data.payload.tlCreationId,
+                LbDate: dateFrom,
+                RbDate: dateTo,
+                LbYear: data.payload.startYear,
+                LbMonth: data.payload.startMonth,
+                RbMonth: data.payload.endMonth,
+                RbYear: data.payload.endYear,
+                ShortName: data.payload.shortName,
+                Description: data.payload.description};
+
+            periods.splice(periodToUpdateIndex, 1, updateDataPeriod);
+
+            console.log('events updateEventSaga: ', periods)
+
+            yield put(setTemporaryPeriods(periods));
+        }
+
         yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
@@ -294,10 +379,11 @@ function* createPeriodSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        yield call(createPeriod, data.payload);
+        const {id} = yield call(createPeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
+        // yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true})) //todo remove it later
+        yield put(addTemporaryPeriod({...data.payload, Id: id}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -309,6 +395,7 @@ function* selectPeriodSaga(data) {
     try {
 
         if (data.payload && data.payload.Id) {
+            console.log('selectPeriodSaga data.payload, ', data.payload)
             yield put({
                 type: SET_SELECTED_PERIOD, payload: {
                     ...data.payload,
@@ -459,8 +546,8 @@ const createPeriod = (period) => {
     const periodData = {
         Name: period.name,
         TlCreationId: period.TlCreationId ? period.TlCreationId : period.tlCreationId,
-        LbDate: dateFrom,
-        RbDate: dateTo,
+        LbDate: moment.isMoment(period.StartDate) ? period.StartDate : dateFrom,
+        RbDate: moment.isMoment(period.EndDate) ? period.EndDate : dateFrom,
         LbYear: parseInt(period.startYear),
         LbMonth: parseInt(period.startMonth),
         RbMonth: parseInt(period.endMonth),

@@ -3,6 +3,7 @@ import {Field, Form, FormSpy} from "react-final-form";
 import {Select, TextBox} from "../../ui-kit";
 import './period-form.sass'
 import validators from "../../../tools/validators";
+import moment from "moment";
 
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
@@ -12,12 +13,12 @@ export default function PeriodForm(props) {
         name: (periodData && periodData.Name) ? periodData.Name : '',
         shortName: (periodData && periodData.ShortName) ? periodData.ShortName : '',
         description: (periodData && periodData.Description) ? periodData.Description : '',
-        startDate: (periodData && periodData.startDate) ? new Date(periodData.startDate).getDate() : '',
-        startMonth: (periodData && periodData.startDate) ? new Date(periodData.startDate).getMonth() + 1 : '',
-        startYear: (periodData && periodData.startDate) ? new Date(periodData.startDate).getFullYear() : '',
-        endDate: (periodData && periodData.endDate) ? new Date(periodData.endDate).getDate() : '',
-        endMonth: (periodData && periodData.endDate) ? new Date(periodData.endDate).getMonth() + 1 : '',
-        endYear: (periodData && periodData.endDate) ? new Date(periodData.endDate).getFullYear() : '',
+        startDate: (periodData && periodData.startDate && (typeof periodData.startDate !== 'string')) ? new Date(periodData.startDate).getDate() : (periodData.StartDate && moment.isMoment(periodData.StartDate)) ? periodData.StartDate.toDate().getDate() : (periodData.StartDate) ? new Date(periodData.StartDate).getDate() : '',
+        startMonth: (periodData && periodData.startDate && (typeof periodData.startDate !== 'string')) ? new Date(periodData.startDate).getMonth() + 1 : (periodData.StartDate && moment.isMoment(periodData.StartDate)) ? periodData.StartDate.toDate().getMonth() + 1 : (periodData.StartDate) ? new Date(periodData.StartDate).getMonth() + 1 : '',
+        startYear: (periodData && periodData.startDate && (typeof periodData.startDate !== 'string')) ? new Date(periodData.startDate).getFullYear() : (periodData.StartDate && moment.isMoment(periodData.StartDate)) ? periodData.StartDate.toDate().getFullYear() : (periodData.StartDate) ? new Date(periodData.StartDate).getFullYear() : '',
+        endDate: (periodData && periodData.endDate && (typeof periodData.endDate !== 'string')) ? new Date(periodData.endDate).getDate() : (periodData.EndDate && moment.isMoment(periodData.EndDate)) ? periodData.EndDate.toDate().getDate() : (periodData.EndDate) ? new Date(periodData.EndDate).getDate() : '',
+        endMonth: (periodData && periodData.endDate && (typeof periodData.endDate !== 'string')) ? new Date(periodData.endDate).getMonth() + 1 : (periodData.EndDate && moment.isMoment(periodData.EndDate)) ? periodData.EndDate.toDate().getMonth() + 1 : (periodData.EndDate) ? new Date(periodData.EndDate).getMonth() + 1 : '',
+        endYear: (periodData && periodData.endDate && (typeof periodData.endDate !== 'string')) ? new Date(periodData.endDate).getFullYear() : (periodData.EndDate && moment.isMoment(periodData.EndDate)) ? periodData.EndDate.toDate().getFullYear() : (periodData.EndDate) ? new Date(periodData.EndDate).getFullYear() + 1 : '',
         tlCreationId: (timelineId) ? timelineId : '',
     }), [periodData]);
 

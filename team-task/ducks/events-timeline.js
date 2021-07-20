@@ -44,6 +44,7 @@ const ADD_TEMPORARY_EVENTS_REQUEST = `${prefix}/ADD_TEMPORARY_EVENTS_REQUEST`;
 const SET_TEMPORARY_EVENTS = `${prefix}/SET_TEMPORARY_EVENTS`;
 const CREATE_EVENTS = `${prefix}/CREATE_EVENTS`;
 const SET_SELECTED_EVENT = `${prefix}/SET_SELECTED_EVENT`;
+// const UPDATE_EVENT
 
 // const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
 // const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
@@ -116,7 +117,7 @@ export const requestEvents = () => {
 
 export const addTemporaryEvent = (event) => {
     return {type: ADD_TEMPORARY_EVENTS_REQUEST, payload: event}
-}
+};
 
 export const setTemporaryEvents = (data) => {
     return {type: SET_TEMPORARY_EVENTS, payload: data}
@@ -151,12 +152,12 @@ export const updateEventData = ({eventId, eventData}) => {
 }
 
 export const removeEvent = (eventId) => {
-  return {type: REMOVE_EVENT, payload: eventId}
+    return {type: REMOVE_EVENT, payload: eventId}
 };
 
 export const setEvents = (events) => {
     return {type: SET_EVENTS_REQUEST, payload: events}
-}
+};
 
 //sagas
 
@@ -177,7 +178,7 @@ export const saga = function* () {
     ])
 };
 
-const _getColor = () => {
+const _getColor = () => { //todo add to helpers/tools
     return "hsl(" + 360 * Math.random() + ',' +
         (55 + 45 * Math.random()) + '%,' +
         (50 + 10 * Math.random()) + '%)'
@@ -185,7 +186,7 @@ const _getColor = () => {
 
 function* setEventsSaga({payload}) {
     const _events = payload.map((item) => {
-        let _event = {...item}
+        let _event = {...item};
 
         _event.year = item.Year ? item.Year : new Date(item.Date).getFullYear()
         _event.name = item.Name
@@ -200,16 +201,27 @@ function* setEventsSaga({payload}) {
 }
 
 function* addTemporaryEventSaga({payload}) {
-    const _events = yield select(temporaryEventsSelector)
+    const _events = yield select(temporaryEventsSelector);
 
-    yield put(SET_TEMPORARY_EVENTS, [..._events, payload])
+    const newEvent = {
+        ...payload,
+        Date: payload.date,
+        Description: payload.description,
+        Month: payload.month,
+        Name: payload.name,
+        ShortName: payload.shortName,
+        Year: payload.year,
+        State: 1
+    };
+
+    yield put({type: SET_EVENTS_REQUEST, payload: [..._events, newEvent]});
 }
 
 function* createEventsSaga(data) {
     try {
+        let eventsToCreate = [];
 
-        let eventsToCreate =  [];
-        if(data.payload.events && data.payload.events.length > 0){
+        if (data.payload.events && data.payload.events.length > 0) {
             eventsToCreate = data.payload.events;
         } else {
             eventsToCreate = yield select(temporaryEventsSelector);
@@ -217,22 +229,20 @@ function* createEventsSaga(data) {
 
         yield put({type: START_REQUEST});
 
-        if(data.payload.timelineId){
-
+        if (data.payload.timelineId) {
             const finalEvents = [...eventsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
-
 
             yield all(
                 finalEvents.map((ev) => {
                     console.log(ev);
-                    return call(createEvent, ev)})
+                    return call(createEvent, ev)
+                })
             );
         }
 
-
         yield put({type: SUCCESS_REQUEST});
         yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
-    }catch (e) {
+    } catch (e) {
         yield put({type: FAIL_REQUEST});
         console.log(e);
         yield put(showErrorMessage(e.toString()))
@@ -315,7 +325,34 @@ function* updateEventSaga(data) {
         yield call(updateEvent, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
+
+        const events = yield select(eventsSelector);
+
+        const eventToUpdateIndex = events.findIndex(ev => ev.Id === data.payload.Id);
+        const eventToUpdate = events[eventToUpdateIndex];
+
+        // let updateDataEvent;
+
+        if(eventToUpdate){
+            const dateObject = (data.payload.date && data.payload.month && data.payload.year) ? moment(`${data.payload.year}-${data.payload.month}-${data.payload.date}`) : null;
+            const updateDataEvent = {...eventToUpdate, Id: data.payload.Id,
+                Name: data.payload.name,
+                TlCreationId: data.payload.tlCreationId,
+                Date: dateObject,
+                Month: parseInt(data.payload.month),
+                Year: parseInt(data.payload.year),
+                ShortName: data.payload.shortName,
+                Description: data.payload.description};
+
+            events.splice(eventToUpdateIndex, 1, updateDataEvent);
+
+            console.log('events updateEventSaga: ', events)
+
+            yield put(setTemporaryEvents(events));
+        }
+        // console.log('if (event) {');
+        // yield put({type: SET_SELECTED_EVENT, payload: data.payload.event});
+        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true})) //todo remove it later
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -327,12 +364,12 @@ function* createEventSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        yield call(createEvent, data.payload);
-
+        const {id} = yield call(createEvent, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
 
-        yield put(getOneTimeline({id: data.payload.TlCreationId, setToEditor: true}))
+        yield put(getOneTimeline({id: data.payload.TlCreationId, setToEditor: true})); //todo remove it later
+        yield put(addTemporaryEvent({...data.payload, Id: id}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -343,12 +380,15 @@ function* createEventSaga(data) {
 function* selectEventSaga(data) {
     try {
 
-        if (data.payload && data.payload.Id){
-            yield put({type: SET_SELECTED_EVENT, payload: {...data.payload,
+        if (data.payload && data.payload.Id) {
+            yield put({
+                type: SET_SELECTED_EVENT, payload: {
+                    ...data.payload,
                     Name: (data.payload && data.payload.name) ? data.payload.name : '',
                     ShortName: (data.payload && data.payload.shortName) ? data.payload.shortName : '',
                     Description: (data.payload && data.payload.description) ? data.payload.description : ''
-                    }});
+                }
+            });
         }
     } catch (e) {
         console.log(e);
@@ -361,12 +401,13 @@ function* openEditorSaga(data) {
             let event = null;
             if (data.payload.eventId) {
                 const events = yield select(eventsSelector);
-                event = events && events.length > 0 &&  events.find(ev => ev.Id === data.payload.eventId);
+                event = events && events.length > 0 && events.find(ev => ev.Id === data.payload.eventId);
 
-                if(event){
-                    //todo smth ad here maybe
+                if (event) {
+                    console.log('if (event) {');
+                    yield put({type: SET_SELECTED_EVENT, payload: data.payload.event});
                 } else {
-                    if(data.payload.event){
+                    if (data.payload.event) {
                         yield put({type: SET_SELECTED_EVENT, payload: data.payload.event});
                     }
                 }
@@ -454,10 +495,10 @@ const findEventBy = (paramsObject) => {
 };
 
 const createEvent = (event) => {
-     const dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.Date}`) : null;
+    const dateObject = (event.Date && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.Date}`) : null;
     let eventData = {
         Name: event.Name,
-        TlCreationId:  event.TlCreationId,
+        TlCreationId: event.TlCreationId,
         Date: dateObject,
         Month: event.Month,
         Year: event.Year,
