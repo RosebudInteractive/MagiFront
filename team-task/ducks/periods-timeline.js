@@ -9,7 +9,6 @@ import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {Period} from "../types/periods";
 import moment from "moment";
-import {getOneTimeline} from "tt-ducks/timelines";
 import type {Message} from "../types/messages";
 import $ from "jquery";
 //constants
@@ -82,20 +81,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_FINDED:
             return state.set('finded', payload);
         case SET_TEMPORARY_PERIODS:
-            console.log('SET_TEMPORARY_PERIODS, payload', payload);
-            const mapped = payload.map(pr => ({
-                ...pr,
-                Name: pr.name,
-                ShortName: pr.shortName,
-                Description: pr.description,
-                StartDate: pr.startDate,
-                StartMonth: pr.startMonth,
-                StartYear: pr.startYear,
-                EndDate: pr.endDate,
-                EndMonth: pr.endMonth,
-                EndYear: pr.endYear
-            }));
-            return state.set('periods', mapped);
+            return state.set('periods', [...payload]);
         default:
             return state;
     }
@@ -154,7 +140,7 @@ export const goBack = () => {
 
 export const updatePeriodData = ({periodId, periodData}) => {
     return {type: UPDATE_PERIOD, payload: {...periodData, Id: periodId}}
-}
+};
 
 export const removePeriod = (periodId) => {
     return {type: REMOVE_PERIOD, payload: periodId}
@@ -162,7 +148,7 @@ export const removePeriod = (periodId) => {
 
 export const setPeriods = (periods) => {
     return {type: SET_PERIODS_REQUEST, payload: periods}
-}
+};
 
 //sagas
 
@@ -194,11 +180,42 @@ function* setPeriodsSaga({payload}) {
         let _period = {...item};
         console.log('setPeriodsSaga, item,', item);
 
-        _period.year = item.Year ? item.Year : new Date(item.Date).getFullYear();
-        _period.startDate = item.startDate ? new Date(item.startDate).toLocaleDateString("ru-Ru") : `${item.startMonth ? item.startMonth + '.' : ''}${item.startYear}`;
-        _period.endDate = item.endDate ? new Date(item.endDate).toLocaleDateString("ru-Ru") : `${item.endMonth ? item.endMonth + '.' : ''}${item.endYear}`;
+
+        _period.StartYear = item.StartYear ? item.StartYear :
+            item.LbYear ? item.LbYear :
+                new Date(item.LbDate).getFullYear();
+        _period.StartMonth = item.StartMonth ? item.StartMonth :
+            item.LbMonth ? item.LbMonth :
+                new Date(item.LbDate).getMonth() + 1;
+        _period.StartDay = item.StartDay ? item.StartDay : new Date(item.LbDate).getDate();
+
+        _period.EndYear = item.EndYear ? item.EndYear :
+            item.RbYear ? item.RbYear :
+                new Date(item.RbDate).getFullYear();
+        _period.EndMonth = item.EndMonth ? item.EndMonth :
+            item.RbMonth ? item.RbMonth :
+                new Date(item.RbDate).getMonth() + 1;
+        _period.EndDay = item.EndDay ? item.EndDay : new Date(item.RbDate).getDate();
+
+
+        _period.startDate = item.StartDate ?
+            new Date(item.StartDate).toLocaleDateString("ru-Ru") :
+            item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
+                `${item.LbMonth ? item.LbMonth + '.' : ''}${item.LbYear}`;
+        _period.endDate = item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
+            item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
+            `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
         _period.name = item.Name;
         _period.color = _getColor();
+
+        _period.DisplayStartDate =
+            item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
+            item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
+            `${item.StartDay ? item.StartDay.toString().padStart(2, '0') + '.' : ''}${item.StartMonth ? item.StartMonth.toString().padStart(2, '0') + '.' : ''}${item.StartYear}`;
+
+        _period.DisplayEndDate = item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
+            item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
+            `${item.EndDay ? item.EndDay.toString().padStart(2, '0') + '.' : ''}${item.EndMonth ? item.EndMonth.toString().padStart(2, '0') + '.' : ''}${item.EndYear}`;
 
         return _period
     });
@@ -208,21 +225,7 @@ function* setPeriodsSaga({payload}) {
 
 function* addTemporaryPeriodSaga({payload}) {
     const _periods = yield select(temporaryPeriodsSelector);
-
-
-
-    console.log('add period', payload)
-    const newPeriod = {
-        ...payload, Name: payload.name,
-        Description: payload.description || payload.Description,
-        ShortName: payload.shortName,
-        Year: payload.year,
-        StartDate: moment(`${payload.startYear}-${payload.startMonth}-${payload.startDate}`),
-        EndDate: moment(`${payload.endYear}-${payload.endMonth}-${payload.endDate}`),
-        State: 1
-    };
-
-    yield put({type: SET_PERIODS_REQUEST, payload: [..._periods, newPeriod]});
+    yield put({type: SET_PERIODS_REQUEST, payload: [..._periods, payload]});
 }
 
 function* createPeriodsSaga(data) {
@@ -239,7 +242,6 @@ function* createPeriodsSaga(data) {
         if (data.payload.timelineId) {
 
             const finalPeriods = [...periodsToCreate.map(ev => ({...ev, TlCreationId: data.payload.timelineId}))];
-
 
             yield all(
                 finalPeriods.map((ev) => {
@@ -321,7 +323,6 @@ function* removePeriodSaga(data) {
         const res = yield call(deletePeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         console.dir(e);
@@ -346,28 +347,31 @@ function* updatePeriodSaga(data) {
         // let updateDataEvent;
 
         if(periodToUpdate){
-            const dateFrom = (data.payload.startDate && data.payload.startMonth && data.payload.startYear) ? moment(`${data.payload.startYear}-${data.payload.startMonth}-${data.payload.startDate}`) : null;
-            const dateTo = (data.payload.endDate && data.payload.endMonth && data.payload.endYear) ? moment(`${data.payload.endYear}-${data.payload.endMonth}-${data.payload.endDate}`) : null;
+            const dateFrom = (data.payload.StartDay && data.payload.StartMonth && data.payload.StartYear) ? moment(`${data.payload.StartYear}-${data.payload.StartMonth}-${data.payload.StartDay}`) : null;
+            const dateTo = (data.payload.EndDay && data.payload.EndMonth && data.payload.EndYear) ? moment(`${data.payload.EndYear}-${data.payload.EndMonth}-${data.payload.EndDay}`) : null;
             const updateDataPeriod = {...periodToUpdate, Id: data.payload.Id,
-                Name: data.payload.name,
-                TlCreationId: data.payload.tlCreationId,
+                Name: data.payload.Name,
+                TlCreationId: data.payload.TlCreationId,
                 LbDate: dateFrom,
                 RbDate: dateTo,
-                LbYear: data.payload.startYear,
-                LbMonth: data.payload.startMonth,
-                RbMonth: data.payload.endMonth,
-                RbYear: data.payload.endYear,
-                ShortName: data.payload.shortName,
-                Description: data.payload.description};
+                LbYear: parseInt(data.payload.StartYear),
+                LbMonth: parseInt(data.payload.StartMonth),
+                RbMonth: parseInt(data.payload.EndMonth),
+                RbYear: parseInt(data.payload.EndYear),
+                ShortName: data.payload.ShortName,
+                Description: data.payload.Description,
+                StartDay: parseInt(data.payload.StartDay),
+                EndDay: parseInt(data.payload.EndDay),
+                StartYear: parseInt(data.payload.StartYear),
+                EndYear: parseInt(data.payload.EndYear),
+                StartMonth: parseInt(data.payload.StartMonth),
+                EndMonth: parseInt(data.payload.EndMonth),
+            };
 
             periods.splice(periodToUpdateIndex, 1, updateDataPeriod);
 
-            console.log('events updateEventSaga: ', periods)
-
-            yield put(setTemporaryPeriods(periods));
+            yield put(setPeriods([...periods]));
         }
-
-        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -382,8 +386,7 @@ function* createPeriodSaga(data) {
         const {id} = yield call(createPeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
-        // yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true})) //todo remove it later
-        yield put(addTemporaryPeriod({...data.payload, Id: id}))
+        yield put(addTemporaryPeriod({...data.payload, Id: id, State: 1}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
@@ -395,7 +398,6 @@ function* selectPeriodSaga(data) {
     try {
 
         if (data.payload && data.payload.Id) {
-            console.log('selectPeriodSaga data.payload, ', data.payload)
             yield put({
                 type: SET_SELECTED_PERIOD, payload: {
                     ...data.payload,
@@ -438,14 +440,24 @@ function* openEditorSaga(data) {
                             Description: '',
                             TlCreationId: data.payload.timelineId,
                             TlPublicId: null,
+                            StartDate: date,
+                            StartYear: date.getFullYear(),
+                            EndYear: date.getFullYear(),
+                            EndDate: date,
+                            StartMonth: date.getMonth() + 1,
+                            EndMonth: date.getMonth() + 1,
+                            DisplayStartDate: date.toLocaleDateString(),
+                            DisplayEndDate: date.toLocaleDateString(),
                             LbEffDate: date.toLocaleDateString(),
-                            LbDate: date.getDate(),
-                            LbMonth: date.getMonth(),
+                            LbDate: date,
+                            LbMonth: date.getMonth() + 1,
                             LbYear: date.getFullYear(),
                             RbEffDate: date.toLocaleDateString(),
-                            RbDate: date.getDate(),
-                            RbMonth: date.getMonth(),
-                            RbYear: date.getFullYear()
+                            RbDate: date,
+                            RbMonth: date.getMonth() + 1,
+                            RbYear: date.getFullYear(),
+                            StartDay: date.getDate(),
+                            EndDay: date.getDate()
                         }
                     });
                 } else {
@@ -456,14 +468,24 @@ function* openEditorSaga(data) {
                             Description: '',
                             TlCreationId: null,
                             TlPublicId: null,
+                            StartDate: date,
+                            EndDate: date,
+                            StartMonth: date.getMonth() + 1,
+                            EndMonth: date.getMonth() + 1,
+                            DisplayStartDate: date.toLocaleDateString(),
+                            DisplayEndDate: date.toLocaleDateString(),
                             LbEffDate: date.toLocaleDateString(),
-                            LbDate: date.getDate(),
-                            LbMonth: date.getMonth(),
+                            LbDate: date,
+                            LbMonth: date.getMonth() + 1,
                             LbYear: date.getFullYear(),
                             RbEffDate: date.toLocaleDateString(),
-                            RbDate: date.getDate(),
-                            RbMonth: date.getMonth(),
-                            RbYear: date.getFullYear()
+                            RbDate: date,
+                            RbMonth: date.getMonth() + 1,
+                            RbYear: date.getFullYear(),
+                            StartDay: date.getDate(),
+                            EndDay: date.getDate(),
+                            StartYear: date.getFullYear(),
+                            EndYear: date.getFullYear(),
                         }
                     });
                 }
@@ -479,14 +501,28 @@ function* openEditorSaga(data) {
                     Description: '',
                     TlCreationId: null,
                     TlPublicId: null,
+
+                    StartDate: date,
+                    EndDate: date,
+                    StartMonth: date.getMonth() + 1,
+                    EndMonth: date.getMonth() + 1,
+
+                    DisplayStartDate: date.toLocaleDateString(),
+                    DisplayEndDate: date.toLocaleDateString(),
+
                     LbEffDate: date.toLocaleDateString(),
-                    LbDate: date.getDate(),
-                    LbMonth: date.getMonth(),
+                    LbDate: date,
+                    LbMonth: date.getMonth() + 1,
                     LbYear: date.getFullYear(),
                     RbEffDate: date.toLocaleDateString(),
-                    RbDate: date.getDate(),
-                    RbMonth: date.getMonth(),
-                    RbYear: date.getFullYear()
+                    RbDate: date,
+                    RbMonth: date.getMonth() + 1,
+                    RbYear: date.getFullYear(),
+
+                    StartDay: date.getDate(),
+                    EndDay: date.getDate(),
+                    StartYear: date.getFullYear(),
+                    EndYear: date.getFullYear(),
                 }
             });
             yield put({type: TOGGLE_EDITOR, payload: true});
@@ -506,25 +542,7 @@ function* getPeriodsSaga() {
         const params = yield select(paramsSelector);
         const periods = yield call(getPeriods, params);
 
-        //todo map periods if it need
-
-        const mappedPeriods = periods.map(period => ({
-            ...period,
-            startDate: period.LbDate,
-            startMonth: period.LbMonth,
-            startYear: period.LbYear,
-            endDate: period.RbDate,
-            endMonth: period.RbMonth,
-            endYear: period.RbYear,
-            StartDate: period.LbDate,
-            StartMonth: period.LbMonth,
-            StartYear: period.LbYear,
-            EndDate: period.RbDate,
-            EndMonth: period.RbMonth,
-            EndYear: period.RbYear,
-        }));
-
-        yield put({type: SET_PERIODS, payload: mappedPeriods});
+        yield put({type: SET_PERIODS_REQUEST, payload: periods});
         yield put({type: SUCCESS_REQUEST});
         yield put(clearLocationGuard())
     } catch (e) {
@@ -541,19 +559,19 @@ const findPeriodBy = (paramsObj) => { //maybe add something else
 
 
 const createPeriod = (period) => {
-    const dateFrom = (period.startDate && period.startMonth && period.startYear) ? moment(`${period.startYear}-${period.startMonth}-${period.startDate}`) : null;
-    const dateTo = (period.endDate && period.endMonth && period.endYear) ? moment(`${period.endYear}-${period.endMonth}-${period.endDate}`) : null;
+    const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
+    const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
     const periodData = {
-        Name: period.name,
-        TlCreationId: period.TlCreationId ? period.TlCreationId : period.tlCreationId,
-        LbDate: moment.isMoment(period.StartDate) ? period.StartDate : dateFrom,
-        RbDate: moment.isMoment(period.EndDate) ? period.EndDate : dateFrom,
-        LbYear: parseInt(period.startYear),
-        LbMonth: parseInt(period.startMonth),
-        RbMonth: parseInt(period.endMonth),
-        RbYear: parseInt(period.endYear),
-        ShortName: period.shortName,
-        Description: period.description
+        Name: period.Name,
+        TlCreationId: period.TlCreationId,
+        LbDate: dateFrom,
+        RbDate: dateTo,
+        LbYear: parseInt(period.StartYear),
+        LbMonth: parseInt(period.StartMonth),
+        RbMonth: parseInt(period.EndMonth),
+        RbYear: parseInt(period.EndYear),
+        ShortName: period.ShortName,
+        Description: period.Description
     };
 
     return fetch("/api/pm/period", {
@@ -567,21 +585,21 @@ const createPeriod = (period) => {
 };
 
 const updatePeriod = (period) => {
-    const dateFrom = (period.startDate && period.startMonth && period.startYear) ? moment(`${period.startYear}-${period.startMonth}-${period.startDate}`) : null;
-    const dateTo = (period.endDate && period.endMonth && period.endYear) ? moment(`${period.endYear}-${period.endMonth}-${period.endDate}`) : null;
+    const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
+    const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
 
     const periodData = {
         Id: period.Id,
-        Name: period.name,
-        TlCreationId: period.tlCreationId,
+        Name: period.Name,
+        TlCreationId: period.TlCreationId,
         LbDate: dateFrom,
         RbDate: dateTo,
-        LbYear: period.startYear,
-        LbMonth: period.startMonth,
-        RbMonth: period.endMonth,
-        RbYear: period.endYear,
-        ShortName: period.shortName,
-        Description: period.description
+        LbYear: parseInt(period.StartYear),
+        LbMonth: parseInt(period.StartMonth),
+        RbMonth: parseInt(period.EndMonth),
+        RbYear: parseInt(period.EndYear),
+        ShortName: period.ShortName,
+        Description: period.Description
     };
 
     return fetch(`/api/pm/period/${period.Id}`, {

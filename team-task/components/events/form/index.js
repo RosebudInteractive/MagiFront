@@ -6,13 +6,13 @@ import './event-form.sass'
 export default function EventForm(props) {
     const {eventData, timelineId, closeModalCb, timelines} = props;
     const formData = useMemo(() => ({
-        name: (eventData && eventData.Name) ? eventData.Name : '',
-        shortName: (eventData && eventData.ShortName) ? eventData.ShortName : '',
-        description: (eventData && eventData.Description) ? eventData.Description : '',
-        date: (eventData && eventData.Date) ? new Date(eventData.Date).getDate() : '',
-        month: (eventData && eventData.Date) ? new Date(eventData.Date).getMonth() + 1 : '',
-        year: (eventData && eventData.Date) ? new Date(eventData.Date).getFullYear() : '',
-        tlCreationId: (timelineId) ? timelineId : '',
+        Name: eventData.Name,
+        ShortName: eventData.ShortName,
+        Description: eventData.Description,
+        DayNumber: eventData.DayNumber,
+        Month: eventData.Month,
+        Year: eventData.Year,
+        TlCreationId: (timelineId) ? timelineId : null,
     }), [eventData]);
 
     return (
@@ -41,7 +41,7 @@ export default function EventForm(props) {
                     <form className='event-form-tag'>
                         <div className='event-form__field'>
                             <div className="event-name">
-                                <Field name="name"
+                                <Field name="Name"
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"
@@ -53,7 +53,7 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field'>
-                            <Field name="shortName"
+                            <Field name="ShortName"
                                    component={TextBox}
                                    label={"Краткое название"}
                                    placeholder="Краткое название"
@@ -63,7 +63,7 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field'>
-                            <Field name="description"
+                            <Field name="Description"
                                    component={TextBox}
                                    label={"Описание"}
                                    placeholder="Описание"
@@ -73,7 +73,7 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field'>
-                            <Field name="tlCreationId"
+                            <Field name="TlCreationId"
                                    component={Select}
                                    options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
                                    label={"Привязка к таймлайну"}
@@ -84,9 +84,10 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field event-date'>
-                            <Field name="date"
+                            <Field name="DayNumber"
                                    component={TextBox}
                                    label={"Дата"}
+                                   // type={'number'}
                                    placeholder="Дата"
                                    initialValue={formData.Date}
                                    disabled={false}>
@@ -94,8 +95,9 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field event-date'>
-                            <Field name="month"
+                            <Field name="Month"
                                    component={TextBox}
+                                   // type={'number'}
                                    label={"Месяц"}
                                    placeholder="Месяц"
                                    initialValue={formData.Month}
@@ -104,7 +106,8 @@ export default function EventForm(props) {
                         </div>
 
                         <div className='event-form__field event-date'>
-                            <Field name="year"
+                            <Field name="Year"
+                                   // type={'number'}
                                    component={TextBox}
                                    label={"Год"}
                                    placeholder="Год"
