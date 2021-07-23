@@ -126,8 +126,8 @@ export const setTemporaryPeriods = (data) => {
     return {type: SET_TEMPORARY_PERIODS, payload: data}
 };
 
-export const openPeriodEditor = ({periodId = null, timelineId = null, period = null}) => {
-    return {type: OPEN_EDITOR, payload: {periodId, timelineId, period}}
+export const openPeriodEditor = ({periodId = null, timelineId = null, period = null, tableId = null}) => {
+    return {type: OPEN_EDITOR, payload: {periodId, timelineId, period, tableId}}
 };
 
 export const toggleEditorTo = (isOn) => {
@@ -138,8 +138,8 @@ export const goBack = () => {
     return {type: GO_BACK}
 };
 
-export const updatePeriodData = ({periodId, periodData}) => {
-    return {type: UPDATE_PERIOD, payload: {...periodData, Id: periodId}}
+export const updatePeriodData = ({periodId, periodData, tableId}) => {
+    return {type: UPDATE_PERIOD, payload: {...periodData, Id: periodId, tableId: tableId}}
 };
 
 export const removePeriod = (periodId) => {
@@ -332,16 +332,18 @@ function* removePeriodSaga(data) {
 
 function* updatePeriodSaga(data) {
     try {
-        yield put({type: START_REQUEST});
+        if(data.payload.Id){
+            yield put({type: START_REQUEST});
 
-        yield call(updatePeriod, data.payload);
+            yield call(updatePeriod, data.payload);
 
-        yield put({type: SUCCESS_REQUEST});
+            yield put({type: SUCCESS_REQUEST});
+        }
+
 
 
         const periods = yield select(periodsSelector);
-
-        const periodToUpdateIndex = periods.findIndex(ev => ev.Id === data.payload.Id);
+        const periodToUpdateIndex =  data.payload.tableId ? periods.findIndex(ev => ev.id === data.payload.tableId) : periods.findIndex(ev => ev.Id === data.payload.Id);
         const periodToUpdate = periods[periodToUpdateIndex];
 
         // let updateDataEvent;
@@ -494,37 +496,47 @@ function* openEditorSaga(data) {
             yield put({type: TOGGLE_EDITOR, payload: true});
         } else {
             const date = new Date();
-            yield put({
-                type: SET_SELECTED_PERIOD, payload: {
-                    Name: '',
-                    ShortName: '',
-                    Description: '',
-                    TlCreationId: null,
-                    TlPublicId: null,
 
-                    StartDate: date,
-                    EndDate: date,
-                    StartMonth: date.getMonth() + 1,
-                    EndMonth: date.getMonth() + 1,
 
-                    DisplayStartDate: date.toLocaleDateString(),
-                    DisplayEndDate: date.toLocaleDateString(),
+            if(data.payload.tableId){
+                const periods = yield select(periodsSelector);
+                const period = periods.length > 0 && periods.find(pr => pr.id === data.payload.tableId);
+                yield put({type: SET_SELECTED_PERIOD, payload: period})
+            } else {
+                yield put({
+                    type: SET_SELECTED_PERIOD, payload: {
+                        Name: '',
+                        ShortName: '',
+                        Description: '',
+                        TlCreationId: null,
+                        TlPublicId: null,
 
-                    LbEffDate: date.toLocaleDateString(),
-                    LbDate: date,
-                    LbMonth: date.getMonth() + 1,
-                    LbYear: date.getFullYear(),
-                    RbEffDate: date.toLocaleDateString(),
-                    RbDate: date,
-                    RbMonth: date.getMonth() + 1,
-                    RbYear: date.getFullYear(),
+                        StartDate: date,
+                        EndDate: date,
+                        StartMonth: date.getMonth() + 1,
+                        EndMonth: date.getMonth() + 1,
 
-                    StartDay: date.getDate(),
-                    EndDay: date.getDate(),
-                    StartYear: date.getFullYear(),
-                    EndYear: date.getFullYear(),
-                }
-            });
+                        DisplayStartDate: date.toLocaleDateString(),
+                        DisplayEndDate: date.toLocaleDateString(),
+
+                        LbEffDate: date.toLocaleDateString(),
+                        LbDate: date,
+                        LbMonth: date.getMonth() + 1,
+                        LbYear: date.getFullYear(),
+                        RbEffDate: date.toLocaleDateString(),
+                        RbDate: date,
+                        RbMonth: date.getMonth() + 1,
+                        RbYear: date.getFullYear(),
+
+                        StartDay: date.getDate(),
+                        EndDay: date.getDate(),
+                        StartYear: date.getFullYear(),
+                        EndYear: date.getFullYear(),
+                    }
+                });
+            }
+
+
             yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {

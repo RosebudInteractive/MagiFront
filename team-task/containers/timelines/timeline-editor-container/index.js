@@ -101,7 +101,7 @@ function TimelineEditorContainer(props) {
         actions.toggleEditorToPeriod(false);
     };
 
-    const doubleClickAction = function ({id, type}) {
+    const doubleClickAction = function ({id, type, optionalParam}) {
         if (id && type) {
             if (type === 'periods') {
                 detailsEditor.current = PeriodForm;
@@ -122,8 +122,38 @@ function TimelineEditorContainer(props) {
                     actions.openEventEditor({eventId: id});
                 }
             }
+        } else {
+            if(!id && type){
+                if(type === 'periods'){
+                    detailsEditor.current = PeriodForm;
+
+                    // const periodToSet = sTimeline.Periods.find(p => p.id === optionalParam.row);
+                    actions.openPeriodEditor({tableId: optionalParam.row});
+
+                    // if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
+                    //     const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
+                    //     actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
+                    // } else {
+                    //     actions.openPeriodEditor({periodId: id});
+                    // }
+                } else {
+                    detailsEditor.current = EventForm;
+
+                    // const eventToSet = events.find(ev => ev.id === optionalParam);
+                    actions.openEventEditor({tableId: optionalParam.row});
+
+                }
+            }
         }
     };
+
+    useEffect(() => {
+        if(sTimeline){
+            sTimeline.Events = events;
+            sTimeline.Periods = periods;
+        }
+
+    }, [events, periods]);
 
     const onSave = (timelineFormData) => {
         if (timeline.Id) {
@@ -160,7 +190,6 @@ function TimelineEditorContainer(props) {
         const timelineId = timeline.Id ? timeline.Id : null;
 
         if(!timelineId){
-            // console.log('');
             actions.setTemporaryEvents([]);
             actions.setTemporaryPeriods([]);
         }
@@ -179,16 +208,21 @@ function TimelineEditorContainer(props) {
         setFinderFormOpened(true);
     };
 
-    const onSaveModal = (id, values) => {
+    const onSaveModal = ({id, tableId, values}) => {
         if (eventEditorOpened) {
             if (id) {
                 actions.updateEventData({eventId: id, eventData: values})
             } else {
-                if (timeline && timeline.Id) {
-                    actions.createNewEvent(values)
+                if(!id && tableId){
+                    actions.updateEventData({tableId: id, eventData: values})
                 } else {
-                    actions.addTemporaryEvent({...values, State: 1})
+                    if (timeline && timeline.Id) {
+                        actions.createNewEvent(values)
+                    } else {
+                        actions.addTemporaryEvent({...values, State: 1})
+                    }
                 }
+
             }
         }
 
@@ -196,12 +230,15 @@ function TimelineEditorContainer(props) {
             if (id) {
                 actions.updatePeriodData({periodId: id, periodData: values})
             } else {
-                if (timeline && timeline.Id) {
-                    actions.createNewPeriod(values)
+                if(!id && tableId){
+                    actions.updatePeriodData({tableId: id, periodData: values})
                 } else {
-                    actions.addTemporaryPeriod({...values, State: 1})
+                    if (timeline && timeline.Id) {
+                        actions.createNewPeriod(values)
+                    } else {
+                        actions.addTemporaryPeriod({...values, State: 1})
+                    }
                 }
-
             }
         }
 
@@ -260,7 +297,7 @@ function TimelineEditorContainer(props) {
     }, [location]);
 
     useEffect(() => {
-        sTimeline = selectedTimeline.Id && selectedTimeline;
+        sTimeline = selectedTimeline;
         setTimeline(selectedTimeline.hasOwnProperty('State') ? selectedTimeline : DEFAULT_TIMELINE);
     }, [selectedTimeline]);
 
@@ -309,7 +346,7 @@ function TimelineEditorContainer(props) {
                     events: {
                         headerClickAction: () => {
                         },
-                        doubleClickAction: (id) => doubleClickAction({id: id, type: 'events'}),
+                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
                         deleteAction: (id) => {
                             id && actions.removeEvent(id)
                         },
@@ -323,7 +360,7 @@ function TimelineEditorContainer(props) {
                     , periods: {
                         headerClickAction: () => {
                         },
-                        doubleClickAction: (id) => doubleClickAction({id: id, type: 'periods'})
+                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId})
                         ,
                         deleteAction: (id) => {
                             actions.removePeriod(id);

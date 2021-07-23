@@ -87,7 +87,7 @@ export default function EventForm(props) {
                             <Field name="DayNumber"
                                    component={TextBox}
                                    label={"Дата"}
-                                   // type={'number'}
+                                   type={'number'}
                                    placeholder="Дата"
                                    initialValue={formData.Date}
                                    disabled={false}>
@@ -97,7 +97,7 @@ export default function EventForm(props) {
                         <div className='event-form__field event-date'>
                             <Field name="Month"
                                    component={TextBox}
-                                   // type={'number'}
+                                   type={'number'}
                                    label={"Месяц"}
                                    placeholder="Месяц"
                                    initialValue={formData.Month}
@@ -107,7 +107,7 @@ export default function EventForm(props) {
 
                         <div className='event-form__field event-date'>
                             <Field name="Year"
-                                   // type={'number'}
+                                   type={'number'}
                                    component={TextBox}
                                    label={"Год"}
                                    placeholder="Год"
@@ -119,7 +119,7 @@ export default function EventForm(props) {
 
                         <div className='event-form__field center'>
                             <button type={'button'} className="orange-button big-button" disabled={pristine}
-                                    onClick={() => props.onSave(eventData.Id, values)}>Сохранить
+                                    onClick={() => props.onSave({id: eventData.Id, tableId: eventData.id, values: values})}>Сохранить
                             </button>
                         </div>
 

@@ -135,8 +135,8 @@ export const findEvent = (data) => {
     return {type: FIND_EVENT, payload: data}
 }
 
-export const openEventEditor = ({eventId = null, event = null, timelineId = null}) => {
-    return {type: OPEN_EDITOR, payload: {eventId, timelineId, event}}
+export const openEventEditor = ({eventId = null, event = null, timelineId = null, tableId = null}) => {
+    return {type: OPEN_EDITOR, payload: {eventId, timelineId, event, tableId}}
 };
 
 export const toggleEditorTo = (isOn) => {
@@ -147,8 +147,8 @@ export const goBack = () => {
     return {type: GO_BACK}
 };
 
-export const updateEventData = ({eventId, eventData}) => {
-    return {type: UPDATE_EVENT, payload: {...eventData, Id: eventId}}
+export const updateEventData = ({eventId, eventData, tableId}) => {
+    return {type: UPDATE_EVENT, payload: {...eventData, Id: eventId, tableId: tableId}}
 }
 
 export const removeEvent = (eventId) => {
@@ -324,11 +324,15 @@ function* removeEventSaga(data) {
 
 function* updateEventSaga(data) {
     try {
-        yield put({type: START_REQUEST});
 
-        yield call(updateEvent, data.payload);
+        if(data.payload.Id){
+            yield put({type: START_REQUEST});
 
-        yield put({type: SUCCESS_REQUEST});
+            yield call(updateEvent, data.payload);
+
+            yield put({type: SUCCESS_REQUEST});
+        }
+
 
         const events = yield select(eventsSelector);
 
@@ -441,19 +445,28 @@ function* openEditorSaga(data) {
             yield put({type: TOGGLE_EDITOR, payload: true});
         } else {
             const date = new Date();
-            yield put({
-                type: SET_SELECTED_EVENT, payload: {
-                    Name: '',
-                    ShortName: '',
-                    Description: '',
-                    TlCreationId: null,
-                    TlPublicId: null,
-                    EffDate: date.toLocaleDateString(),
-                    Date: date.getDay(),
-                    Month: date.getMonth(),
-                    Year: date.getFullYear()
-                }
-            });
+
+
+            if(data.payload.tableId){
+                const events = yield select(eventsSelector);
+                const event = events.length > 0 && events.find(ev => ev.id === data.payload.tableId);
+                yield put({type: SET_SELECTED_EVENT, payload: event})
+            } else {
+                yield put({
+                    type: SET_SELECTED_EVENT, payload: {
+                        Name: '',
+                        ShortName: '',
+                        Description: '',
+                        TlCreationId: null,
+                        TlPublicId: null,
+                        EffDate: date.toLocaleDateString(),
+                        Date: date.getDay(),
+                        Month: date.getMonth(),
+                        Year: date.getFullYear()
+                    }
+                });
+            }
+
             yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {

@@ -167,7 +167,7 @@ return <div className="timeline-form-block">
                            placeholder="Порядковый номер"
                            disabled={false}
                            defaultValue={data.OrderNumber}
-                           validate={ComposeValidators(validators.required, validators.minValue.bind(validators.minValue, 1))}>
+                           validate={ComposeValidators(validators.required, validators.min.bind(validators.min, 1))}>
                     </Field>
                 </div>
 
