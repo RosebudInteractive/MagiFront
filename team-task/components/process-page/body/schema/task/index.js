@@ -69,7 +69,7 @@ export default function SchemaTask(props: TaskProps) {
 
     return node ?
         <div className="process-schema__cell" style={style}>
-            <div className={"process-schema__task" + (active ? " _active" : "") + (state.isExpired ? " _expired" : "")}
+            <div className={"process-schema__task unselectable" + (active ? " _active" : "") + (state.isExpired ? " _expired" : "")}
                  id={"js-task_" + node.id}
                  onClick={_onClick}
                  onDoubleClick={_onEdit}>

@@ -228,7 +228,7 @@ const Timelines = (props) => {
                 <button className="open-form-button" onClick={openTimelineForm}>
                     <PlusIco/>
                 </button>
-                <div className="grid-container timelines-table">
+                <div className="grid-container timelines-table unselectable">
                     <Webix ui={GRID_CONFIG} data={timelines}/>
                 </div>
             </div>

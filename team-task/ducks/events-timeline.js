@@ -194,11 +194,7 @@ function* setEventsSaga({payload}) {
             _event.name = item.Name;
             _event.color = _getColor();
             _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`
-        _event.year = item.Year ? item.Year : new Date(item.Date).getFullYear()
-        _event.name = item.Name
-        _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`
-        _event.color = _getColor()
-        _event.visible = true
+            _event.visible = true
 
             _event.DisplayDate = item.Date ?  //это дата для отображения целиком строкой
                 new Date(item.Date).toLocaleDateString("ru-Ru") :
@@ -206,6 +202,7 @@ function* setEventsSaga({payload}) {
             _event.DayNumber =  item.Date ? new Date(item.Date).getDate() : item.DayNumber ? item.DayNumber : null; //а это дата для  отображения только дня
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
+            
             return _event
         });
 

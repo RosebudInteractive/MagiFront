@@ -284,7 +284,7 @@ function TimelineEditorContainer(props) {
     }, []);
 
     return (
-        <div className="timeline-editor-container">
+        <div className="timeline-editor-container form">
             {timeline && timeline.State &&
             <React.Fragment>
                 <TimelineEditorHeader name={timeline.Name}

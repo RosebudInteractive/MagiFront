@@ -173,7 +173,7 @@ function Processes(props) {
         <button className="process-button _add" onClick={onAddProcess}>
             <PlusIco/>
         </button>
-        <div className="grid-container">
+        <div className="grid-container unselectable">
             <Webix ui={GRID_CONFIG} data={processes}/>
         </div>
         {createFormVisible && <CreateProcessForm
