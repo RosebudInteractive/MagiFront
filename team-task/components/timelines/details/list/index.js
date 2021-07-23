@@ -63,15 +63,14 @@ export default function DetailsList(props) {
                 // this.markSorting(_sort.field, _sort.direction); //todo maybe use it later
             },
             onItemDblClick: function (id) {
-                console.log(' onItemDblClickid', id)
                 const item = this.getItem(id);
-                actions.doubleClickAction(item.Id);
+                actions.doubleClickAction(item.Id, id);
             }
         },
         onClick: {
             "elem-delete": function (e, data) {
                 e.preventDefault();
-                const item = this.getItem(data.row)
+                const item = this.getItem(data.row);
                 actions.deleteAction(item.Id);
             }
         },

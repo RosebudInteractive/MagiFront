@@ -171,7 +171,7 @@ function TimelineForm(props) {
                                placeholder="Номер"
                                disabled={false}
                                defaultValue={data.OrderNumber}
-                               validate={ComposeValidators(validators.minValue.bind(validators.minValue, 1))}>
+                               validate={ComposeValidators(validators.min.bind(validators.min, 1))}>
                         </Field>
                     </div>
 

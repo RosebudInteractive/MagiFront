@@ -2,7 +2,7 @@ import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
 import {Select, TextBox} from "../../ui-kit";
 import './period-form.sass'
-import validators from "../../../tools/validators";
+import v from "../../../tools/validators";
 
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
@@ -27,7 +27,7 @@ export default function PeriodForm(props) {
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
-                    {(periodData && periodData.Id) ? 'Редактирование' : 'Создание'} периода
+                    {((periodData && periodData.Id) || periodData.id) ? 'Редактирование' : 'Создание'} периода
                 </h6>
             </div>
 
@@ -50,7 +50,7 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ? v.required : undefined}
                                        defaultValue={periodData && periodData.Name ? periodData.Name : ''}
                                        disabled={false}>
                                 </Field>
@@ -63,7 +63,7 @@ export default function PeriodForm(props) {
                                    label={"Краткое название"}
                                    placeholder="Краткое название"
                                    initialValue={formData.ShortName}
-                                   validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                   validate={(periodData && periodData.Id) ? v.required : undefined}
                                    disabled={false}>
                             </Field>
                         </div>
@@ -73,7 +73,7 @@ export default function PeriodForm(props) {
                                    component={TextBox}
                                    label={"Описание"}
                                    placeholder="Описание"
-                                   validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                   validate={(periodData && periodData.Id) ? v.required : undefined}
                                    initialValue={formData.Description}
                                    disabled={false}>
                             </Field>
@@ -86,7 +86,7 @@ export default function PeriodForm(props) {
                                    label={"Привязка к таймлайну"}
                                    placeholder="Привязка к таймлайну"
                                    initialValue={timelineId}
-                                   validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                   validate={(periodData && periodData.Id) ? v.required : undefined}
                                    disabled={!timelineId}>
                             </Field>
                         </div>
@@ -98,7 +98,15 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Дата начала"}
                                        placeholder="Дата начала"
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.positiveInteger,
+                                               v.min.bind(v.min, 1),
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.max(31),
+                                               v.maxLength(2)) : undefined}
+                                       type={'number'}
                                        initialValue={formData.StartDay}
                                        disabled={false}>
                                 </Field>
@@ -109,7 +117,15 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Месяц начала"}
                                        placeholder="Месяц начала"
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.positiveInteger,
+                                               v.min.bind(v.min, 1),
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.max.bind(v.max, 31),
+                                               v.maxLength.bind(v.maxLength, 2)) : undefined}
+                                       type={'number'}
                                        initialValue={formData.StartMonth}
                                        disabled={false}>
                                 </Field>
@@ -120,7 +136,12 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Год начала"}
                                        placeholder="Год начала"
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.maxLength.bind(v.maxLength, 4)) : undefined}
+                                       type={'number'}
                                        initialValue={formData.StartYear}
                                        disabled={false}>
                                 </Field>
@@ -132,7 +153,15 @@ export default function PeriodForm(props) {
                                 <Field name="EndDay"
                                        component={TextBox}
                                        label={"Дата окончания"}
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.positiveInteger,
+                                               v.min.bind(v.min, 1),
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.max(31),
+                                               v.maxLength(2)) : undefined}
+                                       type={'number'}
                                        placeholder="Дата окончания"
                                        initialValue={formData.EndDay}
                                        disabled={false}>
@@ -143,7 +172,15 @@ export default function PeriodForm(props) {
                                 <Field name="EndMonth"
                                        component={TextBox}
                                        label={"Месяц окончания"}
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.positiveInteger,
+                                               v.min.bind(v.min, 1),
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.max.bind(v.max, 31),
+                                               v.maxLength.bind(v.maxLength, 2)) : undefined}
+                                       type={'number'}
                                        placeholder="Месяц окончания"
                                        initialValue={formData.EndMonth}
                                        disabled={false}>
@@ -154,7 +191,12 @@ export default function PeriodForm(props) {
                                 <Field name="EndYear"
                                        component={TextBox}
                                        label={"Год окончания"}
-                                       validate={(periodData && periodData.Id) ? validators.required : undefined}
+                                       validate={(periodData && periodData.Id) ?
+                                           v.compose(
+                                               v.required,
+                                               v.minLength.bind(v.minLength, 1),
+                                               v.maxLength.bind(v.maxLength, 4)) : undefined}
+                                       type={'number'}
                                        placeholder="Год окончания"
                                        initialValue={formData.EndYear}
                                        disabled={false}>
@@ -163,31 +205,35 @@ export default function PeriodForm(props) {
                         </div>
 
 
-
-
-
                         <div className='period-form__field center'>
                             <button type={'button'} className="orange-button big-button" disabled={!validIs}
-                                    onClick={() => props.onSave(periodData.Id, values)}>Сохранить
+                                    onClick={() => props.onSave({
+                                        id: periodData.Id,
+                                        tableId: periodData.id,
+                                        values: values
+                                    })}>Сохранить
                             </button>
                         </div>
 
 
                         <FormSpy subscription={{values: true, pristine: true}}
-                                 onChange={({values, pristine}) => {
-                                     if((periodData && periodData.Id)){
-                                         setValid(true); //cause pristine
+                                 onChange={({values, pristine, formValue, valid}) => {
+                                     console.log('onChange');
+                                     console.log('valid', valid);
+                                     console.log('formValue', formValue);
+                                     if ((periodData && periodData.Id)) {
+                                         setValid(true); //cause pristine todo change dis to normal validation
                                      } else {
-                                         if(periodData){
-                                             if((values.Name && values.Name.length > 0) &&
-                                             (values.ShortName && values.ShortName.length > 0) &&
-                                             (values.Description && values.Description.length > 0) &&
-                                             (values.StartDay) &&
-                                             (values.EndDay) &&
-                                             (values.EndYear) &&
-                                             (values.EndMonth) &&
-                                             (values.StartMonth) &&
-                                             (values.StartYear)){
+                                         if (periodData) {
+                                             if ((values.Name && values.Name.length > 0) &&
+                                                 (values.ShortName && values.ShortName.length > 0) &&
+                                                 (values.Description && values.Description.length > 0) &&
+                                                 (values.StartDay) &&
+                                                 (values.EndDay) &&
+                                                 (values.EndYear) &&
+                                                 (values.EndMonth) &&
+                                                 (values.StartMonth) &&
+                                                 (values.StartYear)) {
                                                  setValid(true);
                                              }
                                          } //todo do same crazy shit in event form too
