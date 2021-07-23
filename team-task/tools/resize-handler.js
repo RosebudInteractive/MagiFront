@@ -13,7 +13,6 @@ export const resizeHandler = (rowCount: number, gridName: string, minWidth = nul
 
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - parseInt(style.paddingTop) - parseInt(style.paddingBottom)
-                // _gridWidth = width - parseInt(style.paddingLeft) - parseInt(style.paddingRight)
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight;

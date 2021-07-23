@@ -38,9 +38,7 @@ export default function PeriodForm(props) {
                 onSubmit={e => {
                     e.preventDefault();
                 }}
-                validate={values => {
-                }
-                }
+                validate={validate}
                 subscription={{values: true, pristine: true}}
                 render={({periodForm, submitting, pristine, values, valid}) => (
                     <form className='period-form-tag'>
@@ -98,14 +96,14 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Дата начала"}
                                        placeholder="Дата начала"
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.positiveInteger,
-                                               v.min.bind(v.min, 1),
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.max(31),
-                                               v.maxLength(2)) : undefined}
+                                       // validate={(periodData && periodData.Id) ?
+                                       //     v.compose(
+                                       //         v.required,
+                                       //         v.positiveInteger,
+                                       //         v.min.bind(v.min, 1),
+                                       //         v.minLength.bind(v.minLength, 1),
+                                       //         v.max(31),
+                                       //         v.maxLength(2)) : undefined}
                                        type={'number'}
                                        initialValue={formData.StartDay}
                                        disabled={false}>
@@ -149,7 +147,7 @@ export default function PeriodForm(props) {
                         </div>
 
                         <div className="period-end-date">
-                            <div className='period-form__field end-date'>
+                            {/*<div className='period-form__field end-date'>*/}
                                 <Field name="EndDay"
                                        component={TextBox}
                                        label={"Дата окончания"}
@@ -164,11 +162,12 @@ export default function PeriodForm(props) {
                                        type={'number'}
                                        placeholder="Дата окончания"
                                        initialValue={formData.EndDay}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                                       disabled={false}
+                                        extClass="period-form__field end-date"/>
+                                {/*</Field>*/}
+                            {/*</div>*/}
 
-                            <div className='period-form__field end-date'>
+                            {/*<div className='period-form__field end-date'>*/}
                                 <Field name="EndMonth"
                                        component={TextBox}
                                        label={"Месяц окончания"}
@@ -183,11 +182,12 @@ export default function PeriodForm(props) {
                                        type={'number'}
                                        placeholder="Месяц окончания"
                                        initialValue={formData.EndMonth}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                                       disabled={false}
+                                extClass="period-form__field end-date"/>
+                                {/*</Field>*/}
+                            {/*</div>*/}
 
-                            <div className='period-form__field end-date'>
+                            {/*<div className='period-form__field end-date'>*/}
                                 <Field name="EndYear"
                                        component={TextBox}
                                        label={"Год окончания"}
@@ -199,9 +199,10 @@ export default function PeriodForm(props) {
                                        type={'number'}
                                        placeholder="Год окончания"
                                        initialValue={formData.EndYear}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                                       disabled={false}
+                                extClass="period-form__field end-date"/>
+                                {/*</Field>*/}
+                            {/*</div>*/}
                         </div>
 
 
@@ -242,4 +243,30 @@ export default function PeriodForm(props) {
                     </form>
                 )}/>
         </div>)
+}
+
+
+const validate = (values) => {
+    const errors = {}
+
+    if (!values.StartYear) {
+        errors.StartYear = 'Required'
+    }
+
+    if (values.StartYear && !values.StartDay && !values.StartMonth) {
+        errors.StartMonth = 'Required'
+    }
+
+    if ((values.StartMonth > 12) || (values.StartMonth < 1)) {
+        errors.StartMonth = 'Wrong value'
+    }
+
+    // todo : сделать учет месяцев
+    if ((values.StartDay > 31) || (values.StartDay < 1)) {
+        errors.StartDay = 'Wrong value'
+    }
+
+
+
+    return errors
 }

@@ -77,7 +77,7 @@ export default function DetailsList(props) {
     };
 
     return (
-        <div className="details-list ">
+        <div className="details-list">
             <div className='sticky-block'>
                 <h5 className="form-header _grey70">{title ? title : 'Элементы'}</h5>
                 <button className="open-form-button" onClick={actions.createAction}>
@@ -88,7 +88,7 @@ export default function DetailsList(props) {
                 </button>
             </div>
             <div className="grid-container__wrapper">
-                <div className="grid-container details-list-table items-table js-resizeable-container">
+                <div className="grid-container details-list-table items-table js-resizeable-container unselectable">
                     <Webix ui={GRID_CONFIG} data={items}/>
                 </div>
             </div>
