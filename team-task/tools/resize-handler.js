@@ -8,8 +8,6 @@ export const resizeHandler = (rowCount: number, gridName: string, minWidth = nul
 
     const width = minWidth && _width < minWidth ? minWidth : _width;
 
-    console.log(parseInt(style.paddingTop))
-
     if (window.$$(`${gridName}-grid`)) {
         const _headerHeight = window.$$(`${gridName}-grid`).config.headerRowHeight;
 
