@@ -13,23 +13,26 @@ export default function DetailsList(props) {
     const {actions, items, columnsConfig, idGrid, title, findedEl, addCompletelyCreated} = props;
 
     useWindowSize(() => {
-        idGrid && resizeHandler(_itemsCount, idGrid, 560)
+        idGrid && resizeHandler(_itemsCount, idGrid)
     });
 
     useEffect(() => {
         _itemsCount = items.length;
-        idGrid && resizeHandler(_itemsCount, idGrid, 560);
+        idGrid && resizeHandler(_itemsCount, idGrid);
         _onResize();
     }, [items, idGrid]);
 
     useEffect(() => {
         _onResize()
+
+        setTimeout(_onResize, 300)
+
     }, [location]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(items.length, idGrid, 560)
+        resizeHandler(items.length, idGrid)
     }, [items]);
-    //
+
     const GRID_CONFIG = {
         view: "datatable",
         id: `${idGrid}-grid`,
@@ -74,7 +77,7 @@ export default function DetailsList(props) {
     };
 
     return (
-        <div className="details-list form _scrollable-y">
+        <div className="details-list">
             <div className='sticky-block'>
                 <h5 className="form-header _grey70">{title ? title : 'Элементы'}</h5>
                 <button className="open-form-button" onClick={actions.createAction}>
@@ -83,11 +86,11 @@ export default function DetailsList(props) {
                 <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated}>
                     <PlusOrangeIco/>
                 </button>
-
             </div>
-
-            <div className="grid-container details-list-table items-table">
-                <Webix ui={GRID_CONFIG} data={items}/>
+            <div className="grid-container__wrapper">
+                <div className="grid-container details-list-table items-table js-resizeable-container unselectable">
+                    <Webix ui={GRID_CONFIG} data={items}/>
+                </div>
             </div>
         </div>
     )

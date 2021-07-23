@@ -137,7 +137,7 @@ function Tasks(props) {
     return <div className="tasks-page form _scrollable-y">
         <h5 className="form-header _grey70">Задачи</h5>
         <FilterRow fields={FILTER_CONFIG}  onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-        <div className="grid-container">
+        <div className="grid-container unselectable">
             <Webix ui={GRID_CONFIG} data={tasks}/>
         </div>
     </div>

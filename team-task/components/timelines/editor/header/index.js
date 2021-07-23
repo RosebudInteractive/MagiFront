@@ -41,7 +41,8 @@ export default function TimelineEditorHeader(props) {
                                    placeholder="Название таймлайна"
                                    // initialValue={name} todo mayby use it
                                    // defaultValue={name}
-                                   disabled={false}>
+                                   disabled={false}
+                                   extClass="_grey100 page-title">
                             </Field>
                         </div>
                     </div>

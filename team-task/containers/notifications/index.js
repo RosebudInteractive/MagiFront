@@ -188,7 +188,7 @@ const Notifications = (props) => {
             <div className="notifications-page form _scrollable-y">
                 <h5 className="form-header _grey70">Нотификации</h5>
                 <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-                <div className="grid-container notifications-table">
+                <div className="grid-container notifications-table unselectable">
                     <Webix ui={GRID_CONFIG} data={notifications}/>
                 </div>
             </div>
