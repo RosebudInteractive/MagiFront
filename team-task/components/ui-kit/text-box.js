@@ -94,7 +94,7 @@ const CssTextField = withStyles({
 
 export default function UiTextBox(props) {
 
-    const _className = props.extClass ?  "input-field " + props.extClass : "input-field"
+    const _className = props.extClass ?  "input-field " + props.extClass : "input-field";
 
     return <CssTextField {...props.input}
                          error={props.meta.touched && props.meta.invalid}

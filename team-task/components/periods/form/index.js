@@ -2,7 +2,6 @@ import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
 import {Select, TextBox} from "../../ui-kit";
 import './period-form.sass'
-import v from "../../../tools/validators";
 
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
@@ -38,9 +37,11 @@ export default function PeriodForm(props) {
                 onSubmit={e => {
                     e.preventDefault();
                 }}
-                validate={validate}
+                validate={values => validate(values, [
+                        {fieldName: 'TlCreationId', condition: !periodData.Id}])
+                }
                 subscription={{values: true, pristine: true}}
-                render={({periodForm, submitting, pristine, values, valid}) => (
+                render={({periodForm, form, submitting, pristine, values, valid, errors, touched}) => (
                     <form className='period-form-tag'>
                         <div className='period-form__field'>
                             <div className="period-name">
@@ -48,161 +49,100 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"
-                                       validate={(periodData && periodData.Id) ? v.required : undefined}
                                        defaultValue={periodData && periodData.Name ? periodData.Name : ''}
                                        disabled={false}>
                                 </Field>
                             </div>
                         </div>
 
-                        <div className='period-form__field'>
-                            <Field name="ShortName"
-                                   component={TextBox}
-                                   label={"Краткое название"}
-                                   placeholder="Краткое название"
-                                   initialValue={formData.ShortName}
-                                   validate={(periodData && periodData.Id) ? v.required : undefined}
-                                   disabled={false}>
-                            </Field>
-                        </div>
+                        <Field name="ShortName"
+                               component={TextBox}
+                               label={"Краткое название"}
+                               placeholder="Краткое название"
+                               initialValue={formData.ShortName}
+                               disabled={false}
+                               extClass={'period-form__field'}>
+                        </Field>
 
-                        <div className='period-form__field'>
-                            <Field name="Description"
-                                   component={TextBox}
-                                   label={"Описание"}
-                                   placeholder="Описание"
-                                   validate={(periodData && periodData.Id) ? v.required : undefined}
-                                   initialValue={formData.Description}
-                                   disabled={false}>
-                            </Field>
-                        </div>
+                        <Field name="Description"
+                               component={TextBox}
+                               label={"Описание"}
+                               placeholder="Описание"
+                               initialValue={formData.Description}
+                               disabled={false}
+                               extClass={'period-form__field'}>
+                        </Field>
 
-                        <div className='period-form__field'>
-                            <Field name="TlCreationId"
-                                   component={Select}
-                                   options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
-                                   label={"Привязка к таймлайну"}
-                                   placeholder="Привязка к таймлайну"
-                                   initialValue={timelineId}
-                                   validate={(periodData && periodData.Id) ? v.required : undefined}
-                                   disabled={!timelineId}>
-                            </Field>
-                        </div>
+                        <Field name="TlCreationId"
+                               component={Select}
+                               options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
+                               label={"Привязка к таймлайну"}
+                               placeholder="Привязка к таймлайну"
+                               initialValue={timelineId}
+                               disabled={!timelineId}
+                               extClass={'period-form__field'}>
+                        </Field>
+                        {/*</div>*/}
 
 
                         <div className="period-start-date">
-                            <div className='period-form__field start-date'>
-                                <Field name="StartDay"
-                                       component={TextBox}
-                                       label={"Дата начала"}
-                                       placeholder="Дата начала"
-                                       // validate={(periodData && periodData.Id) ?
-                                       //     v.compose(
-                                       //         v.required,
-                                       //         v.positiveInteger,
-                                       //         v.min.bind(v.min, 1),
-                                       //         v.minLength.bind(v.minLength, 1),
-                                       //         v.max(31),
-                                       //         v.maxLength(2)) : undefined}
-                                       type={'number'}
-                                       initialValue={formData.StartDay}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                            <Field name="StartDay"
+                                   component={TextBox}
+                                   label={"Дата начала"}
+                                   placeholder="Дата начала"
+                                   type={'number'}
+                                   initialValue={formData.StartDay}
+                                   disabled={false}
+                                   extClass={'period-form__field'}>
+                            </Field>
 
-                            <div className='period-form__field'>
-                                <Field name="StartMonth"
-                                       component={TextBox}
-                                       label={"Месяц начала"}
-                                       placeholder="Месяц начала"
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.positiveInteger,
-                                               v.min.bind(v.min, 1),
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.max.bind(v.max, 31),
-                                               v.maxLength.bind(v.maxLength, 2)) : undefined}
-                                       type={'number'}
-                                       initialValue={formData.StartMonth}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                            <Field name="StartMonth"
+                                   component={TextBox}
+                                   label={"Месяц начала"}
+                                   placeholder="Месяц начала"
+                                   type={'number'}
+                                   initialValue={formData.StartMonth}
+                                   disabled={false}
+                                   extClass={'period-form__field'}>
+                            </Field>
 
-                            <div className='period-form__field'>
-                                <Field name="StartYear"
-                                       component={TextBox}
-                                       label={"Год начала"}
-                                       placeholder="Год начала"
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.maxLength.bind(v.maxLength, 4)) : undefined}
-                                       type={'number'}
-                                       initialValue={formData.StartYear}
-                                       disabled={false}>
-                                </Field>
-                            </div>
+                            <Field name="StartYear"
+                                   component={TextBox}
+                                   label={"Год начала"}
+                                   placeholder="Год начала"
+                                   type={'number'}
+                                   initialValue={formData.StartYear}
+                                   disabled={false}
+                                   extClass={'period-form__field'}>
+                            </Field>
                         </div>
 
                         <div className="period-end-date">
-                            {/*<div className='period-form__field end-date'>*/}
-                                <Field name="EndDay"
-                                       component={TextBox}
-                                       label={"Дата окончания"}
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.positiveInteger,
-                                               v.min.bind(v.min, 1),
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.max(31),
-                                               v.maxLength(2)) : undefined}
-                                       type={'number'}
-                                       placeholder="Дата окончания"
-                                       initialValue={formData.EndDay}
-                                       disabled={false}
-                                        extClass="period-form__field end-date"/>
-                                {/*</Field>*/}
-                            {/*</div>*/}
+                            <Field name="EndDay"
+                                   component={TextBox}
+                                   label={"Дата окончания"}
+                                   type={'number'}
+                                   placeholder="Дата окончания"
+                                   initialValue={formData.EndDay}
+                                   disabled={false}
+                                   extClass="period-form__field end-date"/>
+                            <Field name="EndMonth"
+                                   component={TextBox}
+                                   label={"Месяц окончания"}
+                                   type={'number'}
+                                   placeholder="Месяц окончания"
+                                   initialValue={formData.EndMonth}
+                                   disabled={false}
+                                   extClass="period-form__field end-date"/>
 
-                            {/*<div className='period-form__field end-date'>*/}
-                                <Field name="EndMonth"
-                                       component={TextBox}
-                                       label={"Месяц окончания"}
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.positiveInteger,
-                                               v.min.bind(v.min, 1),
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.max.bind(v.max, 31),
-                                               v.maxLength.bind(v.maxLength, 2)) : undefined}
-                                       type={'number'}
-                                       placeholder="Месяц окончания"
-                                       initialValue={formData.EndMonth}
-                                       disabled={false}
-                                extClass="period-form__field end-date"/>
-                                {/*</Field>*/}
-                            {/*</div>*/}
-
-                            {/*<div className='period-form__field end-date'>*/}
-                                <Field name="EndYear"
-                                       component={TextBox}
-                                       label={"Год окончания"}
-                                       validate={(periodData && periodData.Id) ?
-                                           v.compose(
-                                               v.required,
-                                               v.minLength.bind(v.minLength, 1),
-                                               v.maxLength.bind(v.maxLength, 4)) : undefined}
-                                       type={'number'}
-                                       placeholder="Год окончания"
-                                       initialValue={formData.EndYear}
-                                       disabled={false}
-                                extClass="period-form__field end-date"/>
-                                {/*</Field>*/}
-                            {/*</div>*/}
+                            <Field name="EndYear"
+                                   component={TextBox}
+                                   label={"Год окончания"}
+                                   type={'number'}
+                                   placeholder="Год окончания"
+                                   initialValue={formData.EndYear}
+                                   disabled={false}
+                                   extClass="period-form__field end-date"/>
                         </div>
 
 
@@ -216,29 +156,12 @@ export default function PeriodForm(props) {
                             </button>
                         </div>
 
-
-                        <FormSpy subscription={{values: true, pristine: true}}
-                                 onChange={({values, pristine, formValue, valid}) => {
-                                     console.log('onChange');
-                                     console.log('valid', valid);
-                                     console.log('formValue', formValue);
-                                     if ((periodData && periodData.Id)) {
-                                         setValid(true); //cause pristine todo change dis to normal validation
-                                     } else {
-                                         if (periodData) {
-                                             if ((values.Name && values.Name.length > 0) &&
-                                                 (values.ShortName && values.ShortName.length > 0) &&
-                                                 (values.Description && values.Description.length > 0) &&
-                                                 (values.StartDay) &&
-                                                 (values.EndDay) &&
-                                                 (values.EndYear) &&
-                                                 (values.EndMonth) &&
-                                                 (values.StartMonth) &&
-                                                 (values.StartYear)) {
-                                                 setValid(true);
-                                             }
-                                         } //todo do same crazy shit in event form too
+                        <FormSpy subscription={{values: true, pristine: true, errors: true, submitting, touched: true}}
+                                 onChange={({values, pristine, errors, submitting, touched}) => {
+                                     if(Object.values(errors).length === 0){
+                                         setValid(true);
                                      }
+
                                  }}/>
                     </form>
                 )}/>
@@ -246,8 +169,8 @@ export default function PeriodForm(props) {
 }
 
 
-const validate = (values) => {
-    const errors = {}
+const validate = (values, disableValidationOnFields = []) => {
+    const errors = {};
 
     if (!values.StartYear) {
         errors.StartYear = 'Required'
@@ -257,7 +180,27 @@ const validate = (values) => {
         errors.StartMonth = 'Required'
     }
 
+    if (!values.StartMonth) {
+        errors.StartMonth = 'Required'
+    }
+
     if ((values.StartMonth > 12) || (values.StartMonth < 1)) {
+        errors.StartMonth = 'Wrong value'
+    }
+
+    if (!values.EndYear) {
+        errors.StartYear = 'Required'
+    }
+
+    if (values.EndYear && !values.EndDay && !values.EndMonth) {
+        errors.EndMonth = 'Required'
+    }
+
+    if (!values.EndMonth) {
+        errors.StartMonth = 'Required'
+    }
+
+    if ((values.EndMonth > 12) || (values.EndMonth < 1)) {
         errors.StartMonth = 'Wrong value'
     }
 
@@ -266,7 +209,29 @@ const validate = (values) => {
         errors.StartDay = 'Wrong value'
     }
 
+    if ((values.EndDay > 31) || (values.EndDay < 1)) {
+        errors.StartDay = 'Wrong value'
+    }
 
+    if (!values.Name || (values.Name && values.Name.length < 1)){
+        errors.Name = 'Required'
+    }
+
+    if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
+        errors.ShortName = 'Required'
+    }
+
+    if (!values.Description || (values.Description && values.Description.length < 1)) {
+        errors.Description = 'Wrong value'
+    }
+
+    if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
+        errors.TlCreationId = 'Wrong value'
+    }
+
+    disableValidationOnFields.map(field => {
+        field.condition && delete errors[field.fieldName];
+    });
 
     return errors
-}
+};
