@@ -119,7 +119,7 @@ export default function EventsFindForm(props) {
                     </form>)}/>
 
 
-            <div className="grid-container finded-events-table">
+            <div className="grid-container finded-events-table js-resizeable-container unselectable">
                 <Webix ui={GRID_CONFIG} data={findedData}/>
             </div>
 

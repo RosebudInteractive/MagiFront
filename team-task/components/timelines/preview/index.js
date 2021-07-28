@@ -23,7 +23,7 @@ export default function TimelinePreview(props) {
                 setWidth(_preview.current.clientWidth);
                 setHeight(_preview.current.clientHeight)
             }
-        }, 300)
+        }, 400)
 
     }, []);
 

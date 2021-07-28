@@ -96,14 +96,6 @@ export default function PeriodForm(props) {
                                        component={TextBox}
                                        label={"Дата начала"}
                                        placeholder="Дата начала"
-                                       // validate={(periodData && periodData.Id) ?
-                                       //     v.compose(
-                                       //         v.required,
-                                       //         v.positiveInteger,
-                                       //         v.min.bind(v.min, 1),
-                                       //         v.minLength.bind(v.minLength, 1),
-                                       //         v.max(31),
-                                       //         v.maxLength(2)) : undefined}
                                        type={'number'}
                                        initialValue={formData.StartDay}
                                        disabled={false}>

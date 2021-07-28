@@ -174,8 +174,10 @@ export default function TimeAxis(props: Props) {
 
     useEffect(() => {
         const allItems = [...events, ...periods];
-        let minYear = Math.min(...allItems.map(el => new Date((el.date || el.startDate).split('.')[2]).getFullYear())),
-            maxYear = Math.max(...allItems.map(el => new Date((el.date || el.endDate).split('.')[2]).getFullYear()));
+        let minYear = Math.min(allItems.map(el => el.year || el.startYear)),
+            maxYear = Math.max(allItems.map(el => el.year || el.endYear));
+        // let minYear = Math.min(...allItems.map(el => new Date((el.date || el.startDate).split('.')[2]).getFullYear())),
+        //     maxYear = Math.max(...allItems.map(el => new Date((el.date || el.endDate).split('.')[2]).getFullYear()));
 
         if(lastYearFromLastPoint && lastYearFromLastPoint > maxYear){
             maxYear = lastYearFromLastPoint;

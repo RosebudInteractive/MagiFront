@@ -1,7 +1,7 @@
 import $ from "jquery";
 
-export const resizeHandler = (rowCount: number, gridName: string, minWidth = null) => {
-    const _container = $('.js-resizeable-container'),
+export const resizeHandler = (rowCount: number, containerSelector: string, gridName: string, minWidth = null) => {
+    const _container = $(containerSelector),
         _height = _container.height(),
         _width = _container.width(),
         style = _container.parent()[0].currentStyle || window.getComputedStyle(_container.parent()[0]);
