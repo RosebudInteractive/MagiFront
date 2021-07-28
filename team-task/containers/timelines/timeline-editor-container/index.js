@@ -189,11 +189,6 @@ function TimelineEditorContainer(props) {
     const detailsCreateAction = (type) => {
         const timelineId = timeline.Id ? timeline.Id : null;
 
-        if(!timelineId){
-            actions.setTemporaryEvents([]);
-            actions.setTemporaryPeriods([]);
-        }
-
         if (type === 'events') {
             detailsEditor.current = EventForm;
             actions.openEventEditor({timelineId: timelineId});

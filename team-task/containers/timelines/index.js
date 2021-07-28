@@ -20,7 +20,8 @@ import {
     selectTimeline,
     timelineOpenedSelector,
     timelinesFetchingSelector,
-    timelinesSelector
+    timelinesSelector,
+    updateTimeline
 } from "tt-ducks/timelines";
 import {setTemporaryPeriods} from "tt-ducks/periods-timeline";
 import {setTemporaryEvents} from "tt-ducks/events-timeline";
@@ -32,7 +33,7 @@ import PlusIco from "tt-assets/svg/plus.svg";
 let timelinesCount = 0;
 
 const Timelines = (props) => {
-    const {fetching, actions, timelines, showModal, hasAdminRights, hasSupervisorRights} = props;
+    const {fetching, actions, timelines} = props;
 
     const location = useLocation();
 
@@ -147,15 +148,15 @@ const Timelines = (props) => {
                 }
             },
             {
-                id: 'publish-btn', header: '', width: 50, css: "_container", fillspace: 5,
+                id: 'publish-btn', header: '', width: 50, css: "_container", fillspace: 10,
                 template: function(data){
                     return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : ""
                 }
-            },
-            {
-                id: 'copy-btn', header: '', width: 50, css: "_container", fillspace: 5,
-                template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
-            },
+            }
+            // { todo after backend is done
+            //     id: 'copy-btn', header: '', width: 50, css: "_container", fillspace: 5,
+            //     template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
+            // },
         ],
         on: {
             onHeaderClick: function (header) {
@@ -188,7 +189,11 @@ const Timelines = (props) => {
                 e.preventDefault()
                 const item = this.getItem(data.row);
                 if (item) {
-                    //todo publish action after api complete
+                    actions.updateTimeline(item.Id, {
+                        ...item,
+                        State: 2
+                    });
+                    actions.getTimelines();
                 }
             },
             "js-copy": function (e, data) {
@@ -262,7 +267,8 @@ const mapDispatch2Props = (dispatch) => {
             hideSideBarMenu,
             setTemporaryEvents,
             clearSelectedTimeline,
-            setTemporaryPeriods
+            setTemporaryPeriods,
+            updateTimeline
         }, dispatch)
     }
 };

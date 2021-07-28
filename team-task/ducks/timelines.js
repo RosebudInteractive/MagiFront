@@ -193,7 +193,8 @@ function* updateTimelineSaga(data) {
         const mappedTimeline = {
             Name: data.payload.timelineData.Name,
             SpecifCode: data.payload.timelineData.SpecifCode,
-            TypeOfUse: parseInt(data.payload.timelineData.TypeOfUse)
+            TypeOfUse: parseInt(data.payload.timelineData.TypeOfUse),
+            State: parseInt(data.payload.timelineData.State)
         };
 
         if (data.payload.timelineData.Image) {

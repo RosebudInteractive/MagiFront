@@ -1,10 +1,12 @@
-import React, {useMemo} from "react";
+import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
 import {Select, TextBox} from "../../ui-kit";
 import './event-form.sass'
 
 export default function EventForm(props) {
     const {eventData, timelineId, closeModalCb, timelines} = props;
+    const [validIs, setValid] = useState(false);
+
     const formData = useMemo(() => ({
         Name: eventData.Name,
         ShortName: eventData.ShortName,
@@ -31,105 +33,151 @@ export default function EventForm(props) {
                 }
                 onSubmit={e => {
                     e.preventDefault()
-                    console.log('onSubmit')
                 }}
-                validate={values => {
+                validate={values => validate(values, [
+                        {fieldName: 'TlCreationId', condition: !eventData.Id}])
                 }
-                }
-                subscription={{values: true, pristine: true}}
                 render={({eventForm, submitting, pristine, values}) => (
                     <form className='event-form-tag'>
                         <div className='event-form__field'>
-                            <div className="event-name">
                                 <Field name="Name"
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"
                                        defaultValue={eventData && eventData.Name ? eventData.Name : ''}
                                        disabled={false}
+                                       extClass={'event-name'}
                                 >
                                 </Field>
-                            </div>
                         </div>
 
-                        <div className='event-form__field'>
                             <Field name="ShortName"
                                    component={TextBox}
                                    label={"Краткое название"}
                                    placeholder="Краткое название"
                                    initialValue={formData.shortName}
-                                   disabled={false}>
+                                   disabled={false}
+                            extClass={'event-form__field'}>
                             </Field>
-                        </div>
 
-                        <div className='event-form__field'>
                             <Field name="Description"
                                    component={TextBox}
                                    label={"Описание"}
                                    placeholder="Описание"
                                    initialValue={formData.description}
-                                   disabled={false}>
+                                   disabled={false}
+                                   extClass={'event-form__field'}>
                             </Field>
-                        </div>
 
-                        <div className='event-form__field'>
                             <Field name="TlCreationId"
                                    component={Select}
                                    options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
                                    label={"Привязка к таймлайну"}
                                    placeholder="Привязка к таймлайну"
                                    initialValue={timelineId}
-                                   disabled={!timelineId}>
+                                   disabled={!timelineId}
+                                   extClass={'event-form__field'}>
                             </Field>
-                        </div>
 
-                        <div className='event-form__field event-date'>
                             <Field name="DayNumber"
                                    component={TextBox}
                                    label={"Дата"}
                                    type={'number'}
                                    placeholder="Дата"
                                    initialValue={formData.Date}
-                                   disabled={false}>
+                                   disabled={false}
+                                   extClass={'event-form__field event-date'}>
                             </Field>
-                        </div>
 
-                        <div className='event-form__field event-date'>
                             <Field name="Month"
                                    component={TextBox}
                                    type={'number'}
                                    label={"Месяц"}
                                    placeholder="Месяц"
                                    initialValue={formData.Month}
-                                   disabled={false}>
+                                   disabled={false}
+                                   extClass={'event-form__field event-date'}
+                            >
                             </Field>
-                        </div>
 
-                        <div className='event-form__field event-date'>
                             <Field name="Year"
                                    type={'number'}
                                    component={TextBox}
                                    label={"Год"}
                                    placeholder="Год"
                                    initialValue={formData.Year}
-                                   disabled={false}>
+                                   disabled={false}
+                                   extClass={'event-form__field event-date'}>
                             </Field>
-                        </div>
 
 
                         <div className='event-form__field center'>
-                            <button type={'button'} className="orange-button big-button" disabled={pristine}
+                            <button type={'button'} className="orange-button big-button" disabled={!validIs}
                                     onClick={() => props.onSave({id: eventData.Id, tableId: eventData.id, values: values})}>Сохранить
                             </button>
                         </div>
 
 
-                        <FormSpy subscription={{values: true, pristine: true}}
-                                 onChange={({values, pristine, formValue}) => {
-
+                        <FormSpy subscription={{values: true, pristine: true, errors: true}}
+                                 onChange={({values, pristine, formValue, errors}) => {
+                                     if(Object.values(errors).length === 0){
+                                         setValid(true);
+                                     }
                                      //some logic if it need
                                  }}/>
                     </form>
                 )}/>
         </div>)
 }
+
+const validate = (values, disableValidationOnFields = []) => {
+    const errors = {};
+
+    if (!values.Year) {
+        errors.StartYear = 'Required'
+    }
+
+    if (values.Year && (values.Year.length < 1)) {
+        errors.StartMonth = 'Wrong value'
+    }
+
+    if (!values.Month) {
+        errors.Month = 'Required'
+    }
+
+    if ((values.Month > 12) || (values.Month < 1)) {
+        errors.StartMonth = 'Wrong value'
+    }
+
+    if (values.Year && !values.DayNumber && !values.Month) {
+        errors.Month = 'Required'
+    }
+
+    // todo : сделать учет месяцев
+
+    if ((values.DayNumber > 31) || (values.DayNumber < 1)) {
+        errors.StartDay = 'Wrong value'
+    }
+
+    if (!values.Name || (values.Name && values.Name.length < 1)){
+        errors.Name = 'Wrong values'
+    }
+
+    if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
+        errors.ShortName = 'Required'
+    }
+
+    if (!values.Description || (values.Description && values.Description.length < 1)) {
+        errors.Description = 'Wrong value'
+    }
+
+    if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
+        errors.TlCreationId = 'Wrong value'
+    }
+
+    disableValidationOnFields.map(field => {
+        field.condition && delete errors[field.fieldName];
+    });
+
+    return errors
+};
