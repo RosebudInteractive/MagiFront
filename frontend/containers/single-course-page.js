@@ -13,14 +13,14 @@ import * as userActions from "../actions/user-actions";
 
 import $ from 'jquery'
 
-import {pages, getDomain, getPageUrl,} from 'tools/page-tools';
-import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
+import {getDomain, getPageUrl, pages,} from 'tools/page-tools';
+import {addCourseToBookmarks, removeCourseFromBookmarks, userBookmarksSelector,} from "ducks/profile";
 import {
+    clearCurrentPage,
     enabledPaidCoursesSelector,
     facebookAppIdSelector,
-    setCurrentPage,
-    clearCurrentPage,
-    notifyAnalyticsChangePage
+    notifyAnalyticsChangePage,
+    setCurrentPage
 } from "ducks/app";
 import {notifyConcreteCourseShowed} from "ducks/google-analytics";
 
@@ -36,11 +36,11 @@ class Main extends React.Component {
     }
 
     UNSAFE_componentWillMount() {
-        window.scrollTo(0, 0)
-        this.props.userActions.whoAmI()
+        window.scrollTo(0, 0);
+        this.props.userActions.whoAmI();
         this.props.storageActions.refreshState();
         this.props.coursesActions.getCourses();
-        this.props.coursesActions.getCourse(this.props.courseUrl);
+        this.props.coursesActions.getCourse(this.props.courseUrl, {timeline: true});
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
 
@@ -48,13 +48,13 @@ class Main extends React.Component {
         if (this.props.courseUrl && nextProps.courseUrl && (this.props.courseUrl !== nextProps.courseUrl)) {
             this.props.storageActions.refreshState();
             this.props.coursesActions.getCourses();
-            this.props.coursesActions.getCourse(nextProps.courseUrl);
+            this.props.coursesActions.getCourse(nextProps.courseUrl, {timeline: true});
             window.scrollTo(0, 0)
         }
     }
 
     componentDidUpdate(prevProps) {
-        let {course} = this.props
+        let {course} = this.props;
 
         if (course) {
             let _authors = course.Authors
@@ -88,7 +88,7 @@ class Main extends React.Component {
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.coursesActions.getCourses();
-        this.props.coursesActions.getCourse(this.props.courseUrl);
+        this.props.coursesActions.getCourse(this.props.courseUrl, {timeline: true});
     }
 
     componentWillUnmount() {

@@ -1,22 +1,22 @@
 import {
+    GET_COURSES_FAIL,
     GET_COURSES_REQUEST,
     GET_COURSES_SUCCESS,
-    GET_COURSES_FAIL,
+    GET_SINGLE_COURSE_FAIL,
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
-    GET_SINGLE_COURSE_FAIL, SET_COURSE_NOT_FOUND,
+    SET_COURSE_NOT_FOUND,
 } from '../constants/courses'
 
-import {
-    LOAD_FILTER_VALUES,
-} from '../constants/filters'
+import {LOAD_FILTER_VALUES,} from '../constants/filters'
 
 import 'whatwg-fetch';
 import {parseReadyDate} from "../tools/time-tools";
-import {DATA_EXPIRATION_TIME, LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
+import {LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
 
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import CourseDiscounts from "tools/course-discount";
+import $ from 'jquery'
 
 
 export const getCourses = () => {
@@ -64,7 +64,9 @@ export const getCourse = (url, options) => {
             payload: null
         });
 
-        const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
+        const params = $.param(options);
+
+        const _fetchUrl = "/api/courses/" + url + '?' + params;
 
         return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
