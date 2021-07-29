@@ -17,9 +17,17 @@ export default function EventForm(props) {
         TlCreationId: (timelineId) ? timelineId : null,
     }), [eventData]);
 
+    const _timelines = useMemo(() => {
+        const _result = timelines.map(item => ({id: item.Id, label: item.Name, name: item.Name}))
+
+        if (!timelineId) {_result.push({id: null, label: "Текущий таймлайн"})}
+
+        return _result
+    },[timelines, timelineId])
+
     return (
 
-        (timelines && timelines.length > 0) && <div className="event-form">
+        (_timelines.length > 0) && <div className="event-form">
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
@@ -28,12 +36,8 @@ export default function EventForm(props) {
             </div>
 
             <Form
-                initialValues={
-                    formData
-                }
-                onSubmit={e => {
-                    e.preventDefault()
-                }}
+                initialValues={formData}
+                onSubmit={e => {e.preventDefault()}}
                 validate={values => validate(values, [
                         {fieldName: 'TlCreationId', condition: !eventData.Id}])
                 }
@@ -71,6 +75,7 @@ export default function EventForm(props) {
 
                             <Field name="TlCreationId"
                                    component={Select}
+                                   required={true}
                                    options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
                                    label={"Привязка к таймлайну"}
                                    placeholder="Привязка к таймлайну"

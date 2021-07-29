@@ -178,12 +178,11 @@ const _getColor = () => { //todo add to helpers/tools
 function* setPeriodsSaga({payload}) {
     const _periods = payload.map((item) => {
         let _period = {...item};
-        console.log('setPeriodsSaga, item,', item);
-
 
         _period.StartYear = item.StartYear ? item.StartYear :
             item.LbYear ? item.LbYear :
                 new Date(item.LbDate).getFullYear();
+
         _period.StartMonth = item.StartMonth ? item.StartMonth :
             item.LbMonth ? item.LbMonth :
                 new Date(item.LbDate).getMonth() + 1;
@@ -192,6 +191,7 @@ function* setPeriodsSaga({payload}) {
         _period.EndYear = item.EndYear ? item.EndYear :
             item.RbYear ? item.RbYear :
                 new Date(item.RbDate).getFullYear();
+
         _period.EndMonth = item.EndMonth ? item.EndMonth :
             item.RbMonth ? item.RbMonth :
                 new Date(item.RbDate).getMonth() + 1;
@@ -205,7 +205,7 @@ function* setPeriodsSaga({payload}) {
         _period.endDate = item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
             item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
             `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
-        _period.name = item.Name;
+        // _period.name = item.Name;
         _period.color = _getColor();
 
         _period.DisplayStartDate =
@@ -245,7 +245,6 @@ function* createPeriodsSaga(data) {
 
             yield all(
                 finalPeriods.map((ev) => {
-                    console.log(ev);
                     return call(createPeriod, ev)
                 })
             );
@@ -281,7 +280,6 @@ function* findPeriodSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e);
         showErrorMessage(e);
     }
 }
@@ -297,7 +295,6 @@ function* getPeriodSaga(data) {
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
-        console.log(e);
     }
 }
 
@@ -325,7 +322,6 @@ function* removePeriodSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.dir(e);
         yield put(showErrorMessage(e.toString()));
     }
 }
@@ -377,7 +373,6 @@ function* updatePeriodSaga(data) {
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
-        console.log(e);
     }
 }
 
@@ -392,7 +387,6 @@ function* createPeriodSaga(data) {
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
-        console.log(e);
     }
 }
 

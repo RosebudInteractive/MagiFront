@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Field, Form} from "react-final-form";
 import {TextBox} from "../../ui-kit";
 import {EVENT_STATES} from "../../../constants/events";
@@ -9,25 +9,26 @@ import Webix from "../../Webix";
 import './event-find-form.sass'
 
 
-let findedEventsCount = 0;
-
-
 export default function EventsFindForm(props) {
     const {findedData, addEventsAction, findAction, closeAction} = props;
+    const [eventsCount, setEventsCount] = useState(0)
     const selectedEvents = useRef([]);
 
     useWindowSize(() => {
-        resizeHandler(findedEventsCount, 'events-find-form');
+        resizeHandler(eventsCount, "#found-events-container", 'events-find-form');
     });
 
     useEffect(() => {
-        findedEventsCount = findedData ? findedData.length : findedEventsCount;
-        _onResize();
+        setEventsCount(findedData ? findedData.length : 0)
     }, [findedData]);
 
-    const _onResize = useCallback(() => {
-        resizeHandler(findedEventsCount, 'events-find-form')
-    }, [findedData]);
+    useEffect(() => {
+        resizeHandler(eventsCount, "#found-events-container",'events-find-form')
+    }, [eventsCount])
+
+    useEffect(() => {
+        resizeHandler(eventsCount, "#found-events-container", 'events-find-form')
+    }, [])
 
     const GRID_CONFIG = {
         view: "datatable",
@@ -88,13 +89,9 @@ export default function EventsFindForm(props) {
     return (
         <div className="events-find-form">
             <Form
-                initialValues={
-                    searchFormData
-                }
-                onSubmit={values => {
-                }}
-                validate={values => {
-                }}
+                initialValues={searchFormData}
+                onSubmit={values => {}}
+                validate={values => {}}
                 subscription={{values: true, pristine: true}}
                 render={({searchForm, submitting, pristine, values}) => (
                     <form onSubmit={e => {
@@ -119,8 +116,10 @@ export default function EventsFindForm(props) {
                     </form>)}/>
 
 
-            <div className="grid-container finded-events-table js-resizeable-container unselectable">
-                <Webix ui={GRID_CONFIG} data={findedData}/>
+            <div className="grid-container__wrapper">
+                <div className="grid-container found-events-table unselectable" id="found-events-container">
+                    <Webix ui={GRID_CONFIG} data={findedData}/>
+                </div>
             </div>
 
             <button disabled={false} type="button" className="orange-button big-button add-selected" onClick={() => {
@@ -128,7 +127,7 @@ export default function EventsFindForm(props) {
                     addEventsAction(selectedEvents.current)
                 }
             }}>
-                Добавить выделенные
+                Добавить
             </button>
         </div>
     )

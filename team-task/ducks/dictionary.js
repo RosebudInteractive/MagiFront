@@ -68,7 +68,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case SET_ALL_DATA:
-            console.log('payload courses', payload)
             return state
                 .setIn(['users', 'a'], payload.a)
                 .setIn(['users', 'pma'], payload.pma)

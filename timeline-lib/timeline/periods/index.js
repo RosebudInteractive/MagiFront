@@ -1,7 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import placeByYLevelLimit from "../../helpers/placeByLevel";
 import AnimatedPeriod from "./native-item";
-import moment from "moment"
 
 export default function Periods(props) {
     const {zoom, startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis} = props;
@@ -10,26 +9,51 @@ export default function Periods(props) {
     const didMountRef = useRef(0);
 
     useEffect(() => {
-        if(didMountRef.current === 0){
+        if (didMountRef.current === 0) {
             didMountRef.current += 1;
         }
-
     }, [periods]);
 
     useEffect(() => {
-        if(didMountRef.current === 1){
+        if (didMountRef.current === 1) {
             setTimeout(() => {
                 setOpacity(1)
             }, 500)
         }
     }, [didMountRef]);
 
-    const p = verticallyAlignedPeriods.length > 0 &&
-        verticallyAlignedPeriods
-            .map((period) => {
+    useEffect(() => {
+        if (periods.length > 0) {
+            const periodsWithCoords = periods.map((item) => {
+                const _yearStart = item.startYear,
+                    _yearEnd = item.endYear
+
+
+                const xStart = Math.abs(_yearStart - startDate) * yearPerPixel;
+                const xEnd = Math.abs(_yearEnd - startDate) * yearPerPixel;
+
+                return {...item, yLevel: 0, xLevel: 0, xStart, xEnd}
+            });
+
+            const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit);
+
+            alignedPeriods.forEach(item => {
+                item.displayDate = `${item.startYear} - ${item.endYear}гг.`;
+                item.y = elementsOverAxis ? (y - 30) - (item.yLevel * 30) : (y + 30) + (item.yLevel * 30);
+                item.title = item.name;
+            });
+
+            setVerticallyAlignedPeriods(alignedPeriods);
+        }
+
+    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis]);
+
+    return useMemo(() => {
+        return verticallyAlignedPeriods.length > 0 ?
+            verticallyAlignedPeriods.map((period) => {
                 return <AnimatedPeriod title={period.title}
                                        key={period.id}
-                                       date={period.date}
+                                       date={period.displayDate}
                                        id={period.id}
                                        startX={period.xStart}
                                        endX={period.xEnd}
@@ -39,35 +63,8 @@ export default function Periods(props) {
                                        visible={period.visible}
                                        opacity={period.visible ? opacity : 0}
                                        opacityHalf={0.57}/>
-            });
-
-
-    useEffect(() => {
-        if (periods.length > 0) {
-
-            const periodsWithCoords = periods.map((per) => {
-                const _yearStart = +per.startDate.substr(per.startDate.length - 4, 4),
-                    _yearEnd = +per.endDate.substr(per.endDate.length - 4, 4)
-
-
-                const xStart = Math.abs(_yearStart - startDate) * yearPerPixel;
-                const xEnd = Math.abs(_yearEnd - startDate) * yearPerPixel;
-
-                return {...per, yLevel: 0, xLevel: 0, xStart, xEnd}
-            });
-
-            const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit);
-
-            alignedPeriods.forEach(x => {
-                x.date = `${moment(x.startDate).get('year')} - ${moment(x.endDate).get('year')}г.`;
-                x.y = elementsOverAxis ? (y - 30) - (x.yLevel * 30) : (y + 30) + (x.yLevel * 30);
-                x.title = x.name;
-            });
-
-            setVerticallyAlignedPeriods(alignedPeriods);
-        }
-
-    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis]);
-
-    return p;
+            })
+            :
+            null
+    }, [verticallyAlignedPeriods])
 }
