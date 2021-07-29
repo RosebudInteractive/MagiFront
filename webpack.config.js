@@ -117,6 +117,7 @@ const _prodConfig = {
     },
     resolve: {
         alias: {
+            'react-native$': 'react-native-web',
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
             // "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
