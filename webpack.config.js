@@ -132,6 +132,7 @@ const _prodConfig = {
             'tools': path.resolve(__dirname, 'frontend/tools'),
             'common-tools': path.resolve(__dirname, 'common/tools'),
             'common-styles': path.resolve(__dirname, 'common/styles'),
+            'timeline': path.resolve(__dirname, 'timeline-lib'),
         }
     },
     resolveLoader: {
