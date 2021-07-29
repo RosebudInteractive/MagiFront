@@ -176,11 +176,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.StartYear = 'Required'
     }
 
-    if (values.StartYear && !values.StartDay && !values.StartMonth) {
-        errors.StartMonth = 'Required'
-    }
-
-    if (!values.StartMonth) {
+    if (values.StartYear && values.StartDay && !values.StartMonth) {
         errors.StartMonth = 'Required'
     }
 
@@ -189,19 +185,15 @@ const validate = (values, disableValidationOnFields = []) => {
     }
 
     if (!values.EndYear) {
-        errors.StartYear = 'Required'
+        errors.EndYear = 'Required'
     }
 
-    if (values.EndYear && !values.EndDay && !values.EndMonth) {
+    if (values.EndYear && values.EndDay && !values.EndMonth) {
         errors.EndMonth = 'Required'
     }
 
-    if (!values.EndMonth) {
-        errors.StartMonth = 'Required'
-    }
-
     if ((values.EndMonth > 12) || (values.EndMonth < 1)) {
-        errors.StartMonth = 'Wrong value'
+        errors.EndMonth = 'Wrong value'
     }
 
     // todo : сделать учет месяцев
@@ -210,7 +202,7 @@ const validate = (values, disableValidationOnFields = []) => {
     }
 
     if ((values.EndDay > 31) || (values.EndDay < 1)) {
-        errors.StartDay = 'Wrong value'
+        errors.EndDay = 'Wrong value'
     }
 
     if (!values.Name || (values.Name && values.Name.length < 1)){

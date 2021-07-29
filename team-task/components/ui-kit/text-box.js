@@ -102,5 +102,5 @@ export default function UiTextBox(props) {
                          label={props.label}
                          variant="outlined"
                          className={_className}
-                         helperText={props.meta.error}/>
+                         helperText={props.meta.touched && props.meta.error}/>
 }

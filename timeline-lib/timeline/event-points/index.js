@@ -91,7 +91,8 @@ export default function EventPoints(props: Props) {
 
     const _e = useMemo(() => {
         return [...events].sort((a, b) => {
-            return ((moment(b.data).get('year') - startDate) - (moment(a.date).get('year') - startDate));
+            return ((b.year - startDate) - (a.year - startDate));
+            // return ((moment(b.data).get('year') - startDate) - (moment(a.date).get('year') - startDate));
         });
 
     }, [events]);

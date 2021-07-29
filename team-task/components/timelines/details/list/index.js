@@ -10,15 +10,17 @@ let _itemsCount = 0;
 
 //todo finish this
 export default function DetailsList(props) {
-    const {actions, items, columnsConfig, idGrid, title, findedEl, addCompletelyCreated} = props;
+    const {actions, items, columnsConfig, idGrid, title, addCompletelyCreated} = props;
+
+    const _containerId = `${idGrid}-container`
 
     useWindowSize(() => {
-        idGrid && resizeHandler(_itemsCount, idGrid)
+        idGrid && resizeHandler(_itemsCount, `#${_containerId}`, idGrid)
     });
 
     useEffect(() => {
         _itemsCount = items.length;
-        idGrid && resizeHandler(_itemsCount, idGrid);
+        idGrid && resizeHandler(_itemsCount, `#${_containerId}`, idGrid);
         _onResize();
     }, [items, idGrid]);
 
@@ -30,7 +32,7 @@ export default function DetailsList(props) {
     }, [location]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(items.length, idGrid)
+        resizeHandler(items.length, `#${_containerId}`, idGrid)
     }, [items]);
 
     const GRID_CONFIG = {
@@ -88,7 +90,7 @@ export default function DetailsList(props) {
                 </button>
             </div>
             <div className="grid-container__wrapper">
-                <div className="grid-container details-list-table items-table js-resizeable-container unselectable">
+                <div className="grid-container details-list-table items-table unselectable" id={_containerId}>
                     <Webix ui={GRID_CONFIG} data={items}/>
                 </div>
             </div>

@@ -335,39 +335,24 @@ function TimelineEditorContainer(props) {
                 }
                 <TimelinePreview
                     background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
-                    events={events}/>
-
+                    events={events} periods={periods}/>
                 <TimelineDetails actions={{
                     events: {
-                        headerClickAction: () => {
-                        },
+                        headerClickAction: () => {},
                         doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
-                        deleteAction: (id) => {
-                            id && actions.removeEvent(id)
-                        },
-                        createAction: () => {
-                            detailsCreateAction('events')
-                        },
-                        openFindFormAction: () => {
-                            detailsOpenFindFormAction('events')
-                        }
+                        deleteAction: (id) => {id && actions.removeEvent(id)},
+                        createAction: () => {detailsCreateAction('events')},
+                        openFindFormAction: () => {detailsOpenFindFormAction('events')}
                     }
                     , periods: {
-                        headerClickAction: () => {
-                        },
-                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId})
-                        ,
-                        deleteAction: (id) => {
-                            actions.removePeriod(id);
-                        },
-                        createAction: () => {
-                            detailsCreateAction('periods')
-                        },
-                        openFindFormAction: () => {
-                            detailsOpenFindFormAction('periods')
-                        }
+                        headerClickAction: () => {},
+                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId}),
+                        deleteAction: (id) => {actions.removePeriod(id)},
+                        createAction: () => {detailsCreateAction('periods')},
+                        openFindFormAction: () => {detailsOpenFindFormAction('periods')}
                     }
-                }} events={events}
+                }}
+                                 events={events}
                                  periods={periods}
                                  findedEvents={findedEvents}
                                  findedPeriods={findedPeriods}
@@ -375,27 +360,33 @@ function TimelineEditorContainer(props) {
             </React.Fragment>
             }
 
-            {((eventEditorOpened || periodEditorOpened) && timelinesAll && detailsEditor.current) &&
-            <Modal WrappedComponent={detailsEditor.current} wrappedProps={{
-                eventData: selectedEvent,
-                periodData: selectedPeriod,
-                closeModalCb: closeModal,
-                timelines: timelinesAll,
-                timelineId: timeline.Id,
-                onSave: onSaveModal
-            }}/>
+            {
+                ((eventEditorOpened || periodEditorOpened) && timelinesAll && detailsEditor.current) &&
+                <Modal WrappedComponent={detailsEditor.current}
+                       customHeader={true}
+                       wrappedProps={{
+                           eventData: selectedEvent,
+                           periodData: selectedPeriod,
+                           closeModalCb: closeModal,
+                           timelines: timelinesAll,
+                           timelineId: timeline.Id,
+                           onSave: onSaveModal
+                       }}/>
             }
 
-            {finderFormOpened && <Modal WrappedComponent={finderForm.current}
-                                        commonHeader={true}
-                                        closeAction={finderFormCloseAction}
-                                        wrappedProps={{
-                                            findedData: finderForm.current === PeriodsFindForm ? findedPeriods : findedEvents,
-                                            addEventsAction: (data) => {addElementsAction(data, 'events')},
-                                            addPeriodsAction: (data) => {addElementsAction(data, 'periods')},
-                                            findAction: findAction,
-                                            closeAction: closeFinderAction
-                                        }}/>}
+            {
+                finderFormOpened &&
+                <Modal WrappedComponent={finderForm.current}
+                       title={finderForm.current === PeriodsFindForm ? "Добавление периода" : "Добавление события"}
+                       closeAction={finderFormCloseAction}
+                       wrappedProps={{
+                           findedData: finderForm.current === PeriodsFindForm ? findedPeriods : findedEvents,
+                           addEventsAction: (data) => {addElementsAction(data, 'events')},
+                           addPeriodsAction: (data) => {addElementsAction(data, 'periods')},
+                           findAction: findAction,
+                           closeAction: closeFinderAction
+                       }}/>
+            }
         </div>
     )
 }

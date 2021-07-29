@@ -11,13 +11,12 @@ import './period-find-form.sass'
 
 let findedPeriodsCount = 0;
 
-
 export default function PeriodsFindForm(props) {
-    const {findedData, addPeriodsAction, findAction, closeAction} = props;
+    const {findedData, addPeriodsAction, findAction} = props;
     const selectedPeriods = useRef([]);
 
     useWindowSize(() => {
-        resizeHandler(findedPeriodsCount, 'periods-find-form');
+        resizeHandler(findedPeriodsCount, "#found-periods-container", 'periods-find-form');
     });
 
     useEffect(() => {
@@ -26,7 +25,7 @@ export default function PeriodsFindForm(props) {
     }, [findedData]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(findedPeriodsCount, 'periods-find-form')
+        resizeHandler(findedPeriodsCount, "#found-periods-container", 'periods-find-form')
     }, [findedData]);
 
     const GRID_CONFIG = {
@@ -91,50 +90,45 @@ export default function PeriodsFindForm(props) {
         }
     });
 
+    const _onSearchClick = (values) => {
+        const value = values.textValue;
+        findAction(value);
+    }
+
+    const _onAddButtonClick = () => {
+        if (selectedPeriods.current.length > 0) {
+            addPeriodsAction(selectedPeriods.current)
+        }
+    }
+
     return (
         <div className="periods-find-form">
             <Form
-                initialValues={
-                    searchFormData
-                }
-                onSubmit={values => {
-                }}
-                validate={values => {
-                }}
+                initialValues={searchFormData}
+                onSubmit={values => {}}
+                validate={values => {}}
                 subscription={{values: true, pristine: true}}
                 render={({searchForm, submitting, pristine, values}) => (
-                    <form onSubmit={e => {
-                        e.preventDefault();
-                    }}>
+                    <form onSubmit={e => {e.preventDefault()}}>
                         <div className='periods-find-form__field'>
                             <Field name="textValue"
                                    component={TextBox}
                                    type="text"
                                    placeholder="Дата/Год/Название"
                                    label={"Дата/Год/Название"}
-
                                    disabled={false}/>
-                            <button disabled={false} type="button" className='search-button' onClick={() => {
-                                const value = values.textValue;
-
-                                findAction(value);
-                            }}>
+                            <button type="button" className='search-button' onClick={() => {_onSearchClick(values)}}>
                                 Поиск
                             </button>
                         </div>
                     </form>)}/>
-
-
-            <div className="grid-container finded-periods-table">
-                <Webix ui={GRID_CONFIG} data={findedData}/>
+            <div className="grid-container__wrapper">
+                <div className="grid-container finded-periods-table unselectable" id="found-periods-container">
+                    <Webix ui={GRID_CONFIG} data={findedData}/>
+                </div>
             </div>
-
-            <button disabled={false} type="button" className="orange-button big-button add-selected" onClick={() => {
-                if (selectedPeriods.current.length > 0) {
-                    addPeriodsAction(selectedPeriods.current)
-                }
-            }}>
-                Добавить выделенные
+            <button type="button" className="orange-button big-button add-selected" onClick={_onAddButtonClick}>
+                Добавить
             </button>
         </div>
     )

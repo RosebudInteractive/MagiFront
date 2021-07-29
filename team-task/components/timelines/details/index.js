@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import './details.sass'
 import {EVENT_STATES} from "../../../constants/events"
 import DetailsList from "./list";
@@ -6,10 +6,6 @@ import DetailsList from "./list";
 //todo finish this
 export default function TimelineDetails(props) {
     const {events, periods, actions, findedEvents, findedPeriods, timelineId} = props;
-
-    useEffect(() => {
-        console.log('TimelineDetails events', events);
-    }, [events]);
 
     return (
         <div className="timeline-details">
@@ -26,9 +22,7 @@ export default function TimelineDetails(props) {
                     {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 18},
                     {id: 'Description', header: 'Описание',  minWidth: 80, fillspace: 18},
                     {id: 'DisplayDate', header: 'Дата события',  minWidth: 80, fillspace: 18},
-                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20,
-                    options: EVENT_STATES},
-
+                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES},
                     {
                         id: 'del-btn', header: '', width: 50, fillspace: 8,
                         template: "<button class='process-elements-grid__button elem-delete remove-event-button'/>"
@@ -50,9 +44,7 @@ export default function TimelineDetails(props) {
                     {id: 'Description', header: 'Описание',  minWidth: 80, fillspace: 18},
                     {id: 'DisplayStartDate', header: 'Начало',  minWidth: 80, fillspace: 18},
                     {id: 'DisplayEndDate', header: 'Конец',  minWidth: 80, fillspace: 18},
-                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20,
-                        options: EVENT_STATES
-                    },
+                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES},
                     {
                         id: 'del-btn', header: '', width: 50, fillspace: 8,
                         template: "<button class='process-elements-grid__button elem-delete remove-event-button'/>"

@@ -117,6 +117,7 @@ const _prodConfig = {
     },
     resolve: {
         alias: {
+            'react-native$': 'react-native-web',
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
             // "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
@@ -132,6 +133,7 @@ const _prodConfig = {
             'tools': path.resolve(__dirname, 'frontend/tools'),
             'common-tools': path.resolve(__dirname, 'common/tools'),
             'common-styles': path.resolve(__dirname, 'common/styles'),
+            'timeline': path.resolve(__dirname, 'timeline-lib'),
         }
     },
     resolveLoader: {
