@@ -17,10 +17,9 @@ export default function singleCourse(state = initialState, action) {
         case GET_SINGLE_COURSE_REQUEST:
             return {...state, object: null, fetching: true, notFound: false};
 
-        case GET_SINGLE_COURSE_SUCCESS: {
-            console.log('GET_SINGLE_COURSE_SUCCESS', action.payload)
+        case GET_SINGLE_COURSE_SUCCESS:
             return {...state, object: action.payload, fetching: false};
-        }
+
 
         case GET_SINGLE_COURSE_FAIL:
             return initialState;
