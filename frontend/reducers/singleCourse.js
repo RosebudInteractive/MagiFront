@@ -1,7 +1,7 @@
 import {
+    GET_SINGLE_COURSE_FAIL,
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
-    GET_SINGLE_COURSE_FAIL,
     SET_COURSE_NOT_FOUND,
 } from '../constants/courses'
 
@@ -18,6 +18,7 @@ export default function singleCourse(state = initialState, action) {
             return {...state, object: null, fetching: true, notFound: false};
 
         case GET_SINGLE_COURSE_SUCCESS: {
+            console.log('GET_SINGLE_COURSE_SUCCESS', action.payload)
             return {...state, object: action.payload, fetching: false};
         }
 
@@ -25,7 +26,7 @@ export default function singleCourse(state = initialState, action) {
             return initialState;
 
         case SET_COURSE_NOT_FOUND:
-            return {...state, object: null, fetching: false, notFound: true}
+            return {...state, object: null, fetching: false, notFound: true};
 
         default:
             return state;

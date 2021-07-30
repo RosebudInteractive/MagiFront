@@ -1,9 +1,10 @@
 import {appName} from '../config'
 import {all, call, put, takeEvery} from "@redux-saga/core/effects";
-import {GET_SINGLE_COURSE_REQUEST, GET_SINGLE_COURSE_SUCCESS} from "../constants/courses";
+import {GET_SINGLE_COURSE_REQUEST, SOME_ACTION_TO_CHECK} from "../constants/courses";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {List, Record} from "immutable";
 import {createSelector} from "reselect";
+// import commonTools from "../../team-task/tools/common"
 
 
 /**
@@ -55,6 +56,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set("loading", false);
 
         case SET_COURSE_TIMELINES:
+            console.log('set_course_timelines');
             return state.set('timelines', [...payload]);
 
         case SET_VISIBLE_COURSE:
@@ -100,13 +102,86 @@ export const saga = function* () {
         takeEvery(GET_COURSE_DISCOUNTS_REQUEST, getCourseDiscountsSaga),
         takeEvery(GET_CONCRETE_COURSE_REQUEST, getCourseSaga),
         takeEvery(GET_SINGLE_COURSE_REQUEST, getSingleCourseSaga),
-        takeEvery(GET_SINGLE_COURSE_SUCCESS, setTimelinesSaga)
+        takeEvery(SOME_ACTION_TO_CHECK, someSaga),
+        // takeEvery(GET_SINGLE_COURSE_SUCCESS, setTimelinesSaga)
     ])
 };
 
+function* someSaga(data) {
+    try {
+        yield ;
+        console.log('someSaga', data);
+    }catch (e) {
+        console.log(e)
+    }
+}
+
 function* setTimelinesSaga(data) {
     try {
-        yield put({type: SET_COURSE_TIMELINES, payload: data.payload.Timelines ?data.payload.Timelines : []});
+        console.log('setTimelinesSaga, ', data)
+        // const mappedTimelines = data.payload.Timelines.map(tm => ({
+        //         ...tm,
+        //         CourseId: tm.Course ? tm.Course.Id : null,
+        //         LessonId: tm.Lesson ? tm.Lesson.Id : null,
+        //         Events: tm.Events.map(ev => ({
+        //             ...ev,
+        //             year: ev.Year ? ev.Year : new Date(ev.Date).getFullYear(),
+        //             month: ev.Month ? ev.Month : new Date(ev.Date).getMonth() + 1,
+        //             name: ev.Name,
+        //             color: commonTools.getColor(),
+        //             date: ev.Date ? new Date(ev.Date).toLocaleDateString("ru-Ru") : `${ev.Month ? ev.Month + '.' : ''}${ev.Year}`,
+        //             visible: true,
+        //             DisplayDate: ev.Date ?  //это дата для отображения целиком строкой
+        //     new Date(ev.Date).toLocaleDateString("ru-Ru") :
+        //     `${ev.DayNumber ? ev.DayNumber.toString().padStart(2, '0') + '.' : ''}${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`,
+        //             DayNumber: ev.Date ? new Date(ev.Date).getDate() : ev.DayNumber ? ev.DayNumber : null, //а это дата для  отображения только дня
+        //             Month: ev.Month ? ev.Month : ev.Date ? new Date(ev.Date).getMonth() + 1 : null,
+        //             Year: ev.Year ? ev.Year : ev.Date ? new Date(ev.Date).getFullYear() : null
+        //         })),
+        //     Periods: tm.Periods.map(pr => ({
+        //         ...pr,
+        //         StartYear: pr.StartYear ? pr.StartYear :
+        //             pr.LbYear ? pr.LbYear :
+        //                 new Date(pr.LbDate).getFullYear(),
+        //
+        // StartMonth: pr.StartMonth ? pr.StartMonth :
+        //     pr.LbMonth ? pr.LbMonth :
+        //         new Date(pr.LbDate).getMonth() + 1,
+        // StartDay: pr.StartDay ? pr.StartDay : new Date(pr.LbDate).getDate(),
+        //
+        // EndYear: pr.EndYear ? pr.EndYear :
+        //     pr.RbYear ? pr.RbYear :
+        //         new Date(pr.RbDate).getFullYear(),
+        //
+        // EndMonth: pr.EndMonth ? pr.EndMonth :
+        //     pr.RbMonth ? pr.RbMonth :
+        //         new Date(pr.RbDate).getMonth() + 1,
+        // EndDay: pr.EndDay ? pr.EndDay : new Date(pr.RbDate).getDate(),
+        //
+        //
+        // startDate: pr.StartDate ?
+        //     new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+        //     pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+        //         `${pr.LbMonth ? pr.LbMonth + '.' : ''}${pr.LbYear}`,
+        // endDate: pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+        //     pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+        //         `${pr.RbMonth ? pr.RbMonth + '.' : ''}${pr.RbYear}`,
+        // // _period.name = item.Name;
+        // color: commonTools.getColor(),
+        //
+        // DisplayStartDate:
+        //     pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+        //         pr.StartDate ? new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+        //             `${pr.StartDay ? pr.StartDay.toString().padStart(2, '0') + '.' : ''}${pr.StartMonth ? pr.StartMonth.toString().padStart(2, '0') + '.' : ''}${pr.StartYear}`,
+        //
+        // DisplayEndDate: pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+        //     pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+        //         `${pr.EndDay ? pr.EndDay.toString().padStart(2, '0') + '.' : ''}${pr.EndMonth ? pr.EndMonth.toString().padStart(2, '0') + '.' : ''}${pr.EndYear}`,
+        //     }))
+        //     })
+        // );
+
+        yield put({type: SET_COURSE_TIMELINES, payload: data.payload});
     } catch (e) {
         console.log(e)
     }
@@ -125,7 +200,7 @@ function* getCourseDiscountsSaga() {
     try {
         yield put({type: GET_COURSE_DISCOUNTS_START});
 
-        let _discounts = yield call(_fetchDiscounts)
+        let _discounts = yield call(_fetchDiscounts);
         yield put({type: GET_COURSE_DISCOUNTS_SUCCESS, payload: _discounts})
     } catch (e) {
         yield put({type: GET_COURSE_DISCOUNTS_FAIL, payload: {e}})

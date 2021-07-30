@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import Cover from './cover'
 import './course-page.sass'
-
 // import {course} from "./mock-data";
 import Content from "./content";
 import $ from "jquery";
@@ -29,9 +28,9 @@ export default class Wrapper extends React.Component {
         }
 
         this._resizeHandler = (e) => {
-            const _margin =$('.page-header').height()
+            const _margin =$('.page-header').height();
 
-            let _isCoverVisible = isInViewport('.course-page__cover', _margin)
+            let _isCoverVisible = isInViewport('.course-page__cover', _margin);
             if (_isCoverVisible && !this.state.transparentMenu) {
                 this.setState({transparentMenu: true})
             }

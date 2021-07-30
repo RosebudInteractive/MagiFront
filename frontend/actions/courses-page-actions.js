@@ -17,6 +17,7 @@ import {LESSON_STATE, TEST_TYPE} from "../constants/common-consts";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import CourseDiscounts from "tools/course-discount";
 import $ from 'jquery'
+import commonTools from "../../team-task/tools/common";
 
 
 export const getCourses = () => {
@@ -33,7 +34,7 @@ export const getCourses = () => {
         });
 
         fetch("/api/courses", {method: 'GET', credentials: 'include'})
-        .then(checkStatus)
+            .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 handleCourses(data, getState());
@@ -72,12 +73,20 @@ export const getCourse = (url, options) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                // const mappedData = {...data, Timelines: _mapTimelines(data.Timelines)};
+                // console.log('mappedData', mappedData);
+
                 handleCourse(data, getState());
 
                 dispatch({
                     type: GET_SINGLE_COURSE_SUCCESS,
                     payload: data
                 });
+
+                // dispatch({
+                //     type: SOME_ACTION_TO_CHECK,
+                //     payload: mappedData
+                // })
             })
             .catch((err) => {
                 if (err.status === 404) {
@@ -145,14 +154,139 @@ const handleCourses = (data, state) => {
 
             calcStatistics(item, state)
         });
-    }
-    catch (err) {
+    } catch (err) {
         console.error('ERR: ' + err.message);
     }
 };
 
+const _mapTimelines = (dataToMap) => {
+    const mappedData = dataToMap.map(tm => ({
+        ...tm,
+        CourseId: tm.Course ? tm.Course.Id : null,
+        LessonId: tm.Lesson ? tm.Lesson.Id : null,
+        Events: tm.Events.map(ev => ({
+            ...ev,
+            year: ev.Year ? ev.Year : new Date(ev.Date).getFullYear(),
+            month: ev.Month ? ev.Month : new Date(ev.Date).getMonth() + 1,
+            name: ev.Name,
+            color: commonTools.getColor(),
+            date: ev.Date ? new Date(ev.Date).toLocaleDateString("ru-Ru") : `${ev.Month ? ev.Month + '.' : ''}${ev.Year}`,
+            visible: true,
+            DisplayDate: ev.Date ?
+                new Date(ev.Date).toLocaleDateString("ru-Ru") :
+                `${ev.DayNumber ? ev.DayNumber.toString().padStart(2, '0') + '.' : ''}${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`,
+            DayNumber: ev.Date ? new Date(ev.Date).getDate() : ev.DayNumber ? ev.DayNumber : null, //а это дата для  отображения только дня
+            Month: ev.Month ? ev.Month : ev.Date ? new Date(ev.Date).getMonth() + 1 : null,
+            Year: ev.Year ? ev.Year : ev.Date ? new Date(ev.Date).getFullYear() : null
+        })),
+
+        Periods: tm.Periods.map(pr => ({
+            ...pr,
+            StartYear: pr.StartYear ? pr.StartYear :
+                pr.LbYear ? pr.LbYear :
+                    new Date(pr.LbDate).getFullYear(),
+
+            StartMonth: pr.StartMonth ? pr.StartMonth :
+                pr.LbMonth ? pr.LbMonth :
+                    new Date(pr.LbDate).getMonth() + 1,
+            StartDay: pr.StartDay ? pr.StartDay : new Date(pr.LbDate).getDate(),
+
+            EndYear: pr.EndYear ? pr.EndYear :
+                pr.RbYear ? pr.RbYear :
+                    new Date(pr.RbDate).getFullYear(),
+
+            EndMonth: pr.EndMonth ? pr.EndMonth :
+                pr.RbMonth ? pr.RbMonth :
+                    new Date(pr.RbDate).getMonth() + 1,
+            EndDay: pr.EndDay ? pr.EndDay : new Date(pr.RbDate).getDate(),
+
+            startDate: pr.StartDate ?
+                new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+                pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+                    `${pr.LbMonth ? pr.LbMonth + '.' : ''}${pr.LbYear}`,
+            endDate: pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+                pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+                    `${pr.RbMonth ? pr.RbMonth + '.' : ''}${pr.RbYear}`,
+            color: commonTools.getColor(),
+
+            DisplayStartDate:
+                pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+                    pr.StartDate ? new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+                        `${pr.StartDay ? pr.StartDay.toString().padStart(2, '0') + '.' : ''}${pr.StartMonth ? pr.StartMonth.toString().padStart(2, '0') + '.' : ''}${pr.StartYear}`,
+
+            DisplayEndDate: pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+                pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+                    `${pr.EndDay ? pr.EndDay.toString().padStart(2, '0') + '.' : ''}${pr.EndMonth ? pr.EndMonth.toString().padStart(2, '0') + '.' : ''}${pr.EndYear}`,
+        }))
+    }));
+    return mappedData;
+};
+
 const handleCourse = (data, state,) => {
-    (CourseDiscounts.activateDiscount({course: data}))
+    console.log('handleCourse, ', data)
+
+    // const mappedTimelines = data.payload.Timelines.map(tm => ({
+    //         ...tm,
+    //         CourseId: tm.Course ? tm.Course.Id : null,
+    //         LessonId: tm.Lesson ? tm.Lesson.Id : null,
+    //         Events: tm.Events.map(ev => ({
+    //             ...ev,
+    //             year: ev.Year ? ev.Year : new Date(ev.Date).getFullYear(),
+    //             month: ev.Month ? ev.Month : new Date(ev.Date).getMonth() + 1,
+    //             name: ev.Name,
+    //             color: commonTools.getColor(),
+    //             date: ev.Date ? new Date(ev.Date).toLocaleDateString("ru-Ru") : `${ev.Month ? ev.Month + '.' : ''}${ev.Year}`,
+    //             visible: true,
+    //             DisplayDate: ev.Date ?  //это дата для отображения целиком строкой
+    //                 new Date(ev.Date).toLocaleDateString("ru-Ru") :
+    //                 `${ev.DayNumber ? ev.DayNumber.toString().padStart(2, '0') + '.' : ''}${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`,
+    //             DayNumber: ev.Date ? new Date(ev.Date).getDate() : ev.DayNumber ? ev.DayNumber : null, //а это дата для  отображения только дня
+    //             Month: ev.Month ? ev.Month : ev.Date ? new Date(ev.Date).getMonth() + 1 : null,
+    //             Year: ev.Year ? ev.Year : ev.Date ? new Date(ev.Date).getFullYear() : null
+    //         })),
+    //
+    //         Periods: tm.Periods.map(pr => ({
+    //             ...pr,
+    //             StartYear: pr.StartYear ? pr.StartYear :
+    //                 pr.LbYear ? pr.LbYear :
+    //                     new Date(pr.LbDate).getFullYear(),
+    //
+    //             StartMonth: pr.StartMonth ? pr.StartMonth :
+    //                 pr.LbMonth ? pr.LbMonth :
+    //                     new Date(pr.LbDate).getMonth() + 1,
+    //             StartDay: pr.StartDay ? pr.StartDay : new Date(pr.LbDate).getDate(),
+    //
+    //             EndYear: pr.EndYear ? pr.EndYear :
+    //                 pr.RbYear ? pr.RbYear :
+    //                     new Date(pr.RbDate).getFullYear(),
+    //
+    //             EndMonth: pr.EndMonth ? pr.EndMonth :
+    //                 pr.RbMonth ? pr.RbMonth :
+    //                     new Date(pr.RbDate).getMonth() + 1,
+    //             EndDay: pr.EndDay ? pr.EndDay : new Date(pr.RbDate).getDate(),
+    //
+    //             startDate: pr.StartDate ?
+    //                 new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+    //                 pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+    //                     `${pr.LbMonth ? pr.LbMonth + '.' : ''}${pr.LbYear}`,
+    //             endDate: pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+    //                 pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+    //                     `${pr.RbMonth ? pr.RbMonth + '.' : ''}${pr.RbYear}`,
+    //             color: commonTools.getColor(),
+    //
+    //             DisplayStartDate:
+    //                 pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
+    //                     pr.StartDate ? new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
+    //                         `${pr.StartDay ? pr.StartDay.toString().padStart(2, '0') + '.' : ''}${pr.StartMonth ? pr.StartMonth.toString().padStart(2, '0') + '.' : ''}${pr.StartYear}`,
+    //
+    //             DisplayEndDate: pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
+    //                 pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
+    //                     `${pr.EndDay ? pr.EndDay.toString().padStart(2, '0') + '.' : ''}${pr.EndMonth ? pr.EndMonth.toString().padStart(2, '0') + '.' : ''}${pr.EndYear}`,
+    //         }))
+    //     })
+    // );
+
+    (CourseDiscounts.activateDiscount({course: data}));
 
     try {
         if (data.CoverMeta && (typeof data.CoverMeta === "string")) {
@@ -210,8 +344,7 @@ const handleCourse = (data, state,) => {
 
         calcStatistics(data, state)
         calcTestsData(data)
-    }
-    catch (err) {
+    } catch (err) {
         console.error('ERR: ' + err.message);
     }
 };
@@ -239,20 +372,22 @@ const calcStatistics = (course, state) => {
 
         if (item.Lessons && item.Lessons.length > 0) {
             _sublessonsCount += item.Lessons.length
-            item.Lessons.forEach((subitem) => { _duration += subitem.Duration })
+            item.Lessons.forEach((subitem) => {
+                _duration += subitem.Duration
+            })
         }
     })
 
     let _allPublished = course.Lessons.length === _published
 
     _duration = !_allPublished && course.EstDuration && (course.EstDuration > _duration) ?
-            course.EstDuration
-            :
-            _duration
+        course.EstDuration
+        :
+        _duration
 
     // _duration = new Date(_duration * 1000)
     const _durationHours = Math.trunc(_duration / (60 * 60)),
-        _durationMinutes = Math.trunc((_duration  - (_durationHours * 60 * 60)) /60)
+        _durationMinutes = Math.trunc((_duration - (_durationHours * 60 * 60)) / 60)
 
     let {lesson: lastListened, hasListened} = getLastListenedLesson(course.Lessons, state)
 
@@ -260,13 +395,15 @@ const calcStatistics = (course, state) => {
         total: course.Lessons.length,
         sublessonsCount: _sublessonsCount,
         published: _published,
-        allPublished : _allPublished,
+        allPublished: _allPublished,
         readyDate: _allPublished ? null : parseReadyDate(_maxReadyDate),
         duration: {hours: _durationHours, minutes: _durationMinutes},
         finishedLessons: _finishedLessons,
         lastListened: lastListened,
         hasListened: !!hasListened,
-        freeLesson: course.Lessons.find((item) => {return item.IsFreeInPaidCourse})
+        freeLesson: course.Lessons.find((item) => {
+            return item.IsFreeInPaidCourse
+        })
     }
 
 }
@@ -287,7 +424,7 @@ const getLastListenedLesson = (lessons, state) => {
                 ((acc.info.ts < curr.info.ts) && !acc.info.isFinished && !curr.info.isFinished) || (acc.info.isFinished && !curr.info.isFinished) ? curr : acc
                 :
                 curr.info ? curr : acc
-    })
+        })
 
     return {lesson: lessons[_lesson.index], hasListened: (_lesson.index !== 0) || (_lesson.info && _lesson.info.ts)}
 }
@@ -321,7 +458,7 @@ const calcTestsData = (course) => {
             _tests
                 .filter(item => item.Instance && item.Instance.IsFinished)
                 .reduce((acc, value) => {
-                    return acc + (value.Instance.Score > value.Instance.MaxScore ? 0 :  value.Instance.Score / value.Instance.MaxScore)
+                    return acc + (value.Instance.Score > value.Instance.MaxScore ? 0 : value.Instance.Score / value.Instance.MaxScore)
                 }, 0) / _completed
             :
             0
