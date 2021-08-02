@@ -117,6 +117,9 @@ export default function TimeAxis(props: Props) {
         }
 
         didMountRef.current += 1;
+
+        // todo: ВОЗМОЖНО НЕ НУЖНО, НО ПРИ ОБНОВЛЕНИИ В АДМИНКЕ СОБЫТИЯ ВЫСТРАИВАЮТСЯ В ЛИНИЮ
+        setSorted(false);
     }, [events]);
 
     function calculateVertical(arr, lvlLim, nullify = false, checkVisibility = true){
