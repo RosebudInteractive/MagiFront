@@ -158,9 +158,7 @@ export default function PeriodForm(props) {
 
                         <FormSpy subscription={{values: true, pristine: true, errors: true, submitting, touched: true}}
                                  onChange={({values, pristine, errors, submitting, touched}) => {
-                                     if(Object.values(errors).length === 0){
-                                         setValid(true);
-                                     }
+                                     setValid(Object.values(errors).length === 0);
 
                                  }}/>
                     </form>
@@ -196,7 +194,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.EndMonth = 'Wrong value'
     }
 
-    // todo : сделать учет месяцев
+    // todo : сделать учет месяцев, позже если такая необходимость действительно будет
     if ((values.StartDay > 31) || (values.StartDay < 1)) {
         errors.StartDay = 'Wrong value'
     }
@@ -211,10 +209,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Required'
-    }
-
-    if (!values.Description || (values.Description && values.Description.length < 1)) {
-        errors.Description = 'Wrong value'
     }
 
     if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {

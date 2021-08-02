@@ -41,7 +41,7 @@ export default function TimelinePreview(props) {
                 visible: true,
             }
         }) : []
-    }, [periods])
+    }, [periods]);
 
     const _events = useMemo(() => {
         return events ? events.map((item) => {
@@ -74,6 +74,7 @@ TimelinePreview.propTypes = {
 }
 
 
+//todo move it to helpers/tools or smth
 function hslToHex(color) {
     let result = color.match(/hsl\(([^)]+)\)/)[1]
 
