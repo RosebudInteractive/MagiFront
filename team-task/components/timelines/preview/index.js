@@ -43,9 +43,23 @@ export default function TimelinePreview(props) {
         }) : []
     }, [periods])
 
+    const _events = useMemo(() => {
+        return events ? events.map((item) => {
+            return {
+                id: item.Id ? item.Id : item.id,
+                date: item.date,
+                year: item.year,
+                month: item.month,
+                name: item.Name,
+                color: item.color,
+                visible: true,
+            }
+        }) : []
+    }, [events])
+
     return <div ref={_preview} className="timeline-preview">
             <div className="image-filter">
-            <Timeline width={width} height={height} events={events ? events : []} zoom={1} periods={_periods} levelLimit={4}/>
+            <Timeline width={width} height={height} events={_events} zoom={1} periods={_periods} levelLimit={4}/>
             </div>
             {
                 background && <img alt={'timeline background'} className="normal" src={`/data/${background}`}/>

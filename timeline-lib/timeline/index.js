@@ -94,7 +94,7 @@ export default function TimeAxis(props: Props) {
 
     useEffect(() => {
         const eventsWithYearNumber = events.map(ev => {
-            ev.startDateYearNumber = new Date((ev.date).split('.')[2]).getFullYear();
+            ev.startDateYearNumber = ev.year;
             return ev;
         });
 

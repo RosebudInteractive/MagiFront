@@ -104,7 +104,8 @@ export default class EventPoint extends React.Component {
     }
 
     handleLastPoint() {
-        const {isLastPoint, onLastPoint, item, zoom, x} = this.props,
+        const {zoom} = this.context;
+        const {isLastPoint, onLastPoint, item, x} = this.props,
             {width} = this.state,
             _x = x * zoom;
 
@@ -127,7 +128,7 @@ export default class EventPoint extends React.Component {
         if (this.props.clicked) {
             this.props.clicked(this.props.item.id);
         }
-    };
+    }
 
     onLayout(data) {
         if (data.width >= 125) {

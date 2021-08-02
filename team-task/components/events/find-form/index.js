@@ -8,10 +8,10 @@ import Webix from "../../Webix";
 
 import './event-find-form.sass'
 
+let eventsCount = 0
 
 export default function EventsFindForm(props) {
     const {findedData, addEventsAction, findAction, closeAction} = props;
-    const [eventsCount, setEventsCount] = useState(0)
     const selectedEvents = useRef([]);
 
     useWindowSize(() => {
@@ -19,16 +19,9 @@ export default function EventsFindForm(props) {
     });
 
     useEffect(() => {
-        setEventsCount(findedData ? findedData.length : 0)
-    }, [findedData]);
-
-    useEffect(() => {
+        eventsCount = findedData ? findedData.length : 0
         resizeHandler(eventsCount, "#found-events-container",'events-find-form')
-    }, [eventsCount])
-
-    useEffect(() => {
-        resizeHandler(eventsCount, "#found-events-container", 'events-find-form')
-    }, [])
+    }, [findedData]);
 
     const GRID_CONFIG = {
         view: "datatable",
@@ -117,7 +110,7 @@ export default function EventsFindForm(props) {
 
 
             <div className="grid-container__wrapper">
-                <div className="grid-container found-events-table unselectable" id="found-events-container">
+                <div className="grid-container found-events-table unselectable _with-custom-scroll" id="found-events-container">
                     <Webix ui={GRID_CONFIG} data={findedData}/>
                 </div>
             </div>

@@ -27,7 +27,7 @@ import {setTemporaryPeriods} from "tt-ducks/periods-timeline";
 import {setTemporaryEvents} from "tt-ducks/events-timeline";
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {TimelineStatuses, TimelineTypesOfUse} from "../../constants/timelines";
-import {hideSideBarMenu} from "tt-ducks/app";
+import {hideSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import PlusIco from "tt-assets/svg/plus.svg";
 
 let timelinesCount = 0;
@@ -46,7 +46,10 @@ const Timelines = (props) => {
 
     useEffect(() => {
         timelinesCount = timelines.length;
-        _onResize();
+        if (props.sideBarMenuVisible) { _onResize() }
+        else {
+            setTimeout(() => {_onResize()}, 200)
+        }
     }, [timelines]);
 
     useEffect(() => {
@@ -251,6 +254,7 @@ const mapState2Props = (state) => {
         hasSupervisorRights: hasSupervisorRights(state),
         editorMode: timelineOpenedSelector,
         timelineInEditor: currentTimelineSelector,
+        sideBarMenuVisible: sideBarMenuVisible(state),
     }
 };
 
