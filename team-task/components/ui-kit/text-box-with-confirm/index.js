@@ -133,13 +133,19 @@ export default function TextBoxWithConfirm(props) {
 
     useEffect(() => {
         if (_inputRef && _inputRef.current) {
-            const _style = window.getComputedStyle(_inputRef.current),
-                _fontName = _style.getPropertyValue('font-family'),
-                _fontSize = _style.getPropertyValue('font-size')
 
-            const _width = getWidthOfText(myValue, _fontName, _fontSize)
+            if (myValue) {
+                const _style = window.getComputedStyle(_inputRef.current),
+                    _fontName = _style.getPropertyValue('font-family'),
+                    _fontSize = _style.getPropertyValue('font-size')
 
-            _inputRef.current.style.width = Math.round(_width + 5) + 'px'
+                const _width = getWidthOfText(myValue, _fontName, _fontSize)
+
+                _inputRef.current.style.width = Math.round(_width + 5) + 'px'
+            } else {
+                _inputRef.current.style.width = '125px'
+            }
+
         }
     }, [myValue])
 

@@ -179,8 +179,6 @@ export default function TimeAxis(props: Props) {
 
         let minYear = Math.min(...allItems.map(el => el.year || el.startYear)),
             maxYear = Math.max(...allItems.map(el => el.year || el.endYear));
-        // let minYear = Math.min(...allItems.map(el => new Date((el.date || el.startDate).split('.')[2]).getFullYear())),
-        //     maxYear = Math.max(...allItems.map(el => new Date((el.date || el.endDate).split('.')[2]).getFullYear()));
 
         if(lastYearFromLastPoint && lastYearFromLastPoint > maxYear){
             maxYear = lastYearFromLastPoint;
@@ -217,7 +215,7 @@ export default function TimeAxis(props: Props) {
         setSvgWidth(svgWidth)
         _startDate.current = _startPoint
         _yearPerPixel.current = (width) / (_endPoint - _startPoint)
-    }, [width, zoom, events, lastYearFromLastPoint]);
+    }, [width, zoom, events, periods, lastYearFromLastPoint]);
 
     const _midHeight = height / 2;
 

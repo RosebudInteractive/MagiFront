@@ -242,7 +242,7 @@ function TimelineEditorContainer(props) {
     };
 
     const finderFormCloseAction = () => {
-        (timeline && timeline.Id) && actions.getOneTimeline({id: timeline.Id});
+        (timeline && timeline.Id) //&& actions.getOneTimeline({id: timeline.Id});
         setFinderFormOpened(false);
     };
 

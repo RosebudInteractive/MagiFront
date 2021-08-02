@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 
 
 export default function Modal(props) { // todo maybe use it in different places?
-    const {WrappedComponent, wrappedProps, customHeader, commonHeader, title, closeAction} = props;
+    const {WrappedComponent, wrappedProps, customHeader, title, closeAction} = props;
 
     const closeModalForm = () => {
         closeAction();

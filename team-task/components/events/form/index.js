@@ -139,29 +139,21 @@ const validate = (values, disableValidationOnFields = []) => {
     const errors = {};
 
     if (!values.Year) {
-        errors.StartYear = 'Required'
+        errors.Year = 'Required'
     }
 
-    if (values.Year && (values.Year.length < 1)) {
-        errors.StartMonth = 'Wrong value'
+    if (values.Month && ((values.Month > 12) || (values.Month < 1))) {
+        errors.Month = 'Wrong value'
     }
 
-    if (!values.Month) {
-        errors.Month = 'Required'
-    }
-
-    if ((values.Month > 12) || (values.Month < 1)) {
-        errors.StartMonth = 'Wrong value'
-    }
-
-    if (values.Year && !values.DayNumber && !values.Month) {
+    if (values.Year && values.DayNumber && !values.Month) {
         errors.Month = 'Required'
     }
 
     // todo : сделать учет месяцев
 
-    if ((values.DayNumber > 31) || (values.DayNumber < 1)) {
-        errors.StartDay = 'Wrong value'
+    if (values.DayNumber && ((values.DayNumber > 31) || (values.DayNumber < 1))) {
+        errors.DayNumber = 'Wrong value'
     }
 
     if (!values.Name || (values.Name && values.Name.length < 1)){

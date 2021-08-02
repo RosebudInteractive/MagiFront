@@ -202,7 +202,7 @@ function* setEventsSaga({payload}) {
             _event.DayNumber =  item.Date ? new Date(item.Date).getDate() : item.DayNumber ? item.DayNumber : null; //а это дата для  отображения только дня
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
-            
+
             return _event
         });
 
@@ -275,8 +275,7 @@ function* findEventSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST})
-        console.log(e);
-        showErrorMessage(e)
+        showErrorMessage(e.message)
     }
 }
 
@@ -290,7 +289,7 @@ function* getEventSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
+        yield put(showErrorMessage(e.message));
         console.log(e);
     }
 }
@@ -360,8 +359,7 @@ function* updateEventSaga(data) {
         }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
-        console.log(e);
+        yield put(showErrorMessage(e.message));
     }
 }
 
@@ -376,7 +374,7 @@ function* createEventSaga(data) {
         yield put(addTemporaryEvent({...data.payload, Id: id, State: 1}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
+        yield put(showErrorMessage(e.message));
         console.log(e);
     }
 }

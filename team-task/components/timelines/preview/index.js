@@ -31,13 +31,14 @@ export default function TimelinePreview(props) {
     const _periods = useMemo(() => {
         return periods ? periods.map((item) => {
             return {
-                id: item.Id,
+                id: item.Id ? item.Id : item.id,
                 startYear: item.StartYear,
                 endYear: item.EndYear,
                 name: item.Name,
                 color: hslToHex(item.color),
                 startDate: item.startDate,
                 endDate: item.endDate,
+                visible: true,
             }
         }) : []
     }, [periods])

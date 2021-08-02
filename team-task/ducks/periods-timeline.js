@@ -280,7 +280,7 @@ function* findPeriodSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        showErrorMessage(e);
+        showErrorMessage(e.message);
     }
 }
 
@@ -294,7 +294,7 @@ function* getPeriodSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
+        yield put(showErrorMessage(e.message));
     }
 }
 
@@ -372,7 +372,7 @@ function* updatePeriodSaga(data) {
         }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
+        yield put(showErrorMessage(e.message));
     }
 }
 
@@ -386,7 +386,7 @@ function* createPeriodSaga(data) {
         yield put(addTemporaryPeriod({...data.payload, Id: id, State: 1}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        yield put(showErrorMessage(e));
+        yield put(showErrorMessage(e.message));
     }
 }
 

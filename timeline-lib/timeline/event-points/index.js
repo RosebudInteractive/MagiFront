@@ -127,7 +127,8 @@ export default function EventPoints(props: Props) {
         :
         _e
             .map((item, index) => {
-                let x = (new Date(item.date.split('.')[2]).getFullYear() - startDate) * yearPerPixel;
+                // let x = (new Date(item.date.split('.')[2]).getFullYear() - startDate) * yearPerPixel;
+                let x = (item.year - startDate) * yearPerPixel;
                 let yValue = elementsOverAxis ? (y - (60 * levelLimit)) - (item.yLevel * VERTICAL_STEP) : y - (item.yLevel * VERTICAL_STEP);
 
                 return <EventPoint item={item}
