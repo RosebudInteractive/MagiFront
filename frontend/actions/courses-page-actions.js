@@ -354,6 +354,7 @@ const calcTestsData = (course) => {
 }
 
 const _mapTimelines = (dataToMap) => {
+
     const mappedData = dataToMap.map(tm => ({
         ...tm,
         CourseId: tm.Course ? tm.Course.Id : null,
@@ -367,34 +368,12 @@ const _mapTimelines = (dataToMap) => {
             color: _getColor(),
             date: ev.Date ? new Date(ev.Date).toLocaleDateString("ru-Ru") : `${ev.Month ? ev.Month + '.' : ''}${ev.Year}`,
             visible: true,
-            DisplayDate: ev.Date ?
-                new Date(ev.Date).toLocaleDateString("ru-Ru") :
-                `${ev.DayNumber ? ev.DayNumber.toString().padStart(2, '0') + '.' : ''}${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`,
-            DayNumber: ev.Date ? new Date(ev.Date).getDate() : ev.DayNumber ? ev.DayNumber : null, //а это дата для  отображения только дня
-            Month: ev.Month ? ev.Month : ev.Date ? new Date(ev.Date).getMonth() + 1 : null,
-            Year: ev.Year ? ev.Year : ev.Date ? new Date(ev.Date).getFullYear() : null
         })),
 
         Periods: tm.Periods.map(pr => ({
             ...pr,
-            StartYear: pr.StartYear ? pr.StartYear :
-                pr.LbYear ? pr.LbYear :
-                    new Date(pr.LbDate).getFullYear(),
-
-            StartMonth: pr.StartMonth ? pr.StartMonth :
-                pr.LbMonth ? pr.LbMonth :
-                    new Date(pr.LbDate).getMonth() + 1,
-            StartDay: pr.StartDay ? pr.StartDay : new Date(pr.LbDate).getDate(),
-
-            EndYear: pr.EndYear ? pr.EndYear :
-                pr.RbYear ? pr.RbYear :
-                    new Date(pr.RbDate).getFullYear(),
-
-            EndMonth: pr.EndMonth ? pr.EndMonth :
-                pr.RbMonth ? pr.RbMonth :
-                    new Date(pr.RbDate).getMonth() + 1,
-            EndDay: pr.EndDay ? pr.EndDay : new Date(pr.RbDate).getDate(),
-
+            id: pr.Id,
+            name: pr.Name,
             startDate: pr.StartDate ?
                 new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
                 pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
@@ -404,15 +383,6 @@ const _mapTimelines = (dataToMap) => {
                     `${pr.RbMonth ? pr.RbMonth + '.' : ''}${pr.RbYear}`,
             color: _getColor(),
             visible: true,
-
-            DisplayStartDate:
-                pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
-                    pr.StartDate ? new Date(pr.StartDate).toLocaleDateString("ru-Ru") :
-                        `${pr.StartDay ? pr.StartDay.toString().padStart(2, '0') + '.' : ''}${pr.StartMonth ? pr.StartMonth.toString().padStart(2, '0') + '.' : ''}${pr.StartYear}`,
-
-            DisplayEndDate: pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
-                pr.EndDate ? new Date(pr.EndDate).toLocaleDateString("ru-Ru") :
-                    `${pr.EndDay ? pr.EndDay.toString().padStart(2, '0') + '.' : ''}${pr.EndMonth ? pr.EndMonth.toString().padStart(2, '0') + '.' : ''}${pr.EndYear}`,
         }))
     }));
     return mappedData;

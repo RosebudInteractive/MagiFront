@@ -300,8 +300,8 @@ function TimelineEditorContainer(props) {
     useEffect(() => {
         if (timeline && timeline.hasOwnProperty('State')) {
             actions.hideSideBarMenu();
-            (!lessons || lessons.length === 0) && actions.getAllLessons(true, false);
-            (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses
+            (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo return this string if behaviour seems to be broken
+            // (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses, why it still here but all works fine?!? (but its no vision about where getiign the courses)
         }
     }, [timeline, lessons, courses]);
 
@@ -340,14 +340,14 @@ function TimelineEditorContainer(props) {
                     events: {
                         headerClickAction: () => {},
                         doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
-                        deleteAction: (id) => {id && actions.removeEvent(id)},
+                        deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)},
                         createAction: () => {detailsCreateAction('events')},
                         openFindFormAction: () => {detailsOpenFindFormAction('events')}
                     }
                     , periods: {
                         headerClickAction: () => {},
                         doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId}),
-                        deleteAction: (id) => {actions.removePeriod(id)},
+                        deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)},
                         createAction: () => {detailsCreateAction('periods')},
                         openFindFormAction: () => {detailsOpenFindFormAction('periods')}
                     }

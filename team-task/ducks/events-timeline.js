@@ -151,8 +151,8 @@ export const updateEventData = ({eventId, eventData, tableId}) => {
     return {type: UPDATE_EVENT, payload: {...eventData, Id: eventId, tableId: tableId}}
 }
 
-export const removeEvent = (eventId) => {
-    return {type: REMOVE_EVENT, payload: eventId}
+export const removeEvent = (id, timelineId) => {
+    return {type: REMOVE_EVENT, payload: {id, timelineId}}
 };
 
 export const setEvents = (events) => {
@@ -296,7 +296,7 @@ function* getEventSaga(data) {
 
 function* removeEventSaga(data) {
     const message: Message = {
-        content: `Удалить событие #${data.payload}?`,
+        content: `Удалить событие #${data.payload.id}?`,
         title: "Подтверждение удаления"
     };
 
@@ -312,11 +312,11 @@ function* removeEventSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        const res = yield call(deleteEvent, data.payload);
+        const res = yield call(deleteEvent, data.payload.id, data.payload.timelineId);
 
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(getOneTimeline({id: data.payload.tlCreationId, setToEditor: true}))
+        yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.toString()));
@@ -548,13 +548,14 @@ const updateEvent = (event) => {
         .then(parseJSON)
 };
 
-const deleteEvent = (eventId) => {
+const deleteEvent = (eventId, timelineId) => {
     return fetch(`/api/pm/event/${eventId}`, {
         method: 'DELETE',
         headers: {
             "Content-type": "application/json"
         },
-        credentials: 'include'
+        credentials: 'include',
+        body: JSON.stringify({timelineId: timelineId})
     })
         .then(checkStatus)
         .then(parseJSON)

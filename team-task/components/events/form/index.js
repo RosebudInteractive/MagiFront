@@ -125,9 +125,7 @@ export default function EventForm(props) {
 
                         <FormSpy subscription={{values: true, pristine: true, errors: true}}
                                  onChange={({values, pristine, formValue, errors}) => {
-                                     if(Object.values(errors).length === 0){
-                                         setValid(true);
-                                     }
+                                         setValid(Object.values(errors).length === 0);
                                      //some logic if it need
                                  }}/>
                     </form>
@@ -150,7 +148,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Month = 'Required'
     }
 
-    // todo : сделать учет месяцев
+    // todo : сделать учет месяцев, если в этом действительно будет необходимость
 
     if (values.DayNumber && ((values.DayNumber > 31) || (values.DayNumber < 1))) {
         errors.DayNumber = 'Wrong value'
@@ -162,10 +160,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Required'
-    }
-
-    if (!values.Description || (values.Description && values.Description.length < 1)) {
-        errors.Description = 'Wrong value'
     }
 
     if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
