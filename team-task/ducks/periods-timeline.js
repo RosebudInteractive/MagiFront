@@ -11,6 +11,7 @@ import {Period} from "../types/periods";
 import moment from "moment";
 import type {Message} from "../types/messages";
 import $ from "jquery";
+import {getOneTimeline} from "tt-ducks/timelines";
 //constants
 
 export const moduleName = 'periods-timeline';
@@ -142,8 +143,8 @@ export const updatePeriodData = ({periodId, periodData, tableId}) => {
     return {type: UPDATE_PERIOD, payload: {...periodData, Id: periodId, tableId: tableId}}
 };
 
-export const removePeriod = (periodId) => {
-    return {type: REMOVE_PERIOD, payload: periodId}
+export const removePeriod = (id, timelineId) => {
+    return {type: REMOVE_PERIOD, payload: {id, timelineId}}
 };
 
 export const setPeriods = (periods) => {
@@ -300,7 +301,7 @@ function* getPeriodSaga(data) {
 
 function* removePeriodSaga(data) {
     const message: Message = {
-        content: `Удалить период #${data.payload}?`,
+        content: `Удалить период #${data.payload.id}?`,
         title: "Подтверждение удаления"
     };
 
@@ -317,9 +318,10 @@ function* removePeriodSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        const res = yield call(deletePeriod, data.payload);
+        const res = yield call(deletePeriod, data.payload.id, data.payload.timelineId);
 
         yield put({type: SUCCESS_REQUEST});
+        yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.toString()));
@@ -620,13 +622,14 @@ const updatePeriod = (period) => {
         .then(parseJSON)
 };
 
-const deletePeriod = (periodId) => {
-    return fetch(`/api/pm/period/${periodId}`, {
+const deletePeriod = (id, timelineId) => {
+    return fetch(`/api/pm/period/${id}`, {
         method: 'DELETE',
         headers: {
             "Content-type": "application/json"
         },
-        credentials: 'include'
+        credentials: 'include',
+        body: JSON.stringify({timelineId: timelineId})
     })
         .then(checkStatus)
         .then(parseJSON)
@@ -638,7 +641,7 @@ const getPeriods = (params) => {
 };
 
 const getPeriod = (id) => {
-    return commonGetQuery(`/api/pm/event/${id}`);
+    return commonGetQuery(`/api/pm/period/${id}`);
 };
 
 

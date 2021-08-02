@@ -14,7 +14,7 @@ export const resizeHandler = (rowCount: number, containerSelector: string, gridN
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - parseInt(style.paddingTop) - parseInt(style.paddingBottom)
 
-            const _calcHeight = (rowCount * 80) + _headerHeight + 60
+            const _calcHeight = (rowCount * 48) + _headerHeight + 32
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight;
             window.$$(`${gridName}-grid`).$setSize(width, _gridHeight)
         }, 0)

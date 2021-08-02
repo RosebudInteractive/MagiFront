@@ -27,7 +27,7 @@ export default function DetailsList(props) {
     useEffect(() => {
         _onResize()
 
-        setTimeout(_onResize, 300)
+        setTimeout(_onResize, 400)
 
     }, [location]);
 

@@ -20,9 +20,17 @@ export default function PeriodForm(props) {
         TlCreationId: (timelineId) ? timelineId : null,
     }), [periodData]);
 
+    const _timelines = useMemo(() => {
+        const _result = timelines.map(item => ({id: item.Id, label: item.Name, name: item.Name}))
+
+        if (!timelineId) {_result.push({id: null, label: "Текущий таймлайн"})}
+
+        return _result
+    },[timelines, timelineId])
+
     return (
 
-        (timelines && timelines.length > 0) && <div className="period-form">
+        (_timelines.length > 0) && <div className="period-form">
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
@@ -31,12 +39,8 @@ export default function PeriodForm(props) {
             </div>
 
             <Form
-                initialValues={
-                    formData
-                }
-                onSubmit={e => {
-                    e.preventDefault();
-                }}
+                initialValues={formData}
+                onSubmit={e => {e.preventDefault()}}
                 validate={values => validate(values, [
                         {fieldName: 'TlCreationId', condition: !periodData.Id}])
                 }
@@ -158,9 +162,7 @@ export default function PeriodForm(props) {
 
                         <FormSpy subscription={{values: true, pristine: true, errors: true, submitting, touched: true}}
                                  onChange={({values, pristine, errors, submitting, touched}) => {
-                                     if(Object.values(errors).length === 0){
-                                         setValid(true);
-                                     }
+                                     setValid(Object.values(errors).length === 0);
 
                                  }}/>
                     </form>
@@ -196,7 +198,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.EndMonth = 'Wrong value'
     }
 
-    // todo : сделать учет месяцев
+    // todo : сделать учет месяцев, позже если такая необходимость действительно будет
     if ((values.StartDay > 31) || (values.StartDay < 1)) {
         errors.StartDay = 'Wrong value'
     }
@@ -211,10 +213,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Required'
-    }
-
-    if (!values.Description || (values.Description && values.Description.length < 1)) {
-        errors.Description = 'Wrong value'
     }
 
     if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
