@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import './course-wrapper.sass'
 import ExtendedInfo from "./extended-info";
@@ -8,6 +8,7 @@ import Books from "../../../books";
 import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
 import VideoBlock from "./video-block";
 import MoreCourses from "./more-courses";
+import TimelinePreview from "../../../../../team-task/components/timelines/preview";
 
 export default function CourseWrapper(props) {
     const {course, moreCourses} = props
@@ -33,9 +34,14 @@ export default function CourseWrapper(props) {
                 setShowMore(true)
             }
         }
-    })
+    });
 
-    const _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought
+    const timelines = useMemo(() => {
+        return course.Timelines.map(tm => <TimelinePreview key={tm.Id} background={tm.Image ? tm.Image : null}
+                                                           events={tm.Events} periods={tm.Periods}/>);
+    }, [course]);
+
+    const _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought;
 
     return <div className="course-page__course-wrapper">
         <div className="course-wrapper__short-description wrapper-item" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
@@ -52,6 +58,7 @@ export default function CourseWrapper(props) {
                 </div>
         }
         <Scheme course={course}/>
+        {(timelines && timelines.length > 0) && timelines}
         <Books books={course.Books}
                titleClassName={"course-wrapper__title"}
                listClass={CourseBooksList}

@@ -1,7 +1,6 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -14,27 +13,27 @@ import CourseWrapper from '../components/course/item-wrapper';
 import FixCourseWrapper from '../components/fixed/course/wrapper';
 import FixLessonWrapper from '../components/fixed/lesson/wrapper';
 import {
+    applyExternalFilter,
+    clear,
+    disableScrollGuard,
+    enableScrollGuard,
+    filterCourseTypeSelector,
+    filterMainTypeSelector,
     filtersSelector,
     isEmptyFilterSelector,
     loadingSelector,
     selectedFilterSelector,
-    filterCourseTypeSelector,
-    filterMainTypeSelector,
-    applyExternalFilter, clear,
     setInitialState,
-    enableScrollGuard,
-    disableScrollGuard,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
-import {setCurrentPage, clearCurrentPage,} from "ducks/app";
+import {clearCurrentPage, notifyAnalyticsChangePage, setCurrentPage,} from "ducks/app";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 import MetaTags from 'react-meta-tags';
 import $ from "jquery";
 import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
 import {OverflowHandler} from "tools/page-tools";
-import {notifyAnalyticsChangePage} from 'ducks/app';
 import browserHistory from "../history";
 
 class CoursesPage extends React.Component {
@@ -140,7 +139,7 @@ class CoursesPage extends React.Component {
 
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
-            ScrollMemoryStorage.scrollPage(_key)
+            ScrollMemoryStorage.scrollPage(_key);
             if (!hasExternalFilter) {
                 this.props.notifyCoursesShowed(this._getVisibleCourses())
             }
