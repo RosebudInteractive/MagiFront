@@ -20,9 +20,17 @@ export default function PeriodForm(props) {
         TlCreationId: (timelineId) ? timelineId : null,
     }), [periodData]);
 
+    const _timelines = useMemo(() => {
+        const _result = timelines.map(item => ({id: item.Id, label: item.Name, name: item.Name}))
+
+        if (!timelineId) {_result.push({id: null, label: "Текущий таймлайн"})}
+
+        return _result
+    },[timelines, timelineId])
+
     return (
 
-        (timelines && timelines.length > 0) && <div className="period-form">
+        (_timelines.length > 0) && <div className="period-form">
             <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
             <div className="title">
                 <h6>
@@ -31,12 +39,8 @@ export default function PeriodForm(props) {
             </div>
 
             <Form
-                initialValues={
-                    formData
-                }
-                onSubmit={e => {
-                    e.preventDefault();
-                }}
+                initialValues={formData}
+                onSubmit={e => {e.preventDefault()}}
                 validate={values => validate(values, [
                         {fieldName: 'TlCreationId', condition: !periodData.Id}])
                 }
