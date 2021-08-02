@@ -360,6 +360,7 @@ const _mapTimelines = (dataToMap) => {
         LessonId: tm.Lesson ? tm.Lesson.Id : null,
         Events: tm.Events.map(ev => ({
             ...ev,
+            id: ev.Id,
             year: ev.Year ? ev.Year : new Date(ev.Date).getFullYear(),
             month: ev.Month ? ev.Month : new Date(ev.Date).getMonth() + 1,
             name: ev.Name,
@@ -402,6 +403,7 @@ const _mapTimelines = (dataToMap) => {
                 pr.RbDate ? new Date(pr.RbDate).toLocaleDateString("ru-Ru") :
                     `${pr.RbMonth ? pr.RbMonth + '.' : ''}${pr.RbYear}`,
             color: _getColor(),
+            visible: true,
 
             DisplayStartDate:
                 pr.LbDate ? new Date(pr.LbDate).toLocaleDateString("ru-Ru") :
