@@ -127,8 +127,8 @@ class SocialBlock extends React.Component {
                     <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16}
                                 href={'https://www.instagram.com/magisteria.ru/'}/>
                     <SocialLink text={'RSS'} logo={'rss'} icoWidth={16} icoHeight={16} href={'/feed/'}/>
-                    <SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16}
-                                href={'https://zen.yandex.com/magisteria'}/>
+                    {/*<SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16}*/}
+                    {/*            href={'https://zen.yandex.com/magisteria'}/>*/}
                 </div>
             </div>
         )
