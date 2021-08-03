@@ -23,6 +23,7 @@ import {
 import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
 import {
     addTemporaryEvent,
+    cleanFound as cleanFoundEvents,
     createEvents,
     createNewEvent,
     currentEventSelector,
@@ -35,7 +36,7 @@ import {
     requestEvents,
     setTemporaryEvents,
     toggleEditorTo,
-    updateEventData,
+    updateEventData
 } from "tt-ducks/events-timeline";
 import {useLocation,} from "react-router-dom"
 import Modal from "../../../components/events/modal"
@@ -46,6 +47,7 @@ import EventsFindForm from "../../../components/events/find-form";
 
 import {
     addTemporaryPeriod,
+    cleanFound as cleanFoundPeriods,
     createNewPeriod,
     currentPeriodSelector,
     findedPeriodsSelector,
@@ -126,22 +128,10 @@ function TimelineEditorContainer(props) {
             if(!id && type){
                 if(type === 'periods'){
                     detailsEditor.current = PeriodForm;
-
-                    // const periodToSet = sTimeline.Periods.find(p => p.id === optionalParam.row);
                     actions.openPeriodEditor({tableId: optionalParam.row});
-
-                    // if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
-                    //     const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
-                    //     actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
-                    // } else {
-                    //     actions.openPeriodEditor({periodId: id});
-                    // }
                 } else {
                     detailsEditor.current = EventForm;
-
-                    // const eventToSet = events.find(ev => ev.id === optionalParam);
                     actions.openEventEditor({tableId: optionalParam.row});
-
                 }
             }
         }
@@ -278,6 +268,8 @@ function TimelineEditorContainer(props) {
 
     const closeFinderAction = () => {
         setFinderFormOpened(false);
+        actions.cleanFoundEvents();
+        actions.cleanFoundPeriods();
         finderForm.current = null
     };
 
@@ -378,7 +370,7 @@ function TimelineEditorContainer(props) {
                 finderFormOpened &&
                 <Modal WrappedComponent={finderForm.current}
                        title={finderForm.current === PeriodsFindForm ? "Добавление периода" : "Добавление события"}
-                       closeAction={finderFormCloseAction}
+                       closeAction={closeFinderAction}
                        wrappedProps={{
                            findedData: finderForm.current === PeriodsFindForm ? findedPeriods : findedEvents,
                            addEventsAction: (data) => {addElementsAction(data, 'events')},
@@ -441,7 +433,9 @@ const mapDispatch2Props = (dispatch) => {
             setTemporaryEvents,
             setTemporaryPeriods,
             createEvents,
-            clearSelectedTimeline
+            clearSelectedTimeline,
+            cleanFoundPeriods,
+            cleanFoundEvents
         }, dispatch)
     }
 };

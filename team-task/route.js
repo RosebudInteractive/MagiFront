@@ -10,8 +10,8 @@ import DictionaryUsers from "./components/dictionaries/users/users";
 import DictionaryComponents from "./components/dictionaries/components/components"
 import Notifications from "./containers/notifications"
 import {USER_ROLE} from "./constants/common";
-import Timelines from "./containers/timelines";
-import TimelineEditorContainer from "./containers/timelines/timeline-editor-container"
+import Timelines from "./containers/timelines/list";
+import TimelineEditorContainer from "./containers/timelines/editor"
 
 type RouterProps = {
     hasSupervisorRights: boolean,

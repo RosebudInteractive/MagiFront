@@ -90,7 +90,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case TOGGLE_EDITOR:
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            return state.set('finded', payload);
+            return state.set('finded', [...payload]);
         case SET_TEMPORARY_EVENTS:
             return state.set('events', [...payload]);
         default:
@@ -157,6 +157,10 @@ export const removeEvent = (id, timelineId) => {
 
 export const setEvents = (events) => {
     return {type: SET_EVENTS_REQUEST, payload: events}
+};
+
+export const cleanFound = () => {
+    return {type: SET_FINDED, payload: []}
 };
 
 //sagas
@@ -270,11 +274,20 @@ function* findEventSaga(data) {
             paramsObject.Name = data.payload;
         }
 
+        paramsObject.Name = data.payload;
+
         const response = yield call(findEventBy, $.param(paramsObject));
-        yield put({type: SET_FINDED, payload: response});
+
+        const resData = response.map(ev => {
+           if(!ev.Date) {
+               ev.Date = new Date(`01.${ev.Month ? ev.Month : '01'}.${ev.Year}`)
+           }
+        });
+
+        yield put({type: SET_FINDED, payload: resData});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
-        yield put({type: FAIL_REQUEST})
+        yield put({type: FAIL_REQUEST});
         showErrorMessage(e.message)
     }
 }

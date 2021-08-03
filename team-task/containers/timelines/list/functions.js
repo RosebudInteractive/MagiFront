@@ -1,7 +1,7 @@
-import {FILTER_FIELD_TYPE} from "../../components/filter/types";
+import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
-import {GRID_SORT_DIRECTION} from "../../constants/common";
-import {TimelineStatuses, TimelineTypesOfUse} from "../../constants/timelines";
+import {GRID_SORT_DIRECTION} from "../../../constants/common";
+import {TimelineStatuses, TimelineTypesOfUse} from "../../../constants/timelines";
 
 export const getFilterConfig = (filter, disableFields = []) => {
     const initialFields = [

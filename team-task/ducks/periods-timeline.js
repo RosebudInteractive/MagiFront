@@ -80,7 +80,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case TOGGLE_EDITOR:
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            return state.set('finded', payload);
+            return state.set('finded', [...payload]);
         case SET_TEMPORARY_PERIODS:
             return state.set('periods', [...payload]);
         default:
@@ -149,6 +149,10 @@ export const removePeriod = (id, timelineId) => {
 
 export const setPeriods = (periods) => {
     return {type: SET_PERIODS_REQUEST, payload: periods}
+};
+
+export const cleanFound = () => {
+    return {type: SET_FINDED, payload: []}
 };
 
 //sagas
