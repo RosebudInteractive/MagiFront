@@ -51,10 +51,58 @@ const SQL_PUBLISH_TL_PERIOD_MYSQL =
     "update `Period` set `State` = 2, `TlPublicId` = <%= id %> where (`State` = 1)\n" +
     "  and(`Id` in (select `PeriodId` from `TimelinePeriod` where `TimelineId` = <%= id %>))";
 
+const SQL_DELETE_TL_EVENT_MYSQL =
+    "delete from `Entity` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
+
+const SQL_DELETE_TL_EVENT_MSSQL =
+    "delete from [Entity] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
+
+const SQL_DELETE_TL_PERIOD_MYSQL =
+    "delete from `Period` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
+
+const SQL_DELETE_TL_PERIOD_MSSQL =
+    "delete from [Period] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
+
+const TL_MSSQL_DELETE_SCRIPT =
+    [
+        "update [Event] set [TlCreationId] = null where [TlCreationId] = <%= id %>",
+        "update [Event] set [TlPublicId] = null where [TlPublicId] = <%= id %>",
+        "update [Period] set [TlCreationId] = null where [TlCreationId] = <%= id %>",
+        "update [Period] set [TlPublicId] = null where [TlPublicId] = <%= id %>"
+    ];
+
+const TL_MYSQL_DELETE_SCRIPT =
+    [
+        "update `Event` set `TlCreationId` = null where `TlCreationId` = <%= id %>",
+        "update `Event` set `TlPublicId` = null where `TlPublicId` = <%= id %>",
+        "update `Period` set `TlCreationId` = null where `TlCreationId` = <%= id %>",
+        "update `Period` set `TlPublicId` = null where `TlPublicId` = <%= id %>"
+    ];
+
 const TL_CREATE = {
     expr: {
         model: {
             name: "Timeline"
+        }
+    }
+};
+
+const TL_DELETE = {
+    expr: {
+        model: {
+            name: "Timeline",
+            childs: [
+                {
+                    dataObject: {
+                        name: "TimelineEvent"
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "TimelinePeriod"
+                    }
+                }
+            ]
         }
     }
 };
@@ -511,6 +559,95 @@ const TimelineAPI = class TimelineAPI extends DbObject {
 
                     if (logModif)
                         console.log(buildLogString(`Timeline updated: Id="${id}".`));
+                    return { result: "OK", id: id };
+                })
+        }, memDbOptions);
+
+    }
+
+    async deleteTimeline(id, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, TL_DELETE, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Таймлайн (Id =${id}) не найден.`);
+                    let timelineObj = collection.get(0);
+
+                    await root_obj.edit();
+
+                    if (timelineObj.state() !== TimelineState.Draft)
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить таймлайн в состоянии "${TimelineStateStr[timelineObj.state()]}".`);
+
+                    let te_root = timelineObj.getDataRoot("TimelineEvent");
+                    let col_te = te_root.getCol("DataElements");
+                    let events_to_delete = [];
+                    while (col_te.count() > 0) {
+                        let obj = col_te.get(0);
+                        events_to_delete.push(obj.eventId());
+                        col_te._del(obj);
+                    }
+
+                    let tp_root = timelineObj.getDataRoot("TimelinePeriod");
+                    let col_tp = tp_root.getCol("DataElements");
+                    let periods_to_delete = [];
+                    while (col_tp.count() > 0) {
+                        let obj = col_tp.get(0);
+                        periods_to_delete.push(obj.periodId());
+                        col_tp._del(obj);
+                    }
+
+                    collection._del(timelineObj);
+
+                    let tran = await $data.tranStart(dbOpts);
+                    let transactionId = tran.transactionId;
+                    dbOpts.transactionId = tran.transactionId;
+                    try {
+                        let mysql_script = [];
+                        TL_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                            mysql_script.push(_.template(elem)({ id: id }));
+                        });
+                        let mssql_script = [];
+                        TL_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                            mssql_script.push(_.template(elem)({ id: id }));
+                        });
+                        await DbUtils.execSqlScript(mysql_script, mssql_script, dbOpts);
+                        await root_obj.save(dbOpts);
+                        if (events_to_delete.length > 0)
+                            await $data.execSql({
+                                dialect: {
+                                    mysql: _.template(SQL_DELETE_TL_EVENT_MYSQL)({ ids: events_to_delete.join() }),
+                                    mssql: _.template(SQL_DELETE_TL_EVENT_MSSQL)({ ids: events_to_delete.join() })
+                                }
+                            }, dbOpts);
+                        if (periods_to_delete.length > 0)
+                            await $data.execSql({
+                                dialect: {
+                                    mysql: _.template(SQL_DELETE_TL_PERIOD_MYSQL)({ ids: periods_to_delete.join() }),
+                                    mssql: _.template(SQL_DELETE_TL_PERIOD_MSSQL)({ ids: periods_to_delete.join() })
+                                }
+                            }, dbOpts);
+                        await $data.tranCommit(transactionId)
+                    }
+                    catch (err) {
+                        await $data.tranRollback(transactionId);
+                        throw err;
+                    }
+
+                    if (logModif)
+                        console.log(buildLogString(`Timeline deleted: Id="${id}".`));
                     return { result: "OK", id: id };
                 })
         }, memDbOptions);
