@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import {connect} from 'react-redux'
 import AppRouter from "./route"
 import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
 import {
+    hasAdminRights,
     hasPmRights,
     hasSupervisorRights,
     initializedSelector,
@@ -31,7 +32,7 @@ import NotificationRefresher from "./components/notification-refresher";
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole} = props
+    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole, hasAdminRights} = props;
 
     let location = useLocation();
 
@@ -55,7 +56,7 @@ function App(props) {
                 <SideBarMenu/>
                 <div className="tt-main-area__info-panel">
                     <Breadcrumb/>
-                    <AppRouter hasSupervisorRights={hasSupervisorRights} userRole={userRole}/>
+                    <AppRouter hasSupervisorRights={hasSupervisorRights} hasAdminRights={hasAdminRights} userRole={userRole}/>
                 </div>
             </div>
             <ReduxModalDialog/>
@@ -77,6 +78,7 @@ function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
+        hasAdminRights: hasAdminRights(state),
         userInitialized: initializedSelector(state),
         hasPmRights: hasPmRights(state),
         userRole: userRoleSelector(state),

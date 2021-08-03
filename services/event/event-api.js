@@ -226,6 +226,13 @@ const EventApi = class EventApi extends DbObject {
                 mysql_conds.push(`(tp.${'`'}TimelineId${'`'} = ${opts.TimelineId})`);
             }
         }
+        if (opts.ExcTimelineId) {
+            let id = +opts.ExcTimelineId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(tp.[TimelineId] <> ${opts.ExcTimelineId})`);
+                mysql_conds.push(`(tp.${'`'}TimelineId${'`'} <> ${opts.ExcTimelineId})`);
+            }
+        }
         if (opts.Id) {
             let id = +opts.Id;
             if ((typeof (id) === "number") && (!isNaN(id))) {
@@ -283,31 +290,35 @@ const EventApi = class EventApi extends DbObject {
             }
         }, dbOpts)
         if (records && records.detail && (records.detail.length > 0)) {
+            let ids = {};
             records.detail.forEach(elem => {
-                let timeline = {
-                    Id: elem.Id,
-                    Name: elem.Name,
-                    ShortName: elem.ShortName,
-                    Description: elem.Description,
-                    State: elem.State,
-                    LbDate: elem.LbDate,
-                    LbMonth: elem.LbMonth,
-                    LbYear: elem.LbYear,
-                    RbDate: elem.RbDate,
-                    RbMonth: elem.RbMonth,
-                    RbYear: elem.RbYear,
-                    TlCreationId: elem.TlCreationId,
-                    TlPublicId: elem.TlPublicId,
-                    TlCreation: elem.TlCreationId ? {
-                        Id: elem.TlCreationId,
-                        Name: elem.TlCrName
-                    } : undefined,
-                    TlPublic: elem.TlPublicId ? {
-                        Id: elem.TlPublicId,
-                        Name: elem.TlPubName
-                    } : undefined
-                };
-                result.push(timeline);
+                if (!ids[elem.Id]) {
+                    ids[elem.Id] = true;
+                    let timeline = {
+                        Id: elem.Id,
+                        Name: elem.Name,
+                        ShortName: elem.ShortName,
+                        Description: elem.Description,
+                        State: elem.State,
+                        LbDate: elem.LbDate,
+                        LbMonth: elem.LbMonth,
+                        LbYear: elem.LbYear,
+                        RbDate: elem.RbDate,
+                        RbMonth: elem.RbMonth,
+                        RbYear: elem.RbYear,
+                        TlCreationId: elem.TlCreationId,
+                        TlPublicId: elem.TlPublicId,
+                        TlCreation: elem.TlCreationId ? {
+                            Id: elem.TlCreationId,
+                            Name: elem.TlCrName
+                        } : undefined,
+                        TlPublic: elem.TlPublicId ? {
+                            Id: elem.TlPublicId,
+                            Name: elem.TlPubName
+                        } : undefined
+                    };
+                    result.push(timeline);
+                }
             });
         }
 
@@ -378,6 +389,13 @@ const EventApi = class EventApi extends DbObject {
                 mysql_conds.push(`(te.${'`'}TimelineId${'`'} = ${opts.TimelineId})`);
             }
         }
+        if (opts.ExcTimelineId) {
+            let id = +opts.ExcTimelineId;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(te.[TimelineId] <> ${opts.ExcTimelineId})`);
+                mysql_conds.push(`(te.${'`'}TimelineId${'`'} <> ${opts.ExcTimelineId})`);
+            }
+        }
         if (opts.Id) {
             let id = +opts.Id;
             if ((typeof (id) === "number") && (!isNaN(id))) {
@@ -431,28 +449,32 @@ const EventApi = class EventApi extends DbObject {
             }
         }, dbOpts)
         if (records && records.detail && (records.detail.length > 0)) {
+            let ids = {};
             records.detail.forEach(elem => {
-                let timeline = {
-                    Id: elem.Id,
-                    Name: elem.Name,
-                    ShortName: elem.ShortName,
-                    Description: elem.Description,
-                    State: elem.State,
-                    Date: elem.Date,
-                    Month: elem.Month,
-                    Year: elem.Year,
-                    TlCreationId: elem.TlCreationId,
-                    TlPublicId: elem.TlPublicId,
-                    TlCreation: elem.TlCreationId ? {
-                        Id: elem.TlCreationId,
-                        Name: elem.TlCrName
-                    } : undefined,
-                    TlPublic: elem.TlPublicId ? {
-                        Id: elem.TlPublicId,
-                        Name: elem.TlPubName
-                    } : undefined
-                };
-                result.push(timeline);
+                if (!ids[elem.Id]) {
+                    ids[elem.Id] = true;
+                    let timeline = {
+                        Id: elem.Id,
+                        Name: elem.Name,
+                        ShortName: elem.ShortName,
+                        Description: elem.Description,
+                        State: elem.State,
+                        Date: elem.Date,
+                        Month: elem.Month,
+                        Year: elem.Year,
+                        TlCreationId: elem.TlCreationId,
+                        TlPublicId: elem.TlPublicId,
+                        TlCreation: elem.TlCreationId ? {
+                            Id: elem.TlCreationId,
+                            Name: elem.TlCrName
+                        } : undefined,
+                        TlPublic: elem.TlPublicId ? {
+                            Id: elem.TlPublicId,
+                            Name: elem.TlPubName
+                        } : undefined
+                    };
+                    result.push(timeline);
+                }
             });
         }
 

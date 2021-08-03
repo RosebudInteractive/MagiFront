@@ -28,6 +28,7 @@ const SUCCESS_REQUEST = `${prefix}/SUCCESS_REQUEST`;
 const FAIL_REQUEST = `${prefix}/FAIL_REQUEST`;
 
 const TOGGLE_EDITOR = `${prefix}/TOGGLE_EDITOR`;
+const CLOSE_EDITOR_WITH_CONFIRMATION = `${prefix}/CLOSE_EDITOR_WITH_CONFIRMATION`;
 
 const SELECT_EVENT = `${prefix}/SELECT_EVENT`;
 const UNSELECT_EVENT = `${prefix}/UNSELECT_EVENT`;
@@ -90,7 +91,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case TOGGLE_EDITOR:
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            return state.set('finded', payload);
+            return state.set('finded', [...payload]);
         case SET_TEMPORARY_EVENTS:
             return state.set('events', [...payload]);
         default:
@@ -159,11 +160,20 @@ export const setEvents = (events) => {
     return {type: SET_EVENTS_REQUEST, payload: events}
 };
 
+export const cleanFound = () => {
+    return {type: SET_FINDED, payload: []}
+};
+
+export const closeEditorWithConfirmation = () => {
+    return {type: CLOSE_EDITOR_WITH_CONFIRMATION}
+};
+
 //sagas
 
 export const saga = function* () {
     yield all([
         takeEvery(OPEN_EDITOR, openEditorSaga),
+        takeEvery(CLOSE_EDITOR_WITH_CONFIRMATION, closeEditorSaga),
         takeEvery(SELECT_EVENT, selectEventSaga),
         takeEvery(GO_BACK, goBackSaga),
         takeEvery(LOAD_EVENTS, getEventsSaga),
@@ -182,6 +192,28 @@ const _getColor = () => { //todo add to helpers/tools
     return "hsl(" + 360 * Math.random() + ',' +
         (55 + 45 * Math.random()) + '%,' +
         (50 + 10 * Math.random()) + '%)'
+};
+
+function* closeEditorSaga() {
+    try {
+        const message: Message = {
+            content: `Закрыть без сохранения изменений?`,
+            title: "Подтверждение"
+        };
+
+        yield put(showUserConfirmation(message));
+
+        const {accept} = yield race({
+            accept: take(MODAL_MESSAGE_ACCEPT),
+            decline: take(MODAL_MESSAGE_DECLINE)
+        });
+
+        if (!accept) return;
+
+        yield put(toggleEditorTo(false));
+    }catch (e)  {
+        console.log(e.toString())
+    }
 }
 
 function* setEventsSaga({payload}) {
@@ -270,11 +302,20 @@ function* findEventSaga(data) {
             paramsObject.Name = data.payload;
         }
 
+        paramsObject.Name = data.payload;
+
         const response = yield call(findEventBy, $.param(paramsObject));
-        yield put({type: SET_FINDED, payload: response});
+
+        const resData = response.map(ev => {
+           if(!ev.Date) {
+               ev.Date = new Date(`01.${ev.Month ? ev.Month : '01'}.${ev.Year}`)
+           }
+        });
+
+        yield put({type: SET_FINDED, payload: resData});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
-        yield put({type: FAIL_REQUEST})
+        yield put({type: FAIL_REQUEST});
         showErrorMessage(e.message)
     }
 }
@@ -406,7 +447,6 @@ function* openEditorSaga(data) {
                     }
                 }
             } else {
-                const date = new Date();
                 if (data.payload.timelineId) {
                     yield put({
                         type: SET_SELECTED_EVENT, payload: {
@@ -415,59 +455,63 @@ function* openEditorSaga(data) {
                             Description: '',
                             TlCreationId: data.payload.timelineId,
                             TlPublicId: null,
-                            EffDate: date.toLocaleDateString(),
-                            DisplayDate: date.toLocaleDateString("ru-Ru"),
-                            Date: date,
-                            DayNumber: date.getDate(),
-                            Month: date.getMonth() + 1,
-                            Year: date.getFullYear()
+                            EffDate: null,
+                            DisplayDate: null,
+                            Date: null,
+                            DayNumber: null,
+                            Month: null,
+                            Year: null,
+                            State: 1
                         }
                     });
                 } else {
-                    yield put({
-                        type: SET_SELECTED_EVENT, payload: {
-                            Name: '',
-                            ShortName: '',
-                            Description: '',
-                            TlCreationId: null,
-                            TlPublicId: null,
-                            EffDate: date.toLocaleDateString(),
-                            DisplayDate: date.toLocaleDateString("ru-Ru"),
-                            Date: date,
-                            DayNumber: date.getDate(),
-                            Month: date.getMonth() + 1,
-                            Year: date.getFullYear()
-                        }
-                    });
+                    //todo make it unavailable - remove later
+                    // yield put({
+                    //     type: SET_SELECTED_EVENT, payload: {
+                    //         Name: '',
+                    //         ShortName: '',
+                    //         Description: '',
+                    //         TlCreationId: null,
+                    //         TlPublicId: null,
+                    //         EffDate: date.toLocaleDateString(),
+                    //         DisplayDate: date.toLocaleDateString("ru-Ru"),
+                    //         Date: date,
+                    //         DayNumber: date.getDate(),
+                    //         Month: date.getMonth() + 1,
+                    //         Year: date.getFullYear()
+                    //     }
+                    // });
                 }
             }
 
             yield put({type: TOGGLE_EDITOR, payload: true});
         } else {
-            const date = new Date();
 
+            //todo mke it unavalable - remove it later
+            // const date = new Date();
+            //
+            //
+            // if(data.payload.tableId){
+            //     const events = yield select(eventsSelector);
+            //     const event = events.length > 0 && events.find(ev => ev.id === data.payload.tableId);
+            //     yield put({type: SET_SELECTED_EVENT, payload: event})
+            // } else {
+            //     yield put({
+            //         type: SET_SELECTED_EVENT, payload: {
+            //             Name: '',
+            //             ShortName: '',
+            //             Description: '',
+            //             TlCreationId: null,
+            //             TlPublicId: null,
+            //             EffDate: date.toLocaleDateString(),
+            //             Date: date.getDay(),
+            //             Month: date.getMonth(),
+            //             Year: date.getFullYear()
+            //         }
+            //     });
+            // }
 
-            if(data.payload.tableId){
-                const events = yield select(eventsSelector);
-                const event = events.length > 0 && events.find(ev => ev.id === data.payload.tableId);
-                yield put({type: SET_SELECTED_EVENT, payload: event})
-            } else {
-                yield put({
-                    type: SET_SELECTED_EVENT, payload: {
-                        Name: '',
-                        ShortName: '',
-                        Description: '',
-                        TlCreationId: null,
-                        TlPublicId: null,
-                        EffDate: date.toLocaleDateString(),
-                        Date: date.getDay(),
-                        Month: date.getMonth(),
-                        Year: date.getFullYear()
-                    }
-                });
-            }
-
-            yield put({type: TOGGLE_EDITOR, payload: true});
+            // yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {
         console.log(e)

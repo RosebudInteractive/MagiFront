@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {useLocation, withRouter} from 'react-router-dom';
-import {useWindowSize} from "../../tools/window-resize-hook";
+import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
-import type {GridSortOrder} from "../../types/grid";
-import {GRID_SORT_DIRECTION} from "../../constants/common";
-import FilterRow from "../../components/filter";
-import Webix from "../../components/Webix";
-import type {FilterField} from "../../components/filter/types";
+import type {GridSortOrder} from "../../../types/grid";
+import {GRID_SORT_DIRECTION} from "../../../constants/common";
+import FilterRow from "../../../components/filter";
+import Webix from "../../../components/Webix";
+import type {FilterField} from "../../../components/filter/types";
 import {taskSelector} from "tt-ducks/task";
 import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
@@ -26,7 +26,7 @@ import {
 import {setTemporaryPeriods} from "tt-ducks/periods-timeline";
 import {setTemporaryEvents} from "tt-ducks/events-timeline";
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
-import {TimelineStatuses, TimelineTypesOfUse} from "../../constants/timelines";
+import {TimelineStatuses, TimelineTypesOfUse} from "../../../constants/timelines";
 import {hideSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import PlusIco from "tt-assets/svg/plus.svg";
 

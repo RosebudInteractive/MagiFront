@@ -10,12 +10,13 @@ import DictionaryUsers from "./components/dictionaries/users/users";
 import DictionaryComponents from "./components/dictionaries/components/components"
 import Notifications from "./containers/notifications"
 import {USER_ROLE} from "./constants/common";
-import Timelines from "./containers/timelines";
-import TimelineEditorContainer from "./containers/timelines/timeline-editor-container"
+import Timelines from "./containers/timelines/list";
+import TimelineEditorContainer from "./containers/timelines/editor"
 
 type RouterProps = {
     hasSupervisorRights: boolean,
-    userRole: string
+    userRole: string,
+    hasAdminRights: boolean
 }
 
 export default function AppRouter(props: RouterProps) {
@@ -29,8 +30,10 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
-        <Route exact path={'/timelines'}  render={() => (<Timelines/>)}/>
-        <Route exact path={'/timelines/:timelineId'}  render={() => (<TimelineEditorContainer/>)}/>
+        <Route exact path={'/timelines'}
+               render={() => {return (props.hasSupervisorRights || props.hasAdminRights) ? <Timelines/> : <AccessDeniedPlaceholder/>}}/>
+        <Route exact path={'/timelines/:timelineId'}
+               render={() => {return (props.hasSupervisorRights || props.hasAdminRights) ? <TimelineEditorContainer/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/timelines/new'}  render={() => (<TimelineEditorContainer/>)}/>
         <Route exact path={'/notifications/task/:taskId'} render={() => (<Notifications showModal={true}/>)}/>
         <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>

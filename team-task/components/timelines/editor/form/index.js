@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {Select, TextBox} from "../../../ui-kit";
+import {Autocomplete, Select, TextBox} from "../../../ui-kit";
 import {TIMELINE_TYPES_OF_USE} from "../../../../constants/timelines";
 import {Field, Form, FormSpy} from "react-final-form";
 import './timeline-form.sass'
@@ -28,8 +28,6 @@ function TimelineForm(props) {
     }, [data]);
 
 
-
-
     const closeModalForm = () => {
         //todo close form action here ot not???
     };
@@ -46,7 +44,7 @@ function TimelineForm(props) {
     };
 
     const _getUseTypes = () => {
-        return Object.entries(TIMELINE_TYPES_OF_USE).map(type => ({id:  parseInt(type[0]), name: type[1]}))
+        return Object.entries(TIMELINE_TYPES_OF_USE).map(type => ({id: parseInt(type[0]), name: type[1]}))
     };
 
     const lessonsOptions = useMemo(() => {
@@ -80,20 +78,22 @@ function TimelineForm(props) {
                                options={_getUseTypes()}
                                defaultValue={data && data.TypeOfUse ? data.TypeOfUse : ''}
                                validate={validators.required}
-                               disabled={false}>
+                               disabled={false}
+                               required={true}>
+
                         </Field>
                     </div>
 
                     {(lessons && typeOfUse === 2) &&
                     <div className='timeline-form__field'>
                         <Field name="lessonId"
-                               component={Select}
+                               component={Autocomplete}
                                label={"Лекция"}
                                placeholder="Лекция"
                                disabled={false}
                                options={lessonsOptions}
                                validate={validators.required}
-                        >
+                               required={true}>
                         </Field>
                     </div>
                     }
@@ -101,12 +101,13 @@ function TimelineForm(props) {
                     {(courses && typeOfUse === 1) &&
                     <div className='timeline-form__field'>
                         <Field name="courseId"
-                               component={Select}
+                               component={Autocomplete}
                                label={"Курс"}
                                placeholder="Курс"
                                disabled={false}
                                options={coursesOptions}
-                               validate={validators.required}>
+                               validate={validators.required}
+                               required={true}>
                         </Field>
                     </div>
                     }
@@ -134,7 +135,7 @@ function TimelineForm(props) {
                             disabled={false}
                             defaultValue={data.Image}
                             multiple={false} upload={'/api/adm/upload'}
-                            >
+                        >
                             {({input, meta}) => {
                                 return (
 
@@ -176,11 +177,20 @@ function TimelineForm(props) {
                     </div>
 
 
-                    <FormSpy subscription={{formData: true, formValues: true, values: true, pristine: true, valid: true, hasValidationErrors: true,  formValue: true, submitErrors: true}}
+                    <FormSpy subscription={{
+                        formData: true,
+                        formValues: true,
+                        values: true,
+                        pristine: true,
+                        valid: true,
+                        hasValidationErrors: true,
+                        formValue: true,
+                        submitErrors: true
+                    }}
                              onChange={({values, pristine}) => {
                                  setTypeOfUse(parseInt(values.typeOfUse));
                                  let prstn;
-                                 if(!isCreate){
+                                 if (!isCreate) {
                                      prstn = pristine;
                                  } else {
                                      prstn = pristine || pristineFlag.current;
@@ -199,12 +209,12 @@ function TimelineForm(props) {
                                          valuesIs.courseId = values.courseId;
                                      }
 
-                                     if(values.lessonId){
+                                     if (values.lessonId) {
                                          valuesIs.lessonId = values.lessonId;
                                      }
                                  } else {
-                                     if(values.typeOfUse === 2){
-                                         if(values.lessonId){
+                                     if (values.typeOfUse === 2) {
+                                         if (values.lessonId) {
                                              valuesIs.lessonId = values.lessonId;
                                          }
                                      }

@@ -26,6 +26,7 @@ const SUCCESS_REQUEST = `${prefix}/SUCCESS_REQUEST`;
 const FAIL_REQUEST = `${prefix}/FAIL_REQUEST`;
 
 const TOGGLE_EDITOR = `${prefix}/TOGGLE_EDITOR`;
+const CLOSE_EDITOR_WITH_CONFIRMATION = `${prefix}/CLOSE_EDITOR_WITH_CONFIRMATION`;
 
 const SELECT_PERIOD = `${prefix}/SELECT_PERIOD`;
 const UNSELECT_PERIOD = `${prefix}/UNSELECT_PERIOD`;
@@ -80,7 +81,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case TOGGLE_EDITOR:
             return state.set('editorOpened', payload);
         case SET_FINDED:
-            return state.set('finded', payload);
+            return state.set('finded', [...payload]);
         case SET_TEMPORARY_PERIODS:
             return state.set('periods', [...payload]);
         default:
@@ -151,12 +152,21 @@ export const setPeriods = (periods) => {
     return {type: SET_PERIODS_REQUEST, payload: periods}
 };
 
+export const cleanFound = () => {
+    return {type: SET_FINDED, payload: []}
+};
+
+export const closeEditorWithConfirmation = () => {
+    return {type: CLOSE_EDITOR_WITH_CONFIRMATION}
+};
+
 //sagas
 
 export const saga = function* () {
     yield all([
         takeEvery(OPEN_EDITOR, openEditorSaga),
         takeEvery(SELECT_PERIOD, selectPeriodSaga),
+        takeEvery(CLOSE_EDITOR_WITH_CONFIRMATION, closeEditorSaga),
         takeEvery(GO_BACK, goBackSaga),
         takeEvery(LOAD_PERIODS, getPeriodsSaga),
         takeEvery(CREATE_NEW_PERIOD, createPeriodSaga),
@@ -174,6 +184,28 @@ const _getColor = () => { //todo add to helpers/tools
     return "hsl(" + 360 * Math.random() + ',' +
         (55 + 45 * Math.random()) + '%,' +
         (50 + 10 * Math.random()) + '%)'
+};
+
+function* closeEditorSaga() {
+    try {
+        const message: Message = {
+            content: `Закрыть без сохранения изменений?`,
+            title: "Подтверждение"
+        };
+
+        yield put(showUserConfirmation(message));
+
+        const {accept} = yield race({
+            accept: take(MODAL_MESSAGE_ACCEPT),
+            decline: take(MODAL_MESSAGE_DECLINE)
+        });
+
+        if (!accept) return;
+
+        yield put(toggleEditorTo(false));
+    }catch (e)  {
+        console.log(e.toString())
+    }
 }
 
 function* setPeriodsSaga({payload}) {
@@ -427,10 +459,8 @@ function* openEditorSaga(data) {
                 }
 
             } else {
-                const date = new Date();
 
                 if (data.payload.timelineId) {
-
                     yield put({
                         type: SET_SELECTED_PERIOD, payload: {
                             Name: '',
@@ -438,102 +468,102 @@ function* openEditorSaga(data) {
                             Description: '',
                             TlCreationId: data.payload.timelineId,
                             TlPublicId: null,
-                            StartDate: date,
-                            StartYear: date.getFullYear(),
-                            EndYear: date.getFullYear(),
-                            EndDate: date,
-                            StartMonth: date.getMonth() + 1,
-                            EndMonth: date.getMonth() + 1,
-                            DisplayStartDate: date.toLocaleDateString(),
-                            DisplayEndDate: date.toLocaleDateString(),
-                            LbEffDate: date.toLocaleDateString(),
-                            LbDate: date,
-                            LbMonth: date.getMonth() + 1,
-                            LbYear: date.getFullYear(),
-                            RbEffDate: date.toLocaleDateString(),
-                            RbDate: date,
-                            RbMonth: date.getMonth() + 1,
-                            RbYear: date.getFullYear(),
-                            StartDay: date.getDate(),
-                            EndDay: date.getDate()
+                            StartDate: null,
+                            StartYear: null,
+                            EndYear: null,
+                            EndDate: null,
+                            StartMonth: null,
+                            EndMonth: null,
+                            DisplayStartDate: null,
+                            DisplayEndDate: null,
+                            LbEffDate: null,
+                            LbDate: null,
+                            LbMonth: null,
+                            LbYear:null,
+                            RbEffDate: null,
+                            RbDate: null,
+                            RbMonth: null,
+                            RbYear: null,
+                            StartDay: null,
+                            EndDay: null
                         }
                     });
                 } else {
-                    yield put({
-                        type: SET_SELECTED_PERIOD, payload: {
-                            Name: '',
-                            ShortName: '',
-                            Description: '',
-                            TlCreationId: null,
-                            TlPublicId: null,
-                            StartDate: date,
-                            EndDate: date,
-                            StartMonth: date.getMonth() + 1,
-                            EndMonth: date.getMonth() + 1,
-                            DisplayStartDate: date.toLocaleDateString(),
-                            DisplayEndDate: date.toLocaleDateString(),
-                            LbEffDate: date.toLocaleDateString(),
-                            LbDate: date,
-                            LbMonth: date.getMonth() + 1,
-                            LbYear: date.getFullYear(),
-                            RbEffDate: date.toLocaleDateString(),
-                            RbDate: date,
-                            RbMonth: date.getMonth() + 1,
-                            RbYear: date.getFullYear(),
-                            StartDay: date.getDate(),
-                            EndDay: date.getDate(),
-                            StartYear: date.getFullYear(),
-                            EndYear: date.getFullYear(),
-                        }
-                    });
+                    // yield put({
+                    //     type: SET_SELECTED_PERIOD, payload: {
+                    //         Name: '',
+                    //         ShortName: '',
+                    //         Description: '',
+                    //         TlCreationId: null,
+                    //         TlPublicId: null,
+                    //         StartDate: date,
+                    //         EndDate: date,
+                    //         StartMonth: date.getMonth() + 1,
+                    //         EndMonth: date.getMonth() + 1,
+                    //         DisplayStartDate: date.toLocaleDateString(),
+                    //         DisplayEndDate: date.toLocaleDateString(),
+                    //         LbEffDate: date.toLocaleDateString(),
+                    //         LbDate: date,
+                    //         LbMonth: date.getMonth() + 1,
+                    //         LbYear: date.getFullYear(),
+                    //         RbEffDate: date.toLocaleDateString(),
+                    //         RbDate: date,
+                    //         RbMonth: date.getMonth() + 1,
+                    //         RbYear: date.getFullYear(),
+                    //         StartDay: date.getDate(),
+                    //         EndDay: date.getDate(),
+                    //         StartYear: date.getFullYear(),
+                    //         EndYear: date.getFullYear(),
+                    //     }
+                    // });
                 }
             }
 
             yield put({type: TOGGLE_EDITOR, payload: true});
         } else {
-            const date = new Date();
-
-
-            if(data.payload.tableId){
-                const periods = yield select(periodsSelector);
-                const period = periods.length > 0 && periods.find(pr => pr.id === data.payload.tableId);
-                yield put({type: SET_SELECTED_PERIOD, payload: period})
-            } else {
-                yield put({
-                    type: SET_SELECTED_PERIOD, payload: {
-                        Name: '',
-                        ShortName: '',
-                        Description: '',
-                        TlCreationId: null,
-                        TlPublicId: null,
-
-                        StartDate: date,
-                        EndDate: date,
-                        StartMonth: date.getMonth() + 1,
-                        EndMonth: date.getMonth() + 1,
-
-                        DisplayStartDate: date.toLocaleDateString(),
-                        DisplayEndDate: date.toLocaleDateString(),
-
-                        LbEffDate: date.toLocaleDateString(),
-                        LbDate: date,
-                        LbMonth: date.getMonth() + 1,
-                        LbYear: date.getFullYear(),
-                        RbEffDate: date.toLocaleDateString(),
-                        RbDate: date,
-                        RbMonth: date.getMonth() + 1,
-                        RbYear: date.getFullYear(),
-
-                        StartDay: date.getDate(),
-                        EndDay: date.getDate(),
-                        StartYear: date.getFullYear(),
-                        EndYear: date.getFullYear(),
-                    }
-                });
-            }
-
-
-            yield put({type: TOGGLE_EDITOR, payload: true});
+            // const date = new Date();
+            //
+            //
+            // if(data.payload.tableId){
+            //     const periods = yield select(periodsSelector);
+            //     const period = periods.length > 0 && periods.find(pr => pr.id === data.payload.tableId);
+            //     yield put({type: SET_SELECTED_PERIOD, payload: period})
+            // } else {
+            //     yield put({
+            //         type: SET_SELECTED_PERIOD, payload: {
+            //             Name: '',
+            //             ShortName: '',
+            //             Description: '',
+            //             TlCreationId: null,
+            //             TlPublicId: null,
+            //
+            //             StartDate: date,
+            //             EndDate: date,
+            //             StartMonth: date.getMonth() + 1,
+            //             EndMonth: date.getMonth() + 1,
+            //
+            //             DisplayStartDate: date.toLocaleDateString(),
+            //             DisplayEndDate: date.toLocaleDateString(),
+            //
+            //             LbEffDate: date.toLocaleDateString(),
+            //             LbDate: date,
+            //             LbMonth: date.getMonth() + 1,
+            //             LbYear: date.getFullYear(),
+            //             RbEffDate: date.toLocaleDateString(),
+            //             RbDate: date,
+            //             RbMonth: date.getMonth() + 1,
+            //             RbYear: date.getFullYear(),
+            //
+            //             StartDay: date.getDate(),
+            //             EndDay: date.getDate(),
+            //             StartYear: date.getFullYear(),
+            //             EndYear: date.getFullYear(),
+            //         }
+            //     });
+            // }
+            //
+            //
+            // yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {
         console.log(e)
