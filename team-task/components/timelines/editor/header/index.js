@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from "react";
 import BackArrow from "tt-assets/svg/back-arrow.svg";
-import {TextBoxWithConfirm} from "../../../ui-kit";
+import {TitleTextBox} from "../../../ui-kit";
 import {TIMELINE_STATE} from "../../../../constants/states";
 import './timeline-editor-header.sass'
 import {Field, Form, FormSpy} from "react-final-form";
@@ -36,7 +36,7 @@ export default function TimelineEditorHeader(props) {
                     <div className='timeline-form__field'>
                         <div className="timeline-name">
                             <Field name="name"
-                                   component={TextBoxWithConfirm}
+                                   component={TitleTextBox}
                                    label={"Название таймлайна"}
                                    placeholder="Название таймлайна"
                                    // initialValue={name} todo mayby use it

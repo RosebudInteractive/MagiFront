@@ -70,7 +70,7 @@ return <div className="timeline-form-block">
             <form className='timeline-form' onSubmit={e => {
                 e.preventDefault();
                 handleSubmit(timelineForm.values)
-            }}>
+            }} autoComplete={false}>
                 <div className='timeline-form__field'>
                     <Field name="typeOfUse"
                            component={Select}

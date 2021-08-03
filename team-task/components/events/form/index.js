@@ -42,9 +42,10 @@ export default function EventForm(props) {
                         {fieldName: 'TlCreationId', condition: !eventData.Id}])
                 }
                 render={({eventForm, submitting, pristine, values}) => (
-                    <form className='event-form-tag'>
+                    <form className='event-form-tag' >
                         <div className='event-form__field'>
                                 <Field name="Name"
+                                       autoComplete={false}
                                        component={TextBox}
                                        label={"Название"}
                                        placeholder="Название"

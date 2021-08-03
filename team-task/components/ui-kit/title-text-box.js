@@ -1,5 +1,6 @@
-import React from "react"
+import React, {useEffect, useRef} from "react"
 import {TextField, withStyles} from "@material-ui/core"
+import {getWidthOfText} from "../../tools/text-functions";
 
 const CssTextField = withStyles({
     root: {
@@ -15,45 +16,18 @@ const CssTextField = withStyles({
             "&.MuiFormLabel-root.Mui-focused": {
                 color: "#C8684C"
             },
+            "&.MuiFormLabel-filled": {
+                opacity: 0,
+            },
         },
-        // '& label[data-shrink="true"]': {
-        //     // display: "none"
-        // },
         "& .MuiInputLabel-outlined": {
             "transform": "translate(16px, 14px) scale(1)",
             "&.MuiInputLabel-shrink": {
                 "transform": "translate(16px, 0px) scale(0.75)",
             }
         },
-        "& .MuiOutlinedInput-multiline": {
-            borderRadius: "8px",
-            padding: "15px 16px",
-            border: '1px solid #D2D2D6',
-            "-webkit-transition": "border, background 300ms ease-out",
-            "-moz-transition": "border, background 300ms ease-out",
-            "-o-transition": "border, background 300ms ease-out",
-            "transition": "border, background 300ms ease-out",
-            "font-family": "Inter",
-            "font-style": "normal",
-            "font-weight": "normal",
-            "font-size": "13px",
-            "line-height": "18px",
-            "letter-spacing": "0.15px",
-            "color": "#19191D",
-            '&:hover:not(.Mui-disabled)': {
-                backgroundColor: "#E5E5E7",
-                borderColor: '#C8684C',
-            },
-            '&.Mui-focused': {
-                border: '1px solid #C8684C',
-            },
-            '&.Mui-disabled': {
-                backgroundColor: "#F8F8F8",
-                color: "#9696A0",
-            },
-        },
-
         '& .MuiOutlinedInput-root': {
+            height: 48,
             '& fieldset': {
                 border: "none",
             },
@@ -62,8 +36,9 @@ const CssTextField = withStyles({
             },
             "& input": {
                 borderRadius: "8px",
-                padding: "15px 16px",
-                border: '1px solid #D2D2D6',
+                padding: "0 16px",
+                height: "100%",
+                border: '1px dashed transparent',
                 "-webkit-transition": "border, background 300ms ease-out",
                 "-moz-transition": "border, background 300ms ease-out",
                 "-o-transition": "border, background 300ms ease-out",
@@ -73,16 +48,15 @@ const CssTextField = withStyles({
                 "font-weight": "normal",
                 "font-size": "13px",
                 "line-height": "18px",
-                "letter-spacing": "0.15px",
+                "letter-spacing": "normal",
                 "color": "#19191D",
-
             },
             '&:hover input:not(.Mui-disabled)': {
-                backgroundColor: "#E5E5E7",
-                borderColor: '#C8684C',
+                backgroundColor: "transparent",
+                borderColor: '#D2D2D6',
             },
             '&.Mui-focused input': {
-                border: '1px solid #C8684C',
+                border: '1px dashed #D2D2D6',
             },
             '&.Mui-disabled input': {
                 backgroundColor: "#F8F8F8",
@@ -92,16 +66,36 @@ const CssTextField = withStyles({
     },
 })(TextField);
 
-export default function UiTextBox(props) {
+export default function TitleTextBox(props) {
 
-    const _className = props.extClass ?  "input-field " + props.extClass : "input-field";
+    let _className = props.extClass ? "input-field " + props.extClass : "input-field"
+
+    useEffect(() => {
+        if (_inputRef && _inputRef.current) {
+
+            if (props.input.value) {
+                const _style = window.getComputedStyle(_inputRef.current),
+                    _fontName = _style.getPropertyValue('font-family'),
+                    _fontSize = _style.getPropertyValue('font-size')
+
+                const _width = getWidthOfText(props.input.value, _fontName, _fontSize)
+
+                _inputRef.current.style.width = Math.round(_width + 6) + 'px'
+            } else {
+                _inputRef.current.style.width = '125px'
+            }
+
+        }
+    }, [props.input.value])
+
+    const _inputRef = useRef(null)
 
     return <CssTextField {...props.input}
-                         error={props.meta.touched && props.meta.invalid}
-                         disabled={props.disabled}
+                         disabled={props.disabled || props.readOnly}
                          label={props.label}
                          variant="outlined"
+                         multiline={false}
+                         inputRef={_inputRef}
                          autoComplete="off"
-                         className={_className}
-                         helperText={props.meta.touched && props.meta.error}/>
+                         className={_className}/>
 }

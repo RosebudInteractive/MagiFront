@@ -1,4 +1,4 @@
-import TextBoxWithConfirm from "./text-box-with-confirm";
+import TitleTextBox from "./title-text-box";
 import TextBox from "./text-box";
 import Checkbox from "./checkbox";
 import Select from "./select";
@@ -8,4 +8,4 @@ import Autocomplete from "./autocomplete";
 import LineArrow from "./line-arrow"
 import "./style.sass"
 
-export {TextBox, TextBoxWithConfirm, Checkbox, Select, DatePicker, ProcessElementsGrid, LineArrow, Autocomplete}
+export {TextBox, TitleTextBox, Checkbox, Select, DatePicker, ProcessElementsGrid, LineArrow, Autocomplete}

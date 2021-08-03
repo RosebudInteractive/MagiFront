@@ -148,7 +148,7 @@ export default class EventPoint extends React.Component {
 
         const _wrapperStyle = {
                 left: _x,
-                width: MAX_WIDTH,
+                maxWidth: MAX_WIDTH,
                 opacity: opacity,
                 top: y - FOOTER_HEIGHT,
             },

@@ -1,6 +1,6 @@
 import React, {useRef} from "react"
 import {Field} from "redux-form";
-import {TextBoxWithConfirm} from "../../ui-kit";
+import {TitleTextBox} from "../../ui-kit";
 import "./header.sass"
 import taskController from "../../../tools/task-controller";
 
@@ -19,7 +19,7 @@ export default function TaskHeader(props: TaskHeaderProps) {
     const _lockTaskName = (!taskController.fieldsEnable.form) || (!taskController.fieldsEnable.taskName)
 
     return <div className="task-page__header">
-        <Field component={TextBoxWithConfirm} name={"Name"} label={"Название задачи"} extClass={"page-title"} readOnly={_lockTaskName} disabled={_lockTaskName}/>
+        <Field component={TitleTextBox} name={"Name"} label={"Название задачи"} extClass={"page-title"} readOnly={_lockTaskName} disabled={_lockTaskName}/>
         <div className="task-info-block">
             <h6 className="task-info__task-id _grey50">{_taskNumber.current}</h6>
             <div className="task-info__separator"/>
