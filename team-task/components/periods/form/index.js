@@ -7,6 +7,7 @@ import {TIMELINE_STATE} from "../../../constants/states";
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
     const [validIs, setValid] = useState(false);
+    const [formPristine, setFormPristine] = useState(true);
 
     const _state = useMemo(() => {
         const result = Object.values(TIMELINE_STATE).find(item => item.value === periodData.State);
@@ -36,7 +37,7 @@ export default function PeriodForm(props) {
     return (
 
         (_timelines.length > 0) && <div className="period-form">
-            <button type="button" className="modal-form__close-button" onClick={closeModalCb}>Закрыть</button>
+            <button type="button" className="modal-form__close-button" onClick={() => closeModalCb(!formPristine)}>Закрыть</button>
             <div className="title">
                 <h6>
                     {((periodData && periodData.Id) || periodData.id) ? 'Редактирование' : 'Создание'} периода
@@ -144,7 +145,7 @@ export default function PeriodForm(props) {
 
 
                         <div className='period-form__field center'>
-                            <button type={'button'} className="orange-button big-button" disabled={!validIs}
+                            <button type={'button'} className="orange-button big-button" disabled={((validIs) && !formPristine) !== true}
                                     onClick={() => props.onSave({
                                         id: periodData.Id,
                                         tableId: periodData.id,
@@ -155,8 +156,8 @@ export default function PeriodForm(props) {
 
                         <FormSpy subscription={{values: true, pristine: true, errors: true, submitting, touched: true}}
                                  onChange={({values, pristine, errors, submitting, touched}) => {
+                                     setFormPristine(pristine);
                                      setValid(Object.values(errors).length === 0);
-
                                  }}/>
                     </form>
                 )}/>
@@ -168,44 +169,44 @@ const validate = (values, disableValidationOnFields = []) => {
     const errors = {};
 
     if (!values.StartYear) {
-        errors.StartYear = 'Required'
+        errors.StartYear = 'Обязательное поле'
     }
 
     if (values.StartYear && values.StartDay && !values.StartMonth) {
-        errors.StartMonth = 'Required'
+        errors.StartMonth = 'Обязательное поле'
     }
 
     if ((values.StartMonth > 12) || (values.StartMonth < 1)) {
-        errors.StartMonth = 'Wrong value'
+        errors.StartMonth = 'Неправильное значение'
     }
 
     if (!values.EndYear) {
-        errors.EndYear = 'Required'
+        errors.EndYear = 'Обязательное поле'
     }
 
     if (values.EndYear && values.EndDay && !values.EndMonth) {
-        errors.EndMonth = 'Required'
+        errors.EndMonth = 'Обязательное поле'
     }
 
     if ((values.EndMonth > 12) || (values.EndMonth < 1)) {
-        errors.EndMonth = 'Wrong value'
+        errors.EndMonth = 'Неправильное значение'
     }
 
     // todo : сделать учет месяцев, позже если такая необходимость действительно будет
     if ((values.StartDay > 31) || (values.StartDay < 1)) {
-        errors.StartDay = 'Wrong value'
+        errors.StartDay = 'Неправильное значение'
     }
 
     if ((values.EndDay > 31) || (values.EndDay < 1)) {
-        errors.EndDay = 'Wrong value'
+        errors.EndDay = 'Неправильное значение'
     }
 
     if (!values.Name || (values.Name && values.Name.length < 1)){
-        errors.Name = 'Required'
+        errors.Name = 'Обязательное поле'
     }
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
-        errors.ShortName = 'Required'
+        errors.ShortName = 'Обязательное поле'
     }
 
     disableValidationOnFields.map(field => {

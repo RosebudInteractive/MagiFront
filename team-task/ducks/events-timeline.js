@@ -392,7 +392,12 @@ function* updateEventSaga(data) {
                 Month: parseInt(data.payload.Month),
                 Year: parseInt(data.payload.Year),
                 ShortName: data.payload.ShortName,
-                Description: data.payload.Description};
+                Description: data.payload.Description,
+                DisplayDate: dateObject ?
+                    new Date(dateObject).toLocaleDateString("ru-Ru") :
+                    `${data.payload.DayNumber ? data.payload.DayNumber.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
+                DayNumber: data.payload.DayNumber ? data.payload.DayNumber : null
+            };
 
             events.splice(eventToUpdateIndex, 1, updateDataEvent);
 

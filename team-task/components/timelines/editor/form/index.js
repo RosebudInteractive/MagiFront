@@ -14,7 +14,6 @@ function TimelineForm(props) {
     const pristineFlag = useRef(true);
 
     const timelineFormData = useMemo(() => ({
-        timeCr: (data && data.TimeCr) ? new Date(data.TimeCr).toLocaleDateString() : new Date().toLocaleDateString(),
         typeOfUse: parseInt(data && data.TypeOfUse ? data.TypeOfUse : null),
         orderNumber: (data && data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : data.Order ? data.Order : null,
         state: (data && data.State) ? data.State : '',
@@ -113,17 +112,16 @@ function TimelineForm(props) {
                     }
 
                     <div className='timeline-form__field'>
-                        <Field
-                            name="timeCr"
-                            component={TextBox}
-                            type="text"
-                            placeholder="Время создания"
-                            label={"Время создания"}
-                            disabled={true}
-                            defaultValue={data && data.TimeCr ? new Date(data.TimeCr).toLocaleDateString() : ''}
-                        />
+                        <Field name="orderNumber"
+                               component={TextBox}
+                               type={"number"}
+                               label={"Номер"}
+                               placeholder="Номер"
+                               disabled={false}
+                               defaultValue={data.OrderNumber}
+                               validate={ComposeValidators(validators.min.bind(validators.min, 1))}>
+                        </Field>
                     </div>
-
 
                     <div className='timeline-form__field file-field'>
                         <Field
@@ -164,17 +162,7 @@ function TimelineForm(props) {
                         </Field>
                     </div>
 
-                    <div className='timeline-form__field'>
-                        <Field name="orderNumber"
-                               component={TextBox}
-                               type={"number"}
-                               label={"Номер"}
-                               placeholder="Номер"
-                               disabled={false}
-                               defaultValue={data.OrderNumber}
-                               validate={ComposeValidators(validators.min.bind(validators.min, 1))}>
-                        </Field>
-                    </div>
+
 
 
                     <FormSpy subscription={{

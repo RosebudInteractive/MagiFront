@@ -1,8 +1,8 @@
 import {appName} from "../config";
 import {List, Record} from "immutable";
 import {createSelector} from 'reselect'
-import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
-import {showErrorMessage} from "tt-ducks/messages";
+import {all, call, put, race, select, take, takeEvery} from "@redux-saga/core/effects";
+import {MODAL_MESSAGE_ACCEPT, MODAL_MESSAGE_DECLINE, showErrorMessage, showUserConfirmation} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import {Timeline} from "../types/timeline";
 import {push} from "react-router-redux/src";
@@ -10,6 +10,7 @@ import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {createEvents, setEvents} from "tt-ducks/events-timeline";
 import {createPeriods, setPeriods} from "tt-ducks/periods-timeline";
+import type {Message} from "../types/messages";
 
 //constants
 
@@ -38,6 +39,7 @@ const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
 const UPDATE_TIMELINE = `${prefix}/UPDATE_TIMELINE`;
+const PUBLISH_TIMELINE = `${prefix}/PUBLISH_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
 const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
 
@@ -122,6 +124,10 @@ export const updateTimeline = (timelineId, timelineData) => {
     return {type: UPDATE_TIMELINE, payload: {timelineId, timelineData}};
 };
 
+export const publishTimeline = (id, withConfirmation = true) => {
+   return {type: PUBLISH_TIMELINE, payload: {id, withConfirmation}}
+};
+
 export const selectTimeline = (timelineId) => {
     return {type: SELECT_TIMELINE, payload: timelineId}
 };
@@ -130,8 +136,8 @@ export const openTimelineEditor = (timelineId: number | undefined) => {
     return {type: OPEN_EDITOR, payload: timelineId}
 };
 
-export const goBack = () => {
-    return {type: GO_BACK}
+export const goBack = (withConfirmation) => {
+    return {type: GO_BACK, payload: withConfirmation}
 };
 
 
@@ -146,10 +152,44 @@ export const saga = function* () {
         takeEvery(GO_BACK, goBackSaga),
         takeEvery(GET_TIMELINE, getTimelineSaga),
         takeEvery(UPDATE_TIMELINE, updateTimelineSaga),
+        takeEvery(PUBLISH_TIMELINE, publishTimelineSaga),
         takeEvery(LINK_EVENT, linkEventSaga),
         takeEvery(LINK_PERIOD, linkPeriodSaga),
     ])
 };
+
+function* publishTimelineSaga(data) {
+    try {
+        if(data.payload.withConfirmation){
+            const message: Message = {
+                content: `Опубликовать таймлайн?`,
+                title: "Подтверждение"
+            };
+
+            yield put(showUserConfirmation(message));
+
+            const {accept} = yield race({
+                accept: take(MODAL_MESSAGE_ACCEPT),
+                decline: take(MODAL_MESSAGE_DECLINE)
+            });
+
+            if (!accept) return;
+
+            yield put({type: START_REQUEST});
+            yield call(changeTimeline, data.payload.id, {State: 2})
+            yield put(getTimelines());
+            yield put({type: SUCCESS_REQUEST});
+        } else {
+            yield call(changeTimeline, data.payload.id, {State: 2})
+            yield put(getTimelines());
+            yield put({type: SUCCESS_REQUEST});
+        }
+    }catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e.toString());
+        showErrorMessage(e.toString());
+    }
+}
 
 function* linkEventSaga(data) {
     try {
@@ -326,8 +366,31 @@ function* openEditorSaga(data) {
     }
 }
 
-function* goBackSaga() {
-    yield put(push(`/timelines`))
+function* goBackSaga(data) {
+    try {
+        if(data.payload) {
+            const message: Message = {
+                content: `Закрыть без сохранения изменений?`,
+                title: "Подтверждение"
+            };
+
+            yield put(showUserConfirmation(message));
+
+            const {accept} = yield race({
+                accept: take(MODAL_MESSAGE_ACCEPT),
+                decline: take(MODAL_MESSAGE_DECLINE)
+            });
+
+            if (!accept) return;
+
+            yield put(push(`/timelines`))
+        } else {
+            yield put(push(`/timelines`))
+        }
+
+    }catch (e) {
+        console.log(e.toString())
+    }
 }
 
 function* getTimelinesSaga() {

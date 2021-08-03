@@ -5,8 +5,8 @@ import PropTypes from "prop-types"
 export default function Modal(props) {
     const {WrappedComponent, wrappedProps, customHeader, title, closeAction} = props;
 
-    const closeModalForm = () => {
-        closeAction();
+    const closeModalForm = (withConfirmation) => {
+        closeAction(withConfirmation);
     };
 
     return (

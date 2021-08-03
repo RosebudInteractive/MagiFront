@@ -100,9 +100,14 @@ function TimelineEditorContainer(props) {
         setMainFormPristine(pristine)
     };
 
-    const closeModal = () => {
-        periodEditorOpened && actions.closePeriodWithConfirmation();
-        eventEditorOpened && actions.closeEventWithConfirmation();
+    const closeModal = (withConfirmation) => {
+        if(withConfirmation){
+            periodEditorOpened && actions.closePeriodWithConfirmation();
+            eventEditorOpened && actions.closeEventWithConfirmation();
+        } else {
+            actions.toggleEditorToPeriod(false);
+            actions.toggleEditorTo(false);
+        }
     };
 
     const doubleClickAction = function ({id, type, optionalParam}) {
@@ -282,7 +287,9 @@ function TimelineEditorContainer(props) {
             actions.getOneTimeline({id: search});
         }
 
-        (!timelinesAll || timelinesAll.length === 0) && actions.getTimelines()
+        // console.log('location.pathname', location.pathname);
+
+        (!timelinesAll || timelinesAll.length === 0) && actions.getTimelines();
     }, [location]);
 
     useEffect(() => {
@@ -293,7 +300,6 @@ function TimelineEditorContainer(props) {
 
     useEffect(() => {
         if (timeline && timeline.hasOwnProperty('State')) {
-            actions.hideSideBarMenu();
             (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo return this string if behaviour seems to be broken
             // (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses, why it still here but all works fine?!? (but its no vision about where getiign the courses)
         }
@@ -305,7 +311,6 @@ function TimelineEditorContainer(props) {
         return function () {
             setTemporaryEvents([]);
             setTemporaryPeriods([]);
-            actions.showSideBarMenu();
         }
     }, []);
 
@@ -316,7 +321,7 @@ function TimelineEditorContainer(props) {
                 <TimelineEditorHeader name={timeline.Name}
                                       state={timeline.State}
                                       mainFormPristine={mainFormPristine}
-                                      onBack={() => actions.goBack()}
+                                      onBack={(headerPristine) => actions.goBack(!mainFormPristine || !headerPristine)}
                                       isCreate={!timeline.Id}
                                       onSave={onSave}
                 />
