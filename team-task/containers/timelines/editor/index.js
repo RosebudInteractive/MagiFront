@@ -18,12 +18,13 @@ import {
     linkPeriod,
     timelineOpenedSelector,
     timelinesSelector,
-    updateTimeline
+    updateTimeline,
 } from "tt-ducks/timelines";
 import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
 import {
     addTemporaryEvent,
     cleanFound as cleanFoundEvents,
+    closeEditorWithConfirmation as closeEventWithConfirmation,
     createEvents,
     createNewEvent,
     currentEventSelector,
@@ -48,6 +49,7 @@ import EventsFindForm from "../../../components/events/find-form";
 import {
     addTemporaryPeriod,
     cleanFound as cleanFoundPeriods,
+    closeEditorWithConfirmation as closePeriodWithConfirmation,
     createNewPeriod,
     currentPeriodSelector,
     findedPeriodsSelector,
@@ -99,8 +101,8 @@ function TimelineEditorContainer(props) {
     };
 
     const closeModal = () => {
-        actions.toggleEditorTo(false);
-        actions.toggleEditorToPeriod(false);
+        periodEditorOpened && actions.closePeriodWithConfirmation();
+        eventEditorOpened && actions.closeEventWithConfirmation();
     };
 
     const doubleClickAction = function ({id, type, optionalParam}) {
@@ -202,7 +204,7 @@ function TimelineEditorContainer(props) {
                     actions.updateEventData({tableId: id, eventData: values})
                 } else {
                     if (timeline && timeline.Id) {
-                        actions.createNewEvent(values)
+                        actions.createNewEvent({...values, TlCreationId: timeline.Id});
                     } else {
                         actions.addTemporaryEvent({...values, State: 1})
                     }
@@ -414,6 +416,8 @@ const mapDispatch2Props = (dispatch) => {
             getOneTimeline,
             updateTimeline,
             toggleEditorTo,
+            closePeriodWithConfirmation,
+            closeEventWithConfirmation,
             getTimelines,
             createNewEvent,
             updateEventData,

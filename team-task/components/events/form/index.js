@@ -1,11 +1,19 @@
 import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
-import {Select, TextBox} from "../../ui-kit";
+import {TextBox} from "../../ui-kit";
 import './event-form.sass'
+import {TIMELINE_STATE} from "../../../constants/states";
 
 export default function EventForm(props) {
     const {eventData, timelineId, closeModalCb, timelines} = props;
     const [validIs, setValid] = useState(false);
+
+
+    const _state = useMemo(() => {
+        const result = Object.values(TIMELINE_STATE).find(item => item.value === eventData.State);
+        return result ? result : {label: "Ошибка", css: "_error"}
+    }, [eventData.State]);
+
 
     const formData = useMemo(() => ({
         Name: eventData.Name,
@@ -14,7 +22,6 @@ export default function EventForm(props) {
         DayNumber: eventData.DayNumber,
         Month: eventData.Month,
         Year: eventData.Year,
-        TlCreationId: (timelineId) ? timelineId : null,
     }), [eventData]);
 
     const _timelines = useMemo(() => {
@@ -23,7 +30,7 @@ export default function EventForm(props) {
         if (!timelineId) {_result.push({id: null, label: "Текущий таймлайн"})}
 
         return _result
-    },[timelines, timelineId])
+    },[timelines, timelineId]);
 
     return (
 
@@ -33,6 +40,8 @@ export default function EventForm(props) {
                 <h6>
                     {(eventData && eventData.Id) ? 'Редактирование' : 'Создание'} события
                 </h6>
+
+                <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
             </div>
 
             <Form
@@ -73,17 +82,6 @@ export default function EventForm(props) {
                                    extClass={'event-form__field'}>
                             </Field>
 
-                            <Field name="TlCreationId"
-                                   component={Select}
-                                   required={true}
-                                   options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
-                                   label={"Привязка к таймлайну"}
-                                   placeholder="Привязка к таймлайну"
-                                   initialValue={timelineId}
-                                   disabled={!timelineId}
-                                   extClass={'event-form__field'}>
-                            </Field>
-
                             <Field name="DayNumber"
                                    component={TextBox}
                                    label={"Дата"}
@@ -106,7 +104,6 @@ export default function EventForm(props) {
                             </Field>
 
                             <Field name="Year"
-                                   type={'number'}
                                    component={TextBox}
                                    label={"Год"}
                                    placeholder="Год"
@@ -160,10 +157,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Required'
-    }
-
-    if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
-        errors.TlCreationId = 'Wrong value'
     }
 
     disableValidationOnFields.map(field => {

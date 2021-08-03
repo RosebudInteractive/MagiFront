@@ -17,3 +17,11 @@ export const TIMELINE_STATUSES = {
     1: 'Черновик',
     2: 'Опубликован'
 };
+
+export const EVENT_STATUSES = {
+    ...TIMELINE_STATUSES
+};
+
+export const PERIODS_STATUSES = {
+    ...EVENT_STATUSES
+};

@@ -10,9 +10,9 @@ export default function TimelineEditorHeader(props) {
     const [headerPristine, setHeaderPristine] = useState(true);
     const [currentValues, setCurrentValues] = useState({});
 
-    const _state = useMemo(()=>{
-    const result = Object.values(TIMELINE_STATE).find(item => item.value === state); //todo uncomment this after all complete
-    return result ? result : {label: "Ошибка", css: "_error"}
+    const _state = useMemo(() => {
+        const result = Object.values(TIMELINE_STATE).find(item => item.value === state);
+        return result ? result : {label: "Ошибка", css: "_error"}
     }, [state, name]);
 
     return <div className="timeline-editor-header">
@@ -32,15 +32,13 @@ export default function TimelineEditorHeader(props) {
             subscription={{values: true, pristine: true}}
             render={({headerForm, submitting, pristine, values}) => (
 
-                <form className='header-form' >
+                <form className='header-form'>
                     <div className='timeline-form__field'>
                         <div className="timeline-name">
                             <Field name="name"
                                    component={TextBoxWithConfirm}
                                    label={"Название таймлайна"}
                                    placeholder="Название таймлайна"
-                                   // initialValue={name} todo mayby use it
-                                   // defaultValue={name}
                                    disabled={false}
                                    extClass="_grey100 page-title">
                             </Field>
@@ -51,8 +49,6 @@ export default function TimelineEditorHeader(props) {
                         <Field name="state"
                                label={"Состояние"}
                                placeholder="Состояние"
-                               // initialValue={state} todo mayby use it
-                               // value={state}
                                disabled={true}>
                             {props => (
                                 <div className={`state`}>
@@ -77,7 +73,9 @@ export default function TimelineEditorHeader(props) {
 
         <button className="timeline-editor-header__save-button orange-button big-button"
                 disabled={isCreate ? !(!(headerPristine === true) && !(mainFormPristine === true)) : !(!(headerPristine === true) || !(mainFormPristine === true))}
-                onClick={() => {currentValues && onSave(currentValues)}}>
+                onClick={() => {
+                    currentValues && onSave(currentValues)
+                }}>
             Сохранить
         </button>
     </div>

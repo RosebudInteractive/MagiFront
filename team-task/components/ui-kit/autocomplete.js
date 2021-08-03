@@ -85,12 +85,12 @@ export default function UiAutocomplete(props) {
 
     useEffect(() => {
         if (props.input.value) {
-            const _item = options.find(item => item.id === props.input.value)
-            setValue(_item.name)
+            const _item = options.find(item => item.id === props.input.value);
+            setValue(_item ? _item.name : '');
         } else {
             setValue(null)
         }
-    }, [props.input.value])
+    }, [props.input.value, options]);
 
     const _options = useMemo(() => { return options.map(item => item.name) }, [options])
 

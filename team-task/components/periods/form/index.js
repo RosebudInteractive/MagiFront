@@ -1,11 +1,17 @@
 import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
-import {Select, TextBox} from "../../ui-kit";
+import {TextBox} from "../../ui-kit";
 import './period-form.sass'
+import {TIMELINE_STATE} from "../../../constants/states";
 
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
     const [validIs, setValid] = useState(false);
+
+    const _state = useMemo(() => {
+        const result = Object.values(TIMELINE_STATE).find(item => item.value === periodData.State);
+        return result ? result : {label: "Ошибка", css: "_error"}
+    }, [periodData.State]);
 
     const formData = useMemo(() => ({
         Name: periodData.Name,
@@ -17,7 +23,6 @@ export default function PeriodForm(props) {
         EndDay: periodData.EndDay,
         EndMonth: periodData.EndMonth,
         EndYear: periodData.EndYear,
-        TlCreationId: (timelineId) ? timelineId : null,
     }), [periodData]);
 
     const _timelines = useMemo(() => {
@@ -36,6 +41,8 @@ export default function PeriodForm(props) {
                 <h6>
                     {((periodData && periodData.Id) || periodData.id) ? 'Редактирование' : 'Создание'} периода
                 </h6>
+
+                <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
             </div>
 
             <Form
@@ -77,18 +84,6 @@ export default function PeriodForm(props) {
                                extClass={'period-form__field'}>
                         </Field>
 
-                        <Field name="TlCreationId"
-                               component={Select}
-                               options={timelines.map((tm) => ({id: tm.Id, label: tm.Name, name: tm.Name}))}
-                               label={"Привязка к таймлайну"}
-                               placeholder="Привязка к таймлайну"
-                               initialValue={timelineId}
-                               disabled={!timelineId}
-                               extClass={'period-form__field'}>
-                        </Field>
-                        {/*</div>*/}
-
-
                         <div className="period-start-date">
                             <Field name="StartDay"
                                    component={TextBox}
@@ -114,7 +109,6 @@ export default function PeriodForm(props) {
                                    component={TextBox}
                                    label={"Год начала"}
                                    placeholder="Год начала"
-                                   type={'number'}
                                    initialValue={formData.StartYear}
                                    disabled={false}
                                    extClass={'period-form__field'}>
@@ -142,7 +136,6 @@ export default function PeriodForm(props) {
                             <Field name="EndYear"
                                    component={TextBox}
                                    label={"Год окончания"}
-                                   type={'number'}
                                    placeholder="Год окончания"
                                    initialValue={formData.EndYear}
                                    disabled={false}
@@ -213,10 +206,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Required'
-    }
-
-    if (!values.TlCreationId || (values.TlCreationId && isNaN(values.TlCreationId))) {
-        errors.TlCreationId = 'Wrong value'
     }
 
     disableValidationOnFields.map(field => {
