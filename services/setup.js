@@ -193,6 +193,8 @@ function setupAPI(express, app) {
     app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
     app.post('/api/adm/import-test', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportTest(), ImportTestParams()));
+    if (pmEnabled)
+        app.post('/api/pm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
 
     setupPrerender(app);
     setupCache(app);
