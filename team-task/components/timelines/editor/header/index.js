@@ -17,7 +17,7 @@ export default function TimelineEditorHeader(props) {
 
     return <div className="timeline-editor-header">
 
-        <div className="header__back-arrow" onClick={onBack}>
+        <div className="header__back-arrow" onClick={() => onBack(headerPristine)}>
             <BackArrow/>
         </div>
         <Form

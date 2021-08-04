@@ -485,7 +485,8 @@ function* openEditorSaga(data) {
                             RbMonth: null,
                             RbYear: null,
                             StartDay: null,
-                            EndDay: null
+                            EndDay: null,
+                            State: 1
                         }
                     });
                 } else {
@@ -599,6 +600,8 @@ const findPeriodBy = (paramsObj) => { //maybe add something else
 const createPeriod = (period) => {
     const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
     const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
+    dateFrom && dateFrom.set('year', period.StartYear);
+    dateTo && dateTo.set('year', period.EndYear);
     const periodData = {
         Name: period.Name,
         TlCreationId: period.TlCreationId,
@@ -625,6 +628,8 @@ const createPeriod = (period) => {
 const updatePeriod = (period) => {
     const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
     const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
+    dateFrom && dateFrom.set('year', period.StartYear);
+    dateTo && dateTo.set('year', period.EndYear);
 
     const periodData = {
         Id: period.Id,

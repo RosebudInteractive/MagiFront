@@ -112,6 +112,17 @@ function setupTimelines(app) {
                     next(err);
                 }
             });
+
+            app.delete(`/api/pm/timeline/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().deleteTimeline(parseInt(req.params.id), opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
         }
     }
 }

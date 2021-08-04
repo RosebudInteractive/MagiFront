@@ -17,6 +17,7 @@ import {
     currentTimelineSelector,
     getTimelines,
     openTimelineEditor,
+    publishTimeline,
     selectTimeline,
     timelineOpenedSelector,
     timelinesFetchingSelector,
@@ -181,7 +182,6 @@ const Timelines = (props) => {
                 if (item && item.Id) {
                     // todo open action
                     actions.selectTimeline(item.Id);
-                    actions.hideSideBarMenu();
                     props.history.push(`timelines/${item.Id}`);
                 }
 
@@ -192,10 +192,11 @@ const Timelines = (props) => {
                 e.preventDefault()
                 const item = this.getItem(data.row);
                 if (item) {
-                    actions.updateTimeline(item.Id, {
-                        ...item,
-                        State: 2
-                    });
+                    actions.publishTimeline(item.Id, true);
+                    // actions.updateTimeline(item.Id, {
+                    //     ...item,
+                    //     State: 2
+                    // });
                     actions.getTimelines();
                 }
             },
@@ -272,7 +273,8 @@ const mapDispatch2Props = (dispatch) => {
             setTemporaryEvents,
             clearSelectedTimeline,
             setTemporaryPeriods,
-            updateTimeline
+            updateTimeline,
+            publishTimeline
         }, dispatch)
     }
 };

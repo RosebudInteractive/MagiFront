@@ -7,8 +7,8 @@ export default function Modal(props) {
     const [createAction, setActionCreate] = useState(true); //too use it but not here
 
 
-    const closeModalForm = () => {
-        closeAction();
+    const closeModalForm = (withConfirmation) => {
+        closeAction(withConfirmation);
     };
 
 
