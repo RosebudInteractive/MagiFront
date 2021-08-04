@@ -225,8 +225,8 @@ function* setEventsSaga({payload}) {
             _event.month = item.Month ? item.Month : new Date(item.Date).getMonth() + 1;
             _event.name = item.Name;
             _event.color = _getColor();
-            _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`
-            _event.visible = true
+            _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`;
+            _event.visible = true;
 
             _event.DisplayDate = item.Date ?  //это дата для отображения целиком строкой
                 new Date(item.Date).toLocaleDateString("ru-Ru") :
@@ -235,7 +235,7 @@ function* setEventsSaga({payload}) {
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
 
-            return _event
+            return _event;
         });
 
         yield put({type: SET_EVENTS, payload: _events})
@@ -308,8 +308,14 @@ function* findEventSaga(data) {
 
         const resData = response.map(ev => {
            if(!ev.Date) {
-               ev.Date = new Date(`01.${ev.Month ? ev.Month : '01'}.${ev.Year}`)
+               ev.Date = new Date(`01.${ev.Month ? ev.Month : '01'}.${ev.Year}`);
+
+               ev.DisplayDate = ev.Year ?  //это дата для отображения целиком строкой
+                   new Date(ev.Year).toLocaleDateString("ru-Ru") :
+                   `${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`;
            }
+
+           return ev;
         });
 
         yield put({type: SET_FINDED, payload: resData});

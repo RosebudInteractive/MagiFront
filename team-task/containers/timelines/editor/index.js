@@ -165,6 +165,8 @@ function TimelineEditorContainer(props) {
                 Order: changedValues.orderNumber,
                 Image: changedValues.image
             });
+
+
         } else {
             actions.createNewTimeline({
                     ...timeline,
@@ -231,7 +233,7 @@ function TimelineEditorContainer(props) {
                     actions.updatePeriodData({tableId: id, periodData: values})
                 } else {
                     if (timeline && timeline.Id) {
-                        actions.createNewPeriod(values)
+                        actions.createNewPeriod({...values, TlCreationId: timeline.Id})
                     } else {
                         actions.addTemporaryPeriod({...values, State: 1})
                     }
@@ -291,8 +293,6 @@ function TimelineEditorContainer(props) {
         if (search) {
             actions.getOneTimeline({id: search});
         }
-
-        // console.log('location.pathname', location.pathname);
 
         (!timelinesAll || timelinesAll.length === 0) && actions.getTimelines();
     }, [location]);

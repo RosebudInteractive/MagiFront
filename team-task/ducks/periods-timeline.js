@@ -203,12 +203,14 @@ function* closeEditorSaga() {
         if (!accept) return;
 
         yield put(toggleEditorTo(false));
-    }catch (e)  {
+    } catch (e) {
         console.log(e.toString())
     }
 }
 
 function* setPeriodsSaga({payload}) {
+
+    console.log('setPeriodsSaga');
     const _periods = payload.map((item) => {
         let _period = {...item};
 
@@ -237,18 +239,20 @@ function* setPeriodsSaga({payload}) {
                 `${item.LbMonth ? item.LbMonth + '.' : ''}${item.LbYear}`;
         _period.endDate = item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
             item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
-            `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
+                `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
         // _period.name = item.Name;
         _period.color = _getColor();
 
         _period.DisplayStartDate =
             item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
-            item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
-            `${item.StartDay ? item.StartDay.toString().padStart(2, '0') + '.' : ''}${item.StartMonth ? item.StartMonth.toString().padStart(2, '0') + '.' : ''}${item.StartYear}`;
+                item.LbYear ? `${item.LbMonth ? item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
+                    item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
+                        `${item.StartDay ? item.StartDay.toString().padStart(2, '0') + '.' : ''}${item.StartMonth ? item.StartMonth.toString().padStart(2, '0') + '.' : ''}${item.StartYear}`;
 
         _period.DisplayEndDate = item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
-            item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
-            `${item.EndDay ? item.EndDay.toString().padStart(2, '0') + '.' : ''}${item.EndMonth ? item.EndMonth.toString().padStart(2, '0') + '.' : ''}${item.EndYear}`;
+            item.RbYear ? `${item.RbMonth ? item.RbMonth.toString().padStart(2, '0') + '.' : ''}${item.RbYear}` :
+                item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
+                    `${item.EndDay ? item.EndDay.toString().padStart(2, '0') + '.' : ''}${item.EndMonth ? item.EndMonth.toString().padStart(2, '0') + '.' : ''}${item.EndYear}`;
 
         return _period
     });
@@ -362,7 +366,7 @@ function* removePeriodSaga(data) {
 
 function* updatePeriodSaga(data) {
     try {
-        if(data.payload.Id){
+        if (data.payload.Id) {
             yield put({type: START_REQUEST});
 
             yield call(updatePeriod, data.payload);
@@ -371,17 +375,17 @@ function* updatePeriodSaga(data) {
         }
 
 
-
         const periods = yield select(periodsSelector);
-        const periodToUpdateIndex =  data.payload.tableId ? periods.findIndex(ev => ev.id === data.payload.tableId) : periods.findIndex(ev => ev.Id === data.payload.Id);
+        const periodToUpdateIndex = data.payload.tableId ? periods.findIndex(ev => ev.id === data.payload.tableId) : periods.findIndex(ev => ev.Id === data.payload.Id);
         const periodToUpdate = periods[periodToUpdateIndex];
 
         // let updateDataEvent;
 
-        if(periodToUpdate){
+        if (periodToUpdate) {
             const dateFrom = (data.payload.StartDay && data.payload.StartMonth && data.payload.StartYear) ? moment(`${data.payload.StartYear}-${data.payload.StartMonth}-${data.payload.StartDay}`) : null;
             const dateTo = (data.payload.EndDay && data.payload.EndMonth && data.payload.EndYear) ? moment(`${data.payload.EndYear}-${data.payload.EndMonth}-${data.payload.EndDay}`) : null;
-            const updateDataPeriod = {...periodToUpdate, Id: data.payload.Id,
+            const updateDataPeriod = {
+                ...periodToUpdate, Id: data.payload.Id,
                 Name: data.payload.Name,
                 TlCreationId: data.payload.TlCreationId,
                 LbDate: dateFrom,
@@ -417,7 +421,19 @@ function* createPeriodSaga(data) {
         const {id} = yield call(createPeriod, data.payload);
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(addTemporaryPeriod({...data.payload, Id: id, State: 1}))
+        yield put(addTemporaryPeriod({
+            ...data.payload,
+            DisplayStartDate:
+                data.payload.LbDate ? new Date(data.payload.LbDate).toLocaleDateString("ru-Ru") :
+                    data.payload.StartDate ? new Date(data.payload.StartDate).toLocaleDateString("ru-Ru") :
+                        `${data.payload.StartDay ? data.payload.StartDay.toString().padStart(2, '0') + '.' : ''}${data.payload.StartMonth ? data.payload.StartMonth.toString().padStart(2, '0') + '.' : ''}${data.payload.StartYear}`,
+
+            DisplayEndDate: data.payload.RbDate ? new Date(data.payload.RbDate).toLocaleDateString("ru-Ru") :
+                data.payload.EndDate ? new Date(data.payload.EndDate).toLocaleDateString("ru-Ru") :
+                    `${data.payload.EndDay ? data.payload.EndDay.toString().padStart(2, '0') + '.' : ''}${data.payload.EndMonth ? data.payload.EndMonth.toString().padStart(2, '0') + '.' : ''}${data.payload.EndYear}`,
+            Id: id,
+            State: 1
+        }))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.message));
@@ -479,7 +495,7 @@ function* openEditorSaga(data) {
                             LbEffDate: null,
                             LbDate: null,
                             LbMonth: null,
-                            LbYear:null,
+                            LbYear: null,
                             RbEffDate: null,
                             RbDate: null,
                             RbMonth: null,

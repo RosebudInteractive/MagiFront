@@ -264,11 +264,12 @@ function* updateTimelineSaga(data) {
         }
 
         yield call(changeTimeline, data.payload.timelineId, mappedTimeline);
+        yield put(replace('/timelines/' + data.payload.timelineData.Id));
 
         yield put({type: SUCCESS_REQUEST});
         yield put(getTimelines());
     } catch (e) {
-        yield put({type: FAIL_REQUEST})
+        yield put({type: FAIL_REQUEST});
         console.log(e);
         showErrorMessage(e);
     }

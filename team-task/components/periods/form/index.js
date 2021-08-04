@@ -157,54 +157,62 @@ export default function PeriodForm(props) {
 
 
 const validate = (values, disableValidationOnFields = []) => {
+    const vals = values;
+
+    vals.StartYear = parseInt(vals.StartYear);
+    vals.StartMonth = parseInt(vals.StartMonth);
+    vals.StartDay = parseInt(vals.StartDay);
+    vals.EndYear = parseInt(vals.EndYear);
+    vals.EndMonth = parseInt(vals.EndMonth);
+    vals.EndDay = parseInt(vals.EndDay);
+
     const errors = {};
 
-    if (!values.StartYear) {
+    if (!vals.StartYear) {
         errors.StartYear = 'Обязательное поле'
     }
 
-    if (values.StartYear && values.StartDay && !values.StartMonth) {
+    if (vals.StartYear && vals.StartDay && !vals.StartMonth) {
         errors.StartMonth = 'Обязательное поле'
     }
 
-    if ((values.StartMonth > 12) || (values.StartMonth < 1)) {
+    if (vals.StartMonth && (vals.StartMonth > 12 || vals.StartMonth < 1)) {
         errors.StartMonth = 'Неправильное значение'
     }
 
-    if (!values.EndYear) {
+    if (!vals.EndYear) {
         errors.EndYear = 'Обязательное поле'
     }
 
-    if (values.EndYear && values.EndDay && !values.EndMonth) {
+    if (vals.EndYear && vals.EndDay && !vals.EndMonth) {
         errors.EndMonth = 'Обязательное поле'
     }
 
-    if ((values.EndMonth > 12) || (values.EndMonth < 1)) {
+    if (vals.EndMonth &&(vals.EndMonth > 12) || (vals.EndMonth < 1)) {
         errors.EndMonth = 'Неправильное значение'
     }
 
-    // todo : сделать учет месяцев, позже если такая необходимость действительно будет
-    if ((values.StartDay > 31) || (values.StartDay < 1)) {
+    if (vals.StartDay && (vals.StartDay > 31) || (vals.StartDay < 1)) {
         errors.StartDay = 'Неправильное значение'
     }
 
-    if ((values.EndDay > 31) || (values.EndDay < 1)) {
+    if (vals.EndDay && (vals.EndDay > 31) || (vals.EndDay < 1)) {
         errors.EndDay = 'Неправильное значение'
     }
 
-    if (!values.Name || (values.Name && values.Name.length < 1)){
+    if (!vals.Name || (vals.Name && vals.Name.length < 1)){
         errors.Name = 'Обязательное поле'
     }
 
-    if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
+    if (!vals.ShortName || (vals.ShortName && vals.ShortName.length < 1)) {
         errors.ShortName = 'Обязательное поле'
     }
 
-    if (values.StartDay && values.StartYear && values.StartMonth) {
+    if (vals.StartDay && vals.StartYear && vals.StartMonth) {
         const dateObj = moment({
-                year: values.StartYear,
-                month: parseInt(values.StartMonth - 1),
-                day: values.StartDay
+                year: vals.StartYear,
+                month: parseInt(vals.StartMonth - 1),
+                day: vals.StartDay
             }
         );
         if (!dateObj.isValid()) {
@@ -212,11 +220,11 @@ const validate = (values, disableValidationOnFields = []) => {
         }
     }
 
-    if (values.EndYear && values.EndMonth && values.EndDay) {
+    if (vals.EndYear && vals.EndMonth && vals.EndDay) {
         const dateObj = moment({
-                year: values.EndYear,
-                month: parseInt(values.EndMonth - 1),
-                day: values.EndDay
+                year: vals.EndYear,
+                month: parseInt(vals.EndMonth - 1),
+                day: vals.EndDay
             }
         );
         if (!dateObj.isValid()) {
