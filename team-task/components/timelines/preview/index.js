@@ -61,7 +61,11 @@ export default function TimelinePreview(props) {
     }, [events])
 
     const _style = useMemo(() => {
-        return background ? {background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)), url(/data/${background})`} : null
+        return background ? {
+            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)), url(/data/${background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "top center"
+        } : {backgroundColor: "#B4B4BB"}
     }, [background])
 
     const _onZoomChange = useCallback((value) => {

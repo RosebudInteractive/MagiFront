@@ -26,19 +26,7 @@ export default function EventForm(props) {
         Year: eventData.Year,
     }), [eventData]);
 
-    const _timelines = useMemo(() => {
-        const _result = timelines.map(item => ({id: item.Id, label: item.Name, name: item.Name}))
-
-        if (!timelineId) {
-            _result.push({id: null, label: "Текущий таймлайн"})
-        }
-
-        return _result
-    }, [timelines, timelineId]);
-
-    return (
-
-        (_timelines.length > 0) && <div className="event-form">
+    return <div className="event-form">
             <button type="button" className="modal-form__close-button" onClick={() => closeModalCb(!formPristine)}>Закрыть
             </button>
             <div className="title">
@@ -141,7 +129,7 @@ export default function EventForm(props) {
                                  }}/>
                     </form>
                 )}/>
-        </div>)
+        </div>
 }
 
 const validate = (values, disableValidationOnFields = []) => {
@@ -159,8 +147,6 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Month = 'Обязательное поле'
     }
 
-    // todo : сделать учет месяцев, если в этом действительно будет необходимость
-
     if (values.DayNumber && ((values.DayNumber > 31) || (values.DayNumber < 1))) {
         errors.DayNumber = 'Неправильное значение'
     }
@@ -174,18 +160,15 @@ const validate = (values, disableValidationOnFields = []) => {
     }
 
     if (values.DayNumber && values.Year && values.Month) {
-        const setErr = () => {
-            errors.Month = 'Неправильная дата';
-            errors.Year = 'Неправильная дата';
-            errors.DayNumber = 'Неправильная дата';
-        };
         const dateObj = moment({
                 year: values.Year,
                 month: parseInt(values.Month - 1),
                 day: values.DayNumber
             }
         );
-        (!dateObj.isValid()) && setErr();
+        if (!dateObj.isValid()) {
+            errors.DayNumber = 'Неправильная дата';
+        }
     }
 
     disableValidationOnFields.map(field => {

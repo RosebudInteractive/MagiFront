@@ -3,6 +3,7 @@ import {Field, Form, FormSpy} from "react-final-form";
 import {TextBox} from "../../ui-kit";
 import './period-form.sass'
 import {TIMELINE_STATE} from "../../../constants/states";
+import moment from "moment";
 
 export default function PeriodForm(props) {
     const {periodData, timelineId, closeModalCb, timelines} = props;
@@ -26,17 +27,7 @@ export default function PeriodForm(props) {
         EndYear: periodData.EndYear,
     }), [periodData]);
 
-    const _timelines = useMemo(() => {
-        const _result = timelines.map(item => ({id: item.Id, label: item.Name, name: item.Name}))
-
-        if (!timelineId) {_result.push({id: null, label: "Текущий таймлайн"})}
-
-        return _result
-    },[timelines, timelineId])
-
-    return (
-
-        (_timelines.length > 0) && <div className="period-form">
+    return <div className="period-form">
             <button type="button" className="modal-form__close-button" onClick={() => closeModalCb(!formPristine)}>Закрыть</button>
             <div className="title">
                 <h6>
@@ -161,7 +152,7 @@ export default function PeriodForm(props) {
                                  }}/>
                     </form>
                 )}/>
-        </div>)
+        </div>
 }
 
 
@@ -207,6 +198,30 @@ const validate = (values, disableValidationOnFields = []) => {
 
     if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
         errors.ShortName = 'Обязательное поле'
+    }
+
+    if (values.StartDay && values.StartYear && values.StartMonth) {
+        const dateObj = moment({
+                year: values.StartYear,
+                month: parseInt(values.StartMonth - 1),
+                day: values.StartDay
+            }
+        );
+        if (!dateObj.isValid()) {
+            errors.StartDay = 'Неправильная дата';
+        }
+    }
+
+    if (values.EndYear && values.EndMonth && values.EndDay) {
+        const dateObj = moment({
+                year: values.EndYear,
+                month: parseInt(values.EndMonth - 1),
+                day: values.EndDay
+            }
+        );
+        if (!dateObj.isValid()) {
+            errors.EndDay = 'Неправильная дата';
+        }
     }
 
     disableValidationOnFields.map(field => {
