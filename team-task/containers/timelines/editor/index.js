@@ -88,6 +88,8 @@ function TimelineEditorContainer(props) {
         , events, periods
     } = props;
     const [mainFormPristine, setMainFormPristine] = useState(true);
+    const [headerPristine, setHeaderPristine] = useState(true);
+    const [detailsActive, setDetailsActive] = useState(false);
     const [timeline, setTimeline] = useState(null);
     const [changedValues, setChangedValues] = useState({});
     const detailsEditor = useRef(null);
@@ -177,9 +179,12 @@ function TimelineEditorContainer(props) {
                 events,
                 periods)
         }
-        actions.goBack();
+        // actions.goBack();
+        setDetailsActive(true);
         actions.setTemporaryEvents([]);
         actions.setTemporaryPeriods([]);
+        // actions.clearSelectedTimeline();
+        // actions.sele
         actions.getTimelines();
     };
 
@@ -324,6 +329,7 @@ function TimelineEditorContainer(props) {
                                       onBack={(headerPristine) => actions.goBack(!mainFormPristine || !headerPristine)}
                                       isCreate={!timeline.Id}
                                       onSave={onSave}
+                                      onPristineChanged={(hP) => setHeaderPristine(hP)}
                 />
 
                 {(lessons && courses) &&
@@ -337,25 +343,28 @@ function TimelineEditorContainer(props) {
                     events={events} periods={periods}/>
                 <TimelineDetails actions={{
                     events: {
-                        headerClickAction: () => {},
-                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
-                        deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)},
-                        createAction: () => {detailsCreateAction('events')},
-                        openFindFormAction: () => {detailsOpenFindFormAction('events')}
-                    }
-                    , periods: {
-                        headerClickAction: () => {},
-                        doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId}),
-                        deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)},
-                        createAction: () => {detailsCreateAction('periods')},
-                        openFindFormAction: () => {detailsOpenFindFormAction('periods')}
-                    }
-                }}
-                                 events={events}
-                                 periods={periods}
-                                 findedEvents={findedEvents}
-                                 findedPeriods={findedPeriods}
-                                 timelineId={timeline.Id}/>
+                            headerClickAction: () => {},
+                            doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
+                            deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)},
+                            createAction: () => {detailsCreateAction('events')},
+                            openFindFormAction: () => {detailsOpenFindFormAction('events')}
+                        },
+                    periods: {
+                            headerClickAction: () => {},
+                            doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId}),
+                            deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)},
+                            createAction: () => {detailsCreateAction('periods')},
+                            openFindFormAction: () => {detailsOpenFindFormAction('periods')}
+                        }
+                    }}
+                                     events={events}
+                                     periods={periods}
+                                     findedEvents={findedEvents}
+                                     findedPeriods={findedPeriods}
+                                     timelineId={timeline.Id}
+                    disabled={(!(timeline && timeline.Id) || (!headerPristine || !mainFormPristine))}/>
+                {/*{timeline && <div>{(!headerPristine || !mainFormPristine).toString()}</div>}*/}
+                {/*{timeline && <div>{(timeline && timeline.Id).toString()}</div>}*/}
             </React.Fragment>
             }
 

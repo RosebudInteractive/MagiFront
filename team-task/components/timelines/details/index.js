@@ -5,11 +5,16 @@ import DetailsList from "./list";
 
 //todo finish this
 export default function TimelineDetails(props) {
-    const {events, periods, actions, findedEvents, findedPeriods, timelineId} = props;
+    const {events, periods, actions, findedEvents, findedPeriods, timelineId, disabled} = props;
+
+    // useEffect(() => {
+    //     console.log()
+    // },[disabled]);
 
     return (
         <div className="timeline-details">
             <DetailsList
+                disabled={disabled}
                 items={events ? events : []}
                 idGrid={'events-list'}
                 actions={actions.events}
@@ -31,6 +36,7 @@ export default function TimelineDetails(props) {
             />
 
             <DetailsList
+                disabled={disabled}
                 idGrid={'periods-list'}
                 items={periods ? periods : []}
                 actions={actions.periods}

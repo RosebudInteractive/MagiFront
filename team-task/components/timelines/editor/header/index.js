@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import BackArrow from "tt-assets/svg/back-arrow.svg";
 import {TitleTextBox} from "../../../ui-kit";
 import {TIMELINE_STATE} from "../../../../constants/states";
@@ -6,9 +6,13 @@ import './timeline-editor-header.sass'
 import {Field, Form, FormSpy} from "react-final-form";
 
 export default function TimelineEditorHeader(props) {
-    const {name, state, mainFormPristine, onBack, onSave, isCreate} = props;
+    const {name, state, mainFormPristine, onBack, onSave, isCreate, onPristineChanged} = props;
     const [headerPristine, setHeaderPristine] = useState(true);
     const [currentValues, setCurrentValues] = useState({});
+
+    useEffect(() => {
+        onPristineChanged(headerPristine)
+    }, [headerPristine]);
 
     const _state = useMemo(() => {
         const result = Object.values(TIMELINE_STATE).find(item => item.value === state);
