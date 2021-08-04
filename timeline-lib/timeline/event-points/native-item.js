@@ -96,8 +96,10 @@ export default class EventPoint extends React.Component {
         const {item, onMount, x, visible, y} = this.props;
 
         if (onMount) {
-            const _x = x * zoom;
-            onMount({xStart: _x, xEnd: _x + MAX_WIDTH, id: item.id, yLevel: 0, visible: visible});
+            const _x = x * zoom,
+                _width = this._wrapper && this._wrapper.current ? this._wrapper.current.clientWidth : MAX_WIDTH
+
+            onMount({xStart: _x, xEnd: _x + _width, id: item.id, yLevel: 0, visible: visible});
         }
 
         this.handleLastPoint();

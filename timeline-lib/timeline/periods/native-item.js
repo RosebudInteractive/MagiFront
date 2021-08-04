@@ -1,11 +1,11 @@
 import React from 'react';
 import {Animated, StyleSheet, Text} from 'react-native';
+import {SerifsContext} from "timeline/timeline/serifs/context";
 
 type Props = {
     y: number,
     startX: number,
     endX: number,
-    zoom: number,
     color: string,
     opacity: number,
     opacityHalf: number,
@@ -34,20 +34,6 @@ export default class Period extends React.Component {
                 outputRange: [0, props.y],
             }),
         };
-    }
-
-    componentDidMount() {
-        // Animated.timing(this.opacityAnim, {
-        //     toValue: this.props.opacity,
-        //     duration: 4000,
-        //     useNativeDriver: true,
-        // }).start();
-        //
-        // Animated.timing(this.verticalAnim, {
-        //     toValue: 1,
-        //     duration: 2000,
-        //     useNativeDriver: true,
-        // }).start();
     }
 
     componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS) {
@@ -96,7 +82,9 @@ export default class Period extends React.Component {
     }
 
     render() {
-        const {startX, endX, zoom, color, id} = this.props,
+        const {zoom} = this.context;
+
+        const {startX, endX, color, id} = this.props,
             _xStart = startX * zoom,
             _xEnd = endX * zoom,
             _blockWidth = Math.ceil(_xEnd - _xStart),
@@ -151,3 +139,5 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
     }
 });
+
+Period.contextType = SerifsContext;

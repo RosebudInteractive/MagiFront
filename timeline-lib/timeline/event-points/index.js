@@ -7,7 +7,6 @@ const DEFAULT_OPACITY = 0.6;
 
 type Props = {
     events: Array,
-    // zoom: number,
     startDate: number,
     yearPerPixel: number,
     onCoordinatesReady: Function,
@@ -15,7 +14,7 @@ type Props = {
 };
 
 export default function EventPoints(props: Props) {
-    const {events, zoom, startDate, yearPerPixel, y, sorted, onRecalculateTimelineEnding, elementsOverAxis, levelLimit} = props;
+    const {events, startDate, yearPerPixel, y, sorted, onRecalculateTimelineEnding, elementsOverAxis, levelLimit} = props;
     const [activeId, setActive] = useState(null);
     const [guard, setGuard] = useState(true);
     const [showActive, setShowActive] = useState(false);

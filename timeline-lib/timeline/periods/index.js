@@ -3,7 +3,7 @@ import placeByYLevelLimit from "../../helpers/placeByLevel";
 import AnimatedPeriod from "./native-item";
 
 export default function Periods(props) {
-    const {zoom, startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis} = props;
+    const {startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis} = props;
     const [verticallyAlignedPeriods, setVerticallyAlignedPeriods] = useState([]);
     const [opacity, setOpacity] = useState(0);
     const didMountRef = useRef(0);
@@ -59,7 +59,6 @@ export default function Periods(props) {
                                        endX={period.xEnd}
                                        y={period.y}
                                        color={period.color}
-                                       zoom={zoom}
                                        visible={period.visible}
                                        opacity={period.visible ? opacity : 0}
                                        opacityHalf={0.57}/>
