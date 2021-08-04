@@ -1,13 +1,16 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
 import './preview.sass'
 import {Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
+import ZoomSlider from "./zoom-slider";
 
 export default function TimelinePreview(props) {
     const {background, events, periods} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
+    const [zoom, setZoom] = useState(1)
+    const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
 
     const _preview = useRef(null);
 
@@ -57,14 +60,25 @@ export default function TimelinePreview(props) {
         }) : []
     }, [events])
 
-    return <div ref={_preview} className="timeline-preview">
-            <div className="image-filter">
-            <Timeline width={width} height={height} events={_events} zoom={1} periods={_periods} levelLimit={4}/>
-            </div>
-            {
-                background && <img alt={'timeline background'} className="normal" src={`/data/${background}`}/>
-            }
+    const _style = useMemo(() => {
+        return background ? {background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)), url(/data/${background})`} : null
+    }, [background])
+
+    const _onZoomChange = useCallback((value) => {
+        setZoom(value)
+    }, []);
+
+    const _zoomSliderStopped = (stopped) => {
+        setZoomSliderStopped(stopped)
+    };
+
+    return <div className="timeline-preview">
+        <ZoomSlider onChange={_onZoomChange} value={zoom} onSliderStop={_zoomSliderStopped}/>
+
+        <div className="timeline-preview__container _with-custom-scroll" ref={_preview} style={_style}>
+            <Timeline width={width} height={height} events={_events} zoom={zoom} periods={_periods} levelLimit={4} zoomSliderStopped={zoomSliderStopped}/>
         </div>
+    </div>
 }
 
 TimelinePreview.propTypes = {
