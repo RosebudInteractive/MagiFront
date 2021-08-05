@@ -10,7 +10,7 @@ let _itemsCount = 0;
 
 //todo finish this
 export default function DetailsList(props) {
-    const {actions, items, columnsConfig, idGrid, title, addCompletelyCreated} = props;
+    const {actions, items, columnsConfig, idGrid, title, addCompletelyCreated, disabled} = props;
 
     const _containerId = `${idGrid}-container`
 
@@ -79,13 +79,13 @@ export default function DetailsList(props) {
     };
 
     return (
-        <div className="details-list">
+        <div className={`details-list ${disabled ? 'disabled' : ''}`}>
             <div className='sticky-block'>
                 <h5 className="form-header _grey70">{title ? title : 'Элементы'}</h5>
-                <button className="open-form-button" onClick={actions.createAction}>
+                <button className="open-form-button" onClick={actions.createAction} disabled={disabled}>
                     <PlusIco/>
                 </button>
-                <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated}>
+                <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated || disabled}>
                     <PlusOrangeIco/>
                 </button>
             </div>

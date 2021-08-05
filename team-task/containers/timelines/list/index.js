@@ -221,8 +221,6 @@ const Timelines = (props) => {
     };
 
     const openTimelineForm = () => {
-        // actions.selectTimeline(item.Id);
-        actions.hideSideBarMenu();
         props.history.push(`timelines/new`);
     };
 

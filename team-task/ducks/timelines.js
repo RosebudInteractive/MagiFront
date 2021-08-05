@@ -5,7 +5,7 @@ import {all, call, put, race, select, take, takeEvery} from "@redux-saga/core/ef
 import {MODAL_MESSAGE_ACCEPT, MODAL_MESSAGE_DECLINE, showErrorMessage, showUserConfirmation} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import {Timeline} from "../types/timeline";
-import {push} from "react-router-redux/src";
+import {push, replace} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {createEvents, setEvents} from "tt-ducks/events-timeline";
@@ -264,11 +264,12 @@ function* updateTimelineSaga(data) {
         }
 
         yield call(changeTimeline, data.payload.timelineId, mappedTimeline);
+        yield put(replace('/timelines/' + data.payload.timelineData.Id));
 
         yield put({type: SUCCESS_REQUEST});
         yield put(getTimelines());
     } catch (e) {
-        yield put({type: FAIL_REQUEST})
+        yield put({type: FAIL_REQUEST});
         console.log(e);
         showErrorMessage(e);
     }
@@ -308,7 +309,8 @@ function* createTimelineSaga(data) {
             }
 
             if (data.payload.setToSelected) {
-                yield put({type: GET_TIMELINE, payload: {id: res.id, setToEditor: true}});
+                yield put(replace('/timelines/' + res.id))
+                // yield put({type: GET_TIMELINE, payload: {id: res.id, setToEditor: true}});
             }
 
         }
