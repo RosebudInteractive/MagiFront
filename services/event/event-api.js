@@ -385,19 +385,19 @@ const EventApi = class EventApi extends DbObject {
                 let day = date.getDate();
                 let month = date.getMonth() + 1;
                 let year = date.getFullYear();
-                mssql_conds.push(`(p.[Day] = ${day})`);
-                mssql_conds.push(`(p.[Month] = ${month})`);
-                mssql_conds.push(`(p.[Year] = ${year})`);
-                mysql_conds.push(`(p.${'`'}Day${'`'} = ${day})`);
-                mysql_conds.push(`(p.${'`'}Month${'`'} = ${month})`);
-                mysql_conds.push(`(p.${'`'}Year${'`'} = ${year})`);
+                mssql_conds.push(`(e.[Day] = ${day})`);
+                mssql_conds.push(`(e.[Month] = ${month})`);
+                mssql_conds.push(`(e.[Year] = ${year})`);
+                mysql_conds.push(`(e.${'`'}Day${'`'} = ${day})`);
+                mysql_conds.push(`(e.${'`'}Month${'`'} = ${month})`);
+                mysql_conds.push(`(e.${'`'}Year${'`'} = ${year})`);
             }
         }
         if (opts.Year) {
             let year = +opts.Year;
             if ((typeof (year) === "number") && (!isNaN(year))) {
-                mssql_conds.push(`(p.[Year] = ${year})`);
-                mysql_conds.push(`(p.${'`'}Year${'`'} = ${year})`);
+                mssql_conds.push(`(e.[Year] = ${year})`);
+                mysql_conds.push(`(e.${'`'}Year${'`'} = ${year})`);
             }
         }
         if (opts.TimelineId) {
