@@ -3,7 +3,7 @@ import {Autocomplete, Select, TextBox} from "../../../ui-kit";
 import {TIMELINE_TYPES_OF_USE} from "../../../../constants/timelines";
 import {Field, Form, FormSpy} from "react-final-form";
 import './timeline-form.sass'
-import validators, {ComposeValidators} from "../../../../tools/validators";
+import validators from "../../../../tools/validators";
 import Uploader from "../../../../tools/uploader/uploader";
 
 function TimelineForm(props) {
@@ -15,7 +15,7 @@ function TimelineForm(props) {
 
     const timelineFormData = useMemo(() => ({
         typeOfUse: parseInt(data && data.TypeOfUse ? data.TypeOfUse : null),
-        orderNumber: (data && data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : data.Order ? data.Order : null,
+        orderNumber: (data && data.Order ? data.Order : data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : null,
         state: (data && data.State) ? data.State : '',
         image: (data && data.Image) ? data.Image : '',
         courseId: data.CourseId,
@@ -55,6 +55,7 @@ function TimelineForm(props) {
     }, [courses]);
 
     return <div className="timeline-form-block">
+
         <Form
             initialValues={
                 timelineFormData
@@ -118,8 +119,7 @@ function TimelineForm(props) {
                                label={"Номер"}
                                placeholder="Номер"
                                disabled={false}
-                               defaultValue={data.OrderNumber}
-                               validate={ComposeValidators(validators.min.bind(validators.min, 1))}>
+                               defaultValue={data.OrderNumber}>
                         </Field>
                     </div>
 
@@ -175,7 +175,9 @@ function TimelineForm(props) {
                         formValue: true,
                         submitErrors: true
                     }}
-                             onChange={({values, pristine}) => {
+                             onChange={({values, pristine, hasValidationErrors, formValues}) => {
+                                 // console.log('formValues', formValues)
+                                 // console.log('hasValidationErrors,', hasValidationErrors)
                                  setTypeOfUse(parseInt(values.typeOfUse));
                                  let prstn;
                                  if (!isCreate) {

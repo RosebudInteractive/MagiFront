@@ -46,24 +46,10 @@ export default function PeriodsFindForm(props) {
             {id: 'ShortName', header: 'Краткое название', minWidth: 100, fillspace: 20},
             {id: 'Description', header: 'Описание', minWidth: 100, fillspace: 20},
             {
-                id: 'LbDate', header: 'Дата начала', minWidth: 100, fillspace: 20, format: function (value) {
-                    if (value){
-                        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-                        return value ? fn(new Date(value)) : '';
-                    } else {
-                        return '--';
-                    }
-                }
+                id: 'DisplayStartDate', header: 'Дата начала', minWidth: 100, fillspace: 20
             },
             {
-                id: 'RbDate', header: 'Дата конца', minWidth: 100, fillspace: 20, format: function (value) {
-                    if (value){
-                        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-                        return value ? fn(new Date(value)) : '';
-                    } else {
-                        return '--';
-                    }
-                }
+                id: 'DisplayEndDate', header: 'Дата конца', minWidth: 100, fillspace: 20
             },
             {
                 id: 'State', header: 'Состояние', minWidth: 100, fillspace: 20,
@@ -94,13 +80,16 @@ export default function PeriodsFindForm(props) {
 
     const searchFormData = useMemo(() => {
         return {
-            textValue: ''
+            Name: '',
+            Year: '',
+            Month: '',
+            Day: '',
         }
     });
 
     const _onSearchClick = (values) => {
-        const value = values.textValue;
-        findAction(value);
+        // const value = values;
+        findAction(values);
     }
 
     const _onAddButtonClick = () => {
@@ -113,22 +102,64 @@ export default function PeriodsFindForm(props) {
         <div className="periods-find-form">
             <Form
                 initialValues={searchFormData}
-                onSubmit={values => {}}
-                validate={values => {}}
+                onSubmit={values => {
+                }}
+                validate={values => {
+                }}
                 subscription={{values: true, pristine: true}}
                 render={({searchForm, submitting, pristine, values}) => (
-                    <form onSubmit={e => {e.preventDefault()}}>
+                    <form onSubmit={e => {
+                        e.preventDefault()
+                    }}>
                         <div className='periods-find-form__field'>
-                            <Field name="textValue"
+                            <Field name="Name"
                                    component={TextBox}
                                    type="text"
-                                   placeholder="Дата/Год/Название"
-                                   label={"Дата/Год/Название"}
+                                   placeholder="Название"
+                                   label={"Название"}
+
                                    disabled={false}/>
-                            <button type="button" className='search-button' onClick={() => {_onSearchClick(values)}}>
-                                Поиск
-                            </button>
+
                         </div>
+                        <div>
+                            <div className="periods-find-form-date">
+                                <div className="periods-find-form__field">
+                                    <Field name="Year"
+                                           component={TextBox}
+                                           type="text"
+                                           placeholder="Год"
+                                           label={"Год"}
+
+                                           disabled={false}/>
+                                </div>
+                                <div className="periods-find-form__field">
+                                    <Field name="Month"
+                                           type="number"
+                                           component={TextBox}
+                                           type="text"
+                                           placeholder="Месяц"
+                                           label={"Месяц"}
+
+                                           disabled={false}/>
+                                </div>
+                                <div className="periods-find-form__field">
+                                    <Field name="Day"
+                                           component={TextBox}
+                                           type="number"
+                                           placeholder="День"
+                                           label={"День"}/>
+                                </div>
+                                <button type="button" className='search-button' onClick={() => {
+                                    _onSearchClick(values)
+                                }}>
+                                    Поиск
+                                </button>
+                            </div>
+                        </div>
+
+
+
+                        {/*</div>*/}
                     </form>)}/>
             <div className="grid-container__wrapper">
                 <div className="grid-container finded-periods-table unselectable" id="found-periods-container">

@@ -23,10 +23,9 @@ export default function TimelineDetails(props) {
                 addCompletelyCreated={!!timelineId}
                 columnsConfig={[
                     {id: 'Id', header: 'Id', hidden: true},
-                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 18},
-                    {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 18},
-                    {id: 'Description', header: 'Описание',  minWidth: 80, fillspace: 18},
-                    {id: 'DisplayDate', header: 'Дата события',  minWidth: 80, fillspace: 18},
+                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
+                    {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 24},
+                    {id: 'DisplayDate', header: 'Дата события',  minWidth: 80, fillspace: 24},
                     {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES},
                     {
                         id: 'del-btn', header: '', width: 50, fillspace: 8,
@@ -45,11 +44,10 @@ export default function TimelineDetails(props) {
                 addCompletelyCreated={!!timelineId}
                 columnsConfig={[
                     {id: 'Id', header: 'Id', hidden: true},
-                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 18},
+                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
                     {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 18},
-                    {id: 'Description', header: 'Описание',  minWidth: 80, fillspace: 18},
-                    {id: 'DisplayStartDate', header: 'Начало',  minWidth: 80, fillspace: 18},
-                    {id: 'DisplayEndDate', header: 'Конец',  minWidth: 80, fillspace: 18},
+                    {id: 'DisplayStartDate', header: 'Начало',  minWidth: 80, fillspace: 24},
+                    {id: 'DisplayEndDate', header: 'Конец',  minWidth: 80, fillspace: 24},
                     {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES},
                     {
                         id: 'del-btn', header: '', width: 50, fillspace: 8,

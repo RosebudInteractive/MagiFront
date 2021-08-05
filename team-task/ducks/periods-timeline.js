@@ -120,8 +120,8 @@ export const createNewPeriod = (period) => {
     return {type: CREATE_NEW_PERIOD, payload: period};
 };
 
-export const findPeriod = (data) => {
-    return {type: FIND_PERIOD, payload: data}
+export const findPeriod = (data, timelineId) => {
+    return {type: FIND_PERIOD, payload: {data, timelineId}}
 };
 
 export const setTemporaryPeriods = (data) => {
@@ -214,52 +214,25 @@ function* setPeriodsSaga({payload}) {
     const _periods = payload.map((item) => {
         let _period = {...item};
 
-        _period.StartYear = item.StartYear ? item.StartYear :
-            item.LbYear ? item.LbYear :
-                new Date(item.LbDate).getFullYear();
-
-        _period.StartMonth = item.StartMonth ? item.StartMonth :
-            item.LbMonth ? item.LbMonth :
-                new Date(item.LbDate).getMonth() + 1;
-        _period.StartDay = item.StartDay ? item.StartDay : new Date(item.LbDate).getDate();
-
-        _period.EndYear = item.EndYear ? item.EndYear :
-            item.RbYear ? item.RbYear :
-                new Date(item.RbDate).getFullYear();
-
-        _period.EndMonth = item.EndMonth ? item.EndMonth :
-            item.RbMonth ? item.RbMonth :
-                new Date(item.RbDate).getMonth() + 1;
-        _period.EndDay = item.EndDay ? item.EndDay : new Date(item.RbDate).getDate();
-
-
-        _period.startDate = item.StartDate ?
-            new Date(item.StartDate).toLocaleDateString("ru-Ru") :
-            item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
-                `${item.LbMonth ? item.LbMonth + '.' : ''}${item.LbYear}`;
-        _period.endDate = item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
-            item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
-                `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
-        // _period.name = item.Name;
+        _period.startDate = item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
+            `${item.LbMonth ? item.LbMonth + '.' : ''}${item.LbYear}`;
+        _period.endDate = item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
+            `${item.RbMonth ? item.RbMonth + '.' : ''}${item.RbYear}`;
+        _period.name = item.Name;
         _period.color = _getColor();
 
-        _period.DisplayStartDate =
-            item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
-                item.LbYear ? `${item.LbMonth
-                    ? item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
-                        item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
-                        `${item.StartDay ? item.StartDay.toString().padStart(2, '0') + '.' : ''}${item.StartMonth ? item.StartMonth.toString().padStart(2, '0') + '.' : ''}${item.StartYear}`;
+        _period.DisplayStartDate = item.LbYear ? `${item.LbDay ? 
+            item.LbDay.toString().padStart(2, '0') + '.' : ''}${item.LbMonth ? 
+            item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
+            '--'
+        ;
+        _period.DisplayEndDate = item.RbYear ? `${item.RbDay ?
+            item.RbDay.toString().padStart(2, '0') + '.' : ''}${item.RbMonth ?
+            item.RbMonth.toString().padStart(2, '0') + '.' : ''}${item.RbYear}` :
+            '--'
+        ;
 
-        _period.DisplayEndDate = item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
-            item.RbYear ? `${item.RbMonth ? item.RbMonth.toString().padStart(2, '0') + '.' : ''}${item.RbYear}` :
-                item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
-                    `${item.EndDay ? item.EndDay.toString().padStart(2, '0') + '.' : ''}${item.EndMonth ? item.EndMonth.toString().padStart(2, '0') + '.' : ''}${item.EndYear}`;
-
-        _period.DisplayStartDate =  _period.DisplayStartDate === "undefined" ? '--' : _period.DisplayStartDate;
-        _period.DisplayEndDate = _period.DisplayEndDate === "undefined" ? '--' : _period.DisplayEndDate;
-        console.log('_period.DisplayStartDate', _period.DisplayStartDate);
-        console.log('_period.DisplayEndDate', _period.DisplayEndDate);
-        return _period
+        return _period;
     });
 
     yield put({
@@ -313,18 +286,30 @@ function* findPeriodSaga(data) {
 
         const paramsObject = {};
 
-        const numberDate = parseInt(data.payload);
-
-        if (!isNaN(numberDate)) {
-            paramsObject.Date = numberDate;
-            paramsObject.Year = numberDate;
-        } else {
-            paramsObject.Name = data.payload;
+        if (data.payload.data) {
+            paramsObject.Year = data.payload.data.Year;
+            paramsObject.Month = data.payload.data.Month;
+            paramsObject.Day = data.payload.data.Day;
+            paramsObject.Name = data.payload.data.Name;
+            paramsObject.ExcTimelineId = data.payload.timelineId;
         }
 
         const response = yield call(findPeriodBy, $.param(paramsObject));
 
-        yield put({type: SET_FINDED, payload: response});
+        yield put({type: SET_FINDED, payload: response.map(el => {
+
+            return {
+                ...el,
+                DisplayStartDate:  el.LbYear ? `${el.LbDay ?
+                    el.LbDay.toString().padStart(2, '0') + '.' : ''}${el.LbMonth ?
+                    el.LbMonth.toString().padStart(2, '0') + '.' : ''}${el.LbYear}` :
+                    '-13',
+                DisplayEndDate:  el.RbYear ? `${el.RbDay ?
+                    el.RbDay.toString().padStart(2, '0') + '.' : ''}${el.RbMonth ?
+                    el.RbMonth.toString().padStart(2, '0') + '.' : ''}${el.RbYear}` :
+                    '-34'
+            }
+            })});
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
@@ -516,82 +501,10 @@ function* openEditorSaga(data) {
                             State: 1
                         }
                     });
-                } else {
-                    // yield put({
-                    //     type: SET_SELECTED_PERIOD, payload: {
-                    //         Name: '',
-                    //         ShortName: '',
-                    //         Description: '',
-                    //         TlCreationId: null,
-                    //         TlPublicId: null,
-                    //         StartDate: date,
-                    //         EndDate: date,
-                    //         StartMonth: date.getMonth() + 1,
-                    //         EndMonth: date.getMonth() + 1,
-                    //         DisplayStartDate: date.toLocaleDateString(),
-                    //         DisplayEndDate: date.toLocaleDateString(),
-                    //         LbEffDate: date.toLocaleDateString(),
-                    //         LbDate: date,
-                    //         LbMonth: date.getMonth() + 1,
-                    //         LbYear: date.getFullYear(),
-                    //         RbEffDate: date.toLocaleDateString(),
-                    //         RbDate: date,
-                    //         RbMonth: date.getMonth() + 1,
-                    //         RbYear: date.getFullYear(),
-                    //         StartDay: date.getDate(),
-                    //         EndDay: date.getDate(),
-                    //         StartYear: date.getFullYear(),
-                    //         EndYear: date.getFullYear(),
-                    //     }
-                    // });
                 }
             }
 
             yield put({type: TOGGLE_EDITOR, payload: true});
-        } else {
-            // const date = new Date();
-            //
-            //
-            // if(data.payload.tableId){
-            //     const periods = yield select(periodsSelector);
-            //     const period = periods.length > 0 && periods.find(pr => pr.id === data.payload.tableId);
-            //     yield put({type: SET_SELECTED_PERIOD, payload: period})
-            // } else {
-            //     yield put({
-            //         type: SET_SELECTED_PERIOD, payload: {
-            //             Name: '',
-            //             ShortName: '',
-            //             Description: '',
-            //             TlCreationId: null,
-            //             TlPublicId: null,
-            //
-            //             StartDate: date,
-            //             EndDate: date,
-            //             StartMonth: date.getMonth() + 1,
-            //             EndMonth: date.getMonth() + 1,
-            //
-            //             DisplayStartDate: date.toLocaleDateString(),
-            //             DisplayEndDate: date.toLocaleDateString(),
-            //
-            //             LbEffDate: date.toLocaleDateString(),
-            //             LbDate: date,
-            //             LbMonth: date.getMonth() + 1,
-            //             LbYear: date.getFullYear(),
-            //             RbEffDate: date.toLocaleDateString(),
-            //             RbDate: date,
-            //             RbMonth: date.getMonth() + 1,
-            //             RbYear: date.getFullYear(),
-            //
-            //             StartDay: date.getDate(),
-            //             EndDay: date.getDate(),
-            //             StartYear: date.getFullYear(),
-            //             EndYear: date.getFullYear(),
-            //         }
-            //     });
-            // }
-            //
-            //
-            // yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {
         console.log(e)
@@ -625,8 +538,8 @@ const findPeriodBy = (paramsObj) => { //maybe add something else
 
 
 const createPeriod = (period) => {
-    const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
-    const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
+    const dateFrom = (period.LbDay && period.LbMonth && period.LbYear) ? moment(`${period.LbYear}-${period.LbMonth}-${period.LbDay}`) : null;
+    const dateTo = (period.RbDay && period.RbMonth && period.RbYear) ? moment(`${period.RbYear}-${period.RbMonth}-${period.RbDay}`) : null;
     dateFrom && dateFrom.set('year', period.StartYear);
     dateTo && dateTo.set('year', period.EndYear);
     const periodData = {
@@ -634,10 +547,12 @@ const createPeriod = (period) => {
         TlCreationId: period.TlCreationId,
         LbDate: dateFrom,
         RbDate: dateTo,
-        LbYear: parseInt(period.StartYear),
-        LbMonth: parseInt(period.StartMonth),
-        RbMonth: parseInt(period.EndMonth),
-        RbYear: parseInt(period.EndYear),
+        LbYear: parseInt(period.LbYear),
+        LbMonth: parseInt(period.LbMonth),
+        RbMonth: parseInt(period.RbMonth),
+        RbYear: parseInt(period.RbYear),
+        LbDay: parseInt(period.LbDay),
+        RbDay: parseInt(period.RbDay),
         ShortName: period.ShortName,
         Description: period.Description
     };
@@ -653,8 +568,8 @@ const createPeriod = (period) => {
 };
 
 const updatePeriod = (period) => {
-    const dateFrom = (period.StartDay && period.StartMonth && period.StartYear) ? moment(`${period.StartYear}-${period.StartMonth}-${period.StartDay}`) : null;
-    const dateTo = (period.EndDay && period.EndMonth && period.EndYear) ? moment(`${period.EndYear}-${period.EndMonth}-${period.EndDay}`) : null;
+    const dateFrom = (period.LbDay && period.LbMonth && period.LbYear) ? moment(`${period.LbYear}-${period.LbMonth}-${period.LbDay}`) : null;
+    const dateTo = (period.RbDay && period.RbMonth && period.RbYear) ? moment(`${period.RbYear}-${period.RbMonth}-${period.RbDay}`) : null;
     dateFrom && dateFrom.set('year', period.StartYear);
     dateTo && dateTo.set('year', period.EndYear);
 
@@ -664,10 +579,10 @@ const updatePeriod = (period) => {
         TlCreationId: period.TlCreationId,
         LbDate: dateFrom,
         RbDate: dateTo,
-        LbYear: parseInt(period.StartYear),
-        LbMonth: parseInt(period.StartMonth),
-        RbMonth: parseInt(period.EndMonth),
-        RbYear: parseInt(period.EndYear),
+        LbYear: parseInt(period.LbYear),
+        LbMonth: parseInt(period.LbMonth),
+        RbMonth: parseInt(period.RbMonth),
+        RbYear: parseInt(period.RbYear),
         ShortName: period.ShortName,
         Description: period.Description
     };
