@@ -132,8 +132,8 @@ export const createEvents = ({events, timelineId}) => {
     return {type: CREATE_EVENTS, payload: {events, timelineId}};
 };
 
-export const findEvent = (data) => {
-    return {type: FIND_EVENT, payload: data}
+export const findEvent = (data, timelineId) => {
+    return {type: FIND_EVENT, payload: {data, timelineId}}
 }
 
 export const openEventEditor = ({eventId = null, event = null, timelineId = null, tableId = null}) => {
@@ -293,16 +293,25 @@ function* findEventSaga(data) {
 
         const paramsObject = {};
 
-        const numberDate = parseInt(data.payload);
+        if (data.payload.data) {
+            if( data.payload.data.Name && data.payload.data.Name.length > 0){
+                paramsObject.Name = data.payload.data.Name
+            }
 
-        if (!isNaN(numberDate)) {
-            paramsObject.Date = numberDate;
-            paramsObject.Year = numberDate;
-        } else {
-            paramsObject.Name = data.payload;
+            if( parseInt(data.payload.data.Year)){
+                paramsObject.Year = parseInt(data.payload.data.Year)
+            }
+
+            if( parseInt(data.payload.data.Month)){
+                paramsObject.Month = parseInt(data.payload.data.Month)
+            }
+
+            if(parseInt(data.payload.data.Day)){
+                paramsObject.Day = parseInt(data.payload.data.Day)
+            }
+
+            paramsObject.ExcTimelineId = data.payload.timelineId;
         }
-
-        paramsObject.Name = data.payload;
 
         const response = yield call(findEventBy, $.param(paramsObject));
 
@@ -475,54 +484,10 @@ function* openEditorSaga(data) {
                             State: 1
                         }
                     });
-                } else {
-                    //todo make it unavailable - remove later
-                    // yield put({
-                    //     type: SET_SELECTED_EVENT, payload: {
-                    //         Name: '',
-                    //         ShortName: '',
-                    //         Description: '',
-                    //         TlCreationId: null,
-                    //         TlPublicId: null,
-                    //         EffDate: date.toLocaleDateString(),
-                    //         DisplayDate: date.toLocaleDateString("ru-Ru"),
-                    //         Date: date,
-                    //         DayNumber: date.getDate(),
-                    //         Month: date.getMonth() + 1,
-                    //         Year: date.getFullYear()
-                    //     }
-                    // });
                 }
             }
 
             yield put({type: TOGGLE_EDITOR, payload: true});
-        } else {
-
-            //todo mke it unavalable - remove it later
-            // const date = new Date();
-            //
-            //
-            // if(data.payload.tableId){
-            //     const events = yield select(eventsSelector);
-            //     const event = events.length > 0 && events.find(ev => ev.id === data.payload.tableId);
-            //     yield put({type: SET_SELECTED_EVENT, payload: event})
-            // } else {
-            //     yield put({
-            //         type: SET_SELECTED_EVENT, payload: {
-            //             Name: '',
-            //             ShortName: '',
-            //             Description: '',
-            //             TlCreationId: null,
-            //             TlPublicId: null,
-            //             EffDate: date.toLocaleDateString(),
-            //             Date: date.getDay(),
-            //             Month: date.getMonth(),
-            //             Year: date.getFullYear()
-            //         }
-            //     });
-            // }
-
-            // yield put({type: TOGGLE_EDITOR, payload: true});
         }
     } catch (e) {
         console.log(e)

@@ -19,12 +19,12 @@ export default function PeriodForm(props) {
         Name: periodData.Name,
         ShortName: periodData.ShortName,
         Description: periodData.Description,
-        StartDay: periodData.StartDay,
-        StartMonth: periodData.StartMonth,
-        StartYear: periodData.StartYear,
-        EndDay: periodData.EndDay,
-        EndMonth: periodData.EndMonth,
-        EndYear: periodData.EndYear,
+        LbDay: periodData.LbDay,
+        LbMonth: periodData.LbMonth,
+        LbYear: periodData.LbYear,
+        RbDay: periodData.RbDay,
+        RbMonth: periodData.RbMonth,
+        RbYear: periodData.RbYear,
     }), [periodData]);
 
     return <div className="period-form">
@@ -77,59 +77,59 @@ export default function PeriodForm(props) {
                         </Field>
 
                         <div className="period-start-date">
-                            <Field name="StartDay"
+                            <Field name="LbDay"
                                    component={TextBox}
                                    label={"Дата начала"}
                                    placeholder="Дата начала"
                                    type={'number'}
-                                   initialValue={formData.StartDay}
+                                   initialValue={formData.LbDay}
                                    disabled={false}
                                    extClass={'period-form__field'}>
                             </Field>
 
-                            <Field name="StartMonth"
+                            <Field name="LbMonth"
                                    component={TextBox}
                                    label={"Месяц начала"}
                                    placeholder="Месяц начала"
                                    type={'number'}
-                                   initialValue={formData.StartMonth}
+                                   initialValue={formData.LbMonth}
                                    disabled={false}
                                    extClass={'period-form__field'}>
                             </Field>
 
-                            <Field name="StartYear"
+                            <Field name="LbYear"
                                    component={TextBox}
                                    label={"Год начала"}
                                    placeholder="Год начала"
-                                   initialValue={formData.StartYear}
+                                   initialValue={formData.LbYear}
                                    disabled={false}
                                    extClass={'period-form__field'}>
                             </Field>
                         </div>
 
                         <div className="period-end-date">
-                            <Field name="EndDay"
+                            <Field name="RbDay"
                                    component={TextBox}
                                    label={"Дата окончания"}
                                    type={'number'}
                                    placeholder="Дата окончания"
-                                   initialValue={formData.EndDay}
+                                   initialValue={formData.RbDay}
                                    disabled={false}
                                    extClass="period-form__field end-date"/>
-                            <Field name="EndMonth"
+                            <Field name="RbMonth"
                                    component={TextBox}
                                    label={"Месяц окончания"}
                                    type={'number'}
                                    placeholder="Месяц окончания"
-                                   initialValue={formData.EndMonth}
+                                   initialValue={formData.RbMonth}
                                    disabled={false}
                                    extClass="period-form__field end-date"/>
 
-                            <Field name="EndYear"
+                            <Field name="RbYear"
                                    component={TextBox}
                                    label={"Год окончания"}
                                    placeholder="Год окончания"
-                                   initialValue={formData.EndYear}
+                                   initialValue={formData.RbYear}
                                    disabled={false}
                                    extClass="period-form__field end-date"/>
                         </div>
@@ -159,76 +159,73 @@ export default function PeriodForm(props) {
 const validate = (values, disableValidationOnFields = []) => {
     const vals = values;
 
-    vals.StartYear = parseInt(vals.StartYear);
-    vals.StartMonth = parseInt(vals.StartMonth);
-    vals.StartDay = parseInt(vals.StartDay);
-    vals.EndYear = parseInt(vals.EndYear);
-    vals.EndMonth = parseInt(vals.EndMonth);
-    vals.EndDay = parseInt(vals.EndDay);
+    vals.LbYear = parseInt(vals.LbYear);
+    vals.LbMonth = parseInt(vals.LbMonth);
+    vals.LbDay = parseInt(vals.LbDay);
+    vals.RbYear = parseInt(vals.RbYear);
+    vals.RbMonth = parseInt(vals.RbMonth);
+    vals.RbDay = parseInt(vals.RbDay);
 
     const errors = {};
 
-    if (!vals.StartYear) {
-        errors.StartYear = 'Обязательное поле'
+    if (vals.LbYear && vals.LbDay && !vals.LbMonth) {
+        errors.LbMonth = 'Обязательное поле'
     }
 
-    if (vals.StartYear && vals.StartDay && !vals.StartMonth) {
-        errors.StartMonth = 'Обязательное поле'
+    if (vals.LbMonth && (vals.LbMonth > 12 || vals.LbMonth < 1)) {
+        errors.LbMonth = 'Неправильное значение'
     }
 
-    if (vals.StartMonth && (vals.StartMonth > 12 || vals.StartMonth < 1)) {
-        errors.StartMonth = 'Неправильное значение'
+    if ((!vals.RbYear && !vals.LbYear)) {
+        errors.RbYear = 'Обязательное поле';
+        errors.LbYear = 'Обязательное поле';
     }
 
-    if (!vals.EndYear) {
-        errors.EndYear = 'Обязательное поле'
+    if (vals.RbYear && vals.RbDay && !vals.RbMonth) {
+        errors.RbMonth = 'Обязательное поле'
     }
 
-    if (vals.EndYear && vals.EndDay && !vals.EndMonth) {
-        errors.EndMonth = 'Обязательное поле'
+    if (vals.RbMonth &&(vals.RbMonth > 12) || (vals.RbMonth < 1)) {
+        errors.RbMonth = 'Неправильное значение'
     }
 
-    if (vals.EndMonth &&(vals.EndMonth > 12) || (vals.EndMonth < 1)) {
-        errors.EndMonth = 'Неправильное значение'
+    if (vals.LbDay && (vals.LbDay > 31) || (vals.LbDay < 1)) {
+        errors.LbDay = 'Неправильное значение'
     }
 
-    if (vals.StartDay && (vals.StartDay > 31) || (vals.StartDay < 1)) {
-        errors.StartDay = 'Неправильное значение'
-    }
-
-    if (vals.EndDay && (vals.EndDay > 31) || (vals.EndDay < 1)) {
-        errors.EndDay = 'Неправильное значение'
+    if (vals.RbDay && (vals.RbDay > 31) || (vals.RbDay < 1)) {
+        errors.RbDay = 'Неправильное значение'
     }
 
     if (!vals.Name || (vals.Name && vals.Name.length < 1)){
         errors.Name = 'Обязательное поле'
     }
 
-    if (!vals.ShortName || (vals.ShortName && vals.ShortName.length < 1)) {
-        errors.ShortName = 'Обязательное поле'
-    }
+    // if (!vals.ShortName || (vals.ShortName && vals.ShortName.length < 1)) {
+    //     errors.ShortName = 'Обязательное поле'
+    // }
 
-    if (vals.StartDay && vals.StartYear && vals.StartMonth) {
+    if (vals.LbDay && vals.LbYear && vals.LbMonth) {
         const dateObj = moment({
-                year: vals.StartYear,
-                month: parseInt(vals.StartMonth - 1),
-                day: vals.StartDay
+                year: vals.LbYear,
+                month: parseInt(vals.LbMonth - 1),
+                day: vals.LbDay
             }
         );
         if (!dateObj.isValid()) {
-            errors.StartDay = 'Неправильная дата';
+            errors.LbDay = 'Неправильная дата';
         }
     }
 
-    if (vals.EndYear && vals.EndMonth && vals.EndDay) {
+    if (vals.RbYear && vals.RbMonth && vals.RbDay) {
         const dateObj = moment({
-                year: vals.EndYear,
-                month: parseInt(vals.EndMonth - 1),
-                day: vals.EndDay
+                year: vals.RbYear,
+                month: parseInt(vals.RbMonth - 1),
+                day: vals.RbDay
             }
         );
         if (!dateObj.isValid()) {
-            errors.EndDay = 'Неправильная дата';
+            errors.RbDay = 'Неправильная дата';
         }
     }
 
