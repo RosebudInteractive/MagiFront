@@ -450,8 +450,8 @@ const EventApi = class EventApi extends DbObject {
                     mysql_field = "e.`State` " + dir;
                     break;
                 case "Date":
-                   mssql_field = "p.[Year] " + dir + ", p.[Month] " + dir + ", p.[Day] " + dir;
-                    mysql_field = "p.`Year` " + dir + ", p.`Month` " + dir + ", p.`Day` " + dir;
+                   mssql_field = "e.[Year] " + dir + ", e.[Month] " + dir + ", e.[Day] " + dir;
+                    mysql_field = "e.`Year` " + dir + ", e.`Month` " + dir + ", e.`Day` " + dir;
                     break;
             }
             if (mysql_field) {
