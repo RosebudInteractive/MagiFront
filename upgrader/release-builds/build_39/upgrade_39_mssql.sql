@@ -7,7 +7,11 @@ CREATE UNIQUE INDEX [u_Idx_Event_Name] ON [Event]([Name]);
 GO
 CREATE INDEX [idx_Event_ShortName] ON [Event]([ShortName]);
 GO
-CREATE INDEX [idx_Event_EffDate] ON [Event]([EffDate]);
+CREATE INDEX [idx_Event_Day] ON [Event]([Day]);
+GO
+CREATE INDEX [idx_Event_Month] ON [Event]([Month]);
+GO
+CREATE INDEX [idx_Event_Year] ON [Event]([Year]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Period_Name] ON [Period]([Name]);
 GO
@@ -15,9 +19,17 @@ CREATE INDEX [idx_Period_ShortName] ON [Period]([ShortName]);
 GO
 CREATE INDEX [idx_Period_State] ON [Period]([State]);
 GO
-CREATE INDEX [idx_Period_LbEffDate] ON [Period]([LbEffDate]);
+CREATE INDEX [idx_Period_LbDay] ON [Period]([LbDay]);
 GO
-CREATE INDEX [idx_Period_RbEffDate] ON [Period]([RbEffDate]);
+CREATE INDEX [idx_Period_LbMonth] ON [Period]([LbMonth]);
+GO
+CREATE INDEX [idx_Period_LbYear] ON [Period]([LbYear]);
+GO
+CREATE INDEX [idx_Period_RbDay] ON [Period]([RbDay]);
+GO
+CREATE INDEX [idx_Period_RbMonth] ON [Period]([RbMonth]);
+GO
+CREATE INDEX [idx_Period_RbYear] ON [Period]([RbYear]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Timeline_Name] ON [Timeline]([Name]);
 GO

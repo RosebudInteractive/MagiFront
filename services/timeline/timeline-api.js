@@ -52,16 +52,18 @@ const SQL_PUBLISH_TL_PERIOD_MYSQL =
     "  and(`Id` in (select `PeriodId` from `TimelinePeriod` where `TimelineId` = <%= id %>))";
 
 const SQL_DELETE_TL_EVENT_MYSQL =
-    "delete from `Entity` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
+    "delete from `Entity` where (`Id` in (select `SysParentId` from `Event` where (`State` = 1) and (`SysParentId` in (<%= ids %>))))\n" +
+    "  and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_EVENT_MSSQL =
-    "delete from [Entity] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
+    "delete from [Entity] where ([Id] in (select [SysParentId] from [Event] where ([State] = 1) and ([SysParentId] in (<%= ids %>))))\n" +
+    "  and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MYSQL =
-    "delete from `Period` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
+    "delete from `Period` where (`State` = 1) and (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MSSQL =
-    "delete from [Period] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
+    "delete from [Period] where ([State] = 1) and ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
 
 const TL_MSSQL_DELETE_SCRIPT =
     [
