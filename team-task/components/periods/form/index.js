@@ -168,10 +168,6 @@ const validate = (values, disableValidationOnFields = []) => {
 
     const errors = {};
 
-    if (!vals.StartYear) {
-        errors.StartYear = 'Обязательное поле'
-    }
-
     if (vals.StartYear && vals.StartDay && !vals.StartMonth) {
         errors.StartMonth = 'Обязательное поле'
     }
@@ -180,8 +176,9 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.StartMonth = 'Неправильное значение'
     }
 
-    if (!vals.EndYear) {
-        errors.EndYear = 'Обязательное поле'
+    if ((!vals.EndYear && !vals.StartYear)) {
+        errors.EndYear = 'Обязательное поле';
+        errors.StartYear = 'Обязательное поле';
     }
 
     if (vals.EndYear && vals.EndDay && !vals.EndMonth) {

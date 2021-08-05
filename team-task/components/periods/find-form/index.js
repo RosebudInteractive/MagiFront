@@ -47,14 +47,22 @@ export default function PeriodsFindForm(props) {
             {id: 'Description', header: 'Описание', minWidth: 100, fillspace: 20},
             {
                 id: 'LbDate', header: 'Дата начала', minWidth: 100, fillspace: 20, format: function (value) {
-                    let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-                    return value ? fn(new Date(value)) : '';
+                    if (value){
+                        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+                        return value ? fn(new Date(value)) : '';
+                    } else {
+                        return '--';
+                    }
                 }
             },
             {
                 id: 'RbDate', header: 'Дата конца', minWidth: 100, fillspace: 20, format: function (value) {
-                    let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-                    return value ? fn(new Date(value)) : '';
+                    if (value){
+                        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+                        return value ? fn(new Date(value)) : '';
+                    } else {
+                        return '--';
+                    }
                 }
             },
             {

@@ -245,8 +245,9 @@ function* setPeriodsSaga({payload}) {
 
         _period.DisplayStartDate =
             item.LbDate ? new Date(item.LbDate).toLocaleDateString("ru-Ru") :
-                item.LbYear ? `${item.LbMonth ? item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
-                    item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
+                item.LbYear ? `${item.LbMonth
+                    ? item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
+                        item.StartDate ? new Date(item.StartDate).toLocaleDateString("ru-Ru") :
                         `${item.StartDay ? item.StartDay.toString().padStart(2, '0') + '.' : ''}${item.StartMonth ? item.StartMonth.toString().padStart(2, '0') + '.' : ''}${item.StartYear}`;
 
         _period.DisplayEndDate = item.RbDate ? new Date(item.RbDate).toLocaleDateString("ru-Ru") :
@@ -254,10 +255,20 @@ function* setPeriodsSaga({payload}) {
                 item.EndDate ? new Date(item.EndDate).toLocaleDateString("ru-Ru") :
                     `${item.EndDay ? item.EndDay.toString().padStart(2, '0') + '.' : ''}${item.EndMonth ? item.EndMonth.toString().padStart(2, '0') + '.' : ''}${item.EndYear}`;
 
+        _period.DisplayStartDate =  _period.DisplayStartDate === "undefined" ? '--' : _period.DisplayStartDate;
+        _period.DisplayEndDate = _period.DisplayEndDate === "undefined" ? '--' : _period.DisplayEndDate;
+        console.log('_period.DisplayStartDate', _period.DisplayStartDate);
+        console.log('_period.DisplayEndDate', _period.DisplayEndDate);
         return _period
     });
 
-    yield put({type: SET_PERIODS, payload: _periods})
+    yield put({
+        type: SET_PERIODS, payload: _periods.map(pr => ({
+            ...pr,
+            DisplayStartDate: pr.DisplayStartDate !== undefined ? pr.DisplayStartDate : '--',
+            DisplayEndDate: pr.DisplayEndDate !== undefined ? pr.DisplayEndDate : '--'
+        }))
+    })
 }
 
 function* addTemporaryPeriodSaga({payload}) {
