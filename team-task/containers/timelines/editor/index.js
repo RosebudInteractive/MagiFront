@@ -181,12 +181,9 @@ function TimelineEditorContainer(props) {
                 events,
                 periods)
         }
-        // actions.goBack();
         setDetailsActive(true);
         actions.setTemporaryEvents([]);
         actions.setTemporaryPeriods([]);
-        // actions.clearSelectedTimeline();
-        // actions.sele
         actions.getTimelines();
     };
 
@@ -323,14 +320,16 @@ function TimelineEditorContainer(props) {
         <div className="timeline-editor-container form">
             {timeline && timeline.State &&
             <React.Fragment>
-                <Prompt when={!headerPristine || !mainFormPristine } message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+                <Prompt when={(!headerPristine || !mainFormPristine)} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>}
                 <TimelineEditorHeader name={timeline.Name}
                                       state={timeline.State}
                                       mainFormPristine={mainFormPristine}
-                                      onBack={(headerPristine) => actions.goBack()}
+                                      onBack={(headerPristine) =>{
+                                           actions.goBack() }}
                                       isCreate={!timeline.Id}
                                       onSave={onSave}
-                                      onPristineChanged={(hP) => setHeaderPristine(hP)}
+                                      onPristineChanged={(hP) =>{
+                                          setHeaderPristine(hP)} }
                 />
 
                 {(lessons && courses) &&
@@ -342,7 +341,7 @@ function TimelineEditorContainer(props) {
                 <TimelinePreview
                     background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
                     events={events} periods={periods}/>
-                <TimelineDetails actions={{
+                <TimelineDetails  actions={{
                     events: {
                             headerClickAction: () => {},
                             doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),

@@ -30,6 +30,7 @@ import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 import {TimelineStatuses, TimelineTypesOfUse} from "../../../constants/timelines";
 import {hideSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import PlusIco from "tt-assets/svg/plus.svg";
+import {TIMELINE_STATE} from "../../../constants/states";
 
 let timelinesCount = 0;
 
@@ -130,7 +131,11 @@ const Timelines = (props) => {
                 editor: "select",
                 options: Object.entries(TimelineStatuses).map((ent) => ({id: ent[0], value: ent[1]}))
                 ,  minWidth: 50,
-                fillspace: 12
+                fillspace: 12,
+                template: function (val) {
+                    const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
+                    return `<div class="state-template-block font-body-s"><div class="state-circle ${cssWithLabel.css}"></div></div>`
+                }
             },
             {
                 id: 'OrderNumber',

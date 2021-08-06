@@ -1,3 +1,5 @@
+@import "~tt-assets/styles/colors.sass"
+
 .timelines-page
   position: relative
 
@@ -48,3 +50,36 @@
     border-top: 0
     border-right: 0
     transform: rotate(312deg)
+
+.state-template-block
+  display: flex
+  flex-flow: row nowrap
+  justify-content: center
+  align-items: center
+  color: $color-main-light
+  box-sizing: border-box
+  width: 100%
+  font-size: 12px !important
+  text-align: center !important
+  //margin-top: 10px
+  border-radius: 4px
+  height: 100%
+
+
+
+  .state-circle
+    border-radius: 50%
+    width: 14px
+    height: 14px
+
+    &._draft
+      background-color: $blue
+
+    &._executing
+      background-color: $yellow
+
+    &._done
+      background-color: $green
+
+    &._error
+      background-color: $red

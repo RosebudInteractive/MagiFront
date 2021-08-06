@@ -38,7 +38,7 @@ export default function DetailsList(props) {
     const GRID_CONFIG = {
         view: "datatable",
         id: `${idGrid}-grid`,
-        css: 'tt-grid',
+        css: 'tt-grid ',
         hover: "row-hover",
         scroll: 'none',
         headerRowHeight: 20,

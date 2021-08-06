@@ -62,8 +62,7 @@ function TimelineForm(props) {
             }
             onSubmit={values => {
             }}
-            validate={values => {
-            }}
+            validate={values => validate(values, [])}
             subscription={{values: true, pristine: true}}
             render={({timelineForm, submitting, pristine, values, hasValidationErrors, valid}) => (
                 <form className='timeline-form' onSubmit={e => {
@@ -173,12 +172,12 @@ function TimelineForm(props) {
                         valid: true,
                         hasValidationErrors: true,
                         formValue: true,
-                        submitErrors: true
+                        submitErrors: true,
+                        errors: true
                     }}
-                             onChange={({values, pristine, hasValidationErrors, formValues}) => {
-                                 // console.log('formValues', formValues)
-                                 // console.log('hasValidationErrors,', hasValidationErrors)
+                             onChange={({values, pristine, hasValidationErrors, formValues, errors}) => {
                                  setTypeOfUse(parseInt(values.typeOfUse));
+
                                  let prstn;
                                  if (!isCreate) {
                                      prstn = pristine;
@@ -209,6 +208,8 @@ function TimelineForm(props) {
                                          }
                                      }
                                  }
+
+                                 prstn =  ((Object.entries(errors).length !== 0)) ? true : prstn;
                                  setTimeout(() => props.onChangeFormCallback(prstn, {values: valuesIs}), 0);
                              }}/>
                 </form>)}/>
@@ -216,4 +217,26 @@ function TimelineForm(props) {
 }
 
 export default TimelineForm;
+
+const validate = (values, disableValidationOnFields = []) => {
+    const errors = {};
+
+   if(values.orderNumber && values.orderNumber < 1){
+       errors.orderNumber = 'Значение меньше 1'
+   }
+
+    if(values.typeOfUse && parseInt(values.typeOfUse) === 1 && (values.courseId && isNaN(parseInt(values.courseId)))){
+        errors.courseId = 'Курс не указан'
+    }
+
+    if(values.typeOfUse && parseInt(values.typeOfUse) === 2 && (values.lessonId && isNaN(parseInt(values.lessonId)))){
+        errors.courseId = 'Лекция не указана'
+    }
+
+    disableValidationOnFields.map(field => {
+        field.condition && delete errors[field.fieldName];
+    });
+
+    return errors
+};
 
