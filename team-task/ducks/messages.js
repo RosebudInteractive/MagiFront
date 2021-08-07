@@ -43,7 +43,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SHOW_ERROR:
         case SHOW_WARNING:
         case SHOW_USER_CONFIRMATION:
-            console.log('PAYLOAD:,', payload)
             return state.merge({
                 visible: true,
                 confirmButtonText: payload.confirmButtonText ? payload.confirmButtonText : initialButtonsText.confirmButtonText,

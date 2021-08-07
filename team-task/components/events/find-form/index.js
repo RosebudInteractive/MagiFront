@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef} from "react";
 import {Field, Form} from "react-final-form";
 import {TextBox} from "../../ui-kit";
 import {EVENT_STATES} from "../../../constants/events";
@@ -75,7 +75,10 @@ export default function EventsFindForm(props) {
 
     const searchFormData = useMemo(() => {
         return {
-            textValue: ''
+            Name: '',
+            Year: '',
+            Month: '',
+            Day: '',
         }
     });
 
@@ -91,21 +94,55 @@ export default function EventsFindForm(props) {
                         e.preventDefault();
                     }}>
                         <div className='events-find-form__field'>
-                            <Field name="textValue"
+                            <Field name="Name"
                                    component={TextBox}
                                    type="text"
-                                   placeholder="Дата/Год/Название"
-                                   label={"Дата/Год/Название"}
+                                   placeholder="Название"
+                                   label={"Название"}
 
                                    disabled={false}/>
-                            <button disabled={false} type="button" className='search-button' onClick={() => {
-                                const value = values.textValue;
+                        </div>
 
-                                findAction(value);
+                        <div className="events-find-form-date">
+                            <div className='events-find-form__field'>
+                                <Field name="Year"
+                                       component={TextBox}
+                                       type="text"
+                                       placeholder="Год"
+                                       label={"Год"}
+
+                                       disabled={false}/>
+                            </div>
+                            <div className='events-find-form__field'>
+                                <Field name="Month"
+                                       type="number"
+                                       component={TextBox}
+                                       type="text"
+                                       placeholder="Месяц"
+                                       label={"Месяц"}
+
+                                       disabled={false}/>
+                            </div>
+                            <div className='events-find-form__field'>
+                                <Field name="Day"
+                                       component={TextBox}
+                                       type="number"
+                                       placeholder="День"
+                                       label={"День"}
+
+                                       disabled={false}/>
+                            </div>
+
+
+
+                            <button disabled={false} type="button" className='search-button' onClick={() => {
+                                findAction(values);
                             }}>
                                 Поиск
                             </button>
                         </div>
+
+                        {/*</div>*/}
                     </form>)}/>
 
 

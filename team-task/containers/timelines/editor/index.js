@@ -39,7 +39,7 @@ import {
     toggleEditorTo,
     updateEventData
 } from "tt-ducks/events-timeline";
-import {useLocation,} from "react-router-dom"
+import {Prompt, useLocation,} from "react-router-dom"
 import Modal from "../../../components/events/modal"
 import EventForm from "../../../components/events/form"
 import PeriodForm from "../../../components/periods/form"
@@ -181,12 +181,9 @@ function TimelineEditorContainer(props) {
                 events,
                 periods)
         }
-        // actions.goBack();
         setDetailsActive(true);
         actions.setTemporaryEvents([]);
         actions.setTemporaryPeriods([]);
-        // actions.clearSelectedTimeline();
-        // actions.sele
         actions.getTimelines();
     };
 
@@ -276,8 +273,8 @@ function TimelineEditorContainer(props) {
 
     const findAction = (elData) => {
         finderForm.current === PeriodsFindForm ?
-            actions.findPeriod(elData) :
-            actions.findEvent(elData);
+            actions.findPeriod(elData, timeline.Id) :
+            actions.findEvent(elData, timeline.Id);
     };
 
     const closeFinderAction = () => {
@@ -323,13 +320,16 @@ function TimelineEditorContainer(props) {
         <div className="timeline-editor-container form">
             {timeline && timeline.State &&
             <React.Fragment>
+                <Prompt when={(!headerPristine || !mainFormPristine)} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>}
                 <TimelineEditorHeader name={timeline.Name}
                                       state={timeline.State}
                                       mainFormPristine={mainFormPristine}
-                                      onBack={(headerPristine) => actions.goBack(!mainFormPristine || !headerPristine)}
+                                      onBack={(headerPristine) =>{
+                                           actions.goBack() }}
                                       isCreate={!timeline.Id}
                                       onSave={onSave}
-                                      onPristineChanged={(hP) => setHeaderPristine(hP)}
+                                      onPristineChanged={(hP) =>{
+                                          setHeaderPristine(hP)} }
                 />
 
                 {(lessons && courses) &&
@@ -341,7 +341,7 @@ function TimelineEditorContainer(props) {
                 <TimelinePreview
                     background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
                     events={events} periods={periods}/>
-                <TimelineDetails actions={{
+                <TimelineDetails  actions={{
                     events: {
                             headerClickAction: () => {},
                             doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),

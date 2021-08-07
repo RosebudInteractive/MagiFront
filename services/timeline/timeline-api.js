@@ -52,16 +52,18 @@ const SQL_PUBLISH_TL_PERIOD_MYSQL =
     "  and(`Id` in (select `PeriodId` from `TimelinePeriod` where `TimelineId` = <%= id %>))";
 
 const SQL_DELETE_TL_EVENT_MYSQL =
-    "delete from `Entity` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
+    "delete from `Entity` where (`Id` in (select `SysParentId` from `Event` where (`State` = 1) and (`SysParentId` in (<%= ids %>))))\n" +
+    "  and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_EVENT_MSSQL =
-    "delete from [Entity] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
+    "delete from [Entity] where ([Id] in (select [SysParentId] from [Event] where ([State] = 1) and ([SysParentId] in (<%= ids %>))))\n" +
+    "  and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MYSQL =
-    "delete from `Period` where (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
+    "delete from `Period` where (`State` = 1) and (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MSSQL =
-    "delete from [Period] where ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
+    "delete from [Period] where ([State] = 1) and ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
 
 const TL_MSSQL_DELETE_SCRIPT =
     [
@@ -88,6 +90,26 @@ const TL_CREATE = {
 };
 
 const TL_DELETE = {
+    expr: {
+        model: {
+            name: "Timeline",
+            childs: [
+                {
+                    dataObject: {
+                        name: "TimelineEvent"
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "TimelinePeriod"
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const TL_COPY = {
     expr: {
         model: {
             name: "Timeline",
@@ -370,17 +392,19 @@ const TimelineAPI = class TimelineAPI extends DbObject {
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
         let root_obj = null;
         let inpFields = data || {};
-        let timelineObj = null;
-        let newId;
+        let src_tl = null;
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(-1, TL_CREATE, dbOpts));
+                resolve(this._getObjById(-1, inpFields.CopyFrom ? TL_COPY : TL_CREATE, dbOpts));
             })
                 .then(async (result) => {
                     root_obj = result;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
+                    if (inpFields.CopyFrom)
+                        src_tl = await this.getTimeline(inpFields.CopyFrom, options);
+                    
                     await root_obj.edit();
 
                     let fields = { State: TimelineState.Draft }; // State = Draft
@@ -388,13 +412,16 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     if (typeof (inpFields.Name) !== "undefined")
                         fields.Name = inpFields.Name
                     else
-                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing field "Name"`);
+                        if (src_tl)
+                            fields.Name = `${src_tl.Name} - Copy ${(new Date()).toISOString()}`
+                        else
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing field "Name"`);
 
-                    if (typeof (inpFields.State) === "number") {
+                    if (!src_tl && (typeof (inpFields.State) === "number")) {
                         let valid_states = {};
                         for (let key in TimelineState)
                             valid_states[TimelineState[key]] = true;
-                        if(valid_states[inpFields.State])
+                        if (valid_states[inpFields.State])
                             fields.State = inpFields.State
                         else
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "State": ${inpFields.State}.`);
@@ -402,36 +429,63 @@ const TimelineAPI = class TimelineAPI extends DbObject {
 
                     if (typeof (inpFields.SpecifCode) !== "undefined")
                         fields.SpecifCode = inpFields.SpecifCode
+                    else
+                        if(src_tl)
+                            fields.SpecifCode = src_tl.SpecifCode
 
                     if (typeof (inpFields.Description) !== "undefined")
                         fields.Description = inpFields.Description
+                    else
+                        if (src_tl)
+                            fields.Description = src_tl.Description
 
                     if (typeof (inpFields.Image) !== "undefined")
                         fields.Image = inpFields.Image
+                    else
+                        if (src_tl)
+                            fields.Image = src_tl.Image
 
                     if (typeof (inpFields.ImageMeta) !== "undefined")
                         if (typeof (inpFields.ImageMeta) === "string")
                             fields.ImageMeta = inpFields.ImageMeta
                         else
                             fields.ImageMeta = JSON.stringify(inpFields.ImageMeta)
+                    else
+                        if (src_tl)
+                            fields.ImageMeta = JSON.stringify(src_tl.ImageMeta)
 
                     if (typeof (inpFields.Options) !== "undefined")
                         if (typeof (inpFields.Options) === "string")
                             fields.Options = inpFields.Options
                         else
                             fields.Options = JSON.stringify(inpFields.Options)
+                    else
+                        if (src_tl)
+                            fields.Options = JSON.stringify(src_tl.Options)
 
                     if (typeof (inpFields.ProcessId) === "number")
                         fields.ProcessId = inpFields.ProcessId
+                    else
+                        if (src_tl)
+                            fields.ProcessId = src_tl.ProcessId
 
                     if (typeof (inpFields.Order) === "number")
                         fields.Order = inpFields.Order
+                    else
+                        if (src_tl)
+                            fields.Order = src_tl.Order
 
                     if (typeof (inpFields.CourseId) === "number")
                         fields.CourseId = inpFields.CourseId
+                    else
+                        if (src_tl)
+                            fields.CourseId = src_tl.CourseId
 
                     if (typeof (inpFields.LessonId) === "number")
                         fields.LessonId = inpFields.LessonId
+                    else
+                        if (src_tl)
+                            fields.LessonId = src_tl.LessonId
 
                     if ((fields.CourseId && fields.LessonId) || ((!fields.CourseId) && (!fields.LessonId)))
                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Inconsistent combination of "CourseId" and "LessonId" fields.`);
@@ -440,8 +494,22 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                         fields: fields
                     }, dbOpts);
 
-                    timelineObj = this._db.getObj(newHandler.newObject);
-                    newId = newHandler.keyValue;
+                    let timelineObj = this._db.getObj(newHandler.newObject);
+                    let newId = newHandler.keyValue;
+
+                    if (src_tl) {
+                        let te_root = timelineObj.getDataRoot("TimelineEvent");
+                        for (let i = 0; src_tl.Events && (i < src_tl.Events.length); i++)
+                            await te_root.newObject({
+                                fields: { EventId: src_tl.Events[i].Id }
+                            }, dbOpts);
+                        let tp_root = timelineObj.getDataRoot("TimelinePeriod");
+                        for (let i = 0; src_tl.Periods && (i < src_tl.Periods.length); i++)
+                            await tp_root.newObject({
+                                fields: { PeriodId: src_tl.Periods[i].Id }
+                            }, dbOpts);
+                    }
+
                     await root_obj.save(dbOpts);
 
                     if (logModif)

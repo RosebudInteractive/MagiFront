@@ -155,10 +155,6 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Name = 'Неправильное значение'
     }
 
-    if (!values.ShortName || (values.ShortName && values.ShortName.length < 1)) {
-        errors.ShortName = 'Обязательное поле'
-    }
-
     if (values.DayNumber && values.Year && values.Month) {
         const dateObj = moment({
                 year: values.Year,

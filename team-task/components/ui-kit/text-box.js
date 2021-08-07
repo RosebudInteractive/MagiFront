@@ -14,6 +14,7 @@ const CssTextField = withStyles({
             "text-align": "left",
             "&.MuiFormLabel-root.Mui-focused": {
                 color: "#C8684C"
+                // "color": "#19191D"
             },
         },
         // '& label[data-shrink="true"]': {
@@ -44,8 +45,10 @@ const CssTextField = withStyles({
                 backgroundColor: "#E5E5E7",
                 borderColor: '#C8684C',
             },
-            '&.Mui-focused': {
+            "&.Mui-focused": {
                 border: '1px solid #C8684C',
+                // color: "#C8684C"
+                "color": "#19191D"
             },
             '&.Mui-disabled': {
                 backgroundColor: "#F8F8F8",
@@ -83,12 +86,23 @@ const CssTextField = withStyles({
             },
             '&.Mui-focused input': {
                 border: '1px solid #C8684C',
+                // color: "#C8684C"
+                "color": "#19191D"
             },
             '&.Mui-disabled input': {
                 backgroundColor: "#F8F8F8",
                 color: "#9696A0",
             },
+            '& p.MuiFormHelperText-contained.Mui-error.MuiFormHelperText-filled':{
+                backgroundColor: 'green',
+                position: 'fixed !important',
+                top: '45px !important'
+            }
         },
+        '& p': {
+            position: 'absolute',
+            top: '45px'
+        }
     },
 })(TextField);
 

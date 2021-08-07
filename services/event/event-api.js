@@ -18,7 +18,7 @@ const DataObject = require(UCCELLO_CONFIG.uccelloPath + 'dataman/data-object');
 const logModif = config.has("debug.event.logModif") ? config.get("debug.event.logModif") : false;
 
 const SQL_GET_EVENT_LIST_MSSQL =
-    "select e.[SysParentId] as[Id], e.[Name], e.[ShortName], e.[Description], e.[Date], e.[Month], e.[Year],\n" +
+    "select e.[SysParentId] as[Id], e.[Name], e.[ShortName], e.[Description], e.[Day], e.[Month], e.[Year],\n" +
     "  e.[State], e.[TlCreationId], tcr.[Name] as [TlCrName], e.[TlPublicId], tpb.[Name] as [TlPubName]\n" +
     "from [Entity] et\n" +
     "  join [Event] e on e.[SysParentId] = et.[Id]\n" +
@@ -27,7 +27,7 @@ const SQL_GET_EVENT_LIST_MSSQL =
     "  left join [Timeline] tpb on tpb.[Id] = e.[TlPublicId]";
 
 const SQL_GET_EVENT_LIST_MYSQL =
-    "select e.`SysParentId` as`Id`, e.`Name`, e.`ShortName`, e.`Description`, e.`Date`, e.`Month`, e.`Year`,\n" +
+    "select e.`SysParentId` as`Id`, e.`Name`, e.`ShortName`, e.`Description`, e.`Day`, e.`Month`, e.`Year`,\n" +
     "  e.`State`, e.`TlCreationId`, tcr.`Name` as `TlCrName`, e.`TlPublicId`, tpb.`Name` as `TlPubName`\n" +
     "from `Entity` et\n" +
     "  join `Event` e on e.`SysParentId` = et.`Id`\n" +
@@ -37,8 +37,8 @@ const SQL_GET_EVENT_LIST_MYSQL =
 
 
 const SQL_GET_PERIOD_LIST_MSSQL =
-    "select p.[Id], p.[Name], p.[ShortName], p.[Description], p.[LbDate], p.[LbMonth], p.[LbYear],\n" +
-    "  p.[RbDate], p.[RbMonth], p.[RbYear],\n" +
+    "select p.[Id], p.[Name], p.[ShortName], p.[Description], p.[LbDay], p.[LbMonth], p.[LbYear],\n" +
+    "  p.[RbDay], p.[RbMonth], p.[RbYear],\n" +
     "  p.[State], p.[TlCreationId], tcr.[Name] as [TlCrName], p.[TlPublicId], tpb.[Name] as [TlPubName]\n" +
     "from [Period] p\n" +
     "  left join [TimelinePeriod] tp on tp.[PeriodId] = p.[Id]\n" +
@@ -46,8 +46,8 @@ const SQL_GET_PERIOD_LIST_MSSQL =
     "  left join [Timeline] tpb on tpb.[Id] = p.[TlPublicId]";
 
 const SQL_GET_PERIOD_LIST_MYSQL =
-    "select p.`Id`, p.`Name`, p.`ShortName`, p.`Description`, p.`LbDate`, p.`LbMonth`, p.`LbYear`,\n" +
-    "  p.`RbDate`, p.`RbMonth`, p.`RbYear`,\n" +
+    "select p.`Id`, p.`Name`, p.`ShortName`, p.`Description`, p.`LbDay`, p.`LbMonth`, p.`LbYear`,\n" +
+    "  p.`RbDay`, p.`RbMonth`, p.`RbYear`,\n" +
     "  p.`State`, p.`TlCreationId`, tcr.`Name` as `TlCrName`, p.`TlPublicId`, tpb.`Name` as `TlPubName`\n" +
     "from `Period` p\n" +
     "  left join `TimelinePeriod` tp on tp.`PeriodId` = p.`Id`\n" +
@@ -184,9 +184,15 @@ const EventApi = class EventApi extends DbObject {
                         date = opts.LbDate;
             }
             if (typeof (date) !== "undefined") {
-                let date_str = this._dateToString(date, false, false);
-                mssql_conds.push(`(p.[LbDate] = convert(datetime, '${date_str}'))`);
-                mysql_conds.push(`(p.${'`'}LbDate${'`'} = '${date_str}')`);
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+                mssql_conds.push(`(p.[LbDay] = ${day})`);
+                mssql_conds.push(`(p.[LbMonth] = ${month})`);
+                mssql_conds.push(`(p.[LbYear] = ${year})`);
+                mysql_conds.push(`(p.${'`'}LbDay${'`'} = ${day})`);
+                mysql_conds.push(`(p.${'`'}LbMonth${'`'} = ${month})`);
+                mysql_conds.push(`(p.${'`'}LbYear${'`'} = ${year})`);
             }
         }
         if (opts.RbDate) {
@@ -200,23 +206,29 @@ const EventApi = class EventApi extends DbObject {
                         date = opts.RbDate;
             }
             if (typeof (date) !== "undefined") {
-                let date_str = this._dateToString(date, false, false);
-                mssql_conds.push(`(p.[RbDate] = convert(datetime, '${date_str}'))`);
-                mysql_conds.push(`(p.${'`'}RbDate${'`'} = '${date_str}')`);
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+                mssql_conds.push(`(p.[RbDay] = ${day})`);
+                mssql_conds.push(`(p.[RbMonth] = ${month})`);
+                mssql_conds.push(`(p.[RbYear] = ${year})`);
+                mysql_conds.push(`(p.${'`'}RbDay${'`'} = ${day})`);
+                mysql_conds.push(`(p.${'`'}RbMonth${'`'} = ${month})`);
+                mysql_conds.push(`(p.${'`'}RbYear${'`'} = ${year})`);
             }
         }
         if (opts.LbYear) {
             let year = +opts.LbYear;
             if ((typeof (year) === "number") && (!isNaN(year))) {
-                mssql_conds.push(`(year(p.[LbEffDate]) = ${opts.LbYear})`);
-                mysql_conds.push(`(year(p.${'`'}LbEffDate${'`'}) = ${opts.LbYear})`);
+                mssql_conds.push(`(p.[LbYear] = ${year})`);
+                mysql_conds.push(`(p.${'`'}LbYear${'`'} = ${year})`);
             }
         }
         if (opts.RbYear) {
             let year = +opts.RbYear;
             if ((typeof (year) === "number") && (!isNaN(year))) {
-                mssql_conds.push(`(year(p.[RbEffDate]) = ${opts.RbYear})`);
-                mysql_conds.push(`(year(p.${'`'}RbEffDate${'`'}) = ${opts.RbYear})`);
+                mssql_conds.push(`p.[RbYear] = ${year})`);
+                mysql_conds.push(`p.${'`'}RbYear${'`'} = ${year})`);
             }
         }
         if (opts.TimelineId) {
@@ -253,33 +265,33 @@ const EventApi = class EventApi extends DbObject {
             let mssql_field;
             switch (ord_arr[0]) {
                 case "TimeCr":
-                    mssql_field = "p.[TimeCr]";
-                    mysql_field = "p.`TimeCr`";
+                    mssql_field = "p.[TimeCr] " + dir;
+                    mysql_field = "p.`TimeCr` " + dir;
                     break;
                 case "Name":
-                    mssql_field = "p.[Name]";
-                    mysql_field = "p.`Name`";
+                    mssql_field = "p.[Name] " + dir;
+                    mysql_field = "p.`Name` " + dir;
                     break;
                 case "ShortName":
-                    mssql_field = "p.[ShortName]";
-                    mysql_field = "p.`ShortName`";
+                    mssql_field = "p.[ShortName] " + dir;
+                    mysql_field = "p.`ShortName` " + dir;
                     break;
                 case "State":
-                    mssql_field = "p.[State]";
-                    mysql_field = "p.`State`";
+                    mssql_field = "p.[State] " + dir;
+                    mysql_field = "p.`State` " + dir;
                     break;
                 case "LbDate":
-                    mssql_field = "p.[LbEffDate]";
-                    mysql_field = "p.`LbEffDate`";
+                    mssql_field = "p.[LbYear] " + dir + ", p.[LbMonth] " + dir + ", p.[LbDay] " + dir;
+                    mysql_field = "p.`LbYear` " + dir + ", p.`LbMonth` " + dir + ", p.`LbDay` " + dir;
                     break;
                 case "RbDate":
-                    mssql_field = "p.[RbEffDate]";
-                    mysql_field = "p.`RbEffDate`";
+                    mssql_field = "p.[RbYear] " + dir + ", p.[RbMonth] " + dir + ", p.[RbDay] " + dir;
+                    mysql_field = "p.`RbYear` " + dir + ", p.`RbMonth` " + dir + ", p.`RbDay` " + dir;
                     break;
             }
             if (mysql_field) {
-                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
-                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+                sql_mysql += `\nORDER BY ${mysql_field}`;
+                sql_mssql += `\nORDER BY ${mssql_field}`;
             }
         }
 
@@ -300,11 +312,11 @@ const EventApi = class EventApi extends DbObject {
                         ShortName: elem.ShortName,
                         Description: elem.Description,
                         State: elem.State,
-                        LbDate: elem.LbDate,
-                        LbMonth: elem.LbMonth,
+                        LbDay: elem.LbDay ? elem.LbDay : null,
+                        LbMonth: elem.LbMonth ? elem.LbMonth : null,
                         LbYear: elem.LbYear,
-                        RbDate: elem.RbDate,
-                        RbMonth: elem.RbMonth,
+                        RbDay: elem.RbDay ? elem.RbDay : null,
+                        RbMonth: elem.RbMonth ? elem.RbMonth : null,
                         RbYear: elem.RbYear,
                         TlCreationId: elem.TlCreationId,
                         TlPublicId: elem.TlPublicId,
@@ -370,16 +382,22 @@ const EventApi = class EventApi extends DbObject {
                         date = opts.Date;
             }
             if (typeof (date) !== "undefined") {
-                let date_str = this._dateToString(date, false, false);
-                mssql_conds.push(`(e.[Date] = convert(datetime, '${date_str}'))`);
-                mysql_conds.push(`(e.${'`'}Date${'`'} = '${date_str}')`);
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+                mssql_conds.push(`(e.[Day] = ${day})`);
+                mssql_conds.push(`(e.[Month] = ${month})`);
+                mssql_conds.push(`(e.[Year] = ${year})`);
+                mysql_conds.push(`(e.${'`'}Day${'`'} = ${day})`);
+                mysql_conds.push(`(e.${'`'}Month${'`'} = ${month})`);
+                mysql_conds.push(`(e.${'`'}Year${'`'} = ${year})`);
             }
         }
         if (opts.Year) {
             let year = +opts.Year;
             if ((typeof (year) === "number") && (!isNaN(year))) {
-                mssql_conds.push(`(year(e.[EffDate]) = ${opts.Year})`);
-                mysql_conds.push(`(year(e.${'`'}EffDate${'`'}) = ${opts.Year})`);
+                mssql_conds.push(`(e.[Year] = ${year})`);
+                mysql_conds.push(`(e.${'`'}Year${'`'} = ${year})`);
             }
         }
         if (opts.TimelineId) {
@@ -416,29 +434,29 @@ const EventApi = class EventApi extends DbObject {
             let mssql_field;
             switch (ord_arr[0]) {
                 case "TimeCr":
-                    mssql_field = "et.[TimeCr]";
-                    mysql_field = "et.`TimeCr`";
+                    mssql_field = "et.[TimeCr] " + dir;
+                    mysql_field = "et.`TimeCr` " + dir;
                     break;
                 case "Name":
-                    mssql_field = "e.[Name]";
-                    mysql_field = "e.`Name`";
+                    mssql_field = "e.[Name] " + dir;
+                    mysql_field = "e.`Name` " + dir;
                     break;
                 case "ShortName":
-                    mssql_field = "e.[ShortName]";
-                    mysql_field = "e.`ShortName`";
+                    mssql_field = "e.[ShortName] " + dir;
+                    mysql_field = "e.`ShortName` " + dir;
                     break;
                 case "State":
-                    mssql_field = "e.[State]";
-                    mysql_field = "e.`State`";
+                    mssql_field = "e.[State] " + dir;
+                    mysql_field = "e.`State` " + dir;
                     break;
                 case "Date":
-                    mssql_field = "e.[EffDate]";
-                    mysql_field = "e.`EffDate`";
+                   mssql_field = "e.[Year] " + dir + ", e.[Month] " + dir + ", e.[Day] " + dir;
+                    mysql_field = "e.`Year` " + dir + ", e.`Month` " + dir + ", e.`Day` " + dir;
                     break;
             }
             if (mysql_field) {
-                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
-                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+                sql_mysql += `\nORDER BY ${mysql_field}`;
+                sql_mssql += `\nORDER BY ${mssql_field}`;
             }
         }
 
@@ -459,8 +477,8 @@ const EventApi = class EventApi extends DbObject {
                         ShortName: elem.ShortName,
                         Description: elem.Description,
                         State: elem.State,
-                        Date: elem.Date,
-                        Month: elem.Month,
+                        Day: elem.Day ? elem.Day : null,
+                        Month: elem.Month ? elem.Month : null,
                         Year: elem.Year,
                         TlCreationId: elem.TlCreationId,
                         TlPublicId: elem.TlPublicId,
@@ -493,9 +511,10 @@ const EventApi = class EventApi extends DbObject {
     }
 
     _prepareDateField(inp, out, dsc) {
+        let eff_date = null;
         let _dsc = dsc ? dsc : {
-            EffDate: "EffDate",
             Date: "Date",
+            Day: "Day",
             Month: "Month",
             Year: "Year"
         };
@@ -513,20 +532,39 @@ const EventApi = class EventApi extends DbObject {
                 res = out[field];
             return res;
         };
-        setOut(_dsc.EffDate, null);
-        setOut(_dsc.Date, null);
-        setOut(_dsc.Month, null);
-        setOut(_dsc.Year, null);
+        setOut(_dsc.Day, 0);
+        setOut(_dsc.Month, 0);
+        setOut(_dsc.Year, 0);
         if (inp[_dsc.Date]) {
             if (inp[_dsc.Date] instanceof Date)
-                setOut(_dsc.EffDate, inp[_dsc.Date])
+                eff_date = inp[_dsc.Date]
             else
                 if (typeof (inp[_dsc.Date]) === "string")
-                    setOut(_dsc.EffDate, new Date(inp[_dsc.Date]));
-            setOut(_dsc.Date, getOut(_dsc.EffDate));
+                    eff_date = new Date(inp[_dsc.Date]);
+            if (eff_date) {
+                setOut(_dsc.Day, eff_date.getDate());
+                setOut(_dsc.Month, eff_date.getMonth() + 1);
+                setOut(_dsc.Year, eff_date.getFullYear());
+            }
+            else
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "${_dsc.Date}": ${inp[_dsc.Date]}.`);
         }
         else
         {
+            let day = inp[_dsc.Day];
+            if ((day !== null) && (typeof (day) !== "undefined")) {
+                if (typeof (day) === "number") {
+                    if ((day >= 1) && (day <= 31))
+                        setOut(_dsc.Day, inp[_dsc.Day])
+                    else
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid value of field "${_dsc.Day}": ${inp[_dsc.Day]}.`);
+                }
+                else
+                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid type of field "${_dsc.Day}": ${typeof (day)}.`);
+            }
+            else
+                day = 1;
+
             let month = inp[_dsc.Month];
             if ((month !== null) && (typeof (month) !== "undefined")) {
                 if (typeof (month) === "number") {
@@ -547,13 +585,15 @@ const EventApi = class EventApi extends DbObject {
                     setOut(_dsc.Year, inp[_dsc.Year])
                 else
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid type of field "${_dsc.Year}": ${typeof (year)}.`);
-                setOut(_dsc.EffDate, new Date(year, month));
+                eff_date = new Date(year, month, day);
+                if ((eff_date.getFullYear() !== year) || (eff_date.getMonth() !== month) || (eff_date.getDate() !== day))
+                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid date value "${year}-${month + 1}-${day}".`);
             }
             else
                 if (getOut(_dsc.Month) !== null)
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing field "${_dsc.Year}".`);
         }
-        return getOut(_dsc.EffDate);
+        return eff_date;
     }
 
     async newPeriod(data, options) {
@@ -595,14 +635,14 @@ const EventApi = class EventApi extends DbObject {
                     }
 
                     let lb_eff_date = this._prepareDateField(inpFields, fields, {
-                        EffDate: "LbEffDate",
                         Date: "LbDate",
+                        Day: "LbDay",
                         Month: "LbMonth",
                         Year: "LbYear"
                     })
                     let rb_eff_date = this._prepareDateField(inpFields, fields, {
-                        EffDate: "RbEffDate",
                         Date: "RbDate",
+                        Day: "RbDay",
                         Month: "RbMonth",
                         Year: "RbYear"
                     })
@@ -684,14 +724,14 @@ const EventApi = class EventApi extends DbObject {
                     }
 
                     let lb_eff_date = this._prepareDateField(inpFields, periodObj, {
-                        EffDate: "LbEffDate",
                         Date: "LbDate",
+                        Day: "LbDay",
                         Month: "LbMonth",
                         Year: "LbYear"
                     })
                     let rb_eff_date = this._prepareDateField(inpFields, periodObj, {
-                        EffDate: "RbEffDate",
                         Date: "RbDate",
+                        Day: "RbDay",
                         Month: "RbMonth",
                         Year: "RbYear"
                     })
