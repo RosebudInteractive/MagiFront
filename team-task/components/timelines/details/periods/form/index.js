@@ -230,7 +230,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.RbYear = "Неправильный интервал дат";
     }
 
-    if(vals.LbYear && vals.RbYear && (vals.LbMonth && vals.RbMonth) && (vals.LbMonth >= vals.RbMonth) && (vals.LbYear <= vals.RbYear) && !(vals.LbDay && vals.RbDay)){
+    if(vals.LbYear && vals.RbYear && (vals.LbMonth && vals.RbMonth) && (vals.LbMonth >= vals.RbMonth) && (vals.LbYear === vals.RbYear) && !(vals.LbDay && vals.RbDay)){
         errors.LbMonth = "Неправильный интервал дат";
         errors.RbMonth = "Неправильный интервал дат";
     }
@@ -250,6 +250,12 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.LbDay = "Неправильный интервал дат";
         errors.RbDay = "Неправильный интервал дат";
     }
+
+    if((vals.LbYear && vals.RbYear) && (vals.RbMonth && vals.LbMonth) && (vals.LbDay && vals.RbDay) && (vals.LbYear > vals.RbYear)){
+        errors.LbYear = "Неправильный интервал дат";
+        errors.RbYear = "Неправильный интервал дат";
+    }
+
 
     disableValidationOnFields.map(field => {
         field.condition && delete errors[field.fieldName];
