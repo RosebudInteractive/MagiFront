@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Field, Form} from "react-final-form";
-import {TextBox} from "../../ui-kit";
-import {EVENT_STATES} from "../../../constants/events";
-import {useWindowSize} from "../../../tools/window-resize-hook";
-import {resizeHandler} from "../../../tools/resize-handler";
-import Webix from "../../Webix";
+import {TextBox} from "../../../../ui-kit";
+import {EVENT_STATES} from "../../../../../constants/events";
+import {useWindowSize} from "../../../../../tools/window-resize-hook";
+import {resizeHandler} from "../../../../../tools/resize-handler";
+import Webix from "../../../../Webix";
 
 import './period-find-form.sass'
 

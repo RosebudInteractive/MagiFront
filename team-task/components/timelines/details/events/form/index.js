@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
-import {TextBox} from "../../ui-kit";
+import {TextBox} from "../../../../ui-kit";
 import './event-form.sass'
-import {TIMELINE_STATE} from "../../../constants/states";
+import {TIMELINE_STATE} from "../../../../../constants/states";
 import moment from "moment";
 
 export default function EventForm(props) {

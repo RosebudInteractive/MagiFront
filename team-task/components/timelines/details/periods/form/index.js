@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
-import {TextBox} from "../../ui-kit";
+import {TextBox} from "../../../../ui-kit";
 import './period-form.sass'
-import {TIMELINE_STATE} from "../../../constants/states";
+import {TIMELINE_STATE} from "../../../../../constants/states";
 import moment from "moment";
 
 export default function PeriodForm(props) {
@@ -201,10 +201,6 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Name = 'Обязательное поле'
     }
 
-    // if (!vals.ShortName || (vals.ShortName && vals.ShortName.length < 1)) {
-    //     errors.ShortName = 'Обязательное поле'
-    // }
-
     if (vals.LbDay && vals.LbYear && vals.LbMonth) {
         const dateObj = moment({
                 year: vals.LbYear,
@@ -234,7 +230,7 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.RbYear = "Неправильный интервал дат";
     }
 
-    if(vals.LbYear && vals.RbYear && (vals.LbMonth && vals.RbMonth) && (vals.LbMonth >= vals.RbMonth) && (vals.LbYear <= vals.RbYear) && !(vals.LbDay && vals.RbDay)){
+    if(vals.LbYear && vals.RbYear && (vals.LbMonth && vals.RbMonth) && (vals.LbMonth >= vals.RbMonth) && (vals.LbYear === vals.RbYear) && !(vals.LbDay && vals.RbDay)){
         errors.LbMonth = "Неправильный интервал дат";
         errors.RbMonth = "Неправильный интервал дат";
     }
@@ -254,6 +250,12 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.LbDay = "Неправильный интервал дат";
         errors.RbDay = "Неправильный интервал дат";
     }
+
+    if((vals.LbYear && vals.RbYear) && (vals.RbMonth && vals.LbMonth) && (vals.LbDay && vals.RbDay) && (vals.LbYear > vals.RbYear)){
+        errors.LbYear = "Неправильный интервал дат";
+        errors.RbYear = "Неправильный интервал дат";
+    }
+
 
     disableValidationOnFields.map(field => {
         field.condition && delete errors[field.fieldName];
