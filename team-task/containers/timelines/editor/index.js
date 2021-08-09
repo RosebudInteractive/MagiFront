@@ -94,7 +94,7 @@ function TimelineEditorContainer(props) {
     const location = useLocation();
 
     const closeModal = (withConfirmation) => {
-        if(withConfirmation){
+        if (withConfirmation) {
             periodEditorOpened && actions.closePeriodWithConfirmation();
             eventEditorOpened && actions.closeEventWithConfirmation();
         } else {
@@ -125,8 +125,8 @@ function TimelineEditorContainer(props) {
                 }
             }
         } else {
-            if(!id && type){
-                if(type === 'periods'){
+            if (!id && type) {
+                if (type === 'periods') {
                     detailsEditor.current = PeriodForm;
                     actions.openPeriodEditor({tableId: optionalParam.row});
                 } else {
@@ -138,7 +138,7 @@ function TimelineEditorContainer(props) {
     };
 
     useEffect(() => {
-        if(sTimeline){
+        if (sTimeline) {
             sTimeline.Events = events;
             sTimeline.Periods = periods;
         }
@@ -219,7 +219,7 @@ function TimelineEditorContainer(props) {
             if (id) {
                 actions.updatePeriodData({periodId: id, periodData: values})
             } else {
-                if(!id && tableId){
+                if (!id && tableId) {
                     actions.updatePeriodData({tableId: id, periodData: values})
                 } else {
                     if (timeline && timeline.Id) {
@@ -230,14 +230,6 @@ function TimelineEditorContainer(props) {
                 }
             }
         }
-
-        actions.toggleEditorTo(false);
-        actions.toggleEditorToPeriod(false);
-    };
-
-    const finderFormCloseAction = () => {
-        (timeline && timeline.Id) //&& actions.getOneTimeline({id: timeline.Id});
-        setFinderFormOpened(false);
     };
 
     const addElementsAction = (data, type) => {
@@ -392,6 +384,7 @@ function TimelineEditorContainer(props) {
                        }}/>
             }
         </div>
+    )
 }
 
 const mapState2Props = (state) => {

@@ -418,6 +418,7 @@ function* updateEventSaga(data) {
 
             yield put(setEvents([...events]));
         }
+        yield put(toggleEditorTo(false))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.message));
@@ -433,6 +434,8 @@ function* createEventSaga(data) {
         yield put({type: SUCCESS_REQUEST});
 
         yield put(addTemporaryEvent({...data.payload, Id: id, State: 1}))
+
+        yield put(toggleEditorTo(false))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.message));

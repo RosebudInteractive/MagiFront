@@ -132,13 +132,14 @@ const Timelines = (props) => {
                 options: Object.entries(TimelineStatuses).map((ent) => ({id: ent[0], value: ent[1]}))
                 ,  minWidth: 50,
                 fillspace: 12,
+                css: "_container",
                 template: function (val) {
                     const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
-                    return `<div class="state-template-block font-body-s"><div class="state-circle ${cssWithLabel.css}"></div></div>`
+                    return `<div class="state-template-block-tm font-body-s ${cssWithLabel.css}">${cssWithLabel.label}</div>`
                 }
             },
             {
-                id: 'OrderNumber',
+                id: 'Order',
                 header: 'Номер'
                 ,  minWidth: 50,
                 fillspace: 8

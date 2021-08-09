@@ -1928,7 +1928,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         let child_tasks = [];
                         let notifications = [];
                         if (process.State === ProcessState.Executing) {
-                            let task_ids = this._getTaskChildList(process, id, TaskState.Draft);
+                            let task_ids = this._getTaskListToStartAfterDel(process, id);
                             if (task_ids.length > 0) {
                                 for (let i = 0; i < task_ids.length; i++) {
                                     let ch_root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
@@ -1995,7 +1995,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         });
     }
 
-    _getTaskChildList(process, id, task_state) {
+    _getTaskListToStartAfterDel(process, id) {
         let result = [];
         this._get_proc_deps(process);
         let childs = process._childs[id];
@@ -2003,8 +2003,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             for (let child in childs) {
                 let task = this._getProcessTask(process, child);
                 if (task) {
-                    if ((!task_state) || (task.State === task_state))
-                        result.push(task.Id);
+                    if (task.State === TaskState.Draft) {
+                        let parents = Object.keys(process._parents[task.Id]);
+                        if (parents.length === 1)
+                            result.push(task.Id);
+                    }
                 }
             }
         }
