@@ -35,12 +35,12 @@ export default function TimelinePreview(props) {
         return periods ? periods.map((item) => {
             return {
                 id: item.Id ? item.Id : item.id,
-                startDay: item.LbDay,
-                startMonth: item.LbMonth,
-                startYear: item.LbYear,
-                endDay: item.RbDay,
-                endMonth: item.RbMonth,
-                endYear: item.RbYear,
+                startDay: !!item.LbDay && +item.LbDay,
+                startMonth: !!item.LbMonth && +item.LbMonth,
+                startYear: !!item.LbYear && +item.LbYear,
+                endDay: !!item.RbDay && +item.RbDay,
+                endMonth: !!item.RbMonth && +item.RbMonth,
+                endYear: !!item.RbYear && +item.RbYear,
                 name: item.Name,
                 color: hslToHex(item.color),
                 visible: true,
@@ -52,9 +52,9 @@ export default function TimelinePreview(props) {
         return events ? events.map((item) => {
             return {
                 id: item.Id ? item.Id : item.id,
-                day: item.Day,
-                month: item.Month,
-                year: item.Year,
+                day: !!item.Day && +item.Day,
+                month: !!item.Month && +item.Month,
+                year: !!item.Year && +item.Year,
                 name: item.Name,
                 color: item.color,
                 visible: true,

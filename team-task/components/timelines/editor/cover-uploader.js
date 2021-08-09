@@ -37,17 +37,9 @@ export default function CoverUploader(props: Props) {
     }, [input])
 
     return <div className="timeline-form__field-file-name">
-        <TextBox label={"Фоновое изображение"}
-                 placeholder={"Фоновое изображение"}
-                 readonly={true}
-                 value={_value}
-                 meta={{...props.meta}}
-                 ref={_textBox}/>
-        <Uploader upload={'/api/pm/upload'}
-                  multiple={false}
-                  buttonText={'Выбрать файл'}
+        <TextBox label={"Фоновое изображение"} placeholder={"Фоновое изображение"} readonly={true} value={_value} meta={{...props.meta}} ref={_textBox}/>
+        <Uploader upload={'/api/pm/upload'} multiple={false} buttonText={'Выбрать файл'} acceptType={"image/*"}
                   onProgress={_handleProgress}
-                  acceptType={"image/*"}
                   onUploadFile={_onUploadFile}/>
     </div>
 }

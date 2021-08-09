@@ -104,7 +104,7 @@ const validate = (values) => {
         errors.LessonId = "Обязательное поле"
     }
 
-    if (values.Order < 1) {
+    if ((values.Order !== null) && (values.Order < 1)) {
         errors.Order = "Больше 0"
     }
 

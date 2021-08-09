@@ -247,8 +247,6 @@ function* createTimelineSaga({payload}) {
     try {
         yield put({type: START_REQUEST});
 
-        console.log(payload)
-
         const res = yield call(createTimeline, payload.timeline);
 
         yield put(reset("TIMELINE_EDITOR_HEADER"))

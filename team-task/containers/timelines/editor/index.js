@@ -150,8 +150,11 @@ function TimelineEditorContainer(props) {
             SpecifCode: timeline.SpecifCode,
             State: +timeline.State,
             Name: values.Name,
-            Order: +values.Order,
             TypeOfUse: values.TypeOfUse,
+        }
+
+        if (values.Order !== null) {
+            _object.Order = +values.Order
         }
 
         if (values.Image && values.Image.file && values.Image.meta) {
@@ -311,40 +314,26 @@ function TimelineEditorContainer(props) {
                                      periods={periods}/>
                     <TimelineDetails actions={{
                         events: {
-                            headerClickAction: () => {
-                            },
+                            headerClickAction: () => { },
                             doubleClickAction: (id, tableId = null) => doubleClickAction({
                                 id: id,
                                 type: 'events',
                                 optionalParam: tableId
                             }),
-                            deleteAction: (id) => {
-                                (id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)
-                            },
-                            createAction: () => {
-                                detailsCreateAction('events')
-                            },
-                            openFindFormAction: () => {
-                                detailsOpenFindFormAction('events')
-                            }
+                            deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id) },
+                            createAction: () => { detailsCreateAction('events') },
+                            openFindFormAction: () => { detailsOpenFindFormAction('events') }
                         },
                         periods: {
-                            headerClickAction: () => {
-                            },
+                            headerClickAction: () => { },
                             doubleClickAction: (id, tableId = null) => doubleClickAction({
                                 id: id,
                                 type: 'periods',
                                 optionalParam: tableId
                             }),
-                            deleteAction: (id) => {
-                                (id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)
-                            },
-                            createAction: () => {
-                                detailsCreateAction('periods')
-                            },
-                            openFindFormAction: () => {
-                                detailsOpenFindFormAction('periods')
-                            }
+                            deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id) },
+                            createAction: () => { detailsCreateAction('periods') },
+                            openFindFormAction: () => { detailsOpenFindFormAction('periods') }
                         }
                     }}
                                      events={events}
@@ -384,7 +373,6 @@ function TimelineEditorContainer(props) {
                        }}/>
             }
         </div>
-    )
 }
 
 const mapState2Props = (state) => {
