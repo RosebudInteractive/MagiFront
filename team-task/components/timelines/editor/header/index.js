@@ -80,9 +80,6 @@ export default function TimelineEditorHeader(props) {
                 onClick={() => {
                     currentValues && onSave(currentValues)
                 }}>
-            {/*{headerPristine.toString()}*/}
-            {/*{mainFormPristine.toString()}*/}
-            {/*{((headerPristine || mainFormPristine)).toString()}*/}
             Сохранить
         </button>
     </div>

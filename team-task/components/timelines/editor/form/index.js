@@ -15,7 +15,7 @@ function TimelineForm(props) {
 
     const timelineFormData = useMemo(() => ({
         typeOfUse: parseInt(data && data.TypeOfUse ? data.TypeOfUse : null),
-        orderNumber: (data && data.Order ? data.Order : data.OrderNumber && data.OrderNumber === 0) ? data.OrderNumber : null,
+        orderNumber: data && data.Order ? data.Order : data.OrderNumber ? data.OrderNumber : null,
         state: (data && data.State) ? data.State : '',
         image: (data && data.Image) ? data.Image : '',
         courseId: data.CourseId,

@@ -51,19 +51,34 @@
     border-right: 0
     transform: rotate(312deg)
 
-.state-template-block
-  display: flex
-  flex-flow: row nowrap
-  justify-content: center
-  align-items: center
-  color: $color-main-light
+.state-template-block-tm
+  font-family: Inter
+  font-style: normal
+  font-weight: 400
+  font-size: 13px
+  line-height: 20px
+  letter-spacing: 0.25px
+  height: 24px
+  margin: auto 0
+  padding: 2px 12px
   box-sizing: border-box
-  width: 100%
-  font-size: 12px !important
-  text-align: center !important
-  //margin-top: 10px
-  border-radius: 4px
-  height: 100%
+  border-radius: 32px
+
+  &._draft
+    background-color: #EBF2FF
+    color: $blue
+
+  &._executing
+    background-color: #FFF8EA
+    color: $yellow
+
+  &._done
+    background-color: #EDF6EE
+    color: $green
+
+  &._error
+    background-color: #EDF6EE
+    color: $red
 
 
 

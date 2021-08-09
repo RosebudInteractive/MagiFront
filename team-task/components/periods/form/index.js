@@ -229,6 +229,32 @@ const validate = (values, disableValidationOnFields = []) => {
         }
     }
 
+    if(vals.LbYear && vals.RbYear && (vals.LbYear >= vals.RbYear) && !(vals.RbMonth && vals.LbMonth) && !(vals.LbDay && vals.RbDay)){
+        errors.LbYear = "Неправильный интервал дат";
+        errors.RbYear = "Неправильный интервал дат";
+    }
+
+    if(vals.LbYear && vals.RbYear && (vals.LbMonth && vals.RbMonth) && (vals.LbMonth >= vals.RbMonth) && (vals.LbYear <= vals.RbYear) && !(vals.LbDay && vals.RbDay)){
+        errors.LbMonth = "Неправильный интервал дат";
+        errors.RbMonth = "Неправильный интервал дат";
+    }
+
+    if((vals.LbYear && vals.RbYear) && ((!vals.LbMonth || !vals.RbMonth)) && (vals.LbYear === vals.RbYear) && !(vals.LbDay && vals.RbDay)){
+        errors.LbMonth = "Неправильный интервал дат";
+        errors.RbMonth = "Неправильный интервал дат";
+    }
+
+    if((vals.LbYear && vals.RbYear) && (vals.LbMonth && vals.RbMonth) && (vals.LbYear === vals.RbYear)  && (vals.LbMonth === vals.RbMonth) && !(vals.LbDay || vals.RbDay)){
+        errors.LbDay = "Неправильный интервал дат";
+        errors.RbDay = "Неправильный интервал дат";
+    }
+
+    if((vals.LbYear && vals.RbYear) && (vals.LbMonth && vals.RbMonth) && (vals.LbYear === vals.RbYear) &&
+        (vals.LbDay && vals.RbDay) && (vals.LbMonth >= vals.RbMonth) && (vals.LbDay >= vals.RbDay)){
+        errors.LbDay = "Неправильный интервал дат";
+        errors.RbDay = "Неправильный интервал дат";
+    }
+
     disableValidationOnFields.map(field => {
         field.condition && delete errors[field.fieldName];
     });

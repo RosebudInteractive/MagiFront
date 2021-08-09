@@ -124,14 +124,13 @@ export default function PeriodsFindForm(props) {
                         <div>
                             <div className="periods-find-form-date">
                                 <div className="periods-find-form__field">
-                                    <Field name="Year"
+                                    <Field name="Day"
                                            component={TextBox}
-                                           type="text"
-                                           placeholder="Год"
-                                           label={"Год"}
-
-                                           disabled={false}/>
+                                           type="number"
+                                           placeholder="День"
+                                           label={"День"}/>
                                 </div>
+
                                 <div className="periods-find-form__field">
                                     <Field name="Month"
                                            type="number"
@@ -142,13 +141,17 @@ export default function PeriodsFindForm(props) {
 
                                            disabled={false}/>
                                 </div>
+
                                 <div className="periods-find-form__field">
-                                    <Field name="Day"
+                                    <Field name="Year"
                                            component={TextBox}
-                                           type="number"
-                                           placeholder="День"
-                                           label={"День"}/>
+                                           type="text"
+                                           placeholder="Год"
+                                           label={"Год"}
+
+                                           disabled={false}/>
                                 </div>
+
                                 <button type="button" className='search-button' onClick={() => {
                                     _onSearchClick(values)
                                 }}>
