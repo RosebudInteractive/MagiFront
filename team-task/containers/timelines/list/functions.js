@@ -32,10 +32,10 @@ export const getFilterConfig = (filter, disableFields = []) => {
             options: Object.entries(TimelineStatuses).map(ent => ({value: +ent[0], label: ent[1]}))
         },
         {
-            name: "OrderNumber",
+            name: "Order",
             placeholder: "Порядковый номер",
             type: FILTER_FIELD_TYPE.TEXT,
-            value: filter ? filter.OrderNumber : null,
+            value: filter ? filter.Order : null,
         },
         {
             name: "HasScript",
@@ -61,7 +61,7 @@ export const parseParams = () => {
         TypeOfUse = _params.get("TypeOfUse"),
         nameOfLectionOrCourse = _params.get("nameOfLectionOrCourse"),
         State = _params.get("State"),
-        OrderNumber = _params.get("OrderNumber"),
+        Order = _params.get("Order"),
         HasScript = _params.get("HasScript");
 
     let _order = _params.get('order');
@@ -76,7 +76,7 @@ export const parseParams = () => {
             TypeOfUse,
             nameOfLectionOrCourse,
             State,
-            OrderNumber,
+            Order,
             HasScript
         });
 
@@ -87,13 +87,13 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({Name, TypeOfUse, nameOfLectionOrCourse, State, OrderNumber, HasScript}) => {
+const convertParam2Filter = ({Name, TypeOfUse, nameOfLectionOrCourse, State, Order, HasScript}) => {
 
     if (!(Name ||
         TypeOfUse ||
         nameOfLectionOrCourse ||
         State ||
-        OrderNumber ||
+        Order ||
         HasScript)) return null;
 
     const filter = {};
@@ -101,7 +101,7 @@ const convertParam2Filter = ({Name, TypeOfUse, nameOfLectionOrCourse, State, Ord
     filter.TypeOfUse = (TypeOfUse !== null && TypeOfUse !== undefined) ? +TypeOfUse : '';
     filter.NameOfLectionOrCourse = nameOfLectionOrCourse ? nameOfLectionOrCourse : '';
     filter.State = (State !== null && State !== undefined) ? +State : '';
-    filter.OrderNumber = OrderNumber ? +OrderNumber : '';
+    filter.Order = Order ? +Order : '';
     filter.HasScript = (HasScript !== null && HasScript !== undefined) ? +HasScript : '';
 
 
@@ -140,7 +140,7 @@ export const convertFilter2Params = (filter) => {
 
         if(filter.State) { _data.State = filter.State }
 
-        if(filter.OrderNumber) { _data.OrderNumber = filter.OrderNumber }
+        if(filter.Order) { _data.Order = filter.Order }
 
         if(filter.HasScript !== null && filter.HasScript !== undefined ) { _data.HasScript = filter.HasScript }
     }

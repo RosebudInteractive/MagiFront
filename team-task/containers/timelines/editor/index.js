@@ -40,11 +40,11 @@ import {
     updateEventData
 } from "tt-ducks/events-timeline";
 import {Prompt, useLocation,} from "react-router-dom"
-import Modal from "../../../components/events/modal"
-import EventForm from "../../../components/events/form"
-import PeriodForm from "../../../components/periods/form"
-import PeriodsFindForm from "../../../components/periods/find-form";
-import EventsFindForm from "../../../components/events/find-form";
+import Modal from "../../../components/modal"
+import EventForm from "../../../components/timelines/details/events/form"
+import PeriodForm from "../../../components/timelines/details/periods/form"
+import PeriodsFindForm from "../../../components/timelines/details/periods/find-form";
+import EventsFindForm from "../../../components/timelines/details/events/find-form";
 
 import {
     addTemporaryPeriod,

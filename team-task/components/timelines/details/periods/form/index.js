@@ -1,8 +1,8 @@
 import React, {useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
-import {TextBox} from "../../ui-kit";
+import {TextBox} from "../../../../ui-kit";
 import './period-form.sass'
-import {TIMELINE_STATE} from "../../../constants/states";
+import {TIMELINE_STATE} from "../../../../../constants/states";
 import moment from "moment";
 
 export default function PeriodForm(props) {
@@ -200,10 +200,6 @@ const validate = (values, disableValidationOnFields = []) => {
     if (!vals.Name || (vals.Name && vals.Name.length < 1)){
         errors.Name = 'Обязательное поле'
     }
-
-    // if (!vals.ShortName || (vals.ShortName && vals.ShortName.length < 1)) {
-    //     errors.ShortName = 'Обязательное поле'
-    // }
 
     if (vals.LbDay && vals.LbYear && vals.LbMonth) {
         const dateObj = moment({
