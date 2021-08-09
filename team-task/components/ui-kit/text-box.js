@@ -93,7 +93,16 @@ const CssTextField = withStyles({
                 backgroundColor: "#F8F8F8",
                 color: "#9696A0",
             },
+            '& p.MuiFormHelperText-contained.Mui-error.MuiFormHelperText-filled':{
+                backgroundColor: 'green',
+                position: 'fixed !important',
+                top: '45px !important'
+            }
         },
+        '& p': {
+            position: 'absolute',
+            top: '45px'
+        }
     },
 })(TextField);
 

@@ -76,7 +76,7 @@ export default function TimelineEditorHeader(props) {
         <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
 
         <button className="timeline-editor-header__save-button orange-button big-button"
-                disabled={isCreate ? !(!(headerPristine === true) && !(mainFormPristine === true)) : !(!(headerPristine === true) || !(mainFormPristine === true))}
+                disabled={(headerPristine && mainFormPristine) }
                 onClick={() => {
                     currentValues && onSave(currentValues)
                 }}>

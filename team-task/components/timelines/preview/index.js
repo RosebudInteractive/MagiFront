@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState, useCallback} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import './preview.sass'
 import {Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
@@ -76,7 +76,7 @@ export default function TimelinePreview(props) {
         setZoomSliderStopped(stopped)
     };
 
-    return <div className="timeline-preview">
+    return <div className="timeline-preview" >
         <ZoomSlider onChange={_onZoomChange} value={zoom} onSliderStop={_zoomSliderStopped}/>
 
         <div className="timeline-preview__container _with-custom-scroll" ref={_preview} style={_style}>
@@ -89,12 +89,12 @@ TimelinePreview.propTypes = {
     background: PropTypes.string,
     events: PropTypes.array,
     periods: PropTypes.array
-}
+};
 
 
 //todo move it to helpers/tools or smth
 function hslToHex(color) {
-    let result = color.match(/hsl\(([^)]+)\)/)[1]
+    let result = color.match(/hsl\(([^)]+)\)/)[1];
 
     let [h, l, s] = result.split(',')
 

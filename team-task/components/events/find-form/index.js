@@ -105,25 +105,6 @@ export default function EventsFindForm(props) {
 
                         <div className="events-find-form-date">
                             <div className='events-find-form__field'>
-                                <Field name="Year"
-                                       component={TextBox}
-                                       type="text"
-                                       placeholder="Год"
-                                       label={"Год"}
-
-                                       disabled={false}/>
-                            </div>
-                            <div className='events-find-form__field'>
-                                <Field name="Month"
-                                       type="number"
-                                       component={TextBox}
-                                       type="text"
-                                       placeholder="Месяц"
-                                       label={"Месяц"}
-
-                                       disabled={false}/>
-                            </div>
-                            <div className='events-find-form__field'>
                                 <Field name="Day"
                                        component={TextBox}
                                        type="number"
@@ -133,7 +114,25 @@ export default function EventsFindForm(props) {
                                        disabled={false}/>
                             </div>
 
+                            <div className='events-find-form__field'>
+                                <Field name="Month"
+                                       type="number"
+                                       component={TextBox}
+                                       type="text"
+                                       placeholder="Месяц"
+                                       label={"Месяц"}
+                                       disabled={false}/>
+                            </div>
 
+                            <div className='events-find-form__field'>
+                                <Field name="Year"
+                                       component={TextBox}
+                                       type="text"
+                                       placeholder="Год"
+                                       label={"Год"}
+
+                                       disabled={false}/>
+                            </div>
 
                             <button disabled={false} type="button" className='search-button' onClick={() => {
                                 findAction(values);

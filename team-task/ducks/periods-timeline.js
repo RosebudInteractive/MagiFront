@@ -44,6 +44,7 @@ const CREATE_PERIODS = `${prefix}/CREATE_PERIODS`;
 const SET_SELECTED_PERIOD = `${prefix}/SET_SELECTED_PERIOD`;
 const ADD_TEMPORARY_PERIODS_REQUEST = `${prefix}/ADD_TEMPORARY_PERIODS_REQUEST`;
 const SET_PERIODS_REQUEST = `${prefix}/SET_PERIODS_REQUEST`;
+const CHANGE_CREATION_STATUS = `${prefix}/CHANGE_CREATION_STATUS`;
 
 //store
 
@@ -56,6 +57,7 @@ export const ReducerRecord = Record({
     selectedPeriod: PeriodRecord,
     editorOpened: false,
     finded: null,
+    creatingSuccess: true
 });
 
 // reducer
@@ -84,6 +86,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('finded', [...payload]);
         case SET_TEMPORARY_PERIODS:
             return state.set('periods', [...payload]);
+        case CHANGE_CREATION_STATUS:
+            return state.set('creatingSuccess', payload);
         default:
             return state;
     }
@@ -101,6 +105,7 @@ export const periodEditorOpenedSelector = createSelector(stateSelector, state =>
 
 export const findedPeriodsSelector = createSelector(stateSelector, state => state.finded);
 export const temporaryPeriodsSelector = createSelector(stateSelector, state => state.periods);
+export const creationSuccessSelector = createSelector(stateSelector, state => state.creatingSuccess);
 
 //actions
 
@@ -378,22 +383,23 @@ function* updatePeriodSaga(data) {
         // let updateDataEvent;
 
         if (periodToUpdate) {
-            const dateFrom = (data.payload.StartDay && data.payload.StartMonth && data.payload.StartYear) ? moment(`${data.payload.StartYear}-${data.payload.StartMonth}-${data.payload.StartDay}`) : null;
-            const dateTo = (data.payload.EndDay && data.payload.EndMonth && data.payload.EndYear) ? moment(`${data.payload.EndYear}-${data.payload.EndMonth}-${data.payload.EndDay}`) : null;
+            const dateFrom = (data.payload.LbDay && data.payload.LbMonth && data.payload.LbYear) ? moment(`${data.payload.LbYear}-${data.payload.LbMonth}-${data.payload.LbDay}`) : null;
+            const dateTo = (data.payload.RbDay && data.payload.RbMonth && data.payload.RbYear) ? moment(`${data.payload.RbYear}-${data.payload.RbMonth}-${data.payload.RbDay}`) : null;
             const updateDataPeriod = {
                 ...periodToUpdate, Id: data.payload.Id,
                 Name: data.payload.Name,
                 TlCreationId: data.payload.TlCreationId,
                 LbDate: dateFrom,
                 RbDate: dateTo,
-                LbYear: parseInt(data.payload.StartYear),
-                LbMonth: parseInt(data.payload.StartMonth),
-                RbMonth: parseInt(data.payload.EndMonth),
-                RbYear: parseInt(data.payload.EndYear),
+                LbYear: parseInt(data.payload.LbYear),
+                LbMonth: parseInt(data.payload.LbMonth),
+                RbMonth: parseInt(data.payload.RbMonth),
+                RbYear: parseInt(data.payload.RbYear),
                 ShortName: data.payload.ShortName,
                 Description: data.payload.Description,
-                StartDay: parseInt(data.payload.StartDay),
+                LbDay: parseInt(data.payload.LbDay),
                 EndDay: parseInt(data.payload.EndDay),
+                RbDay: parseInt(data.payload.RbDay),
                 StartYear: parseInt(data.payload.StartYear),
                 EndYear: parseInt(data.payload.EndYear),
                 StartMonth: parseInt(data.payload.StartMonth),
@@ -404,6 +410,7 @@ function* updatePeriodSaga(data) {
 
             yield put(setPeriods([...periods]));
         }
+        yield put(toggleEditorTo(false))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.message));
@@ -430,8 +437,11 @@ function* createPeriodSaga(data) {
             Id: id,
             State: 1
         }))
+
+        yield put(toggleEditorTo(false))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
+        // yield put({type: CHANGE_CREATION_STATUS, payload: false});
         yield put(showErrorMessage(e.message));
     }
 }
