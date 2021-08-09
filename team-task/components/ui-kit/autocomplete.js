@@ -56,6 +56,10 @@ const CssAutocomplete = withStyles({
                 backgroundColor: "#E5E5E7",
                 borderColor: '#C8684C',
             },
+            '&.Mui-focused': {
+                backgroundColor: "#E5E5E7",
+                borderColor: '#C8684C',
+            },
             '&.Mui-disabled': {
                 backgroundColor: "#F8F8F8",
                 color: "#9696A0",

@@ -35,12 +35,14 @@ export default function TimelinePreview(props) {
         return periods ? periods.map((item) => {
             return {
                 id: item.Id ? item.Id : item.id,
-                startYear: item.StartYear,
-                endYear: item.EndYear,
+                startDay: item.LbDay,
+                startMonth: item.LbMonth,
+                startYear: item.LbYear,
+                endDay: item.RbDay,
+                endMonth: item.RbMonth,
+                endYear: item.RbYear,
                 name: item.Name,
                 color: hslToHex(item.color),
-                startDate: item.startDate,
-                endDate: item.endDate,
                 visible: true,
             }
         }) : []
@@ -50,9 +52,9 @@ export default function TimelinePreview(props) {
         return events ? events.map((item) => {
             return {
                 id: item.Id ? item.Id : item.id,
-                date: item.date,
-                year: item.year,
-                month: item.month,
+                day: item.Day,
+                month: item.Month,
+                year: item.Year,
                 name: item.Name,
                 color: item.color,
                 visible: true,
@@ -61,10 +63,10 @@ export default function TimelinePreview(props) {
     }, [events])
 
     const _style = useMemo(() => {
-        return background ? {
-            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)), url(/data/${background})`,
-            backgroundSize: "cover",
-            backgroundPosition: "top center"
+        const fileName = background && background.file ? background.file : null
+
+        return fileName ? {
+            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)) center top / cover, url(/data/${fileName})`,
         } : {backgroundColor: "#B4B4BB"}
     }, [background])
 
@@ -79,7 +81,7 @@ export default function TimelinePreview(props) {
     return <div className="timeline-preview" >
         <ZoomSlider onChange={_onZoomChange} value={zoom} onSliderStop={_zoomSliderStopped}/>
 
-        <div className="timeline-preview__container _with-custom-scroll" ref={_preview} style={_style}>
+        <div className="timeline-preview__container _with-custom-scroll" ref={_preview} style={{..._style}}>
             <Timeline width={width} height={height} events={_events} zoom={zoom} periods={_periods} levelLimit={4} zoomSliderStopped={zoomSliderStopped}/>
         </div>
     </div>

@@ -25,12 +25,14 @@ export default function Periods(props) {
     useEffect(() => {
         if (periods.length > 0) {
             const periodsWithCoords = periods.map((item) => {
-                const _yearStart = item.startYear,
-                    _yearEnd = item.endYear
+                const {start, end} = calcPeriodPoints(item)
+
+                // const _yearStart = item.startYear,
+                //     _yearEnd = item.endYear
 
 
-                const xStart = Math.abs(_yearStart - startDate) * yearPerPixel;
-                const xEnd = Math.abs(_yearEnd - startDate) * yearPerPixel;
+                const xStart = Math.abs(start - startDate) * yearPerPixel;
+                const xEnd = Math.abs(end - startDate) * yearPerPixel;
 
                 return {...item, yLevel: 0, xLevel: 0, xStart, xEnd}
             });
@@ -38,7 +40,10 @@ export default function Periods(props) {
             const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit);
 
             alignedPeriods.forEach(item => {
-                item.displayDate = `${item.startYear} - ${item.endYear}гг.`;
+                const startDate = `${item.startDay ? item.startDay + "." : ""}${item.startMonth ? item.startMonth + "." : ""}${item.startYear}`,
+                    endDate = `${item.endDay ? item.endDay + "." : ""}${item.endMonth ? item.endMonth + "." : ""}${item.endYear}`
+
+                item.displayDate = `${startDate} - ${endDate}гг.`;
                 item.y = elementsOverAxis ? (y - 30) - (item.yLevel * 30) : (y + 30) + (item.yLevel * 30);
                 item.title = item.name;
             });
@@ -66,4 +71,11 @@ export default function Periods(props) {
             :
             null
     }, [verticallyAlignedPeriods])
+}
+
+const calcPeriodPoints = (period) => {
+    const start = period.startYear + (period.startMonth ? (period.startMonth - 1) / 12 : .5) + (period.startDay ? period.startDay / (12 * 30) : (.5 / 12)),
+        end = period.endYear + (period.endMonth ? (period.endMonth - 1) / 12 : .5) + (period.endDay ? period.endDay / (12 * 30) : (.5 / 12))
+
+    return {start, end}
 }

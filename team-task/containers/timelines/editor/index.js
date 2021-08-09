@@ -3,21 +3,20 @@ import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import './timeline-editor-container.sass'
-import TimelineEditorHeader from "../../../components/timelines/editor/header";
-import TimelineForm from "../../../components/timelines/editor/form";
+import TimelineHeader, {EDITOR_NAME as HEADER_EDITOR_NAME} from "../../../components/timelines/editor";
 import TimelinePreview from "../../../components/timelines/preview";
 import TimelineDetails from "../../../components/timelines/details";
 import {
+    currentTimelineSelector,
+    timelineOpenedSelector,
+    timelinesSelector,
     clearSelectedTimeline,
     createNewTimeline,
-    currentTimelineSelector,
     getOneTimeline,
     getTimelines,
     goBack,
     linkEvent,
     linkPeriod,
-    timelineOpenedSelector,
-    timelinesSelector,
     updateTimeline,
 } from "tt-ducks/timelines";
 import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
@@ -63,6 +62,7 @@ import {
     toggleEditorTo as toggleEditorToPeriod,
     updatePeriodData
 } from "tt-ducks/periods-timeline";
+import {getFormValues, isDirty} from "redux-form";
 
 const DEFAULT_TIMELINE = {
     Name: '',
@@ -87,20 +87,11 @@ function TimelineEditorContainer(props) {
         timelinesAll, findedEvents, periodEditorOpened
         , events, periods
     } = props;
-    const [mainFormPristine, setMainFormPristine] = useState(true);
-    const [headerPristine, setHeaderPristine] = useState(true);
-    const [detailsActive, setDetailsActive] = useState(false);
     const [timeline, setTimeline] = useState(null);
-    const [changedValues, setChangedValues] = useState({});
     const detailsEditor = useRef(null);
     const finderForm = useRef(null);
     const [finderFormOpened, setFinderFormOpened] = useState(false);
     const location = useLocation();
-
-    const formChangedCb = (pristine, {values}) => {
-        values && setChangedValues(values);
-        setMainFormPristine(pristine)
-    };
 
     const closeModal = (withConfirmation) => {
         if(withConfirmation){
@@ -154,34 +145,36 @@ function TimelineEditorContainer(props) {
 
     }, [events, periods]);
 
-    const onSave = (timelineFormData) => {
-        if (timeline.Id) {
-            actions.updateTimeline(timeline.Id, {
-                ...timeline,
-                Name: timelineFormData.name,
-                CourseId: changedValues.courseId,
-                LessonId: changedValues.lessonId,
-                TypeOfUse: changedValues.typeOfUse,
-                Order: changedValues.orderNumber,
-                Image: changedValues.image
-            });
-
-
-        } else {
-            actions.createNewTimeline({
-                    ...timeline,
-                    Name: timelineFormData.name,
-                    CourseId: changedValues.courseId,
-                    LessonId: changedValues.lessonId,
-                    TypeOfUse: changedValues.typeOfUse,
-                    Order: changedValues.orderNumber,
-                    Image: changedValues.image
-                },
-                true,
-                events,
-                periods)
+    const onSave = (values) => {
+        const _object = {
+            SpecifCode: timeline.SpecifCode,
+            State: +timeline.State,
+            Name: values.Name,
+            Order: +values.Order,
+            TypeOfUse: values.TypeOfUse,
         }
-        setDetailsActive(true);
+
+        if (values.Image && values.Image.file && values.Image.meta) {
+            _object.Image = values.Image.file
+            _object.ImageMeta = values.Image.meta
+        }
+
+        if (values.TypeOfUse === 1) {
+            _object.CourseId = values.CourseId
+            _object.LessonId = null
+        }
+
+        if (values.TypeOfUse === 2) {
+            _object.CourseId = null
+            _object.LessonId = values.LessonId
+        }
+
+        if (timeline.Id) {
+            actions.updateTimeline(timeline.Id, _object);
+        } else {
+            actions.createNewTimeline(_object, true, events, periods)
+        }
+
         actions.setTemporaryEvents([]);
         actions.setTemporaryPeriods([]);
         actions.getTimelines();
@@ -309,52 +302,57 @@ function TimelineEditorContainer(props) {
 
 
     useEffect(() => {
-
         return function () {
             setTemporaryEvents([]);
             setTemporaryPeriods([]);
         }
     }, []);
 
-    return (
-        <div className="timeline-editor-container form">
-            {timeline && timeline.State &&
-            <React.Fragment>
-                <Prompt when={(!headerPristine || !mainFormPristine)} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>}
-                <TimelineEditorHeader name={timeline.Name}
-                                      state={timeline.State}
-                                      mainFormPristine={mainFormPristine}
-                                      onBack={(headerPristine) =>{
-                                           actions.goBack() }}
-                                      isCreate={!timeline.Id}
-                                      onSave={onSave}
-                                      onPristineChanged={(hP) =>{
-                                          setHeaderPristine(hP)} }
-                />
-
-                {(lessons && courses) &&
-                <TimelineForm data={timeline}
-                              onChangeFormCallback={formChangedCb}
-                              lessons={lessons}
-                              courses={courses}/>
-                }
-                <TimelinePreview
-                    background={(changedValues.image && changedValues.image.file) ? changedValues.image.file : timeline.Image ? timeline.Image : null}
-                    events={events} periods={periods}/>
-                <TimelineDetails  actions={{
-                    events: {
-                            headerClickAction: () => {},
-                            doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'events', optionalParam: tableId}),
-                            deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)},
-                            createAction: () => {detailsCreateAction('events')},
-                            openFindFormAction: () => {detailsOpenFindFormAction('events')}
+    return <div className="timeline-editor-container form">
+            {
+                timeline && timeline.State &&
+                <React.Fragment>
+                    <Prompt when={props.hasChanges}
+                            message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave}/>
+                    <TimelinePreview background={props.editorValues && props.editorValues.Image} events={events}
+                                     periods={periods}/>
+                    <TimelineDetails actions={{
+                        events: {
+                            headerClickAction: () => {
+                            },
+                            doubleClickAction: (id, tableId = null) => doubleClickAction({
+                                id: id,
+                                type: 'events',
+                                optionalParam: tableId
+                            }),
+                            deleteAction: (id) => {
+                                (id && (sTimeline && sTimeline.Id)) && actions.removeEvent(id, sTimeline.Id)
+                            },
+                            createAction: () => {
+                                detailsCreateAction('events')
+                            },
+                            openFindFormAction: () => {
+                                detailsOpenFindFormAction('events')
+                            }
                         },
-                    periods: {
-                            headerClickAction: () => {},
-                            doubleClickAction: (id, tableId = null) => doubleClickAction({id: id, type: 'periods', optionalParam: tableId}),
-                            deleteAction: (id) => {(id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)},
-                            createAction: () => {detailsCreateAction('periods')},
-                            openFindFormAction: () => {detailsOpenFindFormAction('periods')}
+                        periods: {
+                            headerClickAction: () => {
+                            },
+                            doubleClickAction: (id, tableId = null) => doubleClickAction({
+                                id: id,
+                                type: 'periods',
+                                optionalParam: tableId
+                            }),
+                            deleteAction: (id) => {
+                                (id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id)
+                            },
+                            createAction: () => {
+                                detailsCreateAction('periods')
+                            },
+                            openFindFormAction: () => {
+                                detailsOpenFindFormAction('periods')
+                            }
                         }
                     }}
                                      events={events}
@@ -362,10 +360,8 @@ function TimelineEditorContainer(props) {
                                      findedEvents={findedEvents}
                                      findedPeriods={findedPeriods}
                                      timelineId={timeline.Id}
-                    disabled={(!(timeline && timeline.Id) || (!headerPristine || !mainFormPristine))}/>
-                {/*{timeline && <div>{(!headerPristine || !mainFormPristine).toString()}</div>}*/}
-                {/*{timeline && <div>{(timeline && timeline.Id).toString()}</div>}*/}
-            </React.Fragment>
+                                     disabled={(!(timeline && timeline.Id) || (props.hasChanges))}/>
+                </React.Fragment>
             }
 
             {
@@ -396,7 +392,6 @@ function TimelineEditorContainer(props) {
                        }}/>
             }
         </div>
-    )
 }
 
 const mapState2Props = (state) => {
@@ -414,6 +409,8 @@ const mapState2Props = (state) => {
         selectedPeriod: currentPeriodSelector(state),
         findedPeriods: findedPeriodsSelector(state),
         courses: coursesSelector(state),
+        editorValues: getFormValues(HEADER_EDITOR_NAME)(state),
+        hasChanges: isDirty(HEADER_EDITOR_NAME)(state),
     }
 };
 

@@ -11,6 +11,7 @@ import {commonGetQuery} from "tools/fetch-tools";
 import {createEvents, setEvents} from "tt-ducks/events-timeline";
 import {createPeriods, setPeriods} from "tt-ducks/periods-timeline";
 import type {Message} from "../types/messages";
+import {reset} from "redux-form";
 
 //constants
 
@@ -38,7 +39,7 @@ const OPEN_EDITOR = `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
-const UPDATE_TIMELINE = `${prefix}/UPDATE_TIMELINE`;
+const UPDATE_TIMELINE_REQUEST = `${prefix}/UPDATE_TIMELINE_REQUEST`;
 const PUBLISH_TIMELINE = `${prefix}/PUBLISH_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
 const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
@@ -52,7 +53,7 @@ export const ReducerRecord = Record({
     timelines: TimelinesRecord,
     fetching: false,
     selectedTimeline: TimelineRecord,
-    editorOpened: false
+    editorOpened: false,
 });
 
 // reducer
@@ -79,6 +80,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('editorOpened', payload);
         case TOGGLE_COMPONENT_FORM_VISIBILITY:
             return state.set('componentFormOpened', payload);
+
         default:
             return state;
     }
@@ -121,7 +123,7 @@ export const createNewTimeline = (timeline, setToSelected = false, events = [], 
 };
 
 export const updateTimeline = (timelineId, timelineData) => {
-    return {type: UPDATE_TIMELINE, payload: {timelineId, timelineData}};
+    return {type: UPDATE_TIMELINE_REQUEST, payload: {timelineId, timelineData}};
 };
 
 export const publishTimeline = (id, withConfirmation = true) => {
@@ -151,7 +153,7 @@ export const saga = function* () {
         takeEvery(SELECT_TIMELINE, selectTimelineSaga),
         takeEvery(GO_BACK, goBackSaga),
         takeEvery(GET_TIMELINE, getTimelineSaga),
-        takeEvery(UPDATE_TIMELINE, updateTimelineSaga),
+        takeEvery(UPDATE_TIMELINE_REQUEST, updateTimelineSaga),
         takeEvery(PUBLISH_TIMELINE, publishTimelineSaga),
         takeEvery(LINK_EVENT, linkEventSaga),
         takeEvery(LINK_PERIOD, linkPeriodSaga),
@@ -204,8 +206,7 @@ function* linkEventSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e);
-        showErrorMessage(e)
+        showErrorMessage(e.message)
     }
 }
 
@@ -222,97 +223,48 @@ function* linkPeriodSaga(data) {
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e);
-        showErrorMessage(e)
+        showErrorMessage(e.message)
     }
 }
 
-function* updateTimelineSaga(data) {
+function* updateTimelineSaga({payload}) {
     try {
         yield put({type: START_REQUEST});
-        const mappedTimeline = {
-            Name: data.payload.timelineData.Name,
-            SpecifCode: data.payload.timelineData.SpecifCode,
-            TypeOfUse: parseInt(data.payload.timelineData.TypeOfUse),
-            State: parseInt(data.payload.timelineData.State)
-        };
 
-        if (data.payload.timelineData.Image) {
-            mappedTimeline.Image = data.payload.timelineData.Image.file;
-            mappedTimeline.ImageMeta = data.payload.timelineData.Image.meta;
-        }
+        yield call(changeTimeline, payload.timelineId, payload.timelineData);
 
-        if(data.payload.timelineData.OrderNumber || data.payload.timelineData.Order) {
-            if(data.payload.timelineData.OrderNumber){
-                mappedTimeline.Order = parseInt(data.payload.timelineData.OrderNumber);
-            }
-
-            if(data.payload.timelineData.Order){
-                mappedTimeline.Order = parseInt(data.payload.timelineData.Order);
-            }
-
-        }
-
-        if (data.payload.timelineData.CourseId || data.payload.timelineData.LessonId) {
-            if (data.payload.timelineData.CourseId) {
-                mappedTimeline.CourseId = data.payload.timelineData.CourseId;
-                mappedTimeline.LessonId = null;
-            } else {
-                mappedTimeline.LessonId = data.payload.timelineData.LessonId;
-                mappedTimeline.CourseId = null;
-            }
-        }
-
-        yield call(changeTimeline, data.payload.timelineId, mappedTimeline);
-        yield put(replace('/timelines/' + data.payload.timelineData.Id));
+        yield put(getOneTimeline({id: payload.timelineId}));
 
         yield put({type: SUCCESS_REQUEST});
         yield put(getTimelines());
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e);
-        showErrorMessage(e);
+        showErrorMessage(e.message);
     }
 }
 
-function* createTimelineSaga(data) {
+function* createTimelineSaga({payload}) {
     try {
         yield put({type: START_REQUEST});
-        const mappedTimeline = {
-            Name: data.payload.timeline.Name,
-            SpecifCode: data.payload.timeline.SpecifCode,
-            State: data.payload.timeline.State,
-            Order: parseInt(data.payload.timeline.OrderNumber || data.payload.timeline.Order),
-            Image: data.payload.timeline.Image ? data.payload.timeline.Image.file : null,
-            ImageMeta: data.payload.timeline.Image ? JSON.stringify(data.payload.timeline.Image.meta) : null,
-            TypeOfUse: data.payload.timeline.TypeOfUse
-        };
 
-        if (data.payload.timeline.CourseId || data.payload.timeline.LessonId) {
-            if (data.payload.timeline.CourseId) {
-                mappedTimeline.CourseId = data.payload.timeline.CourseId
-            } else {
-                mappedTimeline.LessonId = data.payload.timeline.LessonId
-            }
-        }
+        console.log(payload)
 
-        const res = yield call(createTimeline, mappedTimeline);
+        const res = yield call(createTimeline, payload.timeline);
 
+        yield put(reset("TIMELINE_EDITOR_HEADER"))
 
         if (res && res.id) {
-            if (data.payload.events && data.payload.events.length > 0) {
-                yield put(createEvents({events: data.payload.events, timelineId: res.id}));
+            if (payload.events && payload.events.length > 0) {
+                yield put(createEvents({events: payload.events, timelineId: res.id}));
             }
 
-            if (data.payload.periods && data.payload.periods.length > 0) {
-                yield put(createPeriods({periods: data.payload.periods, timelineId: res.id}));
+            if (payload.periods && payload.periods.length > 0) {
+                yield put(createPeriods({periods: payload.periods, timelineId: res.id}));
             }
 
-            if (data.payload.setToSelected) {
+            if (payload.setToSelected) {
                 yield put(replace('/timelines/' + res.id))
-                // yield put({type: GET_TIMELINE, payload: {id: res.id, setToEditor: true}});
             }
-
         }
 
         yield put({type: SUCCESS_REQUEST});
@@ -320,7 +272,6 @@ function* createTimelineSaga(data) {
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e));
-        console.log(e);
     }
 }
 
@@ -445,7 +396,6 @@ function* getTimelineSaga(data) {
         }
     } catch (e) {
         yield put({type: FAIL_REQUEST});
-        console.log(e.toString());
         yield put(showErrorMessage(e.toString()))
     }
 }

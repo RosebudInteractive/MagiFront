@@ -1,6 +1,6 @@
 import React from 'react';
 import {Animated, StyleSheet, Text} from 'react-native';
-import {SerifsContext} from "timeline/timeline/serifs/context";
+import {SerifsContext} from "../serifs/context";
 
 type Props = {
     y: number,

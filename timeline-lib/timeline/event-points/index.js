@@ -90,7 +90,9 @@ export default function EventPoints(props: Props) {
 
     const _e = useMemo(() => {
         return [...events].sort((a, b) => {
-            return ((b.year - startDate) - (a.year - startDate));
+            const pointA = calcEventPoint(a),
+                pointB = calcEventPoint(b)
+            return ((pointB - startDate) - (pointA - startDate));
         });
 
     }, [events]);
@@ -125,7 +127,8 @@ export default function EventPoints(props: Props) {
         :
         _e
             .map((item, index) => {
-                let x = (item.year - startDate) * yearPerPixel;
+                let _point = calcEventPoint(item)
+                let x = (_point - startDate) * yearPerPixel;
                 let yValue = elementsOverAxis ? (y - (60 * levelLimit)) - (item.yLevel * VERTICAL_STEP) : y - (item.yLevel * VERTICAL_STEP);
 
                 return <EventPoint item={item}
@@ -145,4 +148,8 @@ export default function EventPoints(props: Props) {
 
 
     return elements
+}
+
+const calcEventPoint = (event) => {
+    return event.year + (event.month ? (event.month - 1) / 12 : .5) + (event.day ? event.day / (12 * 30) : (.5 / 12))
 }

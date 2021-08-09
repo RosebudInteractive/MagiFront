@@ -175,6 +175,8 @@ export default function TimeAxis(props: Props) {
     }, [levelLimit]);
 
 
+
+
     useEffect(() => {
         const allItems = [...events, ...periods];
 
@@ -183,9 +185,9 @@ export default function TimeAxis(props: Props) {
         let minYear = Math.min(...allItems.map(el => el.year || el.startYear)),
             maxYear = Math.max(...allItems.map(el => el.year || el.endYear));
 
-        if(lastYearFromLastPoint && lastYearFromLastPoint > maxYear){
-            maxYear = lastYearFromLastPoint;
-        }
+        // if(lastYearFromLastPoint && lastYearFromLastPoint > maxYear){
+        //     maxYear = lastYearFromLastPoint;
+        // }
 
         const _startPoint = (minYear - minYear % 10) - HORIZONTAL_INDENT,
             _endPoint = (maxYear + (10 - (maxYear % 10))) + HORIZONTAL_INDENT;
@@ -219,6 +221,10 @@ export default function TimeAxis(props: Props) {
         _startDate.current = _startPoint
         _yearPerPixel.current = (width) / (_endPoint - _startPoint)
     }, [width, zoom, events, periods, lastYearFromLastPoint]);
+
+    useEffect(() => {
+        setLastYear(null)
+    }, [events, periods])
 
     const _midHeight = height / 2;
 

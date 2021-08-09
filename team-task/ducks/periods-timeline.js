@@ -209,8 +209,6 @@ function* closeEditorSaga() {
 }
 
 function* setPeriodsSaga({payload}) {
-
-    console.log('setPeriodsSaga');
     const _periods = payload.map((item) => {
         let _period = {...item};
 

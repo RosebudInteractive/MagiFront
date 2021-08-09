@@ -162,6 +162,8 @@ export default class EventPoint extends React.Component {
                 height: axisY - (y - FOOTER_HEIGHT) - 18
             };
 
+        const displayDate = `${item.day ? item.day + "." : ""}${item.month ? item.month + "." : ""}${item.year}`
+
 
         return <Animated.View style={[styles.wrapper, _wrapperStyle]} ref={this._wrapper}>
             <View style={[styles.event, eventStyle]}>
@@ -169,7 +171,7 @@ export default class EventPoint extends React.Component {
                 {/*{needMask && <LinearGradient style={styles.mask} colors={['#f00', '#0f0']}/>}*/}
             </View>
             <Text numberOfLines={1} style={[styles.title, styles.date]}>
-                {item.date}
+                {displayDate}
             </Text>
             <View style={[styles.flagpole, flagpoleStyle]} ref={this._flagpole}/>
         </Animated.View>;
