@@ -214,7 +214,7 @@ export default function TimeAxis(props: Props) {
         if (svgWidth < width) svgWidth = width
 
         setItemWidth(itemWidth)
-        if (serifs.length !== _serifs.length) {
+        if (!isArrayEquals(serifs, _serifs)) {
             setSerifs(_serifs)
         }
         setSvgWidth(svgWidth)
@@ -261,3 +261,7 @@ export default function TimeAxis(props: Props) {
     </View>
 }
 
+
+const isArrayEquals = (array1, array2) => {
+    return array1.length === array2.length && array1.every((value, index) => value === array2[index])
+}
