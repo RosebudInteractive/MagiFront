@@ -586,6 +586,8 @@ const EventApi = class EventApi extends DbObject {
                 else
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid type of field "${_dsc.Year}": ${typeof (year)}.`);
                 eff_date = new Date(year, month, day);
+                if ((year >= 0) && (year <= 99))
+                    eff_date.setFullYear(year);
                 if ((eff_date.getFullYear() !== year) || (eff_date.getMonth() !== month) || (eff_date.getDate() !== day))
                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid date value "${year}-${month + 1}-${day}".`);
             }
