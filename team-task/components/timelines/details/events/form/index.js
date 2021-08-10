@@ -21,7 +21,7 @@ export default function EventForm(props) {
         Name: eventData.Name,
         ShortName: eventData.ShortName,
         Description: eventData.Description,
-        DayNumber: eventData.DayNumber,
+        Day: eventData.Day,
         Month: eventData.Month,
         Year: eventData.Year,
     }), [eventData]);
@@ -78,12 +78,12 @@ export default function EventForm(props) {
                         </Field>
 
                         <div className="ev-date-block">
-                            <Field name="DayNumber"
+                            <Field name="Day"
                                    component={TextBox}
                                    label={"Дата"}
                                    type={'number'}
                                    placeholder="Дата"
-                                   initialValue={formData.Date}
+                                   initialValue={formData.Day}
                                    disabled={false}
                                    extClass={'event-form__field event-date'}>
                             </Field>
@@ -143,27 +143,27 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Month = 'Неправильное значение'
     }
 
-    if (values.Year && values.DayNumber && !values.Month) {
+    if (values.Year && values.Day && !values.Month) {
         errors.Month = 'Обязательное поле'
     }
 
-    if (values.DayNumber && ((values.DayNumber > 31) || (values.DayNumber < 1))) {
-        errors.DayNumber = 'Неправильное значение'
+    if (values.Day && ((values.Day > 31) || (values.Day < 1))) {
+        errors.Day = 'Неправильное значение'
     }
 
     if (!values.Name || (values.Name && values.Name.length < 1)) {
         errors.Name = 'Неправильное значение'
     }
 
-    if (values.DayNumber && values.Year && values.Month) {
+    if (values.Day && values.Year && values.Month) {
         const dateObj = moment({
                 year: values.Year,
                 month: parseInt(values.Month - 1),
-                day: values.DayNumber
+                day: values.Day
             }
         );
         if (!dateObj.isValid()) {
-            errors.DayNumber = 'Неправильная дата';
+            errors.Day = 'Неправильная дата';
         }
     }
 
