@@ -26,13 +26,13 @@ export default function TimelineDetails(props) {
                     {id: 'Id', header: 'Id', hidden: true},
                     {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
                     {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 24},
-                    {id: 'DisplayDate', header: 'Дата события',  minWidth: 80, fillspace: 24},
-                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES, template: function (val) {
+                    {id: 'DisplayDate', header: 'Дата события',  width: 80, adjust:true, css: "_centered"},
+                    {id: 'State', header: 'Состояние',  width: 80, options: EVENT_STATES, template: function (val) {
                         const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
                             return `<div class="state-template-block font-body-s"><div class="state-circle ${cssWithLabel.css}"></div></div>`
                         }},
                     {
-                        id: 'del-btn', header: '', width: 50, fillspace: 8,
+                        id: 'del-btn', header: '', width: 50,
                         template: "<button class='process-elements-grid__button elem-delete remove-event-button'/>"
                     },
                 ]}
@@ -50,16 +50,16 @@ export default function TimelineDetails(props) {
                     {id: 'Id', header: 'Id', hidden: true},
                     {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
                     {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 18},
-                    {id: 'DisplayStartDate', header: 'Начало',  minWidth: 80, fillspace: 24},
-                    {id: 'DisplayEndDate', header: 'Конец',  minWidth: 80, fillspace: 24},
-                    {id: 'State', header: 'Состояние',  minWidth: 80, fillspace: 20, options: EVENT_STATES,  template: function (val) {
+                    {id: 'DisplayStartDate', header: 'Начало',  width: 80, adjust:true, css: "_centered"},
+                    {id: 'DisplayEndDate', header: 'Конец',  width: 80, adjust:true, css: "_centered"},
+                    {id: 'State', header: 'Состояние',  width: 80, options: EVENT_STATES,  template: function (val) {
                             const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
                             return `<div class="state-template-block font-body-s">
                                             <div class="state-circle ${cssWithLabel.css}"></div></div>`
                     }
                     },
                     {
-                        id: 'del-btn', header: '', width: 50, fillspace: 8,
+                        id: 'del-btn', header: '', width: 50,
                         template: "<button class='process-elements-grid__button elem-delete remove-event-button'/>"
                     },
                 ]}
