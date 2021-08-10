@@ -81,13 +81,19 @@ export class LessonEditor extends React.Component {
     }
 
     _getNewLesson() {
-        let _lesson = Object.assign({}, NEW_LESSON)
+        const {course} = this.props
 
-        if (this.props.course) {
-            _lesson.CourseId = this.props.course.id
-            _lesson.CourseName = this.props.course.Name
-            _lesson.Number = this.props.course.Lessons ? (this.props.course.Lessons.length + 1) : 1
+        let _lesson = {...NEW_LESSON}
+
+        if (course) {
+            _lesson.CourseId = course.id
+            _lesson.CourseName = course.Name
+            _lesson.Number = course.Lessons ? (course.Lessons.length + 1) : 1
             _lesson.LessonType = 'L'
+
+            if (course.Authors && (course.Authors.length === 1)) {
+                _lesson.AuthorId = course.Authors[0]
+            }
         }
 
         return _lesson

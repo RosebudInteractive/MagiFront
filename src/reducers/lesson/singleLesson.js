@@ -34,22 +34,10 @@ export default function singleLesson(state = initialState, action) {
     switch (action.type) {
         case CREATE_NEW_LESSON: {
             let _newObject = {
-                CourseId: action.payload.CourseId,
-                CourseName: action.payload.CourseName,
-                Number: action.payload.Number,
-                State: 'D',
-                LessonType: action.payload.LessonType,
-                CurrParentName: action.payload.CurrParentName,
-                CurrParentId: action.payload.CurrParentId,
-                IsAuthRequired: true,
+                ...action.payload,
                 suppEpisodes: [],
                 mainEpisodes: [],
             };
-
-            if (action.payload.IsFreeInPaidCourse !== undefined) {
-                _newObject.IsFreeInPaidCourse = action.payload.IsFreeInPaidCourse
-            }
-
 
             return {
                 ...state,

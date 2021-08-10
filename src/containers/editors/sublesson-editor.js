@@ -83,16 +83,21 @@ export class LessonEditor extends React.Component {
     }
 
     _getNewLesson() {
-        let _lesson = Object.assign({}, NEW_LESSON)
+        const {course} = this.props
+        let _lesson = {...NEW_LESSON}
 
 
-        if (this.props.course) {
-            _lesson.CourseId = this.props.course.id
-            _lesson.CourseName = this.props.course.Name
-            _lesson.Number = this.props.course.Lessons ? (this.props.course.Lessons.length + 1) : 1
+        if (course) {
+            _lesson.CourseId = course.id
+            _lesson.CourseName = course.Name
+            _lesson.Number = course.Lessons ? (course.Lessons.length + 1) : 1
             _lesson.LessonType = 'L'
             _lesson.CurrParentName = this.props.parentLesson.name
             _lesson.CurrParentId = this.props.parentLesson.id
+
+            if (course.Authors && (course.Authors.length === 1)) {
+                _lesson.AuthorId = course.Authors[0]
+            }
 
             if (this.props.course.IsPaid) {
                 _lesson.IsFreeInPaidCourse = true
