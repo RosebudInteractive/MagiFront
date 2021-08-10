@@ -117,6 +117,9 @@ const PROC_ELEM_STRUCT_EXPRESSION = {
     }
 };
 
+const SQL_PROCESS_LESSON_MSSQL = "select [Name] from [LessonLng] where [LessonId] = <%= id %>";
+const SQL_PROCESS_LESSON_MYSQL = "select `Name` from `LessonLng` where `LessonId` = <%= id %>";
+
 const SQL_PROCESS_ELEMS_MSSQL =
     "select [Id], [State], [ElemId], [TaskId], [SupervisorId] from [PmElemProcess] where [ProcessId] = <%= id %> order by [Index]";
 
@@ -386,9 +389,10 @@ const PROCESS_PROTO_TABLE = {
     "Lesson Process Proto": require('./process-types/lesson')
 };
 
-const TASK_START_NOTIF = "Можно приступать к выполнению задачи #<%= id %> \"<%= name %>\".";
-const TASK_ALERT_NOTIF = "Возник вопрос по задаче #<%= id %> \"<%= name %>\".";
-const TASK_CONTINUE_NOTIF = "Можно продолжить выполнение задачи #<%= id %> \"<%= name %>\".";
+const TASK_START_NOTIF = "Приступить к #<%= id %>:\"<%= lesson %>\":\"<%= name %>\".";
+const TASK_ALERT_NOTIF = "Вопрос по #<%= id %>:\"<%= lesson %>\":\"<%= name %>\".";
+const TASK_CONTINUE_NOTIF = "Продолжить #<%= id %>:\"<%= lesson %>\":\"<%= name %>\".";
+const URGENT_INTERVAL_MS = 1000 * 3600 * 48; // 48 hours
 
 const ProcessAPI = class ProcessAPI extends DbObject {
 
@@ -1101,6 +1105,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             let process_obj = collection.get(0);
             await this._getFieldValues(process_obj, result, { "GuidVer": true });
 
+            if (result.LessonId) {
+                let records = await $data.execSql({
+                    dialect: {
+                        mysql: _.template(SQL_PROCESS_LESSON_MYSQL)({ id: result.LessonId }),
+                        mssql: _.template(SQL_PROCESS_LESSON_MSSQL)({ id: result.LessonId })
+                    }
+                }, dbOpts)
+                if (records && records.detail && (records.detail.length === 1)) {
+                    result.Lesson = { Id: result.LessonId, Name: records.detail[0].Name };
+                }
+            }
+
             let records = await $data.execSql({
                 dialect: {
                     mysql: _.template(SQL_PROCESS_ELEMS_MYSQL)({ id: id }),
@@ -1782,9 +1798,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     UserId: user_id,
                                     NotifType: NotificationType.TaskCanStart,
                                     Data: { taskId: taskObj.id() },
+                                    IsUrgent: taskObj.dueDate() && ((taskObj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                     URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                     Subject: _.template(TASK_START_NOTIF)({
                                         id: taskObj.id(),
+                                        lesson: process.Lesson.Name,
                                         name: taskObj.name()
                                     })
                                 })
@@ -1947,9 +1965,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                         UserId: user_id,
                                         NotifType: NotificationType.TaskCanStart,
                                         Data: { taskId: ctask.id() },
+                                        IsUrgent: ctask.dueDate() && ((ctask.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                         URL: `${this._absPmTaskUrl}${ctask.id()}`,
                                         Subject: _.template(TASK_START_NOTIF)({
                                             id: ctask.id(),
+                                            lesson: process.Lesson.Name,
                                             name: ctask.name()
                                         })
                                     })
@@ -2238,9 +2258,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                     UserId: user_id,
                                                     NotifType: NotificationType.TaskCanStart,
                                                     Data: { taskId: ctask.id() },
+                                                    IsUrgent: ctask.dueDate() && ((ctask.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                                     URL: `${this._absPmTaskUrl}${ctask.id()}`,
                                                     Subject: _.template(TASK_START_NOTIF)({
                                                         id: ctask.id(),
+                                                        lesson: process.Lesson.Name,
                                                         name: ctask.name()
                                                     })
                                                 })
@@ -2263,9 +2285,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskAssigned,
                                 Data: { taskId: taskObj.id() },
+                                IsUrgent: taskObj.dueDate() && ((taskObj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_START_NOTIF)({
                                     id: taskObj.id(),
+                                    lesson: process.Lesson.Name,
                                     name: taskObj.name()
                                 })
                             })
@@ -2277,9 +2301,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskQuestionRaised,
                                 Data: { taskId: taskObj.id() },
+                                IsUrgent: taskObj.dueDate() && ((taskObj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_ALERT_NOTIF)({
                                     id: taskObj.id(),
+                                    lesson: process.Lesson.Name,
                                     name: taskObj.name()
                                 })
                             })
@@ -2291,9 +2317,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskQuestionResolved,
                                 Data: { taskId: taskObj.id() },
+                                IsUrgent: taskObj.dueDate() && ((taskObj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_CONTINUE_NOTIF)({
                                     id: taskObj.id(),
+                                    lesson: process.Lesson.Name,
                                     name: taskObj.name()
                                 })
                             })
@@ -2502,9 +2530,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 UserId: user_id,
                                 NotifType: NotificationType.TaskCanStart,
                                 Data: { taskId: taskObj.id() },
+                                IsUrgent: taskObj.dueDate() && ((taskObj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                 URL: `${this._absPmTaskUrl}${taskObj.id()}`,
                                 Subject: _.template(TASK_START_NOTIF)({
                                     id: taskObj.id(),
+                                    lesson: process.Lesson.Name,
                                     name: taskObj.name()
                                 })
                             })
@@ -2739,9 +2769,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                         UserId: user_id,
                                                         NotifType: NotificationType.TaskCanStart,
                                                         Data: { taskId: ctask.id() },
+                                                        IsUrgent: ctask.dueDate() && ((ctask.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
                                                         URL: `${this._absPmTaskUrl}${ctask.id()}`,
                                                         Subject: _.template(TASK_START_NOTIF)({
                                                             id: ctask.id(),
+                                                            lesson: process.Lesson.Name,
                                                             name: ctask.name()
                                                         })
                                                     })
