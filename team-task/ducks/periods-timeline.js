@@ -546,15 +546,9 @@ const findPeriodBy = (paramsObj) => { //maybe add something else
 
 
 const createPeriod = (period) => {
-    const dateFrom = (period.LbDay && period.LbMonth && period.LbYear) ? moment(`${period.LbYear}-${period.LbMonth}-${period.LbDay}`) : null;
-    const dateTo = (period.RbDay && period.RbMonth && period.RbYear) ? moment(`${period.RbYear}-${period.RbMonth}-${period.RbDay}`) : null;
-    dateFrom && dateFrom.set('year', period.StartYear);
-    dateTo && dateTo.set('year', period.EndYear);
     const periodData = {
         Name: period.Name,
         TlCreationId: period.TlCreationId,
-        LbDate: dateFrom,
-        RbDate: dateTo,
         LbYear: parseInt(period.LbYear),
         LbMonth: parseInt(period.LbMonth),
         RbMonth: parseInt(period.RbMonth),
@@ -576,17 +570,10 @@ const createPeriod = (period) => {
 };
 
 const updatePeriod = (period) => {
-    const dateFrom = (period.LbDay && period.LbMonth && period.LbYear) ? moment(`${period.LbYear}-${period.LbMonth}-${period.LbDay}`) : null;
-    const dateTo = (period.RbDay && period.RbMonth && period.RbYear) ? moment(`${period.RbYear}-${period.RbMonth}-${period.RbDay}`) : null;
-    dateFrom && dateFrom.set('year', period.StartYear);
-    dateTo && dateTo.set('year', period.EndYear);
-
     const periodData = {
         Id: period.Id,
         Name: period.Name,
         TlCreationId: period.TlCreationId,
-        LbDate: dateFrom,
-        RbDate: dateTo,
         LbYear: parseInt(period.LbYear),
         LbMonth: parseInt(period.LbMonth),
         RbMonth: parseInt(period.RbMonth),

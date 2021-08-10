@@ -228,9 +228,7 @@ function* setEventsSaga({payload}) {
             _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`;
             _event.visible = true;
 
-            _event.DisplayDate = item.Date ?  //это дата для отображения целиком строкой
-                new Date(item.Date).toLocaleDateString("ru-Ru") :
-                `${item.Day ? item.Day.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${item.Year}`;
+            _event.DisplayDate = `${item.Day ? item.Day.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${item.Year}`;
             _event.Day =  item.Day;
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
