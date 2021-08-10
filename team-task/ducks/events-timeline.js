@@ -230,8 +230,8 @@ function* setEventsSaga({payload}) {
 
             _event.DisplayDate = item.Date ?  //это дата для отображения целиком строкой
                 new Date(item.Date).toLocaleDateString("ru-Ru") :
-                `${item.DayNumber ? item.DayNumber.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${item.Year}`;
-            _event.DayNumber =  item.Date ? new Date(item.Date).getDate() : item.DayNumber ? item.DayNumber : null; //а это дата для  отображения только дня
+                `${item.Day ? item.Day.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${item.Year}`;
+            _event.Day =  item.Day;
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
 
@@ -399,7 +399,9 @@ function* updateEventSaga(data) {
         // let updateDataEvent;
 
         if(eventToUpdate){
-            const dateObject = (data.payload.DayNumber && data.payload.Month && data.payload.Year) ? moment(`${data.payload.Year}-${data.payload.Month}-${data.payload.DayNumber}`) : null;
+            const dateObject = (data.payload.Day && data.payload.Month && data.payload.Year) ? moment(`${data.payload.Year}-${data.payload.Month}-${data.payload.Day}`) : null;
+            dateObject.set('year', data.payload.Year);
+
             const updateDataEvent = {...eventToUpdate, Id: data.payload.Id,
                 Name: data.payload.Name,
                 TlCreationId: data.payload.TlCreationId,
@@ -410,8 +412,8 @@ function* updateEventSaga(data) {
                 Description: data.payload.Description,
                 DisplayDate: dateObject ?
                     new Date(dateObject).toLocaleDateString("ru-Ru") :
-                    `${data.payload.DayNumber ? data.payload.DayNumber.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
-                DayNumber: data.payload.DayNumber ? data.payload.DayNumber : null
+                    `${data.payload.Day ? data.payload.Day.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
+                Day: data.payload.Day ? data.payload.Day : null
             };
 
             events.splice(eventToUpdateIndex, 1, updateDataEvent);
@@ -481,7 +483,7 @@ function* openEditorSaga(data) {
                             EffDate: null,
                             DisplayDate: null,
                             Date: null,
-                            DayNumber: null,
+                            Day: null,
                             Month: null,
                             Year: null,
                             State: 1
@@ -524,11 +526,10 @@ const findEventBy = (paramsObject) => {
 };
 
 const createEvent = (event) => {
-    const dateObject = (event.DayNumber && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.DayNumber}`) : null;
     let eventData = {
         Name: event.Name,
         TlCreationId: event.TlCreationId,
-        Date: dateObject,
+        Day: parseInt(event.Day),
         Month: parseInt(event.Month),
         Year: parseInt(event.Year),
         ShortName: event.ShortName,
@@ -546,13 +547,11 @@ const createEvent = (event) => {
 };
 
 const updateEvent = (event) => {
-    const dateObject = (event.DayNumber && event.Month && event.Year) ? moment(`${event.Year}-${event.Month}-${event.DayNumber}`) : null;
-
     const eventData = {
         Id: event.Id,
         Name: event.Name,
         TlCreationId: event.TlCreationId,
-        Date: dateObject,
+        Day: parseInt(event.Day),
         Month: parseInt(event.Month),
         Year: parseInt(event.Year),
         ShortName: event.ShortName,

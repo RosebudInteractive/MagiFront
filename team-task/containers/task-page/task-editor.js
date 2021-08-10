@@ -149,6 +149,7 @@ function TaskEditor(props: EditorProps) {
                     <form className="task-editor-page form form-with-header__main-block"
                           onSubmit={e => e.preventDefault()}>
                         <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name}
+                                    processId={task.Process.Id}
                                     onSave={_save}/>
                         <TaskBody task={task}
                                   elements={props.elements}
