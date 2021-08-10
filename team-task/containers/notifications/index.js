@@ -15,7 +15,6 @@ import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks
 import {connect} from "react-redux";
 import './notifications.sass';
 import {fetchingSelector, getNotifications, markNotifsAsRead, notificationsSelector} from "tt-ducks/notifications";
-import {NOTIFICATION_TYPES} from "../../constants/notifications";
 import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
 
 let notificationsCount = 0;
@@ -119,19 +118,10 @@ const Notifications = (props) => {
                 }
             },
             {
-                id: 'NotifType', header: 'Тип', minWidth: 50, fillspace: 20, editor: 'select',
-                options: [
-                    {id: '1', value: NOTIFICATION_TYPES["1"]},
-                    {id: '2', value: NOTIFICATION_TYPES["2"]},
-                    {id: '3', value: NOTIFICATION_TYPES["3"]},
-                    {id: '4', value: NOTIFICATION_TYPES["4"]}
-                ]
-            },
-            {
                 id: 'Subject',
                 header: 'Описание',
                 minWidth: 100,
-                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 45 : 30
+                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 75 : 60
             },
             {
                 id: 'Urgent',
@@ -139,11 +129,11 @@ const Notifications = (props) => {
                 minWidth: 100,
                 fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8,
                 format: function (value) {
-                    return value ? 'Срочно' : 'Не Срочно'
+                    return value ? 'Срочное' : 'Штатное'
                 }
             },
             {id: 'NotRead', header: 'Непрочитано', hidden: true},
-            {id: 'UserName', header: 'Пользователь', hidden: (!hasAdminRights || !hasSupervisorRights), fillspace: 25}
+            {id: 'UserName', header: 'Пользователь', hidden: (!hasAdminRights || !hasSupervisorRights), fillspace: 15}
         ],
         on: {
             onHeaderClick: function (header) {
