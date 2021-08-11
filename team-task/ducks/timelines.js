@@ -348,15 +348,17 @@ function* getTimelinesSaga() {
     yield put({type: START_REQUEST});
     try {
         const params = yield select(paramsSelector);
-        const timelines = yield call(_getTimelines, params);
+
+        const preparedParams = params.replace('order', 'SortOrder');
+        const timelines = yield call(_getTimelines, preparedParams);
+        console.log('params', params)
 
         const mappedTimelines = timelines.map(tm => {
             const nameOfLectionOrCourse = tm.Lesson ? tm.Lesson.Name :
                 tm.Course ? tm.Course.Name : '';
             return {
                 ...tm,
-                NameOfLectionOrCourse: nameOfLectionOrCourse,
-                OrderNumber: tm.Order,
+                LessonOrCourse: nameOfLectionOrCourse,
                 Code: tm.SpecifCode
             }
         });

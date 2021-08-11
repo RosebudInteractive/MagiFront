@@ -123,7 +123,7 @@ const Timelines = (props) => {
                 fillspace: 10
             },
             {
-                id: 'NameOfLectionOrCourse', header: 'Название курса или лекции',  minWidth: 20, fillspace: 20
+                id: 'LessonOrCourse', header: 'Название курса или лекции',  minWidth: 20, fillspace: 20
             },
             {
                 id: 'State',
