@@ -251,20 +251,9 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ExecutorId": supervisor_id,
         "Description": "",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "WriteFieldSet": "Зарегистрировать запись",
-        "IsElemReady": false,
-        "Dependencies": []
-    }, options);
-    // Задача #2
-    res = await pm.newTask({
-        "Name": "Редактура звука - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "",
-        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Обработать звук",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": []
     }, options);
     // Задача #3
     res = await pm.newTask({
@@ -275,17 +264,6 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Выложить отредактированный звук",
         "IsElemReady": true,
-        "Dependencies": [res.id]
-    }, options);
-    // Задача #4
-    res = await pm.newTask({
-        "Name": "Транскрипт - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "Дать задание на расшифровку.",
-        "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
-        "WriteFieldSet": "Сделать расшифровку",
-        "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
     // Задача #5
@@ -365,17 +343,6 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res2.id]
     }, options);
-    // Задача #12
-    res = await pm.newTask({
-        "Name": "Контроль звука и расстановка тайм-кодов - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "",
-        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
-        "WriteFieldSet": "Расставить тайм-коды",
-        "IsElemReady": false,
-        "Dependencies": [res.id]
-    }, options);
     // Задача #13
     res = await pm.newTask({
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
@@ -419,20 +386,9 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ExecutorId": supervisor_id,
         "Description": "",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "WriteFieldSet": "Зарегистрировать запись",
-        "IsElemReady": false,
-        "Dependencies": []
-    }, options);
-    // Задача #2
-    res = await pm.newTask({
-        "Name": "Редактура звука - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "",
-        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Обработать звук",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": []
     }, options);
     // Задача #3
     res = await pm.newTask({
@@ -443,17 +399,6 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Выложить отредактированный звук",
         "IsElemReady": true,
-        "Dependencies": [res.id]
-    }, options);
-    // Задача #4
-    res = await pm.newTask({
-        "Name": "Транскрипт - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "Дать задание на расшифровку.",
-        "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
-        "WriteFieldSet": "Сделать расшифровку",
-        "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
     // Задача #5
@@ -533,17 +478,6 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res2.id]
     }, options);
-    // Задача #12
-    res = await pm.newTask({
-        "Name": "Контроль звука и расстановка тайм-кодов - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "",
-        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
-        "WriteFieldSet": "Расставить тайм-коды",
-        "IsElemReady": false,
-        "Dependencies": [res.id]
-    }, options);
     // Задача #13
     res = await pm.newTask({
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
@@ -587,20 +521,9 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ExecutorId": supervisor_id,
         "Description": "",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "WriteFieldSet": "Зарегистрировать запись",
-        "IsElemReady": false,
-        "Dependencies": []
-    }, options);
-    // Задача #2
-    res = await pm.newTask({
-        "Name": "Редактура звука - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "",
-        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Обработать звук",
         "IsElemReady": false,
-        "Dependencies": [res.id]
+        "Dependencies": []
     }, options);
     // Задача #3
     res = await pm.newTask({
@@ -611,17 +534,6 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
         "WriteFieldSet": "Выложить отредактированный звук",
         "IsElemReady": true,
-        "Dependencies": [res.id]
-    }, options);
-    // Задача #4
-    res = await pm.newTask({
-        "Name": "Транскрипт - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "Дать задание на расшифровку.",
-        "ElementId": elements["Транскрипт"] ? elements["Транскрипт"].Id : null,
-        "WriteFieldSet": "Сделать расшифровку",
-        "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
     // Задача #5
@@ -709,17 +621,6 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "Description": "Запросить у автора расстановку музыкальных фрагментов.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Запросить роспись музыки",
-        "IsElemReady": false,
-        "Dependencies": [res.id]
-    }, options);
-    // Задача #13
-    res = await pm.newTask({
-        "Name": "Контроль звука и расстановка тайм-кодов - постановка задачи",
-        "ProcessId": p_id,
-        "ExecutorId": supervisor_id,
-        "Description": "Запустить монтаж музыки, проверку звука и расстановку таймкодов.",
-        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
-        "WriteFieldSet": "Подготовить монтаж музыки",
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
