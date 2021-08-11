@@ -227,8 +227,61 @@ const EventApi = class EventApi extends DbObject {
         if (opts.RbYear) {
             let year = +opts.RbYear;
             if ((typeof (year) === "number") && (!isNaN(year))) {
-                mssql_conds.push(`p.[RbYear] = ${year})`);
-                mysql_conds.push(`p.${'`'}RbYear${'`'} = ${year})`);
+                mssql_conds.push(`(p.[RbYear] = ${year})`);
+                mysql_conds.push(`(p.${'`'}RbYear${'`'} = ${year})`);
+            }
+        }
+        let mdy = {};
+        if (opts.Day) {
+            let day = +opts.Day;
+            if ((typeof (day) === "number") && (!isNaN(day)))
+                mdy["Day"] = day;
+        }
+        if (opts.Month) {
+            let month = +opts.Month;
+            if ((typeof (month) === "number") && (!isNaN(month)))
+                mdy["Month"] = month;
+        }
+        if (opts.Year) {
+            let year = +opts.Year;
+            if ((typeof (year) === "number") && (!isNaN(year)))
+                mdy["Year"] = year;
+        }
+        let mdy_keys = Object.keys(mdy);
+        if (mdy_keys.length > 0) {
+            let l_cond_mssql = "";
+            let r_cond_mssql = "";
+            let l_cond_mysql = "";
+            let r_cond_mysql = "";
+            let is_next = false;
+            for (let key in mdy){
+                switch (key) {
+                    case "Day":
+                        l_cond_mssql += `${is_next ? " AND " : ""}(p.[LbDay] = ${mdy[key]})`;
+                        r_cond_mssql += `${is_next ? " AND " : ""}(p.[RbDay] = ${mdy[key]})`;
+                        l_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}LbDay${'`'} = ${mdy[key]})`;
+                        r_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}RbDay${'`'} = ${mdy[key]})`;
+                        is_next = true;
+                        break;
+                    case "Month":
+                        l_cond_mssql += `${is_next ? " AND " : ""}(p.[LbMonth] = ${mdy[key]})`;
+                        r_cond_mssql += `${is_next ? " AND " : ""}(p.[RbMonth] = ${mdy[key]})`;
+                        l_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}LbMonth${'`'} = ${mdy[key]})`;
+                        r_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}RbMonth${'`'} = ${mdy[key]})`;
+                        is_next = true;
+                        break;
+                    case "Year":
+                        l_cond_mssql += `${is_next ? " AND " : ""}(p.[LbYear] = ${mdy[key]})`;
+                        r_cond_mssql += `${is_next ? " AND " : ""}(p.[RbYear] = ${mdy[key]})`;
+                        l_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}LbYear${'`'} = ${mdy[key]})`;
+                        r_cond_mysql += `${is_next ? " AND " : ""}(p.${'`'}RbYear${'`'} = ${mdy[key]})`;
+                        is_next = true;
+                        break;
+                }
+            }
+            if (l_cond_mssql.length > 0) {
+                mssql_conds.push(`((${l_cond_mssql}) OR (${r_cond_mssql}))`);
+                mysql_conds.push(`((${l_cond_mysql}) OR (${r_cond_mysql}))`);
             }
         }
         if (opts.TimelineId) {
@@ -391,6 +444,20 @@ const EventApi = class EventApi extends DbObject {
                 mysql_conds.push(`(e.${'`'}Day${'`'} = ${day})`);
                 mysql_conds.push(`(e.${'`'}Month${'`'} = ${month})`);
                 mysql_conds.push(`(e.${'`'}Year${'`'} = ${year})`);
+            }
+        }
+        if (opts.Day) {
+            let day = +opts.Day;
+            if ((typeof (day) === "number") && (!isNaN(day))) {
+                mssql_conds.push(`(e.[Day] = ${day})`);
+                mysql_conds.push(`(e.${'`'}Day${'`'} = ${day})`);
+            }
+        }
+        if (opts.Month) {
+            let month = +opts.Month;
+            if ((typeof (month) === "number") && (!isNaN(month))) {
+                mssql_conds.push(`(e.[Month] = ${month})`);
+                mysql_conds.push(`(e.${'`'}Month${'`'} = ${month})`);
             }
         }
         if (opts.Year) {

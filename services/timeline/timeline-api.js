@@ -198,6 +198,10 @@ const TimelineAPI = class TimelineAPI extends DbObject {
             mssql_conds.push(`(ll.[Name] like N'%${opts.Lesson}%')`);
             mysql_conds.push(`(ll.${'`'}Name${'`'} like '%${opts.Lesson}%')`);
         }
+        if (opts.LessonOrCourse) {
+            mssql_conds.push(`((cl.[Name] like N'%${opts.LessonOrCourse}%') OR (ll.[Name] like N'%${opts.LessonOrCourse}%'))`);
+            mysql_conds.push(`((cl.${'`'}Name${'`'} like '%${opts.LessonOrCourse}%') OR (ll.${'`'}Name${'`'} like '%${opts.LessonOrCourse}%'))`);
+        }
         if (opts.Order) {
             let order = +opts.Order;
             if ((typeof (order) === "number") && (!isNaN(order))) {
