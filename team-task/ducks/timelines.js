@@ -34,13 +34,13 @@ const TOGGLE_COMPONENT_FORM_VISIBILITY = `${prefix}/TOGGLE_COMPONENT_FORM_VISIBI
 const TOGGLE_EDITOR = `${prefix}/TOGGLE_EDITOR`;
 
 const SELECT_TIMELINE = `${prefix}/SELECT_TIMELINE`;
-// const UNSELECT_TIMELINE =  `${prefix}/UNSELECT_TIMELINE`;
 const OPEN_EDITOR = `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
 const UPDATE_TIMELINE_REQUEST = `${prefix}/UPDATE_TIMELINE_REQUEST`;
 const PUBLISH_TIMELINE = `${prefix}/PUBLISH_TIMELINE`;
+const REMOVE_TIMELINE = `${prefix}/REMOVE_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
 const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
 
@@ -126,6 +126,10 @@ export const updateTimeline = (timelineId, timelineData) => {
     return {type: UPDATE_TIMELINE_REQUEST, payload: {timelineId, timelineData}};
 };
 
+export const removeTimeline = (id) => {
+    return {type: REMOVE_TIMELINE, payload: id};
+};
+
 export const publishTimeline = (id, withConfirmation = true) => {
    return {type: PUBLISH_TIMELINE, payload: {id, withConfirmation}}
 };
@@ -157,8 +161,35 @@ export const saga = function* () {
         takeEvery(PUBLISH_TIMELINE, publishTimelineSaga),
         takeEvery(LINK_EVENT, linkEventSaga),
         takeEvery(LINK_PERIOD, linkPeriodSaga),
+        takeEvery(REMOVE_TIMELINE, removeTimelineSaga),
     ])
 };
+
+function* removeTimelineSaga(data) {
+    try {
+        const message: Message = {
+            content: `Удалить таймлайн #${data.payload}?`,
+            title: "Подтверждение"
+        };
+
+        yield put(showUserConfirmation(message));
+
+        const {accept} = yield race({
+            accept: take(MODAL_MESSAGE_ACCEPT),
+            decline: take(MODAL_MESSAGE_DECLINE)
+        });
+
+        if (!accept) return;
+        yield put({type: START_REQUEST});
+        yield call(deleteTimeline, data.payload);
+        yield put({type: SUCCESS_REQUEST});
+        yield put(getTimelines());
+    }catch (e) {
+        yield put({type: REMOVE_TIMELINE});
+        console.log(e);
+        showErrorMessage(e.toString());
+    }
+}
 
 function* publishTimelineSaga(data) {
     try {
@@ -178,11 +209,11 @@ function* publishTimelineSaga(data) {
             if (!accept) return;
 
             yield put({type: START_REQUEST});
-            yield call(changeTimeline, data.payload.id, {State: 2})
+            yield call(changeTimeline, data.payload.id, {State: 2});
             yield put(getTimelines());
             yield put({type: SUCCESS_REQUEST});
         } else {
-            yield call(changeTimeline, data.payload.id, {State: 2})
+            yield call(changeTimeline, data.payload.id, {State: 2});
             yield put(getTimelines());
             yield put({type: SUCCESS_REQUEST});
         }
@@ -351,7 +382,6 @@ function* getTimelinesSaga() {
 
         const preparedParams = params.replace('order', 'SortOrder');
         const timelines = yield call(_getTimelines, preparedParams);
-        console.log('params', params)
 
         const mappedTimelines = timelines.map(tm => {
             const nameOfLectionOrCourse = tm.Lesson ? tm.Lesson.Name :
@@ -459,6 +489,18 @@ const addPeriodToTimeline = ({periodId, timelineId}) => {
 const _getTimelines = (params) => {
     let _urlString = `/api/pm/timeline-list${params ? `?${params}` : ''}`;
     return commonGetQuery(_urlString);
+};
+
+const deleteTimeline = (id) => {
+    return fetch(`/api/pm/timeline/${id}`, {
+        method: 'DELETE',
+        headers: {
+            "Content-type": "application/json"
+        },
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
 };
 
 

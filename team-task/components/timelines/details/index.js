@@ -24,8 +24,7 @@ export default function TimelineDetails(props) {
                 addCompletelyCreated={!!timelineId}
                 columnsConfig={[
                     {id: 'Id', header: 'Id', hidden: true},
-                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
-                    {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 24},
+                    {id: 'Name', header: 'Название', fillspace: true},
                     {id: 'DisplayDate', header: 'Дата события',  width: 80, adjust:true, css: "_centered"},
                     {id: 'State', header: 'Состояние',  width: 80, options: EVENT_STATES, template: function (val) {
                         const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
@@ -48,8 +47,7 @@ export default function TimelineDetails(props) {
                 addCompletelyCreated={!!timelineId}
                 columnsConfig={[
                     {id: 'Id', header: 'Id', hidden: true},
-                    {id: 'Name', header: 'Название', minWidth: 80, fillspace: 24},
-                    {id: 'ShortName', header: 'Краткое название',  minWidth: 80, fillspace: 18},
+                    {id: 'Name', header: 'Название', fillspace: true},
                     {id: 'DisplayStartDate', header: 'Начало',  width: 80, adjust:true, css: "_centered"},
                     {id: 'DisplayEndDate', header: 'Конец',  width: 80, adjust:true, css: "_centered"},
                     {id: 'State', header: 'Состояние',  width: 80, options: EVENT_STATES,  template: function (val) {

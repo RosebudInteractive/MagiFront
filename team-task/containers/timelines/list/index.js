@@ -18,6 +18,7 @@ import {
     getTimelines,
     openTimelineEditor,
     publishTimeline,
+    removeTimeline,
     selectTimeline,
     timelineOpenedSelector,
     timelinesFetchingSelector,
@@ -162,7 +163,13 @@ const Timelines = (props) => {
                 template: function(data){
                     return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : ""
                 }
-            }
+            },
+            {
+                id: 'del-btn', header: '', width: 50,
+                template: function (data) {
+                    return data.State !== 2 ? "<button class='process-elements-grid__button elem-delete remove-timeline-button'/>" : ""
+                }
+            },
             // { todo after backend is done
             //     id: 'copy-btn', header: '', width: 50, css: "_container", fillspace: 5,
             //     template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
@@ -211,6 +218,14 @@ const Timelines = (props) => {
                 const item = this.getItem(data.row);
                 if (item) {
                     //todo copy action after api complete
+                }
+            },
+            "remove-timeline-button": function (e, data) {
+                e.preventDefault();
+                const item = this.getItem(data.row);
+                if (item) {
+                    (+item.State) ===  1 && actions.removeTimeline(item.Id);
+                    actions.getTimelines();
                 }
             }
         },
@@ -278,7 +293,8 @@ const mapDispatch2Props = (dispatch) => {
             clearSelectedTimeline,
             setTemporaryPeriods,
             updateTimeline,
-            publishTimeline
+            publishTimeline,
+            removeTimeline
         }, dispatch)
     }
 };

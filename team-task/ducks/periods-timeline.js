@@ -224,27 +224,21 @@ function* setPeriodsSaga({payload}) {
         _period.name = item.Name;
         _period.color = _getColor();
 
-        _period.DisplayStartDate = item.LbYear ? `${item.LbDay ? 
+        _period.DisplayStartDate = item.LbYear ? `${item.LbYear < 0 ? '-' : ''}${item.LbDay ? 
             item.LbDay.toString().padStart(2, '0') + '.' : ''}${item.LbMonth ? 
-            item.LbMonth.toString().padStart(2, '0') + '.' : ''}${item.LbYear}` :
+            item.LbMonth.toString().padStart(2, '0') + '.' : ''}${Math.abs(item.LbYear)}` :
             '--'
         ;
-        _period.DisplayEndDate = item.RbYear ? `${item.RbDay ?
+        _period.DisplayEndDate = item.RbYear ? `${item.RbYear < 0 ? '-' : ''}${item.RbDay ?
             item.RbDay.toString().padStart(2, '0') + '.' : ''}${item.RbMonth ?
-            item.RbMonth.toString().padStart(2, '0') + '.' : ''}${item.RbYear}` :
+            item.RbMonth.toString().padStart(2, '0') + '.' : ''}${Math.abs(item.RbYear)}` :
             '--'
         ;
 
         return _period;
     });
 
-    yield put({
-        type: SET_PERIODS, payload: _periods.map(pr => ({
-            ...pr,
-            DisplayStartDate: pr.DisplayStartDate !== undefined ? pr.DisplayStartDate : '--',
-            DisplayEndDate: pr.DisplayEndDate !== undefined ? pr.DisplayEndDate : '--'
-        }))
-    })
+    yield put({type: SET_PERIODS, payload: _periods})
 }
 
 function* addTemporaryPeriodSaga({payload}) {
@@ -303,14 +297,14 @@ function* findPeriodSaga(data) {
 
             return {
                 ...el,
-                DisplayStartDate:  el.LbYear ? `${el.LbDay ?
+                DisplayStartDate:  el.LbYear ? `${el.LbYear < 0 ? '-' : ''}${el.LbDay ?
                     el.LbDay.toString().padStart(2, '0') + '.' : ''}${el.LbMonth ?
-                    el.LbMonth.toString().padStart(2, '0') + '.' : ''}${el.LbYear}` :
-                    '-13',
-                DisplayEndDate:  el.RbYear ? `${el.RbDay ?
+                    el.LbMonth.toString().padStart(2, '0') + '.' : ''}${Math.abs(el.LbYear)}` :
+                    '--',
+                DisplayEndDate:  el.RbYear ? `${el.RbYear < 0 ? '-' : ''}${el.RbDay ?
                     el.RbDay.toString().padStart(2, '0') + '.' : ''}${el.RbMonth ?
-                    el.RbMonth.toString().padStart(2, '0') + '.' : ''}${el.RbYear}` :
-                    '-34'
+                    el.RbMonth.toString().padStart(2, '0') + '.' : ''}${Math.abs(el.RbYear)}` :
+                    '--'
             }
             })});
         yield put({type: SUCCESS_REQUEST});
@@ -340,7 +334,7 @@ function* removePeriodSaga(data) {
         title: "Подтверждение удаления"
     };
 
-    yield put(showUserConfirmation(message))
+    yield put(showUserConfirmation(message));
 
     const {accept} = yield race({
         accept: take(MODAL_MESSAGE_ACCEPT),
@@ -377,8 +371,6 @@ function* updatePeriodSaga(data) {
         const periods = yield select(periodsSelector);
         const periodToUpdateIndex = data.payload.tableId ? periods.findIndex(ev => ev.id === data.payload.tableId) : periods.findIndex(ev => ev.Id === data.payload.Id);
         const periodToUpdate = periods[periodToUpdateIndex];
-
-        // let updateDataEvent;
 
         if (periodToUpdate) {
             const dateFrom = (data.payload.LbDay && data.payload.LbMonth && data.payload.LbYear) ? moment(`${data.payload.LbYear}-${data.payload.LbMonth}-${data.payload.LbDay}`) : null;
@@ -549,12 +541,12 @@ const createPeriod = (period) => {
     const periodData = {
         Name: period.Name,
         TlCreationId: period.TlCreationId,
-        LbYear: parseInt(period.LbYear),
-        LbMonth: parseInt(period.LbMonth),
-        RbMonth: parseInt(period.RbMonth),
-        RbYear: parseInt(period.RbYear),
-        LbDay: parseInt(period.LbDay),
-        RbDay: parseInt(period.RbDay),
+        LbYear: +period.LbYear,
+        LbMonth: +period.LbMonth,
+        RbMonth: +period.RbMonth,
+        RbYear: +period.RbYear,
+        LbDay: +period.LbDay,
+        RbDay: +period.RbDay,
         ShortName: period.ShortName,
         Description: period.Description
     };
@@ -574,10 +566,10 @@ const updatePeriod = (period) => {
         Id: period.Id,
         Name: period.Name,
         TlCreationId: period.TlCreationId,
-        LbYear: parseInt(period.LbYear),
-        LbMonth: parseInt(period.LbMonth),
-        RbMonth: parseInt(period.RbMonth),
-        RbYear: parseInt(period.RbYear),
+        LbYear: +period.LbYear,
+        LbMonth: +period.LbMonth,
+        RbMonth: +period.RbMonth,
+        RbYear: +period.RbYear,
         ShortName: period.ShortName,
         Description: period.Description
     };

@@ -8,7 +8,6 @@ import {push} from "react-router-redux/src";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {Event} from "../types/events";
-import moment from "moment";
 import {getOneTimeline} from "tt-ducks/timelines";
 import type {Message} from "../types/messages";
 import $ from "jquery";
@@ -45,17 +44,8 @@ const ADD_TEMPORARY_EVENTS_REQUEST = `${prefix}/ADD_TEMPORARY_EVENTS_REQUEST`;
 const SET_TEMPORARY_EVENTS = `${prefix}/SET_TEMPORARY_EVENTS`;
 const CREATE_EVENTS = `${prefix}/CREATE_EVENTS`;
 const SET_SELECTED_EVENT = `${prefix}/SET_SELECTED_EVENT`;
-// const UPDATE_EVENT
-
-// const SELECT_COMPONENT_REQUEST = `${prefix}/SELECT_COMPONENT_REQUEST`;
-// const SET_SELECTED_COMPONENT = `${prefix}/SET_SELECTED_COMPONENT`;
-// const CLEAN_SELECTED_COMPONENT = `${prefix}/CLEAN_SELECTED_COMPONENT`;
-// const CHANGE_COMPONENT = `${prefix}/CHANGE_COMPONENT`; // runs before request
-// const UPDATE_COMPONENT = `${prefix}/UPDATE_COMPONENT`; // runs after request complete succesfully
-
 
 //store
-
 
 const EventsRecord = List<Event>([]);
 const EventRecord: Event = {};
@@ -228,7 +218,7 @@ function* setEventsSaga({payload}) {
             _event.date = item.Date ? new Date(item.Date).toLocaleDateString("ru-Ru") : `${item.Month ? item.Month + '.' : ''}${item.Year}`;
             _event.visible = true;
 
-            _event.DisplayDate = `${item.Day ? item.Day.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${item.Year}`;
+            _event.DisplayDate = `${item.Year < 0 ? '-' : ''}${item.Day ? item.Day.toString().padStart(2, '0') + '.' : ''}${item.Month ? item.Month.toString().padStart(2, '0') + '.' : ''}${Math.abs(item.Year)}`;
             _event.Day =  item.Day;
             _event.Month = item.Month ? item.Month : item.Date ? new Date(item.Date).getMonth() + 1 : null;
             _event.Year = item.Year ? item.Year : item.Date ? new Date(item.Date).getFullYear() : null;
@@ -314,14 +304,7 @@ function* findEventSaga(data) {
         const response = yield call(findEventBy, $.param(paramsObject));
 
         const resData = response.map(ev => {
-           if(!ev.Date) {
-               ev.Date = new Date(`01.${ev.Month ? ev.Month : '01'}.${ev.Year}`);
-
-               ev.DisplayDate = ev.Year ?  //это дата для отображения целиком строкой
-                   new Date(ev.Year).toLocaleDateString("ru-Ru") :
-                   `${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${ev.Year}`;
-           }
-
+            ev.DisplayDate = `${ev.Year < 0 ? '-' : ''}${ev.Day ? ev.Day.toString().padStart(2, '0') + '.' : ''}${ev.Month ? ev.Month.toString().padStart(2, '0') + '.' : ''}${Math.abs(ev.Year)}`;
            return ev;
         });
 
@@ -397,20 +380,15 @@ function* updateEventSaga(data) {
         // let updateDataEvent;
 
         if(eventToUpdate){
-            const dateObject = (data.payload.Day && data.payload.Month && data.payload.Year) ? moment(`${data.payload.Year}-${data.payload.Month}-${data.payload.Day}`) : null;
-            dateObject.set('year', data.payload.Year);
 
             const updateDataEvent = {...eventToUpdate, Id: data.payload.Id,
                 Name: data.payload.Name,
                 TlCreationId: data.payload.TlCreationId,
-                Date: dateObject,
                 Month: parseInt(data.payload.Month),
                 Year: parseInt(data.payload.Year),
                 ShortName: data.payload.ShortName,
                 Description: data.payload.Description,
-                DisplayDate: dateObject ?
-                    new Date(dateObject).toLocaleDateString("ru-Ru") :
-                    `${data.payload.Day ? data.payload.Day.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
+                DisplayDate: `${data.payload.Day ? data.payload.Day.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
                 Day: data.payload.Day ? data.payload.Day : null
             };
 
@@ -525,13 +503,10 @@ const findEventBy = (paramsObject) => {
 
 const createEvent = (event) => {
     let eventData = {
-        Name: event.Name,
-        TlCreationId: event.TlCreationId,
-        Day: parseInt(event.Day),
-        Month: parseInt(event.Month),
-        Year: parseInt(event.Year),
-        ShortName: event.ShortName,
-        Description: event.Description
+        ...event,
+        Day: +event.Day,
+        Month: +event.Month,
+        Year: +event.Year,
     };
 
     return fetch("/api/pm/event", {
@@ -546,14 +521,10 @@ const createEvent = (event) => {
 
 const updateEvent = (event) => {
     const eventData = {
-        Id: event.Id,
-        Name: event.Name,
-        TlCreationId: event.TlCreationId,
-        Day: parseInt(event.Day),
-        Month: parseInt(event.Month),
-        Year: parseInt(event.Year),
-        ShortName: event.ShortName,
-        Description: event.Description
+        ...event,
+        Day: +event.Day,
+        Month: +event.Month,
+        Year: +event.Year,
     };
 
     return fetch(`/api/pm/event/${event.Id}`, {

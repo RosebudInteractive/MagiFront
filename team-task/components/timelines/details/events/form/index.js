@@ -139,6 +139,10 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.Year = 'Обязательное поле'
     }
 
+    if(values.Year && (isNaN(+values.Year) || (+values.Year === 0))){
+        errors.Year = 'Неправильное значение'
+    }
+
     if (values.Month && ((values.Month > 12) || (values.Month < 1))) {
         errors.Month = 'Неправильное значение'
     }
