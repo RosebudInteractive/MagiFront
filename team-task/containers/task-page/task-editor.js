@@ -17,7 +17,7 @@ import {
 import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import TaskBody from "../../components/task-page/body";
-import {hasSupervisorRights, userSelector,} from "tt-ducks/auth";
+import {hasAdminRights, hasSupervisorRights, userSelector,} from "tt-ducks/auth";
 import "./task-page.sass"
 import {COMMENT_ACTION} from "../../constants/common";
 import moment from "moment";
@@ -26,7 +26,7 @@ import {TASK_STATE} from "../../constants/states";
 import AccessDeniedPlaceholder from "../../components/access-denied-placeholder";
 import type {UpdatingCommentData} from "../../types/task";
 
-const EDITOR_NAME = "TASK_EDITOR"
+const EDITOR_NAME = "TASK_EDITOR";
 
 type EditorProps = {
     taskId: number,
@@ -36,7 +36,8 @@ type EditorProps = {
 }
 
 function TaskEditor(props: EditorProps) {
-    const {actions, task, fetching, accessDenied, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, notifUuid } = props
+    const {actions, task, fetching, accessDenied, hasChanges, editorValues, currentElement, taskId, processId, parentTaskId, notifUuid,
+    hasAdminRights, hasSupervisorRights} = props;
 
     useEffect(() => {
         if (taskId === -1) {
@@ -150,7 +151,8 @@ function TaskEditor(props: EditorProps) {
                           onSubmit={e => e.preventDefault()}>
                         <TaskHeader hasChanged={hasChanges} taskId={taskId} processName={task.Process.Name}
                                     processId={task.Process.Id}
-                                    onSave={_save}/>
+                                    onSave={_save}
+                        linkActive={hasAdminRights || hasSupervisorRights}/>
                         <TaskBody task={task}
                                   elements={props.elements}
                                   currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
@@ -188,18 +190,20 @@ const mapState2Props = (state) => {
         editorValues: getFormValues(EDITOR_NAME)(state),
         editorValid: isValid(EDITOR_NAME)(state),
         user: userSelector(state),
+        hasSupervisorRights: hasSupervisorRights(state),
+        hasAdminRights: hasAdminRights(state)
     }
-}
+};
 
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({getTask, createTask, saveTask, saveComment, getProcessElement}, dispatch)
     }
-}
+};
 
 const enhance = compose(
     reduxForm({form: EDITOR_NAME, validate}),
     connect(mapState2Props, mapDispatch2Props)
-)
+);
 
 export default enhance(TaskEditor)

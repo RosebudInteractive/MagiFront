@@ -11,14 +11,15 @@ type TaskHeaderProps = {
     processName: string,
     processId: number,
     onSave: Function,
+    linkActive?: boolean
 }
 
 export default function TaskHeader(props: TaskHeaderProps) {
-    const {hasChanged, taskId, processName, processId} = props
+    const {hasChanged, taskId, processName, processId, linkActive = false} = props
 
     const _taskNumber = useRef(taskId ? (taskId === -1) ? "Создание задачи" : `№${taskId}` : "not saved")
 
-    const _lockTaskName = (!taskController.fieldsEnable.form) || (!taskController.fieldsEnable.taskName)
+    const _lockTaskName = (!taskController.fieldsEnable.form) || (!taskController.fieldsEnable.taskName);
 
     return <div className="task-page__header">
         <Field component={TitleTextBox} name={"Name"} label={"Название задачи"} extClass={"page-title"}
@@ -26,13 +27,17 @@ export default function TaskHeader(props: TaskHeaderProps) {
         <div className="task-info-block">
             <h6 className="task-info__task-id _grey50">{_taskNumber.current}</h6>
             <div className="task-info__separator"/>
-            {processName &&
-            <Link className="header-link" to={`/process/${processId}`}>
+            {(processName) &&
+            (linkActive ?
+                <Link className="header-link" to={`/process/${processId}`}>
+                    <div className="task-info__process-name font-body-s _white">
+                        {processName}
+                    </div>
+                </Link> :
                 <div className="task-info__process-name font-body-s _white">
                     {processName}
                 </div>
-            </Link>
-            }
+            )}
             <button className="task-info__save-button orange-button big-button" disabled={!hasChanged}
                     onClick={props.onSave}>Сохранить
             </button>
