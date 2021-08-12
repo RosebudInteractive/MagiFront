@@ -77,7 +77,7 @@ export default function Schema(props: SchemaProps) {
             const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
                 _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
 
-            _scrollLeft > 1 &&_container.scrollLeft(_scrollLeft);
+            _scrollLeft > 1 && _container.scrollLeft(_scrollLeft); //todo think about it or not
             _container.scrollTop(_scrollTop)
         } else {
             setTimeout(() => {
