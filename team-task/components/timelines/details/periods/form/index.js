@@ -181,11 +181,11 @@ const validate = (values, disableValidationOnFields = []) => {
         errors.LbYear = 'Обязательное поле';
     }
 
-    if(vals.LbYear && (isNaN(vals.LbYear) || (vals.LbYear === 0))){
+    if((isNaN(vals.LbYear) || (vals.LbYear === 0))){
         errors.Year = 'Неправильное значение'
     }
 
-    if(vals.RbYear && (isNaN(vals.RbYear) || (vals.RbYear === 0))){
+    if((isNaN(vals.RbYear) || (vals.RbYear === 0))){
         errors.Year = 'Неправильное значение'
     }
 
