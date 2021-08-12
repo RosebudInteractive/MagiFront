@@ -114,7 +114,10 @@ function* getNotificationsSaga() {
 
         yield put({
             type: SET_NOTIFICATIONS,
-            payload: notifications.map(notif => ({...notif, NotRead: !notif.IsRead, UserName: notif.User.DisplayName}))
+            payload: notifications.map(notif => ({...notif,
+                NotRead: !notif.IsRead,
+                UserName: notif.User.DisplayName,
+                Urgent: notif.IsUrgent}))
         });
         yield put({type: REQUEST_SUCCESS});
         yield put(clearLocationGuard());

@@ -67,7 +67,7 @@ export default function Schema(props: SchemaProps) {
                 }, 0)
             }
         }
-    }, [activeTaskId, tree, horizontalProcess])
+    }, [activeTaskId, horizontalProcess]);
 
     const _scrollToTask = (taskId) => {
         if (horizontalProcess) {
@@ -77,7 +77,7 @@ export default function Schema(props: SchemaProps) {
             const _scrollLeft = _task.offset().left - _container.width() + _task.outerWidth() / 3,
                 _scrollTop = _task.offset().top - _container.height() + _task.outerHeight() / 2
 
-            _container.scrollLeft(_scrollLeft)
+            _container.scrollLeft(_scrollLeft);
             _container.scrollTop(_scrollTop)
         } else {
             setTimeout(() => {
