@@ -1279,6 +1279,10 @@ const DbCourse = class DbCourse extends DbObject {
                         let dprice = course.Price * (1 - promo.Perc / 100);
                         course.Promo.Sum = Math.trunc(dprice / 10) * 10;
                         course.Promo.PromoSum = course.Price - course.Promo.Sum;
+                        let in_app_pricers = await this._getInAppPricers(opts);
+                        let in_app_price = this._getNearestPrice(course.Promo.Sum, in_app_pricers);
+                        if (in_app_price)
+                            course.Promo.InAppPrices = in_app_price;
                     }
                 }
             }
@@ -1733,6 +1737,30 @@ const DbCourse = class DbCourse extends DbObject {
             coeff = price > elem.price ? elem.coeff : coeff;
         }
         return coeff;
+    }
+
+    _getNearestPrice(price, in_app_pricers) {
+        let result = null;
+        if (in_app_pricers) {
+            for (let key in in_app_pricers) {
+                let getPrice = in_app_pricers[key];
+                let coeff;
+                if (typeof (getPrice) === "function") {
+                    if (price) {
+                        coeff = this._getPriceCoeff(key, price);
+                        let price_ini = Math.round(price * coeff);
+                        let pelem = getPrice(price_ini);
+                        if (pelem) {
+                            if (!result)
+                                result = {};
+                            result[key] = pelem;
+                            result[key].PriceIni = price_ini;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     _setPriceByProd(course, prod, hasRaw, in_app_pricers) {
