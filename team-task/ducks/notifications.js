@@ -105,8 +105,8 @@ function* getNotificationsSaga() {
 
         let paramsQuery = params.replace('notRead=1', 'notRead=true');
         paramsQuery = paramsQuery.replace('notRead=2', 'notRead=false');
-        paramsQuery = paramsQuery.replace('urgent=2', 'urgent=false');
-        paramsQuery = paramsQuery.replace('urgent=1', 'urgent=true');
+        paramsQuery = paramsQuery.replace('isUrgent=2', 'urgent=false');
+        paramsQuery = paramsQuery.replace('isUrgent=1', 'urgent=true');
         paramsQuery = paramsQuery.replace('notifType', 'type');
         paramsQuery = `${paramsQuery !== '' ? paramsQuery : ''}`;
 
@@ -116,8 +116,8 @@ function* getNotificationsSaga() {
             type: SET_NOTIFICATIONS,
             payload: notifications.map(notif => ({...notif,
                 NotRead: !notif.IsRead,
-                UserName: notif.User.DisplayName,
-                Urgent: notif.IsUrgent}))
+                UserName: notif.User.DisplayName
+            }))
         });
         yield put({type: REQUEST_SUCCESS});
         yield put(clearLocationGuard());

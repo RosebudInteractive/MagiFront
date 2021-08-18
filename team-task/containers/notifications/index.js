@@ -112,6 +112,14 @@ const Notifications = (props) => {
         },
         columns: [
             {
+                id: 'IsUrgent',
+                header: '',
+                fillspace: 5,
+                template: function (data) {
+                    return data.IsUrgent ? `<div class="is-urgent"></div>` : "";
+                },
+            },
+            {
                 id: 'TimeCr', header: 'Дата/Время', minWidth: 50, fillspace: 10, format: function (value) {
                     let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
                     return value ? fn(new Date(value)) : '';
@@ -122,15 +130,6 @@ const Notifications = (props) => {
                 header: 'Описание',
                 minWidth: 100,
                 fillspace: (!hasAdminRights || !hasSupervisorRights) ? 75 : 60
-            },
-            {
-                id: 'Urgent',
-                header: 'Приоритет',
-                minWidth: 100,
-                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8,
-                format: function (value) {
-                    return value ? 'Срочное' : 'Штатное'
-                }
             },
             {id: 'NotRead', header: 'Непрочитано', hidden: true},
             {id: 'UserName', header: 'Пользователь', hidden: (!hasAdminRights || !hasSupervisorRights), fillspace: 15}
