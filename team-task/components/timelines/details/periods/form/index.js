@@ -168,11 +168,11 @@ const validate = (values, disableValidationOnFields = []) => {
 
     const errors = {};
 
-    if (vals.LbYear && vals.LbDay && !vals.LbMonth) {
+    if (vals.LbYear && vals.LbDay && !vals.LbMonth && !vals.LbMonth !== 0) {
         errors.LbMonth = 'Обязательное поле'
     }
 
-    if (vals.LbMonth && (vals.LbMonth > 12 || vals.LbMonth < 1)) {
+    if ((vals.LbMonth || vals.LbMonth === 0) && (vals.LbMonth > 12 || vals.LbMonth < 1)) {
         errors.LbMonth = 'Неправильное значение'
     }
 
@@ -182,18 +182,18 @@ const validate = (values, disableValidationOnFields = []) => {
     }
 
     if((isNaN(vals.LbYear) || (vals.LbYear === 0))){
-        errors.Year = 'Неправильное значение'
+        errors.LbYear = 'Неправильное значение'
     }
 
     if((isNaN(vals.RbYear) || (vals.RbYear === 0))){
-        errors.Year = 'Неправильное значение'
+        errors.RbYear = 'Неправильное значение'
     }
 
-    if (vals.RbYear && vals.RbDay && !vals.RbMonth) {
+    if (vals.RbYear && vals.RbDay && !vals.RbMonth && !vals.RbMonth !== 0) {
         errors.RbMonth = 'Обязательное поле'
     }
 
-    if (vals.RbMonth &&(vals.RbMonth > 12) || (vals.RbMonth < 1)) {
+    if ((vals.RbMonth || vals.RbMonth === 0) && (vals.RbMonth > 12) || (vals.RbMonth < 1)) {
         errors.RbMonth = 'Неправильное значение'
     }
 

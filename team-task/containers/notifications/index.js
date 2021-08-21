@@ -90,7 +90,15 @@ const Notifications = (props) => {
     function getUpdatedNotifications() {
         actions.getNotifications();
         setNotifUuid(null);
-        props.history.push(`/notifications`);
+
+        let filterParams = props.history.location.search.length > 0 ? props.history.location.search : ''; //todo simplify it
+        if(filterParams.length > 0){
+            filterParams = filterParams.split('&');
+            filterParams.splice(0, 1);
+            filterParams = '?' + filterParams.join('&');
+        }
+
+        props.history.push(`/notifications${filterParams}`);
     }
 
     const GRID_CONFIG = {
@@ -152,7 +160,8 @@ const Notifications = (props) => {
                 const item = this.getItem(id);
 
                 if (item && item.Id) {
-                    props.history.push(`/notifications/task/${item.Data.taskId}?notification=${item.Data.notifKey}`);
+                    const filterParams = props.history.location.search.length > 0 ? props.history.location.search.replace('?', '&') : ''; //todo maybe simplify it
+                    props.history.push(`/notifications/task/${item.Data.taskId}?notification=${item.Data.notifKey}${filterParams}`);
                     setNotifUuid(item.Data.notifKey);
                     actions.showTaskEditor({taskId: item.Data.taskId});
                 }
