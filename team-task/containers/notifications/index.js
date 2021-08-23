@@ -122,7 +122,7 @@ const Notifications = (props) => {
             {
                 id: 'IsUrgent',
                 header: '',
-                fillspace: 5,
+                width : 52,
                 template: function (data) {
                     return data.IsUrgent ? `<div class="is-urgent"></div>` : "";
                 },
