@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import EventPoint from './native-item'
-import moment from 'moment';
+import {Event} from "../../types/event";
+import {isArrayEquals, VERTICAL_STEP} from "../../helpers/tools";
 
-export const VERTICAL_STEP = 50;
 const DEFAULT_OPACITY = 0.6;
 
 type Props = {
@@ -14,9 +14,9 @@ type Props = {
 };
 
 export default function EventPoints(props: Props) {
-    const {events, startDate, yearPerPixel, y, sorted, onRecalculateTimelineEnding, elementsOverAxis, levelLimit} = props;
+    const {events, startDate, yearPerPixel, y, onRecalculateTimelineEnding, elementsOverAxis, levelLimit} = props;
     const [activeId, setActive] = useState(null);
-    const [guard, setGuard] = useState(true);
+    const [visible, setVisible] = useState(true);
     const [showActive, setShowActive] = useState(false);
 
     const [activeOpacity, setActiveOpacity] = useState(0);
@@ -26,25 +26,11 @@ export default function EventPoints(props: Props) {
     const didMountRef = useRef(0);
     const nextActiveId = useRef(null);
 
-
+    const renderedEvents = useRef([])
     const _coordinates = useRef([]);
 
     const rerenderWithClickedElement = (id) => {
-        if (activeId !== null && activeId !== id) {
-            nextActiveId.current = id;
-            setActiveOpacity(0);
-            setActiveElementWillChange(true);
-        } else {
-            if (activeId === id) {
-                setActiveOpacity(0);
-                setShowActive(false);
-                setActive(null);
-                nextActiveId.current = null
-            } else {
-                setActive(id);
-                setShowActive(true);
-            }
-        }
+        if (activeId !== id) { setActive(id); }
     };
 
     useEffect(() => {
@@ -67,47 +53,25 @@ export default function EventPoints(props: Props) {
     }
 
     useEffect(() => {
-        didMountRef.current += 1;
-    }, [events]);
+        if (!visible) setVisible(true)
+    }, [visible]);
 
     useEffect(() => {
         if (events.some(event => event.yLevel > 0)) {
             setOpacity(DEFAULT_OPACITY)
         }
-
     }, [events]);
 
     useEffect(() => {
-        setGuard(sorted)
-    }, [sorted]);
-
-    useEffect(() => {
-        if (!sorted) {
+        if (!isArrayEquals(renderedEvents.current, events)) {
+            renderedEvents.current = [...events]
             _coordinates.current = []
+            setVisible(false)
         }
-    }, [sorted]);
-
-
-    const _e = useMemo(() => {
-        return [...events].sort((a, b) => {
-            const pointA = calcEventPoint(a),
-                pointB = calcEventPoint(b)
-            return ((pointB - startDate) - (pointA - startDate));
-        });
-
     }, [events]);
 
-    useEffect(() => {
-        setTimeout(() => {
-            activeId && setShowActive(true)
-        }, 700)
 
-    }, [_e]);
-
-
-    const callback = function (data) {
-        if (sorted) return;
-
+    const onMountCallback = function (data) {
         _coordinates.current.push(data)
         if (_coordinates.current.length === events.length) {
             if (props.onCoordinatesReady) {
@@ -122,34 +86,29 @@ export default function EventPoints(props: Props) {
         }
     }, []);
 
-    const elements = (!sorted && guard ?
-        null
-        :
-        _e
-            .map((item, index) => {
-                let _point = calcEventPoint(item)
-                let x = (_point - startDate) * yearPerPixel;
-                let yValue = elementsOverAxis ? (y - (60 * levelLimit)) - (item.yLevel * VERTICAL_STEP) : y - (item.yLevel * VERTICAL_STEP);
+    const renderElements = useMemo(() => {
+        return events.map((item: Event, index) => {
+            const x = (item.calculatedDate - startDate) * yearPerPixel,
+                yValue = elementsOverAxis ? (y - (60 * levelLimit)) - (item.yLevel * VERTICAL_STEP) : y - (item.yLevel * VERTICAL_STEP),
+                isActive = item.id === activeId,
+                zIndex = isActive ? events.length : events.length - index - 1;
 
-                return <EventPoint item={item}
-                                   x={x}
-                                   y={Number.isNaN(yValue) ? y : yValue}
-                                   axisY={y}
-                                   isActive={item.id === activeId}
-                                   onMount={callback}
-                                   clicked={rerenderWithClickedElement}
-                                   isLastPoint={item.isLastPoint}
-                                   onLastPoint={recalculateEndingOfTimeline}
-                                   visible={item.visible}
-                                   renderCount={didMountRef.current}
-                                   key={index}
-                />;
-            }));
+            return <EventPoint item={item}
+                               visible={item.visible}
+                               level={item.yLevel}
+                               x={x}
+                               y={yValue - 50}
+                               axisY={y}
+                               isActive={isActive}
+                               onMount={onMountCallback}
+                               onClick={rerenderWithClickedElement}
+                               onLastPoint={recalculateEndingOfTimeline}
+                               zIndex={zIndex}
+                               key={index}
+            />;
+        })
+    }, [events, activeId])
 
-
-    return elements
+    return visible && renderElements
 }
 
-const calcEventPoint = (event) => {
-    return event.year + (event.month ? (event.month - 1) / 12 : .5) + (event.day ? event.day / (12 * 30) : (.5 / 12))
-}

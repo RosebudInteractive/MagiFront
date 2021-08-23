@@ -17,7 +17,7 @@ class SerifItem extends React.Component {
         }
     }
 
-    onLayout(data){
+    onLayout(data) {
         this.setState({textOffset: data.width / 2})
     }
 
@@ -36,7 +36,9 @@ class SerifItem extends React.Component {
 
         return <React.Fragment>
             <View style={[styles.serif, serifStyle]}/>
-            <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => { this.onLayout(event.nativeEvent.layout) }} >
+            <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => {
+                this.onLayout(event.nativeEvent.layout)
+            }}>
                 {text}
             </Text>
         </React.Fragment>

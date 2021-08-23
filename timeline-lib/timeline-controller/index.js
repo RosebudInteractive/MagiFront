@@ -116,7 +116,7 @@ class TimelineController {
             this.events.forEach((v) => { v.visible = true; });
         } else {
             eventIds.forEach(eventId => {
-                this.events.get(eventId).visible = true
+                if (this.events.has(eventId)) this.events.get(eventId).visible = true
             });
         }
     }
@@ -125,7 +125,10 @@ class TimelineController {
         if (eventIds.length === 0) {
             this.events.forEach((v) => { v.visible = false });
         } else {
-            eventIds.forEach(id => { this.events.get(id).visible = false });
+            eventIds.forEach(id => {
+                const event = this.events.get(id)
+                if (!!event) event.visible = false
+            });
         }
     }
 

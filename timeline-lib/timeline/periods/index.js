@@ -27,10 +27,6 @@ export default function Periods(props) {
             const periodsWithCoords = periods.map((item) => {
                 const {start, end} = calcPeriodPoints(item)
 
-                // const _yearStart = item.startYear,
-                //     _yearEnd = item.endYear
-
-
                 const xStart = Math.abs(start - startDate) * yearPerPixel;
                 const xEnd = Math.abs(end - startDate) * yearPerPixel;
 
