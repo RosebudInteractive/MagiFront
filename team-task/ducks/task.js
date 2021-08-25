@@ -487,7 +487,7 @@ function* saveDependenciesSaga({payload}) {
     yield put({type: SAVE_TASK_LINKS_START})
 
     try {
-        const _calls = payload.deps
+        const actions = payload.deps
             .map((item) => {
                 return item.state === "DELETED"
                     ? call(_deleteDependence, {DepTaskId: payload.taskId, TaskId: item.taskId})
@@ -499,8 +499,8 @@ function* saveDependenciesSaga({payload}) {
             })
             .filter(item => item)
 
-        if (_calls.length > 0) {
-            yield all(_calls)
+        for (let action of actions) {
+            yield action
         }
 
         yield put({type: SAVE_TASK_LINKS_SUCCESS})
