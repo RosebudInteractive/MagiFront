@@ -7,6 +7,7 @@ const { CreateInvoice } = require('./create-invoice');
 const { UploadFile } = require('./upload-file');
 const { login } = require('./utils');
 const { PmTests } = require('./pm-tests');
+const { PromoCodes } = require('./promo-codes');
 
 let courses = [1, 2, 3, 17];
 let user = "sokolov@rosebud.ru";
@@ -26,6 +27,21 @@ for (let _cnt = 2; _cnt < process.argv.length; _cnt++) {
 }
 
 async function start() {
+    if (true) {
+        let st = new Date();
+        let host = "http://localhost:3000";
+        try {
+            let token = await login(host, user, password);
+            let res = await PromoCodes.genPromoCodes(host, token, 50, 'YA', 'Yandex partner unlimited promo');
+            console.log(`Time taken: ${(((new Date()) - st) / 1000).toFixed(3)} sec.`)
+            console.log(res);
+        }
+        catch (err) {
+            console.error(err);
+            console.log(err);
+        }
+    }
+
     if (false) {
         let st = new Date();
         await DownloadFiles.getLessonSeq(1, false)
@@ -65,7 +81,7 @@ async function start() {
         }
     }
 
-    if (true) {
+    if (false) {
         let host = "http://localhost:3000";
         try {
             let result = [];

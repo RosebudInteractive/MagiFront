@@ -542,11 +542,11 @@ const createPeriod = (period) => {
         Name: period.Name,
         TlCreationId: period.TlCreationId,
         LbYear: +period.LbYear,
-        LbMonth: +period.LbMonth,
-        RbMonth: +period.RbMonth,
+        LbMonth: +period.LbMonth ? +period.LbMonth : null,
+        RbMonth: +period.RbMonth ? +period.RbMonth : null,
         RbYear: +period.RbYear,
-        LbDay: +period.LbDay,
-        RbDay: +period.RbDay,
+        LbDay: +period.LbDay ? +period.LbDay : null,
+        RbDay: +period.RbDay ? +period.RbDay : null,
         ShortName: period.ShortName,
         Description: period.Description
     };
@@ -567,9 +567,11 @@ const updatePeriod = (period) => {
         Name: period.Name,
         TlCreationId: period.TlCreationId,
         LbYear: +period.LbYear,
-        LbMonth: +period.LbMonth,
-        RbMonth: +period.RbMonth,
+        LbMonth: +period.LbMonth ? +period.LbMonth : null,
+        RbMonth: +period.RbMonth ? +period.RbMonth : null,
         RbYear: +period.RbYear,
+        LbDay: +period.LbDay ? +period.LbDay : null,
+        RbDay: +period.RbDay ? +period.RbDay : null,
         ShortName: period.ShortName,
         Description: period.Description
     };

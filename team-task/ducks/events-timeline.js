@@ -504,8 +504,8 @@ const findEventBy = (paramsObject) => {
 const createEvent = (event) => {
     let eventData = {
         ...event,
-        Day: +event.Day,
-        Month: +event.Month,
+        Day: +event.Day ? +event.Day : null,
+        Month: +event.Month ? +event.Month : null,
         Year: +event.Year,
     };
 
@@ -522,8 +522,8 @@ const createEvent = (event) => {
 const updateEvent = (event) => {
     const eventData = {
         ...event,
-        Day: +event.Day,
-        Month: +event.Month,
+        Day: +event.Day ? +event.Day : null,
+        Month: +event.Month ? +event.Month : null,
         Year: +event.Year,
     };
 

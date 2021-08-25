@@ -90,7 +90,15 @@ const Notifications = (props) => {
     function getUpdatedNotifications() {
         actions.getNotifications();
         setNotifUuid(null);
-        props.history.push(`/notifications`);
+
+        let filterParams = props.history.location.search.length > 0 ? props.history.location.search : ''; //todo simplify it
+        if(filterParams.length > 0){
+            filterParams = filterParams.split('&');
+            filterParams.splice(0, 1);
+            filterParams = '?' + filterParams.join('&');
+        }
+
+        props.history.push(`/notifications${filterParams}`);
     }
 
     const GRID_CONFIG = {
@@ -112,6 +120,14 @@ const Notifications = (props) => {
         },
         columns: [
             {
+                id: 'IsUrgent',
+                header: '',
+                width : 52,
+                template: function (data) {
+                    return data.IsUrgent ? `<div class="is-urgent"></div>` : "";
+                },
+            },
+            {
                 id: 'TimeCr', header: 'Дата/Время', minWidth: 50, fillspace: 10, format: function (value) {
                     let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
                     return value ? fn(new Date(value)) : '';
@@ -122,15 +138,6 @@ const Notifications = (props) => {
                 header: 'Описание',
                 minWidth: 100,
                 fillspace: (!hasAdminRights || !hasSupervisorRights) ? 75 : 60
-            },
-            {
-                id: 'Urgent',
-                header: 'Приоритет',
-                minWidth: 100,
-                fillspace: (!hasAdminRights || !hasSupervisorRights) ? 15 : 8,
-                format: function (value) {
-                    return value ? 'Срочное' : 'Штатное'
-                }
             },
             {id: 'NotRead', header: 'Непрочитано', hidden: true},
             {id: 'UserName', header: 'Пользователь', hidden: (!hasAdminRights || !hasSupervisorRights), fillspace: 15}
@@ -153,7 +160,8 @@ const Notifications = (props) => {
                 const item = this.getItem(id);
 
                 if (item && item.Id) {
-                    props.history.push(`/notifications/task/${item.Data.taskId}?notification=${item.Data.notifKey}`);
+                    const filterParams = props.history.location.search.length > 0 ? props.history.location.search.replace('?', '&') : ''; //todo maybe simplify it
+                    props.history.push(`/notifications/task/${item.Data.taskId}?notification=${item.Data.notifKey}${filterParams}`);
                     setNotifUuid(item.Data.notifKey);
                     actions.showTaskEditor({taskId: item.Data.taskId});
                 }
