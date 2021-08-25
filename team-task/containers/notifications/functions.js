@@ -16,7 +16,7 @@ export const getFilterConfig = (filter, disableFields = []) => {
             name: "IsUrgent",
             placeholder: "Приоритет",
             type: FILTER_FIELD_TYPE.SELECT,
-            options: [{value: 1, label: 'Срочные'}], //1 = true, 2 = false
+            options: [{value: 1, label: 'Срочные'},{value: 2, label: 'Штатные'}], //1 = true, 2 = false
             value: filter ? filter.IsUrgent : null
         },
         {
