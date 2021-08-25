@@ -1,225 +1,196 @@
 import React from 'react';
-import {Animated, View, Text, StyleSheet} from 'react-native';
-import {SerifsContext} from '../serifs/context';
+import {
+  Animated, Text, TouchableHighlight,
+} from 'react-native';
+import { SerifsContext } from '../serifs/context';
+import styles from './styles';
+import {calcScaleY, VERTICAL_STEP} from "../../helpers/tools";
 // import {LinearGradient} from "react-native-svg";
 
 type Props = {
-    item: Object,
-    onMount?: Function,
-    x: number,
-    y: number,
-    visible: boolean,
-    isActive: boolean,
-    zoom: number,
-    isLastPoint: boolean,
-    onLastPoint?: Function,
-    opacity: number
+  item: Object,
+  onMount: Function,
+  onClick: Function,
+  x: number,
+  y: number,
+  isActive: boolean,
+  zoom: number,
+  isLastPoint: boolean,
+  onLastPoint?: Function,
 };
 
-const FOOTER_HEIGHT = 40,
-    MAX_WIDTH = 141;
+const MAX_WIDTH = 141;
 
-export default class EventPoint extends React.Component {
-    constructor(props: Props) {
-        super(props);
+export default class EventPoint extends React.PureComponent {
+  constructor(props: Props) {
+    super(props);
 
-        this.opacityAnim = new Animated.Value(0);
-        this.verticalAnim = new Animated.Value(props.y);
+    this.opacityAnim = new Animated.Value(1);
+    this.verticalAnim = new Animated.Value(1);
 
-        this.verticalAnim.addListener(({value}) => {
-            this.setHeight(value)
-        });
+    this.state = {
+      flagHeight: 0,
+      opacity: this.opacityAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [1, 1],
+      }),
+      top: this.verticalAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, props.y],
+      }),
+      scale: this.verticalAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 1],
+      }),
+      indent: this.verticalAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 0],
+      }),
+    };
 
-        this.state = {
-            width: MAX_WIDTH,
-            needMask: false,
-            tooltipTitle: props.item ? props.item.name : '',
+    this.container = React.createRef();
+    this.flagpole = React.createRef();
+  }
 
-            opacity: this.opacityAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 1],
-            }),
-        };
+  componentDidUpdate(prevProps, prevState) {
+    const {visible, y, level} = this.props,
+        {flagHeight} = this.state;
 
-        this._wrapper = React.createRef();
-        this._flagpole = React.createRef();
+    if (prevProps.visible !== visible) {
+      this.opacityAnim = new Animated.Value(0);
+
+      const _oldValue = prevProps.visible ? 1 : 0,
+          _newValue = visible ? 1 : 0
+
+      this.setState({
+        opacity: this.opacityAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [_oldValue, _newValue],
+        }),
+      });
     }
 
-    setHeight(value) {
-        const _top = value - FOOTER_HEIGHT;
-
-        if (this._wrapper && this._wrapper.current) {
-            this._wrapper.current.setNativeProps({style: {top: _top}});
-        }
-
-        if (this._flagpole && this._flagpole.current) {
-            this._flagpole.current.setNativeProps({style: {height: this.props.axisY - _top - 18}});
-        }
+    if (this.state.opacity !== prevState.opacity) {
+      Animated.timing(this.opacityAnim, {
+        toValue: 1,
+        duration: 580,
+        useNativeDriver: true,
+      }).start();
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        const {visible, y} = this.props;
+    if (prevProps.y !== y) {
 
-        if (prevProps.visible !== visible) {
-            this.opacityAnim = new Animated.Value(0);
+      const prevScale = calcScaleY(prevProps.level, flagHeight),
+        newScale = calcScaleY(level, flagHeight),
+        oldIndent = prevProps.level * VERTICAL_STEP / 2,
+        newIndent = level * VERTICAL_STEP / 2;
 
-            const _oldValue = prevProps.visible ? 1 : 0,
-                _newValue = visible ? 1 : 0;
-
-            this.setState({
-                opacity: this.opacityAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [_oldValue, _newValue],
-                }),
-            });
-        }
-
-        if (this.state.opacity !== prevState.opacity) {
-            Animated.timing(this.opacityAnim, {
-                toValue: 1,
-                duration: 580,
-                useNativeDriver: true,
-            }).start();
-        }
-
-        if (prevProps.y !== y) {
-            Animated.timing(this.verticalAnim, {
-                toValue: y,
-                duration: 670,
-                useNativeDriver: true,
-            }).start();
-        }
+      this.verticalAnim = new Animated.Value(0);
+      this.setState({
+        top: this.verticalAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [prevProps.y, y],
+        }),
+        scale: this.verticalAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [prevScale, newScale],
+        }),
+        indent: this.verticalAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [oldIndent, newIndent],
+        }),
+      });
     }
 
-    componentDidMount() {
-        const {zoom} = this.context;
-        const {item, onMount, x, visible, y} = this.props;
+    if (this.state.top !== prevState.top) {
+      Animated.timing(this.verticalAnim, {
+        toValue: 1,
+        duration: 670,
+        useNativeDriver: true,
+      }).start();
+    }
+  }
 
-        if (onMount) {
-            const _x = x * zoom,
-                _width = this._wrapper && this._wrapper.current ? this._wrapper.current.clientWidth : MAX_WIDTH
+  onTextLayout(event) {
+    const data = event.nativeEvent.layout,
+      { width, height } = data
 
-            onMount({xStart: _x, xEnd: _x + _width, id: item.id, yLevel: 0, visible: visible});
-        }
+    this.setState({ flagHeight : height })
 
-        this.handleLastPoint();
+    if (width >= 125) {
+      this.setState({
+        needMask: true,
+      });
+    }
+  }
+
+  onViewLayout(event) {
+    const data = event.nativeEvent.layout,
+        {width} = data,
+        {onMount, x, item} = this.props;
+
+    if (onMount && width) {
+      item.left = x;
+      item.width = width;
+      onMount(item.id);
+    }
+  }
+
+  onClick() {
+    const { onClick, item } = this.props
+
+    if (onClick) { onClick(item.id); }
+  }
+
+  render() {
+    const { zoom } = this.context;
+
+    const { isActive, x, item, zIndex } = this.props,
+      { top, scale, indent, opacity, flagHeight } = this.state,
+      left = x * zoom;
+
+    const wrapperStyle = {
+      left,
+      zIndex,
+      opacity,
+      maxWidth: MAX_WIDTH,
+      transform: [{ translateY: top },]
+    };
+    const eventStyle = {
+      backgroundColor: item.color,
+      opacity: isActive ? 1 : 0.57,
+    };
+    const flagpoleStyle = {
+      backgroundColor: item.color,
+      opacity: isActive ? 1 : 0.57,
+      height: VERTICAL_STEP - flagHeight,
+      top: flagHeight,
+      transform: [{ translateY: indent }, { scaleY: scale }]
+    };
+    const dateStyle = {
+      opacity: isActive ? 1 : 0.57,
     }
 
-    handleLastPoint() {
-        const {zoom} = this.context;
-        const {isLastPoint, onLastPoint, item, x} = this.props,
-            {width} = this.state,
-            _x = x * zoom;
-
-        if (isLastPoint && onLastPoint) {
-            onLastPoint({
-                width: width,
-                _width: width,
-                _x: _x,
-                x: x,
-                title: item.name,
-                date: item.date,
-                xStart: _x,
-                xEnd: _x + width,
-                zoom: zoom,
-            });
-        }
-    }
-
-    rerenderComponent() {
-        if (this.props.clicked) {
-            this.props.clicked(this.props.item.id);
-        }
-    }
-
-    onLayout(data) {
-        if (data.width >= 125) {
-            this.setState({
-                needMask: true
-            })
-        }
-    }
-
-    render() {
-        const {zoom} = this.context;
-
-        const {isActive, x, y, item, axisY} = this.props,
-            {width} = this.state,
-            _x = x * zoom,
-            {opacity, needMask} = this.state;
-
-        const _wrapperStyle = {
-                left: _x,
-                maxWidth: MAX_WIDTH,
-                opacity: opacity,
-                top: y - FOOTER_HEIGHT,
-            },
-            eventStyle = {
-                backgroundColor: item.color,
-            },
-            flagpoleStyle = {
-                backgroundColor: item.color,
-                height: axisY - (y - FOOTER_HEIGHT) - 18
-            };
-
-        const displayDate = `${item.day ? item.day + "." : ""}${item.month ? item.month + "." : ""}${item.year}`
-
-
-        return <Animated.View style={[styles.wrapper, _wrapperStyle]} ref={this._wrapper}>
-            <View style={[styles.event, eventStyle]}>
-                <Text numberOfLines={1} style={styles.title} onLayout={(event) => { this.onLayout(event.nativeEvent.layout) }}>{item.name}</Text>
-                {/*{needMask && <LinearGradient style={styles.mask} colors={['#f00', '#0f0']}/>}*/}
-            </View>
-            <Text numberOfLines={1} style={[styles.title, styles.date]}>
-                {displayDate}
+    return (
+      <Animated.View
+        style={[styles.wrapper, wrapperStyle]}
+        ref={this.container}
+        onLayout={this.onViewLayout.bind(this)}>
+        <TouchableHighlight onPress={this.onClick.bind(this)} underlayColor="transparent">
+          <Animated.View>
+            <Animated.View style={[styles.event, eventStyle]}>
+              <Text numberOfLines={1} style={styles.title} onLayout={this.onTextLayout.bind(this)}>{item.name}</Text>
+              {/* {needMask && <LinearGradient style={sty les.mask} colors={['#f00', '#0f0']}/>} */}
+            </Animated.View>
+            <Text numberOfLines={1} style={[styles.title, styles.date, dateStyle]}>
+              {item.displayDate}
             </Text>
-            <View style={[styles.flagpole, flagpoleStyle]} ref={this._flagpole}/>
-        </Animated.View>;
-    }
+            <Animated.View style={[styles.flagpole, flagpoleStyle]} ref={this.flagpole}/>
+          </Animated.View>
+        </TouchableHighlight>
+      </Animated.View>
+    );
+  }
 }
 
 EventPoint.contextType = SerifsContext;
-
-const styles = StyleSheet.create({
-    wrapper: {
-        position: 'absolute',
-    },
-    event: {
-        height: 18,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderTopLeftRadius: 4,
-        borderBottomRightRadius: 4,
-        paddingHorizontal: 8,
-        opacity: 0.57,
-        cursor: 'pointer',
-    },
-    mask: {
-        top: 0,
-        height: 18,
-        left: 4,
-    },
-    title: {
-        color: 'white',
-        fontFamily: 'Fira Sans',
-        fontWeight: '400',
-        fontSize: 10,
-        lineHeight: 18,
-        width: 'auto',
-    },
-    date: {
-        // marginTop: 2,
-        marginLeft: 8,
-        opacity: 0.57,
-    },
-    flagpole: {
-        position: 'absolute',
-        width: 1,
-        left: 0,
-        top: 18,
-        bottom: 0,
-        height: '100%',
-        opacity: 0.57,
-    },
-});

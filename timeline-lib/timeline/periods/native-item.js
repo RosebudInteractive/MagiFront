@@ -1,19 +1,13 @@
 import React from 'react';
-import {Animated, StyleSheet, Text} from 'react-native';
+import {Animated, Text, TouchableHighlight} from 'react-native';
 import {SerifsContext} from "../serifs/context";
+import styles from "./styles";
 
 type Props = {
+    period: any,
+    onClick: Function,
     y: number,
-    startX: number,
-    endX: number,
-    color: string,
-    opacity: number,
-    opacityHalf: number,
-    id: number,
-    date: string,
-    title: string,
 }
-
 
 export default class Period extends React.Component {
     constructor(props: Props) {
@@ -81,31 +75,39 @@ export default class Period extends React.Component {
         }
     }
 
+    onPress() {
+        const { onClick, period } = this.props
+
+        if (onClick) { onClick(period.id); }
+    }
+
     render() {
         const {zoom} = this.context;
 
-        const {startX, endX, color, id} = this.props,
-            _xStart = startX * zoom,
-            _xEnd = endX * zoom,
-            _blockWidth = Math.ceil(_xEnd - _xStart),
+        const { startX, endX, period, isActive } = this.props,
+            left = startX * zoom,
+            width = Math.ceil(endX * zoom - left),
+            { top, opacity } = this.state;
 
-            {top, opacity, dateText, titleText} = this.state;
+        const { r, g, b } = hexToRgb(period.color),
+            alpha = isActive ? 1 : 0.57,
+            backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`
 
-        const _color = hexToRgb(color),
-            _rgba=`rgba(${_color.r}, ${_color.g}, ${_color.b}, 0.57)`
-
-        const _style = {
-            left: _xStart,
-            backgroundColor: _rgba,
-            opacity: opacity,
-            width: _blockWidth,
+        const style = {
+            left,
+            width,
+            opacity,
+            backgroundColor,
+            zIndex: isActive ? 2 : 1,
             transform: [{ translateY: top },]
         };
 
-        return <Animated.View style={[styles.period, _style]}>
-            <Text numberOfLines={1} style={[styles.title, styles.dateTitle]}>{dateText}</Text>
-            <Text numberOfLines={1} style={[styles.title]}>{titleText}</Text>
-        </Animated.View>;
+        return <TouchableHighlight onPress={this.onPress.bind(this)} underlayColor="transparent">
+            <Animated.View style={[styles.period, style]}>
+                <Text numberOfLines={1} style={[styles.title, styles.dateTitle]}>{period.displayDate}</Text>
+                <Text numberOfLines={1} style={[styles.title]}>{period.title}</Text>
+            </Animated.View>
+        </TouchableHighlight>
     }
 }
 
@@ -117,27 +119,5 @@ function hexToRgb(hex) {
         b: parseInt(result[3], 16)
     } : null;
 }
-
-const styles = StyleSheet.create({
-    period: {
-        position: 'absolute',
-        borderRadius: 4,
-        flexDirection: "row",
-        overflow: "hidden",
-        height: 24,
-        justifyContent: "flex-start",
-        alignItems: "center",
-    },
-    title: {
-        color: "white",
-        fontFamily: "Fira Sans",
-        fontWeight: "400",
-        fontSize: 10,
-    },
-    dateTitle: {
-        opacity: 0.57,
-        marginHorizontal: 8,
-    }
-});
 
 Period.contextType = SerifsContext;

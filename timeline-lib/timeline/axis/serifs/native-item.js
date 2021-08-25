@@ -17,27 +17,26 @@ class SerifItem extends React.Component {
         }
     }
 
-    onLayout(data){
+    onLayout(data) {
         this.setState({textOffset: data.width / 2})
     }
 
     render() {
-        const {x,} = this.context
+        const {x, zoom} = this.context,
+            { index, text, yearPerPixel } = this.props,
+            left = x * index + (text < 0 ? yearPerPixel * zoom : 0);
 
-        const {index, text} = this.props;
-
-        const serifStyle = {
-            left: x * index,
-        }
-
-        const textStyle = {
-            left: x * index - this.state.textOffset,
-        };
+        const serifStyle = {left},
+            textStyle = {
+                left: left - this.state.textOffset,
+            };
 
         return <React.Fragment>
             <View style={[styles.serif, serifStyle]}/>
-            <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => { this.onLayout(event.nativeEvent.layout) }} >
-                {text}
+            <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => {
+                this.onLayout(event.nativeEvent.layout)
+            }}>
+                {text === 0 ? -1 : text}
             </Text>
         </React.Fragment>
     }

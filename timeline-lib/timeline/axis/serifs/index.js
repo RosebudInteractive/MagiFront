@@ -8,11 +8,11 @@ type Props = {
 };
 
 export default function Serifs(props: Props) {
-    const {points} = props
+    const {points, yearPerPixel} = props
 
     return useMemo(() => {
         return points.map((event, index) => {
-            return <SerifItem text={event} index={index} key={index}/>
+            return <SerifItem yearPerPixel={yearPerPixel} text={event} index={index} key={index}/>
         })
     }, [points])
 }
