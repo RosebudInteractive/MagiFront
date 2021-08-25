@@ -15,8 +15,8 @@ export const getFilterConfig = (filter, disableFields = []) => {
         {
             name: "IsUrgent",
             placeholder: "Приоритет",
-            type: FILTER_FIELD_TYPE.COMBO,
-            options: [{value: 1, label: 'Срочные'},{value: 2, label: 'Штатные'}], //1 = true, 2 = false
+            type: FILTER_FIELD_TYPE.SELECT,
+            options: [{value: 1, label: 'Срочные'}], //1 = true, 2 = false
             value: filter ? filter.IsUrgent : null
         },
         {
@@ -68,7 +68,7 @@ const convertParam2Filter = ({notRead, isUrgent, notifType, userName}) => {
 
     const filter = {};
     filter.NotRead = (notRead !== null && notRead !== undefined) ? +notRead : '';
-    filter.IsUrgent = (isUrgent !== null && isUrgent !== undefined) ? isUrgent.split(',').map(pr => +pr) : '';
+    filter.IsUrgent = (isUrgent !== null && isUrgent !== undefined) ? +isUrgent : '';
     filter.NotifType = (notifType !== null &&  notifType !== undefined) ? notifType.split(',').map(pr => +pr) : '';
     filter.UserName = userName && userName.length > 0 ? userName : '';
 
@@ -103,7 +103,7 @@ export const convertFilter2Params = (filter) => {
             filter.NotRead === 1 ?
                 _data.notRead = +filter.NotRead : delete _data.notRead;
         } //cause its for SELECT (+filter.NotRead) and delete for not perform to pass param 'notRead'
-        if(filter.IsUrgent) {_data.isUrgent = filter.IsUrgent.join(',')}
+        if(filter.IsUrgent) {_data.isUrgent = +filter.IsUrgent}
         if(filter.NotifType) {_data.notifType = filter.NotifType.join(',')}
         if(filter.UserName) {_data.userName = filter.UserName}
     }
