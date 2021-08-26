@@ -83,7 +83,7 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                     message: `LessonPositionsBase::setHist: Field "ts_start" (${data.ts_start}) > "ts" (${data.ts}).`
                 });
             let hist = { t: data.t, ut: data.ut, ts: data.ts };
-            let rc = this._setHist(userId, data.id, data.ts_start, hist, this.histTTL);
+            let rc = this._setHist(userId, data.id, data.ts_start, null, hist, this.histTTL);
             resolve(rc);
         });
     }

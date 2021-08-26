@@ -15,6 +15,8 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
+const MAX_CORRUPT_CODES = 1000;
+
 const dfltSettings = {
     maxInsertNum: 10,
     completion: {
@@ -64,9 +66,9 @@ exports.LsnHistTask = class LsnHistTask extends Task {
     }
 
     _importHstFromCache() {
-        let errors = [];
         let totUsers = {};
         let totLessons = {};
+        let corruptCodes = [];
         let totTime = 0;
         let totUserTime = 0;
         let totItems = 0;
@@ -82,7 +84,7 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                         return this._lsnHstService.cacheGet(elem, { isInternal: true })
                             .then(_elem => {
                                 let hstElem = JSON.parse(_elem);
-                                if (hstElem) {
+                                if (hstElem && hstElem.ts) {
                                     let now = (new Date()) - 0;
                                     if (((now - hstElem.ts) / 1000) > this._settings.maxIdle) {
                                         let flds = elem.split(":");
@@ -114,6 +116,9 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                                         }
                                     }
                                 }
+                                else
+                                    if (corruptCodes.length < MAX_CORRUPT_CODES)
+                                        corruptCodes.push(elem);
                                 if (hstElems.length >= this._settings.maxInsertNum)
                                     return this._processHstElems(elemCodes, hstElems)
                                         .then(() => {
@@ -126,6 +131,10 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                             return this._processHstElems(elemCodes, hstElems);
                         });
                 }
+            })
+            .then(() => {
+                if (corruptCodes.length > 0)
+                    return this._lsnHstService.cacheDelKeyList(corruptCodes);
             })
             .then(() => {
                 if (this._settings.logStat) {
