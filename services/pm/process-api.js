@@ -12,6 +12,7 @@ const { ProcessState, TaskState, ElemState, TaskStateStr, ProcessStateStr, Notif
 
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
+const DataObject = require(UCCELLO_CONFIG.uccelloPath + 'dataman/data-object');
 
 const logModif = config.has("debug.pm.logModif") ? config.get("debug.pm.logModif") : false;
 
@@ -50,6 +51,14 @@ const PROCESS_ONLY_EXPRESSION = {
     expr: {
         model: {
             name: "PmProcess"
+        }
+    }
+};
+
+const DEPS_ONLY_EXPRESSION = {
+    expr: {
+        model: {
+            name: "PmDepTask"
         }
     }
 };
@@ -144,37 +153,37 @@ const SQL_PROCESS_PUB_ELEMS_MYSQL =
 
 const SQL_PROCESS_TASKS_MSSQL =
     "select [Id], [Name], [State], [DueDate], [ExecutorId], [Description], [AlertId], [ElementId],\n" +
-    "  [IsElemReady], [WriteFieldSet]\n" +
+    "  [IsElemReady], [WriteFieldSet], [IsFinal], [IsAutomatic], [IsActive]\n" +
     "from [PmTask]\n" +
     "where [ProcessId] = <%= id %>";
 
 const SQL_PROCESS_TASKS_MYSQL =
     "select `Id`, `Name`, `State`, `DueDate`, `ExecutorId`, `Description`, `AlertId`, `ElementId`,\n" +
-    "  `IsElemReady`, `WriteFieldSet`\n" +
+    "  `IsElemReady`, `WriteFieldSet`, `IsFinal`, `IsAutomatic`, `IsActive`\n" +
     "from `PmTask`\n" +
     "where `ProcessId` = <%= id %>";
 
 const SQL_PROCESS_TASKS_PUB_MSSQL =
     "select t.[Id], t.[Name], t.[State], t.[DueDate], t.[ExecutorId], t.[Description], t.[AlertId], t.[ElementId], \n" +
-    "  t.[IsElemReady], t.[WriteFieldSet], u.[DisplayName]\n" +
-    "from[PmTask] t\n" +
+    "  t.[IsElemReady], t.[WriteFieldSet], u.[DisplayName], t.[IsFinal], t.[IsAutomatic], t.[IsActive]\n" +
+    "from [PmTask] t\n" +
     "  left join [User] u on u.[SysParentId] = t.[ExecutorId]\n" +
     "where[ProcessId] = <%= id %>";
 
 const SQL_PROCESS_TASKS_PUB_MYSQL =
     "select t.`Id`, t.`Name`, t.`State`, t.`DueDate`, t.`ExecutorId`, t.`Description`, t.`AlertId`, t.`ElementId`, \n" +
-    "  t.`IsElemReady`, t.`WriteFieldSet`, u.`DisplayName`\n" +
-    "from`PmTask` t\n" +
+    "  t.`IsElemReady`, t.`WriteFieldSet`, u.`DisplayName`, t.`IsFinal`, t.`IsAutomatic`, t.`IsActive`\n" +
+    "from `PmTask` t\n" +
     "  left join `User` u on u.`SysParentId` = t.`ExecutorId`\n" +
     "where`ProcessId` = <%= id %>";
 
 const SQL_PROCESS_DEPS_MSSQL =
-    "select d.[Id], d.[DepTaskId], d.[TaskId] from[PmDepTask] d\n" +
+    "select d.[Id], d.[DepTaskId], d.[TaskId], d.[IsConditional], d.[IsDefault], d.[IsActive], d.[Result], d.[Expression] from [PmDepTask] d\n" +
     "  join [PmTask] t on d.[TaskId] = t.[Id]\n" +
     "where t.[ProcessId] = <%= id %>";
 
 const SQL_PROCESS_DEPS_MYSQL =
-    "select d.`Id`, d.`DepTaskId`, d.`TaskId` from`PmDepTask` d\n" +
+    "select d.`Id`, d.`DepTaskId`, d.`TaskId`, d.`IsConditional`, d.`IsDefault`, d.`IsActive`, d.`Result`, d.`Expression` from `PmDepTask` d\n" +
     "  join `PmTask` t on d.`TaskId` = t.`Id`\n" +
     "where t.`ProcessId` = <%= id %>";
 
@@ -247,7 +256,7 @@ const SQL_GET_TASK_LIST_MYSQL =
 const SQL_GET_TASK_MSSQL =
     "select t.[Id], t.[Name], t.[ProcessId], t.[TimeCr], t.[DueDate], t.[ExecutorId], u.[DisplayName] as [UserName], p.[Name] as [ProcessName],\n" +
     "  t.[Description], t.[AlertId], t.[IsElemReady], t.[WriteFieldSet], t.[ElementId], t.[State], ep.[State] as [EState],\n" +
-    "  p.[SupervisorId] as [ProcessSupervisorId], t.[GuidVer],\n" +
+    "  p.[SupervisorId] as [ProcessSupervisorId], t.[GuidVer], t.[IsFinal], t.[IsAutomatic], t.[IsActive],\n" +
     "  ep.[SupervisorId], eu.[DisplayName] as [EUserName], e.[Name] as [EName], e.[WriteFields], e.[ViewFields], ps.[ProcessFields]\n" +
     "from [PmTask] t\n" +
     "  join [PmProcess] p on t.[ProcessId] = p.[Id]\n" +
@@ -261,7 +270,7 @@ const SQL_GET_TASK_MSSQL =
 const SQL_GET_TASK_MYSQL =
     "select t.`Id`, t.`Name`, t.`ProcessId`, t.`TimeCr`, t.`DueDate`, t.`ExecutorId`, u.`DisplayName` as `UserName`, p.`Name` as `ProcessName`,\n" +
     "  t.`Description`, t.`AlertId`, t.`IsElemReady`, t.`WriteFieldSet`, t.`ElementId`, t.`State`, ep.`State` as `EState`,\n" +
-    "  p.`SupervisorId` as `ProcessSupervisorId`, t.`GuidVer`,\n" +
+    "  p.`SupervisorId` as `ProcessSupervisorId`, t.`GuidVer`, t.`IsFinal`, t.`IsAutomatic`, t.`IsActive`,\n" +
     "  ep.`SupervisorId`, eu.`DisplayName` as `EUserName`, e.`Name` as `EName`, e.`WriteFields`, e.`ViewFields`, ps.`ProcessFields`\n" +
     "from `PmTask` t\n" +
     "  join `PmProcess` p on t.`ProcessId` = p.`Id`\n" +
@@ -398,7 +407,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     constructor(options) {
         super(options);
-        this._struct_cache = null;
+        this._struct_cache = {};
+        this._var_def_cache = {};
+        this._stdFunctions = {
+            isEmpty: this._isEmpty.bind(this),
+            isNotEmpty: this._isNotEmpty.bind(this)
+        }
     }
 
     async _lockProcess(id, func, timeout) {
@@ -671,6 +685,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 State: elem.State,
                 DueDate: elem.DueDate,
                 Description: elem.Description,
+                IsFinal: elem.IsFinal ? true : false,
+                IsAutomatic: elem.IsAutomatic ? true : false,
+                IsActive: elem.IsActive ? true : false,
                 AlertId: elem.AlertId,
                 IsElemReady: elem.IsElemReady ? true : false,
                 WriteFieldSet: elem.WriteFieldSet,
@@ -1057,6 +1074,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 records.detail.forEach(elem => {
                     let val = _.clone(elem);
                     val.IsElemReady = val.IsElemReady ? true : false;
+                    val.IsFinal = val.IsFinal ? true : false;
+                    val.IsAutomatic = val.IsAutomatic ? true : false;
+                    val.IsActive = val.IsActive ? true : false;
                     if (typeof (val.ExecutorId) !== "undefined") {
                         if (val.ExecutorId) {
                             val.Executor = {
@@ -1079,7 +1099,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             }, dbOpts)
             if (records && records.detail && (records.detail.length > 0)) {
                 records.detail.forEach(elem => {
-                    result.Deps.push(_.clone(elem));
+                    let val = _.clone(elem);
+                    val.IsConditional = val.IsConditional ? true : false;
+                    val.IsDefault = val.IsDefault ? true : false;
+                    val.IsActive = val.IsActive ? true : false;
+                    val.Result = val.Result === null ? null : (val.Result ? true : false);
+                    result.Deps.push(val);
                 });
             }
         }
@@ -1139,6 +1164,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 records.detail.forEach(elem => {
                     let val = _.clone(elem);
                     val.IsElemReady = val.IsElemReady ? true : false;
+                    val.IsFinal = val.IsFinal ? true : false;
+                    val.IsAutomatic = val.IsAutomatic ? true : false;
+                    val.IsActive = val.IsActive ? true : false;
                     result.Tasks.push(val);
                 });
             }
@@ -1151,7 +1179,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             }, dbOpts)
             if (records && records.detail && (records.detail.length > 0)) {
                 records.detail.forEach(elem => {
-                    result.Deps.push(_.clone(elem));
+                    let val = _.clone(elem);
+                    val.IsConditional = val.IsConditional ? true : false;
+                    val.IsDefault = val.IsDefault ? true : false;
+                    val.Result = val.Result === null ? null : (val.Result ? true : false);
+                    result.Deps.push(val);
                 });
             }
         }
@@ -1186,19 +1218,32 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         if ((!process._childs) || (!process._parents) || rebuild) {
             process._childs = {};
             process._parents = {};
+            process._deps = {};
             for (let i = 0; process.Deps && (i < process.Deps.length); i++) {
-                let parent = process.Deps[i].DepTaskId;
-                let child = process.Deps[i].TaskId;
+                let link = process.Deps[i];
+                process._deps[link.Id] = link;
+                let parent = link.DepTaskId;
+                let child = link.TaskId;
                 let parents = process._parents[child];
                 let childs = process._childs[parent];
                 if (!parents)
                     parents = process._parents[child] = {};
                 if (!childs)
                     childs = process._childs[parent] = {};
-                parents[parent] = 1;
-                childs[child]=1;
+                parents[parent] = link;
+                childs[child] = link;
             }
         }
+    }
+
+    _getIncomingDeps(process, task_id, rebuild) {
+        this._get_proc_deps(process, rebuild);
+        return process._parents[task_id];
+    }
+
+    _getOutgoingDeps(process, task_id, rebuild) {
+        this._get_proc_deps(process, rebuild);
+        return process._childs[task_id];
     }
 
     _checkForCyclicDeps(process, rebuild) {
@@ -1749,11 +1794,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         if ((taskObj.state() !== TaskState.Draft) && (taskObj.state() !== TaskState.ReadyToStart))
                             throw new HttpError(HttpCode.ERR_BAD_REQ,
-                                `Невозможно добавить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
+                                `Невозможно удалить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
                         let process = await this._get_process(taskObj.processId(), opts);
                         if (process.State === ProcessState.Finished)
-                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить зависимость в завершившийся процесс".`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно удалить зависимость из завершившегося процесса".`);
 
                         let parent_task = this._getProcessTask(process, parent_id);
                         if (!parent_task)
@@ -1784,9 +1829,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             for (let i = 0; i < collection.count(); i++) {
                                 let dep = collection.get(i);
                                 let ptask = this._getProcessTask(process, dep.depTaskId());
-                                if (ptask && (ptask.State !== TaskState.Finished)) {
-                                    is_ready = false;
-                                    break;
+                                if (ptask) {
+                                    if ((ptask.State === TaskState.Finished)) {
+                                        if (dep.isConditional())
+                                            is_ready = is_ready && dep.result();
+                                    }
+                                    else
+                                        is_ready = false;
                                 }
                             }
                             if (is_ready) {
@@ -1833,7 +1882,143 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         });
     }
 
-    async newTaskDep(data, options) {
+    _isEmpty(arg) {
+        let result = arg ? false : true;
+        switch (typeof (arg)) {
+            case "number":
+                result = isNaN(arg) ? true : false;
+                break;
+        }
+        return result;
+    }
+
+    _isNotEmpty(arg) {
+        return !this._isEmpty(arg);
+    }
+
+    _getVarDefinition(pstruct) {
+        let result = pstruct && this._var_def_cache[pstruct.Id] ? this._var_def_cache[pstruct.Id] : "";
+        if (!result) {
+            let is_first = true;
+            for (let key in this._stdFunctions) {
+                result += `${is_first ? '' : '\n'}var ${key} = this.${key};`;
+                is_first = false;
+            }
+            if (pstruct.ProcessFields)
+                for (let key in pstruct.ProcessFields) {
+                    result += `${is_first ? '' : '\n'}var ${key} = this.${key};`;
+                    is_first = false;
+                }
+            if (result)
+                this._var_def_cache[pstruct.Id] = result;
+        }
+        return result;
+    }
+
+    _crateCondContext(process, pstruct) {
+        let context = _.clone(this._stdFunctions);
+        if (process && pstruct.ProcessFields) {
+            let is_db_object = process instanceof DataObject;
+            for (let key in pstruct.ProcessFields) {
+                let val = is_db_object ? process[this._genGetterName(key)]() : process[key];
+                context[key] = val;
+            }
+        }
+        return context;
+    }
+
+    _checkConditions(process, pstruct, conds, set_result, process_obj) {
+        let context;
+        let vars;
+        let calc_exp = (exp) => {
+            context = context ? context : this._crateCondContext(process_obj ? process_obj : process, pstruct);
+            vars = vars ? vars : this._getVarDefinition(pstruct);
+            let fun;
+            try {
+                fun = new Function(`${vars}\nvar __res = ${exp};\nreturn __res ? true : false;`);
+            }
+            catch (err) {
+                throw new HttpError(HttpCode.ERR_BAD_REQ,
+                    `Ошибка в выражении: "${err.message}".`);
+            }
+            try {
+                return fun.apply(context);
+            }
+            catch (err) {
+                throw new HttpError(HttpCode.ERR_BAD_REQ,
+                    `Ошибка вычисления выражения: "${err.message}".`);
+            }
+        }
+        let calc_link = (link) => {
+            let res = { default_link: null, result: null };
+            let is_cond = link instanceof DataObject ? link.isConditional() : link.IsConditional;
+            if (is_cond) {
+                let is_default = link instanceof DataObject ? link.isDefault() : link.IsDefault;
+                if (!is_default) {
+                    let exp = link instanceof DataObject ? link.expression() : link.Expression;
+                    if (!exp)
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Выражение не задано.`);
+                    res.result = calc_exp(exp);
+                    if (set_result) {
+                        this._get_proc_deps(process);
+                        let link_id;
+                        if (link instanceof DataObject) {
+                            link.result(res.result);
+                            link_id = link.id();
+                        }
+                        else {
+                            link.Result = res.result;
+                            link_id = link.Id;
+                        }
+                        let proc_link = process._deps[link_id];
+                        if (proc_link)
+                            proc_link.Result = res.result;
+                    }
+                }
+                else
+                    res.default_link = link;
+            }
+            return res;
+        }
+        if (process && pstruct) {
+            let default_links = [];
+            let all_res = false;
+            let process_link = (link) => {
+                let { default_link, result } = calc_link(link);
+                if (default_link)
+                    default_links.push(default_link);
+                all_res = result || all_res;
+            }
+            if (Array.isArray(conds)) {
+                for (let i = 0; i < conds.length; i++)
+                    process_link(conds[i]);
+            }
+            else {
+                for (let i = 0; i < conds.count(); i++)
+                    process_link(conds.get(i));
+            }
+            if (set_result) {
+                this._get_proc_deps(process);
+                for (let i = 0; i < default_links.length; i++){
+                    let link = default_links[i];
+                    let link_id;
+                    if (link instanceof DataObject) {
+                        link.result(all_res)
+                        link_id = link.id();
+                   }
+                    else {
+                        link.Result = all_res;
+                        link_id = link.Id;
+                    }
+                    let proc_link = process._deps[link_id];
+                    if (proc_link)
+                        proc_link.Result = res.result;
+                }
+            }
+        }
+    }
+
+    async addOrUpdateTaskDep(is_new, data, options) {
         let opts = _.cloneDeep(options || {});
         opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
 
@@ -1869,42 +2054,77 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         if ((taskObj.state() !== TaskState.Draft) && (taskObj.state() !== TaskState.ReadyToStart))
                             throw new HttpError(HttpCode.ERR_BAD_REQ,
-                                `Невозможно добавить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
+                                `Невозможно добавить/изменить зависимость для задачи в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
                         let process = await this._get_process(taskObj.processId(), opts);
                         if (process.State === ProcessState.Finished)
-                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить зависимость в завершившийся процесс".`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить/изменить зависимость в завершившемся процессе".`);
 
                         let parent_task = this._getProcessTask(process, parent_id);
                         if(!parent_task)
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Родительская задача "${parent_id}" не существует.`);
 
+                        if (parent_task.IsFinal)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить зависимость к конечной задаче.`);
+
+                        if (parent_task.State === TaskState.Finished)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно добавить/изменить переход из завершенной задачи.`);
+
+                        if (!(parent_task.IsActive && taskObj.isActive()))
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Одна из задач неактивна.`);
+
+                        let pstruct = await this.getProcessStruct(process.StructId, opts);
+                        this._checkConditions(process, pstruct, [inpFields], false);
+
                         let root_dep = taskObj.getDataRoot("PmDepTask");
                         collection = root_dep.getCol("DataElements");
+                        let curr_dep = null;
                         for (let i = 0; i < collection.count(); i++){
                             let dep = collection.get(i);
                             if (dep.depTaskId() === parent_id)
-                                throw new HttpError(HttpCode.ERR_BAD_REQ,
-                                    `Зависимость задачи "${id}" от "${parent_id}" уже существует.`);
+                                curr_dep = dep;
                         }
 
-                        process.Deps.push({ TaskId: id, DepTaskId: parent_id });
-                        this._checkForCyclicDeps(process, true);
-
+                        let newHandler;
                         await taskObj.edit();
 
-                        let newHandler = await root_dep.newObject({
-                            fields: { DepTaskId: parent_id }
-                        }, dbOpts);
+                        let is_conditional = typeof (inpFields.IsConditional) === "boolean" ? inpFields.IsConditional : false;
+                        let is_default = typeof (inpFields.IsDefault) === "boolean" ? inpFields.IsDefault : false;
 
-                        if ((taskObj.state() === TaskState.ReadyToStart) && (parent_task.State!==TaskState.Finished)) {
+                        if (is_new) {
+                            if (curr_dep)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
+                                    `Зависимость задачи "${id}" от "${parent_id}" уже существует.`);
+                            process.Deps.push({ TaskId: id, DepTaskId: parent_id });
+                            this._checkForCyclicDeps(process, true);
+                            newHandler = await root_dep.newObject({
+                                fields: {
+                                    DepTaskId: parent_id,
+                                    IsConditional: is_conditional,
+                                    IsDefault: is_default,
+                                    Expression: inpFields.Expression,
+                                    IsActive: true
+                                }
+                            }, dbOpts);
+                        }
+                        else {
+                            if (!curr_dep)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
+                                    `Зависимость задачи "${id}" от "${parent_id}" не найдена.`);
+                            curr_dep.isConditional(is_conditional);
+                            curr_dep.isDefault(is_default);
+                            curr_dep.expression(inpFields.Expression ? inpFields.Expression : null);
+                        }
+
+                        if ((taskObj.state() === TaskState.ReadyToStart) && (parent_task.State !== TaskState.Finished)) {
                             taskObj.state(TaskState.Draft);
                         }
                         await taskObj.save(dbOpts);
 
                         if (logModif)
-                            console.log(buildLogString(`Dependency created: Id="${newHandler.keyValue}".`));
-                        return { result: "OK", id: newHandler.keyValue };
+                            console.log(buildLogString(
+                                `Dependency ${is_new ? 'created' : 'updated'}: Id="${is_new ? newHandler.keyValue : curr_dep.id()}".`));
+                        return { result: "OK", id: is_new ? newHandler.keyValue : curr_dep.id() };
                     })
             }, memDbOptions);
         });
@@ -2034,23 +2254,108 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         return result;
     }
 
+    _setActiveTask(process, task, result) {
+        this._get_proc_deps(process);
+        let dict = {};
+        let setActive = (task) => {
+            let parents = process._parents[task.Id];
+            if (parents) {
+                let is_all_active = true;
+                for (let parent in parents) {
+                    let incoming_link = parents[parent];
+                    if (incoming_link.IsActive && incoming_link.IsConditional && (incoming_link.Result === false)) {
+                        is_all_active = false;
+                        break;
+                    }
+                }
+                if (is_all_active) {
+                    task.isActive = true;
+                    // result.push({ type: "task", id: task.Id, fields: { isActive: true } });
+                    this._setObjFieldValueInQueue(result, dict, "task", task.Id, "isActive", true);
+                    let childs = process._childs[task.Id];
+                    if (childs)
+                        for (let child in childs) {
+                            let link_out = childs[child];
+                            link_out.IsActive = true;
+                            // result.push({ type: "link", id: link_out.Id, fields: { isActive: true } });
+                            this._setObjFieldValueInQueue(result, dict, "link", link_out.Id, "isActive", true);
+                            let ctask = this._getProcessTask(process, child);
+                            if (!ctask.IsActive)
+                                setActive(ctask);
+                        }
+                }
+            }
+        }
+        setActive(task);
+    }
+
     _getListToGoBack(process, id, isSupervisor) {
         let result = [];
         this._get_proc_deps(process);
         let childs = process._childs[id];
         if (childs) {
             for (let child in childs) {
+                if (childs[child].IsConditional)
+                    childs[child].Result = null;
                 let task = this._getProcessTask(process, child);
                 if (task) {
-                    if (task.State === TaskState.ReadyToStart)
-                        result.push(task.Id);
                     if ((!isSupervisor) && (!((task.State === TaskState.Draft) || (task.State === TaskState.ReadyToStart))))
                         throw new HttpError(HttpCode.ERR_BAD_REQ,
                             `Не все зависимые задачи находятся в состоянии "В ожидании" или "Можно приступать".`);
+                    if (task.State === TaskState.ReadyToStart)
+                        result.push({ type: "task", id: task.Id, fields: { state: TaskState.Draft } });
+                    if (!task.IsActive)
+                        this._setActiveTask(process, task, result);
                 }
             }
         }
         return result;
+    }
+
+    _setObjFieldValueInQueue(queue, dict, type, id, field, val) {
+        let key = `${type}:${id}`;
+        let obj = dict[key];
+        if (!obj) {
+            obj = { type: type, id: id, fields: {} };
+            queue.push(obj);
+        }
+        obj.fields[field] = val;
+    }
+
+    _setInactiveTask(process, task, result) {
+        this._get_proc_deps(process);
+        let dict = {};
+        let setInactive = (task) => {
+            task.isActive = false;
+            // result.push({ type: "task", id: task.Id, fields: { isActive: false } });
+            this._setObjFieldValueInQueue(result, dict, "task", task.Id, "isActive", false);
+            let childs = process._childs[task.Id];
+            if (childs)
+                for (let child in childs) {
+                    let link_out = childs[child];
+                    if (link_out.IsActive) {
+                        link_out.IsActive = false;
+                        // result.push({ type: "link", id: link_out.Id, fields: { isActive: false } });
+                        this._setObjFieldValueInQueue(result, dict, "link", link_out.Id, "isActive", false);
+                    }
+                    let ctask = this._getProcessTask(process, child);
+                    if (ctask && ctask.IsActive) {
+                        let parents = process._parents[ctask.Id];
+                        if (parents) {
+                            let is_all_inactive = true;
+                            for (let parent in parents) {
+                                if (parents[parent].IsActive) {
+                                    is_all_inactive = false;
+                                    break;
+                                }
+                            }
+                            if (is_all_inactive)
+                                setInactive(ctask);
+                        }
+                    }
+                }
+        }
+        setInactive(task);
     }
 
     _getListToGoForward(process, id) {
@@ -2062,20 +2367,34 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         if (childs) {
             for (let child in childs) {
                 let task = this._getProcessTask(process, child);
-                if (task && (task.State === TaskState.Draft)) {
+                if (task && task.IsActive && (task.State === TaskState.Draft)) {
                     let parents = process._parents[task.Id];
                     let is_ok = true;
+                    let is_inactive = false;
                     if (parents) {
                         for (let parent in parents) {
                             let tp = this._getProcessTask(process, parent);
-                            if (tp && (tp.State !== TaskState.Finished)) {
-                                is_ok = false;
-                                break;
-                            }
+                            if (tp)
+                                if (tp.State !== TaskState.Finished) {
+                                    is_ok = false;
+                                    break;
+                                }
+                                else {
+                                    let link = parents[parent];
+                                    if (link.IsConditional && (!link.Result)) {
+                                        is_ok = false;
+                                        is_inactive = true;
+                                        break;
+                                    }
+                                }
                         }
                     }
-                    if (is_ok)
-                        result.push(task.Id);
+                    if (is_ok) {
+                        task.State = TaskState.ReadyToStart;
+                        result.push({ type: "task", id: task.Id, fields: { state: TaskState.ReadyToStart } });
+                    }
+                    if (is_inactive)
+                        this._setInactiveTask(process, task, result);
                 }
             }
         }
@@ -2209,9 +2528,33 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         if (isSupervisor)
-                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate"]);
+                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
 
-                        let child_tasks = [];
+                        if ((typeof (inpFields.WriteFieldSet) !== "undefined") && (taskObj.writeFieldSet() !== inpFields.WriteFieldSet)) {
+                            if (!isSupervisor)
+                                throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять набор редактируемых полей.`);
+                            taskObj.writeFieldSet(inpFields.WriteFieldSet);
+                        }
+
+                        await processObj.edit();
+
+                        let allowed_fields = isSupervisor ? undefined : [];
+                        if ((!isSupervisor) && taskObj.elementId() && taskObj.writeFieldSet()) {
+                            let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
+                            if (!wr_set)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ,
+                                    `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
+                            wr_set.forEach(elem => {
+                                allowed_fields.push(elem);
+                            })
+                        }
+
+                        if (typeof (inpFields.Fields) !== "undefined") {
+                            this._setFieldValues(processObj, inpFields.Fields,
+                                ["Id", "Name", "State", "StructId", "SupervisorId", "LessonId", "DueDate"], allowed_fields);
+                        }
+
+                        let mdf_objs = [];
                         let notifications = [];
                         let old_state = taskObj.state();
                         if (typeof (inpFields.State) !== "undefined")
@@ -2225,45 +2568,91 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     if (processObj.state() === ProcessState.Draft)
                                         throw new HttpError(HttpCode.ERR_BAD_REQ, `Невозможно изменить состояние задачи в процессе "Черновик".`);
 
-                                    let task_ids = [];
-                                    let task_state;
+                                    let obj_ids = [];
                                     if (taskObj.state() === TaskState.Finished) {
                                         if ((!isSupervisor) && (inpFields.State !== TaskState.InProgess))
                                             throw new HttpError(HttpCode.ERR_BAD_REQ,
                                                 `Задачу можно перевести только в состояние "${TaskStateStr[TaskState.InProgess]}".`);
-                                        task_state = TaskState.Draft;
-                                        task_ids = this._getListToGoBack(process, id, isSupervisor);
+                                        obj_ids = this._getListToGoBack(process, id, isSupervisor);
+                                        let tmp_root =
+                                            await this._getObjects(DEPS_ONLY_EXPRESSION, { field: "DepTaskId", op: "=", value: id });
+                                        memDbOptions.dbRoots.push(tmp_root); // Remember DbRoot to delete it finally in editDataWrapper
+                                        let links_col = tmp_root.getCol("DataElements");
+                                        if (links_col.count() > 0) {
+                                            mdf_objs.push(tmp_root);
+                                            await tmp_root.edit();
+                                            for (let i = 0; i < links_col.count(); i++){
+                                                let link = links_col.get(0);
+                                                link.result(null);
+                                                link.isActive(true);
+                                            }
+                                        }
                                     }
                                     else
                                         if (inpFields.State === TaskState.Finished) {
-                                            task_state = TaskState.ReadyToStart;
-                                            task_ids = this._getListToGoForward(process, id);
+                                            let tmp_root =
+                                                await this._getObjects(DEPS_ONLY_EXPRESSION, { field: "DepTaskId", op: "=", value: id });
+                                            memDbOptions.dbRoots.push(tmp_root); // Remember DbRoot to delete it finally in editDataWrapper
+                                            let links_col = tmp_root.getCol("DataElements");
+                                            if (links_col.count() > 0) {
+                                                mdf_objs.push(tmp_root);
+                                                await tmp_root.edit();
+                                                this._checkConditions(process, pstruct, links_col, true, processObj);
+                                            }
+                                            obj_ids = this._getListToGoForward(process, id);
                                         }
-                                    if (task_ids.length > 0) {
-                                        for (let i = 0; i < task_ids.length; i++) {
-                                            root_obj = await this._getObjById(task_ids[i], TASK_ONLY_EXPRESSION, dbOpts);
+
+                                    if (obj_ids.length > 0) {
+                                        for (let i = 0; i < obj_ids.length; i++) {
+                                            let expr;
+                                            let err_msg;
+                                            let is_task = false;
+
+                                            switch (obj_ids[i].type) {
+                                                case "link":
+                                                    expr = DEPS_ONLY_EXPRESSION;
+                                                    err_msg = `Переход (Id =${obj_ids[i].id}) не найден.`;
+                                                    break;
+
+                                                case "task":
+                                                    is_task = true;
+                                                    expr = TASK_ONLY_EXPRESSION;
+                                                    err_msg = `Дочерняя задача (Id =${obj_ids[i].id}) не найдена.`;
+                                                    break;
+
+                                                default:
+                                                    throw new Error(`ProcessAPI::updateTask: Unknown modified object type: "${obj_ids[i].type}".`);
+                                            }
+
+                                            root_obj = await this._getObjById(obj_ids[i].id, expr, dbOpts);
                                             memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                                             collection = root_obj.getCol("DataElements");
                                             if (collection.count() != 1)
-                                                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Дочерняя задача (Id =${task_ids[i]}) не найдена.`);
-                                            let ctask = collection.get(0);
-                                            await ctask.edit();
-                                            ctask.state(task_state);
-                                            child_tasks.push(ctask);
-                                            if (task_state === TaskState.ReadyToStart) {
-                                                let elem_supervisor_id = this._getElemSupervisorByTaskId(ctask.id(), process);
-                                                let user_id = ctask.executorId() ? ctask.executorId() :
+                                                throw new HttpError(HttpCode.ERR_NOT_FOUND, err_msg);
+                                            let obj = collection.get(0);
+                                            await obj.edit();
+
+                                            if (obj_ids[i].fields) {
+                                                for (let fld in obj_ids[i].fields) {
+                                                    obj[fld](obj_ids[i].fields[fld]);
+                                                }
+                                                mdf_objs.push(obj);
+                                            }
+
+                                            if (is_task && (obj_ids[i].fields.state === TaskState.ReadyToStart)) {
+                                                let elem_supervisor_id = this._getElemSupervisorByTaskId(obj.id(), process);
+                                                let user_id = obj.executorId() ? obj.executorId() :
                                                     (elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId());
                                                 notifications.push({
                                                     UserId: user_id,
                                                     NotifType: NotificationType.TaskCanStart,
-                                                    Data: { taskId: ctask.id() },
-                                                    IsUrgent: ctask.dueDate() && ((ctask.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
-                                                    URL: `${this._absPmTaskUrl}${ctask.id()}`,
+                                                    Data: { taskId: obj.id() },
+                                                    IsUrgent: obj.dueDate() && ((obj.dueDate() - (new Date()) < URGENT_INTERVAL_MS)),
+                                                    URL: `${this._absPmTaskUrl}${obj.id()}`,
                                                     Subject: _.template(TASK_START_NOTIF)({
-                                                        id: ctask.id(),
+                                                        id: obj.id(),
                                                         lesson: process.Lesson.Name,
-                                                        name: ctask.name()
+                                                        name: obj.name()
                                                     })
                                                 })
                                             }
@@ -2337,30 +2726,6 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 newAlertId = newHandler.keyValue;
                         }
 
-                        if ((typeof (inpFields.WriteFieldSet) !== "undefined") && (taskObj.writeFieldSet() !== inpFields.WriteFieldSet)) {
-                            if (!isSupervisor)
-                                throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять набор редактируемых полей.`);
-                            taskObj.writeFieldSet(inpFields.WriteFieldSet);
-                        }
-
-                        await processObj.edit();
-
-                        let allowed_fields = isSupervisor ? undefined : [];
-                        if ((!isSupervisor) && taskObj.elementId() && taskObj.writeFieldSet()) {
-                            let wr_set = this._getFieldSetByElemId(pstruct, process, taskObj.elementId(), taskObj.writeFieldSet());
-                            if (!wr_set)
-                                throw new HttpError(HttpCode.ERR_BAD_REQ,
-                                    `Набор полей редактирования "${taskObj.writeFieldSet()}" не существует.`);
-                            wr_set.forEach(elem => {
-                                allowed_fields.push(elem);
-                            })
-                        }
-
-                        if (typeof (inpFields.Fields) !== "undefined") {
-                            this._setFieldValues(processObj, inpFields.Fields,
-                                ["Id", "Name", "State", "StructId", "SupervisorId", "LessonId", "DueDate"], allowed_fields);
-                        }
-
                         if (elemObj)
                             await elemObj.edit();
                         if (taskObj.isElemReady() && elemObj) {
@@ -2375,8 +2740,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         let transactionId = tran.transactionId;
                         dbOpts.transactionId = tran.transactionId;
                         try {
-                            for (let i = 0; i < child_tasks.length; i++)
-                                await child_tasks[i].save(dbOpts);
+                            for (let i = 0; i < mdf_objs.length; i++)
+                                await mdf_objs[i].save(dbOpts);
                             if (notifications.length > 0)
                                 await this.sendNotifications(notifications, { user: opts.user, dbOptions: dbOpts });
                             if (!newAlertId)
@@ -2444,7 +2809,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     let elem = inpFields.Dependencies[i];
                                     let task = this._getProcessTask(process, elem);
                                     if (!task)
-                                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Родительская задача Id = ${elem} не существует.`);
+                                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Родительская задача #${elem} не существует.`);
+                                    if (task.IsFinal)
+                                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Невозможно добавить задачу, зависящую от задачи #${elem}.`);
                                     if (task.State !== TaskState.Finished)
                                         break;
                                     finished_cnt++;
@@ -2456,7 +2823,15 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 task_state = TaskState.ReadyToStart;
                         }
                             
-                        let fields = { ProcessId: inpFields.ProcessId, IsElemReady: true, State: task_state, AlertId: null };
+                        let fields = {
+                            ProcessId: inpFields.ProcessId,
+                            IsElemReady: true,
+                            State: task_state,
+                            AlertId: null,
+                            IsFinal: false,
+                            IsAutomatic: false,
+                            IsActive: true
+                        };
 
                         if (typeof (inpFields.Name) !== "undefined")
                             fields.Name = inpFields.Name
@@ -2482,6 +2857,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                     need_elem_rollback = true;
                             }
                         }
+
+                        if (typeof (inpFields.IsFinal) === "boolean")
+                            fields.IsFinal = inpFields.IsFinal;
+
+                        if (typeof (inpFields.IsAutomatic) === "boolean")
+                            fields.IsAutomatic = inpFields.IsAutomatic;
 
                         let newHandler = await root_obj.newObject({
                             fields: fields
@@ -2970,18 +3351,18 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             let result = null;
             let redis_ts = await this.cacheHget(key, "ts", { json: true });
             if (redis_ts) {
-                if ((!this._struct_cache) || (this._struct_cache.ts !== redis_ts)) {
+                if ((!this._struct_cache[id]) || (this._struct_cache[id].ts !== redis_ts)) {
                     let val = await this.cacheHgetAll(key, { json: true });
                     if (val && val.ts && val.data) {
-                        this._struct_cache = val;
+                        this._struct_cache[id] = val;
                         result = val.data;
                     }
                 }
                 else
-                    result = this._struct_cache.data ? this._struct_cache.data : null;
+                    result = this._struct_cache[id].data ? this._struct_cache[id].data : null;
             }
             if (!result) {
-                this._struct_cache = null;
+                this._struct_cache = {};
                 let root_obj = await this._getObjById(id, PROCESS_STRUCT_EXPRESSION, dbOpts);
                 try {
                     let collection = root_obj.getCol("DataElements");
@@ -3017,7 +3398,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     let ts = 't' + ((new Date()) - 0);
                     await this.cacheHset(key, "ts", ts, { json: true });
                     await this.cacheExpire(key, STRUCT_TTL_SEC);
-                    this._struct_cache = { ts: ts, data: result };
+                    this._struct_cache[id] = { ts: ts, data: result };
                 }
                 finally {
                     if (root_obj)

@@ -165,7 +165,18 @@ function setupProcesses(app) {
         app.post(`${ROUTE_PREFIX}task-dep`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ user: req.user }, req.query);
-                let rows = await ProcessService().newTaskDep(req.body, opts);
+                let rows = await ProcessService().addOrUpdateTaskDep(true, req.body, opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.put(`${ROUTE_PREFIX}task-dep`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await ProcessService().addOrUpdateTaskDep(false, req.body, opts);
                 res.send(rows);
             }
             catch (err) {
