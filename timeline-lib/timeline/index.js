@@ -44,7 +44,7 @@ export default function TimeAxis(props: Props) {
         } else {
             setEventsWithCoords(events);
         }
-    }, [events, periods]);
+    }, [events, periods,]);
 
     useEffect(() => {
         if (zoomSliderStopped && zoomRef.current !== zoom) {

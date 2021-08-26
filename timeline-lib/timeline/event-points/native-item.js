@@ -5,7 +5,7 @@ import {
 import { SerifsContext } from '../serifs/context';
 import styles from './styles';
 import {calcScaleY, VERTICAL_STEP} from "../../helpers/tools";
-// import {LinearGradient} from "react-native-svg";
+import Mask from "../gradient-mask";
 
 type Props = {
   item: Object,
@@ -29,6 +29,7 @@ export default class EventPoint extends React.PureComponent {
     this.verticalAnim = new Animated.Value(1);
 
     this.state = {
+      needMask: false,
       flagHeight: 0,
       opacity: this.opacityAnim.interpolate({
         inputRange: [0, 1],
@@ -47,13 +48,10 @@ export default class EventPoint extends React.PureComponent {
         outputRange: [0, 0],
       }),
     };
-
-    this.container = React.createRef();
-    this.flagpole = React.createRef();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {visible, y, level} = this.props,
+    const {visible, y, level, item} = this.props,
         {flagHeight} = this.state;
 
     if (prevProps.visible !== visible) {
@@ -79,7 +77,6 @@ export default class EventPoint extends React.PureComponent {
     }
 
     if (prevProps.y !== y) {
-
       const prevScale = calcScaleY(prevProps.level, flagHeight),
         newScale = calcScaleY(level, flagHeight),
         oldIndent = prevProps.level * VERTICAL_STEP / 2,
@@ -102,7 +99,7 @@ export default class EventPoint extends React.PureComponent {
       });
     }
 
-    if (this.state.top !== prevState.top) {
+    if ((this.state.top !== prevState.top) || (this.state.scale !== prevState.scale)) {
       Animated.timing(this.verticalAnim, {
         toValue: 1,
         duration: 670,
@@ -112,12 +109,34 @@ export default class EventPoint extends React.PureComponent {
   }
 
   onTextLayout(event) {
+    if (event.nativeEvent.lines.length > 1) {
+      this.setState({
+        needMask: true,
+      });
+    }
+  }
+
+  onTextContainerLayout(event) {
     const data = event.nativeEvent.layout,
-      { width, height } = data
+      { width, height } = data,
+      { level } = this.props;
 
-    this.setState({ flagHeight : height })
+    const newScale = calcScaleY(level, height),
+        newIndent = level * VERTICAL_STEP / 2;
 
-    if (width >= 125) {
+    this.setState({
+      flagHeight : height,
+      scale: this.verticalAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, newScale],
+      }),
+      indent: this.verticalAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, newIndent],
+      }),
+    })
+
+    if (width >= MAX_WIDTH - 16) {
       this.setState({
         needMask: true,
       });
@@ -146,7 +165,7 @@ export default class EventPoint extends React.PureComponent {
     const { zoom } = this.context;
 
     const { isActive, x, item, zIndex } = this.props,
-      { top, scale, indent, opacity, flagHeight } = this.state,
+      { top, scale, indent, opacity, flagHeight, needMask } = this.state,
       left = x * zoom;
 
     const wrapperStyle = {
@@ -172,20 +191,21 @@ export default class EventPoint extends React.PureComponent {
     }
 
     return (
-      <Animated.View
-        style={[styles.wrapper, wrapperStyle]}
-        ref={this.container}
-        onLayout={this.onViewLayout.bind(this)}>
+      <Animated.View style={[styles.wrapper, wrapperStyle]} onLayout={this.onViewLayout.bind(this)}>
         <TouchableHighlight onPress={this.onClick.bind(this)} underlayColor="transparent">
           <Animated.View>
             <Animated.View style={[styles.event, eventStyle]}>
-              <Text numberOfLines={1} style={styles.title} onLayout={this.onTextLayout.bind(this)}>{item.name}</Text>
-              {/* {needMask && <LinearGradient style={sty les.mask} colors={['#f00', '#0f0']}/>} */}
+              <Text numberOfLines={1} style={styles.title}
+                    onLayout={this.onTextContainerLayout.bind(this)}
+                    onTextLayout={this.onTextLayout.bind(this)}>
+                {item.name}
+              </Text>
+              { needMask && <Mask color={item.color} isActive={isActive}/> }
             </Animated.View>
             <Text numberOfLines={1} style={[styles.title, styles.date, dateStyle]}>
               {item.displayDate}
             </Text>
-            <Animated.View style={[styles.flagpole, flagpoleStyle]} ref={this.flagpole}/>
+            <Animated.View style={[styles.flagpole, flagpoleStyle]} />
           </Animated.View>
         </TouchableHighlight>
       </Animated.View>

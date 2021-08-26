@@ -74,7 +74,7 @@ export default function EventPoints(props: Props) {
                                key={index}
             />;
         })
-    }, [events, activeId])
+    }, [events, activeId, yearPerPixel])
 
     return visible && renderElements
 }
