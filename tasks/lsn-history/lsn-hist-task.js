@@ -15,7 +15,7 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
-const MAX_CORRUPT_CODES = 1000;
+const MAX_CORRUPT_CODES = 5000;
 
 const dfltSettings = {
     maxInsertNum: 10,
@@ -72,6 +72,8 @@ exports.LsnHistTask = class LsnHistTask extends Task {
         let totTime = 0;
         let totUserTime = 0;
         let totItems = 0;
+        let totCorrupt = 0;
+        let totCorruptRemoved = 0;
         return new Promise(resolve => {
             let rc = this._lsnHstService.cacheGetKeyList("*");
             resolve(rc);
@@ -116,9 +118,13 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                                         }
                                     }
                                 }
-                                else
-                                    if (corruptCodes.length < MAX_CORRUPT_CODES)
+                                else {
+                                    totCorrupt++;
+                                    if (corruptCodes.length < MAX_CORRUPT_CODES) {
                                         corruptCodes.push(elem);
+                                        totCorruptRemoved++;
+                                    }
+                                }
                                 if (hstElems.length >= this._settings.maxInsertNum)
                                     return this._processHstElems(elemCodes, hstElems)
                                         .then(() => {
@@ -143,6 +149,7 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                     totTime = Math.round(totTime);
                     totUserTime = Math.round(totUserTime);
                     let msg = `Listening history import: ${totItems} item(s), ${tot_lessons} lesson(s), ${tot_users} user(s), ` +
+                        ` ${totCorruptRemoved}:${totCorrupt} corrupt, `+
                         `total time: ${DbUtils.fmtDuration(totTime)}, user time: ${DbUtils.fmtDuration(totUserTime)}.`;
                     console.log(buildLogString(msg));
                 };
