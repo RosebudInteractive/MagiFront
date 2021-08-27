@@ -149,7 +149,7 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                     totTime = Math.round(totTime);
                     totUserTime = Math.round(totUserTime);
                     let msg = `Listening history import: ${totItems} item(s), ${tot_lessons} lesson(s), ${tot_users} user(s), ` +
-                        ` ${totCorruptRemoved}:${totCorrupt} corrupt, `+
+                        ` ${totCorruptRemoved}:${totCorrupt} corrupted, `+
                         `total time: ${DbUtils.fmtDuration(totTime)}, user time: ${DbUtils.fmtDuration(totUserTime)}.`;
                     console.log(buildLogString(msg));
                 };
