@@ -58,8 +58,8 @@ export const markNotifsAsRead = (notifIds = []) => {
     return {type: MARK_NOTIFICATIONS_AS_READ, payload: notifIds}
 };
 
-export const getOnlyUnread = () => {
-    return {type: GET_UNREAD_COUNT}
+export const getOnlyUnread = (showError = true) => {
+    return {type: GET_UNREAD_COUNT, payload: {showError}}
 };
 
 
@@ -103,6 +103,7 @@ function* updateNotificationsAsRead(data) {
 
 function* getNotificationsSaga(data) {
     yield put({type: REQUEST_START});
+
     try {
         const params = yield select(paramsSelector);
 
