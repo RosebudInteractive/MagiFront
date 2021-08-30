@@ -2393,7 +2393,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 this._setObjFieldValueInQueue(result, dict, "task", task.Id, "isActive", is_active);
             }
             if (is_active && is_ready && (task.State === TaskState.Draft)) {
-                this._setObjFieldValueInQueue(result, dict, "task", task.Id, "state", TaskState.ReadyToStart);
+                this._setObjFieldValueInQueue(result, dict, "task", task.Id, "state", task.IsAutomatic ? TaskState.Finished : TaskState.ReadyToStart);
                 task.State = TaskState.ReadyToStart;
             }
             if (old_is_active && (!is_ready) && (task.State === TaskState.ReadyToStart)) {
@@ -2583,6 +2583,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             let old_executor = taskObj.executorId();
                             let new_executor = (typeof (inpFields.ExecutorId) === "number") && (inpFields.ExecutorId > 0) ? inpFields.ExecutorId : null;
                             if (old_executor !== new_executor) {
+                                if(taskObj.isAutomatic())
+                                    throw new HttpError(HttpCode.ERR_FORBIDDEN, `Нельзя назначить исполнителя автоматической задаче.`);
                                 if (!(isSupervisor || isElemElemManager))
                                     throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять исполнителя задачи.`);
                                 is_executor_changed = true;
@@ -2594,6 +2596,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
                         if (isSupervisor)
                             this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
+
+                        if (taskObj.isAutomatic() && (!taskObj.isFinal()))
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Автоматическая задача должна быть конечной.`);
 
                         if ((typeof (inpFields.WriteFieldSet) !== "undefined") && (taskObj.writeFieldSet() !== inpFields.WriteFieldSet)) {
                             if (!isSupervisor)
@@ -2749,6 +2754,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             })
                         }
 
+                        if ((old_state !== taskObj.state()) && taskObj.isAutomatic())
+                            throw new HttpError(HttpCode.ERR_BAD_REQ,`Невозможно изменить состояние у автоматической задачи.`);
+
                         if ((old_state !== taskObj.state()) && (taskObj.state() === TaskState.Alert)) {
                             let user_id = elem_supervisor_id ? elem_supervisor_id : processObj.supervisorId();
                             notifications.push({
@@ -2903,7 +2911,15 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         else
                             throw new Error(`Missing field "Name"`);
 
+                        if (typeof (inpFields.IsFinal) === "boolean")
+                            fields.IsFinal = inpFields.IsFinal;
+
+                        if (typeof (inpFields.IsAutomatic) === "boolean")
+                            fields.IsAutomatic = inpFields.IsAutomatic;
+
                         if (typeof (inpFields.ExecutorId) === "number") {
+                            if (fields.IsAutomatic)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Нельзя назначить исполнителя автоматической задаче.`);
                             fields.ExecutorId = inpFields.ExecutorId;
                             if (inpFields.ExecutorId !== opts.user.Id)
                                 await this._checkIfPmTaskExecutor(inpFields.ExecutorId);
@@ -2923,11 +2939,11 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                         }
 
-                        if (typeof (inpFields.IsFinal) === "boolean")
-                            fields.IsFinal = inpFields.IsFinal;
-
-                        if (typeof (inpFields.IsAutomatic) === "boolean")
-                            fields.IsAutomatic = inpFields.IsAutomatic;
+                        if (fields.IsAutomatic && (fields.State === TaskState.ReadyToStart))
+                            fields.State = TaskState.Finished;
+                        
+                        if (fields.IsAutomatic && (!fields.IsFinal))
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Автоматическая задача должна быть конечной.`);
 
                         let newHandler = await root_obj.newObject({
                             fields: fields
@@ -3022,14 +3038,27 @@ const ProcessAPI = class ProcessAPI extends DbObject {
     }
 
     _canGoToFinished(process) {
+        let active_elems = {};
+        for (let i = 0; i < process.Tasks.length; i++)
+            if (process.Tasks[i].ElementId)
+                active_elems[process.Tasks[i].ElementId] = true;
         for (let i = 0; i < process.Elements.length; i++){
-            if (process.Elements[i].State !== ElemState.Ready)
+            if ((process.Elements[i].State !== ElemState.Ready) && active_elems[process.Elements[i].Id])
                 throw new HttpError(HttpCode.ERR_BAD_REQ, `Не все элементы процесса находятся в состоянии готовности.`);
         }
+        let cnt_finished = 0;
+        let is_finished = false;
         for (let i = 0; i < process.Tasks.length; i++) {
-            if (process.Tasks[i].State !== TaskState.Finished)
-                throw new HttpError(HttpCode.ERR_BAD_REQ, `Не все задачи процесса завершены.`);
+            if (process.Tasks[i].State === TaskState.Finished) {
+                cnt_finished++;
+                if (process.Tasks[i].IsFinal) {
+                    is_finished = true;
+                    break;
+                }
+            }
         }
+        if ((!is_finished) || (cnt_finished < process.Tasks.length.length))
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Не все задачи процесса завершены или не выполнена завершающая задача.`);
     }
 
     _makeTasksReady(process) {
