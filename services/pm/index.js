@@ -33,8 +33,19 @@ function setupProcesses(app) {
 
         app.get(`${ROUTE_PREFIX}dashboard`, async (req, res, next) => {
             try {
-                let opts = _.defaultsDeep({ is_counter: true, user: req.user }, req.query);
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
                 let rows = await PmDashboardService().getList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
+        app.get(`${ROUTE_PREFIX}dashboard/lesson-list`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ user: req.user }, req.query);
+                let rows = await PmDashboardService().getLessonList(opts);
                 res.send(rows);
             }
             catch (err) {

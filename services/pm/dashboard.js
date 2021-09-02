@@ -31,7 +31,7 @@ const SQL_GET_LIST_MSSQL =
     "  left join [PmElemProcess] ep on ep.[Id] = t.[ElementId]\n" +
     "  left join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
     "  left join [User] u on u.[SysParentId] = p.[SupervisorId]\n" +
-    "where(not lc.[ReadyDate] is NULL) and (not((lc.[State] = 'R') and (c.[State] = 'P') and (p.[Id] is NULL)))<%= filter %>\n" +
+    "where (not lc.[ReadyDate] is NULL) and (not((lc.[State] = 'R') and (c.[State] = 'P') and (p.[Id] is NULL)))<%= filter %>\n" +
     "order by lc.[ReadyDate], 6, 7, lc.[LessonId]";
 
 const SQL_GET_LIST_MYSQL =
@@ -50,13 +50,114 @@ const SQL_GET_LIST_MYSQL =
     "  left join `PmElemProcess` ep on ep.`Id` = t.`ElementId`\n" +
     "  left join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
     "  left join `User` u on u.`SysParentId` = p.`SupervisorId`\n" +
-    "where(not lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))<%= filter %>\n" +
+    "where (not lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))<%= filter %>\n" +
     "order by lc.`ReadyDate`, 6, 7, lc.`LessonId`";
+
+const SQL_GET_LSN_LIST_MSSQL =
+    "select lc.[CourseId], lc.[LessonId], cl.[Name] CourseName, ll.[Name] LessonName,\n" +
+    "  case when lcp.[Id] is NULL then lc.[Number] else lcp.[Number] end Num_parent,\n" +
+    "  case when lcp.[Id] is NULL then 0 else lc.[Number] end Num, lc.[State] LessonState, c.[State] CourseState\n" +
+    "from [LessonLng] ll\n" +
+    "  join [LessonCourse] lc on ll.[LessonId] = lc.[LessonId]\n" +
+    "  join [Course] c on lc.[CourseId] = c.[Id]\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  left join [LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
+    "  left join [PmProcess] p on p.[LessonId] = lc.[LessonId]\n" +
+    "where (lc.[ReadyDate] is NULL) and (not((lc.[State] = 'R') and (c.[State] = 'P') and (p.[Id] is NULL)))";
+
+const SQL_GET_LSN_LIST_MYSQL =
+    "select lc.`CourseId`, lc.`LessonId`, cl.`Name` CourseName, ll.`Name` LessonName,\n" +
+    "  case when lcp.`Id` is NULL then lc.`Number` else lcp.`Number` end Num_parent,\n" +
+    "  case when lcp.`Id` is NULL then 0 else lc.`Number` end Num, lc.`State` LessonState, c.`State` CourseState\n" +
+    "from `LessonLng` ll\n" +
+    "  join `LessonCourse` lc on ll.`LessonId` = lc.`LessonId`\n" +
+    "  join `Course` c on lc.`CourseId` = c.`Id`\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  left join `LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
+    "  left join `PmProcess` p on p.`LessonId` = lc.`LessonId`\n" +
+    "where (lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))";
+
+const DFLT_LSN_SORT_ORDER = "LessonName,ASC";
 
 const PmDashboard = class PmDashboard extends DbObject {
 
     constructor(options) {
         super(options);
+    }
+
+    async getLessonList(options) {
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmElemManager, opts);
+
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+
+        let sql_mysql = SQL_GET_LSN_LIST_MYSQL;
+        let sql_mssql = SQL_GET_LSN_LIST_MSSQL;
+
+        let mssql_conds = [];
+        let mysql_conds = [];
+
+        if (opts.course_name) {
+            mssql_conds.push(`(cl.[Name] like N'%${opts.course_name}%')`);
+            mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course_name}%')`);
+        }
+        if (opts.lesson_name) {
+            mssql_conds.push(`(ll.[Name] like N'%${opts.lesson_name}%')`);
+            mysql_conds.push(`(ll.${'`'}Name${'`'} like '%${opts.lesson_name}%')`);
+        }
+
+        if (mysql_conds.length > 0) {
+            sql_mysql += `\n  AND ${mysql_conds.join("\n  AND ")}`;
+            sql_mssql += `\n  AND ${mssql_conds.join("\n  AND ")}`;
+        }
+
+        opts.order = opts.order ? opts.order : DFLT_LSN_SORT_ORDER;
+        if (opts.order) {
+            let ord_arr = opts.order.split(',');
+            let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
+            let mysql_field;
+            let mssql_field;
+            switch (ord_arr[0]) {
+                case "CourseName":
+                    mssql_field = `cl.[Name] ${dir}`;
+                    mysql_field = `cl.${'`'}Name${'`'} ${dir}`;
+                    break;
+                case "LessonName":
+                    mssql_field = `ll.[Name] ${dir}`;
+                    mysql_field = `ll.${'`'}Name${'`'} ${dir}`;
+                    break;
+                case "Number":
+                    mysql_field = mssql_field = `5 ${dir}, 6 ASC`;
+                    break;
+            }
+            if (mysql_field) {
+                sql_mysql += `\nORDER BY ${mysql_field}`;
+                sql_mssql += `\nORDER BY ${mssql_field}`;
+            }
+        }
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(sql_mysql)(),
+                mssql: _.template(sql_mssql)()
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            records.detail.forEach(elem => {
+                let rec = {
+                    CourseId: elem.CourseId,
+                    LessonId: elem.LessonId,
+                    CourseName: elem.CourseName,
+                    LessonName: elem.LessonName,
+                    LessonNum: `${elem.Num_parent}${(elem.Num > 0 ? ('.' + elem.Num) : '')}`,
+                    LessonState: elem.LessonState,
+                    CourseState: elem.CourseState
+                };
+                result.push(rec);
+            });
+        }
+
+        return result;
     }
 
     async getList(options) {
@@ -88,9 +189,14 @@ const PmDashboard = class PmDashboard extends DbObject {
             mysql_conds.push(`(lc.${'`'}CourseId${'`'} = ${opts.course})`);
         }
 
+        if (opts.course_name) {
+            mssql_conds.push(`(cl.[Name] like N'%${opts.course_name}%')`);
+            mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course_name}%')`);
+        }
+
         if (mysql_conds.length > 0) {
-            filter_mysql += `\nAND ${mysql_conds.join("\n  AND")}`;
-            filter_mssql += `\nAND ${mssql_conds.join("\n  AND")}`;
+            filter_mysql += `\nAND ${mysql_conds.join("\n  AND ")}`;
+            filter_mssql += `\nAND ${mssql_conds.join("\n  AND ")}`;
         }
 
         let records = await $data.execSql({

@@ -794,6 +794,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             mssql_conds.push(`(t.[State] in (${states.join(',')}))`);
             mysql_conds.push(`(t.${'`'}State${'`'} in (${states.join(',')}))`);
         }
+        if (opts.element) {
+            mssql_conds.push(`(t.[ElementId] = ${opts.element})`);
+            mysql_conds.push(`(t.${'`'}ElementId${'`'} = ${opts.element})`);
+        }
 
         if (mysql_conds.length > 0) {
             sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND ")}`;
