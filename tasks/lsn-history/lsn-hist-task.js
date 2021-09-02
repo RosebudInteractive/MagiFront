@@ -15,6 +15,8 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
+const MAX_CORRUPT_CODES = 5000;
+
 const dfltSettings = {
     maxInsertNum: 10,
     completion: {
@@ -64,12 +66,14 @@ exports.LsnHistTask = class LsnHistTask extends Task {
     }
 
     _importHstFromCache() {
-        let errors = [];
         let totUsers = {};
         let totLessons = {};
+        let corruptCodes = [];
         let totTime = 0;
         let totUserTime = 0;
         let totItems = 0;
+        let totCorrupt = 0;
+        let totCorruptRemoved = 0;
         return new Promise(resolve => {
             let rc = this._lsnHstService.cacheGetKeyList("*");
             resolve(rc);
@@ -82,7 +86,7 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                         return this._lsnHstService.cacheGet(elem, { isInternal: true })
                             .then(_elem => {
                                 let hstElem = JSON.parse(_elem);
-                                if (hstElem) {
+                                if (hstElem && hstElem.ts) {
                                     let now = (new Date()) - 0;
                                     if (((now - hstElem.ts) / 1000) > this._settings.maxIdle) {
                                         let flds = elem.split(":");
@@ -114,6 +118,13 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                                         }
                                     }
                                 }
+                                else {
+                                    totCorrupt++;
+                                    if (corruptCodes.length < MAX_CORRUPT_CODES) {
+                                        corruptCodes.push(elem);
+                                        totCorruptRemoved++;
+                                    }
+                                }
                                 if (hstElems.length >= this._settings.maxInsertNum)
                                     return this._processHstElems(elemCodes, hstElems)
                                         .then(() => {
@@ -128,12 +139,17 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                 }
             })
             .then(() => {
+                if (corruptCodes.length > 0)
+                    return this._lsnHstService.cacheDelKeyList(corruptCodes);
+            })
+            .then(() => {
                 if (this._settings.logStat) {
                     let tot_users = Object.keys(totUsers).length;
                     let tot_lessons = Object.keys(totLessons).length;
                     totTime = Math.round(totTime);
                     totUserTime = Math.round(totUserTime);
                     let msg = `Listening history import: ${totItems} item(s), ${tot_lessons} lesson(s), ${tot_users} user(s), ` +
+                        ` ${totCorruptRemoved}:${totCorrupt} corrupted, `+
                         `total time: ${DbUtils.fmtDuration(totTime)}, user time: ${DbUtils.fmtDuration(totUserTime)}.`;
                     console.log(buildLogString(msg));
                 };

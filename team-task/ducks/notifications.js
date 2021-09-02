@@ -50,16 +50,16 @@ export const fetchingSelector = createSelector(stateSelector, state => state.fet
 export const unreadCountSelector = createSelector(stateSelector, state => state.unreadCount);
 
 //params: notRead,urgent,type
-export const getNotifications = (notRead = null, urgent = null, type) => {
-    return {type: LOAD_NOTIFICATIONS, payload: {notRead, urgent, type}}
+export const getNotifications = (showError = true) => {
+    return {type: LOAD_NOTIFICATIONS, payload: {showError}}
 };
 
 export const markNotifsAsRead = (notifIds = []) => {
     return {type: MARK_NOTIFICATIONS_AS_READ, payload: notifIds}
 };
 
-export const getOnlyUnread = () => {
-    return {type: GET_UNREAD_COUNT}
+export const getOnlyUnread = (showError = true) => {
+    return {type: GET_UNREAD_COUNT, payload: {showError}}
 };
 
 
@@ -71,7 +71,7 @@ export const saga = function* () {
     ])
 };
 
-function* getUnreadCountSaga() {
+function* getUnreadCountSaga(data) {
     // yield put({type: REQUEST_START});
     try {
 
@@ -82,7 +82,10 @@ function* getUnreadCountSaga() {
     } catch (e) {
         yield put({type: REQUEST_FAIL});
         yield put(clearLocationGuard());
-        yield put(showErrorMessage(e.message));
+
+        if(data.payload.showError){
+            yield put(showErrorMessage(e.message));
+        }
     }
 }
 
@@ -98,8 +101,9 @@ function* updateNotificationsAsRead(data) {
     }
 }
 
-function* getNotificationsSaga() {
+function* getNotificationsSaga(data) {
     yield put({type: REQUEST_START});
+
     try {
         const params = yield select(paramsSelector);
 
@@ -124,7 +128,10 @@ function* getNotificationsSaga() {
     } catch (e) {
         yield put({type: REQUEST_FAIL});
         yield put(clearLocationGuard());
-        yield put(showErrorMessage(e.message));
+
+        if(data.payload.showError){
+            yield put(showErrorMessage(e.message));
+        }
     }
 }
 

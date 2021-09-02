@@ -42,5 +42,6 @@ exports.TaskStateStr = {
 exports.ElemState = {
     NotReady: 1,
     Partly: 2,
-    Ready: 3
+    Ready: 3,
+    InProgess: 4
 };
