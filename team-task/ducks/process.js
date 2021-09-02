@@ -148,7 +148,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                         process.Tasks[index] = {...process.Tasks[index], ...payload.fields}
                     }
 
-                    return process
+                    return {...process}
                 })
 
         default:
