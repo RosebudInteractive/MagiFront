@@ -1,7 +1,7 @@
 import {useEffect,} from "react"
 import {useLocation} from "react-router-dom"
 
-const TIME_INTERVAL = 2 * 60 * 1000
+const TIME_INTERVAL = 2 * 60 * 1000;
 
 type Props = {
     getList: Function,
@@ -10,8 +10,8 @@ type Props = {
 
 class Timer {
     init({getList, getUnreadCount}) {
-        this.getList = getList
-        this.getUnreadCount = getUnreadCount
+        this.getList = getList;
+        this.getUnreadCount = getUnreadCount;
 
         if (this._timer) {this.stop()}
         this._timer = setInterval(::this._getData, TIME_INTERVAL)
@@ -23,35 +23,35 @@ class Timer {
 
     _getData() {
         if(location.pathname.includes('notifications')){
-            this.getList()
+            this.getList(!this._timer)
         } else {
-            this.getUnreadCount()
+            this.getUnreadCount(!this._timer)
         }
     }
 
     stop() {
-        clearInterval(this._timer)
+        clearInterval(this._timer);
         this._timer = null
     }
 }
 
-const timer = new Timer()
+const timer = new Timer();
 
 export default function NotificationRefresher(props: Props) {
-    const {getList, getUnreadCount} = props
-    const location = useLocation()
+    const {getList, getUnreadCount} = props;
+    const location = useLocation();
 
     useEffect(() => {
         timer.setLocation(location)
-    }, [location])
+    }, [location]);
 
     useEffect(() => {
-        timer.init({getList, getUnreadCount})
+        timer.init({getList, getUnreadCount});
 
         return () => {
             timer.stop()
         }
-    }, [])
+    }, []);
 
     return null
 }
