@@ -11,6 +11,7 @@ import {
     updateElement,
     deleteElement,
     clear,
+    updateProcessTask,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -152,6 +153,7 @@ function ProcessEditor(props) {
                              onAddElement={actions.addElement}
                              onUpdateElement={actions.updateElement}
                              onDeleteElement={actions.deleteElement}
+                             onUpdateProcessTask={actions.updateProcessTask}
                              onAddTask={onAddTask}
                              onAddTaskWithLink={onAddTaskWithLink}
                              onEditTaskLinks={onEditTaskLinks}
@@ -206,6 +208,7 @@ const mapDispatch2Props = (dispatch) => {
             setActiveTaskId,
             setInitState,
             changeProcessRotation,
+            updateProcessTask,
         }, dispatch)
     }
 }

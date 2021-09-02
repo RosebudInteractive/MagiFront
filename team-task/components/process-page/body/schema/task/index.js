@@ -1,48 +1,66 @@
-import React, {useMemo, useRef,} from "react"
+import React, {useCallback, useMemo, useRef,} from "react"
 import "./task.sass"
 import {getTaskState} from "../../../../../tools/tasks";
 import moment from "moment";
 import {TASK_STATE} from "../../../../../constants/states";
-
+import ActionMenu from "./action-menu";
 
 type TaskProps = {
     onClick: Function,
     onEditLinks: Function,
     onEdit: Function,
     onDelete: Function,
+    onMenuButtonClick: Function,
     onAddNewTask: Function,
+    onChangeTaskFinal: Function,
+    onChangeTaskAuto: Function,
     active: boolean,
+    isLast: boolean,
+    menuTaskId: number,
     node: any,
     horizontalProcess: boolean,
 }
 
 export default function SchemaTask(props: TaskProps) {
+    const {node, active, onClick, horizontalProcess, menuTaskId, isLast} = props;
+    const taskRef = useRef(null)
 
-    const {node, active, onClick, horizontalProcess} = props
-
-    const _onEditLinks = () => {
+    const editLinks = useCallback(() => {
         if (props.onEditLinks) {
             props.onEditLinks(node.id)
         }
-    }
+    }, [node])
 
-    const _onEdit = () => {
+    const editTask = useCallback(() => {
         if (props.onEdit) {
             props.onEdit(node.id)
         }
-    }
+    }, [node])
 
-    const _onDelete = () => {
+    const deleteTask = useCallback(() => {
         if (props.onDelete) {
             props.onDelete(node.id)
         }
-    }
+    }, [node])
 
-    const _onAddNewTask = () => {
+    const addNewTask = useCallback(() => {
         if (props.onAddNewTask) {
             props.onAddNewTask(node.id)
         }
-    }
+    }, [node])
+
+    const setTaskFinal = useCallback(() => {
+        if (props.onChangeTaskFinal) {
+            props.onChangeTaskFinal(node.id, !node.isFinal)
+        }
+    }, [node])
+
+    const setTaskAuto = useCallback(() => {
+        if (props.onChangeTaskAuto) {
+            props.onChangeTaskAuto(node.id, !node.isAutomatic)
+        }
+    }, [node])
+
 
 
     const style = useMemo(() => {return {
@@ -59,35 +77,71 @@ export default function SchemaTask(props: TaskProps) {
         return isExpired ? { isExpired, css: "_expired", caption: _state.caption } : { isExpired, ..._state}
     }, [node])
 
-    const _onClick = (e) => {
-        if (e.target.closest(".task__button") || e.target.closest(".task-button_add-new-task")) return
+    const onTaskClick = (e) => {
+        if (e.target.closest(".task-button__add-new-task")) return
 
         if (onClick) {
             onClick(node.id)
         }
     }
 
+    const taskClass = useMemo(() => {
+        return 'process-schema__task unselectable' + (
+            node.disabled ? ' _disabled' : (active ? ' _active' : '') + (state.isExpired ? ' _expired' : '')
+        )
+    }, [node, active])
+
+    const onMenuButtonClick = (e) => {
+        if (props.onMenuButtonClick) {
+            e.stopPropagation();
+            props.onMenuButtonClick(node.id)
+        }
+    }
+
+    const menuPosition = useMemo(() => {
+        if (menuTaskId === node.id) {
+            return {
+                left: (isLast && horizontalProcess  ? 0 : taskRef.current.offsetWidth + 10) + taskRef.current.offsetLeft,
+                top: taskRef.current.offsetTop}
+        }
+    }, [menuTaskId])
+
     return node ?
-        <div className="process-schema__cell" style={style}>
-            <div className={"process-schema__task unselectable" + (active ? " _active" : "") + (state.isExpired ? " _expired" : "")}
-                 id={"js-task_" + node.id}
-                 onClick={_onClick}
-                 onDoubleClick={_onEdit}>
-                <div className="task__first-row">
-                    <div className="task__id _grey50">{node.id}</div>
-                    { node.dueDate && <div className="task__due-date _black">{(new Date(node.dueDate)).toLocaleDateString("ru-RU")}</div> }
+        <React.Fragment>
+            <div className="process-schema__cell" style={style}>
+                <div className={taskClass}
+                     ref={taskRef}
+                     id={"js-task_" + node.id}
+                     onClick={onTaskClick}
+                     onDoubleClick={editTask}>
+                    <div className="task__first-row">
+                        <div className="task__id _grey50">{node.id}</div>
+                        { node.dueDate && <div className="task__due-date _black">{(new Date(node.dueDate)).toLocaleDateString("ru-RU")}</div> }
+                        <div className={'task__action-button'} onClick={onMenuButtonClick}>
+                            <div className='point'/>
+                            <div className='point'/>
+                            <div className='point'/>
+                        </div>
+                    </div>
+                    <div className="task__name _black">{node.name}</div>
+                    <div className="task__executor _black">{node.executorName ? node.executorName : ""}</div>
+                    <div className={`task-state ${state.css}`}>{state.caption}</div>
+                    { !node.disabled && <button className='task-button__add-new-task' onClick={addNewTask}/> }
+                    <div className='task__ext-info'>
+                        { node.isFinal && <div className='ext-info__item _final'>Конечная</div> }
+                        { node.isAutomatic && <div className='ext-info__item _auto'>Авто</div> }
+                    </div>
                 </div>
-                <div className="task__name _black">{node.name}</div>
-                <div className="task__executor _black">{node.executorName ? node.executorName : ""}</div>
-                <div className={`task-state ${state.css}`}>{state.caption}</div>
-                <div className="task__buttons-block">
-                    <button className='task__button _link' onClick={_onEditLinks}/>
-                    <button className='task__button _edit' onClick={_onEdit}/>
-                    <button className='task__button _delete' onClick={_onDelete}/>
-                </div>
-                <button className='task-button_add-new-task' onClick={_onAddNewTask}/>
+                {menuTaskId === node.id && <ActionMenu position={menuPosition}
+                                                       isFinal={node.isFinal}
+                                                       isAutomatic={node.isAutomatic}
+                                                       onEdit={editTask}
+                                                       onFinalClick={setTaskFinal}
+                                                       onAutoClick={setTaskAuto}
+                                                       onDelete={deleteTask}
+                                                       onEditLinks={editLinks}/>}
             </div>
-        </div>
+        </React.Fragment>
         :
         null
 }

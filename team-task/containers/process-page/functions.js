@@ -15,6 +15,9 @@ export const buildTree = (process) => {
             name: task.Name,
             state: task.State,
             dueDate: task.DueDate,
+            isFinal: task.IsFinal,
+            isAutomatic: task.IsAutomatic,
+            disabled: !task.IsActive,
             isExpired: moment(task.DueDate).isBefore(moment()),
             executorName: task.Executor ? task.Executor.DisplayName : "",
             weight: undefined,
@@ -33,7 +36,7 @@ export const buildTree = (process) => {
             _tree.nodes[dep.DepTaskId].dependencies.nodes.push(dep.TaskId)
         }
 
-        _tree.lines.push({from: dep.DepTaskId, to: dep.TaskId})
+        _tree.lines.push({from: dep.DepTaskId, to: dep.TaskId, id: dep.Id, hasCondition: !!dep.IsConditional, disabled: !dep.IsActive})
     })
 
     const _roots = Object.values(_tree.nodes).filter(item => item.dependencies.count === 0)

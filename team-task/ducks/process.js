@@ -69,6 +69,11 @@ const GO_BACK_REQUEST = `${prefix}/GO_BACK_REQUEST`
 
 const CLEAR_PROCESS = `${prefix}/CLEAR_PROCESS`
 
+const UPDATE_PROCESS_TASK_REQUEST = `${prefix}/UPDATE_PROCESS_TASK_REQUEST`
+const UPDATE_PROCESS_TASK_START = `${prefix}/UPDATE_PROCESS_TASK_START`
+const UPDATE_PROCESS_TASK_SUCCESS = `${prefix}/UPDATE_PROCESS_TASK_SUCCESS`
+const UPDATE_PROCESS_TASK_FAIL = `${prefix}/UPDATE_PROCESS_TASK_FAIL`
+
 
 /**
  * Reducer
@@ -134,6 +139,18 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("process", null)
 
+        case UPDATE_PROCESS_TASK_SUCCESS:
+            return state
+                .update('process', (process) => {
+                    const index = process.Tasks.findIndex(task => (task.Id === payload.taskId))
+
+                    if (index !== -1) {
+                        process.Tasks[index] = {...process.Tasks[index], ...payload.fields}
+                    }
+
+                    return process
+                })
+
         default:
             return state
     }
@@ -189,6 +206,10 @@ export const clear = () => {
     return {type: CLEAR_PROCESS}
 }
 
+export const updateProcessTask = (taskId, fields) => {
+    return {type: UPDATE_PROCESS_TASK_REQUEST, payload: {taskId, fields}}
+}
+
 /**
  * Sagas
  */
@@ -202,6 +223,7 @@ export const saga = function* () {
         takeEvery(ADD_ELEMENT_REQUEST, addElementSaga),
         takeEvery(UPDATE_ELEMENT_REQUEST, updateElementSaga),
         takeEvery(DELETE_ELEMENT_REQUEST, deleteElementSaga),
+        takeEvery(UPDATE_PROCESS_TASK_REQUEST, updateProcessTaskSaga),
     ])
 }
 
@@ -434,6 +456,31 @@ const _deleteProcess = (id: number) => {
         headers: {
             "Content-type": "application/json"
         },
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* updateProcessTaskSaga({payload}){
+    yield put({type: UPDATE_PROCESS_TASK_START})
+    try {
+        yield call(updateTask, payload)
+
+        yield put({type: UPDATE_PROCESS_TASK_SUCCESS, payload})
+    } catch (e) {
+        yield put({type: UPDATE_PROCESS_TASK_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const updateTask = ({taskId, fields}) => {
+    return fetch(`/api/pm/task/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(fields),
         credentials: 'include'
     })
         .then(checkStatus)

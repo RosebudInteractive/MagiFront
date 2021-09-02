@@ -25,6 +25,7 @@ type ProcessBodyProps = {
     onEditTask: Function,
     onDeleteTask: Function,
     onChangeRotation: Function,
+    onUpdateProcessTask: Function,
 }
 
 export default function ProcessBody(props: ProcessBodyProps) {
@@ -69,6 +70,7 @@ export default function ProcessBody(props: ProcessBodyProps) {
                     onEditTaskLinks={props.onEditTaskLinks}
                     onEditTask={props.onEditTask}
                     onDeleteTask={props.onDeleteTask}
+                    onUpdateProcessTask={props.onUpdateProcessTask}
                     onChangeRotation={props.onChangeRotation}/>
 
         </div>

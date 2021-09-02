@@ -1,5 +1,5 @@
-import React, {useEffect, useMemo, useRef, useState} from "react"
-import {horizontalProcess} from "tt-ducks/app";
+import React, { useState, useEffect, useMemo } from 'react';
+import Xarrow from 'react-xarrows';
 
 export const ARROW_TYPE = {
     DEFAULT: "DEFAULT",
@@ -7,88 +7,70 @@ export const ARROW_TYPE = {
     OUT: "OUT"
 }
 
-export type ArrowType = $Values<typeof ARROW_TYPE>
-
-type ArrowProps = {
-    source: string,
-    dest: string,
-    scrollPosition: number,
-    type: ArrowType,
-    delay?: number,
-    horizontalProcess: boolean,
-}
-
-export default function LineArrow(props: ArrowProps) {
-    const {source, dest, type, scrollPosition, delay, horizontalProcess} = props
-    const line = useRef(),
-        svgContainer = useRef()
-
-    useEffect(() => {
-        setTimeout(() => {
-            const startElement = document.getElementById(source),
-                endElement = document.getElementById(dest),
-                options = {
-                    color: (type === ARROW_TYPE.OUT) ? "#C8684C" :
-                        (type === ARROW_TYPE.IN) ? "#D1941A" : "#9696A0",
-                    size: 2,
-                    startSocket: props.horizontalProcess ? 'right' : "bottom",
-                    endSocket: props.horizontalProcess ? 'left': "top",
-                    startSocketGravity: props.horizontalProcess ? 31 : 31,
-                    endSocketGravity: props.horizontalProcess ? 31 : 31,
-                }
-
-
-            line.current = new LeaderLine(startElement, endElement, options)
-
-            const _path = $(`#leader-line-${line.current._id}-line-path`)
-            if (_path && _path.parent() && _path.parent()) {
-                svgContainer.current = _path.parent().parent()
-                toggleArrowActive()
-            }
-
-
-        }, delay ? delay : 0)
-
-        return () => {
-            if (line.current) {
-                line.current.remove()
-            }
-        }
-    }, [])
-
-    useEffect(() => {
-        if (line.current) {
-            line.current.color = (type === ARROW_TYPE.OUT) ?
-                "#C8684C"
-                :
-                (type === ARROW_TYPE.IN) ? "#D1941A" : "#9696A0"
-        }
-
-        toggleArrowActive()
-    }, [type])
-
-    useEffect(() => {
-        if (line.current) {line.current.position()}
-    }, [scrollPosition])
-
-    useEffect(() => {
-        if (line.current) {
-            line.current.setOptions({
-                startSocket: horizontalProcess ? 'right' : "bottom",
-                endSocket: horizontalProcess ? 'left' : "top"
-            })
-        }
-    }, [horizontalProcess])
-
-    const toggleArrowActive = () => {
-        if (!svgContainer.current) return
-
-        if ((type === ARROW_TYPE.OUT) || (type === ARROW_TYPE.IN)) {
-            svgContainer.current.addClass("_active")
-        } else {
-            svgContainer.current.removeClass("_active")
-        }
+const COLORS = {
+    DEFAULT: {
+        COMMON: '#9696A0',
+        HOVER: '#4B4B4B'
+    },
+    OUT: {
+        COMMON: 'rgba(200,104,76,0.6)',
+        HOVER: '#C8684C'
+    },
+    IN: {
+        COMMON: 'rgba(209,148,26,0.6)',
+        HOVER: '#D1941A'
+    },
+    WITH_CONDITION: {
+        COMMON: 'rgba(0,44,157,0.6)',
+        HOVER: '#002C9D'
     }
 
-    return null
 }
+
+export default (props) => {
+    const { type, item, setSelected, selected } = props
+
+    const [color, setColor] = useState('transparent'),
+        [strokeWidth, setStrokeWidth] = useState(2),
+        [headSize, setHeadSize] = useState(6),
+        [hover, setHover] = useState(false)
+
+    useEffect(() => {
+        const currentColor = type === ARROW_TYPE.OUT ?
+            COLORS.OUT
+            :
+            (type === ARROW_TYPE.IN) ?
+                COLORS.IN
+                :
+                item.hasCondition ?
+                    COLORS.WITH_CONDITION
+                    :
+                    COLORS.DEFAULT;
+
+        const isArrowSelected = selected === item.id,
+            colorValue = hover || isArrowSelected ? currentColor.HOVER : currentColor.COMMON
+
+        setColor(colorValue)
+        setStrokeWidth(isArrowSelected ? 3 : 2)
+        setHeadSize(isArrowSelected ? 5 : 6)
+    }, [props, hover])
+
+    const passProps = useMemo(() => {
+            return {
+                className: 'process-schema__x-arrow' + (item.disabled ? ' _disabled' : ''),
+                onMouseEnter: () => {if (!item.disabled) setHover(true)},
+                onMouseLeave: () => {if (!item.disabled) setHover(false)},
+                onClick: () => {
+                    if (!item.disabled && setSelected) setSelected(item.id);
+                },
+                cursor: item.disabled ? 'default' : 'pointer',
+            }
+        }, [])
+
+    return <Xarrow {...props}
+        zIndex={selected === item.id ? 2 : 0}
+        passProps={passProps}
+        color={color}
+        strokeWidth={strokeWidth}
+        headSize={headSize}/>;
+};

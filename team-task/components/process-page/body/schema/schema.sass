@@ -1,43 +1,9 @@
 @import "~tt-assets/styles/colors.sass"
 
 .process-body__schema
-
   position: relative
   flex: 1 0 66.67%
   width: 66.67%
-  //.schema__left-screen
-    z-index: 10
-    position: absolute
-    left: -48px
-    top: 0
-    width: 24px
-    height: 100%
-    background-color: $grey01
-    &:after
-      content: ""
-      position: absolute
-      right: -24px
-      top: 0
-      width: 24px
-      height: 100%
-      background-color: $color-main-light
-
-  //.schema__right-screen
-    z-index: 10
-    position: absolute
-    right: -48px
-    top: 0
-    width: 24px
-    height: 100%
-    background-color: $grey01
-    &:before
-      content: ""
-      position: absolute
-      left: -24px
-      top: 0
-      width: 24px
-      height: 100%
-      background-color: $color-main-light
 
 .process-schema__canvas-background
   overflow-x: auto
@@ -56,7 +22,8 @@
   padding: 20px
   margin: auto
   height: auto
-  width: fit-content
+  //width: fit-content
+  justify-items: center
   overflow-x: auto
   min-height: 300px
   background-color: rgba(169, 169, 169, 0)
@@ -105,3 +72,9 @@
   &:hover
     opacity: 1
 
+.process-schema__x-arrow
+  transition: color, stroke-width 300ms ease-in-out
+  &._selected
+    z-index: 2
+  &._disabled
+    opacity: .3

@@ -47,6 +47,9 @@ export type Tree = {
 }
 
 type TreeLine = {
+    id: number,
     from: number,
-    to: number
+    to: number,
+    hasCondition: boolean,
+    disabled: boolean,
 }
