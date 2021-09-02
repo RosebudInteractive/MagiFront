@@ -3,6 +3,7 @@ const config = require('config');
 const { NotificationParams } = require('./const');
 const { ProcessService } = require('./process-api');
 const { NotificationService } = require('./notification');
+const { PmDashboardService } = require('./dashboard');
 const { getTimeStr, buildLogString } = require('../../utils');
 
 const ROUTE_PREFIX = "/api/pm/";
@@ -29,6 +30,17 @@ function setupProcesses(app) {
     global.$Services.processes = ProcessService;
 
     if (app) {
+
+        app.get(`${ROUTE_PREFIX}dashboard`, async (req, res, next) => {
+            try {
+                let opts = _.defaultsDeep({ is_counter: true, user: req.user }, req.query);
+                let rows = await PmDashboardService().getList(opts);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
 
         app.get(`${ROUTE_PREFIX}notification-count`, async (req, res, next) => {
             try {

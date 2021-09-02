@@ -500,8 +500,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }
 
         if (mysql_conds.length > 0) {
-            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND")}`;
-            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND ")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND ")}`;
         }
 
         opts.order = opts.order ? opts.order : DFLT_PROCESS_SORT_ORDER;
@@ -770,6 +770,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 else {
                     mssql_conds.push(`(u.[SysParentId] = ${opts.user.Id})`);
                     mysql_conds.push(`(u.${'`'}SysParentId${'`'} = ${opts.user.Id})`);
+                    mssql_conds.push(`(t.[IsActive] = 1)`);
+                    mysql_conds.push(`(t.${'`'}IsActive${'`'} = 1)`);
                     has_executor = true;
                     opts.executor = null;
                 }
@@ -794,8 +796,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }
 
         if (mysql_conds.length > 0) {
-            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND")}`;
-            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND")}`;
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND ")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND ")}`;
         }
 
         opts.order = opts.order ? opts.order : DFLT_TASK_SORT_ORDER;
