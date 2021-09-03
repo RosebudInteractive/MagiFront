@@ -86,9 +86,10 @@ const Notification = class Notification extends DbObject {
             mssql_conds.push(`(n.[IsRead] = 0)`);
             mysql_conds.push(`(n.${'`'}IsRead${'`'} = 0)`);
         }
-        if ((opts.urgent === "true") || (opts.urgent === true)) {
-            mssql_conds.push(`(n.[IsUrgent] = 1)`);
-            mysql_conds.push(`(n.${'`'}IsUrgent${'`'} = 1)`);
+        if ((opts.urgent === "true") || (opts.urgent === true) || (opts.urgent === "false") || (opts.urgent === false)) {
+            let val = (opts.urgent === "true") || (opts.urgent === true) ? 1 : 0;
+            mssql_conds.push(`(n.[IsUrgent] = ${val})`);
+            mysql_conds.push(`(n.${'`'}IsUrgent${'`'} = ${val})`);
         }
         if (opts.type) {
             let types = Array.isArray(opts.type) ? opts.type : opts.type.split(',');
