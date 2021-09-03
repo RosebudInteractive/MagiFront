@@ -53,6 +53,16 @@ function setupProcesses(app) {
             }
         });
 
+        app.put(`${ROUTE_PREFIX}dashboard/lesson/:id`, async (req, res, next) => {
+            try {
+                let rows = await PmDashboardService().setLessonReadyDate(parseInt(req.params.id), req.body, { user: req.user });
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            }
+        });
+
         app.get(`${ROUTE_PREFIX}notification-count`, async (req, res, next) => {
             try {
                 let opts = _.defaultsDeep({ is_counter: true, user: req.user }, req.query);
