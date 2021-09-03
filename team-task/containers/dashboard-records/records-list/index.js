@@ -33,9 +33,9 @@ const staticPartColumnConfig = [
     {
         id: 'LessonName', header: 'Лекция/допэпизод',
     },
-    {
-        id: 'ElementsTitle', header: 'Элементы процесса'
-    },
+    // {
+    //     id: 'ElementsTitle', header: 'Элементы процесса'
+    // },
 ];
 
 const columnConfigObject = {
@@ -67,9 +67,9 @@ const defaultColumnConfigOne = [
     {
         id: 'LessonName', header: 'Лекция/допэпизод',
     },
-    {
-        id: 'ElementsTitle', header: 'Элементы'
-    }
+    // {
+    //     id: 'ElementsTitle', header: 'Элементы'
+    // }
     // {
     //     id: 'Sound', header: 'Звук'
     // },

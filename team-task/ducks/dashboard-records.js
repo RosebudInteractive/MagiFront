@@ -144,22 +144,45 @@ function* getRecordsSaga() {
 
         const records = yield select(recordsSelector);
 
+        const fieldSet = new Set(records[0].Elements.map((el, inx) => {
+            const fieldObj = {
+                id: el.ColumnName,
+                // header: el.Name,
+            };
+
+            if (inx === 0) {
+                fieldObj.header = [
+                    {
+                        text: "Элементы",
+                        colspan: records[0].Elements.length,
+                        css: {"text-align": "center"}
+                    },
+                    el.Name
+                ];
+
+                fieldObj.fillspace = true;
+            } else {
+                fieldObj.header = ["", el.Name]
+            }
+
+            return fieldObj;
+        }));
+
+
         yield put({
             type: SET_FIELDS,
-            payload: new Set(records[0].Elements.map(el => ({
-                id: el.ColumnName,
-                header: el.Name,
-            })))
+            payload: fieldSet
         });
         yield put({type: REQUEST_SUCCESS});
 
 
-        // yield put({
-        //     type: CHANGE_FIELD_SET,
-        //     payload: new Set(records[0].Elements.map(el => el.Name))
-        // });
+// yield put({
+//     type: CHANGE_FIELD_SET,
+//     payload: new Set(records[0].Elements.map(el => el.Name))
+// });
         yield put(clearLocationGuard());
-    } catch (e) {
+    } catch
+        (e) {
         yield put({type: REQUEST_FAIL});
         yield put(clearLocationGuard());
         yield put(showErrorMessage(e.message));
