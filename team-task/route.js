@@ -12,6 +12,7 @@ import Notifications from "./containers/notifications"
 import {USER_ROLE} from "./constants/common";
 import Timelines from "./containers/timelines/list";
 import TimelineEditorContainer from "./containers/timelines/editor"
+import DashboardRecords from "./containers/dashboard-records"
 
 type RouterProps = {
     hasSupervisorRights: boolean,
@@ -28,6 +29,7 @@ export default function AppRouter(props: RouterProps) {
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
+        <Route path={'/dashboard-records'} component={DashboardRecords}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
         <Route exact path={'/timelines'}

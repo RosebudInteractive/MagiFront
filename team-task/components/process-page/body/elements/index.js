@@ -14,15 +14,15 @@ type ElementsProps  = {
 
 export default function ProcessElements(props: ElementsProps) {
 
-    const [visible, setVisible] = useState(true)
+    const [visible, setVisible] = useState(true);
 
     const toggleVisible = () => {
-        setVisible(!visible)
+        setVisible(!visible);
 
         setTimeout(() => {
             $(window).trigger('toggle-elements-visible');
         }, 310)
-    }
+    };
 
     return <div className={"process-body__elements" + (!visible ? " _hidden" : "")}>
         <div className="process-body__elements-wrapper">

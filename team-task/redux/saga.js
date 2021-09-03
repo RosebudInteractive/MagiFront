@@ -14,6 +14,7 @@ import {saga as notificationsSaga} from 'tt-ducks/notifications'
 import {saga as timelinesSaga} from 'tt-ducks/timelines'
 import {saga as eventsSaga} from 'tt-ducks/events-timeline'
 import {saga as periodsSaga} from 'tt-ducks/periods-timeline'
+import {saga as dashboardRecordsSaga} from 'tt-ducks/dashboard-records'
 
 export default function* rootSaga() {
     yield all([
@@ -31,6 +32,7 @@ export default function* rootSaga() {
         notificationsSaga(),
         timelinesSaga(),
         eventsSaga(),
-        periodsSaga()
+        periodsSaga(),
+        dashboardRecordsSaga()
     ])
 }

@@ -1,0 +1,61 @@
+@import "~tt-assets/styles/colors"
+
+.unpublished-records-block
+  z-index: 3
+  background-color: $color-main-light
+  position: relative
+  flex: 0 1 33.33%
+  max-width: 1000px
+  transition: max-width 300ms ease
+  overflow: hidden
+  .grid-wrapper
+    max-width: 1000px
+    transition: max-width 300ms ease
+
+  &._hidden
+    max-width: 26px
+    .grid-wrapper
+      visibility: hidden
+    button
+      display: none
+    .elements__hide-button
+      order: 0
+    .title
+      visibility: hidden
+    .elements__hide-button
+      border-top: 9px solid transparent
+      border-bottom: 9px solid transparent
+      border-left: 9px solid $grey40
+      border-right: none
+
+
+.unpublished-records-grid
+  display: flex
+  //.process-elements-grid
+  //  flex-grow: 1
+
+  //.process-page__save-button
+  //  position: absolute
+  //  top: 0
+  //  right: 17px
+
+  .elements__hide-button
+    margin: auto 8.5px
+    cursor: pointer
+    width: 0
+    height: 0
+    border-top: 9px solid transparent
+    border-bottom: 9px solid transparent
+    border-right: 9px solid $grey40
+
+.unpublished-records-wrapper
+  position: relative
+  margin-top: 0
+  &._fixed
+    position: fixed
+    top: 16px
+  &._bottom
+    position: absolute
+    bottom: 0
+    margin-top: auto
+

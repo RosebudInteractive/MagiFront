@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useMemo} from "react"
+import React, {useEffect, useMemo, useRef, useState} from "react"
 import type {FilterField} from "./types";
 import Button from "./button";
 import Row from "./row";
@@ -10,11 +10,11 @@ type FilterProps = {
 }
 
 export default function Filter(props: FilterProps) {
-    const {fields} = props
+    const {fields} = props;
 
     const [visible, setVisible] = useState(false)
     const [activeSwitcher, toggleActive] = useState(false)
-    const filterValueRef = useRef({})
+    const filterValueRef = useRef({});
 
 
     useEffect(() => {
@@ -22,17 +22,18 @@ export default function Filter(props: FilterProps) {
             filterValueRef.current[item.name] = item.value
         })
 
-    }, [fields])
+    }, [fields]);
 
     const _onFilterClick = () => {
         setVisible(!visible)
         props.onChangeVisibility()
-    }
+    };
 
     const _onChange = (data) => {
         filterValueRef.current[data.field] = data.value
         toggleActive(!activeSwitcher)
-    }
+    };
+
     const _onClean = (fieldName) => {
         if (filterValueRef.current[fieldName]) {
             delete filterValueRef.current[fieldName]

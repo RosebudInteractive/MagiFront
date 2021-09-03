@@ -1,0 +1,108 @@
+@import "~tt-assets/styles/colors.sass"
+
+.records-page
+  position: relative
+  border-radius: 10px
+  margin-left: 5px
+
+  &.form
+    min-height: calc(100vh - 64px)
+    //height: 100%
+    width: 100%
+    //overflow:
+
+  .filter-button
+    position: absolute
+    top: 33px
+    right: 32px
+
+
+.webix_ceil_text_row
+  display: flex
+  flex-flow: column
+
+.dashboard-records-table
+  width: calc(100% - 24px)
+
+
+//this block is read-only its not an input control
+.check-box-block
+  align-self: center
+  margin-left: 10px
+  overflow: hidden
+  box-sizing: border-box
+  width: 16px
+  height: 16px
+  border: 2px solid #5A5B6A
+  border-radius: 1px
+
+  .check-mark
+    background: #5A5B6A
+
+.check-box-block.checked
+  background: #5A5B6A
+  box-sizing: border-box
+  width: 16px
+  height: 16px
+  border: 2px solid #5A5B6A
+  border-radius: 1px
+
+  .check-mark
+    width: 12px
+    height: 8px
+    background: transparent
+    border: 2px solid white
+    border-top: 0
+    border-right: 0
+    transform: rotate(312deg)
+
+.state-template-block-tm
+  font-family: Inter
+  font-style: normal
+  font-weight: 400
+  font-size: 13px
+  line-height: 20px
+  letter-spacing: 0.25px
+  height: 24px
+  margin: auto 0
+  padding: 2px 12px
+  box-sizing: border-box
+  border-radius: 32px
+
+  &._draft
+    background-color: #EBF2FF
+    color: $blue
+
+  &._executing
+    background-color: #FFF8EA
+    color: $yellow
+
+  &._done
+    background-color: #EDF6EE
+    color: $green
+
+  &._error
+    background-color: #EDF6EE
+    color: $red
+
+
+
+  .state-circle
+    border-radius: 50%
+    width: 14px
+    height: 14px
+
+    &._draft
+      background-color: $blue
+
+    &._executing
+      background-color: $yellow
+
+    &._done
+      background-color: $green
+
+    &._error
+      background-color: $red
+
+.remove-timeline-button
+  margin-top: 12px
