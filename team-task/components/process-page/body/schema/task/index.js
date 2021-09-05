@@ -29,19 +29,19 @@ export default function SchemaTask(props: TaskProps) {
         if (props.onEditLinks) {
             props.onEditLinks(node.id)
         }
-    }, [node])
+    }, [menuTaskId])
 
     const editTask = useCallback(() => {
         if (props.onEdit) {
             props.onEdit(node.id)
         }
-    }, [node])
+    }, [menuTaskId, active])
 
     const deleteTask = useCallback(() => {
         if (props.onDelete) {
             props.onDelete(node.id)
         }
-    }, [node])
+    }, [menuTaskId])
 
     const addNewTask = useCallback(() => {
         if (props.onAddNewTask) {
@@ -117,7 +117,7 @@ export default function SchemaTask(props: TaskProps) {
                     <div className="task__first-row">
                         <div className="task__id _grey50">{node.id}</div>
                         { node.dueDate && <div className="task__due-date _black">{(new Date(node.dueDate)).toLocaleDateString("ru-RU")}</div> }
-                        <div className={'task__action-button'} onClick={onMenuButtonClick}>
+                        <div className={'task__action-button'} onMouseDown={onMenuButtonClick}>
                             <div className='point'/>
                             <div className='point'/>
                             <div className='point'/>

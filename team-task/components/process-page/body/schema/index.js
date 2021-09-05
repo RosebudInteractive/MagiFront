@@ -1,12 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import "./schema.sass"
-import {LineArrow} from "../../../ui-kit";
-import {ARROW_TYPE} from "../../../ui-kit/line-arrow";
+import LineArrow, {ARROW_TYPE} from "./line-arrow";
 import SchemaTask from "./task";
 import RotateIcon from "tt-assets/svg/rotate.svg"
 import type {Tree} from "../../../../types/process";
 import {TASK_STATE} from "../../../../constants/states";
-import ActionMenu from "./task/action-menu";
 import { Xwrapper, useXarrow, } from 'react-xarrows';
 
 
@@ -19,6 +17,8 @@ type SchemaProps = {
     onSetActiveTask: Function,
     onChangeRotation: Function,
     onUpdateProcessTask: Function,
+    onDeleteDependence: Function,
+    onUpdateDependence: Function,
     tree: Tree,
     activeTaskId: ?number,
     horizontalProcess: boolean,
@@ -74,6 +74,8 @@ export default function Schema(props: SchemaProps) {
             }
         }
     }, [activeTaskId, tree, horizontalProcess]);
+
+    useEffect(updateXarrow, [tree])
 
     const _scrollToTask = (taskId) => {
         if (horizontalProcess) {
@@ -135,10 +137,12 @@ export default function Schema(props: SchemaProps) {
         }
     }, [actionMenuTaskId])
 
-    const onTaskClick = (taskId) => {
-        setActiveTask(taskId)
-        props.onSetActiveTask(taskId)
-    }
+    const onTaskClick = useCallback((taskId) => {
+        if (activeTask !== taskId) {
+            setActiveTask(taskId);
+        }
+        props.onSetActiveTask(taskId);
+    }, [activeTask])
 
     const editTaskLinks = useCallback(() => {
         if (props.onEditTaskLinks && actionMenuTaskId) {
@@ -148,11 +152,13 @@ export default function Schema(props: SchemaProps) {
     }, [actionMenuTaskId])
 
     const editTask = useCallback(() => {
-        if (props.onEditTask && actionMenuTaskId) {
-            props.onEditTask(actionMenuTaskId)
-            setActionMenuTaskId(null)
+        const selectedTaskId = actionMenuTaskId || activeTask
+
+        if (props.onEditTask && selectedTaskId) {
+            props.onEditTask(selectedTaskId)
+            actionMenuTaskId && setActionMenuTaskId(null)
         }
-    }, [actionMenuTaskId])
+    }, [actionMenuTaskId, activeTask])
 
     const deleteTask = useCallback(() => {
         if (props.onDeleteTask && actionMenuTaskId) {
@@ -178,6 +184,8 @@ export default function Schema(props: SchemaProps) {
                                   end={"js-task_" + item.to}
                                   type={type}
                                   item={item}
+                                  onDeleteArrow={props.onDeleteDependence}
+                                  onUpdateArrow={props.onUpdateDependence}
                                   selected={activeArrow}
                                   setSelected={setActiveArrow}
                                   key={item.id}/>
@@ -211,12 +219,12 @@ export default function Schema(props: SchemaProps) {
             props.onSetActiveTask(null)
         }
 
-        if (!e.target.closest(".process-schema__x-arrow")) {
-            setActiveArrow(null)
+        if (!(e.target.closest(".process-schema__x-arrow") || e.target.closest(".x-arrow__tooltip"))) {
+            if (activeArrow) setActiveArrow(null)
         }
 
         if (!e.target.closest(".task__action-menu")) {
-            setActionMenuTaskId(null)
+            if (actionMenuTaskId) setActionMenuTaskId(null)
         }
     }
 
@@ -226,7 +234,7 @@ export default function Schema(props: SchemaProps) {
         }
     }
 
-    return <div className="process-body__schema" onClick={onClick}>
+    return <div className="process-body__schema" onMouseDown={onClick}>
         <h6 className="process-schema__title">
             <span>Схема процесса</span>
             <button className="process-schema__rotate-button" onClick={changeRotation}>

@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import Xarrow from 'react-xarrows';
+import './line-arrow.sass'
+import ArrowTooltip from "./arrow-tooltip";
 
 export const ARROW_TYPE = {
     DEFAULT: "DEFAULT",
@@ -24,7 +26,6 @@ const COLORS = {
         COMMON: 'rgba(0,44,157,0.6)',
         HOVER: '#002C9D'
     }
-
 }
 
 export default (props) => {
@@ -67,10 +68,44 @@ export default (props) => {
             }
         }, [])
 
+    const deleteArrow = useCallback(() => {
+        if (props.onDeleteArrow) {
+            props.onDeleteArrow(item)
+        }
+    }, [])
+
+    const changeCondition = useCallback((value) => {
+        if (props.onUpdateArrow) {
+            const newValue = {
+                Id: item.Id,
+                DepTaskId: item.from,
+                TaskId: item.to,
+                Expression: value,
+                IsConditional: !!value,
+                IsActive: !item.disabled,
+            }
+
+            props.onUpdateArrow(newValue);
+            setSelected(null);
+        }
+    }, [])
+
+    const labels = useMemo(() => {
+        const isArrowSelected = selected === item.id
+
+        return isArrowSelected ? {
+            middle: <ArrowTooltip hasCondition={item.hasCondition}
+                                  condition={item.expression}
+                                  onApplyCondition={changeCondition}
+                                  onDeleteArrow={deleteArrow}/>
+        } : null
+    }, [selected])
+
     return <Xarrow {...props}
-        zIndex={selected === item.id ? 2 : 0}
-        passProps={passProps}
-        color={color}
-        strokeWidth={strokeWidth}
-        headSize={headSize}/>;
+                   zIndex={selected === item.id ? 2 : 0}
+                   passProps={passProps}
+                   color={color}
+                   labels={labels}
+                   strokeWidth={strokeWidth}
+                   headSize={headSize}/>;
 };

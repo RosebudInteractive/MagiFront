@@ -1,4 +1,4 @@
-import React, {useEffect, useRef,} from "react"
+import React, {useCallback, useEffect, useRef,} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -12,6 +12,8 @@ import {
     deleteElement,
     clear,
     updateProcessTask,
+    updateDependence,
+    deleteDependence,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -23,7 +25,7 @@ import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasAdminRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, horizontalProcess, showSideBarMenu, changeProcessRotation} from "tt-ducks/app";
 import {activeTaskIdSelector, setActiveTaskId, setInitState} from "tt-ducks/route";
-import {deleteTask,} from "tt-ducks/task";
+import {deleteTask} from "tt-ducks/task";
 import {showTaskEditor, showTaskLinkEditor,} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
@@ -134,6 +136,14 @@ function ProcessEditor(props) {
         actions.setActiveTaskId(taskId)
     }
 
+    const deleteDependence = useCallback((dependence) => {
+        actions.deleteDependence(dependence.from, dependence.to)
+    }, [])
+
+    const updateDependence = useCallback((dependence) => {
+        actions.updateDependence(dependence)
+    }, [])
+
     return !fetching && process &&
         <React.Fragment>
             <Prompt when={hasChanges} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
@@ -159,6 +169,8 @@ function ProcessEditor(props) {
                              onEditTaskLinks={onEditTaskLinks}
                              onEditTask={onEditTask}
                              onDeleteTask={onDeleteTask}
+                             onDeleteDependence={deleteDependence}
+                             onUpdateDependence={updateDependence}
                              onChangeRotation={actions.changeProcessRotation}/>
                 <ProcessTaskEditor/>
                 <TaskLinksEditor/>
@@ -209,6 +221,8 @@ const mapDispatch2Props = (dispatch) => {
             setInitState,
             changeProcessRotation,
             updateProcessTask,
+            updateDependence,
+            deleteDependence,
         }, dispatch)
     }
 }

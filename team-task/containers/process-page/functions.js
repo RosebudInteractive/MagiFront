@@ -36,7 +36,14 @@ export const buildTree = (process) => {
             _tree.nodes[dep.DepTaskId].dependencies.nodes.push(dep.TaskId)
         }
 
-        _tree.lines.push({from: dep.DepTaskId, to: dep.TaskId, id: dep.Id, hasCondition: !!dep.IsConditional, disabled: !dep.IsActive})
+        _tree.lines.push({
+            id: dep.Id,
+            from: dep.DepTaskId,
+            to: dep.TaskId,
+            expression: dep.Expression,
+            hasCondition: !!dep.IsConditional,
+            disabled: !dep.IsActive
+        })
     })
 
     const _roots = Object.values(_tree.nodes).filter(item => item.dependencies.count === 0)
