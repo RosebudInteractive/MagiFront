@@ -1248,12 +1248,14 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     _getIncomingDeps(process, task_id, rebuild) {
         this._get_proc_deps(process, rebuild);
-        return process._parents[task_id];
+        let result = process._parents[task_id];
+        return result ? result : {};
     }
 
     _getOutgoingDeps(process, task_id, rebuild) {
         this._get_proc_deps(process, rebuild);
-        return process._childs[task_id];
+        let result = process._childs[task_id];
+        return result ? result : {};
     }
 
     _checkForCyclicDeps(process, rebuild) {
@@ -2402,7 +2404,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 this._setObjFieldValueInQueue(result, dict, "task", task.Id, "state", task.IsAutomatic ? TaskState.Finished : TaskState.ReadyToStart);
                 task.State = TaskState.ReadyToStart;
             }
-            if (old_is_active && (!is_ready) && (task.State === TaskState.ReadyToStart)) {
+            if (old_is_active && (!is_ready) &&
+                ((task.State === TaskState.ReadyToStart) || (task.IsAutomatic && (task.State === TaskState.Finished)))) {
                 this._setObjFieldValueInQueue(result, dict, "task", task.Id, "state", TaskState.Draft);
                 task.State = TaskState.Draft;
             }
@@ -2603,6 +2606,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         if (isSupervisor)
                             this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
 
+                        if (taskObj.isFinal()) {
+                            let out_links = this._getOutgoingDeps(process, taskObj.id());
+                            if (Object.keys(out_links).length > 0)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `От конечной задачи не могут зависеть другие задачи.`);
+                        }
+                        
                         if (taskObj.isAutomatic() && (!taskObj.isFinal()))
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Автоматическая задача должна быть конечной.`);
 
