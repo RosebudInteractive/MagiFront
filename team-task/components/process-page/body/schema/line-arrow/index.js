@@ -77,7 +77,7 @@ export default (props) => {
     const changeCondition = useCallback((value) => {
         if (props.onUpdateArrow) {
             const newValue = {
-                Id: item.Id,
+                Id: item.id,
                 DepTaskId: item.from,
                 TaskId: item.to,
                 Expression: value,
