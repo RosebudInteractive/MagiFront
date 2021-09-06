@@ -77,6 +77,9 @@ const SQL_GET_LSN_LIST_MYSQL =
     "  left join `PmProcess` p on p.`LessonId` = lc.`LessonId`\n" +
     "where (lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))";
 
+const SQL_GET_LESSON_MSSQL = "select [Id], [CourseId], [ParentId] from [Lesson] where [Id] = <%= id %>";
+const SQL_GET_LESSON_MYSQL = "select `Id`, `CourseId`, `ParentId` from `Lesson` where `Id` = <%= id %>";
+
 const DFLT_LSN_SORT_ORDER = "LessonName,ASC";
 
 const PmDashboard = class PmDashboard extends DbObject {
@@ -255,6 +258,43 @@ const PmDashboard = class PmDashboard extends DbObject {
         }
 
         return result;
+    }
+
+    async setLessonReadyDate(id, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
+        let lessonService = this.getService("lesson", true);
+        if (lessonService) {
+            let inpFields = data || {};
+            let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+
+            if (!inpFields.ReadyDate)
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Дата публикации не задана.`);
+            
+            try {
+                new Date(inpFields.ReadyDate);
+            }
+            catch (err) {
+                throw new HttpError(HttpCode.ERR_BAD_REQ, `Недопустимая дата публикации: "${inpFields.ReadyDate}".`);
+            }
+
+            let records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(SQL_GET_LESSON_MYSQL)({ id: id }),
+                    mssql: _.template(SQL_GET_LESSON_MSSQL)({ id: id })
+                }
+            }, dbOpts)
+
+            if (records && records.detail && (records.detail.length === 1)) {
+                let result = await lessonService.update(records.detail[0].Id,
+                    records.detail[0].CourseId, { ReadyDate: inpFields.ReadyDate }, records.detail[0].ParentId, dbOpts);
+                return result;
+            }
+            else
+                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Лекция (Id=${id}) не найдена.`);
+        }
+        else
+            throw new Error(`Lesson service is unavailable!`);
     }
 }
 
