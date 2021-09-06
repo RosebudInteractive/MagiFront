@@ -102,6 +102,7 @@ export default (props) => {
     }, [selected])
 
     return <Xarrow {...props}
+                   divContainerProps={{className: 'xarrow-container'}}
                    zIndex={selected === item.id ? 2 : 0}
                    passProps={passProps}
                    color={color}
