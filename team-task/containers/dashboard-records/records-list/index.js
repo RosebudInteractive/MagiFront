@@ -56,7 +56,6 @@ const columnConfigObject = {
 const defaultColumnConfigOne = [
     {
         id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
-
     },
     {
         id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}] , css: 'week-up'
@@ -73,41 +72,18 @@ const defaultColumnConfigOne = [
     {
         id: 'LessonName', header: [{text: 'Лекция/допэпизод', css: 'up-headers'}], fillspace: true
     },
-    // {
-    //     id: 'ElementsTitle', header: 'Элементы'
-    // }
-    // {
-    //     id: 'Sound', header: 'Звук'
-    // },
-    // {
-    //     id: 'Transcript', header: 'Транскрипт'
-    // },
-    // {
-    //     id: 'Illustration', header: 'Иллюстрация'
-    // },
-    // {
-    //     id: 'Literature', header: 'Литература'
-    // },
-    // {
-    //     id: 'Music', header: 'Музыка'
-    // },
-    // {
-    //     id: 'Text', header: 'Текст'
-    // },
-    // {
-    //     id: 'IsPublished', header: 'Опубликовано'
-    // },
-    // {
-    //     id: 'ProcessState', header: 'Процесс'
-    // }
 ];
 
 const defaultColumnConfigTwo = [
     {
-        id: 'IsPublished', header: 'Опубликовано', format: (val) => RECORD_PUBLISHED_STATES[val]
+        id: 'IsPublished', header: 'Опубликовано', format: (val) => {
+            return (typeof val === 'boolean')
+                ? RECORD_PUBLISHED_STATES[val]
+                : ''
+        }
     },
     {
-        id: 'ProcessState', header: 'Процесс', format: (val) =>  val ? RECORD_PROCESS_STATES[val] : '--'
+        id: 'ProcessState', header: 'Процесс', format: (val) =>  val ? RECORD_PROCESS_STATES[val] : ''
     }
 ]
 
@@ -130,17 +106,6 @@ const Records = (props) => {
         resizeHandler(recordsCount)
     }, [dashboardRecords]);
 
-    // const columnConfig = useMemo(() => {
-    //     console.log('column config');
-    //     console.log([...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo])
-    //     console.log([...elementsFieldSet])
-    //     return [...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo]
-    // },[elementsFieldSet]);
-
-    // const location = useLocation();
-
-
-
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
@@ -154,13 +119,7 @@ const Records = (props) => {
     }, [resizeTrigger]);
 
     useEffect(() => {
-
-
         setColumnFields([...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo]);
-        // setTimeout(() => {
-
-        // }, 500);
-        // refreshColumns()
     }, [elementsFieldSet]);
 
     useEffect(() => {

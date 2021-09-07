@@ -83,6 +83,11 @@ const defaultFieldSet = new Set([
     // },
 ]);
 
+export const VIEW_MODE = {
+    WEEK: 0,
+    DAY: 1,
+    COMPACT: 2,
+}
 
 const defaultFieldSetObject = {
     Week: {},
@@ -94,7 +99,7 @@ export const ReducerRecord = Record({
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
     fetching: false,
-    viewMode: 0
+    viewMode: VIEW_MODE.WEEK
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -158,196 +163,85 @@ function* changeViewModeSaga(data) {
         yield put({type: SET_VIEW_MODE, payload: +data.payload});
         const records = _.cloneDeep(yield select(recordsSelector));
 
-        let resultArray = null;
+        let resultArray = handleServerData(records, +data.payload);
 
-        switch (+data.payload) {
-            case 0:
-
-                resultArray = changeModeFn(records, 0);
-
-                resultArray.forEach((rec) => {
-                            const date = moment(rec.PubDate);
-
-                            if (date.isValid()) {
-                                rec.PubDate = date.format('DD MMM');
-                            }
-
-                            rec.Elements.forEach((el) => {
-                                rec[el.Name] = el.State ? el.State : '--';
-                            });
-                            return rec;
-                        });
-
-                yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
-                break;
-            case 1:
-
-                resultArray = changeModeFn(records, 1);
-
-                resultArray.forEach((rec) => {
-                    const date = moment(rec.PubDate);
-
-                    if (date.isValid()) {
-                        rec.PubDate = date.format('DD MMM');
-                    }
-
-                    rec.Elements.forEach((el) => {
-                        rec[el.Name] = el.State ? el.State : '--';
-                    });
-                    return rec;
-                });
-                //todo week
-                yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
-                break;
-                // records.forEach((el, index, arr) => {
-                //     if(el.PubDate === ''){
-                //         el.IsEven = records[index - 1] ? records[index - 1].IsEven : el.IsEven;
-                //     }
-                // })
-                // for (let i = 0; i <= days; i++) {
-                //     let currentDate = moment(startDate).add(i, 'days');
-                //
-                // }
-
-                //     let currentWeek = currentDate.isoWeek();
-                //     const filteredRecords = records.filter(rec => moment(rec.PubDate).isSame(currentDate, 'day'));
-                //
-                //     if (filteredRecords.length) {
-                //         if (currentWeek !== week) {
-                //
-                //             const [first, ...other] = filteredRecords;
-                //
-                //             first.Week = `${currentDate.clone().locale('ru').startOf('week').format('DD/MM')} - ${currentDate.clone().locale('ru').endOf('week').format('DD/MM')}`
-                //             first.IsEven = isEven;
-                //
-                //             if (other && other.length > 0) {
-                //                 console.log('other', other)
-                //                 other.forEach(el => {
-                //                     el.PubDate = '';
-                //                     el.IsEven = isEven
-                //                 });
-                //             }
-                //
-                //             // first.
-                //             resultArray.push(first);
-                //             resultArray.push(...other);
-                //             week = currentWeek;
-                //             // if (other.)
-                //         }
-                //
-                //
-                //         resultArray.push(...filteredRecords);
-                //     } else {
-                //
-                //         const objectData = {
-                //             IsEven: isEven,
-                //             PubDate: currentDate.toString(),
-                //             CourseId: null,
-                //             CourseName: "",
-                //             LessonId: null,
-                //             Week: '',
-                //             LessonNum: "",
-                //             LessonName: "",
-                //             Elements: [],
-                //             IsPublished: false,
-                //             ProcessId: null,
-                //             ProcessState: null
-                //         };
-                //         if (currentWeek !== week) {
-                //             objectData.Weak = currentWeek;
-                //             week = currentWeek;
-                //         }
-                //         resultArray.push(objectData);
-                //     }
-                //     isEven = !isEven;
-                // }
-                // yield put({type: SET_RECORDS, payload: changeModeFn(records, 1)});
-                // break;
-            //todo day
-            case 2:
-
-                //todo compact
-                break;
-            default:
-                return;
-        }
+        yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
         showErrorMessage(e.toString())
     }
 }
 
-const changeModeFn = (records, mode) => {
-
+const handleServerData = (records, mode) => {
     const startDate = moment(records[0].PubDate);
     const finishDate = moment(records[records.length - 1].PubDate);
 
-    const days = finishDate.diff(startDate, "days");
+    const daysBetween = finishDate.diff(startDate, "days");
 
     const resultArray = [];
-    let week = 0;
-    let isEven = true;
+    let week = 0,
+        displayWeekRange = '',
+        isEven = true;
 
-        for (let i = 0; i <= days; i++) {
-            let currentDate = moment(startDate).add(i, 'days');
+    for (let i = 0; i <= daysBetween; i++) {
+        let currentDate = moment(startDate).add(i, 'days'),
+            currentWeek = currentDate.isoWeek();
 
-            let currentWeek = currentDate.isoWeek();
-            const filteredRecords = records.filter(rec => moment(rec.PubDate).locale('ru').isSame(currentDate, 'day'));
-
-            if (filteredRecords.length) {
-                if (currentWeek !== week) {
-
-                    if(mode === 0 && week){
-                        isEven = !isEven;
-                    }
-                    const [first, ...other] = filteredRecords;
-                    first.Week = `${currentDate.clone().locale('ru').startOf('week').format('DD/MM')} - ${currentDate.clone().locale('ru').endOf('week').format('DD/MM')}`
-                    first.IsEven = isEven;
-
-                    if (other && other.length > 0) {
-                        console.log('other', other)
-                        other.forEach(el => {
-                            el.PubDate = '';
-                            el.IsEven = isEven
-                        });
-                    }
-
-                    resultArray.push(first);
-                    resultArray.push(...other);
-                    week = currentWeek;
-                }
-
-                resultArray.push(...filteredRecords);
-            } else {
-                if(mode === 0 && week && currentWeek !== week){
-                    isEven = !isEven;
-                }
-                const objectData = {
-                    IsEven: isEven,
-                    PubDate: currentDate.toString(),
-                    CourseId: null,
-                    CourseName: "",
-                    LessonId: null,
-                    Week: '',
-                    LessonNum: "",
-                    LessonName: "",
-                    Elements: [],
-                    IsPublished: false,
-                    ProcessId: null,
-                    ProcessState: null
-                };
-
-                if (currentWeek !== week) {
-                    objectData.Week = currentWeek;
-                    week = currentWeek;
-                }
-                resultArray.push(objectData);
-            }
-
-            if(mode === 1){
-                isEven = !isEven;
-            }
-
+        const weekHasChanged = currentWeek !== week
+        if((mode === VIEW_MODE.WEEK) && week && weekHasChanged){
+            isEven = !isEven;
         }
+
+        if (weekHasChanged) {
+            const clonedDate = currentDate.clone().locale('ru');
+            displayWeekRange = `${clonedDate.startOf('week').format('DD/MM')} - ${clonedDate.endOf('week').format('DD/MM')}`;
+            week = currentWeek;
+        }
+
+        const filteredRecords = records.filter(rec => moment(rec.PubDate).isSame(currentDate, 'day'));
+        if (filteredRecords.length) {
+            const [first, ...other] = filteredRecords;
+            first.Week = weekHasChanged ? displayWeekRange : '';
+            first.IsEven = isEven;
+            first.PubDate = moment(first.PubDate).format('DD MMM');
+            first.Elements.forEach((elem) => {
+                first[elem.Name] = elem.State ? elem.State : '';
+            });
+
+            if (other && other.length > 0) {
+                other.forEach(item => {
+                    item.Week = '';
+                    item.PubDate = '';
+                    item.IsEven = isEven;
+                    item.Elements.forEach((elem) => {
+                        item[elem.Name] = elem.State ? elem.State : '';
+                    })
+                });
+            }
+
+            resultArray.push(first, ...other);
+        } else {
+            const objectData = {
+                IsEven: isEven,
+                PubDate: currentDate.format('DD MMM'),
+                CourseId: null,
+                CourseName: "",
+                LessonId: null,
+                Week: weekHasChanged ? displayWeekRange : '',
+                LessonNum: "",
+                LessonName: "",
+                Elements: [],
+                IsPublished: null,
+                ProcessId: null,
+                ProcessState: null
+            };
+
+            resultArray.push(objectData);
+        }
+
+        if (mode === VIEW_MODE.DAY){
+            isEven = !isEven;
+        }
+    }
 
     return resultArray;
 };
@@ -366,8 +260,6 @@ function* getRecordsSaga() {
             payload: records
         });
 
-        yield put({type: CHANGE_VIEW_MODE, payload: mode});
-
         const fields = new Set();
         records.forEach(rec => {
             if (rec.Elements && Array.isArray(rec.Elements)) {
@@ -377,13 +269,10 @@ function* getRecordsSaga() {
 
         const fieldSet = [];
 
-        Array.from(fields).forEach((el, inx, arr) => {
-            const fieldObj = {
-                id: el,
-            };
+        Array.from(fields).forEach((el, inx) => {
+            const fieldObj = { id: el, };
 
             if (inx === 0) {
-                console.log('el', el);
                 fieldObj.header = [
                     {
                         text: "Элементы",
@@ -398,22 +287,16 @@ function* getRecordsSaga() {
                 fieldObj.header = ["", el]
             }
 
-            fieldObj.format = (val) => val ? RECORD_ELEMENT_STATES[val] : '--';
+            fieldObj.format = (val) => val ? RECORD_ELEMENT_STATES[val] : '';
 
             fieldSet.push(fieldObj)
         });
 
-        yield put({
-            type: SET_FIELDS,
-            payload: fieldSet
-        });
+        yield put({ type: SET_FIELDS, payload: fieldSet });
         yield put({type: REQUEST_SUCCESS});
 
+        yield put({type: CHANGE_VIEW_MODE, payload: mode});
 
-// yield put({
-//     type: CHANGE_FIELD_SET,
-//     payload: new Set(records[0].Elements.map(el => el.Name))
-// });
         yield put(clearLocationGuard());
     } catch
         (e) {

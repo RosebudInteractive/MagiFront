@@ -13,5 +13,6 @@ export const RECORD_PROCESS_STATES = {
 
 export const RECORD_PUBLISHED_STATES = {
     true: 'Да',
-    false: 'Нет'
+    false: 'Нет',
+    undefined: '',
 };
