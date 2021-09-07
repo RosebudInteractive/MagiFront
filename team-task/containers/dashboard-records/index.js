@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
-import {recordsSelector} from "tt-ducks/dashboard-records"
+import {changeViewMode, displayRecordsSelector} from "tt-ducks/dashboard-records"
 import Records from "./records-list"
 import UnpublishedRecords from "./unpublished-records";
 import DashboardRecordsHeader from "./header"
@@ -21,6 +21,11 @@ function DashboardRecords(props) {
         return () => actions.showSideBarMenu();
     },[]);
 
+
+    const changeMode = (mode) => {
+        actions.changeViewMode(mode);
+    }
+
     const backAction = () => {
         !sideBarMenuVisible && actions.showSideBarMenu();
         history.push('/')
@@ -28,7 +33,7 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} onBack={backAction}/>
+            <DashboardRecordsHeader title={'Издательский план'} onBack={backAction} onChangeMode={changeMode}/>
             {/*<div className="header">*/}
                 {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
                 {/*<FilterRow fields={FILTER_CONFIG}*/}
@@ -61,7 +66,8 @@ function DashboardRecords(props) {
 
 const mapState2Props = (state) => {
     return {
-        dashboardRecords: recordsSelector(state),
+        // dashboardRecords: recordsSelector(state),
+        dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
     }
 }
@@ -69,7 +75,7 @@ const mapState2Props = (state) => {
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
-            hideSideBarMenu, showSideBarMenu
+            hideSideBarMenu, showSideBarMenu,changeViewMode
         }, dispatch)
     }
 };

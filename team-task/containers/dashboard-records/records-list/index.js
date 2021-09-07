@@ -9,9 +9,15 @@ import Webix from "../../../components/Webix";
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {elementsFieldSetSelector, fetchingSelector, getRecords, recordsSelector} from "tt-ducks/dashboard-records";
+import {
+    displayRecordsSelector,
+    elementsFieldSetSelector,
+    fetchingSelector,
+    getRecords
+} from "tt-ducks/dashboard-records";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
+import {RECORD_PROCESS_STATES, RECORD_PUBLISHED_STATES} from '../../../constants/dashboard-records';
 
 
 const staticPartColumnConfig = [
@@ -49,23 +55,23 @@ const columnConfigObject = {
 };
 const defaultColumnConfigOne = [
     {
-        id: 'Id', header: 'id', hidden: true
+        id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
 
     },
     {
-        id: 'Week', header: 'Неделя'
+        id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}] , css: 'week-up'
     },
     {
-        id: 'Date', header: 'Дата',
+        id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}],
     },
     {
-        id: 'CourseName', header: 'Курс',
+        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], fillspace: true
     },
     {
-        id: 'LessonNum', header: 'Номер лекции/допэпизода',
+        id: 'LessonNum', header:  [{text: 'Номер лекции/допэпизода', css: 'up-headers'}],
     },
     {
-        id: 'LessonName', header: 'Лекция/допэпизод',
+        id: 'LessonName', header: [{text: 'Лекция/допэпизод', css: 'up-headers'}], fillspace: true
     },
     // {
     //     id: 'ElementsTitle', header: 'Элементы'
@@ -98,10 +104,10 @@ const defaultColumnConfigOne = [
 
 const defaultColumnConfigTwo = [
     {
-        id: 'IsPublished', header: 'Опубликовано'
+        id: 'IsPublished', header: 'Опубликовано', format: (val) => RECORD_PUBLISHED_STATES[val]
     },
     {
-        id: 'ProcessState', header: 'Процесс'
+        id: 'ProcessState', header: 'Процесс', format: (val) =>  val ? RECORD_PROCESS_STATES[val] : '--'
     }
 ]
 
@@ -212,6 +218,13 @@ const Records = (props) => {
         height: 1000,
         select: true,
         editable: false,
+            scheme: {
+                $change: function (item) {
+                    if (item.IsEven){
+                        item.$css = "even-record";
+                    }
+                }
+            },
         columns: [],
         on: {
             onHeaderClick: function (header) {
@@ -308,7 +321,7 @@ const Records = (props) => {
 
 const mapState2Props = (state) => {
     return {
-        dashboardRecords: recordsSelector(state),
+        dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state)
