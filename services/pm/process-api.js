@@ -2611,7 +2611,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             if (Object.keys(out_links).length > 0)
                                 throw new HttpError(HttpCode.ERR_BAD_REQ, `От конечной задачи не могут зависеть другие задачи.`);
                         }
-                        
+
                         if (taskObj.isAutomatic() && (!taskObj.isFinal()))
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Автоматическая задача должна быть конечной.`);
 
@@ -2993,7 +2993,12 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             for (let i = 0; i < inpFields.Dependencies.length; i++) {
                                 let elem = inpFields.Dependencies[i];
                                 await root_elems.newObject({
-                                    fields: { DepTaskId: elem }
+                                    fields: {
+                                        DepTaskId: elem,
+                                        IsActive: true,
+                                        IsConditional: false,
+                                        IsDefault: false
+                                    }
                                 }, dbOpts);
                             }
                         }
