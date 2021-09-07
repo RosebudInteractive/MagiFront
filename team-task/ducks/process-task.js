@@ -26,6 +26,8 @@ const CLOSE_TASK_EDITOR_START = `${prefix}/CLOSE_TASK_EDITOR_START`
 const CLOSE_TASK_LINK_EDITOR_REQUEST = `${prefix}/CLOSE_TASK_LINK_EDITOR_REQUEST`
 const CLOSE_TASK_LINK_EDITOR_START = `${prefix}/CLOSE_TASK_LINK_EDITOR_START`
 
+const SET_TASK_ID = `${prefix}/SET_TASK_ID`
+
 
 /**
  * Reducer
@@ -65,6 +67,10 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLOSE_TASK_LINK_EDITOR_START:
             return state
                 .set("linkEditorVisible", false)
+
+        case SET_TASK_ID:
+            return state
+                .set("taskId", payload)
 
         default:
             return state
@@ -120,9 +126,11 @@ function* showTaskEditorSaga({payload}) {
 
     const {payload: data} = yield take(SAVE_TASK_SUCCESS)
 
+    console.log(data)
+    yield put({type: SET_TASK_ID, payload: data.id})
     yield put(setActiveTaskId(data.id))
 
-    yield call(_closeEditorAndReloadProcess)
+    yield call(closeEditorAndReloadProcess)
 }
 
 function* showTaskLinEditorSaga({payload}) {
@@ -130,15 +138,16 @@ function* showTaskLinEditorSaga({payload}) {
 
     yield take(SAVE_TASK_LINKS_SUCCESS)
 
-    yield call(_closeEditorAndReloadProcess)
+    yield call(closeEditorAndReloadProcess)
 }
 
-function* _closeEditorAndReloadProcess(){
+function* closeEditorAndReloadProcess(){
     const processId = yield select(processIdSelector)
 
     // yield put(closeTaskEditor())
     yield put(closeTaskLinkEditor())
     if (processId) {
+        console.log(processId)
         yield put(getProcess(processId))
     }
 }

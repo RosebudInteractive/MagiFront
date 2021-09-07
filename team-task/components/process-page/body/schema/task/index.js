@@ -100,8 +100,11 @@ export default function SchemaTask(props: TaskProps) {
 
     const menuPosition = useMemo(() => {
         if (menuTaskId === node.id) {
+            const setToLeftBorder = isLast && (horizontalProcess || (!horizontalProcess && node.rowNumber > 0));
+
             return {
-                left: (isLast && horizontalProcess  ? 0 : taskRef.current.offsetWidth + 10) + taskRef.current.offsetLeft,
+                left: setToLeftBorder ? '' : taskRef.current.offsetWidth + 10 + taskRef.current.offsetLeft,
+                right: setToLeftBorder ? taskRef.current.offsetLeft + 40 : '',
                 top: taskRef.current.offsetTop}
         }
     }, [menuTaskId])
@@ -126,15 +129,14 @@ export default function SchemaTask(props: TaskProps) {
                     <div className="task__name _black">{node.name}</div>
                     <div className="task__executor _black">{node.executorName ? node.executorName : ""}</div>
                     <div className={`task-state ${state.css}`}>{state.caption}</div>
-                    { !node.disabled && <button className='task-button__add-new-task' onClick={addNewTask}/> }
+                    { !node.disabled && !node.isFinal && <button className='task-button__add-new-task' onClick={addNewTask}/> }
                     <div className='task__ext-info'>
                         { node.isFinal && <div className='ext-info__item _final'>Конечная</div> }
                         { node.isAutomatic && <div className='ext-info__item _auto'>Авто</div> }
                     </div>
                 </div>
                 {menuTaskId === node.id && <ActionMenu position={menuPosition}
-                                                       isFinal={node.isFinal}
-                                                       isAutomatic={node.isAutomatic}
+                                                       node={node}
                                                        onEdit={editTask}
                                                        onFinalClick={setTaskFinal}
                                                        onAutoClick={setTaskAuto}

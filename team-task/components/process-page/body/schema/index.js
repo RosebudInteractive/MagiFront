@@ -104,31 +104,6 @@ export default function Schema(props: SchemaProps) {
         setActionMenuTaskId(null)
     }, [])
 
-    const getCells = () => {
-        if (tree) {
-            return Object.values(tree.nodes).map((item, index, array) => {
-                const _active = activeTask === item.id
-
-                return <SchemaTask horizontalProcess={props.horizontalProcess}
-                                   onClick={onTaskClick}
-                                   menuTaskId={actionMenuTaskId}
-                                   onEdit={editTask}
-                                   onEditLinks={editTaskLinks}
-                                   onDelete={deleteTask}
-                                   onMenuButtonClick={onMenuButtonClick}
-                                   onChangeTaskAuto={changeTaskAuto}
-                                   onChangeTaskFinal={changeTaskFinal}
-                                   onAddNewTask={addTaskWithLink}
-                                   active={_active}
-                                   node={item}
-                                   isLast={index === array.length - 1}
-                                   key={item.id}/>
-            })
-        } else {
-            return null
-        }
-    }
-
     const onMenuButtonClick = useCallback((taskId) => {
         if (actionMenuTaskId !== taskId) {
             setActionMenuTaskId(taskId)
@@ -169,7 +144,36 @@ export default function Schema(props: SchemaProps) {
 
     const addTaskWithLink = (taskId) => { if (props.onAddTaskWithLink) {props.onAddTaskWithLink(taskId)} }
 
-    const getLines = () => {
+    const taskCells = useMemo(() => {
+        if (tree) {
+            return Object.values(tree.nodes).map((item) => {
+                const _active = activeTask === item.id,
+                    isRight = horizontalProcess
+                        ? (item.weight === tree.colCount - 1)
+                        : (item.rowNumber === tree.rowCount - 1);
+
+                return <SchemaTask horizontalProcess={horizontalProcess}
+                                   onClick={onTaskClick}
+                                   menuTaskId={actionMenuTaskId}
+                                   onEdit={editTask}
+                                   onEditLinks={editTaskLinks}
+                                   onDelete={deleteTask}
+                                   onMenuButtonClick={onMenuButtonClick}
+                                   onChangeTaskAuto={changeTaskAuto}
+                                   onChangeTaskFinal={changeTaskFinal}
+                                   onAddNewTask={addTaskWithLink}
+                                   active={_active}
+                                   node={item}
+                                   isLast={isRight}
+                                   key={item.id}/>
+            })
+        } else {
+            return null
+        }
+    }, [tree, activeTask, horizontalProcess, actionMenuTaskId,
+        onTaskClick, editTask, editTaskLinks, deleteTask, onMenuButtonClick, changeTaskAuto, changeTaskFinal])
+
+    const arrows = useMemo(() => {
         if (tree && tree.lines && tree.lines.length) {
             return tree.lines.map((item,) => {
                 const type = (item.from === activeTask) ?
@@ -193,7 +197,22 @@ export default function Schema(props: SchemaProps) {
         } else {
             return null
         }
-    }
+    }, [tree, activeTask, activeArrow])
+
+    const keyPressHandler = useCallback((e) => {
+        if(e.key === "Escape") {
+            if (activeArrow) setActiveArrow(null)
+            if (actionMenuTaskId) setActionMenuTaskId(null)
+        }
+    }, [activeArrow, actionMenuTaskId])
+
+    useEffect(() => {
+        document.addEventListener('keydown', keyPressHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyPressHandler);
+        }
+    }, [activeArrow, actionMenuTaskId])
 
     useEffect(() => {
         canvas.current.addEventListener('scroll', updateXarrow);
@@ -214,6 +233,12 @@ export default function Schema(props: SchemaProps) {
     }, [tree, horizontalProcess])
 
     const onClick = (e) => {
+        const jQcanvas = $(canvas.current)
+
+        if ((jQcanvas.outerHeight() + jQcanvas.offset().top - 8) <= e.clientY ){
+            return true;
+        }
+
         if (!e.target.closest(".process-schema__task")) {
             setActiveTask(0)
             props.onSetActiveTask(null)
@@ -244,8 +269,8 @@ export default function Schema(props: SchemaProps) {
         <Xwrapper>
             <div className="process-schema__canvas-background _with-custom-scroll" id="schema_container" ref={canvas}>
                 <div className="process-schema__canvas" style={style}>
-                    {getCells()}
-                    {getLines()}
+                    {taskCells}
+                    {arrows}
                 </div>
             </div>
         </Xwrapper>

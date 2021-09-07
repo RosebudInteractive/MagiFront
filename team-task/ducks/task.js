@@ -338,6 +338,12 @@ function* saveTaskSaga({payload}) {
                 put(getTask(id)),
                 put(getProcessElement(elementId)),
             ])
+        } else {
+            console.log(result)
+            yield all([
+                put(getTask(result.id)),
+                put(getProcessElement(null)),
+            ])
         }
     } catch (e) {
         yield put({type: SAVE_TASK_FAIL})

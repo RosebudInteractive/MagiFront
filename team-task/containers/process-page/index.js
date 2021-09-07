@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef,} from "react"
+import React, {useCallback, useEffect, useMemo, useRef,} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -44,8 +44,6 @@ function ProcessEditor(props) {
     const params = useParams()
     const location = useLocation()
 
-    const tree = useRef()
-
     useEffect(() => {
         actions.hideSideBarMenu()
         actions.getProcess(params.processId)
@@ -82,10 +80,10 @@ function ProcessEditor(props) {
             })
 
             props.initialize(_object)
-
-            tree.current = buildTree(process)
         }
     }, [process])
+
+    const tree = useMemo(() => process && buildTree(process), [process])
 
     const _save = () => {
         const _value: UpdatingProcess = {
@@ -152,7 +150,7 @@ function ProcessEditor(props) {
                 <ProcessBody process={process}
                              isAdmin={isAdmin}
                              horizontalProcess={props.horizontalProcess}
-                             tree={tree.current}
+                             tree={tree}
                              supervisors={props.supervisors}
                              editors={props.editors}
                              elements={props.elements}

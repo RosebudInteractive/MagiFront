@@ -62,6 +62,8 @@ export const buildTree = (process) => {
             _tree.rowCount = item.rowNumber
         }
 
+        item.hasInlines = item.dependencies.nodes.count > 0;
+        item.hasOutlines = item.dependencies.nodes.length > 0;
     })
 
     _tree.rowCount++
