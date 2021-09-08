@@ -46,9 +46,18 @@ exports.LsnHistTask = class LsnHistTask extends Task {
         return new Promise(resolve => {
             let rc;
             if (elemCodes.length > 0) {
-                rc = this._lsnHstService.insert(hstElems)
-                    .then(() => {
-                        return this._lsnHstService.cacheDelKeyList(elemCodes);
+                rc = this._lsnHstService.insert(hstElems, { elemCodes: elemCodes, ignore_fk_constraint: true })
+                    .then(async (res) => {
+                        if (res.processed && (res.processed.length > 0))
+                            await this._lsnHstService.cacheDelKeyList(res.processed);
+                        if (res.warnings)
+                            for (let i = 0; i < res.warnings.length; i++)
+                                console.error(buildLogString(`WARNING: ${res.warnings[i]}`));
+                        if (res.errors && (res.errors.length > 0)) {
+                            for (let i = 0; i < res.errors.length; i++)
+                                console.error(buildLogString(`ERROR: ${res.errors[i]}`));
+                            throw new Error(res.errors[res.errors.length - 1]);
+                        }
                     });
             }
             resolve(rc);

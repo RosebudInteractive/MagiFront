@@ -72,29 +72,68 @@ const LsnHistory = class LsnHistory extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
         let inpData = data ? (Array.isArray(data) ? data : [data]) : [];
+        let codes = opts.elemCodes ? opts.elemCodes : null;
+        let processed = [];
+        let warnings = [];
+        let errors = [];
 
         return Utils.editDataWrapper(() => {
+            if (codes && (codes.length !== inpData.length))
+                throw new Error(`Invalid arguments: options.elemCodes.length !== data.length (${codes.length} vs ${inpData.length})`);
             return new MemDbPromise(this._db, resolve => {
                 resolve(this._getObjects(PARAMETER_REQ_TREE, { field: "Id", op: "=", value: -1 }, dbOpts));
             })
                 .then((result) => {
                     root_obj = result;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-                    return root_obj.edit();
+                })
+                .then(async () => {
+                    for (let i = 0; i < inpData.length; i++) {
+                        let elem = inpData[i];
+                        await root_obj.edit();
+                        await root_obj.newObject({ fields: elem }, dbOpts);
+                        try {
+                            await root_obj.save(dbOpts);
+                            if (codes) {
+                                processed.push(codes[i]);
+                            }
+                        }
+                        catch (err) {
+                            let msg = err && err.message ? err.message : JSON.stringify(err);
+                            msg = `UserId:${elem.UserId}, LessonId:${elem.LessonId}, Message: ${msg}`;
+                            let idx = msg.indexOf("FK_LsnHistory_LessonId");
+                            if (idx < 0)
+                                idx = msg.indexOf("FK_LsnHistory_UserId");
+                            if (opts.ignore_fk_constraint && (idx >= 0)) {
+                                processed.push(codes[i]);
+                                warnings.push(`Ignored record: ${msg}`);
+                                root_obj = await this._getObjects(PARAMETER_REQ_TREE, { field: "Id", op: "=", value: -1 }, dbOpts);
+                                memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper}
+                            }
+                            else {
+                                throw new Error(msg);
+                            }
+                        }
+                    }
                 })
                 .then(() => {
-                    if (inpData.length > 0)
-                        return Utils.seqExec(inpData, (elem) => {
-                            return root_obj.newObject({
-                                fields: elem
-                            }, dbOpts);
-                        });
+                    return {
+                        result: errors.length>0 ? "ERROR" : "OK",
+                        processed: processed,
+                        warnings: warnings,
+                        errors: errors
+                    }
                 })
-                .then(() => {
-                    return root_obj.save(dbOpts);
-                })
-                .then(() => { return { result: "OK" } })
-        }, memDbOptions);
+        }, memDbOptions)
+            .catch(err => {
+                errors.push(err && err.message ? err.message : JSON.stringify(err));
+                return {
+                    result: "ERROR",
+                    processed: processed,
+                    warnings: warnings,
+                    errors: errors
+                }
+            });
     }
 
 /*
