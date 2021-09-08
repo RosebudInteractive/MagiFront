@@ -216,9 +216,11 @@ export default function Schema(props: SchemaProps) {
 
     useEffect(() => {
         canvas.current.addEventListener('scroll', updateXarrow);
+        $(window).bind("toggle-elements-visible", updateXarrow);
 
         return () => {
             canvas.current.removeEventListener('scroll', updateXarrow);
+            $(window).unbind("toggle-elements-visible", updateXarrow)
         }
     }, [])
 
@@ -239,7 +241,7 @@ export default function Schema(props: SchemaProps) {
             return true;
         }
 
-        if (!e.target.closest(".process-schema__task")) {
+        if (!(e.target.closest(".process-schema__task") || e.target.closest(".task__action-menu"))) {
             setActiveTask(0)
             props.onSetActiveTask(null)
         }
