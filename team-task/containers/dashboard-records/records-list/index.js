@@ -255,9 +255,13 @@ const Records = (props) => {
                     </button>
                 </div>
 
-                <div className="grid-container dashboard-records-table unselectable">
-                    <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
+
+                <div className="horizontal-scroll-grid">
+                    <div className="grid-container dashboard-records-table unselectable">
+                        <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
+                    </div>
                 </div>
+
             </div>
 
         </React.Fragment>

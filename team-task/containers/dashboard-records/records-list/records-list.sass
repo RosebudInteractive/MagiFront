@@ -6,15 +6,17 @@
   margin-left: 5px
 
   .filters
+    left: 0
+    min-width: 1150px
+    position: sticky
     display: flex
+    width: 100%
     flex-direction: column
 
   &.form
-    /* min-width: 1400px; */
+    width: 98%
     overflow-x: scroll
     min-height: calc(100vh - 64px)
-    //height: 100%
-    //width: 100%
 
   .filter-button
     align-self: flex-end
@@ -25,10 +27,6 @@
   flex-flow: column
 
 .dashboard-records-table
-  min-width: 1400px
-  overflow-x: scroll
-  //width: calc(100% - 24px)
-
   .webix_ss_center
     min-width: 1400px
     width: auto !important
@@ -43,6 +41,10 @@
       flex-direction: row
       justify-content: center
       max-width: 180px
+
+  .webix_ss_body
+    max-width: 1875px
+    border-radius: 5px
 
 
 //this block is read-only its not an input control
@@ -165,4 +167,12 @@
 .scroll-all-table
   min-width: 100%
   //min-width: 1400px
+  //overflow-x: scroll
+
+
+.horizontal-scroll-grid
+  min-width: 1400px
   overflow-x: scroll
+  min-height: 2000px
+  overflow-y: unset
+  max-height: 100%
