@@ -17,7 +17,6 @@ import {
 } from "tt-ducks/dashboard-records";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
-import {RECORD_PUBLISHED_STATES} from '../../../constants/dashboard-records';
 import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
 
 
@@ -32,13 +31,16 @@ const defaultColumnConfigOne = [
         id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}],
     },
     {
-        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], fillspace: true
+        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], fillspace: true, minWidth: 130
     },
     {
-        id: 'LessonNum', header:  [{text: 'Номер', css: 'up-headers'}],
+        id: 'LessonNum', header:  [{text: 'Номер', css: 'up-headers'}], css: '_container',
+        template: function (val) {
+            return `<div class="centered-by-flex">${val.LessonNum}</div>`;
+        },
     },
     {
-        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], fillspace: true
+        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], fillspace: true, minWidth: 130
     },
 ];
 
@@ -53,10 +55,12 @@ const getProcessState = (val) => {
 
 const defaultColumnConfigTwo = [
     {
-        id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}], format: (val) => {
-            return (typeof val === 'boolean')
-                ? RECORD_PUBLISHED_STATES[val]
-                : ''
+        id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}],
+        css: '_container',
+        template: function(data) {
+            return `<div class='${'check-box-block'} ${data.IsPublished ? 'checked' : ''}'>
+                        <div class=${data.IsPublished ? 'check-mark' : ''}></div>
+                        </div>`
         }
     },
     {
@@ -84,19 +88,19 @@ const Records = (props) => {
 
     const _onResize = useCallback(() => {
         console.log('onresize works');
-        resizeHandler(recordsCount)
+        resizeHandler(recordsCount, 1900)
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
     useWindowSize(() => {
-        resizeHandler(recordsCount)
+        resizeHandler(recordsCount, 1900)
     });
 
     useEffect(() => {
         console.log('resizeTrigger in records:', resizeTrigger)
-        resizeHandler(recordsCount)
+        resizeHandler(recordsCount, 1900)
     }, [resizeTrigger]);
 
     useEffect(() => {
@@ -151,7 +155,7 @@ const Records = (props) => {
         return {
         view: "datatable",
         id: 'dashboard-records-grid',
-        css: 'tt-grid ',
+        css: 'tt-grid scroll-all-table',
         hover: "row-hover",
         scroll: 'none',
         headerRowHeight: 40,

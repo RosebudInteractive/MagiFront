@@ -118,21 +118,24 @@ const convertParam2Filter = ({Name, TypeOfUse, LessonOrCourse, State, Order, Has
     return filter
 };
 
-export const resizeHandler = (rowCount: number) => {
+export const resizeHandler = (rowCount, minWidth = null) => {
     const _form = $('.form'),
         _height = _form.height(),
-        _width = _form.width()
+        _width = _form.width(),
+        setMinWidth = minWidth !== null;
+
 
     if (window.$$('dashboard-records-grid')) {
         const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
 
 
+        console.log('width', _width);
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            window.$$('dashboard-records-grid').$setSize(_width, _gridHeight)
+            window.$$('dashboard-records-grid').$setSize(setMinWidth ? minWidth : _width, _gridHeight)
         }, 0)
 
     }

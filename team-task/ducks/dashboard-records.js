@@ -305,6 +305,7 @@ function* getRecordsSaga() {
 
             // fieldObj.width = 150;
             fieldObj.css = '_container';
+            fieldObj.minWidth = 130;
             fieldObj.template = function(val) {
                 const elData = val[el];
 
