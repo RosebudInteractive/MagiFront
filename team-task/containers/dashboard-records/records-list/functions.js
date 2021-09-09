@@ -6,57 +6,18 @@ import {GRID_SORT_DIRECTION} from "../../../constants/common";
 
 export const getFilterConfig = (filter, disableFields = []) => {
     const initialFields = [
-
         {
             name: "CourseName",
             placeholder: "Название курса",
-            type: FILTER_FIELD_TYPE.TEXT,
+            type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
             value: filter ? filter.CourseName : null,
         },
-
-
-        // {
-        //     name: "Name",
-        //     placeholder: "Название",
-        //     type: FILTER_FIELD_TYPE.TEXT,
-        //     value: filter ? filter.Name : null,
-        // },
-        // {
-        //     name: "TypeOfUse",
-        //     placeholder: "Тип использования",
-        //     type: FILTER_FIELD_TYPE.SELECT,
-        //     value: filter ? filter.TypeOfUse : null,
-        //     options: Object.entries(TimelineTypesOfUse).map(ent => ({value: +ent[0], label: ent[1]}))
-        // },
-        // {
-        //     name: "LessonOrCourse",
-        //     placeholder: "Название курса или лекции",
-        //     type: FILTER_FIELD_TYPE.TEXT,
-        //     value: filter ? filter.LessonOrCourse : null,
-        // },
-        // {
-        //     name: "State",
-        //     placeholder: "Состояние",
-        //     type: FILTER_FIELD_TYPE.SELECT,
-        //     value: filter ? filter.State : null,
-        //     options: Object.entries(TimelineStatuses).map(ent => ({value: +ent[0], label: ent[1]}))
-        // },
-        // {
-        //     name: "Order",
-        //     placeholder: "Порядковый номер",
-        //     type: FILTER_FIELD_TYPE.TEXT,
-        //     value: filter ? filter.Order : null,
-        // },
-        // {
-        //     name: "HasScript",
-        //     placeholder: "Наличие скрипта",
-        //     type: FILTER_FIELD_TYPE.SELECT,
-        //     value: filter ? filter.HasScript : null,
-        //     options: [
-        //         {value: 1, label: 'Да'},
-        //         {value: 2, label: 'Нет'}
-        //     ]
-        // }
+        {
+            name: "DateRange",
+            placeholder: "Период",
+            type: FILTER_FIELD_TYPE.DATE_RANGE,
+            value: [null, null],
+        },
     ];
 
     const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
