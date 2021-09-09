@@ -17,42 +17,10 @@ import {
 } from "tt-ducks/dashboard-records";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
-import {RECORD_PROCESS_STATES, RECORD_PUBLISHED_STATES} from '../../../constants/dashboard-records';
+import {RECORD_PUBLISHED_STATES} from '../../../constants/dashboard-records';
+import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
 
 
-const staticPartColumnConfig = [
-    {
-        id: 'Id', header: 'id', hidden: true
-    },
-    {
-        id: 'Week', header: 'Неделя'
-    },
-    {
-        id: 'Date', header: 'Дата',
-    },
-    {
-        id: 'CourseName', header: 'Курс',
-    },
-    {
-        id: 'LessonNum', header: 'Номер лекции/допэпизода',
-    },
-    {
-        id: 'LessonName', header: 'Лекция/допэпизод',
-    },
-    // {
-    //     id: 'ElementsTitle', header: 'Элементы процесса'
-    // },
-];
-
-const columnConfigObject = {
-  Id: {header: 'id', hidden: true},
-  Week: { header: 'Неделя'},
-  Date: { header: 'Дата'},
-  CourseName: { header: 'Курс'},
-  LessonNum: { header: 'Номер лекции/допэпизода'},
-  LessonName: { header: 'Лекция/допэпизод'},
-  ElementsTitle: { header: 'Неделя'}
-};
 const defaultColumnConfigOne = [
     {
         id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
@@ -67,23 +35,36 @@ const defaultColumnConfigOne = [
         id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], fillspace: true
     },
     {
-        id: 'LessonNum', header:  [{text: 'Номер лекции/допэпизода', css: 'up-headers'}],
+        id: 'LessonNum', header:  [{text: 'Номер', css: 'up-headers'}],
     },
     {
-        id: 'LessonName', header: [{text: 'Лекция/допэпизод', css: 'up-headers'}], fillspace: true
+        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], fillspace: true
     },
 ];
 
+const getProcessState = (val) => {
+    if(val){
+        const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === val);
+        return  processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
+    }else {
+        return {css: '', label: ''}
+    }
+}
+
 const defaultColumnConfigTwo = [
     {
-        id: 'IsPublished', header: 'Опубликовано', format: (val) => {
+        id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}], format: (val) => {
             return (typeof val === 'boolean')
                 ? RECORD_PUBLISHED_STATES[val]
                 : ''
         }
     },
     {
-        id: 'ProcessState', header: 'Процесс', format: (val) =>  val ? RECORD_PROCESS_STATES[val] : ''
+        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 150, css: "_container",
+        template: function(val) {
+            const state = getProcessState(val.ProcessState);
+            return `<div class="process-state ${state.css}">${state.label}</div>`;
+        }
     }
 ]
 
@@ -130,6 +111,7 @@ const Records = (props) => {
     }, [columnFields]);
 
     useEffect(() => {
+        console.log('dashboardRecords:', dashboardRecords)
         recordsCount = dashboardRecords.length;
         if (sideBarMenuVisible) {
             _onResize();
@@ -255,7 +237,7 @@ const Records = (props) => {
 
     return (
         <React.Fragment>
-            <div className="records-page form _scrollable-y">
+            <div className="records-page form">
                 {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
 
                 <div className="filters">

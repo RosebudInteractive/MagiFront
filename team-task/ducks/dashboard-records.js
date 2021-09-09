@@ -8,7 +8,7 @@ import {commonGetQuery} from "tools/fetch-tools";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import _ from "lodash";
 import moment from "moment";
-import {RECORD_ELEMENT_STATES} from "../constants/dashboard-records";
+import {DASHBOARD_ELEMENTS_STATE} from "../constants/states";
 
 export const moduleName = 'dashboard-records';
 const prefix = `${appName}/${moduleName}`;
@@ -89,13 +89,13 @@ export const VIEW_MODE = {
     COMPACT: 2,
 }
 
-const defaultFieldSetObject = {
-    Week: {},
-
-};
+// const defaultFieldSetObject = {
+//     Week: {},
+//
+// };
 
 export const ReducerRecord = Record({
-    records: RECORDS_EXAMPLE_SET,
+    records: [],
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
     fetching: false,
@@ -145,8 +145,6 @@ export const changeRecord = (record) => {
 };
 
 export const changeViewMode = (mode) => {
-    console.log('changeViewMode');
-    console.log('mode', mode);
     return {type: CHANGE_VIEW_MODE, payload: mode}
 };
 
@@ -202,9 +200,16 @@ const handleServerData = (records, mode) => {
             const [first, ...other] = filteredRecords;
             first.Week = weekHasChanged ? displayWeekRange : '';
             first.IsEven = isEven;
-            first.PubDate = moment(first.PubDate).format('DD MMM');
+            first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
+
+
+            // const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === first.ProcessState);
+            // first.ProcessState = processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
+
             first.Elements.forEach((elem) => {
-                first[elem.Name] = elem.State ? elem.State : '';
+                const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
+
+                first[elem.Name] = _state ? {css: _state.css, label: _state.label} : {css: "", label: "--"};
             });
 
             if (other && other.length > 0) {
@@ -212,17 +217,27 @@ const handleServerData = (records, mode) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
+
                     item.Elements.forEach((elem) => {
-                        item[elem.Name] = elem.State ? elem.State : '';
+                        const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label} : {css: "_unknown", label: ""};
                     })
                 });
             }
 
             resultArray.push(first, ...other);
+
+            if(mode === VIEW_MODE.COMPACT){
+                isEven = !isEven;
+            }
+
         } else {
+            if(mode === VIEW_MODE.COMPACT){
+                continue;
+            }
             const objectData = {
                 IsEven: isEven,
-                PubDate: currentDate.format('DD MMM'),
+                PubDate: currentDate.locale('ru').format('DD MMM'),
                 CourseId: null,
                 CourseName: "",
                 LessonId: null,
@@ -273,6 +288,7 @@ function* getRecordsSaga() {
             const fieldObj = { id: el, };
 
             if (inx === 0) {
+
                 fieldObj.header = [
                     {
                         text: "Элементы",
@@ -287,7 +303,22 @@ function* getRecordsSaga() {
                 fieldObj.header = ["", el]
             }
 
-            fieldObj.format = (val) => val ? RECORD_ELEMENT_STATES[val] : '';
+            // fieldObj.width = 150;
+            fieldObj.css = '_container';
+            fieldObj.template = function(val) {
+                const elData = val[el];
+
+
+
+                if (elData){
+                    return `<div class="state-template-block-dr ${elData.css}">${elData.label}</div>`;
+                } else {
+                return `<div class="state-template-block-dr _unknown"></div>`
+                }
+                // console.log('fieldObj.template works', val.)
+
+            };
+            // fieldObj.format = (val) => val ? RECORD_ELEMENT_STATES[val] : '';
 
             fieldSet.push(fieldObj)
         });
@@ -331,8 +362,10 @@ function* updateRecordSaga(data) {
     }
 }
 
-const getRecordsReq = (params) => {
-    let urlString = `/api/pm/dashboard?${params}`;
+const getRecordsReq = (params) => { //todo dontforget about params
+    const start = '2021-09-01T07:00:00.000Z';
+    const end = '2021-09-30T07:00:00.000Z';
+    let urlString = `/api/pm/dashboard?st_date=${start}&fin_date=${end}`; //todo add params
     return commonGetQuery(urlString);
 };
 

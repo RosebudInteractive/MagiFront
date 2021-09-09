@@ -9,7 +9,6 @@
     min-height: calc(100vh - 64px)
     //height: 100%
     width: 100%
-    //overflow:
 
   .filter-button
     position: absolute
@@ -56,7 +55,7 @@
     border-right: 0
     transform: rotate(312deg)
 
-.state-template-block-tm
+.state-template-block-dr, .process-state
   font-family: Inter
   font-style: normal
   font-weight: 400
@@ -70,22 +69,36 @@
   border-radius: 32px
 
   &._draft
-    background-color: #EBF2FF
+    background-color: #EBF2FF70
     color: $blue
 
   &._executing
-    background-color: #FFF8EA
+    background-color: #FFF8EA70
     color: $yellow
 
   &._done
-    background-color: #EDF6EE
+    background-color: #EDF6EE70
     color: $green
 
   &._error
-    background-color: #EDF6EE
+    background-color: #EDF6EE70
     color: $red
 
+  &._not-ready
+    background-color: #2979FF70
+    color: $blue
 
+  &._part-ready
+    background-color: #D1941A70
+    color: $yellow
+
+  &._ready
+    background-color: #43A04770
+    color: $green
+
+  &._question
+    background-color: #FEEDEC
+    color: #C8372D
 
   .state-circle
     border-radius: 50%
@@ -107,8 +120,6 @@
 .remove-timeline-button
   margin-top: 12px
 
-
-
 .up-headers
   //border: 1px solid black
   border-radius: 5px
@@ -117,4 +128,4 @@
 
 
 .even-record
-  background: rgba(112, 105, 116, 0.5) !important
+  background: rgba(112, 105, 116, 0.3) !important

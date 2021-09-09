@@ -19,6 +19,18 @@ export default function DashboardRecordsHeader(props) {
         </div>
         <div className="dashboard-header-field-name">
             <h6>{title}</h6>
+
+            {/*<Select*/}
+            {/*    // name='m'*/}
+            {/*    placeholder="Режим отображения"*/}
+            {/*    label={"Режим отображения"}*/}
+            {/*    required={true}*/}
+            {/*    onChange={(val) => props.onChangeMode(val)}*/}
+            {/*    options={[{name: 'Неделя', id: 0},*/}
+            {/*        {name: 'День', id: 1},*/}
+            {/*        {name: 'Компактный', id: 2}]}*/}
+            {/*    disabled={false}*/}
+            {/*/>*/}
             <Form
                 initialValues={{mode: '0'}}
                 onSubmit={values => {}}
