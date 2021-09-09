@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from "react"
 import type {FilterField} from "./types";
+import "./filter.sass"
 import Button from "./button";
 import Row from "./row";
 

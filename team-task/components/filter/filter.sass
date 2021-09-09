@@ -1,9 +1,5 @@
 @import "~tt-assets/styles/colors.sass"
 
-
-.rs-picker-select-menu-item.rs-picker-select-menu-item-active, .rs-picker-select-menu-item.rs-picker-select-menu-item-active:hover
-  color: $grey50 !important
-
 .filter-button
   position: relative
   display: flex
@@ -72,6 +68,18 @@
   display: flex
   justify-content: space-between
   box-sizing: border-box
+
+  .rs-picker-select-menu-item.rs-picker-select-menu-item-active,
+  .rs-picker-select-menu-item.rs-picker-select-menu-item-active:hover
+    color: $grey50 !important
+
+  .rs-picker-toggle-value
+    color: $grey50 !important
+
+  .rs-picker-input,
+  .rs-picker-input:hover,
+  .rs-picker-input.rs-picker-focused
+    border-color: #D2D2D6 !important
 
 .filter-block__buttons
   display: flex
