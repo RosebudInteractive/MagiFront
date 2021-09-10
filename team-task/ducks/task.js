@@ -408,7 +408,6 @@ function* createTaskSaga({payload}) {
         const _newTask = {
             Id: -1,
             Process: {Id: payload},
-            Executor: {Id: _user.Id, DisplayName: _user.DisplayName},
             Name: "Новая задача",
             Element: {Id: null},
             IsElemReady: false,

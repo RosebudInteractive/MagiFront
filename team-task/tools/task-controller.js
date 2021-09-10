@@ -123,7 +123,7 @@ class TaskController {
     _calcAdmin() {
         if (!this.task) return
 
-        this._enable.form = true
+        this._enable.form = !this.task.disabled
         this._enable.taskName = true
         this._enable.description = true
         this._enable.processFields = true
@@ -145,7 +145,7 @@ class TaskController {
     _calcSupervisor() {
         if (!this.task) return
 
-        this._enable.form = true
+        this._enable.form = !this.task.disabled
         this._enable.taskName = true
         this._enable.description = true
         this._enable.processFields = true
@@ -167,20 +167,19 @@ class TaskController {
     _calcElementResponsible() {
         if (!this.task) return
 
+        this._enable.form = !this.task.disabled
+
         if (this.task.State !== TASK_STATE.DONE.value) {
-            this._enable.form = true
             this._enable.executor = true
             this._enable.dueDate = true
             this._enable.description = true
             this._enable.comments = true
         } else {
-            this._enable.form = true
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
 
         if (this.task.Element && this.task.Element.Supervisor && this.task.Element.Supervisor.Id === this.user.Id) {
-            this._enable.form = true
             this._enable.executor = true
             this._enable.state = true
         }
@@ -193,8 +192,9 @@ class TaskController {
     _calcUser() {
         if (!this.task) return
 
+        this._enable.form = !this.task.disabled
+
         if ((this.task.State > TASK_STATE.DRAFT.value) && (this.task.State !== TASK_STATE.DONE.value)) {
-            this._enable.form = true
             this._enable.processFields = true
             this._enable.state = true
             this._enable.comments = true
@@ -207,7 +207,6 @@ class TaskController {
         }
 
         if (this.task.State === TASK_STATE.DONE.value) {
-            this._enable.form = true
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
