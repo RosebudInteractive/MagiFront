@@ -18,6 +18,7 @@ import {
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
 import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
+import {coursesSelector} from "tt-ducks/dictionary";
 
 
 const defaultColumnConfigOne = [
@@ -80,7 +81,8 @@ const Records = (props) => {
         actions,
         sideBarMenuVisible, fetching,
         elementsFieldSet,
-        resizeTrigger
+        resizeTrigger,
+        courses
     } = props;
 
 
@@ -146,7 +148,8 @@ const Records = (props) => {
         actions.setInitState(initState);
 
         if (!fetching) {
-            actions.getRecords()
+            actions.getRecords();
+            // actions.getCourses();
             // refreshColumns
         }
     }, [location]);
@@ -228,8 +231,9 @@ const Records = (props) => {
     }}, [columnFields]);
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
-        return getFilterConfig(filter.current)
-    }, [filter.current]);
+        const optionsCourses = (courses && courses.length > 0) ? courses.map(c => ({value: c.Id, label: c.Name})) : [];
+        return getFilterConfig(filter.current, [], optionsCourses.length > 0 ? optionsCourses : []);
+    }, [filter.current, courses]);
 
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
@@ -245,14 +249,16 @@ const Records = (props) => {
                 {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
 
                 <div className="filters">
-                    <FilterRow fields={FILTER_CONFIG}
-                               onApply={_onApplyFilter}
-                               onChangeVisibility={_onResize}/>
+                    {(courses  && courses.length > 0) && <React.Fragment>
+                        <FilterRow fields={FILTER_CONFIG}
+                                   onApply={_onApplyFilter}
+                                   onChangeVisibility={_onResize}/>
 
 
-                    <button  disabled={true} style={{pointerEvents: 'none'}} className="open-form-button" >
+                        <button  disabled={true} style={{pointerEvents: 'none'}} className="open-form-button" >
 
-                    </button>
+                        </button>
+                    </React.Fragment>}
                 </div>
 
 
@@ -273,7 +279,8 @@ const mapState2Props = (state) => {
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
         fetching: fetchingSelector(state),
-        elementsFieldSet: elementsFieldSetSelector(state)
+        elementsFieldSet: elementsFieldSetSelector(state),
+        courses: coursesSelector(state)
     }
 }
 
@@ -285,7 +292,8 @@ const mapDispatch2Props = (dispatch) => {
             setInitState,
             setPathname,
             setGridSortOrder,
-            getRecords
+            getRecords,
+            // getCourses()
         }, dispatch)
     }
 };

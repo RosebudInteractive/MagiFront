@@ -169,9 +169,9 @@ function* changeViewModeSaga(data) {
     }
 }
 
-const handleServerData = (records, mode) => {
-    const startDate = moment(records[0].PubDate);
-    const finishDate = moment(records[records.length - 1].PubDate);
+const handleServerData = (records, mode, stDate = null, finDate = null) => {
+    const startDate = moment(stDate ? stDate : records[0].PubDate);
+    const finishDate = moment(finDate ? finDate : records[records.length - 1].PubDate);
 
     const daysBetween = finishDate.diff(startDate, "days");
 
@@ -267,6 +267,7 @@ function* getRecordsSaga() {
 
     try {
         const params = yield select(paramsSelector);
+        // console.log('PARAMS!')
 
         const records = yield call(getRecordsReq, params);
 
@@ -327,6 +328,7 @@ function* getRecordsSaga() {
         yield put({ type: SET_FIELDS, payload: fieldSet });
         yield put({type: REQUEST_SUCCESS});
 
+        console.log('params', params);
         yield put({type: CHANGE_VIEW_MODE, payload: mode});
 
         yield put(clearLocationGuard());
@@ -363,10 +365,8 @@ function* updateRecordSaga(data) {
     }
 }
 
-const getRecordsReq = (params) => { //todo dontforget about params
-    const start = '2021-09-01T07:00:00.000Z';
-    const end = '2021-09-30T07:00:00.000Z';
-    let urlString = `/api/pm/dashboard?st_date=${start}&fin_date=${end}`; //todo add params
+const getRecordsReq = (params) => {
+    let urlString = `/api/pm/dashboard?${params}`;
     return commonGetQuery(urlString);
 };
 

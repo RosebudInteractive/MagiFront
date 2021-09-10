@@ -2,15 +2,14 @@ import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 
-//todo change it for dashboard-records
-
-export const getFilterConfig = (filter, disableFields = []) => {
+export const getFilterConfig = (filter, disableFields = [], courseOptions = []) => {
     const initialFields = [
         {
             name: "CourseName",
             placeholder: "Название курса",
             type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
             value: filter ? filter.CourseName : null,
+            options: courseOptions
         },
         {
             name: "DateRange",
@@ -28,12 +27,8 @@ export const getFilterConfig = (filter, disableFields = []) => {
 export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
-        Name = _params.get("Name"),
-        TypeOfUse = _params.get("TypeOfUse"),
-        LessonOrCourse = _params.get("LessonOrCourse"),
-        State = _params.get("State"),
-        Order = _params.get("Order"),
-        HasScript = _params.get("HasScript");
+        CourseName = _params.get("CourseName"),
+        DateRange = _params.get("DateRange");
 
     let _order = _params.get('order');
     if (_order) {
@@ -43,12 +38,8 @@ export const parseParams = () => {
 
     const _filter = convertParam2Filter(
         {
-            Name,
-            TypeOfUse,
-            LessonOrCourse,
-            State,
-            Order,
-            HasScript
+            CourseName,
+            DateRange
         });
 
     if (_filter) {
@@ -58,22 +49,14 @@ export const parseParams = () => {
     return paramsData
 }
 
-const convertParam2Filter = ({Name, TypeOfUse, LessonOrCourse, State, Order, HasScript}) => {
+const convertParam2Filter = ({CourseName, DateRange}) => {
 
-    if (!(Name ||
-        TypeOfUse ||
-        LessonOrCourse ||
-        State ||
-        Order ||
-        HasScript)) return null;
+    if (!(CourseName ||
+        DateRange)) return null;
 
     const filter = {};
-    filter.Name = Name && Name.length > 0 ? Name : '';
-    filter.TypeOfUse = (TypeOfUse !== null && TypeOfUse !== undefined) ? +TypeOfUse : '';
-    filter.LessonOrCourse = LessonOrCourse ? LessonOrCourse : '';
-    filter.State = (State !== null && State !== undefined) ? +State : '';
-    filter.Order = Order ? +Order : '';
-    filter.HasScript = (HasScript !== null && HasScript !== undefined) ? +HasScript : '';
+    filter.CourseName = CourseName && CourseName.length > 0 ? CourseName : '';
+    filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null) ? DateRange : '';
 
 
     return filter
@@ -103,21 +86,8 @@ export const resizeHandler = (rowCount, minWidth = null) => {
 };
 
 export const refreshColumns = (config) => {
-
     if (window.$$('dashboard-records-grid')) {
         window.$$('dashboard-records-grid').refreshColumns(config)
-
-        // const _form = $('.form'),
-        //     _height = _form.height(),
-        //     _width = _form.width();
-
-        // setTimeout(() => {
-            // let _gridHeight = _height - _headerHeight - 48
-
-            // const _calcHeight = (rowCount * 80) + _headerHeight + 60
-            // _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            // window.$$('dashboard-records-grid').$setSize()
-        // }, 0)
     }
 }
 
@@ -125,17 +95,8 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if(filter.Name && filter.Name.length > 0) { _data.Name = filter.Name }
-
-        if(filter.TypeOfUse !== null && filter.TypeOfUse !== undefined && filter.TypeOfUse !== "") { _data.TypeOfUse = filter.TypeOfUse}
-
-        if(filter.LessonOrCourse && filter.LessonOrCourse !== "") { _data.LessonOrCourse = filter.LessonOrCourse }
-
-        if(filter.State && filter.State !== "") { _data.State = filter.State }
-
-        if(filter.Order && filter.Order !== "") { _data.Order = filter.Order }
-
-        if(filter.HasScript !== null && filter.HasScript !== undefined &&  filter.HasScript !== "" ) { _data.HasScript = filter.HasScript }
+        if(filter.CourseName && filter.CourseName.length > 0) { _data.CourseName = filter.CourseName }
+        if(filter.DateRange !== null && filter.DateRange.every(d => d !== null)) { _data.DateRange = filter.DateRange}
     }
 
     return _data
