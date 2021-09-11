@@ -3,7 +3,7 @@ import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
-import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
+import {clearLocationGuard, filterSelector, paramsSelector} from "tt-ducks/route";
 import {commonGetQuery} from "tools/fetch-tools";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import _ from "lodash";
@@ -144,8 +144,8 @@ export const changeRecord = (record) => {
     return {type: CHANGE_RECORD, payload: record};
 };
 
-export const changeViewMode = (mode) => {
-    return {type: CHANGE_VIEW_MODE, payload: mode}
+export const changeViewMode = (mode, params) => {
+    return {type: CHANGE_VIEW_MODE, payload: {mode, params}}
 };
 
 export const saga = function* () {
@@ -158,10 +158,15 @@ export const saga = function* () {
 
 function* changeViewModeSaga(data) {
     try {
-        yield put({type: SET_VIEW_MODE, payload: +data.payload});
+        yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
         const records = _.cloneDeep(yield select(recordsSelector));
 
-        let resultArray = handleServerData(records, +data.payload);
+        const params = yield select(filterSelector);
+
+        console.log('params in changeViewModeSaga', params);
+
+
+        let resultArray = handleServerData(records, +data.payload.mode);
 
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
@@ -296,24 +301,30 @@ function* getRecordsSaga() {
                         colspan: fields.size,
                         css: {"text-align": "center"}
                     },
-                    el
+                    {
+                        text: el,
+                        css: {"text-align": "center"}
+                    }
                 ];
 
-                fieldObj.fillspace = true;
+
             } else {
-                fieldObj.header = ["", el]
+                fieldObj.header = [{text: ''}, {text: el, css: {"text-align": "center"}}];
+                fieldObj.width = 150;
+                // fieldObj.maxWidth = 160;
             }
 
             // fieldObj.width = 150;
-            fieldObj.css = '_container';
+            fieldObj.css = '_container element-style';
             fieldObj.minWidth = 130;
+            // fieldObj.maxWi
             fieldObj.template = function(val) {
                 const elData = val[el];
 
 
 
                 if (elData){
-                    return `<div class="state-template-block-dr ${elData.css}">${elData.label}</div>`;
+                    return `<div style="width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css}">${elData.label}</div></div>`;
                 } else {
                 return `<div class="state-template-block-dr _unknown"></div>`
                 }
@@ -329,7 +340,12 @@ function* getRecordsSaga() {
         yield put({type: REQUEST_SUCCESS});
 
         console.log('params', params);
-        yield put({type: CHANGE_VIEW_MODE, payload: mode});
+        yield put({type: CHANGE_VIEW_MODE,
+            payload: {
+                mode: mode,
+                st_date: params.st_date,
+                fin_date: params.fin_date
+        }});
 
         yield put(clearLocationGuard());
     } catch
@@ -366,7 +382,7 @@ function* updateRecordSaga(data) {
 }
 
 const getRecordsReq = (params) => {
-    let urlString = `/api/pm/dashboard?${params}`;
+    let urlString = `/api/pm/dashboard${params ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };
 

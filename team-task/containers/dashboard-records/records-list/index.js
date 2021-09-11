@@ -6,6 +6,7 @@ import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import type {FilterField} from "../../../components/filter/types";
 import FilterRow from "../../../components/filter";
 import Webix from "../../../components/Webix";
+import {useLocation} from "react-router-dom"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -32,7 +33,7 @@ const defaultColumnConfigOne = [
         id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}],
     },
     {
-        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], fillspace: true, minWidth: 130
+        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], minWidth: 130
     },
     {
         id: 'LessonNum', header:  [{text: 'Номер', css: 'up-headers'}], css: '_container',
@@ -41,7 +42,7 @@ const defaultColumnConfigOne = [
         },
     },
     {
-        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], fillspace: true, minWidth: 130
+        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}],  minWidth: 130
     },
 ];
 
@@ -85,6 +86,7 @@ const Records = (props) => {
         courses
     } = props;
 
+    const location = useLocation();
 
     const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne,...defaultColumnConfigTwo]);
 
@@ -117,7 +119,6 @@ const Records = (props) => {
     }, [columnFields]);
 
     useEffect(() => {
-        console.log('dashboardRecords:', dashboardRecords)
         recordsCount = dashboardRecords.length;
         if (sideBarMenuVisible) {
             _onResize();
