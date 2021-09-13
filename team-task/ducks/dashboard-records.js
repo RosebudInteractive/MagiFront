@@ -30,71 +30,18 @@ const REQUEST_START = `${prefix}/REQUEST_START`;
 const REQUEST_SUCCESS = `${prefix}/REQUEST_SUCCESS`;
 const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
 
+const TOGGLE_MODAL_DND_TO_PUBLISH = `${prefix}/TOGGLE_MODAL_DRAG_N_DROP_TO_PUBLISH`;
+const OPEN_MODAL_DND_TO_PUBLISH = `${prefix}/OPEN_MODAL_DND_TO_PUBLISH`;
+const CLOSE_MODAL_DND_TO_PUBLISH = `${prefix}/CLOSE_MODAL_DND_TO_PUBLISH`;
 
-const RECORDS_EXAMPLE_SET = [
-    {
-        Week: '5/9 - 12/9',
-        Date: '5 ceн',
-        CourseName: 'Курс какой-то курс кря краиииуиуки уиукиукивищль',
-        LessonNum: 4,
-        LessonName: 'Some lesson name',
-        Elements: [
-            {
-                Id: 1,
-                ColumnName: 'Literature',
-                Name: 'Литература',
-                State: 'Опубликован'
-            },
-            {
-                Id: 2,
-                ColumnName: 'Sound',
-                Name: 'Звук',
-                State: 'Опубликован'
-            },
-            {
-                Id: 3,
-                ColumnName: 'Text',
-                Name: 'Текст',
-                State: 'Опубликован'
-            }
-        ],
-        IsPublished: '18 марта 2021',
-        ProcessState: 'Активный',
-        ElementsTitle: 'asdf'
-    },
-];
 
-const defaultFieldSet = new Set([
-    // {
-    //     id: 'Sound', header: 'Звук'
-    // },
-    // {
-    //     id: 'Transcript', header: 'Транскрипт'
-    // },
-    // {
-    //     id: 'Illustration', header: 'Иллюстрация'
-    // },
-    // {
-    //     id: 'Literature', header: 'Литература'
-    // },
-    // {
-    //     id: 'Music', header: 'Музыка'
-    // },
-    // {
-    //     id: 'Text', header: 'Текст'
-    // },
-]);
+const defaultFieldSet = new Set([]);
 
 export const VIEW_MODE = {
     WEEK: 0,
     DAY: 1,
     COMPACT: 2,
-}
-
-// const defaultFieldSetObject = {
-//     Week: {},
-//
-// };
+};
 
 export const ReducerRecord = Record({
     records: [],
@@ -102,7 +49,8 @@ export const ReducerRecord = Record({
     displayRecords: defaultFieldSet,
     unpublishedRecords: [],
     fetching: false,
-    viewMode: VIEW_MODE.WEEK
+    viewMode: VIEW_MODE.WEEK,
+    showModalOfPublishing: false
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -125,6 +73,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('viewMode', payload);
         case SET_UNPUBLISHED_RECORDS:
             return state.set('unpublishedRecords', payload);
+        case TOGGLE_MODAL_DND_TO_PUBLISH:
+        case CLOSE_MODAL_DND_TO_PUBLISH:
+        case OPEN_MODAL_DND_TO_PUBLISH:
+            return state.set('showModalOfPublishing', payload);
         default:
             return state
     }
@@ -138,6 +90,7 @@ export const unpublishedRecordsSelector = createSelector(stateSelector, state =>
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
 export const elementsFieldSetSelector = createSelector(stateSelector, state => state.fieldSet);
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
+export const modalPublishIsOnSelector = createSelector(stateSelector, state => state.showModalOfPublishing);
 
 
 export const getRecords = () => {
@@ -150,6 +103,18 @@ export const getUnpublishedRecords = () => {
 
 export const changeRecord = (record) => {
     return {type: CHANGE_RECORD, payload: record};
+};
+
+export const toggleModalDndToPublish = (isOn) => {
+    return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
+};
+
+export const openModalDndToPublish = () => {
+    return {type: OPEN_MODAL_DND_TO_PUBLISH, payload: true};
+};
+
+export const closeModalDndToPublish = () => {
+    return {type: CLOSE_MODAL_DND_TO_PUBLISH, payload: false};
 };
 
 export const changeViewMode = (mode, params) => {

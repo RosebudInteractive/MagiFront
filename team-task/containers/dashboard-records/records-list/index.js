@@ -89,6 +89,7 @@ const Records = (props) => {
     const location = useLocation();
 
     const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne,...defaultColumnConfigTwo]);
+    // const [set]
 
     const _onResize = useCallback(() => {
         console.log('onresize works');
@@ -171,6 +172,7 @@ const Records = (props) => {
         rowHeight: 72,
         height: 1000,
         select: true,
+        drag:true,
         editable: false,
             scheme: {
                 $change: function (item) {
@@ -195,15 +197,17 @@ const Records = (props) => {
                 this.markSorting(_sort.field, _sort.direction);
             },
             onItemDblClick: function (id) {
-                // const item = this.getItem(id);
-                //
-                // if (item && item.Id) {
-                //     // todo open action
-                //     actions.selectTimeline(item.Id);
-                //     props.history.push(`timelines/${item.Id}`);
-                // }
+                // todo open action
 
-            }
+            },
+            onBeforeDrop: function (context, e) {
+                console.log('before drop!', e);
+                props.openModalOnPublication();
+                return true;
+            },
+            // onAfterDrop: function (context, e) {
+            //     console.log('after drop')
+            // }
         },
         onClick: {
             "js-publish": function (e, data) {

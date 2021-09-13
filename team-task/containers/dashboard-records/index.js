@@ -5,17 +5,22 @@ import "./dashboard-records.sass"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {
     changeViewMode,
+    closeModalDndToPublish,
     displayRecordsSelector,
     getUnpublishedRecords,
+    modalPublishIsOnSelector,
+    openModalDndToPublish,
     unpublishedRecordsSelector
 } from "tt-ducks/dashboard-records"
 import Records from "./records-list"
 import UnpublishedRecords from "./unpublished-records";
 import DashboardRecordsHeader from "./header"
 import {useHistory} from "react-router-dom";
+import Modal from "../../components/modal";
+import ConfirmationOfPublication from "./confirmation-of-publication";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
 
@@ -29,7 +34,6 @@ function DashboardRecords(props) {
     },[]);
 
     const unpublishedPanelToggled = (panelOpened) => {
-        // console.log('it works')
         triggerResize(!resizeTrigger);
         setPanelOpened(panelOpened);
     };
@@ -37,7 +41,7 @@ function DashboardRecords(props) {
 
     const changeMode = (mode) => {
         actions.changeViewMode(mode);
-    }
+    };
 
     const backAction = () => {
         !sideBarMenuVisible && actions.showSideBarMenu();
@@ -57,7 +61,7 @@ function DashboardRecords(props) {
             <div className="dashboard-body">
                 <div className="unpublished-records" >
 
-                    <UnpublishedRecords unpublishedRecords = {unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
+                    <UnpublishedRecords unpublishedRecords={unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
                     {/*<div className='button' style={{width: '50px', height: '50px', background: 'blue'}} onClick={openPane}>*/}
                     {/*    button*/}
                     {/*</div>*/}
@@ -65,10 +69,16 @@ function DashboardRecords(props) {
                 </div>
 
                 <div className="records">
-                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened}/>
+                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened} openModalOnPublication={actions.openModalDndToPublish}/>
                 </div>
             </div>
 
+
+            {modalPublishOn &&
+                <Modal WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+                    actions.closeModalDndToPublish();
+                }}/>
+            }
 
         </div>
     )
@@ -79,8 +89,9 @@ const mapState2Props = (state) => {
         unpublishedRecords: unpublishedRecordsSelector(state),
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
+        modalPublishOn: modalPublishIsOnSelector(state)
     }
-}
+};
 
 const mapDispatch2Props = (dispatch) => {
     return {
@@ -88,7 +99,9 @@ const mapDispatch2Props = (dispatch) => {
             hideSideBarMenu,
             showSideBarMenu,
             changeViewMode,
-            getUnpublishedRecords
+            getUnpublishedRecords,
+            closeModalDndToPublish,
+            openModalDndToPublish
         }, dispatch)
     }
 };
