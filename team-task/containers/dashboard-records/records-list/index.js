@@ -19,6 +19,7 @@ import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks
 import './records-list.sass'
 import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
 import {coursesSelector} from "tt-ducks/dictionary";
+import {useWindowSize} from "../../../tools/window-resize-hook";
 
 
 const defaultColumnConfigOne = [
@@ -99,9 +100,9 @@ const Records = (props) => {
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
-    // useWindowSize(() => {
-        // resizeHandler(recordsCount, 1900)
-    // });
+    useWindowSize(() => {
+        resizeHandler(recordsCount, 0)
+    });
 
     // useEffect(() => {
     //     console.log('resizeTrigger in records:', resizeTrigger);
@@ -259,16 +260,12 @@ const Records = (props) => {
                 {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
 
                 <div className="filters">
-                    {(courses  && courses.length > 0) && <React.Fragment>
+                    {
+                        (courses  && courses.length > 0) &&
                         <FilterRow fields={FILTER_CONFIG}
                                    onApply={_onApplyFilter}
                                    onChangeVisibility={_onResize}/>
-
-
-                        <button  disabled={true} style={{pointerEvents: 'none'}} className="open-form-button" >
-
-                        </button>
-                    </React.Fragment>}
+                    }
                 </div>
 
 

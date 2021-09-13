@@ -101,14 +101,14 @@ export const resizeHandler = (rowCount, additionalWidth) => {
 
 
         let resultWidth = tWidth >_width ? tWidth : _width;
-        resultWidth  += additionalWidth > 0 ? additionalWidth : 0;
+        // resultWidth  += additionalWidth > 0 ? additionalWidth : 0;
         // const oldFiltersWidth = $('.records-page .filters').width();
-        if(additionalWidth > 0){
-
-            $('.records-page .filters').width('72vw');
-        } else {
-            $('.records-page .filters').width('92vw');
-        }
+        // if(additionalWidth > 0){
+        //
+        //     $('.records-page .filters').width('72vw');
+        // } else {
+        //     $('.records-page .filters').width('92vw');
+        // }
 
 
         setTimeout(() => {
@@ -117,6 +117,7 @@ export const resizeHandler = (rowCount, additionalWidth) => {
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
             window.$$('dashboard-records-grid').$setSize(resultWidth, _gridHeight)
+            $('.horizontal-scroll-grid').height(_gridHeight)
         }, 0)
 
     }
