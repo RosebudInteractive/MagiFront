@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React from "react"
 import ArrowAdd from "tt-assets/svg/link-arrow-add.svg"
 import ArrowDel from "tt-assets/svg/link-arrow-del.svg"
 
