@@ -2520,6 +2520,9 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Задача (Id =${id}) не найдена.`);
                         let taskObj = collection.get(0);
 
+                        if (!taskObj.isActive())
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Задача неактивна.`);
+
                         if (inpFields.GuidVer && (inpFields.GuidVer !== taskObj.guidVer()))
                             throw new HttpError(HttpCode.ERR_CONFLICT, `Задача (Id =${id}) была изменена другим пользователем.`);
 
@@ -2587,13 +2590,16 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             elemObj = collection.get(0);
                         }
 
+                        if (isSupervisor)
+                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
+
                         let is_executor_changed = false;
                         if (typeof (inpFields.ExecutorId) !== "undefined") {
                             let old_executor = taskObj.executorId();
                             let new_executor = (typeof (inpFields.ExecutorId) === "number") && (inpFields.ExecutorId > 0) ? inpFields.ExecutorId : null;
                             if (old_executor !== new_executor) {
                                 if(taskObj.isAutomatic())
-                                    throw new HttpError(HttpCode.ERR_FORBIDDEN, `Нельзя назначить исполнителя автоматической задаче.`);
+                                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Нельзя назначить исполнителя автоматической задаче.`);
                                 if (!(isSupervisor || isElemElemManager))
                                     throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять исполнителя задачи.`);
                                 is_executor_changed = true;
@@ -2603,8 +2609,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             }
                         }
 
-                        if (isSupervisor)
-                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
+                        if (taskObj.isAutomatic() && taskObj.executorId())
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Нельзя назначить исполнителя автоматической задаче.`);
 
                         if (taskObj.isFinal()) {
                             let out_links = this._getOutgoingDeps(process, taskObj.id());
