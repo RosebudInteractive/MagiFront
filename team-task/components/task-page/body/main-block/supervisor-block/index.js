@@ -23,7 +23,7 @@ export default function SupervisorBlock(props: TaskBodyProps) {
         return Object.keys(currentElement.WriteSets).map(item => ({id: item, name: item}))
     }
 
-    const writeSetEnable = Object.keys(currentElement.WriteSets).length > 0
+    const writeSetEnable = taskController.fieldsEnable.form && Object.keys(currentElement.WriteSets).length > 0
 
     const _elementsLock = !taskController.fieldsEnable.form || !taskController.fieldsEnable.elements
 

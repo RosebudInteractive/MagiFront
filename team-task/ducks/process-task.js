@@ -126,7 +126,6 @@ function* showTaskEditorSaga({payload}) {
 
     const {payload: data} = yield take(SAVE_TASK_SUCCESS)
 
-    console.log(data)
     yield put({type: SET_TASK_ID, payload: data.id})
     yield put(setActiveTaskId(data.id))
 
@@ -144,10 +143,8 @@ function* showTaskLinEditorSaga({payload}) {
 function* closeEditorAndReloadProcess(){
     const processId = yield select(processIdSelector)
 
-    // yield put(closeTaskEditor())
     yield put(closeTaskLinkEditor())
     if (processId) {
-        console.log(processId)
         yield put(getProcess(processId))
     }
 }

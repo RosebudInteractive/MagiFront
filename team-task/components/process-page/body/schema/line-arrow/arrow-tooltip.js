@@ -7,14 +7,15 @@ type Props = {
     onApplyCondition: Function,
     hasCondition: boolean,
     condition: string,
+    disabled: boolean,
 }
 
 export default function ArrowTooltip(props: Props) {
     const [editorVisible, setEditorVisible] = useState(false)
-    const {hasCondition, onDeleteArrow, onApplyCondition, condition} = props
+    const {hasCondition, onDeleteArrow, onApplyCondition, condition, disabled} = props
 
     const toggleEditorVisible = () => {
-        setEditorVisible(!editorVisible)
+        if (!disabled) setEditorVisible(!editorVisible)
     }
 
     const applyCondition = (e) => {
@@ -25,7 +26,7 @@ export default function ArrowTooltip(props: Props) {
     return <div className={'x-arrow__tooltip' + (hasCondition ? ' _with-condition' : ' _default')}>
         <div className='x-arrow__tooltip-buttons-block'>
             <button className='x-arrow__tooltip-button' onClick={onDeleteArrow}><Bucket/></button>
-            <button className='x-arrow__tooltip-button' onClick={toggleEditorVisible}>if</button>
+            <button className={'x-arrow__tooltip-button' + (disabled ? ' _disabled' : '')} onClick={toggleEditorVisible}>if</button>
         </div>
 
         {editorVisible && <ConditionEditor value={condition} onApply={applyCondition} onClose={toggleEditorVisible}/>}

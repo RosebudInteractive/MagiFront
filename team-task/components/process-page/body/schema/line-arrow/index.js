@@ -29,7 +29,7 @@ const COLORS = {
 }
 
 export default (props) => {
-    const { type, item, setSelected, selected } = props
+    const {type, item, setSelected, selected} = props
 
     const [color, setColor] = useState('transparent'),
         [strokeWidth, setStrokeWidth] = useState(2),
@@ -57,16 +57,21 @@ export default (props) => {
     }, [props, hover])
 
     const passProps = useMemo(() => {
-            return {
-                className: 'process-schema__x-arrow' + (item.disabled ? ' _disabled' : ''),
-                onMouseEnter: () => {if (!item.disabled) setHover(true)},
-                onMouseLeave: () => {if (!item.disabled) setHover(false)},
-                onClick: () => {
-                    if (!item.disabled && setSelected) setSelected(item.id);
-                },
-                cursor: item.disabled ? 'default' : 'pointer',
-            }
-        }, [])
+        return {
+            className: 'process-schema__x-arrow' + (item.disabled ? ' _disabled' : ''),
+            onMouseEnter: () => {
+                if (!item.disabled) setHover(true)
+            },
+            onMouseLeave: () => {
+                if (!item.disabled) setHover(false)
+            },
+            onClick: () => {
+                if (setSelected) setSelected(item.id);
+            },
+            cursor: 'pointer',
+            // cursor: item.disabled ? 'default' : 'pointer',
+        }
+    }, [])
 
     const deleteArrow = useCallback(() => {
         if (props.onDeleteArrow) {
@@ -97,7 +102,8 @@ export default (props) => {
             middle: <ArrowTooltip hasCondition={item.hasCondition}
                                   condition={item.expression}
                                   onApplyCondition={changeCondition}
-                                  onDeleteArrow={deleteArrow}/>
+                                  onDeleteArrow={deleteArrow}
+                                  disabled={item.disabled}/>
         } : null
     }, [selected])
 

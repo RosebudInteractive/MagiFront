@@ -41,8 +41,11 @@
   &:last-child
     margin-left: 7px
 
-  &:hover
+  &:hover:not(._disabled)
     opacity: .5
+
+  &._disabled
+    opacity: .2
 
 .xarrow-container
   position: relative !important
