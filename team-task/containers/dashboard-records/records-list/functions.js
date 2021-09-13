@@ -74,11 +74,10 @@ const convertParam2Filter = ({Course, DateRange}) => {
     return filter
 };
 
-export const resizeHandler = (rowCount, minWidth = null) => {
+export const resizeHandler = (rowCount, additionalWidth) => {
     const _form = $('.form'),
         _height = _form.height(),
-        _width = _form.width(),
-        setMinWidth = minWidth !== null;
+        _width = _form.width();
 
 
 
@@ -90,8 +89,9 @@ export const resizeHandler = (rowCount, minWidth = null) => {
     //
     console.log('tableHeight', tHeight)
     console.log('$(\'.records-page .form\')', $('.records-page.form'));
+
     //
-    $('.records-page.form').height(tHeight + 300);
+    $('.records-page.form').height(tHeight + 250);
 
     // const tableSize = $('.dashboard-records-table').width();
 
@@ -100,13 +100,23 @@ export const resizeHandler = (rowCount, minWidth = null) => {
         const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
 
 
-        console.log('width', _width);
+        let resultWidth = tWidth >_width ? tWidth : _width;
+        resultWidth  += additionalWidth > 0 ? additionalWidth : 0;
+        // const oldFiltersWidth = $('.records-page .filters').width();
+        if(additionalWidth > 0){
+
+            $('.records-page .filters').width('72vw');
+        } else {
+            $('.records-page .filters').width('92vw');
+        }
+
+
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            window.$$('dashboard-records-grid').$setSize(tWidth >_width ? tWidth : _width, _gridHeight)
+            window.$$('dashboard-records-grid').$setSize(resultWidth, _gridHeight)
         }, 0)
 
     }

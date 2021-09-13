@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, refreshColumns, resizeHandler} from "./functions";
 import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
@@ -83,7 +82,8 @@ const Records = (props) => {
         sideBarMenuVisible, fetching,
         elementsFieldSet,
         resizeTrigger,
-        courses
+        courses,
+        unpublishedPanelOpened
     } = props;
 
     const location = useLocation();
@@ -92,20 +92,25 @@ const Records = (props) => {
 
     const _onResize = useCallback(() => {
         console.log('onresize works');
-        resizeHandler(recordsCount, 1900)
+        resizeHandler(recordsCount, unpublishedPanelOpened ? 400 : 0)
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
-    useWindowSize(() => {
-        resizeHandler(recordsCount, 1900)
-    });
+    // useWindowSize(() => {
+        // resizeHandler(recordsCount, 1900)
+    // });
+
+    // useEffect(() => {
+    //     console.log('resizeTrigger in records:', resizeTrigger);
+    //
+    // }, [resizeTrigger]);
 
     useEffect(() => {
-        console.log('resizeTrigger in records:', resizeTrigger)
-        resizeHandler(recordsCount, 1900)
-    }, [resizeTrigger]);
+        const additionalWidth = unpublishedPanelOpened ? 400 : 0;
+        resizeHandler(recordsCount, additionalWidth); //add additional width here
+    }, [unpublishedPanelOpened, resizeTrigger]);
 
     useEffect(() => {
         setColumnFields([...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo]);

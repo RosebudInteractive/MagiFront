@@ -15,6 +15,7 @@ const prefix = `${appName}/${moduleName}`;
 
 const SET_RECORDS = `${prefix}/SET_RECORDS`;
 const LOAD_DASHBOARD_RECORDS = `${prefix}/LOAD_DASHBOARD_RECORDS`;
+const LOAD_UNPUBLISHED_RECORDS = `${prefix}/LOAD_UNPUBLISHED_RECORDS`;
 const CHANGE_RECORD = `${prefix}/CHANGE_RECORD`;
 
 const CHANGE_VIEW_MODE = `${prefix}/CHANGE_VIEW_MODE`;
@@ -22,6 +23,7 @@ const CHANGE_VIEW_MODE = `${prefix}/CHANGE_VIEW_MODE`;
 const CHANGE_FIELD_SET = `${prefix}/CHANGE_FIELD_SET`;
 const SET_FIELDS = `${prefix}/SET_FIELDS`;
 const SET_DISPLAY_RECORDS = `${prefix}/SET_DISPLAY_RECORDS`;
+const SET_UNPUBLISHED_RECORDS = `${prefix}/SET_UNPUBLISHED_RECORDS`;
 const SET_VIEW_MODE = `${prefix}/SET_VIEW_MODE`;
 
 const REQUEST_START = `${prefix}/REQUEST_START`;
@@ -98,6 +100,7 @@ export const ReducerRecord = Record({
     records: [],
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
+    unpublishedRecords: [],
     fetching: false,
     viewMode: VIEW_MODE.WEEK
 });
@@ -120,8 +123,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('fieldSet', payload);
         case SET_VIEW_MODE:
             return state.set('viewMode', payload);
-
-        // case
+        case SET_UNPUBLISHED_RECORDS:
+            return state.set('unpublishedRecords', payload);
         default:
             return state
     }
@@ -131,6 +134,7 @@ const stateSelector = state => state[moduleName];
 
 export const recordsSelector = createSelector(stateSelector, state => state.records);
 export const displayRecordsSelector = createSelector(stateSelector, state => state.displayRecords);
+export const unpublishedRecordsSelector = createSelector(stateSelector, state => state.unpublishedRecords);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
 export const elementsFieldSetSelector = createSelector(stateSelector, state => state.fieldSet);
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
@@ -138,6 +142,10 @@ export const modeSelector = createSelector(stateSelector, state => state.viewMod
 
 export const getRecords = () => {
     return {type: LOAD_DASHBOARD_RECORDS};
+};
+
+export const getUnpublishedRecords = () => {
+    return {type: LOAD_UNPUBLISHED_RECORDS};
 };
 
 export const changeRecord = (record) => {
@@ -151,10 +159,30 @@ export const changeViewMode = (mode, params) => {
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
+        takeEvery(LOAD_UNPUBLISHED_RECORDS, getUnpublishedRecordsSaga),
         takeEvery(CHANGE_RECORD, updateRecordSaga),
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga)
     ])
 };
+
+function* getUnpublishedRecordsSaga() {
+    try {
+        yield put({type: REQUEST_START});
+
+        // const params =
+
+        const unpublishedRecords = yield call(getUnpublishedRecordsReq);
+
+        console.log("unpublishedRecords", unpublishedRecords)
+
+        yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        showErrorMessage(e.toString())
+    }
+}
 
 function* changeViewModeSaga(data) {
     try {
@@ -383,6 +411,11 @@ function* updateRecordSaga(data) {
 
 const getRecordsReq = (params) => {
     let urlString = `/api/pm/dashboard${params ? `?${params}` : ''}`;
+    return commonGetQuery(urlString);
+};
+
+const getUnpublishedRecordsReq = (params) => {
+    let urlString = `/api/pm/dashboard/lesson-list${params ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };
 

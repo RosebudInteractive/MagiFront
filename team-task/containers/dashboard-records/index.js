@@ -3,23 +3,36 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
-import {changeViewMode, displayRecordsSelector} from "tt-ducks/dashboard-records"
+import {
+    changeViewMode,
+    displayRecordsSelector,
+    getUnpublishedRecords,
+    unpublishedRecordsSelector
+} from "tt-ducks/dashboard-records"
 import Records from "./records-list"
 import UnpublishedRecords from "./unpublished-records";
 import DashboardRecordsHeader from "./header"
 import {useHistory} from "react-router-dom";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, dashboardRecords, actions} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords} = props;
     const [resizeTrigger, triggerResize] = useState(true);
+    const [unpublishedPanelOpened, setPanelOpened] = useState(false);
 
     const history = useHistory();
 
     useEffect(() => {
         actions.hideSideBarMenu();
+        actions.getUnpublishedRecords();
 
         return () => actions.showSideBarMenu();
     },[]);
+
+    const unpublishedPanelToggled = (panelOpened) => {
+        // console.log('it works')
+        triggerResize(!resizeTrigger);
+        setPanelOpened(panelOpened);
+    };
 
 
     const changeMode = (mode) => {
@@ -44,10 +57,7 @@ function DashboardRecords(props) {
             <div className="dashboard-body">
                 <div className="unpublished-records" >
 
-                    <UnpublishedRecords resizeTriggerFn={() => {
-                        console.log('it works')
-                        triggerResize(!resizeTrigger)
-                    }}/>
+                    <UnpublishedRecords unpublishedRecords = {unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
                     {/*<div className='button' style={{width: '50px', height: '50px', background: 'blue'}} onClick={openPane}>*/}
                     {/*    button*/}
                     {/*</div>*/}
@@ -55,7 +65,7 @@ function DashboardRecords(props) {
                 </div>
 
                 <div className="records">
-                    <Records resizeTrigger={resizeTrigger}/>
+                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened}/>
                 </div>
             </div>
 
@@ -66,7 +76,7 @@ function DashboardRecords(props) {
 
 const mapState2Props = (state) => {
     return {
-        // dashboardRecords: recordsSelector(state),
+        unpublishedRecords: unpublishedRecordsSelector(state),
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
     }
@@ -75,7 +85,10 @@ const mapState2Props = (state) => {
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
-            hideSideBarMenu, showSideBarMenu,changeViewMode
+            hideSideBarMenu,
+            showSideBarMenu,
+            changeViewMode,
+            getUnpublishedRecords
         }, dispatch)
     }
 };
