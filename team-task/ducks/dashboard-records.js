@@ -143,6 +143,7 @@ function* publishRecordSaga(data) {
             });
 
         yield put({type: LOAD_DASHBOARD_RECORDS});
+        yield put({type: LOAD_UNPUBLISHED_RECORDS});
         // yield call({type: LOAD_U_RECORDS});
 
         yield put({type: REQUEST_SUCCESS});
@@ -233,7 +234,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
-                    item.DateObject = currentDate;
+                    item.DateObject = currentDate.set({hour:0,minute:0,second:0,millisecond:0});
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
@@ -257,8 +258,8 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             }
             const objectData = {
                 IsEven: isEven,
-                PubDate: currentDate.locale('ru').format('DD MMM'),
-                DateObject: currentDate,
+                PubDate: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru').format('DD MMM'),
+                DateObject: currentDate.set({hour:0,minute:0,second:0,millisecond:0}),
                 CourseId: null,
                 CourseName: "",
                 LessonId: null,
@@ -355,13 +356,15 @@ function* getRecordsSaga() {
         yield put({type: SET_FIELDS, payload: fieldSet});
         yield put({type: REQUEST_SUCCESS});
 
-        console.log('params', params);
+        const startDate = params.st_date ? params.st_date : moment().toISOString();
+
+        const finishDate = params.fin_date ? params.fin_date : moment(startDate).add(7, 'days').toISOString();
         yield put({
             type: CHANGE_VIEW_MODE,
             payload: {
                 mode: mode,
-                st_date: params.st_date,
-                fin_date: params.fin_date
+                st_date: startDate,
+                fin_date: finishDate
             }
         });
 

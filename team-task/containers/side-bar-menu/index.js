@@ -42,7 +42,7 @@ function SideBarMenu(props) {
         }
 
         { <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
-                      title={'Дашборд плана публикаций'}/>}
+                      title={'План публикаций'}/>}
     </nav>
 }
 
