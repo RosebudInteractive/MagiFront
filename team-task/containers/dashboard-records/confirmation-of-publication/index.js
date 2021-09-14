@@ -6,10 +6,10 @@ function ConfirmationOfPublication(props) {
     const [value, setValue] = useState(new Date());
     return (
         <div className={'confirmation-of-publication'}>
-            some text
-
 
             <DatePicker input={<input />}/>
+
+            <button type={"button"} className={'big-button'}>ok</button>
             {/*<KeyboardDatePicker variant="inline"*/}
             {/*                    color={'primary'}*/}
             {/*                    format="MM/dd/yyyy"*/}

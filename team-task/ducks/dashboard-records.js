@@ -33,6 +33,7 @@ const REQUEST_FAIL = `${prefix}/REQUEST_FAIL`;
 const TOGGLE_MODAL_DND_TO_PUBLISH = `${prefix}/TOGGLE_MODAL_DRAG_N_DROP_TO_PUBLISH`;
 const OPEN_MODAL_DND_TO_PUBLISH = `${prefix}/OPEN_MODAL_DND_TO_PUBLISH`;
 const CLOSE_MODAL_DND_TO_PUBLISH = `${prefix}/CLOSE_MODAL_DND_TO_PUBLISH`;
+const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
 
 
 const defaultFieldSet = new Set([]);
@@ -101,8 +102,8 @@ export const getUnpublishedRecords = () => {
     return {type: LOAD_UNPUBLISHED_RECORDS};
 };
 
-export const changeRecord = (record) => {
-    return {type: CHANGE_RECORD, payload: record};
+export const setPublishRecordDate = ({isoDateString, lessonId}) => {
+    return {type: PUBLISH_RECORD, payload: {isoDateString, lessonId}};
 };
 
 export const toggleModalDndToPublish = (isOn) => {
@@ -126,19 +127,36 @@ export const saga = function* () {
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
         takeEvery(LOAD_UNPUBLISHED_RECORDS, getUnpublishedRecordsSaga),
         takeEvery(CHANGE_RECORD, updateRecordSaga),
-        takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga)
+        takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
+        takeEvery(PUBLISH_RECORD, publishRecordSaga)
     ])
 };
+
+function* publishRecordSaga(data) {
+    try {
+        yield put({type: REQUEST_START});
+
+        yield call(setDateToPublication,
+            {
+                ReadyDate: data.payload.isoDateString,
+                lessonId: data.payload.lessonId
+            });
+
+        yield put({type: LOAD_DASHBOARD_RECORDS});
+        // yield call({type: LOAD_U_RECORDS});
+
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        showErrorMessage(e)
+    }
+}
 
 function* getUnpublishedRecordsSaga() {
     try {
         yield put({type: REQUEST_START});
 
-        // const params =
-
         const unpublishedRecords = yield call(getUnpublishedRecordsReq);
-
-        console.log("unpublishedRecords", unpublishedRecords)
 
         yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
 
@@ -152,14 +170,10 @@ function* getUnpublishedRecordsSaga() {
 function* changeViewModeSaga(data) {
     try {
         yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
+        const dates = yield select(filterSelector);
         const records = _.cloneDeep(yield select(recordsSelector));
 
-        const params = yield select(filterSelector);
-
-        console.log('params in changeViewModeSaga', params);
-
-
-        let resultArray = handleServerData(records, +data.payload.mode);
+        let resultArray = handleServerData(records, +data.payload.mode, dates.st_date, dates.fin_date);
 
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
@@ -168,6 +182,9 @@ function* changeViewModeSaga(data) {
 }
 
 const handleServerData = (records, mode, stDate = null, finDate = null) => {
+    if (records.length === 0) {
+        return [];
+    }
     const startDate = moment(stDate ? stDate : records[0].PubDate);
     const finishDate = moment(finDate ? finDate : records[records.length - 1].PubDate);
 
@@ -183,7 +200,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             currentWeek = currentDate.isoWeek();
 
         const weekHasChanged = currentWeek !== week
-        if((mode === VIEW_MODE.WEEK) && week && weekHasChanged){
+        if ((mode === VIEW_MODE.WEEK) && week && weekHasChanged) {
             isEven = !isEven;
         }
 
@@ -197,6 +214,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         if (filteredRecords.length) {
             const [first, ...other] = filteredRecords;
             first.Week = weekHasChanged ? displayWeekRange : '';
+            first.DateObject = moment(first.PubDate);
             first.IsEven = isEven;
             first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
 
@@ -215,27 +233,32 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
+                    item.DateObject = currentDate;
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
-                        item[elem.Name] = _state ? {css: _state.css, label: _state.label} : {css: "_unknown", label: ""};
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label} : {
+                            css: "_unknown",
+                            label: ""
+                        };
                     })
                 });
             }
 
             resultArray.push(first, ...other);
 
-            if(mode === VIEW_MODE.COMPACT){
+            if (mode === VIEW_MODE.COMPACT) {
                 isEven = !isEven;
             }
 
         } else {
-            if(mode === VIEW_MODE.COMPACT){
+            if (mode === VIEW_MODE.COMPACT) {
                 continue;
             }
             const objectData = {
                 IsEven: isEven,
                 PubDate: currentDate.locale('ru').format('DD MMM'),
+                DateObject: currentDate,
                 CourseId: null,
                 CourseName: "",
                 LessonId: null,
@@ -251,11 +274,12 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             resultArray.push(objectData);
         }
 
-        if (mode === VIEW_MODE.DAY){
+        if (mode === VIEW_MODE.DAY) {
             isEven = !isEven;
         }
     }
 
+    console.log('result array:', resultArray)
     return resultArray;
 };
 
@@ -265,7 +289,7 @@ function* getRecordsSaga() {
 
     try {
         const params = yield select(paramsSelector);
-        // console.log('PARAMS!')
+        console.log('PARAMS!', params);
 
         const records = yield call(getRecordsReq, params);
 
@@ -284,7 +308,7 @@ function* getRecordsSaga() {
         const fieldSet = [];
 
         Array.from(fields).forEach((el, inx) => {
-            const fieldObj = { id: el, };
+            const fieldObj = {id: el,};
 
             if (inx === 0) {
 
@@ -311,15 +335,14 @@ function* getRecordsSaga() {
             fieldObj.css = '_container element-style';
             fieldObj.minWidth = 130;
             // fieldObj.maxWi
-            fieldObj.template = function(val) {
+            fieldObj.template = function (val) {
                 const elData = val[el];
 
 
-
-                if (elData){
+                if (elData) {
                     return `<div style="width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css}">${elData.label}</div></div>`;
                 } else {
-                return `<div class="state-template-block-dr _unknown"></div>`
+                    return `<div class="state-template-block-dr _unknown"></div>`
                 }
                 // console.log('fieldObj.template works', val.)
 
@@ -329,16 +352,18 @@ function* getRecordsSaga() {
             fieldSet.push(fieldObj)
         });
 
-        yield put({ type: SET_FIELDS, payload: fieldSet });
+        yield put({type: SET_FIELDS, payload: fieldSet});
         yield put({type: REQUEST_SUCCESS});
 
         console.log('params', params);
-        yield put({type: CHANGE_VIEW_MODE,
+        yield put({
+            type: CHANGE_VIEW_MODE,
             payload: {
                 mode: mode,
                 st_date: params.st_date,
                 fin_date: params.fin_date
-        }});
+            }
+        });
 
         yield put(clearLocationGuard());
     } catch
@@ -374,7 +399,20 @@ function* updateRecordSaga(data) {
     }
 }
 
+const setDateToPublication = ({ReadyDate, lessonId}) => {
+    return fetch(`/api/pm/dashboard/lesson/${lessonId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({ReadyDate}),
+        credentials: 'include'
+    }).then(checkStatus)
+        .then(parseJSON);
+};
+
 const getRecordsReq = (params) => {
+    // console.log('params')
     let urlString = `/api/pm/dashboard${params ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };

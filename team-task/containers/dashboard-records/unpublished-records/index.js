@@ -37,7 +37,7 @@ function UnpublishedRecords(props) {
         autoheight: true,
         select: true,
         editable: false,
-        drag:true,
+        drag: "source",
         scheme:{
             // $change: getActiveRow
         },

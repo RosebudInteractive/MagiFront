@@ -13,7 +13,8 @@ import {
     displayRecordsSelector,
     elementsFieldSetSelector,
     fetchingSelector,
-    getRecords
+    getRecords,
+    setPublishRecordDate
 } from "tt-ducks/dashboard-records";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
@@ -27,7 +28,7 @@ const defaultColumnConfigOne = [
         id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
     },
     {
-        id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}] , css: 'week-up'
+        id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up'
     },
     {
         id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}],
@@ -36,21 +37,21 @@ const defaultColumnConfigOne = [
         id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], minWidth: 130
     },
     {
-        id: 'LessonNum', header:  [{text: 'Номер', css: 'up-headers'}], css: '_container',
+        id: 'LessonNum', header: [{text: 'Номер', css: 'up-headers'}], css: '_container',
         template: function (val) {
             return `<div class="centered-by-flex">${val.LessonNum}</div>`;
         },
     },
     {
-        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}],  minWidth: 130
+        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], minWidth: 130
     },
 ];
 
 const getProcessState = (val) => {
-    if(val){
+    if (val) {
         const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === val);
-        return  processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
-    }else {
+        return processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
+    } else {
         return {css: '', label: ''}
     }
 }
@@ -59,7 +60,7 @@ const defaultColumnConfigTwo = [
     {
         id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}],
         css: '_container',
-        template: function(data) {
+        template: function (data) {
             return `<div class='${'check-box-block'} ${data.IsPublished ? 'checked' : ''}'>
                         <div class=${data.IsPublished ? 'check-mark' : ''}></div>
                         </div>`
@@ -67,7 +68,7 @@ const defaultColumnConfigTwo = [
     },
     {
         id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 150, css: "_container",
-        template: function(val) {
+        template: function (val) {
             const state = getProcessState(val.ProcessState);
             return `<div class="process-state ${state.css}">${state.label}</div>`;
         }
@@ -89,7 +90,11 @@ const Records = (props) => {
 
     const location = useLocation();
 
-    const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne,...defaultColumnConfigTwo]);
+    const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
+
+
+    // const publishRecord = (re)
+    // const droppedTar
     // const [set]
 
     const _onResize = useCallback(() => {
@@ -164,82 +169,100 @@ const Records = (props) => {
 
     const GRID_CONFIG = useMemo(() => {
         return {
-        view: "datatable",
-        id: 'dashboard-records-grid',
-        css: 'tt-grid scroll-all-table',
-        hover: "row-hover",
-        scroll: 'none',
-        headerRowHeight: 40,
-        rowHeight: 72,
-        height: 1000,
-        select: true,
-        drag:true,
-        editable: false,
+            view: "datatable",
+            id: 'dashboard-records-grid',
+            css: 'tt-grid scroll-all-table',
+            hover: "row-hover",
+            scroll: 'none',
+            headerRowHeight: 40,
+            rowHeight: 72,
+            height: 1000,
+            select: true,
+            drag: "target",
+            editable: false,
             scheme: {
                 $change: function (item) {
-                    if (item.IsEven){
+                    if (item.IsEven) {
                         item.$css = "even-record";
                     }
                 }
             },
-        columns: [],
-        on: {
-            onHeaderClick: function (header) {
-                const _sort: GridSortOrder = _sortRef.current;
+            columns: [],
+            on: {
+                onHeaderClick: function (header) {
+                    const _sort: GridSortOrder = _sortRef.current;
 
-                if (header.column !== _sort.field) {
-                    _sort.field = header.column
-                    _sort.direction = GRID_SORT_DIRECTION.ACS
-                } else {
-                    _sort.direction = _sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : _sort.type = GRID_SORT_DIRECTION.ACS
-                }
+                    if (header.column !== _sort.field) {
+                        _sort.field = header.column
+                        _sort.direction = GRID_SORT_DIRECTION.ACS
+                    } else {
+                        _sort.direction = _sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : _sort.type = GRID_SORT_DIRECTION.ACS
+                    }
 
-                actions.setGridSortOrder(_sort);
-                this.markSorting(_sort.field, _sort.direction);
-            },
-            onItemDblClick: function (id) {
-                // todo open action
+                    actions.setGridSortOrder(_sort);
+                    this.markSorting(_sort.field, _sort.direction);
+                },
+                onItemDblClick: function (id) {
+                    // todo open action
 
+                },
+                onBeforeDrop: function (context, e) {
+                    console.log('before drop!', context.target);
+                    console.log('context.from.getItem(context.source[0])');
+                    console.log(context.from.getItem(context.source[0]));
+
+                    console.log('target item: ', this.getItem(context.target));
+
+                    // contex
+
+                    const toItem = this.getItem(context.target);
+                    const fromItem = context.from.getItem(context.source[0]);
+
+                    actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
+
+
+
+
+                    // const resultItem =
+
+                    // props.openModalOnPublication();
+                    return true;
+                },
+                // onAfterDrop: function (context, e) {
+                //     console.log('after drop')
+                // }
             },
-            onBeforeDrop: function (context, e) {
-                console.log('before drop!', e);
-                props.openModalOnPublication();
-                return true;
-            },
-            // onAfterDrop: function (context, e) {
-            //     console.log('after drop')
-            // }
-        },
-        onClick: {
-            "js-publish": function (e, data) {
-                e.preventDefault()
-                const item = this.getItem(data.row);
-                if (item) {
-                    actions.publishTimeline(item.Id, true);
-                    // actions.updateTimeline(item.Id, {
-                    //     ...item,
-                    //     State: 2
-                    // });
-                    actions.getTimelines();
+            onClick: {
+                "js-publish": function (e, data) {
+                    e.preventDefault()
+                    const item = this.getItem(data.row);
+                    if (item) {
+                        actions.publishTimeline(item.Id, true);
+                        // actions.updateTimeline(item.Id, {
+                        //     ...item,
+                        //     State: 2
+                        // });
+                        actions.getTimelines();
+                    }
+                },
+                "js-copy": function (e, data) {
+                    e.preventDefault();
+                    const item = this.getItem(data.row);
+                    if (item) {
+                        //todo copy action after api complete
+                    }
+                },
+                "remove-timeline-button": function (e, data) {
+                    e.preventDefault();
+                    const item = this.getItem(data.row);
+                    if (item) {
+                        (+item.State) === 1 && actions.removeTimeline(item.Id);
+                        actions.getTimelines();
+                    }
                 }
             },
-            "js-copy": function (e, data) {
-                e.preventDefault();
-                const item = this.getItem(data.row);
-                if (item) {
-                    //todo copy action after api complete
-                }
-            },
-            "remove-timeline-button": function (e, data) {
-                e.preventDefault();
-                const item = this.getItem(data.row);
-                if (item) {
-                    (+item.State) === 1 && actions.removeTimeline(item.Id);
-                    actions.getTimelines();
-                }
-            }
-        },
-    }}, [columnFields]);
+        }
+    }, [columnFields]);
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
         const optionsCourses = (courses && courses.length > 0) ? courses.map(c => ({value: c.Id, label: c.Name})) : [];
@@ -253,7 +276,6 @@ const Records = (props) => {
     };
 
 
-
     return (
         <React.Fragment>
             <div className="records-page form">
@@ -261,7 +283,7 @@ const Records = (props) => {
 
                 <div className="filters">
                     {
-                        (courses  && courses.length > 0) &&
+                        (courses && courses.length > 0) &&
                         <FilterRow fields={FILTER_CONFIG}
                                    onApply={_onApplyFilter}
                                    onChangeVisibility={_onResize}/>
@@ -300,6 +322,7 @@ const mapDispatch2Props = (dispatch) => {
             setPathname,
             setGridSortOrder,
             getRecords,
+            setPublishRecordDate
             // getCourses()
         }, dispatch)
     }
