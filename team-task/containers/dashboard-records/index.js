@@ -28,6 +28,7 @@ function DashboardRecords(props) {
 
     useEffect(() => {
         actions.hideSideBarMenu();
+        actions.getUnpublishedRecords(false);
         actions.getUnpublishedRecords();
 
         return () => actions.showSideBarMenu();

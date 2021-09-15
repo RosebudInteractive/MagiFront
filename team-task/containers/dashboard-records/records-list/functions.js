@@ -87,8 +87,6 @@ export const resizeHandler = (rowCount, additionalWidth) => {
     // const tableHeight = $('.dashboard-records-table').height();
     // const windowHeight = $(window).height();
     //
-    console.log('tableHeight', tHeight)
-    console.log('$(\'.records-page .form\')', $('.records-page.form'));
 
     //
     $('.records-page.form').height(tHeight + 250);

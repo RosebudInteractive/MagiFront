@@ -1,149 +1,110 @@
-// import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
+import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
-// import {GRID_SORT_DIRECTION} from "../../../constants/common";
+import {GRID_SORT_DIRECTION} from "../../../constants/common";
 // import moment from "moment";
 // import {}
 
-// export const getFilterConfig = (filter, disableFields = [], courseOptions = []) => {
-//     const initialFields = [
-//         {
-//             name: "Course",
-//             placeholder: "Название курса",
-//             type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
-//             value: filter ? filter.Course : null,
-//             options: courseOptions
-//         },
-//         {
-//             name: "DateRange",
-//             placeholder: "Период",
-//             type: FILTER_FIELD_TYPE.DATE_RANGE,
-//             value: (function () {
-//                 if(filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null)){
-//                     return [new Date(filter.DateRange[0]), new Date(filter.DateRange[1])]
-//                 }
-//                 return [null, null]
-//
-//             })()
-//         },
-//     ];
-//
-//     const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
-//
-//     return [...resultFields];
-// };
+export const getFilterConfig = (filter, disableFields = [], {courseOptions = [], lessonOptions = []}) => {
+    const initialFields = [
+        {
+            name: "CourseNameUnpublished",
+            placeholder: "Название курса",
+            type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
+            value: filter ? filter.CourseNameUnpublished : null,
+            options: courseOptions
+        },
+        {
+            name: "LessonNameUnpublished",
+            placeholder: "Лекция",
+            type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
+            value: filter ? filter.LessonNameUnpublished : null,
+            options: lessonOptions
+        },
+    ];
 
-// export const parseParams = () => {
-//     const paramsData = {};
-//     const _params = new URLSearchParams(location.search),
-//         Course = _params.get("course"),
-//         // CourseName = _params.get("courseName"),
-//         DateRangeStart = _params.get("st_date"),
-//         DateRangeEnd = _params.get("fin_date");
-//
-//     const DateRange = [DateRangeStart, DateRangeEnd];
-//
-//     let _order = _params.get('order');
-//     if (_order) {
-//         _order = _order.split(',');
-//         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
-//     }
-//
-//     const _filter = convertParam2Filter(
-//         {
-//             Course,
-//             DateRange
-//         });
-//
-//     if (_filter) {
-//         paramsData.filter = _filter
-//     }
-//
-//     return paramsData
-// }
+    const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
 
-// const convertParam2Filter = ({Course, DateRange}) => {
-//
-//     if (!(Course ||
-//         DateRange)) return null;
-//
-//     const filter = {};
-//     filter.Course = Course ? +Course : '';
-//     filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null) ? DateRange : [];
-//
-//
-//     return filter
-// };
-
-export const resizeHandler = () => {
-    setTimeout(() => {
-    const somediv = $('.somediv'),
-        height = somediv.height(),
-        width = somediv.width();
-    // setMinWidth = minWidth !== null;
-
-
-    console.log(width, height);
-    if (window.$$('unpublished-records-grid-table')) {
-        console.log(window.$$('unpublished-records-grid-table'));
-
-            window.$$('unpublished-records-grid-table').$setSize(width, height);
-
-    }
-    }, 210)
-
-    // const table = $('.dashboard-records-table .webix_ss_center .webix_ss_center_scroll'),
-    //     tWidth = table.width(),
-    //     tHeight = table.height();
-    // // const tableHeight = $('.dashboard-records-table').height();
-    // // const windowHeight = $(window).height();
-    // //
-    // console.log('tableHeight', tHeight)
-    // console.log('$(\'.records-page .form\')', $('.records-page.form'));
-    // //
-    // $('.records-page.form').height(tHeight + 300);
-    //
-    // // const tableSize = $('.dashboard-records-table').width();
-    //
-    //
-    // if (window.$$('dashboard-records-grid')) {
-    //     const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
-    //
-    //
-    //     console.log('width', _width);
-    //     setTimeout(() => {
-    //         let _gridHeight = _height - _headerHeight - 48
-    //
-    //         const _calcHeight = (rowCount * 80) + _headerHeight + 60
-    //         _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-    //         window.$$('dashboard-records-grid').$setSize(tWidth >_width ? tWidth : _width, _gridHeight)
-    //     }, 0)
-    //
-    // }
+    return [...resultFields];
 };
 
-// export const refreshColumns = (config) => {
-//     if (window.$$('dashboard-records-grid')) {
-//         window.$$('dashboard-records-grid').refreshColumns(config)
-//     }
-// }
-//
-// export const convertFilter2Params = (filter) => {
-//     let _data = {};
-//
-//     if (filter) {
-//         if (filter.Course) {
-//             _data.course = filter.Course
-//         }
-//         if (filter.DateRange) {
-//             const dates = filter.DateRange;
-//
-//             if (dates.length === 2 && dates.every(d => d !== null)) {
-//                 _data.st_date = `${moment(dates[0]).locale('ru').toISOString()}`;
-//                 _data.fin_date = `${moment(dates[1]).locale('ru').toISOString()}`;
-//             }
-//
-//         }
-//     }
-//
-//     return _data
-// };
+export const parseParams = ({courseName = null, lessonName = null}) => {
+    const paramsData = {};
+    const params = new URLSearchParams(location.search),
+        CourseName = params.get("course_name_unpublished"),
+        LessonName = params.get("lesson_name_unpublished");
+
+    let _order = params.get('order');
+    if (_order) {
+        _order = _order.split(',');
+        paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
+    }
+
+    const _filter = convertParam2Filter(
+        {
+            courseName: courseName ? courseName : CourseName,
+            lessonName: lessonName ? lessonName : LessonName
+        });
+
+    if (_filter) {
+        paramsData.filter = _filter
+    }
+
+    return paramsData
+}
+
+const convertParam2Filter = ({courseName, lessonName}) => {
+
+    if (!(courseName ||
+        lessonName)) return null;
+
+    const filter = {};
+    filter.CourseNameUnpublished = courseName ? courseName : '';
+    filter.LessonNameUnpublished = lessonName ? lessonName : '';
+
+
+    return filter
+};
+
+export const resizeHandler = (rowCount: number) => {
+    const _form = $('.unpublished-records'),
+        _height = _form.height(),
+        _width = _form.width();
+
+    console.log('.unpublished-records height', _height);
+
+    // $('.somediv').css({'max-heigt'});
+
+    if (window.$$('unpublished-records-grid-table')) {
+        const _headerHeight = window.$$('unpublished-records-grid-table').config.headerRowHeight;
+
+
+        setTimeout(() => {
+            let _gridHeight = _height - _headerHeight - 48
+            console.log('_gridHeight', _gridHeight)
+
+            const _calcHeight = (rowCount * 80) + _headerHeight + 60
+            _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
+            window.$$('unpublished-records-grid-table').$setSize(_width, _gridHeight)
+        }, 0)
+
+    }
+};
+
+export const hideColumn  = (columnName, options) => {
+    window.$$('unpublished-records-grid-table').isColumnVisible(columnName) && window.$$('unpublished-records-grid-table').hideColumn(columnName, options)
+}
+
+export const showColumn  = (columnName, options) => {
+    !window.$$('unpublished-records-grid-table').isColumnVisible(columnName) && window.$$('unpublished-records-grid-table').showColumn(columnName, options)
+};
+
+export const convertFilter2Params = (filter) => {
+    let _data = {};
+
+    if (filter) {
+        _data.course_name_unpublished = filter.CourseNameUnpublished ? filter.CourseNameUnpublished : undefined,
+        _data.lesson_name_unpublished = filter.LessonNameUnpublished ? filter.LessonNameUnpublished : undefined;
+    }
+
+    return _data
+};

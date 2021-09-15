@@ -24,6 +24,7 @@ const CHANGE_FIELD_SET = `${prefix}/CHANGE_FIELD_SET`;
 const SET_FIELDS = `${prefix}/SET_FIELDS`;
 const SET_DISPLAY_RECORDS = `${prefix}/SET_DISPLAY_RECORDS`;
 const SET_UNPUBLISHED_RECORDS = `${prefix}/SET_UNPUBLISHED_RECORDS`;
+const SET_ALL_UNPUBLISHED_RECORDS = `${prefix}/SET_ALL_UNPUBLISHED_RECORDS`;
 const SET_VIEW_MODE = `${prefix}/SET_VIEW_MODE`;
 
 const REQUEST_START = `${prefix}/REQUEST_START`;
@@ -49,6 +50,7 @@ export const ReducerRecord = Record({
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
     unpublishedRecords: [],
+    allUnpublishedRecords: [],
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
     showModalOfPublishing: false
@@ -74,6 +76,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('viewMode', payload);
         case SET_UNPUBLISHED_RECORDS:
             return state.set('unpublishedRecords', payload);
+        case SET_ALL_UNPUBLISHED_RECORDS:
+            return state.set('allUnpublishedRecords', payload);
         case TOGGLE_MODAL_DND_TO_PUBLISH:
         case CLOSE_MODAL_DND_TO_PUBLISH:
         case OPEN_MODAL_DND_TO_PUBLISH:
@@ -88,6 +92,7 @@ const stateSelector = state => state[moduleName];
 export const recordsSelector = createSelector(stateSelector, state => state.records);
 export const displayRecordsSelector = createSelector(stateSelector, state => state.displayRecords);
 export const unpublishedRecordsSelector = createSelector(stateSelector, state => state.unpublishedRecords);
+export const allUnpublishedRecordsSelector = createSelector(stateSelector, state => state.allUnpublishedRecords);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
 export const elementsFieldSetSelector = createSelector(stateSelector, state => state.fieldSet);
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
@@ -98,8 +103,8 @@ export const getRecords = () => {
     return {type: LOAD_DASHBOARD_RECORDS};
 };
 
-export const getUnpublishedRecords = () => {
-    return {type: LOAD_UNPUBLISHED_RECORDS};
+export const getUnpublishedRecords = (filterOn = true) => {
+    return {type: LOAD_UNPUBLISHED_RECORDS, payload: filterOn};
 };
 
 export const setPublishRecordDate = ({isoDateString, lessonId}) => {
@@ -121,6 +126,8 @@ export const closeModalDndToPublish = () => {
 export const changeViewMode = (mode, params) => {
     return {type: CHANGE_VIEW_MODE, payload: {mode, params}}
 };
+
+
 
 export const saga = function* () {
     yield all([
@@ -153,13 +160,33 @@ function* publishRecordSaga(data) {
     }
 }
 
-function* getUnpublishedRecordsSaga() {
+function* getUnpublishedRecordsSaga(data) {
     try {
         yield put({type: REQUEST_START});
 
-        const unpublishedRecords = yield call(getUnpublishedRecordsReq);
+        const filter = yield select(filterSelector);
 
-        yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+        console.log('filter:', filter)
+
+
+
+        const params = $.param({
+            course_name: filter.course_name_unpublished,
+            lesson_name: filter.lesson_name_unpublished,
+            order: filter.order_unpublished
+        });
+        // params.course_name = filter.course_name_unpublished
+
+        const unpublishedRecords = yield call(getUnpublishedRecordsReq, data.payload ? params : null);
+
+
+
+
+        if(!data.payload){
+            yield put({type: SET_ALL_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+        } else {
+            yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+        }
 
         yield put({type: REQUEST_SUCCESS});
     } catch (e) {
@@ -315,6 +342,7 @@ function* getRecordsSaga() {
 
                 fieldObj.header = [
                     {
+                        id: 'processElements',
                         text: "Элементы",
                         colspan: fields.size,
                         css: {"text-align": "center"}

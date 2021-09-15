@@ -8,6 +8,7 @@ import {push} from "react-router-redux/src";
 import $ from "jquery";
 import {GET_TASKS_FAIL, GET_TASKS_SUCCESS} from "tt-ducks/tasks";
 import {GET_PROCESSES_FAIL, GET_PROCESSES_SUCCESS} from "tt-ducks/processes";
+import {showErrorMessage} from "tt-ducks/messages";
 
 /**
  * Constants
@@ -20,6 +21,7 @@ const SET_PATHNAME = `${prefix}/SET_PATHNAME`
 
 const APPLY_FILTER_REQUEST = `${prefix}/APPLY_FILTER_REQUEST`
 const APPLY_FILTER = `${prefix}/APPLY_FILTER`
+const APPLY_FILTER_SILENTLY = `${prefix}/APPLY_FILTER_SILENTLY`
 
 const SET_GRID_SORT_ORDER_REQUEST = `${prefix}/SET_GRID_SORT_ORDER_REQUEST`
 const SET_GRID_SORT_ORDER = `${prefix}/SET_GRID_SORT_ORDER`
@@ -143,6 +145,10 @@ export const clearLocationGuard = () => {
     return { type: CLEAR_GUARD }
 }
 
+export const applyFilterSilently = (filter) => {
+    return {type: APPLY_FILTER_SILENTLY, payload: filter}
+};
+
 
 /**
  * Sagas
@@ -154,8 +160,18 @@ export const saga = function* () {
         takeEvery(SET_GRID_SORT_ORDER_REQUEST, setGridSortOrderSaga),
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
-        takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga)
+        takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga),
+        takeEvery(APPLY_FILTER_SILENTLY, applyFilterSilentlySaga)
     ])
+};
+
+function* applyFilterSilentlySaga(data){
+    try {
+        const filter = yield select(filterSelector);
+        yield put({type: APPLY_FILTER, payload: {...filter,...data.payload}});
+    }catch (e) {
+        showErrorMessage(e);
+    }
 }
 
 function* setPathnameSaga(data) {
@@ -204,6 +220,7 @@ function* buildLocationSaga() {
     yield put({type: BUILD_LOCATION})
     let newLocation = path + (params ? `?${params}` : "")
 
+    console.log('params new loc', params)
     yield put(push(newLocation))
 }
 
