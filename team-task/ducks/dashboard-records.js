@@ -127,8 +127,6 @@ export const changeViewMode = (mode, params) => {
     return {type: CHANGE_VIEW_MODE, payload: {mode, params}}
 };
 
-
-
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
@@ -166,21 +164,13 @@ function* getUnpublishedRecordsSaga(data) {
 
         const filter = yield select(filterSelector);
 
-        console.log('filter:', filter)
-
-
-
         const params = $.param({
             course_name: filter.course_name_unpublished,
             lesson_name: filter.lesson_name_unpublished,
             order: filter.order_unpublished
         });
-        // params.course_name = filter.course_name_unpublished
 
         const unpublishedRecords = yield call(getUnpublishedRecordsReq, data.payload ? params : null);
-
-
-
 
         if(!data.payload){
             yield put({type: SET_ALL_UNPUBLISHED_RECORDS, payload: unpublishedRecords});

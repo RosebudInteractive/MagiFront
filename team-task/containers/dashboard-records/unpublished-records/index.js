@@ -38,7 +38,7 @@ function UnpublishedRecords(props) {
 
     const location = useLocation();
 
-    // const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
+    // const [columnFields, setColumnFields] = useState([...MAIN_COLUMNS, ...defaultColumnConfigTwo]);
 
 
     // const publishRecord = (re)
@@ -67,7 +67,7 @@ function UnpublishedRecords(props) {
     // }, [unpublishedPanelOpened, resizeTrigger]);
 
     // useEffect(() => {
-    //     setColumnFields([...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo]);
+    //     setColumnFields([...MAIN_COLUMNS, ...elementsFieldSet, ...defaultColumnConfigTwo]);
     // }, [elementsFieldSet]);
 
     // useEffect(() => {

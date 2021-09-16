@@ -80,6 +80,10 @@ const getEmptyFieldValue = (field: FilterField) => {
             return []
         case FILTER_FIELD_TYPE.USER:
             return {userName: "", hasNoExecutor: false}
+        case FILTER_FIELD_TYPE.AUTOCOMPLETE:
+            return ''
+        case FILTER_FIELD_TYPE.DATE_RANGE:
+            return [null, null]
         default:
             return null
     }
