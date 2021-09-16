@@ -16,36 +16,14 @@ import {
     getRecords,
     setPublishRecordDate
 } from "tt-ducks/dashboard-records";
-import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {applyFilter, setGridSortOrder, setInitState, setPathname, paramsSelector} from "tt-ducks/route";
 import './records-list.sass'
 import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
 import {coursesSelector} from "tt-ducks/dictionary";
 import {useWindowSize} from "../../../tools/window-resize-hook";
+import {defaultColumnConfigOne} from "./consts";
 
 
-const defaultColumnConfigOne = [
-    {
-        id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
-    },
-    {
-        id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up'
-    },
-    {
-        id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}],
-    },
-    {
-        id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], minWidth: 130
-    },
-    {
-        id: 'LessonNum', header: [{text: 'Номер', css: 'up-headers'}], css: '_container',
-        template: function (val) {
-            return `<div class="centered-by-flex">${val.LessonNum}</div>`;
-        },
-    },
-    {
-        id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], minWidth: 130
-    },
-];
 
 const getProcessState = (val) => {
     if (val) {
@@ -81,11 +59,12 @@ const Records = (props) => {
     const {
         dashboardRecords,
         actions,
-        sideBarMenuVisible, fetching,
+        sideBarMenuVisible,
         elementsFieldSet,
         resizeTrigger,
         courses,
-        unpublishedPanelOpened
+        unpublishedPanelOpened,
+        params
     } = props;
 
     const location = useLocation();
@@ -93,10 +72,6 @@ const Records = (props) => {
     const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
 
     const gridLoadedRef = useRef(false);
-
-    // const publishRecord = (re)
-    // const droppedTar
-    // const [set]
 
     const _onResize = useCallback(() => {
         console.log('onresize works');
@@ -166,12 +141,16 @@ const Records = (props) => {
         initState.pathname = location.pathname;
         actions.setInitState(initState);
 
-        if (!fetching) {
-            actions.getRecords();
-            // actions.getCourses();
-            // refreshColumns
-        }
+        // if (!fetching) {
+        //     actions.getRecords();
+        //     // actions.getCourses();
+        //     // refreshColumns
+        // }
     }, [location]);
+
+    useEffect(() => {
+        actions.getRecords();
+    }, [params])
 
     const GRID_CONFIG = useMemo(() => {
         return {
@@ -318,7 +297,8 @@ const mapState2Props = (state) => {
         sideBarMenuVisible: sideBarMenuVisible(state),
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state),
-        courses: coursesSelector(state)
+        courses: coursesSelector(state),
+        params: paramsSelector(state)
     }
 }
 

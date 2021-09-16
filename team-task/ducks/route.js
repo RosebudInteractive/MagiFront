@@ -224,6 +224,9 @@ function* buildLocationSaga() {
 }
 
 function* setInitStateSaga({payload}) {
+
+    console.log('setInitStateSaga', payload)
+
     if (payload.pathname) {
         yield put({type: SET_PATHNAME, payload: payload.pathname})
     }

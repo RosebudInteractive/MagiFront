@@ -313,11 +313,10 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
 function* getRecordsSaga() {
     yield put({type: REQUEST_START});
-    const mode = yield select(modeSelector);
-    const params = yield select(paramsSelector);
-    const filter = yield select(filterSelector);
-
     try {
+        const mode = yield select(modeSelector),
+            params = yield select(paramsSelector),
+            filter = yield select(filterSelector);
 
         console.log('PARAMS!', params);
         console.log('filter!', filter);
