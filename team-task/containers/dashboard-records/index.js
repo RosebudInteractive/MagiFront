@@ -18,6 +18,7 @@ import DashboardRecordsHeader from "./header"
 import {useHistory} from "react-router-dom";
 import Modal from "../../components/modal";
 import ConfirmationOfPublication from "./confirmation-of-publication";
+import 'react-splitter-layout/lib/index.css';
 
 function DashboardRecords(props) {
     const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn} = props;
@@ -60,18 +61,20 @@ function DashboardRecords(props) {
             {/*</div>*/}
 
             <div className="dashboard-body">
-                <div className="unpublished-records" >
+                {/*<SplitterLayout customClassName="dashboard-body">*/}
+                    <div className="unpublished-records" >
 
-                    <UnpublishedRecords unpublishedRecords={unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
-                    {/*<div className='button' style={{width: '50px', height: '50px', background: 'blue'}} onClick={openPane}>*/}
-                    {/*    button*/}
-                    {/*</div>*/}
-                    {/*    //     unpublished record here*/}
-                </div>
+                        <UnpublishedRecords unpublishedRecords={unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
+                        {/*<div className='button' style={{width: '50px', height: '50px', background: 'blue'}} onClick={openPane}>*/}
+                        {/*    button*/}
+                        {/*</div>*/}
+                        {/*    //     unpublished record here*/}
+                    </div>
 
-                <div className="records">
-                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened} openModalOnPublication={actions.openModalDndToPublish}/>
-                </div>
+                    <div className="records">
+                        <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened} openModalOnPublication={actions.openModalDndToPublish}/>
+                    </div>
+                {/*</SplitterLayout>*/}
             </div>
 
 

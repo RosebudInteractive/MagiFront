@@ -13,7 +13,6 @@ export default function AutocompleteField(props) {
     return <InputPicker className="filter-row__field-input _autocomplete"
                          data={props.options}
                          placeholder={props.placeholder}
-                         searchable={false}
                          value={props.value}
                          defaultValue={props.defaultValue}
                          onSelect={_onChange}

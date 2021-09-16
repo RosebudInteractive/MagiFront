@@ -95,7 +95,7 @@ export const hideColumn  = (columnName, options) => {
 }
 
 export const showColumn  = (columnName, options) => {
-    !window.$$('unpublished-records-grid-table').isColumnVisible(columnName) && window.$$('unpublished-records-grid-table').showColumn(columnName, options)
+    !window.$$('dashboard-records-grid').isColumnVisible(columnName) && window.$$('dashboard-records-grid').showColumn(columnName, options)
 };
 
 export const convertFilter2Params = (filter) => {

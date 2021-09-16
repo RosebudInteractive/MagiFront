@@ -201,7 +201,7 @@ function* changeViewModeSaga(data) {
         const dates = yield select(filterSelector);
         const records = _.cloneDeep(yield select(recordsSelector));
 
-        let resultArray = handleServerData(records, +data.payload.mode, dates.st_date, dates.fin_date);
+        let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
@@ -314,10 +314,13 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 function* getRecordsSaga() {
     yield put({type: REQUEST_START});
     const mode = yield select(modeSelector);
+    const params = yield select(paramsSelector);
+    const filter = yield select(filterSelector);
 
     try {
-        const params = yield select(paramsSelector);
+
         console.log('PARAMS!', params);
+        console.log('filter!', filter);
 
         const records = yield call(getRecordsReq, params);
 
@@ -339,10 +342,9 @@ function* getRecordsSaga() {
             const fieldObj = {id: el,};
 
             if (inx === 0) {
-
+                fieldObj.id = 'processElements';
                 fieldObj.header = [
                     {
-                        id: 'processElements',
                         text: "Элементы",
                         colspan: fields.size,
                         css: {"text-align": "center"}
@@ -384,9 +386,10 @@ function* getRecordsSaga() {
         yield put({type: SET_FIELDS, payload: fieldSet});
         yield put({type: REQUEST_SUCCESS});
 
-        const startDate = params.st_date ? params.st_date : moment().toISOString();
+        const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        const finishDate = params.fin_date ? params.fin_date : moment(startDate).add(7, 'days').toISOString();
+        console.log('params is fin_date', params.fin_date)
+        const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(7, 'days').toISOString();
         yield put({
             type: CHANGE_VIEW_MODE,
             payload: {

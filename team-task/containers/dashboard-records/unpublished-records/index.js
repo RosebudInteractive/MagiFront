@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import './unpublished-records.sass'
 import Webix from "../../../components/Webix";
-import {convertFilter2Params, getFilterConfig, resizeHandler} from "./functions";
+import {convertFilter2Params, getFilterConfig, resizeHandler, showColumn} from "./functions";
 import type {FilterField} from "../../../components/filter/types";
 // import {convertFilter2Params, getFilterConfig, parseParams, refreshColumns} from "../records-list/functions";
 import {useWindowSize} from "../../../tools/window-resize-hook";
@@ -130,7 +130,7 @@ function UnpublishedRecords(props) {
         if(visible) {
             // hideColumn('processElements', {spans: true});
         } else {
-            // showColumn('processElements', {spans: true});
+            showColumn('processElements', {spans: true});
         }
 
         props.resizeTriggerFn(visible);
@@ -246,7 +246,7 @@ function UnpublishedRecords(props) {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
 
-        actions.applyFilterSilently(params);
+        actions.applyFilter(params);
         actions.getUnpublishedRecords();
         actions.getUnpublishedRecords(false);
     };

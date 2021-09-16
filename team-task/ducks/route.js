@@ -8,7 +8,6 @@ import {push} from "react-router-redux/src";
 import $ from "jquery";
 import {GET_TASKS_FAIL, GET_TASKS_SUCCESS} from "tt-ducks/tasks";
 import {GET_PROCESSES_FAIL, GET_PROCESSES_SUCCESS} from "tt-ducks/processes";
-import {showErrorMessage} from "tt-ducks/messages";
 
 /**
  * Constants
@@ -145,9 +144,9 @@ export const clearLocationGuard = () => {
     return { type: CLEAR_GUARD }
 }
 
-export const applyFilterSilently = (filter) => {
-    return {type: APPLY_FILTER_SILENTLY, payload: filter}
-};
+// export const applyFilterSilently = (filter) => {  //silently without add a string params to url
+//     return {type: APPLY_FILTER_SILENTLY, payload: filter}
+// };
 
 
 /**
@@ -161,18 +160,18 @@ export const saga = function* () {
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
         takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga),
-        takeEvery(APPLY_FILTER_SILENTLY, applyFilterSilentlySaga)
+        // takeEvery(APPLY_FILTER_SILENTLY, applyFilterSilentlySaga)
     ])
 };
 
-function* applyFilterSilentlySaga(data){
-    try {
-        const filter = yield select(filterSelector);
-        yield put({type: APPLY_FILTER, payload: {...filter,...data.payload}});
-    }catch (e) {
-        showErrorMessage(e);
-    }
-}
+// function* applyFilterSilentlySaga(data){
+//     try {
+//         const filter = yield select(filterSelector);
+//         yield put({type: APPLY_FILTER, payload: {...filter,...data.payload}});
+//     }catch (e) {
+//         showErrorMessage(e);
+//     }
+// }
 
 function* setPathnameSaga(data) {
     const currentPath = yield select(pathSelector)

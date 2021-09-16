@@ -92,6 +92,7 @@ const Records = (props) => {
 
     const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
 
+    const gridLoadedRef = useRef(false);
 
     // const publishRecord = (re)
     // const droppedTar
@@ -115,8 +116,13 @@ const Records = (props) => {
     // }, [resizeTrigger]);
 
     useEffect(() => {
-        const additionalWidth = unpublishedPanelOpened ? 400 : 0;
-        resizeHandler(recordsCount, additionalWidth); //add additional width here
+        const additionalWidth = unpublishedPanelOpened ? 400 : 0; // todo remove
+        const grid = window.webix.$$("dashboard-records-grid");
+        if(unpublishedPanelOpened){
+            !(grid.getColumnIndex("processElements") < 0) && grid.hideColumn('processElements', {spans: true});
+        }
+
+        resizeHandler(recordsCount, additionalWidth); //add additional width here todo removeit
     }, [unpublishedPanelOpened, resizeTrigger]);
 
     useEffect(() => {
@@ -228,9 +234,12 @@ const Records = (props) => {
                     // props.openModalOnPublication();
                     return true;
                 },
-                // onAfterDrop: function (context, e) {
-                //     console.log('after drop')
-                // }
+                onAfterDrop: function (context, e) {
+                    console.log('after drop')
+                },
+                onAfterRender: function () {
+                    gridLoadedRef.current = true;
+                }
             },
             onClick: {
                 "js-publish": function (e, data) {
