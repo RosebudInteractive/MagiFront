@@ -1,14 +1,12 @@
 import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
-// import moment from "moment";
-// import {}
 
 export const getFilterConfig = (filter, disableFields = [], {courseOptions = [], lessonOptions = []}) => {
     const initialFields = [
         {
             name: "CourseNameUnpublished",
-            placeholder: "Название курса",
+            placeholder: "Курс",
             type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
             value: filter ? filter.CourseNameUnpublished : null,
             options: courseOptions
@@ -70,17 +68,12 @@ export const resizeHandler = (rowCount: number) => {
         _height = _form.height(),
         _width = _form.width();
 
-    console.log('.unpublished-records height', _height);
-
-    // $('.somediv').css({'max-heigt'});
-
     if (window.$$('unpublished-records-grid-table')) {
         const _headerHeight = window.$$('unpublished-records-grid-table').config.headerRowHeight;
 
 
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
-            console.log('_gridHeight', _gridHeight)
 
             const _calcHeight = (rowCount * 80) + _headerHeight + 60
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
@@ -89,10 +82,6 @@ export const resizeHandler = (rowCount: number) => {
 
     }
 };
-
-export const hideColumn  = (columnName, options) => {
-    window.$$('unpublished-records-grid-table').isColumnVisible(columnName) && window.$$('unpublished-records-grid-table').hideColumn(columnName, options)
-}
 
 export const showColumn  = (columnName, options) => {
     !window.$$('dashboard-records-grid').isColumnVisible(columnName) && window.$$('dashboard-records-grid').showColumn(columnName, options)

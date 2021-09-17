@@ -10,12 +10,14 @@
   overflow: hidden
   .grid-wrapper
     max-width: 1000px
-    transition: max-width 300ms ease
+    opacity: 1
+    transition: max-width 400ms ease-in, opacity 1600ms ease-in
 
   &._hidden
     max-width: 26px
     .grid-wrapper
       visibility: hidden
+      opacity: 0
     button
       display: none
     .elements__hide-button
@@ -27,7 +29,6 @@
       width: 0
       visibility: hidden
     .elements__hide-button
-      //position:
       margin: 45vh 8px 0 0
       border-top: 9px solid transparent
       border-bottom: 9px solid transparent
@@ -37,15 +38,7 @@
 
 .unpublished-records-grid
   display: flex
-  //height: 100%
   min-height: 650px
-  //.process-elements-grid
-  //  flex-grow: 1
-
-  //.process-page__save-button
-  //  position: absolute
-  //  top: 0
-  //  right: 17px
 
   .elements__hide-button
     margin: 45vh 8px 0 0

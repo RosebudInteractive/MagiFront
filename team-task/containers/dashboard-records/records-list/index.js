@@ -16,42 +16,12 @@ import {
     getRecords,
     setPublishRecordDate
 } from "tt-ducks/dashboard-records";
-import {applyFilter, setGridSortOrder, setInitState, setPathname, paramsSelector} from "tt-ducks/route";
+import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
-import {DASHBOARD_PROCESS_STATE} from '../../../constants/states'
 import {coursesSelector} from "tt-ducks/dictionary";
 import {useWindowSize} from "../../../tools/window-resize-hook";
-import {defaultColumnConfigOne} from "./consts";
+import {defaultColumnConfigOne, defaultColumnConfigTwo} from "./consts";
 
-
-
-const getProcessState = (val) => {
-    if (val) {
-        const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === val);
-        return processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
-    } else {
-        return {css: '', label: ''}
-    }
-}
-
-const defaultColumnConfigTwo = [
-    {
-        id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}],
-        css: '_container',
-        template: function (data) {
-            return `<div class='${'check-box-block'} ${data.IsPublished ? 'checked' : ''}'>
-                        <div class=${data.IsPublished ? 'check-mark' : ''}></div>
-                        </div>`
-        }
-    },
-    {
-        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 150, css: "_container",
-        template: function (val) {
-            const state = getProcessState(val.ProcessState);
-            return `<div class="process-state ${state.css}">${state.label}</div>`;
-        }
-    }
-]
 
 let recordsCount = 0;
 
@@ -71,10 +41,7 @@ const Records = (props) => {
 
     const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
 
-    const gridLoadedRef = useRef(false);
-
     const _onResize = useCallback(() => {
-        console.log('onresize works');
         resizeHandler(recordsCount, unpublishedPanelOpened ? 400 : 0)
     }, [dashboardRecords]);
 
@@ -84,11 +51,6 @@ const Records = (props) => {
     useWindowSize(() => {
         resizeHandler(recordsCount, 0)
     });
-
-    // useEffect(() => {
-    //     console.log('resizeTrigger in records:', resizeTrigger);
-    //
-    // }, [resizeTrigger]);
 
     useEffect(() => {
         const additionalWidth = unpublishedPanelOpened ? 400 : 0; // todo remove
@@ -120,7 +82,7 @@ const Records = (props) => {
                 _onResize();
             }, 200);
         }
-    }, [dashboardRecords]);
+    }, [dashboardRecords, unpublishedPanelOpened]);
 
     useEffect(() => {
         const initState = parseParams();
@@ -140,17 +102,11 @@ const Records = (props) => {
 
         initState.pathname = location.pathname;
         actions.setInitState(initState);
-
-        // if (!fetching) {
-        //     actions.getRecords();
-        //     // actions.getCourses();
-        //     // refreshColumns
-        // }
     }, [location]);
 
     useEffect(() => {
         actions.getRecords();
-    }, [params])
+    }, [params]);
 
     const GRID_CONFIG = useMemo(() => {
         return {
@@ -192,62 +148,15 @@ const Records = (props) => {
 
                 },
                 onBeforeDrop: function (context, e) {
-                    console.log('before drop!', context.target);
-                    console.log('context.from.getItem(context.source[0])');
-                    console.log(context.from.getItem(context.source[0]));
-
-                    console.log('target item: ', this.getItem(context.target));
-
-                    // contex
-
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
                     actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
 
-
-
-
-                    // const resultItem =
-
-                    // props.openModalOnPublication();
                     return true;
-                },
-                onAfterDrop: function (context, e) {
-                    console.log('after drop')
-                },
-                onAfterRender: function () {
-                    gridLoadedRef.current = true;
                 }
             },
             onClick: {
-                "js-publish": function (e, data) {
-                    e.preventDefault()
-                    const item = this.getItem(data.row);
-                    if (item) {
-                        actions.publishTimeline(item.Id, true);
-                        // actions.updateTimeline(item.Id, {
-                        //     ...item,
-                        //     State: 2
-                        // });
-                        actions.getTimelines();
-                    }
-                },
-                "js-copy": function (e, data) {
-                    e.preventDefault();
-                    const item = this.getItem(data.row);
-                    if (item) {
-                        //todo copy action after api complete
-                    }
-                },
-                "remove-timeline-button": function (e, data) {
-                    e.preventDefault();
-                    const item = this.getItem(data.row);
-                    if (item) {
-                        (+item.State) === 1 && actions.removeTimeline(item.Id);
-                        actions.getTimelines();
-                    }
-                }
             },
         }
     }, [columnFields]);
@@ -267,8 +176,6 @@ const Records = (props) => {
     return (
         <React.Fragment>
             <div className="records-page form">
-                {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
-
                 <div className="filters">
                     {
                         (courses && courses.length > 0) &&
@@ -278,13 +185,11 @@ const Records = (props) => {
                     }
                 </div>
 
-
                 <div className="horizontal-scroll-grid">
                     <div className="grid-container dashboard-records-table unselectable">
                         <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
                     </div>
                 </div>
-
             </div>
 
         </React.Fragment>
@@ -312,7 +217,6 @@ const mapDispatch2Props = (dispatch) => {
             setGridSortOrder,
             getRecords,
             setPublishRecordDate
-            // getCourses()
         }, dispatch)
     }
 };

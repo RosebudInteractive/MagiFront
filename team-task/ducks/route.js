@@ -144,10 +144,6 @@ export const clearLocationGuard = () => {
     return { type: CLEAR_GUARD }
 }
 
-// export const applyFilterSilently = (filter) => {  //silently without add a string params to url
-//     return {type: APPLY_FILTER_SILENTLY, payload: filter}
-// };
-
 
 /**
  * Sagas
@@ -160,18 +156,8 @@ export const saga = function* () {
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
         takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga),
-        // takeEvery(APPLY_FILTER_SILENTLY, applyFilterSilentlySaga)
     ])
 };
-
-// function* applyFilterSilentlySaga(data){
-//     try {
-//         const filter = yield select(filterSelector);
-//         yield put({type: APPLY_FILTER, payload: {...filter,...data.payload}});
-//     }catch (e) {
-//         showErrorMessage(e);
-//     }
-// }
 
 function* setPathnameSaga(data) {
     const currentPath = yield select(pathSelector)
@@ -219,13 +205,10 @@ function* buildLocationSaga() {
     yield put({type: BUILD_LOCATION})
     let newLocation = path + (params ? `?${params}` : "")
 
-    console.log('params new loc', params)
     yield put(push(newLocation))
 }
 
 function* setInitStateSaga({payload}) {
-
-    console.log('setInitStateSaga', payload)
 
     if (payload.pathname) {
         yield put({type: SET_PATHNAME, payload: payload.pathname})

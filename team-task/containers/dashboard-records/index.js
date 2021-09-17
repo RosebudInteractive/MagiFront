@@ -29,11 +29,11 @@ function DashboardRecords(props) {
 
     useEffect(() => {
         actions.hideSideBarMenu();
-        actions.getUnpublishedRecords(false);
-        actions.getUnpublishedRecords();
+        actions.getUnpublishedRecords({filterOn: false});
+        actions.getUnpublishedRecords({filterOn: true});
 
         return () => actions.showSideBarMenu();
-    },[]);
+    }, []);
 
     const unpublishedPanelToggled = (panelOpened) => {
         triggerResize(!resizeTrigger);
@@ -53,37 +53,25 @@ function DashboardRecords(props) {
     return (
         <div className="dashboard">
             <DashboardRecordsHeader title={'Издательский план'} onBack={backAction} onChangeMode={changeMode}/>
-            {/*<div className="header">*/}
-                {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
-                {/*<FilterRow fields={FILTER_CONFIG}*/}
-                {/*           onApply={_onApplyFilter}*/}
-                {/*           onChangeVisibility={_onResize}/>*/}
-            {/*</div>*/}
 
             <div className="dashboard-body">
-                {/*<SplitterLayout customClassName="dashboard-body">*/}
-                    <div className="unpublished-records" >
+                <div className="unpublished-records">
 
-                        <UnpublishedRecords unpublishedRecords={unpublishedRecords} resizeTriggerFn={unpublishedPanelToggled}/>
-                        {/*<div className='button' style={{width: '50px', height: '50px', background: 'blue'}} onClick={openPane}>*/}
-                        {/*    button*/}
-                        {/*</div>*/}
-                        {/*    //     unpublished record here*/}
-                    </div>
+                    <UnpublishedRecords unpublishedRecords={unpublishedRecords}
+                                        resizeTriggerFn={unpublishedPanelToggled}/>
+                </div>
 
-                    <div className="records">
-                        <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened} openModalOnPublication={actions.openModalDndToPublish}/>
-                    </div>
-                {/*</SplitterLayout>*/}
+                <div className="records">
+                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened}
+                             openModalOnPublication={actions.openModalDndToPublish}/>
+                </div>
             </div>
 
-
             {modalPublishOn &&
-                <Modal WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
-                    actions.closeModalDndToPublish();
-                }}/>
+            <Modal WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+                actions.closeModalDndToPublish();
+            }}/>
             }
-
         </div>
     )
 }

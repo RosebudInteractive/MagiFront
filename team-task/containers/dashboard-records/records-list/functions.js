@@ -2,7 +2,7 @@ import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import moment from "moment";
-// import {}
+import {DASHBOARD_PROCESS_STATE} from "../../../constants/states";
 
 export const getFilterConfig = (filter, disableFields = [], courseOptions = []) => {
     const initialFields = [
@@ -36,7 +36,6 @@ export const parseParams = () => {
     const paramsData = {};
     const _params = new URLSearchParams(location.search),
         Course = _params.get("course"),
-        // CourseName = _params.get("courseName"),
         DateRangeStart = _params.get("st_date"),
         DateRangeEnd = _params.get("fin_date");
 
@@ -59,7 +58,7 @@ export const parseParams = () => {
     }
 
     return paramsData
-}
+};
 
 const convertParam2Filter = ({Course, DateRange}) => {
 
@@ -67,9 +66,9 @@ const convertParam2Filter = ({Course, DateRange}) => {
         DateRange)) return null;
 
     const filter = {};
+
     filter.Course = Course ? +Course : '';
     filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null) ? DateRange : [];
-
 
     return filter
 };
@@ -84,30 +83,14 @@ export const resizeHandler = (rowCount, additionalWidth) => {
     const table = $('.dashboard-records-table .webix_ss_center .webix_ss_center_scroll'),
         tWidth = table.width(),
         tHeight = table.height();
-    // const tableHeight = $('.dashboard-records-table').height();
-    // const windowHeight = $(window).height();
-    //
 
-    //
     $('.records-page.form').height(tHeight + 250);
-
-    // const tableSize = $('.dashboard-records-table').width();
-
 
     if (window.$$('dashboard-records-grid')) {
         const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
 
 
         let resultWidth = tWidth >_width ? tWidth : _width;
-        // resultWidth  += additionalWidth > 0 ? additionalWidth : 0;
-        // const oldFiltersWidth = $('.records-page .filters').width();
-        // if(additionalWidth > 0){
-        //
-        //     $('.records-page .filters').width('72vw');
-        // } else {
-        //     $('.records-page .filters').width('92vw');
-        // }
-
 
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
@@ -125,7 +108,7 @@ export const refreshColumns = (config) => {
     if (window.$$('dashboard-records-grid')) {
         window.$$('dashboard-records-grid').refreshColumns(config)
     }
-}
+};
 
 export const convertFilter2Params = (filter) => {
     let _data = {};
@@ -139,9 +122,17 @@ export const convertFilter2Params = (filter) => {
                 _data.st_date = `${moment(dates[0]).locale('ru').toISOString()}`;
                 _data.fin_date = `${moment(dates[1]).locale('ru').toISOString()}`;
             }
-
         }
     }
 
     return _data
+};
+
+export const getProcessState = (val) => {
+    if (val) {
+        const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === val);
+        return processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
+    } else {
+        return {css: '', label: ''}
+    }
 };

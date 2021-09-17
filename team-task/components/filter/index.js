@@ -7,11 +7,12 @@ import Row from "./row";
 type FilterProps = {
     fields: Array<FilterField>,
     onApply: Function,
+    onChangeField?: Function,
     onChangeVisibility: Function
 }
 
 export default function Filter(props: FilterProps) {
-    const {fields} = props;
+    const {fields, onChangeField} = props;
 
     const [visible, setVisible] = useState(false)
     const [activeSwitcher, toggleActive] = useState(false)
@@ -33,7 +34,12 @@ export default function Filter(props: FilterProps) {
     const _onChange = (data) => {
         filterValueRef.current[data.field] = data.value
         toggleActive(!activeSwitcher)
+
+        if(onChangeField){
+            onChangeField({name: data.field, value: data.value})
+        }
     };
+
 
     const _onClean = (fieldName) => {
         if (filterValueRef.current[fieldName]) {

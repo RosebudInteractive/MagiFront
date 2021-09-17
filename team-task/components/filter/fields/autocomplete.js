@@ -4,10 +4,12 @@ import React from "react";
 export default function AutocompleteField(props) {
     const _onClean = () => {
         if (props.onClean) props.onClean(props.name)
-    }
+    };
 
     const _onChange = (value) => {
-        props.onChange({field: props.name, value})
+        if(props.value !== value) {
+            props.onChange({field: props.name, value})
+        }
     };
 
     return <InputPicker className="filter-row__field-input _autocomplete"

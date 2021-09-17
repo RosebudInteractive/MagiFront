@@ -1,3 +1,5 @@
+import {getProcessState} from "./functions";
+
 export const defaultColumnConfigOne = [
     {
         id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true
@@ -21,3 +23,22 @@ export const defaultColumnConfigOne = [
         id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], minWidth: 130
     },
 ];
+
+export const defaultColumnConfigTwo = [
+    {
+        id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}],
+        css: '_container',
+        template: function (data) {
+            return `<div class='${'check-box-block'} ${data.IsPublished ? 'checked' : ''}'>
+                        <div class=${data.IsPublished ? 'check-mark' : ''}></div>
+                        </div>`
+        }
+    },
+    {
+        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 150, css: "_container",
+        template: function (val) {
+            const state = getProcessState(val.ProcessState);
+            return `<div class="process-state ${state.css}">${state.label}</div>`;
+        }
+    }
+]

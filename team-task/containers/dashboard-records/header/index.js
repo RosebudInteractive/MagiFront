@@ -8,11 +8,6 @@ import {Field, Form, FormSpy} from "react-final-form";
 export default function DashboardRecordsHeader(props) {
     const {title} = props;
 
-    // const VIEW_MODES = {
-    //
-    // }
-
-
     return <div className="dashboard-header">
         <div className="dashboard-back-arrow" onClick={props.onBack}>
             <BackArrow/>
@@ -20,17 +15,6 @@ export default function DashboardRecordsHeader(props) {
         <div className="dashboard-header-field-name">
             <h6>{title}</h6>
 
-            {/*<Select*/}
-            {/*    // name='m'*/}
-            {/*    placeholder="Режим отображения"*/}
-            {/*    label={"Режим отображения"}*/}
-            {/*    required={true}*/}
-            {/*    onChange={(val) => props.onChangeMode(val)}*/}
-            {/*    options={[{name: 'Неделя', id: 0},*/}
-            {/*        {name: 'День', id: 1},*/}
-            {/*        {name: 'Компактный', id: 2}]}*/}
-            {/*    disabled={false}*/}
-            {/*/>*/}
             <Form
                 initialValues={{mode: '0'}}
                 onSubmit={values => {}}
@@ -56,12 +40,9 @@ export default function DashboardRecordsHeader(props) {
 
                         <FormSpy subscription={{values: true, pristine: true, errors: true}}
                                  onChange={({values, pristine, formValue, errors}) => {
-                                     console.log('values', values);
                                     props.onChangeMode(values.mode)
                                  }}/>
                     </form>)}/>
-
-            {/*<Field component={TitleTextBox} disable={true} name={"Name"} label={title} extClass="_grey100 page-title"/>*/}
         </div>
     </div>
 }

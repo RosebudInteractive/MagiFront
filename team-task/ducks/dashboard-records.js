@@ -20,7 +20,6 @@ const CHANGE_RECORD = `${prefix}/CHANGE_RECORD`;
 
 const CHANGE_VIEW_MODE = `${prefix}/CHANGE_VIEW_MODE`;
 
-const CHANGE_FIELD_SET = `${prefix}/CHANGE_FIELD_SET`;
 const SET_FIELDS = `${prefix}/SET_FIELDS`;
 const SET_DISPLAY_RECORDS = `${prefix}/SET_DISPLAY_RECORDS`;
 const SET_UNPUBLISHED_RECORDS = `${prefix}/SET_UNPUBLISHED_RECORDS`;
@@ -70,7 +69,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_DISPLAY_RECORDS:
             return state.set('displayRecords', [...payload]);
         case SET_FIELDS:
-            console.log('SET_FIELDS', payload);
             return state.set('fieldSet', payload);
         case SET_VIEW_MODE:
             return state.set('viewMode', payload);
@@ -103,8 +101,8 @@ export const getRecords = () => {
     return {type: LOAD_DASHBOARD_RECORDS};
 };
 
-export const getUnpublishedRecords = (filterOn = true) => {
-    return {type: LOAD_UNPUBLISHED_RECORDS, payload: filterOn};
+export const getUnpublishedRecords = ({filterOn = true, params = null}) => {
+    return {type: LOAD_UNPUBLISHED_RECORDS, payload: {filterOn, params}};
 };
 
 export const setPublishRecordDate = ({isoDateString, lessonId}) => {
@@ -151,7 +149,6 @@ function* publishRecordSaga(data) {
 
         yield put({type: LOAD_DASHBOARD_RECORDS});
         yield put({type: LOAD_UNPUBLISHED_RECORDS});
-        // yield call({type: LOAD_U_RECORDS});
 
         yield put({type: REQUEST_SUCCESS});
     } catch (e) {
@@ -166,23 +163,18 @@ function* getUnpublishedRecordsSaga(data) {
 
         const filter = yield select(filterSelector);
 
-        console.log('filter:', filter)
+        const objectParams = {};
 
+        if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
+        if(filter.course_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
+        if(filter.course_name_unpublished) {objectParams.order = filter.order_unpublished}
 
+        const params = $.param(objectParams);
 
-        const params = $.param({
-            course_name: filter.course_name_unpublished,
-            lesson_name: filter.lesson_name_unpublished,
-            order: filter.order_unpublished
-        });
-        // params.course_name = filter.course_name_unpublished
+        const unpublishedRecords = yield call(getUnpublishedRecordsReq, data.payload.filterOn ? data.payload.params ?
+                data.payload.params : params : null);
 
-        const unpublishedRecords = yield call(getUnpublishedRecordsReq, data.payload ? params : null);
-
-
-
-
-        if(!data.payload){
+        if(!data.payload.filterOn){
             yield put({type: SET_ALL_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
         } else {
             yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
@@ -210,9 +202,6 @@ function* changeViewModeSaga(data) {
 }
 
 const handleServerData = (records, mode, stDate = null, finDate = null) => {
-    if (records.length === 0) {
-        return [];
-    }
     const startDate = moment(stDate ? stDate : records[0].PubDate);
     const finishDate = moment(finDate ? finDate : records[records.length - 1].PubDate);
 
@@ -245,10 +234,6 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             first.DateObject = moment(first.PubDate);
             first.IsEven = isEven;
             first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
-
-
-            // const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === first.ProcessState);
-            // first.ProcessState = processState ? {css: processState.css, label: processState.label} : {css: "", label: "--"};
 
             first.Elements.forEach((elem) => {
                 const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
@@ -307,7 +292,6 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         }
     }
 
-    console.log('result array:', resultArray)
     return resultArray;
 };
 
@@ -318,10 +302,11 @@ function* getRecordsSaga() {
             params = yield select(paramsSelector),
             filter = yield select(filterSelector);
 
-        console.log('PARAMS!', params);
-        console.log('filter!', filter);
+        const cleanedParams = new URLSearchParams(params);
+        cleanedParams.delete('CourseNameUnpublished'); // todo check cleaned
+        cleanedParams.delete('LessonNameUnpublished');
 
-        const records = yield call(getRecordsReq, params);
+        const records = yield call(getRecordsReq, cleanedParams);
 
         yield put({
             type: SET_RECORDS,
@@ -358,13 +343,10 @@ function* getRecordsSaga() {
             } else {
                 fieldObj.header = [{text: ''}, {text: el, css: {"text-align": "center"}}];
                 fieldObj.width = 150;
-                // fieldObj.maxWidth = 160;
             }
 
-            // fieldObj.width = 150;
             fieldObj.css = '_container element-style';
             fieldObj.minWidth = 130;
-            // fieldObj.maxWi
             fieldObj.template = function (val) {
                 const elData = val[el];
 
@@ -374,10 +356,7 @@ function* getRecordsSaga() {
                 } else {
                     return `<div class="state-template-block-dr _unknown"></div>`
                 }
-                // console.log('fieldObj.template works', val.)
-
             };
-            // fieldObj.format = (val) => val ? RECORD_ELEMENT_STATES[val] : '';
 
             fieldSet.push(fieldObj)
         });
@@ -387,8 +366,8 @@ function* getRecordsSaga() {
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        console.log('params is fin_date', params.fin_date)
         const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(7, 'days').toISOString();
+
         yield put({
             type: CHANGE_VIEW_MODE,
             payload: {
@@ -414,16 +393,12 @@ function* updateRecordSaga(data) {
     yield put({type: REQUEST_START});
 
     try {
-        const newRecord = yield call(updateRecordReq, data.payload); //response.result might be 'OK'
-
+        const newRecord = yield call(updateRecordReq, data.payload);
         const records = yield select(recordsSelector);
-
         const oldRecordIndex = records.findIndex(rec => rec.Id === newRecord.Id);
-
         const newRecords = oldRecordIndex !== -1 ? records.splice(oldRecordIndex, 1, newRecord) : records;
 
         yield put({type: SET_RECORDS, payload: newRecords});
-
         yield put({type: REQUEST_SUCCESS});
     } catch (e) {
         yield put({type: REQUEST_FAIL});
@@ -445,13 +420,12 @@ const setDateToPublication = ({ReadyDate, lessonId}) => {
 };
 
 const getRecordsReq = (params) => {
-    // console.log('params')
     let urlString = `/api/pm/dashboard${params ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };
 
 const getUnpublishedRecordsReq = (params) => {
-    let urlString = `/api/pm/dashboard/lesson-list${params ? `?${params}` : ''}`;
+    let urlString = `/api/pm/dashboard/lesson-list${params && params.toString().length ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };
 
