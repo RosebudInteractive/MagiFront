@@ -137,19 +137,18 @@ function UnpublishedRecords(props) {
     }, [visible]);
 
     useEffect(() => {
-        if (unpublishedRecords && unpublishedRecords.length > 0) {
-        }
+        if (unpublishedRecords && unpublishedRecords.length > 0) {}
     }, [unpublishedRecords]);
 
     const GRID_CONFIG = {
         view: "datatable",
         id: 'unpublished-records-grid-table',
-        css: 'tt-element-grid _height-85',
+        css: 'tt-element-grid',
         hover: "row-hover",
-        scroll: "y",
+        scroll: "none",
         headerRowHeight: 40,
         rowHeight: 49,
-        autoheight: true,
+        // autoheight: true,
         select: true,
         editable: false,
         drag: "move",
@@ -252,25 +251,20 @@ function UnpublishedRecords(props) {
     };
 
     return (<div className={"unpublished-records-block" + (!visible ? " _hidden" : "")}>
-        <div className="unpublished-records-wrapper">
-
             <h6 className="title _grey100">Неопубликованные лекции</h6>
             <div className="unpublished-records-grid">
-                <div className="somediv">
-
+                <div className="unpublished-records-grid__wrapper">
                     <div className="filters">
                         <FilterRow fields={FILTER_CONFIG}
                                    onApply={_onApplyFilter}
                                    onChangeVisibility={_onResize}/>
                     </div>
-                    <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
+                    <div className={'webix-datatable js-unpublished _with-custom-scroll'}>
+                        <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
+                    </div>
                 </div>
-
-                <div className="elements__hide-button" onClick={toggleVisible}/>
             </div>
-
-        </div>
-
+        <div className="elements__hide-button" onClick={toggleVisible}/>
     </div>)
 }
 

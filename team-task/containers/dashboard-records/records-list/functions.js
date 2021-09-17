@@ -100,7 +100,7 @@ export const resizeHandler = (rowCount) => {
     }
 };
 
-export const refreshColumns = (config, {needRefresh, recordCount}) => {
+export const refreshColumns = (config, {needRefresh, recordsCount}) => {
     const grid = window.$$('dashboard-records-grid')
 
     if (grid) {
@@ -112,7 +112,7 @@ export const refreshColumns = (config, {needRefresh, recordCount}) => {
             let time = 0,
                 interval = setInterval(() => {
                     time += INTERVAL
-                    resizeHandler(recordCount)
+                    resizeHandler(recordsCount)
                     grid.adjust();
                     if (time >= 300) {
                         clearInterval(interval)

@@ -20,13 +20,13 @@ import {coursesSelector} from "tt-ducks/dictionary";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
 
-let recordsCount = 0;
+let recordsCount = 0,
+    scrollPosition = 0;
 
 const Records = (props) => {
     const {
         dashboardRecords,
         actions,
-        sideBarMenuVisible,
         elementsFieldSet,
         resizeTrigger,
         courses,
@@ -71,7 +71,9 @@ const Records = (props) => {
                 ? [...MAIN_COLUMNS, ...elementsFieldSet, ...STATE_COLUMNS]
                 : [...MAIN_COLUMNS, ...STATE_COLUMNS]
 
-        setColumnFields(columns);
+        if (JSON.stringify(columnFields) !== JSON.stringify(columns)) {
+            setColumnFields(columns);
+        }
     }, [elementsFieldSet, unpublishedPanelOpened]);
 
     useEffect(() => {
@@ -80,12 +82,18 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        if (sideBarMenuVisible) {
-            _onResize();
-        } else {
-            setTimeout(() => {
-                _onResize();
-            }, 200);
+        // if (sideBarMenuVisible) {
+        //     _onResize();
+        // } else {
+        //     setTimeout(() => {
+        //         _onResize();
+        //     }, 200);
+        // }
+        _onResize();
+
+        if (scrollPosition) {
+            window.scroll(0, scrollPosition)
+            scrollPosition = 0
         }
     }, [dashboardRecords]);
 
@@ -143,6 +151,8 @@ const Records = (props) => {
                     const fromItem = context.from.getItem(context.source[0]);
 
                     actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
+                    scrollPosition = window.scrollY;
+
                     return false;
                 },
                 onAfterDrop: function (context, e) {

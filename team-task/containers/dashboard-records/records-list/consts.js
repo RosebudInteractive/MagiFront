@@ -1,7 +1,7 @@
 import {getProcessState} from "./functions";
 
 export const MAIN_COLUMNS = [
-    { id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true },
+    // { id: 'Id', header: [{text: 'id', css: 'up-headers'}], hidden: true },
     { id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up' },
     { id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}], },
     { id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], minWidth: 130, fillspace: 30 },

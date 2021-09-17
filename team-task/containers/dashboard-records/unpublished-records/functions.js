@@ -66,23 +66,17 @@ const convertParam2Filter = ({courseName, lessonName}) => {
 };
 
 export const resizeHandler = (rowCount: number) => {
-    const _form = $('.unpublished-records'),
+    const _form = $('.js-unpublished'),
         _height = _form.height(),
         _width = _form.width();
-
-    console.log('.unpublished-records height', _height);
-
-    // $('.somediv').css({'max-heigt'});
 
     if (window.$$('unpublished-records-grid-table')) {
         const _headerHeight = window.$$('unpublished-records-grid-table').config.headerRowHeight;
 
-
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
-            console.log('_gridHeight', _gridHeight)
 
-            const _calcHeight = (rowCount * 80) + _headerHeight + 60
+            const _calcHeight = (rowCount * 49) + _headerHeight
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
             window.$$('unpublished-records-grid-table').$setSize(_width, _gridHeight)
         }, 0)
