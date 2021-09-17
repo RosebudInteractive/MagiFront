@@ -22,14 +22,8 @@
     border-bottom: 9px solid transparent
     border-right: 9px solid $grey40
 
-  .grid-wrapper
-    max-width: 1000px
-    transition: max-width 300ms ease
-
   &._hidden
     max-width: 26px
-    .grid-wrapper
-      visibility: hidden
     button
       display: none
     .elements__hide-button
@@ -37,9 +31,11 @@
     .title
       visibility: hidden
 
-    .unpublished-records-grid__wrapper
+    .unpublished-records__grid-panel
       width: 0
       visibility: hidden
+      display: none
+
     .elements__hide-button
       border-top: 9px solid transparent
       border-bottom: 9px solid transparent
@@ -58,11 +54,8 @@
     margin-top: auto
 
 
-.unpublished-records-grid
-  display: flex
+.unpublished-records__grid-panel
   height: -webkit-fill-available
-
-.unpublished-records-grid__wrapper
   width: 300px
   visibility: visible
   display: flex

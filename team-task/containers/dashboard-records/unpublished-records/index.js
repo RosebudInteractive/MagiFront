@@ -252,8 +252,7 @@ function UnpublishedRecords(props) {
 
     return (<div className={"unpublished-records-block" + (!visible ? " _hidden" : "")}>
             <h6 className="title _grey100">Неопубликованные лекции</h6>
-            <div className="unpublished-records-grid">
-                <div className="unpublished-records-grid__wrapper">
+                <div className="unpublished-records__grid-panel">
                     <div className="filters">
                         <FilterRow fields={FILTER_CONFIG}
                                    onApply={_onApplyFilter}
@@ -263,7 +262,6 @@ function UnpublishedRecords(props) {
                         <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
                     </div>
                 </div>
-            </div>
         <div className="elements__hide-button" onClick={toggleVisible}/>
     </div>)
 }

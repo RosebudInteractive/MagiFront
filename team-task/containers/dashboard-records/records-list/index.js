@@ -209,8 +209,6 @@ const Records = (props) => {
     return (
         <React.Fragment>
             <div className="records-page form">
-                {/*<h5 className="form-header _grey70">План публикаций</h5>*/}
-
                 <div className="filters">
                     {
                         (courses && courses.length > 0) &&
@@ -224,9 +222,7 @@ const Records = (props) => {
                         <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
                     </div>
                 </div>
-
             </div>
-
         </React.Fragment>
     )
 }
