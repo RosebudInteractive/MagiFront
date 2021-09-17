@@ -407,6 +407,9 @@ function* createTaskSaga({payload}) {
 
         const _newTask = {
             Id: -1,
+            IsActive: true,
+            IsFinal: false,
+            isAutomatic: false,
             Process: {Id: payload},
             Name: "Новая задача",
             Element: {Id: null},

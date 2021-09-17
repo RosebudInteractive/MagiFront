@@ -130,6 +130,7 @@ function* showTaskEditorSaga({payload}) {
     yield put(setActiveTaskId(data.id))
 
     yield call(closeEditorAndReloadProcess)
+    yield put(showTaskEditor(payload))
 }
 
 function* showTaskLinEditorSaga({payload}) {
