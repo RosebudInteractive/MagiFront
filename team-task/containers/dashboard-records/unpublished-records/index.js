@@ -26,6 +26,20 @@ function UnpublishedRecords(props) {
     const {unpublishedRecords, actions, allUnpublishedRecords} = props;
     const [visible, setVisible] = useState(false);
     const [stateChanger, setChanger] = useState(true);
+    const [scrollPosition, setScrollPosition] = useState(0);
+
+    const handleScroll = () => {  //its positioning the menu of items in autocomplete
+        const inputScrollPosY = $('.unpublished-records__grid-panel ._autocomplete.rs-picker-input')[0].getBoundingClientRect().y;
+        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + 40}px`});
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     const _onResize = useCallback(() => {
         resizeHandler(unpublishedCount)
@@ -52,11 +66,7 @@ function UnpublishedRecords(props) {
     };
 
     useEffect(() => {
-        if(visible) {
-            // hideColumn('processElements', {spans: true});
-        } else {
-            showColumn('processElements', {spans: true});
-        }
+        (!visible) && showColumn('processElements', {spans: true});
 
         props.resizeTriggerFn(visible);
     }, [visible]);
@@ -134,22 +144,19 @@ function UnpublishedRecords(props) {
             filterToRequest.lesson_name = filterData.LessonNameUnpublished;
         }
 
-        // actions.applyFilterSilently(filterData);
         actions.getUnpublishedRecords({filterOn: true, params: $.param(filterToRequest)});
         actions.getUnpublishedRecords({filterOn: false});
     };
 
     const onChangeFieldCb = ({name, value}) => {
         if (name === 'CourseNameUnpublished') {
-            console.log('it changed but what?')
             const newFilterValues = {...filter.current, CourseNameUnpublished: value};
-
-            // allUnpublishedRecords.filter(record => record.CourseName == );
             newFilterValues.hasOwnProperty('LessonNameUnpublished') && delete newFilterValues['LessonNameUnpublished'];
             filter.current = newFilterValues;
             setChanger(!stateChanger);
         }
     };
+
 
     return (<div className={"unpublished-records-block" + (!visible ? " _hidden" : "")}>
             <h6 className="title _grey100">Неопубликованные лекции</h6>

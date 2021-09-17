@@ -79,13 +79,6 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        // if (sideBarMenuVisible) {
-        //     _onResize();
-        // } else {
-        //     setTimeout(() => {
-        //         _onResize();
-        //     }, 200);
-        // }
         _onResize();
 
         if (scrollPosition) {
@@ -152,12 +145,6 @@ const Records = (props) => {
 
                     return false;
                 },
-                onAfterDrop: function (context, e) {
-                    console.log('after drop')
-                },
-                onAfterRender: function () {
-                    gridLoadedRef.current = true;
-                }
             },
             onClick: {
             },

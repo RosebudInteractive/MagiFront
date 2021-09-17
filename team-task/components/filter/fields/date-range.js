@@ -26,11 +26,10 @@ export default function DateRangeField(props) {
             onClean: () => {
                 if (onClean) onClean(name)
             }
-        }
+        };
 
-        const hasValue = props.value && Array.isArray(props.value) && props.value.every(item => !!item)
-
-        if (hasValue) result.value = value
+        const hasValue = props.value && Array.isArray(props.value);
+        if (hasValue) result.value = value;
 
         return result
     }, [props])
