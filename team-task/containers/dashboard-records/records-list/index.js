@@ -75,7 +75,7 @@ const Records = (props) => {
     }, [elementsFieldSet, unpublishedPanelOpened]);
 
     useEffect(() => {
-        refreshColumns(columnFields, recordsCount);
+        refreshColumns(columnFields, {needRefresh: true, recordsCount});
     }, [columnFields]);
 
     useEffect(() => {

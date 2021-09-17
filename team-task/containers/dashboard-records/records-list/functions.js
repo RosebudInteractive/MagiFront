@@ -100,24 +100,26 @@ export const resizeHandler = (rowCount) => {
     }
 };
 
-export const refreshColumns = (config, recordCount) => {
+export const refreshColumns = (config, {needRefresh, recordCount}) => {
     const grid = window.$$('dashboard-records-grid')
 
     if (grid) {
         grid.refreshColumns(config)
 
-        const INTERVAL = 100
+        if (needRefresh) {
+            const INTERVAL = 100
 
-        let time = 0,
-            interval = setInterval(() => {
-                time += INTERVAL
-                resizeHandler(recordCount)
-                grid.adjust();
-                if (time >= 300) {
-                    clearInterval(interval)
-                    interval = null
-                }
-        }, INTERVAL);
+            let time = 0,
+                interval = setInterval(() => {
+                    time += INTERVAL
+                    resizeHandler(recordCount)
+                    grid.adjust();
+                    if (time >= 300) {
+                        clearInterval(interval)
+                        interval = null
+                    }
+                }, INTERVAL);
+        }
     }
 }
 
