@@ -125,8 +125,6 @@ export const changeViewMode = (mode, params) => {
     return {type: CHANGE_VIEW_MODE, payload: {mode, params}}
 };
 
-
-
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),

@@ -18,7 +18,7 @@ export const getFilterConfig = (filter, disableFields = [], courseOptions = []) 
             placeholder: "Период",
             type: FILTER_FIELD_TYPE.DATE_RANGE,
             value: (function () {
-                if(filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null)){
+                if (filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null)) {
                     return [new Date(filter.DateRange[0]), new Date(filter.DateRange[1])]
                 }
                 return [null, null]
@@ -61,7 +61,6 @@ export const parseParams = () => {
 };
 
 const convertParam2Filter = ({Course, DateRange}) => {
-
     if (!(Course ||
         DateRange)) return null;
 
@@ -73,15 +72,13 @@ const convertParam2Filter = ({Course, DateRange}) => {
     return filter
 };
 
-export const resizeHandler = (rowCount, additionalWidth) => {
+export const resizeHandler = (rowCount) => {
     const _form = $('.form'),
         _height = _form.height(),
         _width = _form.width();
 
 
-
     const table = $('.dashboard-records-table .webix_ss_center .webix_ss_center_scroll'),
-        tWidth = table.width(),
         tHeight = table.height();
 
     $('.records-page.form').height(tHeight + 250);
@@ -89,8 +86,7 @@ export const resizeHandler = (rowCount, additionalWidth) => {
     if (window.$$('dashboard-records-grid')) {
         const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
 
-
-        let resultWidth = tWidth >_width ? tWidth : _width;
+        let resultWidth = _width; //tWidth > _width ? tWidth : _width;
 
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48
@@ -104,9 +100,26 @@ export const resizeHandler = (rowCount, additionalWidth) => {
     }
 };
 
-export const refreshColumns = (config) => {
-    if (window.$$('dashboard-records-grid')) {
-        window.$$('dashboard-records-grid').refreshColumns(config)
+export const refreshColumns = (config, {needRefresh, recordsCount}) => {
+    const grid = window.$$('dashboard-records-grid')
+
+    if (grid) {
+        grid.refreshColumns(config)
+
+        if (needRefresh) {
+            const INTERVAL = 100
+
+            let time = 0,
+                interval = setInterval(() => {
+                    time += INTERVAL
+                    resizeHandler(recordsCount)
+                    grid.adjust();
+                    if (time >= 300) {
+                        clearInterval(interval)
+                        interval = null
+                    }
+                }, INTERVAL);
+        }
     }
 };
 
@@ -114,11 +127,13 @@ export const convertFilter2Params = (filter) => {
     let _data = {};
 
     if (filter) {
-        if(filter.Course) { _data.course = filter.Course }
-        if(filter.DateRange) {
+        if (filter.Course) {
+            _data.course = filter.Course
+        }
+        if (filter.DateRange) {
             const dates = filter.DateRange;
 
-            if(dates.length === 2 && dates.every(d => d !== null)){
+            if (dates.length === 2 && dates.every(d => d !== null)) {
                 _data.st_date = `${moment(dates[0]).locale('ru').toISOString()}`;
                 _data.fin_date = `${moment(dates[1]).locale('ru').toISOString()}`;
             }
@@ -128,6 +143,7 @@ export const convertFilter2Params = (filter) => {
     return _data
 };
 
+
 export const getProcessState = (val) => {
     if (val) {
         const processState = Object.values(DASHBOARD_PROCESS_STATE).find(prS => prS.value === val);
@@ -135,4 +151,4 @@ export const getProcessState = (val) => {
     } else {
         return {css: '', label: ''}
     }
-};
+}

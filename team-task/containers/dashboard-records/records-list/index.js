@@ -1,7 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {convertFilter2Params, getFilterConfig, parseParams, refreshColumns, resizeHandler} from "./functions";
-import type {GridSortOrder} from "../../../types/grid";
-import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import type {FilterField} from "../../../components/filter/types";
 import FilterRow from "../../../components/filter";
 import Webix from "../../../components/Webix";
@@ -20,16 +18,15 @@ import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname
 import './records-list.sass'
 import {coursesSelector} from "tt-ducks/dictionary";
 import {useWindowSize} from "../../../tools/window-resize-hook";
-import {defaultColumnConfigOne, defaultColumnConfigTwo} from "./consts";
+import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
 
-
-let recordsCount = 0;
+let recordsCount = 0,
+    scrollPosition = 0;
 
 const Records = (props) => {
     const {
         dashboardRecords,
         actions,
-        sideBarMenuVisible,
         elementsFieldSet,
         resizeTrigger,
         courses,
@@ -39,50 +36,63 @@ const Records = (props) => {
 
     const location = useLocation();
 
-    const [columnFields, setColumnFields] = useState([...defaultColumnConfigOne, ...defaultColumnConfigTwo]);
+    const [columnFields, setColumnFields] = useState([...MAIN_COLUMNS, ...STATE_COLUMNS]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(recordsCount, unpublishedPanelOpened ? 400 : 0)
+        resizeHandler(recordsCount)
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
 
     useWindowSize(() => {
-        resizeHandler(recordsCount, 0)
+        resizeHandler(recordsCount)
     });
 
     useEffect(() => {
-        const additionalWidth = unpublishedPanelOpened ? 400 : 0; // todo remove
         const grid = window.webix.$$("dashboard-records-grid");
-        if(unpublishedPanelOpened){
-            !(grid.getColumnIndex("processElements") < 0) && grid.hideColumn('processElements', {spans: true});
+        if (unpublishedPanelOpened) {
+            const elementsColumnExists = grid.getColumnIndex("processElements") >= 0
+
+            if (elementsColumnExists) {
+                grid.hideColumn('processElements', {spans: true});
+            }
         }
 
-        resizeHandler(recordsCount, additionalWidth); //add additional width here todo removeit
+        resizeHandler(recordsCount,); //add additional width here todo removeit
     }, [unpublishedPanelOpened, resizeTrigger]);
 
     useEffect(() => {
-        setColumnFields([...defaultColumnConfigOne, ...elementsFieldSet, ...defaultColumnConfigTwo]);
-    }, [elementsFieldSet]);
+        const elementsFieldsExists = elementsFieldSet && Array.isArray(elementsFieldSet) && elementsFieldSet.length,
+            columns = elementsFieldsExists && !unpublishedPanelOpened
+                ? [...MAIN_COLUMNS, ...elementsFieldSet, ...STATE_COLUMNS]
+                : [...MAIN_COLUMNS, ...STATE_COLUMNS]
+
+        if (JSON.stringify(columnFields) !== JSON.stringify(columns)) {
+            setColumnFields(columns);
+        }
+    }, [elementsFieldSet, unpublishedPanelOpened]);
 
     useEffect(() => {
-        refreshColumns(columnFields);
-        setTimeout(() => {
-            _onResize();
-        }, 200);
+        refreshColumns(columnFields, {needRefresh: true, recordsCount});
     }, [columnFields]);
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        if (sideBarMenuVisible) {
-            _onResize();
-        } else {
-            setTimeout(() => {
-                _onResize();
-            }, 200);
+        // if (sideBarMenuVisible) {
+        //     _onResize();
+        // } else {
+        //     setTimeout(() => {
+        //         _onResize();
+        //     }, 200);
+        // }
+        _onResize();
+
+        if (scrollPosition) {
+            window.scroll(0, scrollPosition)
+            scrollPosition = 0
         }
-    }, [dashboardRecords, unpublishedPanelOpened]);
+    }, [dashboardRecords]);
 
     useEffect(() => {
         const initState = parseParams();
@@ -130,30 +140,23 @@ const Records = (props) => {
             },
             columns: [],
             on: {
-                onHeaderClick: function (header) {
-                    const _sort: GridSortOrder = _sortRef.current;
-
-                    if (header.column !== _sort.field) {
-                        _sort.field = header.column
-                        _sort.direction = GRID_SORT_DIRECTION.ACS
-                    } else {
-                        _sort.direction = _sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : _sort.type = GRID_SORT_DIRECTION.ACS
-                    }
-
-                    actions.setGridSortOrder(_sort);
-                    this.markSorting(_sort.field, _sort.direction);
-                },
                 onItemDblClick: function (id) {
                     // todo open action
-
                 },
                 onBeforeDrop: function (context, e) {
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
                     actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
+                    scrollPosition = window.scrollY;
 
-                    return true;
+                    return false;
+                },
+                onAfterDrop: function (context, e) {
+                    console.log('after drop')
+                },
+                onAfterRender: function () {
+                    gridLoadedRef.current = true;
                 }
             },
             onClick: {
@@ -191,7 +194,6 @@ const Records = (props) => {
                     </div>
                 </div>
             </div>
-
         </React.Fragment>
     )
 }
