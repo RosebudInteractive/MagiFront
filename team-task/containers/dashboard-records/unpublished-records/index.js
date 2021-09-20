@@ -26,11 +26,11 @@ function UnpublishedRecords(props) {
     const {unpublishedRecords, actions, allUnpublishedRecords} = props;
     const [visible, setVisible] = useState(false);
     const [stateChanger, setChanger] = useState(true);
-    const [scrollPosition, setScrollPosition] = useState(0);
 
-    const handleScroll = () => {  //its positioning the menu of items in autocomplete
-        const inputScrollPosY = $('.unpublished-records__grid-panel ._autocomplete.rs-picker-input')[0].getBoundingClientRect().y;
-        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + 40}px`});
+    const handleScroll = () => {
+        const input = $('.unpublished-records__grid-panel ._autocomplete.rs-picker-input');
+        const inputScrollPosY = input[0].getBoundingClientRect().y;
+        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + input.outerHeight}px`});
     };
 
     useEffect(() => {
@@ -83,7 +83,6 @@ function UnpublishedRecords(props) {
         scroll: "none",
         headerRowHeight: 40,
         rowHeight: 49,
-        // autoheight: true,
         select: true,
         editable: false,
         drag: "move",

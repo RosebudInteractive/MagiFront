@@ -59,7 +59,6 @@ const Records = (props) => {
             }
         }
 
-        resizeHandler(recordsCount,); //add additional width here todo removeit
     }, [unpublishedPanelOpened, resizeTrigger]);
 
     useEffect(() => {
@@ -79,7 +78,11 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        _onResize();
+
+        setTimeout(() => {
+            _onResize();
+        }, 300);
+
 
         if (scrollPosition) {
             window.scroll(0, scrollPosition)

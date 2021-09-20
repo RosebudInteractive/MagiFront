@@ -78,24 +78,18 @@ export const resizeHandler = (rowCount) => {
         _width = _form.width();
 
 
-    const table = $('.dashboard-records-table .webix_ss_center .webix_ss_center_scroll'),
-        tHeight = table.height();
-
-    $('.records-page.form').height(tHeight + 250);
-
     if (window.$$('dashboard-records-grid')) {
         const _headerHeight = window.$$('dashboard-records-grid').config.headerRowHeight;
 
-        let resultWidth = _width; //tWidth > _width ? tWidth : _width;
-
         setTimeout(() => {
-            let _gridHeight = _height - _headerHeight - 48
+            let _gridHeight = _height - _headerHeight - 48;
 
-            const _calcHeight = (rowCount * 80) + _headerHeight + 60
-            _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight
-            window.$$('dashboard-records-grid').$setSize(resultWidth, _gridHeight)
-            $('.horizontal-scroll-grid').height(_gridHeight)
-        }, 0)
+            const _calcHeight = (rowCount * 80) + _headerHeight + 60;
+            _gridHeight = (_calcHeight && _calcHeight > 0 && !isNaN(_calcHeight))  ? _calcHeight : _gridHeight;
+
+            window.$$('dashboard-records-grid').$setSize(_width, _gridHeight);
+            $('.horizontal-scroll-grid').height(_gridHeight);
+        }, 200)
 
     }
 };
@@ -104,7 +98,7 @@ export const refreshColumns = (config, {needRefresh, recordsCount}) => {
     const grid = window.$$('dashboard-records-grid')
 
     if (grid) {
-        grid.refreshColumns(config)
+        grid.refreshColumns(config);
 
         if (needRefresh) {
             const INTERVAL = 100
@@ -151,4 +145,4 @@ export const getProcessState = (val) => {
     } else {
         return {css: '', label: ''}
     }
-}
+};
