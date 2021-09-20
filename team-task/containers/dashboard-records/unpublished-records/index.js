@@ -30,7 +30,7 @@ function UnpublishedRecords(props) {
     const handleScroll = () => {
         const input = $('.unpublished-records__grid-panel ._autocomplete.rs-picker-input');
         const inputScrollPosY = input[0].getBoundingClientRect().y;
-        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + input.outerHeight}px`});
+        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + input.outerHeight()}px`});
     };
 
     useEffect(() => {
