@@ -9,6 +9,7 @@ import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import _ from "lodash";
 import moment from "moment";
 import {DASHBOARD_ELEMENTS_STATE} from "../constants/states";
+import $ from "jquery";
 
 export const moduleName = 'dashboard-records';
 const prefix = `${appName}/${moduleName}`;
@@ -139,14 +140,14 @@ function* publishRecordSaga(data) {
     try {
         yield put({type: REQUEST_START});
 
-        yield call(setDateToPublication,
+        const res = yield call(setDateToPublication,
             {
                 ReadyDate: data.payload.isoDateString,
-                lessonId: data.payload.lessonId
-            });
+                lessonId: data.payload.lessonId});
 
-        yield put({type: LOAD_DASHBOARD_RECORDS});
-        yield put({type: LOAD_UNPUBLISHED_RECORDS});
+
+        yield put(getRecords());
+        yield put(getUnpublishedRecords({filterOn: true, params: null}));
 
         yield put({type: REQUEST_SUCCESS});
     } catch (e) {
@@ -165,20 +166,21 @@ function* getUnpublishedRecordsSaga(data) {
 
         if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
         if(filter.course_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
-        if(filter.course_name_unpublished) {objectParams.order = filter.order_unpublished}
 
         const params = $.param(objectParams);
-
-        const unpublishedRecords = yield call(getUnpublishedRecordsReq, data.payload.filterOn ? data.payload.params ?
-                data.payload.params : params : null);
+        const paramsToRequest = (data && data.payload && data.payload.filterOn) ? data.payload.params ?
+            data.payload.params : params : null;
+        const unpublishedRecords = yield call(getUnpublishedRecordsReq, paramsToRequest);
 
         if(!data.payload.filterOn){
             yield put({type: SET_ALL_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+            yield put({type: REQUEST_SUCCESS});
         } else {
             yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+            yield put({type: REQUEST_SUCCESS});
         }
 
-        yield put({type: REQUEST_SUCCESS});
+
     } catch (e) {
         yield put({type: REQUEST_FAIL});
         showErrorMessage(e.toString())
@@ -423,6 +425,7 @@ const getRecordsReq = (params) => {
 };
 
 const getUnpublishedRecordsReq = (params) => {
+    console.log('it works')
     let urlString = `/api/pm/dashboard/lesson-list${params && params.toString().length ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };

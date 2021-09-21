@@ -49,7 +49,7 @@ export const ReducerRecord = Record({
 
 
 export default function reducer(state = new ReducerRecord(), action) {
-    const {type, payload} = action
+    const {type, payload} = action;
 
     switch (type) {
 
@@ -58,23 +58,23 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set("path", payload)
                 .set("order", "")
                 .set("filter", {})
-                .set("activeTask", null)
+                .set("activeTask", null);
 
         case SET_GRID_SORT_ORDER:
             return state
-                .set("order", payload)
+                .set("order", payload);
 
         case SET_ACTIVE_TASK_ID:
             return state
-                .set("activeTask", payload)
+                .set("activeTask", payload);
 
         case APPLY_FILTER:
             return state
-                .set("filter", payload)
+                .set("filter", payload);
 
         case BUILD_LOCATION:
             return state
-                .set("refreshGuard", true)
+                .set("refreshGuard", false);
 
         case GET_TASKS_SUCCESS:
         case GET_TASKS_FAIL:
@@ -82,7 +82,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_PROCESSES_FAIL:
         case CLEAR_GUARD:
             return state
-                .set("refreshGuard", false)
+                .set("refreshGuard", false);
 
         default:
             return state

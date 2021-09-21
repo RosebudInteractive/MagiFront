@@ -32,7 +32,7 @@ export default function DateRangeField(props) {
         if (hasValue) result.value = value;
 
         return result
-    }, [props])
+    }, [props]);
 
 
     return <DateRangePicker className="filter-row__field-input _autocomplete" {...renderProps} />
