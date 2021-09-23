@@ -1,33 +1,54 @@
 import {getProcessState} from "./functions";
 
 export const MAIN_COLUMNS = [
-    { id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up' },
-    { id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}], },
-    { id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], minWidth: 130, fillspace: 30 },
+    {id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up'},
+    {id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}], width: 70},
     {
-        id: 'LessonNum', header: [{text: 'Номер', css: 'up-headers'}], css: '_container',
+        id: 'LessonNum', header: [{text: '№', css: 'up-headers'}], css: '_container',
+        width: 50,
         template: function (val) {
             return `<div class="centered-by-flex">${val.LessonNum}</div>`;
         },
     },
-    { id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], minWidth: 130, fillspace: 30 },
+    {
+        id: 'CourseLessonName', header: [{text: 'Курс', css: 'up-headers'}, {text: 'Название лекции', css: 'up-headers'}], minWidth: 150,
+        css: '_container doubled-ceil',
+        fillspace: true,
+        template: function (data) {
+            return data && data.CourseLessonName ? `<div  class="course-lesson-name-ceil">
+                        <div class="course-name">
+                            ${data.CourseLessonName[0] ? data.CourseLessonName[0] : ''}                   
+                        </div>
+                        <div class="lesson-name">
+                            ${data.CourseLessonName[1] ? data.CourseLessonName[1] : ''}       
+                        </div>
+                   </div>`  : '';
+        }
+    },
+    {id: 'CourseName', header: [{text: 'Курс', css: 'up-headers'}], hidden: true},
+    {id: 'LessonName', header: [{text: 'Название лекции', css: 'up-headers'}], hidden: true},
 ];
 
 export const STATE_COLUMNS = [
     {
         id: 'IsPublished', header: [{text: 'Опубликовано', css: 'up-headers'}],
-        css: '_container',
+        css: '_container up-aligned',
         template: function (data) {
-            return `<div class='${'check-box-block'} ${data.IsPublished ? 'checked' : ''}'>
-                        <div class=${data.IsPublished ? 'check-mark' : ''}></div>
+            return `<div class='${'is-published'} ${data.IsPublished ? 'published-ok' : ''}'>
                         </div>`
         }
     },
     {
-        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 150, css: "_container",
+        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 120, css: "_container process-state-aligned",
         template: function (val) {
             const state = getProcessState(val.ProcessState);
-            return `<div class="process-state ${state.css}">${state.label}</div>`;
+            return `<div class="centered-by-flex process-state ${state.css}">${state.label}</div>`;
         }
-    }
+    },
+    {
+        id: 'options-menu', header: '', width: 50, css: "_container",
+        template: function(data){
+            return "<button class='options-menu js-toggle-menu'/>"
+        }
+    },
 ]

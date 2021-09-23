@@ -2,7 +2,7 @@ export const RECORD_ELEMENT_STATES = {
     1: 'Не начат',
     2: 'В процессе',
     3: 'Готов',
-    4: 'На переделке'
+    4: 'На доработке'
 };
 
 export const RECORD_PROCESS_STATES = {

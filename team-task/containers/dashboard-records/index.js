@@ -12,6 +12,8 @@ import {
     openModalDndToPublish,
     unpublishedRecordsSelector
 } from "tt-ducks/dashboard-records"
+
+import {getDashboardUnpublishedRecords} from 'tt-ducks/dictionary'
 import Records from "./records-list"
 import UnpublishedRecords from "./unpublished-records";
 import DashboardRecordsHeader from "./header"
@@ -29,8 +31,8 @@ function DashboardRecords(props) {
 
     useEffect(() => {
         actions.hideSideBarMenu();
-        actions.getUnpublishedRecords({filterOn: false});
-        actions.getUnpublishedRecords({filterOn: true});
+        actions.getDashboardUnpublishedRecords();
+        actions.getUnpublishedRecords();
 
         return () => actions.showSideBarMenu();
     }, []);
@@ -91,6 +93,7 @@ const mapDispatch2Props = (dispatch) => {
             hideSideBarMenu,
             showSideBarMenu,
             changeViewMode,
+            getDashboardUnpublishedRecords,
             getUnpublishedRecords,
             closeModalDndToPublish,
             openModalDndToPublish

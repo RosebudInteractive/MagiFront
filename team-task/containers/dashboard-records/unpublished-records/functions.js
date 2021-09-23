@@ -10,14 +10,7 @@ export const getFilterConfig = (filter, disableFields = [], {courseOptions = [],
             type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
             value: filter ? filter.CourseNameUnpublished : null,
             options: courseOptions
-        },
-        {
-            name: "LessonNameUnpublished",
-            placeholder: "Лекция",
-            type: FILTER_FIELD_TYPE.AUTOCOMPLETE,
-            value: filter ? filter.LessonNameUnpublished : null,
-            options: lessonOptions
-        },
+        }
     ];
 
     const resultFields = initialFields.filter(f => !disableFields.includes(f.name));
@@ -95,4 +88,9 @@ export const convertFilter2Params = (filter) => {
     }
 
     return _data
+};
+
+export const grid2grid = (data, id) => {
+    data.value = data.value || data.title;
+    return data;
 };

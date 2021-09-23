@@ -8,6 +8,7 @@ import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {
+    addToDisplayedRecords,
     displayRecordsSelector,
     elementsFieldSetSelector,
     fetchingSelector,
@@ -39,7 +40,8 @@ const Records = (props) => {
     const [columnFields, setColumnFields] = useState([...MAIN_COLUMNS, ...STATE_COLUMNS]);
 
     const _onResize = useCallback(() => {
-        resizeHandler(recordsCount)
+        resizeHandler(recordsCount);
+        console.log('it changed')
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
@@ -118,8 +120,8 @@ const Records = (props) => {
         return {
             view: "datatable",
             id: 'dashboard-records-grid',
-            css: 'tt-grid scroll-all-table',
-            hover: "row-hover",
+            css: 'tt-grid scroll-all-table dashboard-table',
+            hover: "bluelight-hover",
             scroll: 'none',
             headerRowHeight: 40,
             rowHeight: 72,
@@ -129,9 +131,17 @@ const Records = (props) => {
             editable: false,
             scheme: {
                 $change: function (item) {
+                    let resultCss = ``;
                     if (item.IsEven) {
-                        item.$css = "even-record";
+                        resultCss += " even-record";
                     }
+
+                    if(item.IsEndOfWeek){
+                        resultCss += " end-of-week-record"
+                    }
+
+                    item.$css = resultCss;
+                    // end-of-week-record
                 }
             },
             columns: [],
@@ -140,11 +150,42 @@ const Records = (props) => {
                     // todo open action
                 },
                 onBeforeDrop: function (context, e) {
+                    const grid = window.webix.$$("dashboard-records-grid");
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
-                    actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
+                    console.log('from Item:', fromItem);
+                    console.log('toItem:', toItem);
+
+                    // const isoDateString = toItem.DateObject.toISOString(),
+                    //     isEven = toItem.IsEven,
+                    //     isEndOfWeek = toItem.IsEndOfWeek;
+
                     scrollPosition = window.scrollY;
+                    actions.addToDisplayedRecords(toItem.id, {
+                        // ...toItem,
+                        // ...fromItem,
+                        // CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
+                        // id: toItem.id
+                        IsEven: toItem.IsEven,
+                        PubDate: toItem.PubDate,
+                        DateObject: toItem.DateObject,
+                        IsEndOfWeek: toItem.IsEndOfWeek,
+                        CourseName: fromItem.CourseName,
+                        LessonId: fromItem.LessonId,
+                        Week: toItem.Week,
+                        LessonNum: fromItem.LessonNum,
+                        CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
+                        LessonName: fromItem.LessonName,
+                        Elements: [],
+                        IsPublished: null,
+                        ProcessId: null,
+                        ProcessState: null
+                    });
+
+                    // context.from(context.source[0],context.start);
+                    actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
+
 
                     return false;
                 },
@@ -197,7 +238,7 @@ const mapState2Props = (state) => {
         courses: coursesSelector(state),
         params: paramsSelector(state)
     }
-}
+};
 
 const mapDispatch2Props = (dispatch) => {
     return {
@@ -208,7 +249,8 @@ const mapDispatch2Props = (dispatch) => {
             setPathname,
             setGridSortOrder,
             getRecords,
-            setPublishRecordDate
+            setPublishRecordDate,
+            addToDisplayedRecords
         }, dispatch)
     }
 };

@@ -84,7 +84,7 @@ export const resizeHandler = (rowCount) => {
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48;
 
-            const _calcHeight = (rowCount * 80) + _headerHeight + 60;
+            const _calcHeight = (rowCount * 80) + _headerHeight + 60 + Math.ceil((rowCount/7)* 15); //todo check it
             _gridHeight = (_calcHeight && _calcHeight > 0 && !isNaN(_calcHeight))  ? _calcHeight : _gridHeight;
 
             window.$$('dashboard-records-grid').$setSize(_width, _gridHeight);
@@ -100,20 +100,20 @@ export const refreshColumns = (config, {needRefresh, recordsCount}) => {
     if (grid) {
         grid.refreshColumns(config);
 
-        if (needRefresh) {
-            const INTERVAL = 100
-
-            let time = 0,
-                interval = setInterval(() => {
-                    time += INTERVAL
-                    resizeHandler(recordsCount)
-                    grid.adjust();
-                    if (time >= 300) {
-                        clearInterval(interval)
-                        interval = null
-                    }
-                }, INTERVAL);
-        }
+        // if (needRefresh) { // it need?
+        //     const INTERVAL = 100
+        //
+        //     let time = 0,
+        //         interval = setInterval(() => {
+        //             time += INTERVAL
+        //             resizeHandler(recordsCount)
+        //             grid.adjust();
+        //             if (time >= 300) {
+        //                 clearInterval(interval)
+        //                 interval = null
+        //             }
+        //         }, INTERVAL);
+        // }
     }
 };
 

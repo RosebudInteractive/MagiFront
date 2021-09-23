@@ -35,6 +35,11 @@ const TOGGLE_MODAL_DND_TO_PUBLISH = `${prefix}/TOGGLE_MODAL_DRAG_N_DROP_TO_PUBLI
 const OPEN_MODAL_DND_TO_PUBLISH = `${prefix}/OPEN_MODAL_DND_TO_PUBLISH`;
 const CLOSE_MODAL_DND_TO_PUBLISH = `${prefix}/CLOSE_MODAL_DND_TO_PUBLISH`;
 const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
+// const SET_FILTER_FOR_UNPUBLISHED = `${prefix}/SET_FILTER_FOR_UNPUBLISHED`;
+// const SET_FILTER_VALUES_UNPUBLISHED = `${prefix}/SET_FILTER_VALUES_UNPUBLISHED`;
+const SET_FILTER_UNPUBLISHED = `${prefix}/SET_FILTER_UNPUBLISHED`;
+const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
+const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 
 
 const defaultFieldSet = new Set([]);
@@ -51,6 +56,7 @@ export const ReducerRecord = Record({
     displayRecords: defaultFieldSet,
     unpublishedRecords: [],
     allUnpublishedRecords: [],
+    filterUnpublished: [],
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
     showModalOfPublishing: false
@@ -81,6 +87,13 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLOSE_MODAL_DND_TO_PUBLISH:
         case OPEN_MODAL_DND_TO_PUBLISH:
             return state.set('showModalOfPublishing', payload);
+        // case SET_FILTER_FOR_UNPUBLISHED:
+        //     return state.set('filterForUnpublishedIsOn', payload);
+        case SET_FILTER_UNPUBLISHED:
+            return state.set('filterUnpublished');
+        case SET_NEW_DISPLAYED_RECORDS:
+            console.log('SET_NEW_DISPLAYED_RECORDS', payload);
+            return state.set('displayRecords', [...payload]);
         default:
             return state
     }
@@ -96,14 +109,19 @@ export const fetchingSelector = createSelector(stateSelector, state => state.fet
 export const elementsFieldSetSelector = createSelector(stateSelector, state => state.fieldSet);
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
 export const modalPublishIsOnSelector = createSelector(stateSelector, state => state.showModalOfPublishing);
+export const filterUnpublishedSelector = createSelector(stateSelector, state => state.filterUnpublished);
 
+
+export const addToDisplayedRecords = (id, newRecord) => {
+    return {type: ADD_TO_DISPLAYED_RECORDS, payload: {id, newRecord}};
+};
 
 export const getRecords = () => {
     return {type: LOAD_DASHBOARD_RECORDS};
 };
 
-export const getUnpublishedRecords = ({filterOn = true, params = null}) => {
-    return {type: LOAD_UNPUBLISHED_RECORDS, payload: {filterOn, params}};
+export const getUnpublishedRecords = (params = null) => {
+    return {type: LOAD_UNPUBLISHED_RECORDS, payload: params};
 };
 
 export const setPublishRecordDate = ({isoDateString, lessonId}) => {
@@ -126,15 +144,41 @@ export const changeViewMode = (mode, params) => {
     return {type: CHANGE_VIEW_MODE, payload: {mode, params}}
 };
 
+export const setFilterUnpublished = (filterValues) => {
+    return {type: SET_FILTER_UNPUBLISHED, payload: filterValues}
+};
+
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
         takeEvery(LOAD_UNPUBLISHED_RECORDS, getUnpublishedRecordsSaga),
         takeEvery(CHANGE_RECORD, updateRecordSaga),
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
-        takeEvery(PUBLISH_RECORD, publishRecordSaga)
+        takeEvery(PUBLISH_RECORD, publishRecordSaga),
+        takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga)
     ])
 };
+
+function* addToDisplayedRecordsSaga(data) {
+    try {
+        const displayedRecords = yield select(displayRecordsSelector);
+
+        const index = displayedRecords.findIndex(record => record.id === data.payload.id);
+
+        if(index !== -1) {
+            if(displayedRecords[index].CourseName.length < 1) {
+                displayedRecords[index] = data.payload.newRecord;
+            } else {
+                displayedRecords.splice(index, 0, data.payload.newRecord);
+            }
+        }
+
+        yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
+
+    }catch (e) {
+        showErrorMessage(e.toString())
+    }
+}
 
 function* publishRecordSaga(data) {
     try {
@@ -145,9 +189,9 @@ function* publishRecordSaga(data) {
                 ReadyDate: data.payload.isoDateString,
                 lessonId: data.payload.lessonId});
 
-
-        yield put(getRecords());
-        yield put(getUnpublishedRecords({filterOn: true, params: null}));
+        // yield put(getRecords());
+        const filterValues = yield select(filterUnpublishedSelector);
+        yield put(getUnpublishedRecords(filterValues));
 
         yield put({type: REQUEST_SUCCESS});
     } catch (e) {
@@ -160,26 +204,20 @@ function* getUnpublishedRecordsSaga(data) {
     try {
         yield put({type: REQUEST_START});
 
-        const filter = yield select(filterSelector);
+        const filter = yield select(filterUnpublishedSelector);
 
         const objectParams = {};
 
         if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
-        if(filter.course_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
-
+        if(filter.lesson_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
         const params = $.param(objectParams);
-        const paramsToRequest = (data && data.payload && data.payload.filterOn) ? data.payload.params ?
-            data.payload.params : params : null;
+
+        const paramsToRequest = (data && data.payload) ? data.payload : params;
+
         const unpublishedRecords = yield call(getUnpublishedRecordsReq, paramsToRequest);
 
-        if(!data.payload.filterOn){
-            yield put({type: SET_ALL_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
-            yield put({type: REQUEST_SUCCESS});
-        } else {
-            yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
-            yield put({type: REQUEST_SUCCESS});
-        }
-
+        yield put({type: SET_UNPUBLISHED_RECORDS, payload: unpublishedRecords});
+        yield put({type: REQUEST_SUCCESS});
 
     } catch (e) {
         yield put({type: REQUEST_FAIL});
@@ -231,14 +269,16 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         if (filteredRecords.length) {
             const [first, ...other] = filteredRecords;
             first.Week = weekHasChanged ? displayWeekRange : '';
-            first.DateObject = moment(first.PubDate);
+            first.DateObject = moment(first.PubDate).locale('ru'); //todo check it
             first.IsEven = isEven;
+            first.IsEndOfWeek = moment(first.PubDate).locale('ru').isoWeekday() === 7;
+            first.CourseLessonName = [first.CourseName, first.LessonName];
             first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
 
             first.Elements.forEach((elem) => {
                 const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
 
-                first[elem.Name] = _state ? {css: _state.css, label: _state.label} : {css: "", label: "--"};
+                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {css: "", label: "--",  question: false};
             });
 
             if (other && other.length > 0) {
@@ -246,13 +286,16 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
+                    item.IsEndOfWeek = moment(item.PubDate).locale('ru').isoWeekday() === 7;
+                    item.CourseLessonName = [item.CourseName, item.LessonName];
                     item.DateObject = currentDate.set({hour:0,minute:0,second:0,millisecond:0});
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
-                        item[elem.Name] = _state ? {css: _state.css, label: _state.label} : {
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label,  question: elem.HasAlert} : {
                             css: "_unknown",
-                            label: ""
+                            label: "",
+                            question: false
                         };
                     })
                 });
@@ -271,12 +314,14 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             const objectData = {
                 IsEven: isEven,
                 PubDate: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru').format('DD MMM'),
-                DateObject: currentDate.set({hour:0,minute:0,second:0,millisecond:0}),
+                DateObject: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru'), //todo check it
                 CourseId: null,
+                IsEndOfWeek: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7,
                 CourseName: "",
                 LessonId: null,
                 Week: weekHasChanged ? displayWeekRange : '',
                 LessonNum: "",
+                CourseLessonName: ['', ''],
                 LessonName: "",
                 Elements: [],
                 IsPublished: null,
@@ -323,36 +368,16 @@ function* getRecordsSaga() {
         const fieldSet = [];
 
         Array.from(fields).forEach((el, inx) => {
-            const fieldObj = {id: el,};
-
-            if (inx === 0) {
-                fieldObj.id = 'processElements';
-                fieldObj.header = [
-                    {
-                        text: "Элементы",
-                        colspan: fields.size,
-                        css: {"text-align": "center"}
-                    },
-                    {
-                        text: el,
-                        css: {"text-align": "center"}
-                    }
-                ];
-
-
-            } else {
-                fieldObj.header = [{text: ''}, {text: el, css: {"text-align": "center"}}];
-                fieldObj.width = 150;
-            }
+            const fieldObj = {id: el};
+            fieldObj.header = [{text: el, css: 'up-headers'}];
 
             fieldObj.css = '_container element-style';
-            fieldObj.minWidth = 130;
+            fieldObj.minWidth = 118;
             fieldObj.template = function (val) {
                 const elData = val[el];
 
-
                 if (elData) {
-                    return `<div style="width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css}">${elData.label}</div></div>`;
+                    return `<div style="margin-bottom: 15% !important; width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css} ">${elData.label}<div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
                 } else {
                     return `<div class="state-template-block-dr _unknown"></div>`
                 }
@@ -425,7 +450,6 @@ const getRecordsReq = (params) => {
 };
 
 const getUnpublishedRecordsReq = (params) => {
-    console.log('it works')
     let urlString = `/api/pm/dashboard/lesson-list${params && params.toString().length ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
 };

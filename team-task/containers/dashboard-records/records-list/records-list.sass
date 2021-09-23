@@ -3,6 +3,20 @@
 .records-page
   position: relative
   border-radius: 10px
+  .tt-grid
+    .webix_column
+      &>div.webix_row_select
+        background-color: inherit
+        color: inherit
+      .webix_row_select
+        border-bottom: 1px solid #010101
+        border-top: 1px solid #010101
+      &.webix_last
+        .webix_row_select
+          border-right: 1px solid #010101
+      &.webix_first
+        .webix_row_select
+          border-left: 1px solid #010101
 
   .filters
     left: 0
@@ -19,26 +33,11 @@
     align-self: flex-end
     margin-bottom: 24px
 
+
+
 .webix_ceil_text_row
   display: flex
   flex-flow: column
-
-.dashboard-records-table
-  //.webix_ss_center
-  //  //min-width: 1400px
-  //  width: auto !important
-  //
-  //.webix_hcell
-  //  .webix_span
-  //    display: flex
-  //    flex-direction: row
-  //    justify-content: center
-  //    max-width: 180px
-  //
-  //.webix_ss_body
-  //  max-width: 1875px
-  //  border-radius: 5px
-
 
 //this block is read-only its not an input control
 .check-box-block
@@ -72,6 +71,7 @@
     transform: rotate(312deg)
 
 .state-template-block-dr, .process-state
+  position: absolute
   font-family: Inter
   font-style: normal
   font-weight: 400
@@ -84,36 +84,45 @@
   box-sizing: border-box
   border-radius: 32px
 
+  .question
+    position: absolute
+    top: 90%
+    left: 50%
+    font-size: 12px
+    color: red
+    font-weight: bold
+    transform: translateX(-50%)
+
   &._draft
-    background-color: #EBF2FF70
-    color: $blue
+    border: 1px solid #1f4ff4
+    color: #004CBF
 
   &._executing
-    background-color: #FFF8EA70
+    border: 1px solid rgba(206, 154, 0, 0.87)
     color: $yellow
 
   &._done
-    background-color: #EDF6EE70
+    border: 1px solid rgba(16, 214, 53, 0.75)
     color: $green
 
   &._error
-    background-color: #EDF6EE70
+    border: 1px solid #EDF6EE70
     color: $red
 
   &._not-ready
-    background-color: #2979FF70
+    border: 1px solid #2979FF
     color: $blue
 
   &._part-ready
-    background-color: #D1941A70
+    border: 1px solid #D1941A70
     color: $yellow
 
   &._ready
-    background-color: #43A04770
-    color: $green
+    border: 1px solid #18CC24
+    color: #01A643
 
   &._question
-    background-color: #FEEDEC
+    border: 1px solid #9c3700
     color: #C8372D
 
   .state-circle
@@ -133,6 +142,10 @@
     &._error
       background-color: $red
 
+
+.process-state
+  justify-content: center
+
 .remove-timeline-button
   margin-top: 12px
 
@@ -144,8 +157,11 @@
   border-radius: 5px
   line-height: 15px !important
 
+.end-of-week-record
+  margin-bottom: 25px !important
+
 .even-record
-  background: rgba(112, 105, 116, 0.3) !important
+  background: #EDF1F3 !important
 
 .centered-by-flex
   width: 100%
@@ -162,3 +178,53 @@
   overflow-x: auto
   position: relative
   overflow-y: hidden
+
+.process-state-aligned
+  .webix_cell
+    padding-top: 17px
+    justify-content: center
+.up-aligned
+  .webix_cell
+    padding-bottom: 15% !important
+
+.doubled-ceil
+  .course-lesson-name-ceil
+    display: flex
+    flex-flow: column nowrap
+    justify-content: center
+
+  .webix_cell
+    line-height: 1.5em !important
+
+  .course-name
+    font-weight: bold
+
+.bluelight-hover
+  background-color: #DBE3E7 !important
+  .options-menu
+    opacity: 1
+
+
+.is-published
+  width: 100%
+  height: 100%
+  background-image: url("~tt-assets/png/published.png")
+  background-repeat: no-repeat
+  background-position: center
+
+  &.published-ok
+    filter: invert(41%) sepia(89%) saturate(336%) hue-rotate(73deg) brightness(98%) contrast(90%) !important
+
+
+
+.options-menu
+  width: 50px
+  height: 70px
+  background-size: contain
+  background-origin: border-box
+  background-repeat: no-repeat
+  background-position: center
+  background-color: transparent
+  opacity: 0
+  transition: opacity 300ms ease-in
+  background-image: url("~tt-assets/png/carbon-menu-vertical.png")
