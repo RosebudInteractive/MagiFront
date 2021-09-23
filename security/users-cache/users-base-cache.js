@@ -12,6 +12,7 @@ const { UserLoginError } = require("../errors");
 const { DbObject } = require('../../database/db-object');
 const { HttpError } = require('../../errors/http-error');
 const { HttpCode } = require("../../const/http-codes");
+const { AccessRights } = require('../access-rights');
 
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
@@ -27,9 +28,9 @@ const TokenUpdTime = config.has("authentication.tokenUpdTime") ? config.get("aut
 const CqUserAuthKey = config.has("integration.carrotquest.userAuthKey") ? config.get("integration.carrotquest.userAuthKey") : null;
 
 const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData",
-    "RegDate", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
+    "RegDate", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId", "Permissions"];
 
-const CONV_USER_DATA_FN = (rawUser) => {
+const CONV_USER_DATA_FN = async (rawUser) => {
     rawUser.SubsExpDateExt = null;
     if (rawUser.RegDate)
         rawUser.RegDate = new Date(rawUser.RegDate);
@@ -48,6 +49,12 @@ const CONV_USER_DATA_FN = (rawUser) => {
         const hmac = crypto.createHmac('sha256', CqUserAuthKey);
         hmac.update(`${rawUser.Id}`);
         rawUser.CqHash = hmac.digest('hex');
+    }
+    if (rawUser.PData && rawUser.PData.roles) {
+        let { permissions, hash } = await AccessRights.buildPermissions(rawUser.Permissions,
+            rawUser.PData.roles, rawUser.rolesHash, rawUser.PData.permissions);
+        rawUser.rolesHash = hash;
+        rawUser.PData.permissions = permissions;
     }
     return rawUser;
 };
@@ -991,10 +998,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 verifyUserFn: verifyUser,
                 errorClass: UserLoginError
             })
-            .then(((result) => {
-                let res = this._convUserDataFn ? this._convUserDataFn(result.fields) : result.fields;
+            .then(async (result) => {
+                let res = this._convUserDataFn ? await this._convUserDataFn(result.fields) : result.fields;
                 return this._storeUser(res);
-            }).bind(this))
+            })
             .catch(err => {
                 if (err === "Incorrect user name or password.")
                     throw new UserLoginError(UserLoginError.AUTH_FAIL)
@@ -1003,34 +1010,48 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
             });
     }
 
+    async _getUserFromCache(id) {
+        let user = await this._getUser(id);
+        if (user && user.PData && user.PData.roles) {
+            let { permissions, hash } = await AccessRights.buildPermissions(user.Permissions,
+                user.PData.roles, user.rolesHash, user.PData.permissions);
+            if (user.PData.permissions !== permissions) {
+                user.PData.permissions = permissions;
+                user.rolesHash = hash;
+                await this._storeUser(user);
+            }
+        }
+        return user;
+    }
+
     getUserInfoById(id, isRenew) {
-        return new Promise((resolve) => { resolve(isRenew ? null : this._getUser(id)) })
+        return new Promise((resolve) => { resolve(isRenew ? null : this._getUserFromCache(id)) })
             .then((user) => {
                 if (!user)
                     user = $dbUser.getUser(id, this._userFields)
-                        .then(((result) => {
+                        .then(async (result) => {
                             let rc = result;
                             if (result) {
-                                let res = this._convUserDataFn ? this._convUserDataFn(result) : result;
+                                let res = this._convUserDataFn ? await this._convUserDataFn(result) : result;
                                 rc = this._storeUser(res);
                             }
                             return rc;
-                        }).bind(this));
+                        });
                 return user;
             });
     }
 
     getUserInfo(condition, isClient, fields) {
         return $dbUser.getUser(condition, fields || this._userFields)
-            .then(((result) => {
+            .then(async (result) => {
                 let rc = result;
                 if (result) {
-                    rc = this._convUserDataFn ? this._convUserDataFn(result) : result;
+                    rc = this._convUserDataFn ? await this._convUserDataFn(result) : result;
                     if (isClient)
                         rc = this.userToClientJSON(rc);
                 }
                 return rc;
-            }).bind(this));
+            });
     }
 
     checkToken(token, isNew, options) {

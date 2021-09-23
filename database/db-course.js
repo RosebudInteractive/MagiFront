@@ -76,6 +76,16 @@ const COURSE_REQ_TREE = {
     }
 };
 
+const COURSE_MSSQL_LIST_REQ =
+    "select c.[Id], cl.[Name], c.[State]<%= ext_fields %>\n" +
+    "from [Course] c\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = c.[Id]";
+
+const COURSE_MYSQL_LIST_REQ =
+    "select c.`Id`, cl.`Name`, c.`State`<%= ext_fields %>\n" +
+    "from `Course` c\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = c.`Id`";
+
 const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
@@ -953,6 +963,87 @@ const DbCourse = class DbCourse extends DbObject {
                 content += `${j === 0 ? "\n" : "\t"}${courses[i][columns[j]] ? courses[i][columns[j]] : ""}`;
         await writeFileAsync(fileName, content);
         return { result: "OK", file: fileName };
+    }
+
+    async getCoursesList(options) {
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+        let dbOpts = _.cloneDeep(opts.dbOptions || {});
+
+        let sql_mysql = COURSE_MYSQL_LIST_REQ;
+        let sql_mssql = COURSE_MSSQL_LIST_REQ;
+
+        let mssql_conds = [];
+        let mysql_conds = [];
+
+        let is_detailed = (opts.isDetailed === "true") || (opts.isDetailed === true);
+        let mysql_ext_fields = is_detailed ? "" : "";
+        let mssql_ext_fields = is_detailed ? "" : "";
+
+        if (opts.Id) {
+            let id = +opts.Id;
+            if ((typeof (id) === "number") && (!isNaN(id))) {
+                mssql_conds.push(`(c.[Id] = ${opts.Id})`);
+                mysql_conds.push(`(c.${'`'}Id${'`'} = ${opts.Id})`);
+            }
+        }
+        if (opts.Name) {
+            mssql_conds.push(`(cl.[Name] like N'%${opts.Name}%')`);
+            mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.Name}%')`);
+        }
+        if (opts.State) {
+            mssql_conds.push(`(c.[State] = '${opts.State}')`);
+            mysql_conds.push(`(c.${'`'}State${'`'} = '${opts.State}')`);
+        }
+
+        if (mysql_conds.length > 0) {
+            sql_mysql += `\nWHERE ${mysql_conds.join("\n  AND ")}`;
+            sql_mssql += `\nWHERE ${mssql_conds.join("\n  AND ")}`;
+        }
+
+        if (opts.SortOrder) {
+            let ord_arr = opts.SortOrder.split(',');
+            let dir = ord_arr.length > 1 && (ord_arr[1].toUpperCase() === "DESC") ? "DESC" : "ASC";
+            let mysql_field;
+            let mssql_field;
+            switch (ord_arr[0]) {
+                case "Id":
+                    mssql_field = "c.[Id]";
+                    mysql_field = "c.`Id`";
+                    break;
+                case "Name":
+                    mssql_field = "cl.[Name]";
+                    mysql_field = "cl.`Name`";
+                    break;
+                case "State":
+                    mssql_field = "c.[State]";
+                    mysql_field = "c.`State`";
+                    break;
+            }
+            if (mysql_field) {
+                sql_mysql += `\nORDER BY ${mysql_field} ${dir}`;
+                sql_mssql += `\nORDER BY ${mssql_field} ${dir}`;
+            }
+        }
+
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(sql_mysql)({ ext_fields: mysql_ext_fields }),
+                mssql: _.template(sql_mssql)({ ext_fields: mssql_ext_fields })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            for (let i = 0; i < records.detail.length; i++) {
+                let elem = records.detail[i];
+                let course = {
+                    Id: elem.Id,
+                    Name: elem.Name,
+                    State: elem.State
+                };
+                result.push(course);
+            }
+        }
+        return result;
     }
 
     getAllPublic(user, options) {

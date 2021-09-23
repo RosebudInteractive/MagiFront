@@ -123,7 +123,7 @@ class TaskController {
     _calcAdmin() {
         if (!this.task) return
 
-        this._enable.form = true
+        this._enable.form = this.task.IsActive;
         this._enable.taskName = true
         this._enable.description = true
         this._enable.processFields = true
@@ -140,12 +140,14 @@ class TaskController {
             this._visibility.elementField = false
             this._visibility.processFields = false
         }
+
+        this.checkAutomaticTask();
     }
 
     _calcSupervisor() {
         if (!this.task) return
 
-        this._enable.form = true
+        this._enable.form = this.task.IsActive;
         this._enable.taskName = true
         this._enable.description = true
         this._enable.processFields = true
@@ -162,25 +164,26 @@ class TaskController {
             this._visibility.elementField = false
             this._visibility.processFields = false
         }
+
+        this.checkAutomaticTask()
     }
 
     _calcElementResponsible() {
         if (!this.task) return
 
+        this._enable.form = this.task.IsActive;
+
         if (this.task.State !== TASK_STATE.DONE.value) {
-            this._enable.form = true
             this._enable.executor = true
             this._enable.dueDate = true
             this._enable.description = true
             this._enable.comments = true
         } else {
-            this._enable.form = true
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
 
         if (this.task.Element && this.task.Element.Supervisor && this.task.Element.Supervisor.Id === this.user.Id) {
-            this._enable.form = true
             this._enable.executor = true
             this._enable.state = true
         }
@@ -188,13 +191,16 @@ class TaskController {
         if (this.task.Executor && (this.task.Executor.Id === this.user.Id)) {
             this._calcUser()
         }
+
+        this.checkAutomaticTask()
     }
 
     _calcUser() {
         if (!this.task) return
 
+        this._enable.form = this.task.IsActive;
+
         if ((this.task.State > TASK_STATE.DRAFT.value) && (this.task.State !== TASK_STATE.DONE.value)) {
-            this._enable.form = true
             this._enable.processFields = true
             this._enable.state = true
             this._enable.comments = true
@@ -207,10 +213,11 @@ class TaskController {
         }
 
         if (this.task.State === TASK_STATE.DONE.value) {
-            this._enable.form = true
             this._enable.state = true
             this._newStates = [TASK_STATE.EXECUTING.value]
         }
+
+        this.checkAutomaticTask()
     }
 
     _setInitState() {
@@ -234,6 +241,13 @@ class TaskController {
         }
 
         this._newStates = [TASK_STATE.EXECUTING.value, TASK_STATE.QUESTION.value, TASK_STATE.DONE.value]
+    }
+
+    checkAutomaticTask() {
+        if (this.task.IsAutomatic) {
+            this._enable.executor = false
+            this._enable.state = false
+        }
     }
 }
 

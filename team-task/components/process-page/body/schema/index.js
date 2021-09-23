@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo, useRef, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import "./schema.sass"
-import {LineArrow} from "../../../ui-kit";
-import {ARROW_TYPE} from "../../../ui-kit/line-arrow";
+import LineArrow, {ARROW_TYPE} from "./line-arrow";
 import SchemaTask from "./task";
 import RotateIcon from "tt-assets/svg/rotate.svg"
 import type {Tree} from "../../../../types/process";
 import {TASK_STATE} from "../../../../constants/states";
+import { Xwrapper, useXarrow, } from 'react-xarrows';
 
 
 type SchemaProps = {
@@ -16,6 +16,9 @@ type SchemaProps = {
     onDeleteTask: Function,
     onSetActiveTask: Function,
     onChangeRotation: Function,
+    onUpdateProcessTask: Function,
+    onDeleteDependence: Function,
+    onUpdateDependence: Function,
     tree: Tree,
     activeTaskId: ?number,
     horizontalProcess: boolean,
@@ -25,9 +28,11 @@ export default function Schema(props: SchemaProps) {
 
     const {tree, activeTaskId, horizontalProcess} = props
 
-    const [active, setActive] = useState(0),
-        [scrollPosition, setScrollPosition] = useState(0),
-        [mounted, setMounted] = useState(false)
+    const [activeTask, setActiveTask] = useState(0),
+        [activeArrow, setActiveArrow] = useState(0),
+        [actionMenuTaskId, setActionMenuTaskId] = useState(null);
+
+    const updateXarrow = useXarrow();
 
     const canvas = useRef()
 
@@ -42,13 +47,14 @@ export default function Schema(props: SchemaProps) {
             return props.horizontalProcess ? {
                     "display": "grid",
                     gridTemplateColumns: `repeat(${tree.colCount}, 1fr)`,
-                    gridTemplateRows: `repeat(${tree.rowCount}, 1fr)`
+                    gridTemplateRows: `repeat(${tree.rowCount}, 1fr)`,
+                    width: 'fit-content'
                 }
                 :
                 {
                     "display": "grid",
                     gridTemplateColumns: `repeat(${tree.rowCount}, 1fr)`,
-                    gridTemplateRows: `repeat(${tree.colCount}, 1fr)`
+                    gridTemplateRows: `repeat(${tree.colCount}, 1fr)`,
                 }
         } else {
             return {
@@ -58,16 +64,18 @@ export default function Schema(props: SchemaProps) {
     }, [tree, horizontalProcess])
 
     useEffect(() => {
-        if (active !== activeTaskId) {
+        if (activeTask !== activeTaskId) {
 
             if (activeTaskId && $("#js-task_" + activeTaskId).length) {
                 setTimeout(() => {
-                    setActive(activeTaskId)
+                    setActiveTask(activeTaskId)
                     _scrollToTask(activeTaskId)
                 }, 0)
             }
         }
     }, [activeTaskId, tree, horizontalProcess]);
+
+    useEffect(updateXarrow, [tree])
 
     const _scrollToTask = (taskId) => {
         if (horizontalProcess) {
@@ -86,72 +94,133 @@ export default function Schema(props: SchemaProps) {
         }
     };
 
-    const toggleElems = () => {
-        if (canvas && canvas.current) {
-            setScrollPosition(canvas.current.scrollLeft + 1)
-            setScrollPosition(canvas.current.scrollLeft)
-        }
-    }
-
-    useEffect(() => {
-        $(window).bind("toggle-elements-visible", toggleElems)
-
-        return () => {
-            $(window).unbind("toggle-elements-visible", toggleElems)
-        }
+    const changeTaskAuto = useCallback((id, value) => {
+        props.onUpdateProcessTask(id, {IsAutomatic: value})
+        setActionMenuTaskId(null)
     }, [])
 
-    const getCells = () => {
-        if (tree) {
-            return Object.values(tree.nodes).map((item, index) => {
-                const _active = active === item.id
+    const changeTaskFinal = useCallback((id, value) => {
+        props.onUpdateProcessTask(id, {IsFinal: value})
+        setActionMenuTaskId(null)
+    }, [])
 
-                return <SchemaTask horizontalProcess={props.horizontalProcess}
-                                   onClick={onTaskClick}
-                                   onEdit={editTask}
-                                   onDelete={deleteTask}
-                                   onEditLinks={editTaskLinks}
-                                   onAddNewTask={addTaskWithLink}
-                                   active={_active} node={item} key={index}/>
-            })
+    const onMenuButtonClick = useCallback((taskId) => {
+        if (actionMenuTaskId !== taskId) {
+            setActionMenuTaskId(taskId)
         } else {
-            return null
+            setActionMenuTaskId(null)
         }
-    }
+    }, [actionMenuTaskId])
 
-    const onTaskClick = (taskId) => {
-        setActive(taskId)
-        props.onSetActiveTask(taskId)
-    }
+    const onTaskClick = useCallback((taskId) => {
+        if (activeTask !== taskId) {
+            setActiveTask(taskId);
+        }
+        props.onSetActiveTask(taskId);
+    }, [activeTask])
 
-    const editTaskLinks = (taskId) => { if (props.onEditTaskLinks) {props.onEditTaskLinks(taskId)} }
+    const editTaskLinks = useCallback(() => {
+        if (props.onEditTaskLinks && actionMenuTaskId) {
+            props.onEditTaskLinks(actionMenuTaskId)
+            setActionMenuTaskId(null)
+        }
+    }, [actionMenuTaskId])
 
-    const editTask = (taskId) => { if (props.onEditTask) {props.onEditTask(taskId)} }
+    const editTask = useCallback(() => {
+        const selectedTaskId = actionMenuTaskId || activeTask
 
-    const deleteTask = (taskId) => { if (props.onDeleteTask) {props.onDeleteTask(taskId)} }
+        if (props.onEditTask && selectedTaskId) {
+            props.onEditTask(selectedTaskId)
+            actionMenuTaskId && setActionMenuTaskId(null)
+        }
+    }, [actionMenuTaskId, activeTask])
+
+    const deleteTask = useCallback(() => {
+        if (props.onDeleteTask && actionMenuTaskId) {
+            props.onDeleteTask(actionMenuTaskId)
+            setActionMenuTaskId(null)
+        }
+    }, [actionMenuTaskId])
 
     const addTaskWithLink = (taskId) => { if (props.onAddTaskWithLink) {props.onAddTaskWithLink(taskId)} }
 
-    const getLines = () => {
-        if (tree && tree.lines && tree.lines.length) {
-            return tree.lines.map((item, index) => {
-                const type = (item.from === active) ? ARROW_TYPE.OUT :
-                    (item.to === active) ? ARROW_TYPE.IN : ARROW_TYPE.DEFAULT
+    const taskCells = useMemo(() => {
+        if (tree) {
+            return Object.values(tree.nodes).map((item) => {
+                const _active = activeTask === item.id,
+                    isRight = horizontalProcess
+                        ? (item.weight === tree.colCount - 1)
+                        : (item.rowNumber === tree.rowCount - 1);
 
-                return <LineArrow horizontalProcess={props.horizontalProcess} source={"js-task_" + item.from} dest={"js-task_" + item.to} type={type} scrollPosition={scrollPosition} key={index}/>
+                return <SchemaTask horizontalProcess={horizontalProcess}
+                                   onClick={onTaskClick}
+                                   menuTaskId={actionMenuTaskId}
+                                   onEdit={editTask}
+                                   onEditLinks={editTaskLinks}
+                                   onDelete={deleteTask}
+                                   onMenuButtonClick={onMenuButtonClick}
+                                   onChangeTaskAuto={changeTaskAuto}
+                                   onChangeTaskFinal={changeTaskFinal}
+                                   onAddNewTask={addTaskWithLink}
+                                   active={_active}
+                                   node={item}
+                                   isLast={isRight}
+                                   key={item.id}/>
             })
         } else {
             return null
         }
-    }
+    }, [tree, activeTask, horizontalProcess, actionMenuTaskId,
+        onTaskClick, editTask, editTaskLinks, deleteTask, onMenuButtonClick, changeTaskAuto, changeTaskFinal])
 
+    const arrows = useMemo(() => {
+        if (tree && tree.lines && tree.lines.length) {
+            return tree.lines.map((item,) => {
+                const type = (item.from === activeTask) ?
+                    ARROW_TYPE.OUT
+                    :
+                    (item.to === activeTask) ?
+                        ARROW_TYPE.IN
+                        :
+                        ARROW_TYPE.DEFAULT;
+
+                return <LineArrow start={"js-task_" + item.from}
+                                  end={"js-task_" + item.to}
+                                  type={type}
+                                  item={item}
+                                  onDeleteArrow={props.onDeleteDependence}
+                                  onUpdateArrow={props.onUpdateDependence}
+                                  selected={activeArrow}
+                                  setSelected={setActiveArrow}
+                                  key={item.id}/>
+            })
+        } else {
+            return null
+        }
+    }, [tree, activeTask, activeArrow])
+
+    const keyPressHandler = useCallback((e) => {
+        if(e.key === "Escape") {
+            if (activeArrow) setActiveArrow(null)
+            if (actionMenuTaskId) setActionMenuTaskId(null)
+        }
+    }, [activeArrow, actionMenuTaskId])
 
     useEffect(() => {
-        setTimeout(() => {setMounted(true)}, 300)
-        canvas.current.addEventListener('scroll', onCanvasScroll);
+        document.addEventListener('keydown', keyPressHandler);
 
         return () => {
-            canvas.current.removeEventListener('scroll', onCanvasScroll);
+            document.removeEventListener('keydown', keyPressHandler);
+        }
+    }, [activeArrow, actionMenuTaskId])
+
+    useEffect(() => {
+        canvas.current.addEventListener('scroll', updateXarrow);
+        $(window).bind("toggle-elements-visible", updateXarrow);
+
+        return () => {
+            canvas.current.removeEventListener('scroll', updateXarrow);
+            $(window).unbind("toggle-elements-visible", updateXarrow)
         }
     }, [])
 
@@ -165,12 +234,24 @@ export default function Schema(props: SchemaProps) {
         }
     }, [tree, horizontalProcess])
 
-    const onCanvasScroll = (e) => { setScrollPosition(e.target.scrollLeft) }
-
     const onClick = (e) => {
-        if (!e.target.closest(".process-schema__task")) {
-            setActive(0)
+        const jQcanvas = $(canvas.current)
+
+        if ((jQcanvas.outerHeight() + jQcanvas.offset().top - 8) <= e.clientY ){
+            return true;
+        }
+
+        if (!(e.target.closest(".process-schema__task") || e.target.closest(".task__action-menu"))) {
+            setActiveTask(0)
             props.onSetActiveTask(null)
+        }
+
+        if (!(e.target.closest(".process-schema__x-arrow") || e.target.closest(".x-arrow__tooltip"))) {
+            if (activeArrow) setActiveArrow(null)
+        }
+
+        if (!e.target.closest(".task__action-menu")) {
+            if (actionMenuTaskId) setActionMenuTaskId(null)
         }
     }
 
@@ -180,21 +261,21 @@ export default function Schema(props: SchemaProps) {
         }
     }
 
-    return <div className="process-body__schema" onClick={onClick}>
+    return <div className="process-body__schema" onMouseDown={onClick}>
         <h6 className="process-schema__title">
             <span>Схема процесса</span>
             <button className="process-schema__rotate-button" onClick={changeRotation}>
                 <RotateIcon/>
             </button>
         </h6>
-
+        <Xwrapper>
             <div className="process-schema__canvas-background _with-custom-scroll" id="schema_container" ref={canvas}>
                 <div className="process-schema__canvas" style={style}>
-                    {getCells()}
-                    {mounted && getLines()}
+                    {taskCells}
+                    {arrows}
                 </div>
             </div>
-
+        </Xwrapper>
         <button className="process-schema__add-task-button orange-button small-button" onClick={_onAdd}>Добавить
             задачу
         </button>

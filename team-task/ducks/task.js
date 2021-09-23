@@ -61,7 +61,7 @@ const CLEAR_PROCESS_ELEMENT = `${prefix}/CLEAR_PROCESS_ELEMENT`
 const SAVE_TASK_LINKS_REQUEST = `${prefix}/SAVE_TASK_LINKS_REQUEST`
 const SAVE_TASK_LINKS_START = `${prefix}/SAVE_TASK_LINKS_START`
 export const SAVE_TASK_LINKS_SUCCESS = `${prefix}/SAVE_TASK_LINKS_SUCCESS`
-const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
+export const SAVE_TASK_LINKS_FAIL = `${prefix}/SAVE_TASK_LINKS_FAIL`
 
 const SET_ACCESS_DENIED = `${prefix}/SET_ACCESS_DENIED`
 
@@ -338,6 +338,12 @@ function* saveTaskSaga({payload}) {
                 put(getTask(id)),
                 put(getProcessElement(elementId)),
             ])
+        } else {
+            console.log(result)
+            yield all([
+                put(getTask(result.id)),
+                put(getProcessElement(null)),
+            ])
         }
     } catch (e) {
         yield put({type: SAVE_TASK_FAIL})
@@ -401,8 +407,10 @@ function* createTaskSaga({payload}) {
 
         const _newTask = {
             Id: -1,
+            IsActive: true,
+            IsFinal: false,
+            isAutomatic: false,
             Process: {Id: payload},
-            Executor: {Id: _user.Id, DisplayName: _user.DisplayName},
             Name: "Новая задача",
             Element: {Id: null},
             IsElemReady: false,

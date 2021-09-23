@@ -25,6 +25,7 @@ import {push} from "react-router-redux/src";
 import {goToProcess} from "tt-ducks/processes";
 import type {Message} from "../types/messages";
 import {race} from "redux-saga/effects";
+import {SAVE_TASK_LINKS_FAIL, SAVE_TASK_LINKS_SUCCESS, saveDependencies} from "tt-ducks/task";
 
 /**
  * Constants
@@ -68,6 +69,21 @@ const SET_LESSONS = `${prefix}/SET_LESSONS`
 const GO_BACK_REQUEST = `${prefix}/GO_BACK_REQUEST`
 
 const CLEAR_PROCESS = `${prefix}/CLEAR_PROCESS`
+
+const UPDATE_PROCESS_TASK_REQUEST = `${prefix}/UPDATE_PROCESS_TASK_REQUEST`
+const UPDATE_PROCESS_TASK_START = `${prefix}/UPDATE_PROCESS_TASK_START`
+const UPDATE_PROCESS_TASK_SUCCESS = `${prefix}/UPDATE_PROCESS_TASK_SUCCESS`
+const UPDATE_PROCESS_TASK_FAIL = `${prefix}/UPDATE_PROCESS_TASK_FAIL`
+
+const DELETE_DEPENDENCE_REQUEST = `${prefix}/DELETE_DEPENDENCE_REQUEST`
+const DELETE_DEPENDENCE_START = `${prefix}/DELETE_DEPENDENCE_START`
+const DELETE_DEPENDENCE_SUCCESS = `${prefix}/DELETE_DEPENDENCE_SUCCESS`
+const DELETE_DEPENDENCE_FAIL = `${prefix}/DELETE_DEPENDENCE_FAIL`
+
+const UPDATE_DEPENDENCE_REQUEST = `${prefix}/UPDATE_DEPENDENCE_REQUEST`
+const UPDATE_DEPENDENCE_START = `${prefix}/UPDATE_DEPENDENCE_START`
+const UPDATE_DEPENDENCE_SUCCESS = `${prefix}/UPDATE_DEPENDENCE_SUCCESS`
+const UPDATE_DEPENDENCE_FAIL = `${prefix}/UPDATE_DEPENDENCE_FAIL`
 
 
 /**
@@ -134,6 +150,30 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set("process", null)
 
+        case UPDATE_PROCESS_TASK_SUCCESS:
+            return state
+                .update('process', (process) => {
+                    const index = process.Tasks.findIndex(task => (task.Id === payload.taskId))
+
+                    if (index !== -1) {
+                        process.Tasks[index] = {...process.Tasks[index], ...payload.fields}
+                    }
+
+                    return {...process}
+                })
+
+        case UPDATE_DEPENDENCE_SUCCESS:
+            return state
+                .update('process', (process) => {
+                    const index = process.Deps.findIndex(dep => { return (dep.DepTaskId === payload.DepTaskId) && (dep.TaskId === payload.TaskId) })
+
+                    if (index !== -1) {
+                        process.Deps[index] = payload
+                    }
+
+                    return {...process}
+                })
+
         default:
             return state
     }
@@ -189,6 +229,18 @@ export const clear = () => {
     return {type: CLEAR_PROCESS}
 }
 
+export const updateProcessTask = (taskId, fields) => {
+    return {type: UPDATE_PROCESS_TASK_REQUEST, payload: {taskId, fields}}
+}
+
+export const deleteDependence = (from: number, to: number) => {
+    return {type: DELETE_DEPENDENCE_REQUEST, payload: {from, to}}
+}
+
+export const updateDependence = (data) => {
+    return {type: UPDATE_DEPENDENCE_REQUEST, payload: data}
+}
+
 /**
  * Sagas
  */
@@ -202,6 +254,9 @@ export const saga = function* () {
         takeEvery(ADD_ELEMENT_REQUEST, addElementSaga),
         takeEvery(UPDATE_ELEMENT_REQUEST, updateElementSaga),
         takeEvery(DELETE_ELEMENT_REQUEST, deleteElementSaga),
+        takeEvery(UPDATE_PROCESS_TASK_REQUEST, updateProcessTaskSaga),
+        takeEvery(DELETE_DEPENDENCE_REQUEST, deleteDependenceSaga),
+        takeEvery(UPDATE_DEPENDENCE_REQUEST, updateDependenceSaga),
     ])
 }
 
@@ -435,6 +490,83 @@ const _deleteProcess = (id: number) => {
             "Content-type": "application/json"
         },
         credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* updateProcessTaskSaga({payload}){
+    yield put({type: UPDATE_PROCESS_TASK_START})
+    try {
+        yield call(updateTask, payload)
+
+        yield put({type: UPDATE_PROCESS_TASK_SUCCESS, payload})
+    } catch (e) {
+        yield put({type: UPDATE_PROCESS_TASK_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const updateTask = ({taskId, fields}) => {
+    return fetch(`/api/pm/task/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(fields),
+        credentials: 'include'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* deleteDependenceSaga({payload}) {
+    yield put({type: DELETE_DEPENDENCE_START})
+    try {
+        const data = {
+            taskId: payload.from,
+            deps: [
+                {state: 'DELETED', taskId: payload.to}
+            ],
+            forceReload: true
+        }
+
+        yield put(saveDependencies(data))
+        const {success} = yield race({
+            success: take(SAVE_TASK_LINKS_SUCCESS),
+            fail: take(SAVE_TASK_LINKS_FAIL)
+        });
+
+        if (success) {
+            yield put({type: DELETE_DEPENDENCE_SUCCESS})
+            const process = yield select(processSelector)
+            yield put(getProcess(process.Id))
+        } else {
+            yield put({type: DELETE_DEPENDENCE_FAIL})
+        }
+    } catch (e) {
+        yield put({type: DELETE_DEPENDENCE_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+function* updateDependenceSaga({payload}) {
+    yield put({type: UPDATE_DEPENDENCE_START})
+    try {
+        yield call(updateDependenceRequest, payload)
+        yield put({type: UPDATE_DEPENDENCE_SUCCESS, payload})
+    } catch (e) {
+        yield put({type: UPDATE_DEPENDENCE_FAIL})
+        yield put(showErrorMessage(e.message))
+    }
+}
+
+const updateDependenceRequest = (body) => {
+    return fetch("/api/pm/task-dep", {
+        method: 'PUT',
+        headers: { "Content-type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(body),
     })
         .then(checkStatus)
         .then(parseJSON)

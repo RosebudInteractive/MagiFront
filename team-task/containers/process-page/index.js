@@ -1,4 +1,4 @@
-import React, {useEffect, useRef,} from "react"
+import React, {useCallback, useEffect, useMemo, useRef,} from "react"
 import {compose} from "redux"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -11,6 +11,9 @@ import {
     updateElement,
     deleteElement,
     clear,
+    updateProcessTask,
+    updateDependence,
+    deleteDependence,
     processSelector,
     supervisorsSelector,
     editorsSelector,
@@ -22,7 +25,7 @@ import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
 import {hasAdminRights, userSelector,} from "tt-ducks/auth";
 import {hideSideBarMenu, horizontalProcess, showSideBarMenu, changeProcessRotation} from "tt-ducks/app";
 import {activeTaskIdSelector, setActiveTaskId, setInitState} from "tt-ducks/route";
-import {deleteTask,} from "tt-ducks/task";
+import {deleteTask} from "tt-ducks/task";
 import {showTaskEditor, showTaskLinkEditor,} from "tt-ducks/process-task";
 import ProcessHeader from "../../components/process-page/header";
 import ProcessBody from "../../components/process-page/body";
@@ -40,8 +43,6 @@ function ProcessEditor(props) {
 
     const params = useParams()
     const location = useLocation()
-
-    const tree = useRef()
 
     useEffect(() => {
         actions.hideSideBarMenu()
@@ -79,10 +80,10 @@ function ProcessEditor(props) {
             })
 
             props.initialize(_object)
-
-            tree.current = buildTree(process)
         }
     }, [process])
+
+    const tree = useMemo(() => process && buildTree(process), [process])
 
     const _save = () => {
         const _value: UpdatingProcess = {
@@ -133,6 +134,14 @@ function ProcessEditor(props) {
         actions.setActiveTaskId(taskId)
     }
 
+    const deleteDependence = useCallback((dependence) => {
+        actions.deleteDependence(dependence.from, dependence.to)
+    }, [])
+
+    const updateDependence = useCallback((dependence) => {
+        actions.updateDependence(dependence)
+    }, [])
+
     return !fetching && process &&
         <React.Fragment>
             <Prompt when={hasChanges} message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
@@ -141,7 +150,7 @@ function ProcessEditor(props) {
                 <ProcessBody process={process}
                              isAdmin={isAdmin}
                              horizontalProcess={props.horizontalProcess}
-                             tree={tree.current}
+                             tree={tree}
                              supervisors={props.supervisors}
                              editors={props.editors}
                              elements={props.elements}
@@ -152,11 +161,14 @@ function ProcessEditor(props) {
                              onAddElement={actions.addElement}
                              onUpdateElement={actions.updateElement}
                              onDeleteElement={actions.deleteElement}
+                             onUpdateProcessTask={actions.updateProcessTask}
                              onAddTask={onAddTask}
                              onAddTaskWithLink={onAddTaskWithLink}
                              onEditTaskLinks={onEditTaskLinks}
                              onEditTask={onEditTask}
                              onDeleteTask={onDeleteTask}
+                             onDeleteDependence={deleteDependence}
+                             onUpdateDependence={updateDependence}
                              onChangeRotation={actions.changeProcessRotation}/>
                 <ProcessTaskEditor/>
                 <TaskLinksEditor/>
@@ -206,6 +218,9 @@ const mapDispatch2Props = (dispatch) => {
             setActiveTaskId,
             setInitState,
             changeProcessRotation,
+            updateProcessTask,
+            updateDependence,
+            deleteDependence,
         }, dispatch)
     }
 }

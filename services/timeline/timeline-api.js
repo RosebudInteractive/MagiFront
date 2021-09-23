@@ -149,7 +149,6 @@ const TimelineAPI = class TimelineAPI extends DbObject {
 
     constructor(options) {
         super(options);
-        this._struct_cache = null;
     }
 
     async getTimelineList(options) {
@@ -167,8 +166,8 @@ const TimelineAPI = class TimelineAPI extends DbObject {
         let mysql_conds = [];
 
         let is_detailed = (opts.isDetailed === "true") || (opts.isDetailed === true);
-        let mysql_ext_fields = opts.isDetailed ? SQL_GET_TL_EXT_FLD_MYSQL : "";
-        let mssql_ext_fields = opts.isDetailed ? SQL_GET_TL_EXT_FLD_MSSQL : "";
+        let mysql_ext_fields = is_detailed ? SQL_GET_TL_EXT_FLD_MYSQL : "";
+        let mssql_ext_fields = is_detailed ? SQL_GET_TL_EXT_FLD_MSSQL : "";
 
         if (opts.Id) {
             let id = +opts.Id;

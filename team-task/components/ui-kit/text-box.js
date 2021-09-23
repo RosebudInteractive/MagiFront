@@ -108,17 +108,17 @@ const CssTextField = withStyles({
 
 export default React.forwardRef(function UiTextBox(props, ref) {
 
-    const _className = props.extClass ?  "input-field " + props.extClass : "input-field";
+    const className = props.extClass ?  "input-field " + props.extClass : "input-field";
 
-    const _props = {...props, ...props.input}
+    const allProps = {...props, ...props.input}
 
-    return <CssTextField {..._props}
-                         error={props.meta.touched && props.meta.invalid}
+    return <CssTextField {...allProps}
+                         error={props.meta && props.meta.touched && props.meta.invalid}
                          disabled={props.disabled}
                          label={props.label}
                          variant="outlined"
                          autoComplete="off"
-                         className={_className}
+                         className={className}
                          ref={ref}
-                         helperText={props.meta.touched && props.meta.error}/>
+                         helperText={props.meta && props.meta.touched && props.meta.error}/>
 })
