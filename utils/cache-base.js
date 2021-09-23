@@ -1,11 +1,117 @@
 'use strict'
+const crypto = require('crypto');
 const _ = require('lodash');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 const { RedisConnections, ConnectionWrapper } = require('../database/providers/redis/redis-connections');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const SCAN_PAGE_SIZE = 100;
 
-exports.CacheableObject = class CacheableObject {
+class DataCache {
+
+    constructor(cache, prefix, data_load_func, ttl_in_sec, options) {
+        let opts = options || {};
+        if (cache instanceof CacheableObject)
+            this._cache = cache
+        else
+            throw new Error(`DataCache:: constructor: Invalid or missing argument "cache".`);
+        if (typeof (prefix) === "string")
+            this._prefix = prefix
+        else
+            throw new Error(`DataCache:: constructor: Invalid or missing argument "prefix".`);
+        if (typeof (data_load_func) === "function")
+            this._loadFunc = data_load_func
+        else
+            throw new Error(`DataCache:: constructor: Invalid or missing argument "data_load_func".`);
+        if (typeof (ttl_in_sec) === "number")
+            this._ttl_in_sec = ttl_in_sec;
+        if (typeof (opts.md5_hash) === "boolean")
+            this._md5_hash = opts.md5_hash;
+        if (typeof (opts.wait_lock_timeout) === "number")
+            this._wait_lock_timeout = opts.wait_lock_timeout;
+        if (typeof (opts.lock_timeout) === "number")
+            this._lock_timeout = opts.lock_timeout;
+        if (typeof (opts.check_timeout) === "number")
+            this._check_timeout = opts.check_timeout;
+        this._data = {};
+    }
+
+    async deleteCacheItem(id) {
+        let key = `${this._prefix}${id}`;
+        await this._cache.cacheDel(key);
+        delete this._data[id];
+    }
+
+    async getCacheItem(id, options) {
+        let result = null;
+        let key = `${this._prefix}${id}`;
+        let getFromCache = async () => {
+            let data = null;
+            let redis_ts = await this._cache.cacheHget(key, "ts", { json: true });
+            if (redis_ts) {
+                if ((!this._data[id]) || (this._data[id].ts !== redis_ts)) {
+                    let val = await this._cache.cacheHgetAll(key, { json: true });
+                    if (val && val.ts && val.data) {
+                        this._data[id] = data = val;
+                    }
+                }
+                else
+                    data = this._data[id];
+            }
+            return data;
+        }
+        result = await getFromCache();
+        if (!result) {
+            result = await this._cache._lock(`_lock:${key}`, async (trial_number) => {
+                let data = null;
+                delete this._data[id];
+                let is_loaded = true;
+                if (trial_number > 1) {
+                    data = await getFromCache();
+                    is_loaded = false;
+                }
+                if (!data) {
+                    data = await this._loadFunc(id, options);
+                    is_loaded = true;
+                }
+                if (is_loaded && data) {
+                    await this._cache.cacheHset(key, "data", data, { json: true });
+                    let ts;
+                    if (this._md5_hash) {
+                        let md5sum = crypto.createHash('md5');
+                        md5sum.update(JSON.stringify(data));
+                        ts = md5sum.digest('hex');
+                    }
+                    else
+                        ts = 't' + ((new Date()) - 0);
+                    await this._cache.cacheHset(key, "ts", ts, { json: true });
+                    if (this._ttl_in_sec)
+                        await this._cache.cacheExpire(key, this._ttl_in_sec);
+                    this._data[id] = data = { ts: ts, data: data };
+                }
+                return data;
+            },
+                this._wait_lock_timeout, {
+                lock_timeout: this._lock_timeout,
+                check_timeout: this._check_timeout
+            });
+        }
+        return result;
+    }
+
+    async getHash(id, options) {
+        let item = await this.getCacheItem(id, options);
+        return item && item.ts ? item.ts : null;
+    }
+
+    async getData(id, options) {
+        let item = await this.getCacheItem(id, options);
+        return item && item.data ? item.data : null;
+    }
+}
+
+class CacheableObject {
 
     static getService(service_name, isSilent) {
         let result = null;
@@ -27,8 +133,66 @@ exports.CacheableObject = class CacheableObject {
         }
     }
 
+    async _lock(key, func, timeout, options) {
+        const DFLT_CHECK_TIMEOUT = 500;
+        const DFLT_WAIT_LOCK_TIMEOUT_MSEC = 60 * 1000;
+        const DFLT_LOCK_TIMEOUT_SEC = 180;
+
+        let opts = options || {};
+        let is_key_set = false;
+        try {
+            if (typeof (func) === "function") {
+                let trial_number = 1;
+                await new Promise((resolve, reject) => {
+                    let is_rejected = false;
+                    let wait_timeout = timeout ? timeout : DFLT_WAIT_LOCK_TIMEOUT_MSEC;
+                    let thandler = setTimeout(() => {
+                        if (!is_key_set) {
+                            is_rejected = true;
+                            reject(new HttpError(HttpCode.ERR_TOO_MANY_REQ, opts.err_msg ?
+                                opts.err_msg : `CacheableObject::_lock timeout ${(wait_timeout / 1000).toFixed(3)}s (key: "${key}") has expired!`));
+                        }
+                    }, wait_timeout);
+                    let lock = async () => {
+                        let lockRes = await this.cacheSet(key, "1", {
+                            ttlInSec: opts.lock_timeout ? opts.lock_timeout : DFLT_LOCK_TIMEOUT_SEC,
+                            nx: true
+                        });
+                        if (lockRes === "OK") {
+                            if (is_rejected)
+                                await this.cacheDel(key)
+                            else {
+                                is_key_set = true;
+                                clearTimeout(thandler);
+                                resolve();
+                            }
+                        }
+                        else
+                            if (!is_rejected) {
+                                trial_number++;
+                                setTimeout(lock, opts.check_timeout ? opts.check_timeout : DFLT_CHECK_TIMEOUT);
+                            }
+                    }
+                    lock();
+                });
+                let result = await func(trial_number);
+                await this.cacheDel(key);
+                return result;
+            }
+        }
+        catch (err) {
+            if (is_key_set && key)
+                await this.cacheDel(key);
+            throw err;
+        }
+    }
+
     getService(service_name, isSilent) {
         return CacheableObject.getService(service_name, isSilent);
+    }
+
+    createDataCache(prefix, data_load_func, ttl_in_sec, options) {
+        return new DataCache(this, prefix, data_load_func, ttl_in_sec, options);
     }
 
     cacheGetKey(key) {
@@ -298,3 +462,5 @@ exports.CacheableObject = class CacheableObject {
         });
     }
 }
+
+exports.CacheableObject = CacheableObject;

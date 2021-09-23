@@ -5,7 +5,6 @@ const request = require('request');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { CacheableObject } = require('../utils/cache-base');
-const { AccessRights } = require('../security/access-rights');
 const { DbUtils: { intFmtWithLeadingZeros, fmtDuration } } = require('./db-utils');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
@@ -53,18 +52,31 @@ exports.DbObject = class DbObject extends CacheableObject {
     async _getUser(options) {
         let opts = options || {};
         let user = opts.user;
-        let userService = this.getService("users", true);
         if (!user)
             throw new HttpError(HttpCode.ERR_BAD_REQ, `DbObject::_getUser: Missing user argument.`);
-        if (typeof (user) === "number")
+        if (typeof (user) === "number") {
+            let userService = this.getService("users");
             user = await userService.getUserInfo({ id: user });
+        }
         return user;
+    }
+
+    async _getPermissions(permissions, options) {
+        let opts = options || {};
+        let user = await this._getUser(opts);
+        let permissionsService = this.getService("permissions");
+        let user_permissions = await permissionsService.getPermissions(user, permissions);
+        let isAdmin = false;
+        if (user && user.PData)
+            isAdmin = user.PData.isAdmin ? true : false;
+        return { user: user, userPermissions: user_permissions, isAdmin: isAdmin };
     }
 
     async _checkPermissions(permissions, options) {
         let opts = options || {};
         let user = await this._getUser(opts);
-        if (AccessRights.checkPermissions(user, permissions) === 0)
+        let permissionsService = this.getService("permissions");
+        if (permissionsService.checkPermissions(user, permissions) === 0)
             throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
         return user;
     }

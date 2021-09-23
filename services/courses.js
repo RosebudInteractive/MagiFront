@@ -22,6 +22,16 @@ function setupCourses(app) {
             };
         });
 
+        app.get('/api/courses/list', async (req, res, next) => {
+            try {
+                let rows = await CoursesService().getCoursesList(req.query);
+                res.send(rows);
+            }
+            catch (err) {
+                next(err);
+            };
+        });
+
         app.get('/api/courses/price-info/:url', async (req, res, next) => {
             try {
                 let rows = await CoursesService()

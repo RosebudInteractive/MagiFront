@@ -132,6 +132,9 @@ module.exports = {
         },
         event: {
             logModif: true
+        },
+        role: {
+            logModif: true
         }
     },
     general: {
