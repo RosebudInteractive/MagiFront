@@ -9,12 +9,23 @@ import { Router } from 'react-router-dom'
 import history from './history'
 import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { IntlProvider } from 'rsuite';
+import ruRU from 'rsuite/lib/IntlProvider/locales/ru_RU';
+import format from 'date-fns/format';
+import ru from 'date-fns/locale/ru';
+
+function formatDate(data, formatStr) {
+    return format(data, 'dd.MM.yyyy', { locale: ru });
+}
 
 render(
     <Provider store={store}>
         <Router history={history}>
             <MuiPickersUtilsProvider utils={MomentUtils}>
-                <App />
+                <IntlProvider locale={ruRU} formatDate={formatDate}>
+                {/*<IntlProvider locale={ruRU}>*/}
+                    <App />
+                </IntlProvider>
             </MuiPickersUtilsProvider>
         </Router>
     </Provider>,

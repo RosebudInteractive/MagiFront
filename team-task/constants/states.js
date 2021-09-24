@@ -22,3 +22,20 @@ export const TIMELINE_STATE = {
     DRAFT: {value: 1, label: "Черновик", css: "_draft"},
     PUBLIC: {value: 2, label: "Опубликован", css: "_done"},
 };
+// отсутствует" - серый, прочерк
+// "не начат" - бледно-желтый, циферблат/песочные часы
+// "в процессе" - голубой, кольцевой значок загрузки/обновления
+// "вопрос"- красный, знак вопроса
+// "готов" - зеленый, галочка
+export const DASHBOARD_ELEMENTS_STATE = {
+    READY: {value: 1, label: "Готов", css: "_ready"},
+    EXECUTING: {value: 2, label: "В процессе", css: "_executing"},
+    NOT_READY: {value: 3, label: "Не готов", css: "_not-ready"},
+    QUESTION: {value: 4, label: "На доработке", css: "_question"},
+}
+
+export const DASHBOARD_PROCESS_STATE = {
+    DRAFT: {value: 1, label: "Черновик", css: "_draft"},
+    EXECUTING: {value: 2, label: "В работе", css: "_executing"},
+    READY: {value: 1, label: "Завершен", css: "_ready"}
+}

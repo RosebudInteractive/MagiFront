@@ -26,7 +26,7 @@ export default function EventsFindForm(props) {
     const GRID_CONFIG = {
         view: "datatable",
         id: `events-find-form-grid`,
-        css: 'tt-grid',
+        css: 'tt-grid ',
         hover: "row-hover",
         scroll: 'none',
         headerRowHeight: 20,
@@ -60,6 +60,7 @@ export default function EventsFindForm(props) {
                 // actions.headerClick();
                 // todo headerClick
             },
+
             onItemDblClick: function (id) {
                 // actions.doubleClickAction(item.Id); // todo onItemDblClick
             }

@@ -1,0 +1,26 @@
+.dashboard
+  position: relative
+  display: flex
+  height: 100%
+  flex-flow: column nowrap
+  background: white
+
+  .filter-button
+    position: relative
+
+.records
+  flex: 1 0 auto
+
+.unpublished-records
+  background: white
+  justify-content: flex-end
+  position: sticky
+  top: 20px
+  overflow-y: hidden
+  height: calc(100vh - 48px)
+
+.dashboard-body
+  will-change: transform, opacity
+  margin: 24px
+  display: flex
+  flex-flow: row nowrap

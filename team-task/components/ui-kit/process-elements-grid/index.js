@@ -210,7 +210,7 @@ export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
             })
             .filter(item => item)
         setElementsForEditor(_elements)
-        setCurrentElement({Name: null, SupervisorId: null, State: 1})
+        setCurrentElement({Name: null, SupervisorId: null, State: 1});
 
         setElementInEditMode(false)
         setEditorVisible(true)

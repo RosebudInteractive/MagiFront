@@ -1,0 +1,117 @@
+@import "~tt-assets/styles/colors"
+
+.unpublished-records-block
+  height: 100%
+  padding-right: 26px
+  z-index: 3
+  background-color: $color-main-light
+  position: relative
+  flex: 0 1 33.33%
+  max-width: 1000px
+  transition: max-width 300ms ease
+  overflow: hidden
+
+  > .title
+    margin-bottom: 20px
+
+  .elements__hide-button
+    cursor: pointer
+    position: absolute
+    right: 0
+    top: 50%
+    transform: translateY(-50%)
+    margin: 0 8px 0 0
+    border-top: 9px solid transparent
+    border-bottom: 9px solid transparent
+    border-right: 9px solid $grey40
+
+  &._hidden
+    max-width: 26px
+    button
+      display: none
+    .elements__hide-button
+      order: 0
+    .title
+      visibility: hidden
+
+    .unpublished-records__grid-panel
+      width: 0
+      visibility: hidden
+      display: none
+
+    .elements__hide-button
+      border-top: 9px solid transparent
+      border-bottom: 9px solid transparent
+      border-left: 9px solid $grey40
+      border-right: none
+
+
+
+.unpublished-records-grid
+  display: flex
+  //height: 100%
+  min-height: 650px
+  //.process-elements-grid
+  //  flex-grow: 1
+
+  //.process-page__save-button
+  //  position: absolute
+  //  top: 0
+  //  right: 17px
+
+  .elements__hide-button
+    margin: 45vh 8px 0 0
+    cursor: pointer
+    width: 0
+    height: 0
+    border-top: 9px solid transparent
+    border-bottom: 9px solid transparent
+    border-right: 9px solid $grey40
+
+.unpublished-records-wrapper
+  position: relative
+  margin-top: 0
+
+  .title
+    height: 64px !important
+
+  &._fixed
+    position: fixed
+    top: 16px
+  &._bottom
+    position: absolute
+    bottom: 0
+    margin-top: auto
+
+
+.unpublished-records__grid-panel
+  height: -webkit-fill-available
+  width: 300px
+  visibility: visible
+  display: flex
+  flex-direction: column
+
+  .filters
+    left: 0
+    display: flex
+    flex-direction: column
+
+  .filter-button
+    align-self: flex-end
+    margin-bottom: 24px
+
+  .webix-datatable
+    flex: 1 0 auto
+    overflow-y: auto
+
+
+
+._height-85
+  max-height: 85vh !important
+  overflow-y: scroll !important
+
+.centered-by-flex
+  width: 100%
+  display: flex
+  align-items: center
+  justify-content: center

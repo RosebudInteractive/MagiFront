@@ -1,0 +1,230 @@
+@import "~tt-assets/styles/colors.sass"
+
+.records-page
+  position: relative
+  border-radius: 10px
+  .tt-grid
+    .webix_column
+      &>div.webix_row_select
+        background-color: inherit
+        color: inherit
+      .webix_row_select
+        border-bottom: 1px solid #010101
+        border-top: 1px solid #010101
+      &.webix_last
+        .webix_row_select
+          border-right: 1px solid #010101
+      &.webix_first
+        .webix_row_select
+          border-left: 1px solid #010101
+
+  .filters
+    left: 0
+    display: flex
+    flex-direction: column
+
+  &.form
+    overflow-x: scroll
+    height: auto
+    min-height: calc(100vh - 136px)
+    overflow-y: hidden
+
+  .filter-button
+    align-self: flex-end
+    margin-bottom: 24px
+
+
+
+.webix_ceil_text_row
+  display: flex
+  flex-flow: column
+
+//this block is read-only its not an input control
+.check-box-block
+  align-self: center
+  margin-left: 10px
+  overflow: hidden
+  box-sizing: border-box
+  width: 16px
+  height: 16px
+  border: 2px solid #5A5B6A
+  border-radius: 1px
+
+  .check-mark
+    background: #5A5B6A
+
+.check-box-block.checked
+  background: #5A5B6A
+  box-sizing: border-box
+  width: 16px
+  height: 16px
+  border: 2px solid #5A5B6A
+  border-radius: 1px
+
+  .check-mark
+    width: 12px
+    height: 8px
+    background: transparent
+    border: 2px solid white
+    border-top: 0
+    border-right: 0
+    transform: rotate(312deg)
+
+.state-template-block-dr, .process-state
+  position: absolute
+  font-family: Inter
+  font-style: normal
+  font-weight: 400
+  font-size: 13px
+  line-height: 19px !important
+  letter-spacing: 0.25px
+  height: 24px
+  margin: auto 0
+  padding: 2px 12px
+  box-sizing: border-box
+  border-radius: 32px
+
+  .question
+    position: absolute
+    top: 90%
+    left: 50%
+    font-size: 12px
+    color: red
+    font-weight: bold
+    transform: translateX(-50%)
+
+  &._draft
+    border: 1px solid #1f4ff4
+    color: #004CBF
+
+  &._executing
+    border: 1px solid rgba(206, 154, 0, 0.87)
+    color: $yellow
+
+  &._done
+    border: 1px solid rgba(16, 214, 53, 0.75)
+    color: $green
+
+  &._error
+    border: 1px solid #EDF6EE70
+    color: $red
+
+  &._not-ready
+    border: 1px solid #2979FF
+    color: $blue
+
+  &._part-ready
+    border: 1px solid #D1941A70
+    color: $yellow
+
+  &._ready
+    border: 1px solid #18CC24
+    color: #01A643
+
+  &._question
+    border: 1px solid #9c3700
+    color: #C8372D
+
+  .state-circle
+    border-radius: 50%
+    width: 14px
+    height: 14px
+
+    &._draft
+      background-color: $blue
+
+    &._executing
+      background-color: $yellow
+
+    &._done
+      background-color: $green
+
+    &._error
+      background-color: $red
+
+
+.process-state
+  justify-content: center
+
+.remove-timeline-button
+  margin-top: 12px
+
+.up-headers
+  max-width: 180px
+  text-align: center !important
+  justify-items: center
+  align-items: center
+  border-radius: 5px
+  line-height: 15px !important
+
+.end-of-week-record
+  margin-bottom: 25px !important
+
+.even-record
+  background: #EDF1F3 !important
+
+.centered-by-flex
+  width: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+
+.scroll-all-table
+  min-width: 100%
+
+
+.horizontal-scroll-grid
+  width: 100%
+  overflow-x: auto
+  position: relative
+  overflow-y: hidden
+
+.process-state-aligned
+  .webix_cell
+    padding-top: 17px
+    justify-content: center
+.up-aligned
+  .webix_cell
+    padding-bottom: 15% !important
+
+.doubled-ceil
+  .course-lesson-name-ceil
+    display: flex
+    flex-flow: column nowrap
+    justify-content: center
+
+  .webix_cell
+    line-height: 1.5em !important
+
+  .course-name
+    font-weight: bold
+
+.bluelight-hover
+  background-color: #DBE3E7 !important
+  .options-menu
+    opacity: 1
+
+
+.is-published
+  width: 100%
+  height: 100%
+  background-image: url("~tt-assets/png/published.png")
+  background-repeat: no-repeat
+  background-position: center
+
+  &.published-ok
+    filter: invert(41%) sepia(89%) saturate(336%) hue-rotate(73deg) brightness(98%) contrast(90%) !important
+
+
+
+.options-menu
+  width: 50px
+  height: 70px
+  background-size: contain
+  background-origin: border-box
+  background-repeat: no-repeat
+  background-position: center
+  background-color: transparent
+  opacity: 0
+  transition: opacity 300ms ease-in
+  background-image: url("~tt-assets/png/carbon-menu-vertical.png")
