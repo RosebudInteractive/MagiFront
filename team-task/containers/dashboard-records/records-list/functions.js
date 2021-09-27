@@ -19,9 +19,6 @@ export const getFilterConfig = (filter, disableFields = [], courseOptions = []) 
             type: FILTER_FIELD_TYPE.DATE_RANGE,
             value: (function () {
                 if (filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null && date !== undefined)) {
-                    console.log('dateranges');
-                    console.log(filter.DateRange[0]);
-                    console.log(filter.DateRange[1]);
                     return [new Date(filter.DateRange[0]), new Date(filter.DateRange[1])]
                 }
 
