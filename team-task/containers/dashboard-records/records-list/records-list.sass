@@ -4,10 +4,15 @@
   position: relative
   border-radius: 10px
   .tt-grid
+    //width: 98vw
     .webix_column
       &>div.webix_row_select
         background-color: inherit
         color: inherit
+      &.process-state-aligned
+        .webix_cell
+          display: flex
+          align-items: center
       .webix_row_select
         border-bottom: 1px solid #010101
         border-top: 1px solid #010101
@@ -142,8 +147,15 @@
     &._error
       background-color: $red
 
+.doubled-aligned
+  justify-items: center
+  align-items: center
+  border-radius: 5px
+  line-height: 15px !important
+  text-align: start
 
 .process-state
+  max-width: 90px
   justify-content: center
 
 .remove-timeline-button
@@ -181,11 +193,7 @@
 
 .process-state-aligned
   .webix_cell
-    padding-top: 17px
     justify-content: center
-.up-aligned
-  .webix_cell
-    padding-bottom: 15% !important
 
 .doubled-ceil
   .course-lesson-name-ceil
@@ -214,8 +222,6 @@
 
   &.published-ok
     filter: invert(41%) sepia(89%) saturate(336%) hue-rotate(73deg) brightness(98%) contrast(90%) !important
-
-
 
 .options-menu
   width: 50px

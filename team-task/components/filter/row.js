@@ -83,7 +83,7 @@ const getEmptyFieldValue = (field: FilterField) => {
         case FILTER_FIELD_TYPE.AUTOCOMPLETE:
             return ''
         case FILTER_FIELD_TYPE.DATE_RANGE:
-            return [null, null]
+            return null;
         default:
             return null
     }

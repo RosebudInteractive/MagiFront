@@ -9,7 +9,7 @@ export default function DateRangeField(props) {
         const result = {
             placeholder,
             searchable: false,
-            defaultCalendarValue: [new Date(), new Date()],
+            defaultCalendarValue: undefined,
             ranges: [{
                 label: 'Неделя',
                 value: [new Date(), addDays(new Date(), 6)]

@@ -19,7 +19,6 @@ import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
 
-
 let unpublishedCount = 0;
 
 function UnpublishedRecords(props) {
@@ -30,7 +29,7 @@ function UnpublishedRecords(props) {
     const handleScroll = () => {
         const input = $('.unpublished-records__grid-panel ._autocomplete.rs-picker-input');
         const inputScrollPosY = input[0].getBoundingClientRect().y;
-        $('.rs-picker-menu').css({position: 'fixed', top: `${inputScrollPosY + input.outerHeight()}px`});
+        $('.rs-picker-menu.CourseNameUnpublished-name-id').css({position: 'fixed', top: `${inputScrollPosY + input.outerHeight()}px`});
     };
 
     useEffect(() => {
@@ -71,10 +70,6 @@ function UnpublishedRecords(props) {
         props.resizeTriggerFn(visible);
     }, [visible]);
 
-    useEffect(() => {
-        if (unpublishedRecords && unpublishedRecords.length > 0) {}
-    }, [unpublishedRecords]);
-
     const GRID_CONFIG = {
         view: "datatable",
         id: 'unpublished-records-grid-table',
@@ -90,7 +85,7 @@ function UnpublishedRecords(props) {
         columns: [
             {id: 'Id', header: 'Id', hidden: true},
             {
-                id: 'CourseLessonName', header: [{text: 'Курс', css: 'up-headers'}, {text: 'Название лекции', css: 'up-headers'}],
+                id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
                 css: '_container doubled-ceil',
                 fillspace: 80,
                 template: function (data) {
@@ -126,7 +121,6 @@ function UnpublishedRecords(props) {
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
 
-        console.log('allUnpublishedRecords', allUnpublishedRecords);
         const selectedRecordByCourse = filter.current ?
             allUnpublishedRecords.find(record => record.CourseName === filter.current.CourseNameUnpublished) : null;
         const uniqCourseIds = [...new Set(allUnpublishedRecords.map(record => record.CourseId))];
@@ -160,12 +154,13 @@ function UnpublishedRecords(props) {
             filterToRequest.lesson_name = filterData.LessonNameUnpublished;
         }
 
-        actions.setFilterUnpublished($.param(filterToRequest));
         actions.getUnpublishedRecords($.param(filterToRequest));
         actions.getDashboardUnpublishedRecords();
     };
 
     const onChangeFieldCb = ({name, value}) => {
+        actions.setFilterUnpublished($.param({course_name: value}));
+
         if (name === 'CourseNameUnpublished') {
             const newFilterValues = {...filter.current, CourseNameUnpublished: value};
             newFilterValues.hasOwnProperty('LessonNameUnpublished') && delete newFilterValues['LessonNameUnpublished'];

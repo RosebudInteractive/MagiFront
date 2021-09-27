@@ -2,7 +2,7 @@ import {getProcessState} from "./functions";
 
 export const MAIN_COLUMNS = [
     {id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up'},
-    {id: 'PubDate', header: [{text: 'Дата', css: 'up-headers'}], width: 70},
+    {id: 'PubDate', css: 'js-change-date', header: [{text: 'Дата', css: 'up-headers'}], width: 70},
     {
         id: 'LessonNum', header: [{text: '№', css: 'up-headers'}], css: '_container',
         width: 50,
@@ -11,7 +11,7 @@ export const MAIN_COLUMNS = [
         },
     },
     {
-        id: 'CourseLessonName', header: [{text: 'Курс', css: 'up-headers'}, {text: 'Название лекции', css: 'up-headers'}], minWidth: 150,
+        id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/> Название лекции</div>`, minWidth: 150,
         css: '_container doubled-ceil',
         fillspace: true,
         template: function (data) {

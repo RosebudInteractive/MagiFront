@@ -40,6 +40,8 @@ const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
 const SET_FILTER_UNPUBLISHED = `${prefix}/SET_FILTER_UNPUBLISHED`;
 const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
 const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
+const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
+
 
 
 const defaultFieldSet = new Set([]);
@@ -59,7 +61,8 @@ export const ReducerRecord = Record({
     filterUnpublished: [],
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
-    showModalOfPublishing: false
+    showModalOfPublishing: false,
+    selectedRecord: null
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -87,12 +90,11 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLOSE_MODAL_DND_TO_PUBLISH:
         case OPEN_MODAL_DND_TO_PUBLISH:
             return state.set('showModalOfPublishing', payload);
-        // case SET_FILTER_FOR_UNPUBLISHED:
-        //     return state.set('filterForUnpublishedIsOn', payload);
         case SET_FILTER_UNPUBLISHED:
-            return state.set('filterUnpublished');
+            return state.set('filterUnpublished', payload);
+        case SET_SELECTED_RECORD_DATA:
+            return state.set('selectedRecord', payload);
         case SET_NEW_DISPLAYED_RECORDS:
-            console.log('SET_NEW_DISPLAYED_RECORDS', payload);
             return state.set('displayRecords', [...payload]);
         default:
             return state
@@ -110,6 +112,7 @@ export const elementsFieldSetSelector = createSelector(stateSelector, state => s
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
 export const modalPublishIsOnSelector = createSelector(stateSelector, state => state.showModalOfPublishing);
 export const filterUnpublishedSelector = createSelector(stateSelector, state => state.filterUnpublished);
+export const selectedRecordSelector = createSelector(stateSelector, state => state.selectedRecord);
 
 
 export const addToDisplayedRecords = (id, newRecord) => {
@@ -132,7 +135,7 @@ export const toggleModalDndToPublish = (isOn) => {
     return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
 };
 
-export const openModalDndToPublish = () => {
+export const openModalDndToPublish = () => { //id, title - CourseName and LessinName, initialDate
     return {type: OPEN_MODAL_DND_TO_PUBLISH, payload: true};
 };
 
@@ -147,6 +150,10 @@ export const changeViewMode = (mode, params) => {
 export const setFilterUnpublished = (filterValues) => {
     return {type: SET_FILTER_UNPUBLISHED, payload: filterValues}
 };
+
+export const setSelectedRecord = (data) => {
+    return {type: SET_SELECTED_RECORD_DATA, payload: data}
+}
 
 export const saga = function* () {
     yield all([
@@ -208,8 +215,11 @@ function* getUnpublishedRecordsSaga(data) {
 
         const objectParams = {};
 
-        if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
-        if(filter.lesson_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
+        if(filter){
+            if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
+            if(filter.lesson_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
+        }
+
         const params = $.param(objectParams);
 
         const paramsToRequest = (data && data.payload) ? data.payload : params;
@@ -240,10 +250,31 @@ function* changeViewModeSaga(data) {
 }
 
 const handleServerData = (records, mode, stDate = null, finDate = null) => {
-    const startDate = moment(stDate ? stDate : records[0].PubDate);
-    const finishDate = moment(finDate ? finDate : records[records.length - 1].PubDate);
+    const currentDate = moment().locale('ru');
+    const defaultStartDate = currentDate.toISOString();
+    const defaultEndDate = currentDate.add(6, 'days').toISOString();
+
+    const sDate = records.length > 0 ? records[0].PubDate : null;
+    const eDate = records.length > 1 ? records[records.length - 1].PubDate : null;
+
+    let startDate;
+    let finishDate;
+    if(!stDate && !finDate){
+        if(sDate && eDate){
+            startDate =  moment(sDate);
+            finishDate =  moment(eDate);
+        } else {
+            startDate =  moment(defaultStartDate);
+            finishDate =  moment(defaultEndDate);
+        }
+    } else {
+        startDate =  moment(stDate);
+        finishDate =  moment(finDate);
+    }
 
     const daysBetween = finishDate.diff(startDate, "days");
+
+    // daysBetween = daysBetween < 7 && (eDate && moment(eDate).isBefore(moment()))) ? 7 : daysBetween;
 
     const resultArray = [];
     let week = 0,
@@ -266,6 +297,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         }
 
         const filteredRecords = records.filter(rec => moment(rec.PubDate).isSame(currentDate, 'day'));
+
         if (filteredRecords.length) {
             const [first, ...other] = filteredRecords;
             first.Week = weekHasChanged ? displayWeekRange : '';
@@ -377,7 +409,7 @@ function* getRecordsSaga() {
                 const elData = val[el];
 
                 if (elData) {
-                    return `<div style="margin-bottom: 15% !important; width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css} ">${elData.label}<div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
+                    return `<div style="width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css} ">${elData.label}<div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
                 } else {
                     return `<div class="state-template-block-dr _unknown"></div>`
                 }
@@ -391,7 +423,7 @@ function* getRecordsSaga() {
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(7, 'days').toISOString();
+        const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
 
         yield put({
             type: CHANGE_VIEW_MODE,

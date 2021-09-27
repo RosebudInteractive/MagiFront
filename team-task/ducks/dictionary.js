@@ -159,7 +159,6 @@ export const toggleFetching = (isOn) => {
 };
 
 export const getDashboardUnpublishedRecords = () => {
-    console.log('getDashboardUnpublishedRecords');
     return {type: GET_UNPUBLISHED_LESSONS}
 };
 
@@ -181,10 +180,8 @@ export const saga = function* () {
 
 function* getUnpublishedRecordsSaga() {
     try {
-        console.log('it here')
         yield put({type: REQUEST_START});
         const records = yield call(getUnpublishedRecordsReq);
-        console.log('records', records);
         yield put({type: SET_UNPUBLISHED_LESSONS, payload: records});
         yield put({type: REQUEST_SUCCESS});
     }catch (e) {

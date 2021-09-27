@@ -53,7 +53,7 @@ export default function Filter(props: FilterProps) {
     const _onClear = () => { props.onApply() }
 
     const _isActiveFilter = useMemo(() => {
-        return fields && fields.some(field => !!field.value)
+        return fields && fields.some(field => !!field.value )
     }, [fields])
 
     return <React.Fragment>

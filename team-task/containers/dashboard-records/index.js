@@ -10,6 +10,7 @@ import {
     getUnpublishedRecords,
     modalPublishIsOnSelector,
     openModalDndToPublish,
+    selectedRecordSelector,
     unpublishedRecordsSelector
 } from "tt-ducks/dashboard-records"
 
@@ -23,7 +24,7 @@ import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
 
@@ -70,7 +71,7 @@ function DashboardRecords(props) {
             </div>
 
             {modalPublishOn &&
-            <Modal WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+            <Modal wrappedProps={selectedRecord} WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
                 actions.closeModalDndToPublish();
             }}/>
             }
@@ -83,7 +84,8 @@ const mapState2Props = (state) => {
         unpublishedRecords: unpublishedRecordsSelector(state),
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
-        modalPublishOn: modalPublishIsOnSelector(state)
+        modalPublishOn: modalPublishIsOnSelector(state),
+        selectedRecord: selectedRecordSelector(state)
     }
 };
 

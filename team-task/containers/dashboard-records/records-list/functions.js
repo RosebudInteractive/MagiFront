@@ -18,11 +18,14 @@ export const getFilterConfig = (filter, disableFields = [], courseOptions = []) 
             placeholder: "Период",
             type: FILTER_FIELD_TYPE.DATE_RANGE,
             value: (function () {
-                if (filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null)) {
+                if (filter && filter.DateRange && filter.DateRange.length === 2 && filter.DateRange.every(date => date !== null && date !== undefined)) {
+                    console.log('dateranges');
+                    console.log(filter.DateRange[0]);
+                    console.log(filter.DateRange[1]);
                     return [new Date(filter.DateRange[0]), new Date(filter.DateRange[1])]
                 }
-                return [null, null]
 
+                return null;
             })()
         },
     ];
@@ -67,12 +70,12 @@ const convertParam2Filter = ({Course, DateRange}) => {
     const filter = {};
 
     filter.Course = Course ? +Course : '';
-    filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null) ? DateRange : [];
+    filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null && d !== undefined) ? DateRange : null;
 
     return filter
 };
 
-export const resizeHandler = (rowCount) => {
+export const resizeHandler = (rowCount, afterResize) => {
     const _form = $('.form'),
         _height = _form.height(),
         _width = _form.width();
@@ -100,7 +103,7 @@ export const refreshColumns = (config, {needRefresh, recordsCount}) => {
     if (grid) {
         grid.refreshColumns(config);
 
-        // if (needRefresh) { // it need?
+        // if (needRefresh) { // i dont know - it need?
         //     const INTERVAL = 100
         //
         //     let time = 0,
@@ -127,7 +130,7 @@ export const convertFilter2Params = (filter) => {
         if (filter.DateRange) {
             const dates = filter.DateRange;
 
-            if (dates.length === 2 && dates.every(d => d !== null)) {
+            if (dates.length === 2 && dates.every(d => d !== null && d !== undefined)) {
                 _data.st_date = `${moment(dates[0]).locale('ru').toISOString()}`;
                 _data.fin_date = `${moment(dates[1]).locale('ru').toISOString()}`;
             }

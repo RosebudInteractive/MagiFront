@@ -13,7 +13,8 @@ import {
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
-    setPublishRecordDate
+    setPublishRecordDate,
+    setSelectedRecord
 } from "tt-ducks/dashboard-records";
 import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
@@ -41,7 +42,6 @@ const Records = (props) => {
 
     const _onResize = useCallback(() => {
         resizeHandler(recordsCount);
-        console.log('it changed')
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
@@ -53,14 +53,10 @@ const Records = (props) => {
 
     useEffect(() => {
         const grid = window.webix.$$("dashboard-records-grid");
-        if (unpublishedPanelOpened) {
-            const elementsColumnExists = grid.getColumnIndex("processElements") >= 0
 
-            if (elementsColumnExists) {
-                grid.hideColumn('processElements', {spans: true});
-            }
-        }
-
+        setTimeout(() => {
+            _onResize();
+        }, 300);
     }, [unpublishedPanelOpened, resizeTrigger]);
 
     useEffect(() => {
@@ -141,32 +137,23 @@ const Records = (props) => {
                     }
 
                     item.$css = resultCss;
-                    // end-of-week-record
                 }
             },
             columns: [],
             on: {
-                onItemDblClick: function (id) {
-                    // todo open action
+
+                onItemClick: function(data) {
+                    const item = this.getItem(data.row);
+
+                    actions.setSelectedRecord(item)
                 },
                 onBeforeDrop: function (context, e) {
                     const grid = window.webix.$$("dashboard-records-grid");
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
-                    console.log('from Item:', fromItem);
-                    console.log('toItem:', toItem);
-
-                    // const isoDateString = toItem.DateObject.toISOString(),
-                    //     isEven = toItem.IsEven,
-                    //     isEndOfWeek = toItem.IsEndOfWeek;
-
                     scrollPosition = window.scrollY;
                     actions.addToDisplayedRecords(toItem.id, {
-                        // ...toItem,
-                        // ...fromItem,
-                        // CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
-                        // id: toItem.id
                         IsEven: toItem.IsEven,
                         PubDate: toItem.PubDate,
                         DateObject: toItem.DateObject,
@@ -183,14 +170,22 @@ const Records = (props) => {
                         ProcessState: null
                     });
 
-                    // context.from(context.source[0],context.start);
                     actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
-
 
                     return false;
                 },
             },
             onClick: {
+                'js-change-date': function (e, data) {
+                    e.preventDefault();
+
+                    const item = this.getItem(data.row);
+
+                    if (item) {
+                        props.openModalOnPublication();
+                    }
+
+                }
             },
         }
     }, [columnFields]);
@@ -250,7 +245,8 @@ const mapDispatch2Props = (dispatch) => {
             setGridSortOrder,
             getRecords,
             setPublishRecordDate,
-            addToDisplayedRecords
+            addToDisplayedRecords,
+            setSelectedRecord
         }, dispatch)
     }
 };

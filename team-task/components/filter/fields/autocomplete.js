@@ -18,5 +18,6 @@ export default function AutocompleteField(props) {
                          value={props.value}
                          defaultValue={props.defaultValue}
                          onSelect={_onChange}
-                         onClean={_onClean}/>
+                         onClean={_onClean}
+                        menuClassName={`${props.name}-name-id`}/>
 }
