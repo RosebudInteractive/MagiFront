@@ -5,6 +5,7 @@ import {bindActionCreators} from "redux"
 import {useLocation} from "react-router-dom"
 import {
     hasAdminRights,
+    hasPmaRights,
     hasPmRights,
     hasSupervisorRights,
     initializedSelector,
@@ -32,7 +33,7 @@ import NotificationRefresher from "./components/notification-refresher";
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole, hasAdminRights} = props;
+    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole, hasAdminRights, hasPmaRights} = props;
 
     let location = useLocation();
 
@@ -56,7 +57,7 @@ function App(props) {
                 <SideBarMenu/>
                 <div className="tt-main-area__info-panel">
                     <Breadcrumb/>
-                    <AppRouter hasSupervisorRights={hasSupervisorRights} hasAdminRights={hasAdminRights} userRole={userRole}/>
+                    <AppRouter hasPmaRights={hasPmaRights} hasSupervisorRights={hasSupervisorRights} hasAdminRights={hasAdminRights} userRole={userRole}/>
                 </div>
             </div>
             <ReduxModalDialog/>
@@ -81,6 +82,7 @@ function mapStateToProps(state,) {
         hasAdminRights: hasAdminRights(state),
         userInitialized: initializedSelector(state),
         hasPmRights: hasPmRights(state),
+        hasPmaRights: hasPmaRights(state),
         userRole: userRoleSelector(state),
         fetching: tasksFetching(state)
             || processesFetching(state)
