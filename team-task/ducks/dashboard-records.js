@@ -39,6 +39,7 @@ const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
 // const SET_FILTER_VALUES_UNPUBLISHED = `${prefix}/SET_FILTER_VALUES_UNPUBLISHED`;
 const SET_FILTER_UNPUBLISHED = `${prefix}/SET_FILTER_UNPUBLISHED`;
 const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
+const CHANGE_DISPLAYED_RECORD = `${prefix}/CHANGE_DISPLAYED_RECORD`;
 const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
 
@@ -131,6 +132,10 @@ export const setPublishRecordDate = ({isoDateString, lessonId}) => {
     return {type: PUBLISH_RECORD, payload: {isoDateString, lessonId}};
 };
 
+export const changePublishRecordDate = (id, newRecord) => {
+    return {type: CHANGE_DISPLAYED_RECORD, payload: {id, newRecord}};
+};
+
 export const toggleModalDndToPublish = (isOn) => {
     return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
 };
@@ -162,7 +167,8 @@ export const saga = function* () {
         takeEvery(CHANGE_RECORD, updateRecordSaga),
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
         takeEvery(PUBLISH_RECORD, publishRecordSaga),
-        takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga)
+        takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga),
+        takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga)
     ])
 };
 
@@ -178,6 +184,23 @@ function* addToDisplayedRecordsSaga(data) {
             } else {
                 displayedRecords.splice(index, 0, data.payload.newRecord);
             }
+        }
+
+        yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
+
+    }catch (e) {
+        showErrorMessage(e.toString())
+    }
+}
+
+function* changeDisplayedRecordsSaga(data) {
+    try {
+        const displayedRecords = yield select(displayRecordsSelector);
+
+        const index = displayedRecords.findIndex(record => record.id === data.payload.id);
+
+        if(index !== -1) {
+            displayedRecords[index] = data.payload.newRecord;
         }
 
         yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});

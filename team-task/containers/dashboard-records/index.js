@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {
+    changePublishRecordDate,
     changeViewMode,
     closeModalDndToPublish,
     displayRecordsSelector,
@@ -11,6 +12,7 @@ import {
     modalPublishIsOnSelector,
     openModalDndToPublish,
     selectedRecordSelector,
+    setPublishRecordDate,
     unpublishedRecordsSelector
 } from "tt-ducks/dashboard-records"
 
@@ -48,6 +50,11 @@ function DashboardRecords(props) {
         actions.changeViewMode(mode);
     };
 
+    const changeDate = ({isoDateString, lessonId}, record) => {
+        actions.changePublishRecordDate(record.id, record);
+        actions.setPublishRecordDate({isoDateString, lessonId})
+    };
+
     const backAction = () => {
         !sideBarMenuVisible && actions.showSideBarMenu();
         history.push('/')
@@ -71,7 +78,7 @@ function DashboardRecords(props) {
             </div>
 
             {modalPublishOn &&
-            <Modal wrappedProps={selectedRecord} WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+            <Modal wrappedProps={{record: selectedRecord, applyAction: changeDate, closeAction: actions.closeModalDndToPublish}} WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
                 actions.closeModalDndToPublish();
             }}/>
             }
@@ -98,7 +105,9 @@ const mapDispatch2Props = (dispatch) => {
             getDashboardUnpublishedRecords,
             getUnpublishedRecords,
             closeModalDndToPublish,
-            openModalDndToPublish
+            openModalDndToPublish,
+            changePublishRecordDate,
+            setPublishRecordDate
         }, dispatch)
     }
 };

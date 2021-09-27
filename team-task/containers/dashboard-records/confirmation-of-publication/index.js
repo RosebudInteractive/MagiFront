@@ -2,17 +2,36 @@ import React, {useEffect, useMemo, useState} from "react";
 import {DatePicker} from "../../../components/ui-kit";
 import "./confirmation-of-publication.sass"
 import $ from "jquery";
+import moment from "moment";
 
 function ConfirmationOfPublication(props) {
-    const { DateObject, closeAction } = props;
+    const {record, closeAction} = props;
 
-    const [value, setValue] = useState(null)
+    const [value, setValue] = useState(null);
 
-    const onApply = () => {}
-    const onCancel = () => { if (closeAction) closeAction() }
+    const onApply = () => {
+        const val = moment(value);
+        props.applyAction({
+                isoDateString: val.toISOString(),
+                lessonId: record.LessonId
+            },
+            {
+                ...record,
+                PubDate: val.locale('ru').format('DD MMM'),
+                DateObject: val,
+                // IsEndOfWeek: toItem.IsEndOfWeek,
+                // Week: props.Week,
+            })
+
+        if (closeAction) closeAction();
+    };
+
+    const onCancel = () => {
+        if (closeAction) closeAction()
+    };
 
     useEffect(() => {
-        setValue(DateObject.toDate())
+        setValue(record.DateObject.toDate())
 
         $("body").addClass("_no-vertical-scroll")
 
@@ -22,8 +41,8 @@ function ConfirmationOfPublication(props) {
     }, [])
 
     const disableApply = useMemo(() => {
-        return !value || DateObject.isSame(value)
-    }, [DateObject, value])
+        return !value || record.DateObject.isSame(value)
+    }, [record.DateObject, value]);
 
     const onChange = (date) => {
         setValue(date)
@@ -33,10 +52,10 @@ function ConfirmationOfPublication(props) {
         <div className="confirmation-of-publication">
             <div className='publication-title'>
                 <div className='publication-title__course _single-line'>
-                    {props.CourseName}
+                    {record.CourseName}
                 </div>
                 <div className='publication-title__lesson _single-line'>
-                    {props.LessonName}
+                    {record.LessonName}
                 </div>
             </div>
             <DatePicker value={value}
