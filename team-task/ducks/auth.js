@@ -2,9 +2,8 @@ import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
-import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
-import {reset} from "redux-form";
-import {all, takeEvery, put, call} from "@redux-saga/core/effects";
+import {checkStatus, commonGetQuery, parseJSON} from "common-tools/fetch-tools";
+import {all, call, put, takeEvery} from "@redux-saga/core/effects";
 import {USER_ROLE} from "../constants/common";
 import {showErrorMessage} from "tt-ducks/messages";
 
@@ -96,7 +95,12 @@ export const userAuthSelector = createSelector(stateSelector, state => state.aut
 export const initializedSelector = createSelector(stateSelector, state => state.initialized)
 export const hasSupervisorRights = createSelector(userSelector, (user) => {
     return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms)
-})
+});
+
+export const hasPmaRights = createSelector(userSelector, (user) => {
+    return user && user.PData && user.PData.roles && (user.PData.roles.pma)
+});
+
 export const hasElementEditorRights = createSelector(userSelector, (user) => {
     return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms || user.PData.roles.pme)
 })

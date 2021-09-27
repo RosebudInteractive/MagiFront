@@ -11,13 +11,13 @@ import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 
 import Logo from "tt-assets/svg/logo.svg"
-import {hasAdminRights, hasSupervisorRights} from "tt-ducks/auth";
+import {hasAdminRights, hasPmaRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 import {newNotifsCountSelector, notificationsSelector, unreadCountSelector} from "tt-ducks/notifications";
 
 function SideBarMenu(props) {
 
-    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, unreadNotificationsCount, newNotifsCount} = props
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, unreadNotificationsCount, newNotifsCount, hasPmaRights} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -41,7 +41,7 @@ function SideBarMenu(props) {
                       title={'Таймлайны'}/>
         }
 
-        { <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
+        { hasPmaRights && <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>}
     </nav>
 }
@@ -95,6 +95,7 @@ const mapState2Props = (state) => {
     return {
         hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
+        hasPmaRights: hasPmaRights(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
         newNotifsCount: newNotifsCountSelector(state),
         unreadNotificationsCount: unreadCountSelector(state),

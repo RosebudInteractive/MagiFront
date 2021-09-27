@@ -84,7 +84,7 @@ export const resizeHandler = (rowCount, afterResize) => {
         setTimeout(() => {
             let _gridHeight = _height - _headerHeight - 48;
 
-            const _calcHeight = (rowCount * 80) + _headerHeight + 60 + Math.ceil((rowCount/7)* 15); //todo check it
+            const _calcHeight = (rowCount * 80) + _headerHeight + 60 + Math.ceil((rowCount/7)* 15);
             _gridHeight = (_calcHeight && _calcHeight > 0 && !isNaN(_calcHeight))  ? _calcHeight : _gridHeight;
 
             window.$$('dashboard-records-grid').$setSize(_width, _gridHeight);

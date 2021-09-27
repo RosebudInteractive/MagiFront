@@ -29,7 +29,7 @@ export default function AppRouter(props: RouterProps) {
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
-        <Route path={'/dashboard-records'} component={DashboardRecords}/>
+        <Route path={'/dashboard-records'} render={() => {return props.hasPmaRights ? <DashboardRecords/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
         <Route exact path={'/timelines'}
