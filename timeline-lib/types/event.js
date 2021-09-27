@@ -1,21 +1,5 @@
-export type Event = {
-    id: number,
-    name: string,
-    color: string,
-    day: number,
-    month: number,
-    year: number,
-    visible: boolean,
-    displayDate: string,
-    calculatedDate: number,
-    width: number,
-    left: number,
-
-    // startDateYearNumber = 1920
-    // isLastPoint: boolean,
-    yLevel: number,
-    offset: number,
-    xStart: number,
-    xEnd: number,
-    repositioned: boolean,
-}
+// eslint-disable-next-line max-classes-per-file
+import { DataItem as DI, VisualItem as VI } from './common';
+export var Event;
+(function (Event) {
+})(Event || (Event = {}));

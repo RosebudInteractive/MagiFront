@@ -45,6 +45,7 @@ export default function CourseWrapper(props) {
 
     return <div className="course-page__course-wrapper">
         <div className="course-wrapper__short-description wrapper-item" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
+        {(timelines && timelines.length > 0) && timelines}
         <ExtendedInfo course={course} visible={showMore}/>
         {
             _showMoreHidden ?
@@ -58,7 +59,7 @@ export default function CourseWrapper(props) {
                 </div>
         }
         <Scheme course={course}/>
-        {(timelines && timelines.length > 0) && timelines}
+
         <Books books={course.Books}
                titleClassName={"course-wrapper__title"}
                listClass={CourseBooksList}

@@ -1,21 +1,17 @@
-class Emitter{
+class Emitter {
     constructor() {
-        this._listeners = []
+        this.listeners = [];
     }
-
     addListener(type, callback) {
-        this._listeners.push({type, callback})
+        this.listeners.push({ type, callback });
     }
-
     emit(type, args) {
-        this._listeners.forEach((listener) => {
+        this.listeners.forEach((listener) => {
             if ((listener.type === type) && (listener.callback)) {
-                listener.callback(args)
+                listener.callback(args);
             }
-        })
+        });
     }
 }
-
-const emitter = new Emitter()
-
-export default emitter
+const emitter = new Emitter();
+export default emitter;

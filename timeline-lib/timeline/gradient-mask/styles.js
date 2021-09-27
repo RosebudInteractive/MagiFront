@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-
 export default StyleSheet.create({
     mask: {
         position: 'absolute',
@@ -8,5 +7,5 @@ export default StyleSheet.create({
         right: 0,
         height: '100%',
         borderBottomRightRadius: 4,
-    }
-})
+    },
+});

@@ -1,9 +1,11 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import './preview.sass'
-import {Timeline} from "timeline/index";
+import {Themes, Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import ZoomSlider from "./zoom-slider";
+import Header from "timeline/timeline/header";
+import Footer from "timeline/timeline/footer";
 
 export default function TimelinePreview(props) {
     const {background, events, periods} = props;
@@ -11,6 +13,7 @@ export default function TimelinePreview(props) {
     const [height, setHeight] = useState(0);
     const [zoom, setZoom] = useState(1)
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
+    const [fsEnable, setFsEnable] = useState(false)
 
     const _preview = useRef(null);
 
@@ -30,6 +33,20 @@ export default function TimelinePreview(props) {
         }, 400)
 
     }, []);
+
+    useEffect(() => {
+        if (_preview.current) {
+            setWidth(_preview.current.clientWidth);
+            setHeight(_preview.current.clientHeight)
+        }
+
+        setTimeout(() => {
+            if (_preview.current) {
+                setWidth(_preview.current.clientWidth);
+                setHeight(_preview.current.clientHeight)
+            }
+        }, 100)
+    }, [fsEnable]);
 
     const _periods = useMemo(() => {
         return periods ? periods.map((item) => {
@@ -70,19 +87,49 @@ export default function TimelinePreview(props) {
         } : {backgroundColor: "#B4B4BB"}
     }, [background]);
 
-    const _onZoomChange = useCallback((value) => {
+    const onZoomChange = useCallback((value) => {
         setZoom(value)
-    }, []);
+    }, [zoom]);
 
-    const _zoomSliderStopped = (stopped) => {
+    const onSliderStop = (stopped) => {
         setZoomSliderStopped(stopped)
     };
 
-    return <div className="timeline-preview" >
-        <ZoomSlider onChange={_onZoomChange} value={zoom} onSliderStop={_zoomSliderStopped}/>
+    const openFullScreen = () => {
+        setFsEnable(true)
+        document.addEventListener('keyup', keyPressHandler)
+    };
 
-        <div className="timeline-preview__container _with-custom-scroll" ref={_preview} style={{..._style}}>
-            <Timeline width={width} height={height} events={_events} zoom={zoom} periods={_periods} levelLimit={4} zoomSliderStopped={zoomSliderStopped}/>
+    const closeFullScreen = () => {
+        setFsEnable(false)
+        document.removeEventListener('keyup', keyPressHandler)
+    };
+
+    const keyPressHandler = (e) => {
+        if (e.key === "Escape") {
+            closeFullScreen();
+            e.preventDefault();
+        }
+    }
+
+    return <div className={"timeline-preview"  + (fsEnable ? ' _full-screen' : '')} >
+        <div className={'timeline-preview__wrapper'}>
+            {fsEnable && <Header title={'Ключевые события'} />}
+            <div className={"timeline-preview__container"} ref={_preview} style={{..._style}}>
+                <Timeline width={width} height={height}
+                          theme={Themes.current}
+                          events={_events}
+                          periods={_periods}
+                          zoom={zoom}
+                          levelLimit={4}
+                          zoomSliderStopped={zoomSliderStopped}/>
+            </div>
+            <Footer onOpenPress={openFullScreen}
+                    onClosePress={closeFullScreen}
+                    fullScreenMode={fsEnable}
+                    zoom={zoom}
+                    onSliderStop={onSliderStop}
+                    onZoomChange={onZoomChange}/>
         </div>
     </div>
 }
