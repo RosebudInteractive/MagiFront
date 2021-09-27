@@ -301,7 +301,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             first.Week = weekHasChanged ? displayWeekRange : '';
             first.DateObject = moment(first.PubDate).locale('ru'); //todo check it
             first.IsEven = isEven;
-            first.IsEndOfWeek = moment(first.PubDate).locale('ru').isoWeekday() === 7;
+            first.IsEndOfWeek = moment(first.PubDate).locale('ru').isoWeekday() === 7 && other.length === 0;
             first.CourseLessonName = [first.CourseName, first.LessonName];
             first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
 
@@ -312,11 +312,11 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             });
 
             if (other && other.length > 0) {
-                other.forEach(item => {
+                other.forEach((item, index) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
-                    item.IsEndOfWeek = moment(item.PubDate).locale('ru').isoWeekday() === 7;
+                    item.IsEndOfWeek = moment(currentDate).set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7 && index === other.length - 1;
                     item.CourseLessonName = [item.CourseName, item.LessonName];
                     item.DateObject = currentDate.set({hour:0,minute:0,second:0,millisecond:0});
 
@@ -366,6 +366,13 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             isEven = !isEven;
         }
     }
+
+    // let arrDoubles = [];
+    // resultArray.forEach((el, index) => {
+    //     const foundedDoubles
+    // });
+
+    // console.log('arrDoublkes', arrDoubles)
 
     return resultArray;
 };
