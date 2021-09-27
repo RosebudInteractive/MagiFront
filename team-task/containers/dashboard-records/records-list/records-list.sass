@@ -4,7 +4,6 @@
   position: relative
   border-radius: 10px
   .tt-grid
-    //width: 98vw
     .webix_column
       &>div.webix_row_select
         background-color: inherit
@@ -37,6 +36,82 @@
   .filter-button
     align-self: flex-end
     margin-bottom: 24px
+
+  .process-state
+    max-width: 90px
+    justify-content: center
+  .state-template-block-dr, .process-state
+    position: absolute
+    font-family: Inter
+    font-style: normal
+    font-weight: 400
+    font-size: 13px
+    line-height: 19px !important
+    letter-spacing: 0.25px
+    height: 24px
+    margin: auto 0
+    padding: 2px 12px
+    box-sizing: border-box
+    border-radius: 32px
+
+    .question
+      position: absolute
+      top: 90%
+      left: 50%
+      font-size: 12px
+      color: red
+      font-weight: bold
+      transform: translateX(-50%)
+
+    &._draft
+      border: 1px solid #1f4ff4
+      color: #004CBF
+
+    &._executing
+      border: 1px solid rgba(206, 154, 0, 0.87)
+      color: $yellow
+
+    &._done
+      border: 1px solid rgba(16, 214, 53, 0.75)
+      color: $green
+
+    &._error
+      border: 1px solid #EDF6EE70
+      color: $red
+
+    &._not-ready
+      border: 1px solid #2979FF
+      color: $blue
+
+    &._part-ready
+      border: 1px solid #D1941A70
+      color: $yellow
+
+    &._ready
+      border: 1px solid #18CC24
+      color: #01A643
+
+    &._question
+      border: 1px solid #9c3700
+      color: #C8372D
+
+    .state-circle
+      border-radius: 50%
+      width: 14px
+      height: 14px
+
+      &._draft
+        background-color: $blue
+
+      &._executing
+        background-color: $yellow
+
+      &._done
+        background-color: $green
+
+      &._error
+        background-color: $red
+
 
 
 
@@ -75,77 +150,6 @@
     border-right: 0
     transform: rotate(312deg)
 
-.state-template-block-dr, .process-state
-  position: absolute
-  font-family: Inter
-  font-style: normal
-  font-weight: 400
-  font-size: 13px
-  line-height: 19px !important
-  letter-spacing: 0.25px
-  height: 24px
-  margin: auto 0
-  padding: 2px 12px
-  box-sizing: border-box
-  border-radius: 32px
-
-  .question
-    position: absolute
-    top: 90%
-    left: 50%
-    font-size: 12px
-    color: red
-    font-weight: bold
-    transform: translateX(-50%)
-
-  &._draft
-    border: 1px solid #1f4ff4
-    color: #004CBF
-
-  &._executing
-    border: 1px solid rgba(206, 154, 0, 0.87)
-    color: $yellow
-
-  &._done
-    border: 1px solid rgba(16, 214, 53, 0.75)
-    color: $green
-
-  &._error
-    border: 1px solid #EDF6EE70
-    color: $red
-
-  &._not-ready
-    border: 1px solid #2979FF
-    color: $blue
-
-  &._part-ready
-    border: 1px solid #D1941A70
-    color: $yellow
-
-  &._ready
-    border: 1px solid #18CC24
-    color: #01A643
-
-  &._question
-    border: 1px solid #9c3700
-    color: #C8372D
-
-  .state-circle
-    border-radius: 50%
-    width: 14px
-    height: 14px
-
-    &._draft
-      background-color: $blue
-
-    &._executing
-      background-color: $yellow
-
-    &._done
-      background-color: $green
-
-    &._error
-      background-color: $red
 
 .doubled-aligned
   justify-items: center
@@ -153,10 +157,6 @@
   border-radius: 5px
   line-height: 15px !important
   text-align: start
-
-.process-state
-  max-width: 90px
-  justify-content: center
 
 .remove-timeline-button
   margin-top: 12px

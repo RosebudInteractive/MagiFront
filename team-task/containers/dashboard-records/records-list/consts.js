@@ -11,7 +11,8 @@ export const MAIN_COLUMNS = [
         },
     },
     {
-        id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/> Название лекции</div>`, minWidth: 150,
+        id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/> Название лекции</div>`,
+        minWidth: 100,
         css: '_container doubled-ceil',
         fillspace: true,
         template: function (data) {
@@ -39,7 +40,7 @@ export const STATE_COLUMNS = [
         }
     },
     {
-        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], width: 120, css: "_container process-state-aligned",
+        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], css: "_container process-state-aligned",
         template: function (val) {
             const state = getProcessState(val.ProcessState);
             return `<div class="centered-by-flex process-state ${state.css}">${state.label}</div>`;

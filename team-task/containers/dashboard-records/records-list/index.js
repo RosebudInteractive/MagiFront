@@ -121,6 +121,7 @@ const Records = (props) => {
             scroll: 'none',
             headerRowHeight: 40,
             rowHeight: 72,
+            // autowidth:true,
             height: 1000,
             select: true,
             drag: "target",
