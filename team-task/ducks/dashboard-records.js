@@ -274,8 +274,6 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
     const daysBetween = finishDate.diff(startDate, "days");
 
-    // daysBetween = daysBetween < 7 && (eDate && moment(eDate).isBefore(moment()))) ? 7 : daysBetween;
-
     const resultArray = [];
     let week = 0,
         displayWeekRange = '',
@@ -380,7 +378,7 @@ function* getRecordsSaga() {
             filter = yield select(filterSelector);
 
         const cleanedParams = new URLSearchParams(params);
-        cleanedParams.delete('CourseNameUnpublished'); // todo check cleaned
+        cleanedParams.delete('CourseNameUnpublished');
         cleanedParams.delete('LessonNameUnpublished');
 
         const records = yield call(getRecordsReq, cleanedParams);
