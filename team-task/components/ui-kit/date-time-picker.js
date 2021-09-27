@@ -104,7 +104,11 @@ const CssKeyboardDatePicker = withStyles({
 
 export default function UiDatePicker(props) {
     const onChange = (e) => {
-        props.input.onChange(e ? e.toDate() : null)
+        const onChangeCallback = props.input ? props.input.onChange : props.onChange
+
+        if (onChangeCallback) {
+            onChangeCallback(e ? e.toDate() : null)
+        }
     }
 
     const onBlur = () => {
@@ -112,7 +116,7 @@ export default function UiDatePicker(props) {
     }
 
     const _id = useRef(props.id ? props.id : "ui-date-time-picker-" + Math.floor(Math.random() * Math.floor(10000)))
-    const allProps = {...props, ...props.input}
+    const extProps = props.input ? props.input : props
 
     return <CssKeyboardDatePicker
         id={_id.current}
@@ -122,10 +126,9 @@ export default function UiDatePicker(props) {
         format={"DD.MM.yyyy"}
         margin="normal"
         autoOk={true}
-        {...allProps}
-        // label={props.label}
-        // {...props.input}
-        value={props.input && props.input.value ? props.input.value : null}
+        label={props.label}
+        {...extProps}
+        value={extProps.value ? extProps.value : null}
         onChange={onChange}
         onBlur={onBlur}
         KeyboardButtonProps={{

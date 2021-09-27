@@ -141,14 +141,21 @@ const Records = (props) => {
             },
             columns: [],
             on: {
-
                 onItemClick: function(data) {
                     const item = this.getItem(data.row);
 
                     actions.setSelectedRecord(item)
                 },
+                onItemDblClick: function (data) {
+                    if (data.column === 'PubDate') {
+                        const item = this.getItem(data.row);
+
+                        if (item && item.CourseId && item.LessonId) {
+                            props.openModalOnPublication();
+                        }
+                    }
+                },
                 onBeforeDrop: function (context, e) {
-                    const grid = window.webix.$$("dashboard-records-grid");
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
@@ -175,18 +182,7 @@ const Records = (props) => {
                     return false;
                 },
             },
-            onClick: {
-                'js-change-date': function (e, data) {
-                    e.preventDefault();
-
-                    const item = this.getItem(data.row);
-
-                    if (item) {
-                        props.openModalOnPublication();
-                    }
-
-                }
-            },
+            onClick: { },
         }
     }, [columnFields]);
 

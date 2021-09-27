@@ -1,11 +1,30 @@
 .confirmation-of-publication
   display: flex
   flex-flow: column nowrap
-  width: 450px
-  height: 250px
+  width: 350px
+  //height: 250px
 
-  .actions
+  ._apply
+    margin-right: 17px
+
+  .action-buttons
+    margin-top: 18px
     display: flex
     flex-flow: row nowrap
-    justify-content: space-around
+    justify-content: flex-start
     align-items: baseline
+
+
+  .publication-title
+    display: flex
+    flex-direction: column
+    margin-bottom: 10px
+
+    ._single-line
+      text-overflow: ellipsis
+      white-space: nowrap
+      overflow: hidden
+
+  .publication-title__course
+    font-weight: bold
+
