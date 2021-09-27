@@ -24,6 +24,7 @@ class DataCache {
             this._loadFunc = data_load_func
         else
             throw new Error(`DataCache:: constructor: Invalid or missing argument "data_load_func".`);
+        this._ttl_mem_cashe = typeof (opts.ttl_mem_cashe) === "number" ? opts.ttl_mem_cashe : 0;
         if (typeof (ttl_in_sec) === "number")
             this._ttl_in_sec = ttl_in_sec;
         if (typeof (opts.md5_hash) === "boolean")
@@ -46,18 +47,29 @@ class DataCache {
     async getCacheItem(id, options) {
         let result = null;
         let key = `${this._prefix}${id}`;
+        let curr_time;
         let getFromCache = async () => {
             let data = null;
-            let redis_ts = await this._cache.cacheHget(key, "ts", { json: true });
-            if (redis_ts) {
-                if ((!this._data[id]) || (this._data[id].ts !== redis_ts)) {
-                    let val = await this._cache.cacheHgetAll(key, { json: true });
-                    if (val && val.ts && val.data) {
-                        this._data[id] = data = val;
+            let should_check = true;
+            if (this._ttl_mem_cashe > 0) {
+                curr_time = Date.now();
+                data = this._data[id];
+                should_check = !(data && (data.exp_time > curr_time));
+                curr_time += this._ttl_mem_cashe;
+            }
+            if (should_check) {
+                let redis_ts = await this._cache.cacheHget(key, "ts", { json: true });
+                if (redis_ts) {
+                    if ((!this._data[id]) || (this._data[id].ts !== redis_ts)) {
+                        let val = await this._cache.cacheHgetAll(key, { json: true });
+                        if (val && val.ts && val.data) {
+                            this._data[id] = data = val;
+                        }
                     }
+                    else
+                        data = this._data[id];
+                    data.exp_time = curr_time;
                 }
-                else
-                    data = this._data[id];
             }
             return data;
         }
@@ -88,7 +100,7 @@ class DataCache {
                     await this._cache.cacheHset(key, "ts", ts, { json: true });
                     if (this._ttl_in_sec)
                         await this._cache.cacheExpire(key, this._ttl_in_sec);
-                    this._data[id] = data = { ts: ts, data: data };
+                    this._data[id] = data = { ts: ts, data: data, exp_time: curr_time };
                 }
                 return data;
             },
@@ -197,6 +209,10 @@ class CacheableObject {
 
     cacheGetKey(key) {
         return this._prefix + key;
+    }
+
+    getConnectionWrapper() {
+        return ConnectionWrapper;
     }
 
     cacheGetKeyList(filter) {

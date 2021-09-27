@@ -7,7 +7,6 @@ const { ACCOUNT_ID } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { AccessFlags } = require('../const/common');
 const { buildLogString } = require('../utils');
-const { over } = require('lodash');
 
 const LESSON_FILE_MSSQL_REQ =
     "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate],\n" +
@@ -44,8 +43,10 @@ const SCHEME_KEY_PREFIX = "_pscheme:";
 const SCHEME_TTL_SEC = 24 * 60 * 60; // 24 hours
 
 const ROLE_KEY_PREFIX = "_role:";
+const TTL_MEMORY_CASHE_MS = 1 * 1000; // 1 sec
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
+const dbg_benchmark_test = false;
 
 class AccessRights extends DbObject {
 
@@ -190,8 +191,10 @@ class AccessRights extends DbObject {
     //
     constructor(options) {
         super(options);
-        this._scheme_cache = this.createDataCache(SCHEME_KEY_PREFIX, this._loadPermissionScheme.bind(this), undefined, { md5_hash: true });
-        this._role_cache = this.createDataCache(ROLE_KEY_PREFIX, this._loadRole.bind(this), undefined, { md5_hash: true });
+        this._scheme_cache = this.createDataCache(SCHEME_KEY_PREFIX,
+            this._loadPermissionScheme.bind(this), undefined, { md5_hash: true, ttl_mem_cashe: TTL_MEMORY_CASHE_MS });
+        this._role_cache = this.createDataCache(ROLE_KEY_PREFIX,
+            this._loadRole.bind(this), undefined, { md5_hash: true, ttl_mem_cashe: TTL_MEMORY_CASHE_MS });
     }
 
     async _loadRole(id, options) {
@@ -438,7 +441,24 @@ class AccessRights extends DbObject {
 };
 
 AccessRights.getInstance();
-
+if (dbg_benchmark_test) {
+    let user_roles = { s: 1, pmu: 1, pms: 1 };
+    AccessRights.buildPermissions(null, user_roles)
+        .then(async () => {
+            const NOP = 4500000;
+            const start = process.hrtime.bigint();
+            for (let i = 0; i < NOP; i++) {
+                let res = await AccessRights.buildPermissions(null, user_roles);
+                if (!(res && res.permissions))
+                    console.error(`Invalid result: ${JSON.stringify(res)}`);
+            }
+            const end = process.hrtime.bigint();
+            console.error(buildLogString(`### Build permissions performance: ${((1e9 * NOP) / Number(end - start)).toFixed(2)} op/sec`));
+        })
+        .catch(err => {
+            console.error(buildLogString(`${err}`));
+        });
+}
 if (!global.$Services)
     global.$Services = {};
 global.$Services.permissions = AccessRights.getInstance;

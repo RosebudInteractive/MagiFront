@@ -315,7 +315,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
+        "ExecutorId": null,
         "Description": "Отредактируйте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
@@ -450,8 +450,8 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
-        "Description": "Проверьте, пожалуйста, техническую стенограмму.",
+        "ExecutorId": null,
+        "Description": "Отредактируйте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
         "IsElemReady": false,
@@ -585,7 +585,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
     res = await pm.newTask({
         "Name": "Редактура-корректура - выполнение задачи",
         "ProcessId": p_id,
-        "ExecutorId": data.ExecutorTranscript ? data.ExecutorTranscript : null,
+        "ExecutorId": null,
         "Description": "Отредактируйте, пожалуйста, техническую стенограмму.",
         "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
         "WriteFieldSet": "Отредактировать ТС",
