@@ -116,6 +116,7 @@ const _prodConfig = {
         ]
     },
     resolve: {
+        extensions: ['.js', '.jsx'],
         alias: {
             'react-native$': 'react-native-web',
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
