@@ -1,8 +1,8 @@
-import React, {useState, useEffect,} from "react"
+import React, {useEffect, useState,} from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
+import {FILTER_FIELD_TYPE} from "./types";
 import Field from "./field";
 import ClearIcon from "tt-assets/svg/close.svg"
-import {FILTER_FIELD_TYPE} from "./types";
 
 
 type RowProps = {
@@ -80,6 +80,10 @@ const getEmptyFieldValue = (field: FilterField) => {
             return []
         case FILTER_FIELD_TYPE.USER:
             return {userName: "", hasNoExecutor: false}
+        case FILTER_FIELD_TYPE.AUTOCOMPLETE:
+            return ''
+        case FILTER_FIELD_TYPE.DATE_RANGE:
+            return null;
         default:
             return null
     }

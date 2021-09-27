@@ -1,5 +1,5 @@
 import React, {useRef} from "react"
-import { withStyles} from "@material-ui/core"
+import {withStyles} from "@material-ui/core"
 import {KeyboardDatePicker} from "@material-ui/pickers"
 
 const CssKeyboardDatePicker = withStyles({
@@ -112,6 +112,7 @@ export default function UiDatePicker(props) {
     }
 
     const _id = useRef(props.id ? props.id : "ui-date-time-picker-" + Math.floor(Math.random() * Math.floor(10000)))
+    const allProps = {...props, ...props.input}
 
     return <CssKeyboardDatePicker
         id={_id.current}
@@ -121,9 +122,9 @@ export default function UiDatePicker(props) {
         format={"DD.MM.yyyy"}
         margin="normal"
         autoOk={true}
-
-        label={props.label}
-        {...props.input}
+        {...allProps}
+        // label={props.label}
+        // {...props.input}
         value={props.input && props.input.value ? props.input.value : null}
         onChange={onChange}
         onBlur={onBlur}

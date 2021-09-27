@@ -20,7 +20,8 @@ const SQL_GET_LIST_MSSQL =
     "  case when lcp.[Id] is NULL then lc.[Number] else lcp.[Number] end Num_parent,\n" +
     "  case when lcp.[Id] is NULL then 0 else lc.[Number] end Num, lc.[ParentId], lc.[ReadyDate],\n" +
     "  lc.[State] LessonState, c.[State] CourseState, p.[Id] Pid, p.[State] PState,\n" +
-    "  t.[State] TaskState, ep.[State] ElState, e.[Name] ElName, ep.[Id] ElemId, u.[SysParentId] UserId, u.[DisplayName]\n" +
+    "  t.[State] TaskState, ep.[State] ElState, e.[Name] ElName, ep.[Id] ElemId, u.[SysParentId] UserId, u.[DisplayName],\n" +
+    "  ue.[SysParentId] EUserId, ue.[DisplayName] EDisplayName\n" +
     "from [LessonLng] ll\n" +
     "  join [LessonCourse] lc on ll.[LessonId] = lc.[LessonId]\n" +
     "  join [Course] c on lc.[CourseId] = c.[Id]\n" +
@@ -31,6 +32,7 @@ const SQL_GET_LIST_MSSQL =
     "  left join [PmElemProcess] ep on ep.[Id] = t.[ElementId]\n" +
     "  left join [PmElement] e on e.[Id] = ep.[ElemId]\n" +
     "  left join [User] u on u.[SysParentId] = p.[SupervisorId]\n" +
+    "  left join [User] ue on ue.[SysParentId] = ep.[SupervisorId]\n" +
     "where (not lc.[ReadyDate] is NULL) and (not((lc.[State] = 'R') and (c.[State] = 'P') and (p.[Id] is NULL)))<%= filter %>\n" +
     "order by lc.[ReadyDate], 6, 7, lc.[LessonId]";
 
@@ -39,7 +41,8 @@ const SQL_GET_LIST_MYSQL =
     "  case when lcp.`Id` is NULL then lc.`Number` else lcp.`Number` end Num_parent,\n" +
     "  case when lcp.`Id` is NULL then 0 else lc.`Number` end Num, lc.`ParentId`, lc.`ReadyDate`,\n" +
     "  lc.`State` LessonState, c.`State` CourseState, p.`Id` Pid, p.`State` PState,\n" +
-    "  t.`State` TaskState, ep.`State` ElState, e.`Name` ElName, ep.`Id` ElemId, u.`SysParentId` UserId, u.`DisplayName`\n" +
+    "  t.`State` TaskState, ep.`State` ElState, e.`Name` ElName, ep.`Id` ElemId, u.`SysParentId` UserId, u.`DisplayName`,\n" +
+    "  ue.`SysParentId` EUserId, ue.`DisplayName` EDisplayName\n" +
     "from `LessonLng` ll\n" +
     "  join `LessonCourse` lc on ll.`LessonId` = lc.`LessonId`\n" +
     "  join `Course` c on lc.`CourseId` = c.`Id`\n" +
@@ -50,6 +53,7 @@ const SQL_GET_LIST_MYSQL =
     "  left join `PmElemProcess` ep on ep.`Id` = t.`ElementId`\n" +
     "  left join `PmElement` e on e.`Id` = ep.`ElemId`\n" +
     "  left join `User` u on u.`SysParentId` = p.`SupervisorId`\n" +
+    "  left join `User` ue on ue.`SysParentId` = ep.`SupervisorId`\n" +
     "where (not lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))<%= filter %>\n" +
     "order by lc.`ReadyDate`, 6, 7, lc.`LessonId`";
 
@@ -82,16 +86,27 @@ const SQL_GET_LESSON_MYSQL = "select `Id`, `CourseId`, `ParentId` from `Lesson` 
 
 const DFLT_LSN_SORT_ORDER = "LessonName,ASC";
 
+const VIEW_ONLY = 1;
+const VIEW_AND_EDIT = 2;
+const FULL_ACCESS = 3;
+
 const PmDashboard = class PmDashboard extends DbObject {
 
     constructor(options) {
         super(options);
     }
 
+    async _checkDashboardPermissions(access_level, options) {
+        let { user, userPermissions, isAdmin } = await this._getPermissions("dsb.al", options);
+        if (!(isAdmin || (userPermissions["dsb.al"] && (userPermissions["dsb.al"] >= access_level))))
+            throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет прав доступа для совершения операции.`);
+        return user;
+    }
+
     async getLessonList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmElemManager, opts);
+        opts.user = await this._checkDashboardPermissions(VIEW_ONLY, options);
 
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
 
@@ -166,8 +181,8 @@ const PmDashboard = class PmDashboard extends DbObject {
     async getList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmElemManager, opts);
-
+        opts.user = await this._checkDashboardPermissions(VIEW_ONLY, options);
+        
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
 
         let filter_mysql = "";
@@ -244,7 +259,16 @@ const PmDashboard = class PmDashboard extends DbObject {
                 if (elem.ElemId) {
                     let pelem = elems[elem.ElemId];
                     if (!pelem) {
-                        elems[elem.ElemId] = pelem = { Id: elem.ElemId, Name: elem.ElName, State: elem.ElState, HasAlert: false };
+                        elems[elem.ElemId] = pelem = {
+                            Id: elem.ElemId,
+                            Name: elem.ElName,
+                            State: elem.ElState,
+                            HasAlert: false,
+                            Supervisor: elem.EUserId ? {
+                                Id: elem.EUserId,
+                                DisplayName: elem.EDisplayName
+                            } : undefined
+                        };
                         curr_lesson.Elements.push(pelem);
                     }
                     if ((pelem.State === ElemState.NotReady) && task_in_progress[elem.TaskState])
@@ -262,7 +286,7 @@ const PmDashboard = class PmDashboard extends DbObject {
 
     async setLessonReadyDate(id, data, options) {
         let opts = _.cloneDeep(options || {});
-        opts.user = await this._checkPermissions(AccessFlags.PmSupervisor, opts);
+        opts.user = await this._checkDashboardPermissions(VIEW_AND_EDIT, options);
         let lessonService = this.getService("lesson", true);
         if (lessonService) {
             let inpFields = data || {};

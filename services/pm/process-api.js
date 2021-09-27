@@ -388,7 +388,7 @@ const DFLT_TASK_SORT_ORDER = "TimeCr,desc";
 const DFLT_PROCESS_SORT_ORDER = "TimeCr,desc";
 
 const DFLT_LOCK_TIMEOUT_SEC = 180;
-const DFLT_WAIT_LOCK_TIMEOUT_SEC = 60;
+const DFLT_WAIT_LOCK_TIMEOUT_MSEC = 60 * 1000; // 60 sec
 
 const LOCK_KEY_PREFIX = "_process_edt:";
 const STRUCT_KEY_PREFIX = "_pstruct:";
@@ -407,8 +407,8 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     constructor(options) {
         super(options);
-        this._struct_cache = {};
         this._var_def_cache = {};
+        this._struct_cache = this.createDataCache(STRUCT_KEY_PREFIX, this._loadProcessStruct.bind(this), STRUCT_TTL_SEC, { md5_hash: true });
         this._stdFunctions = {
             isEmpty: this._isEmpty.bind(this),
             isNotEmpty: this._isNotEmpty.bind(this)
@@ -417,49 +417,13 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     async _lockProcess(id, func, timeout) {
         const CHECK_TIMEOUT = 500;
-        let is_key_set = false;
-        let key;
-        try {
-            if (typeof (func) === "function") {
-                await new Promise((resolve, reject) => {
-                    key = `${LOCK_KEY_PREFIX}${id}`;
-                    let is_rejected = false;
-                    let thandler = setTimeout(() => {
-                        if (!is_key_set) {
-                            is_rejected = true;
-                            reject(new HttpError(HttpCode.ERR_TOO_MANY_REQ, `Процесс модифицируется другим пользователем.`));
-                        }
-                    }, timeout ? timeout : DFLT_WAIT_LOCK_TIMEOUT_SEC);
-                    let lock = async () => {
-                        let lockRes = await this.cacheSet(key, "1", {
-                            ttlInSec: DFLT_LOCK_TIMEOUT_SEC,
-                            nx: true
-                        });
-                        if (lockRes === "OK") {
-                            if (is_rejected)
-                                await this.cacheDel(key)
-                            else {
-                                is_key_set = true;
-                                clearTimeout(thandler);
-                                resolve();
-                            }
-                        }
-                        else
-                            if (!is_rejected)
-                                setTimeout(lock, CHECK_TIMEOUT);
-                    }
-                    lock();
-                });
-                let result = await func();
-                await this.cacheDel(key);
-                return result;
-            }
-        }
-        catch (err) {
-            if (is_key_set && key)
-                await this.cacheDel(key);
-            throw err;
-        }
+        let result = await this._lock(`${LOCK_KEY_PREFIX}${id}`, func,
+            timeout ? timeout : DFLT_WAIT_LOCK_TIMEOUT_MSEC, {
+                lock_timeout: DFLT_LOCK_TIMEOUT_SEC,
+                check_timeout: CHECK_TIMEOUT,
+                err_msg: `Процесс модифицируется другим пользователем.`
+        });
+        return result;
     }
 
     async getProcessList(options) {
@@ -1893,7 +1857,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                         break;
 
                                     default:
-                                        throw new Error(`ProcessAPI::updateTask: Unknown modified object type: "${obj_ids[i].type}".`);
+                                        throw new Error(`ProcessAPI::delTaskDep: Unknown modified object type: "${obj_ids[i].type}".`);
                                 }
 
                                 let obj = taskObj;
@@ -2269,7 +2233,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                             break;
 
                                         default:
-                                            throw new Error(`ProcessAPI::updateTask: Unknown modified object type: "${obj_ids[i].type}".`);
+                                            throw new Error(`ProcessAPI::delTask: Unknown modified object type: "${obj_ids[i].type}".`);
                                     }
 
                                     let root = await this._getObjById(obj_ids[i].id, expr, dbOpts);
@@ -2591,7 +2555,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                         }
 
                         if (isSupervisor)
-                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"]);
+                            this._setFieldValues(taskObj, inpFields, null, ["Name", "Description", "DueDate", "IsFinal", "IsAutomatic"])
+                        else
+                            if (isElemElemManager)
+                                this._setFieldValues(taskObj, inpFields, null, ["Description", "DueDate"]);
 
                         let is_executor_changed = false;
                         if (typeof (inpFields.ExecutorId) !== "undefined") {
@@ -3448,11 +3415,56 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         }, memDbOptions);
     }
 
+    async _loadProcessStruct(id, options) {
+        let opts = _.cloneDeep(options || {});
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let result = null;
+        let root_obj = await this._getObjById(id, PROCESS_STRUCT_EXPRESSION, dbOpts);
+        try {
+            let collection = root_obj.getCol("DataElements");
+            if (collection.count() === 1) {
+                let pstruct_obj = collection.get(0);
+                result = {
+                    Id: pstruct_obj.id(),
+                    Name: pstruct_obj.name(),
+                    Script: pstruct_obj.script() ? pstruct_obj.script() : null,
+                    ProcessFields: pstruct_obj.processFields() ? JSON.parse(pstruct_obj.processFields()) : null,
+                    Elements: []
+                }
+
+                let root_elems = pstruct_obj.getDataRoot("PmElement");
+                let col_elems = root_elems.getCol("DataElements");
+                for (let i = 0; i < col_elems.count(); i++) {
+                    let elem = col_elems.get(i);
+                    result.Elements.push({
+                        Id: elem.id(),
+                        Name: elem.name(),
+                        SupervisorId: elem.supervisorId(),
+                        Index: elem.index(),
+                        WriteFields: elem.writeFields() ? JSON.parse(elem.writeFields()) : null,
+                        ViewFields: elem.viewFields() ? JSON.parse(elem.viewFields()) : null
+                    });
+                }
+                result.Elements.sort((a, b) => a.Index - b.Index);
+                result.Elements.forEach(elem => delete elem.Index);
+            }
+            else
+                if (opts.silent !== true)
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Id =${id}) не найдено.`);
+        }
+        finally {
+            if (root_obj)
+                this._db._deleteRoot(root_obj.getRoot());
+        }
+        return result;
+    }
+
     async getProcessStruct(id_struct, options) {
         let opts = _.cloneDeep(options || {});
         let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
         let id = id_struct;
         try {
+            opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
             if ((opts.byName === "true") || (opts.byName === true)) {
                 let records = await $data.execSql({
                     dialect: {
@@ -3465,66 +3477,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 else
                     throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Name ="${id}") не найдено.`);
             }
-            opts.user = await this._checkPermissions(AccessFlags.PmTaskExecutor, opts);
-            let key = `${STRUCT_KEY_PREFIX}${id}`;
-
-            let result = null;
-            let redis_ts = await this.cacheHget(key, "ts", { json: true });
-            if (redis_ts) {
-                if ((!this._struct_cache[id]) || (this._struct_cache[id].ts !== redis_ts)) {
-                    let val = await this.cacheHgetAll(key, { json: true });
-                    if (val && val.ts && val.data) {
-                        this._struct_cache[id] = val;
-                        result = val.data;
-                    }
-                }
-                else
-                    result = this._struct_cache[id].data ? this._struct_cache[id].data : null;
-            }
-            if (!result) {
-                this._struct_cache = {};
-                let root_obj = await this._getObjById(id, PROCESS_STRUCT_EXPRESSION, dbOpts);
-                try {
-                    let collection = root_obj.getCol("DataElements");
-                    if (collection.count() != 1)
-                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса (Id =${id}) не найдено.`);
-
-                    let pstruct_obj = collection.get(0);
-                    result = {
-                        Id: pstruct_obj.id(),
-                        Name: pstruct_obj.name(),
-                        Script: pstruct_obj.script() ? pstruct_obj.script() : null,
-                        ProcessFields: pstruct_obj.processFields() ? JSON.parse(pstruct_obj.processFields()) : null,
-                        Elements: []
-                    }
-
-                    let root_elems = pstruct_obj.getDataRoot("PmElement");
-                    let col_elems = root_elems.getCol("DataElements");
-                    for (let i = 0; i < col_elems.count(); i++) {
-                        let elem = col_elems.get(i);
-                        result.Elements.push({
-                            Id: elem.id(),
-                            Name: elem.name(),
-                            SupervisorId: elem.supervisorId(),
-                            Index: elem.index(),
-                            WriteFields: elem.writeFields() ? JSON.parse(elem.writeFields()) : null,
-                            ViewFields: elem.viewFields() ? JSON.parse(elem.viewFields()) : null
-                        });
-                    }
-                    result.Elements.sort((a, b) => a.Index - b.Index);
-                    result.Elements.forEach(elem => delete elem.Index);
-
-                    await this.cacheHset(key, "data", result, { json: true });
-                    let ts = 't' + ((new Date()) - 0);
-                    await this.cacheHset(key, "ts", ts, { json: true });
-                    await this.cacheExpire(key, STRUCT_TTL_SEC);
-                    this._struct_cache[id] = { ts: ts, data: result };
-                }
-                finally {
-                    if (root_obj)
-                        this._db._deleteRoot(root_obj.getRoot());
-                }
-            }
+            let result = await this._struct_cache.getData(id, options);
             return result;
         }
         catch (err) {

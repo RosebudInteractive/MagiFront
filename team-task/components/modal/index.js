@@ -28,13 +28,13 @@ export default function Modal(props) {
 }
 
 Modal.propTypes = {
-    WrappedComponent: PropTypes.object,
+    WrappedComponent: PropTypes.object | PropTypes.func,
     wrappedProps: PropTypes.object,
     customHeader: PropTypes.bool,
     title: PropTypes.string,
     closeAction: PropTypes.func,
-}
+};
 
 Modal.defaultProps = {
     customHeader: false
-}
+};

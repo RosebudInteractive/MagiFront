@@ -1,5 +1,4 @@
 import React from "react"
-import "./filter.sass"
 
 type ButtonProps = {
     opened: boolean,

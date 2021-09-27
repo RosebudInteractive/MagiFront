@@ -35,6 +35,9 @@ const SET_NEXT_TIME_TO_LOAD = `${prefix}/SET_NEXT_TIME_TO_LOAD`;
 const SET_ALL_DATA = `${prefix}/SET_ALL_DATA`;
 const SET_USERS = `${prefix}/SET_USERS`;
 const SET_LESSONS = `${prefix}/SET_LESSONS`;
+const GET_UNPUBLISHED_LESSONS = `${prefix}/GET_UNPUBLISHED_LESSONS`;
+const SET_UNPUBLISHED_LESSONS = `${prefix}/SET_UNPUBLISHED_LESSONS}`;
+
 
 const DATA_LIFETIME = (60 * 1); //  1 minute
 
@@ -52,6 +55,7 @@ export const UsersRecord = Record({
 export const ReducerRecord = Record({
     lessons: [],
     courses: [],
+    unpublishedLessons: [],
     availableForCreationLessons: [],
     users: new UsersRecord(),
     processStructures: [],
@@ -81,6 +85,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('nextTimeToLoadData', payload);
         case SET_LESSONS:
             return state.set('lessons', payload);
+        case SET_UNPUBLISHED_LESSONS:
+            return state.set('unpublishedLessons', payload);
         case SET_USERS:
             return state
                 .setIn(['users', 'a'], payload.a)
@@ -104,6 +110,7 @@ export const nextTimeSelector = createSelector(stateSelector, state => state.nex
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
 export const coursesSelector = createSelector(stateSelector, state => state.courses);
+export const unpublishedLessons = createSelector(stateSelector, state => state.unpublishedLessons);
 
 export const allUsersDSelector = createSelector(stateSelector, state => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
@@ -151,6 +158,10 @@ export const toggleFetching = (isOn) => {
     return {type: TOGGLE_FETCHING, payload: isOn}
 };
 
+export const getDashboardUnpublishedRecords = () => {
+    return {type: GET_UNPUBLISHED_LESSONS}
+};
+
 
 //sagas:
 
@@ -163,8 +174,21 @@ export const saga = function* () {
         takeEvery(REQUEST_START, fetchingToggle),
         takeEvery(REQUEST_SUCCESS, fetchingToggle),
         takeEvery(REQUEST_FAIL, fetchingToggle),
+        takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedRecordsSaga),
     ])
 };
+
+function* getUnpublishedRecordsSaga() {
+    try {
+        yield put({type: REQUEST_START});
+        const records = yield call(getUnpublishedRecordsReq);
+        yield put({type: SET_UNPUBLISHED_LESSONS, payload: records});
+        yield put({type: REQUEST_SUCCESS});
+    }catch (e) {
+        yield put({type: REQUEST_FAIL});
+        showErrorMessage(e.toString())
+    }
+}
 
 function* fetchingToggle(isOn){
     try {
@@ -333,6 +357,10 @@ const _getAllUsers = () => {
 
 const _getLessons = () => {
     return commonGetQuery("/api/lessons-list")
+};
+
+const getUnpublishedRecordsReq = () => {
+    return commonGetQuery(`/api/pm/dashboard/lesson-list`);
 };
 
 const _getAvailableForCreationLessons = () => {
