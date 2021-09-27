@@ -60,7 +60,7 @@ const _prodConfig = {
                     path.resolve(__dirname, "node_modules/react-dom"),
                 ],
                 // language=JSRegexp
-                test: /\.js$/
+                test: /\.(js|jsx|ts|tsx)$/
             },
             {
                 test: /\.sass$/,
@@ -116,6 +116,7 @@ const _prodConfig = {
         ]
     },
     resolve: {
+        extensions: ['.js', '.jsx'],
         alias: {
             'react-native$': 'react-native-web',
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
@@ -156,10 +157,10 @@ const _devConfig = {
         mailing: ['./mailing/index', hotMiddlewareScript],
         "team-task": ['./team-task/index', hotMiddlewareScript],
         "test-app": ['./test-app/index', hotMiddlewareScript],
-        'player-main': ['./scripts/player-main', hotMiddlewareScript],
-        'player-app': ['./scripts/native-app-player/player-app', hotMiddlewareScript],
-        'player-app-test': ['./scripts/native-app-player/example', hotMiddlewareScript],
-        'workshop-main': ['./scripts/workshop-main', hotMiddlewareScript],
+        // 'player-main': ['./scripts/player-main', hotMiddlewareScript],
+        // 'player-app': ['./scripts/native-app-player/player-app', hotMiddlewareScript],
+        // 'player-app-test': ['./scripts/native-app-player/example', hotMiddlewareScript],
+        // 'workshop-main': ['./scripts/workshop-main', hotMiddlewareScript],
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -186,7 +187,8 @@ const _devConfig = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                // test: /\.(js|jsx|ts|tsx)$/,
+                test: /\.jsx?$/,
                 loader: 'babel-loader',
                 exclude: [
                     path.resolve(__dirname, "node_modules/webix"),
@@ -256,6 +258,7 @@ const _devConfig = {
         ]
     },
     resolve: {
+        extensions: ['.js', '.jsx'],
         alias: {
             'react-native$': 'react-native-web',
             "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),

@@ -1,7 +1,6 @@
-import React from 'react'
-
+import React from 'react';
 export default function Mask(props) {
-
+    const { color } = props;
     const style = {
         position: 'absolute',
         top: 0,
@@ -9,8 +8,7 @@ export default function Mask(props) {
         height: '100%',
         width: '100%',
         borderBottomRightRadius: 4,
-        background: `linear-gradient(90deg, transparent 65%, ${props.color} 100%)`,
-    }
-
-    return <div style={style}/>
+        background: `linear-gradient(90deg, transparent 65%, ${color} 100%)`,
+    };
+    return <div style={style}/>;
 }

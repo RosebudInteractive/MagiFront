@@ -4,26 +4,54 @@
   width: 100%
   height: 500px
   min-height: 500px
+  padding: 20px 0
+  //margin: 20px 0
+  display: block
+  //flex-direction: column
+  overflow: hidden
+  position: relative
+
+  &._full-screen
+    position: fixed
+    max-height: 10000px
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    width: 100vw
+    height: 100vh
+    z-index: 2
+    margin: 0
+    padding: 50px
+    background-color: rgba(47, 47, 47, 0.8)
+    border: none
+
+.timeline-preview__wrapper
   border-radius: 8px
-  padding: 0 20px 20px
+  position: relative
   display: flex
   flex-direction: column
-  overflow: hidden
-
-//.timeline-preview__wrapper
-//  width: 100%
-//  height: 100%
-//  box-sizing: content-box
-//  display: flex
-//  flex-direction: column
+  width: 100%
+  height: 100%
+  transition: height, width 500ms ease-in-out
 
 .timeline-preview__container
   border-radius: 8px
   overflow-x: auto
-  flex: 1 0 auto
+  flex: 1 0 100%
   height: auto
+  position: relative
 
-.timeline-preview__zoom-slider
-  height: 80px
-  width: 100%
-  //flex: 1 0 auto
+  &::-webkit-scrollbar
+    width: 8px
+    height: 8px
+    visibility: hidden
+
+
+  &::-webkit-scrollbar-track
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3)
+    border-radius: 8px
+
+  &::-webkit-scrollbar-thumb
+    background-color: rgba(169, 169, 169, 100)
+    outline: none
+    border-radius: 8px

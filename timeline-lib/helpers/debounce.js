@@ -1,4 +1,4 @@
-//todo try to use it later instead of lodash.debounce
+// todo try to use it later instead of lodash.debounce
 export default function debounce(originalFn, timeoutMs) {
     let timeout;
     return (...args) => {
