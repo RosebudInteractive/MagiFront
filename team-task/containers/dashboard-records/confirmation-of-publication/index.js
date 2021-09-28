@@ -11,17 +11,11 @@ function ConfirmationOfPublication(props) {
 
     const onApply = () => {
         const val = moment(value);
-        props.applyAction({
-                isoDateString: val.toISOString(),
-                lessonId: record.LessonId
-            },
-            {
-                ...record,
+        props.applyAction(
+            {...record,
                 PubDate: val.locale('ru').format('DD MMM'),
                 DateObject: val,
-                // IsEndOfWeek: toItem.IsEndOfWeek,
-                // Week: props.Week,
-            })
+            });
 
         if (closeAction) closeAction();
     };

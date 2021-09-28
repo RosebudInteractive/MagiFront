@@ -50,9 +50,8 @@ function DashboardRecords(props) {
         actions.changeViewMode(mode);
     };
 
-    const changeDate = ({isoDateString, lessonId}, record) => {
+    const changeDate = (record) => {
         actions.changePublishRecordDate(record.id, record);
-        actions.setPublishRecordDate({isoDateString, lessonId})
     };
 
     const backAction = () => {

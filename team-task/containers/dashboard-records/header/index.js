@@ -4,6 +4,7 @@ import "./dashboard-records-header.sass"
 import BackArrow from "tt-assets/svg/back-arrow.svg"
 import {Field, Form, FormSpy} from "react-final-form";
 
+//todo change to Select instead of Form
 
 export default function DashboardRecordsHeader(props) {
     const {title} = props;
@@ -14,6 +15,11 @@ export default function DashboardRecordsHeader(props) {
         </div>
         <div className="dashboard-header-field-name">
             <h6>{title}</h6>
+
+
+            {/*<Select value={value} todo use it instead of form!*/}
+            {/*        label={'Дата публикации'}*/}
+            {/*        onChange={onChange}/>*/}
 
             <Form
                 initialValues={{mode: '0'}}

@@ -35,13 +35,14 @@ const TOGGLE_MODAL_DND_TO_PUBLISH = `${prefix}/TOGGLE_MODAL_DRAG_N_DROP_TO_PUBLI
 const OPEN_MODAL_DND_TO_PUBLISH = `${prefix}/OPEN_MODAL_DND_TO_PUBLISH`;
 const CLOSE_MODAL_DND_TO_PUBLISH = `${prefix}/CLOSE_MODAL_DND_TO_PUBLISH`;
 const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
-// const SET_FILTER_FOR_UNPUBLISHED = `${prefix}/SET_FILTER_FOR_UNPUBLISHED`;
-// const SET_FILTER_VALUES_UNPUBLISHED = `${prefix}/SET_FILTER_VALUES_UNPUBLISHED`;
 const SET_FILTER_UNPUBLISHED = `${prefix}/SET_FILTER_UNPUBLISHED`;
 const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
 const CHANGE_DISPLAYED_RECORD = `${prefix}/CHANGE_DISPLAYED_RECORD`;
 const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
+
+const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
+const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
 
 
 const defaultFieldSet = new Set([]);
@@ -54,6 +55,7 @@ export const VIEW_MODE = {
 
 export const ReducerRecord = Record({
     records: [],
+    changedRecords: [],
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
     unpublishedRecords: [],
@@ -96,6 +98,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('selectedRecord', payload);
         case SET_NEW_DISPLAYED_RECORDS:
             return state.set('displayRecords', [...payload]);
+        case SET_CHANGED_RECORDS:
+            return state.set('changedRecords', [...payload]);
         default:
             return state
     }
@@ -104,6 +108,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName];
 
 export const recordsSelector = createSelector(stateSelector, state => state.records);
+export const recordsChangedSelector = createSelector(stateSelector, state => state.changedRecords);
 export const displayRecordsSelector = createSelector(stateSelector, state => state.displayRecords);
 export const unpublishedRecordsSelector = createSelector(stateSelector, state => state.unpublishedRecords);
 export const allUnpublishedRecordsSelector = createSelector(stateSelector, state => state.allUnpublishedRecords);
@@ -167,7 +172,8 @@ export const saga = function* () {
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
         takeEvery(PUBLISH_RECORD, publishRecordSaga),
         takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga),
-        takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga)
+        takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga),
+        takeEvery(RELOAD_RECORDS, reloadRecordsSaga)
     ])
 };
 
@@ -194,48 +200,26 @@ function* addToDisplayedRecordsSaga(data) {
 
 function* changeDisplayedRecordsSaga(data) {
     try {
-        const displayedRecords = yield select(displayRecordsSelector);
-        const oldIndex = displayedRecords.findIndex((record) => record.id === data.payload.id);
-        const newIndex = displayedRecords.findIndex((record, ind) => record.DateObject.isSame(data.payload.newRecord.DateObject) && ind !== oldIndex);
+        const mode = yield select(modeSelector);
+        const newRecord = data.payload.newRecord;
 
+        const res = yield call( setDateToPublication,{ReadyDate: newRecord.DateObject.toISOString(), lessonId: newRecord.LessonId});
 
-        if (newIndex !== -1) {
+        if(res && res.result === 'OK'){
+            const dates = yield select(filterSelector);
+            const records = _.cloneDeep(yield select(recordsChangedSelector));
 
-            const newRecordData = {...data.payload.newRecord, id: displayedRecords[newIndex].id,
-                Week: displayedRecords[newIndex].Week,
-                IsEndOfWeek: displayedRecords[newIndex].IsEndOfWeek,
-                PubDate: displayedRecords[newIndex].PubDate,
-                IsEven: displayedRecords[newIndex].IsEven
-            };
+            const foundedRecordIndex = records.findIndex(record => record.CourseId === +newRecord.CourseId && record.LessonId === +newRecord.LessonId);
 
-            if (displayedRecords[newIndex].CourseName.length < 1) {
-                displayedRecords[newIndex] = newRecordData;
-            } else {
-                displayedRecords.splice(newIndex, 0, newRecordData);
+            if(foundedRecordIndex !== -1){
+                records[foundedRecordIndex].PubDate = newRecord.DateObject.toISOString();
+                const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
+
+                yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
+                const resultArray = handleServerData(sorted, +mode, dates.st_date, dates.fin_date);
+                yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
             }
-
-            displayedRecords[oldIndex] = {
-                id: displayedRecords[oldIndex].id,
-                Week: displayedRecords[oldIndex].Week,
-                IsEndOfWeek: displayedRecords[oldIndex].IsEndOfWeek,
-                PubDate: displayedRecords[oldIndex].PubDate,
-                IsEven: displayedRecords[oldIndex].IsEven,
-                $css: displayedRecords[oldIndex].$css,
-                CourseId: null,
-                CourseName: "",
-                LessonId: null,
-                LessonNum: "",
-                CourseLessonName: ['', ''],
-                LessonName: "",
-                Elements: [],
-                IsPublished: null,
-                ProcessId: null,
-                ProcessState: null
-            };
         }
-
-        yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
-
     } catch (e) {
         showErrorMessage(e.toString())
     }
@@ -251,7 +235,7 @@ function* publishRecordSaga(data) {
                 lessonId: data.payload.lessonId
             });
 
-        // yield put(getRecords());
+        // yield put(getRecords()); //todo maybe need in future
         const filterValues = yield select(filterUnpublishedSelector);
         yield put(getUnpublishedRecords(filterValues));
 
@@ -374,7 +358,9 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                 };
             });
 
+            // console.log('first', first)
             if (other && other.length > 0) {
+                // console.log('other', other)
                 other.forEach((item, index) => {
                     item.Week = '';
                     item.PubDate = '';
@@ -438,6 +424,26 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
     return resultArray;
 };
 
+function* reloadRecordsSaga() {
+    yield put({type: REQUEST_START});
+
+    try {
+        const params = yield select(paramsSelector);
+
+        const cleanedParams = new URLSearchParams(params);
+        cleanedParams.delete('CourseNameUnpublished');
+        cleanedParams.delete('LessonNameUnpublished');
+
+        const records = yield call(getRecordsReq, cleanedParams);
+
+        yield put({type: SET_RECORDS, payload: records});
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        yield put(showErrorMessage(e.message));
+    }
+}
+
 function* getRecordsSaga() {
     yield put({type: REQUEST_START});
     try {
@@ -451,10 +457,8 @@ function* getRecordsSaga() {
 
         const records = yield call(getRecordsReq, cleanedParams);
 
-        yield put({
-            type: SET_RECORDS,
-            payload: records
-        });
+        yield put({type: SET_RECORDS, payload: records});
+        yield put({type: SET_CHANGED_RECORDS, payload: records});
 
         const fields = new Set();
         records.forEach(rec => {
