@@ -9,6 +9,6 @@ export default function Axis(props) {
         top,
     }), [width, top]);
     return (<View style={[styles.wrapper, style]}>
-      <Serifs points={serifs} yearPerPixel={yearPerPixel}/>
+        <Serifs points={serifs} yearPerPixel={yearPerPixel} width={width}/>
     </View>);
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState, } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import { View } from 'react-native';
 import EventPoints from './event-points';
 import PeriodSections from './periods';
@@ -11,13 +11,14 @@ export const HORIZONTAL_INDENT = 10;
 const ITEM_MIN_WIDTH = 50;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, } = props;
+    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, fsMode,} = props;
     const [svgWidth, setSvgWidth] = useState(0);
     const [itemWidth, setItemWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
     const [eventsWithCoords, setEventsWithCoords] = useState(events);
     const [lastYearFromLastPoint, setLastYear] = useState(null);
     const [activeItem, setActiveItem] = useState({ type: null, id: null });
+    const viewPort = useRef(null);
     const zoomRef = useRef(zoom);
     function calculateVertical() {
         events.forEach((item) => {
@@ -68,6 +69,16 @@ export default function TimeAxis(props) {
     useEffect(() => {
         calculateVertical();
     }, [levelLimit]);
+    const viewPortHeight = useMemo(() => {
+        if (height) {
+            return height;
+        }
+        // @ts-ignore
+        return (viewPort.current && viewPort.current.parentNode)
+            // @ts-ignore
+            ? viewPort.current.parentNode.clientHeight
+            : 0;
+    }, [viewPort.current, height, fsMode]);
     useEffect(() => {
         const allItems = [...events, ...periods];
         if (allItems.length === 0)
@@ -107,7 +118,7 @@ export default function TimeAxis(props) {
     useEffect(() => {
         setLastYear(null);
     }, [events, periods]);
-    const midHeight = height / 2;
+    const midHeight = viewPortHeight / 2;
     const recalculateTimelineEnding = useCallback((lastPointEndingYear) => {
         setLastYear(lastPointEndingYear);
     }, []);
@@ -122,7 +133,7 @@ export default function TimeAxis(props) {
             onItemClick({ type, id });
     }, [onItemClick, activeItem]);
     return !!width && !!yearPerPixel.current
-        ? (<View style={{ width: svgWidth, height }}>
+        ? (<View style={{ width: svgWidth, height: viewPortHeight }} ref={viewPort}>
         <SerifsContext.Provider value={{
                 x: itemWidth, y: midHeight, zoom, theme,
             }}>
