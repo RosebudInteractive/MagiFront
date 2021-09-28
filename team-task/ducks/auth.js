@@ -98,7 +98,7 @@ export const hasSupervisorRights = createSelector(userSelector, (user) => {
 });
 
 export const hasPmaRights = createSelector(userSelector, (user) => {
-    return user && user.PData && user.PData.roles && (user.PData.roles.pma)
+    return user && user.PData && user.PData.roles && (user.PData.isAdmin || user.PData.roles.pma)
 });
 
 export const hasElementEditorRights = createSelector(userSelector, (user) => {
