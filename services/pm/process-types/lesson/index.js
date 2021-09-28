@@ -1,7 +1,7 @@
 'use strict';
 
 exports.structure = {
-    Name: "Lesson Process Proto ver. 6.0",
+    Name: "Lesson Process Proto ver. 8.0",
     ProcessFields: {
         "AudioIniURL": {
             "caption": "Исходный звук",
@@ -74,6 +74,10 @@ exports.structure = {
         "AllCompsFinalURL": {
             "caption": "Готовые компоненты",
             "type": "string"
+        },
+        "AudioReDo": {
+            "caption": "Переделать звук",
+            "type": "boolean"
         }
     },
     Elements: [
@@ -85,7 +89,8 @@ exports.structure = {
                 "InstrToAudioEdt",
                 "AudioProcURL",
                 "AudioFinalURL",
-                "AudioNotes"
+                "AudioNotes",
+                "AudioReDo"
             ],
             WriteFields: {
                 "Зарегистрировать запись": [
@@ -167,7 +172,8 @@ exports.structure = {
                 "RefsURL",
                 "AudioFinalURL",
                 "AudioProcURL",
-                "AudioNotes"
+                "AudioNotes",
+                "AudioReDo"
             ],
             WriteFields: {
                 "Отредактировать ТС": [
@@ -187,9 +193,21 @@ exports.structure = {
                 "Сдать тайм-коды": [
                     "AudioFinalURL",
                     "AudioNotes",
-                    "TechTransTimeURL"
+                    "TechTransTimeURL",
+                    "AudioReDo"
                 ],
                 "Сдать музыку и коды": [
+                    "AudioFinalURL",
+                    "AudioNotes",
+                    "TechTransMusicResultURL",
+                    "AudioReDo"
+                ],
+                "Повторно сдать тайм-коды": [
+                    "AudioFinalURL",
+                    "AudioNotes",
+                    "TechTransTimeURL"
+                ],
+                "Повторно сдать музыку и коды": [
                     "AudioFinalURL",
                     "AudioNotes",
                     "TechTransMusicResultURL"
@@ -344,7 +362,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "Dependencies": [res2.id]
     }, options);
     // Задача #13
-    res = await pm.newTask({
+    let { id: time_code_task_id } = await pm.newTask({
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
@@ -354,16 +372,54 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #13a
-    await pm.newTask({
+    let { id: sound_notes_task_id } = await pm.newTask({
         "Name": "Ознакомиться с замечаниями к обработке звука",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
         "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "IsElemReady": false,
+        "IsElemReady": false
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": sound_notes_task_id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isNotEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Переделка звука
+    res = await pm.newTask({
+        "Name": "Переделка звука",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
+        "Description": "Переделайте, пожалуйста, звук согласно замечаниям.",
+        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
+        "WriteFieldSet": "Выложить отредактированный звук",
+        "IsElemReady": true
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "(AudioReDo === true)"
+    }, options);
+
+    // Повторный контроль звука и расстановка тайм-кодов
+    res = await pm.newTask({
+        "Name": "Повторный контроль звука и расстановка тайм-кодов",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
+        "Description": "Проверьте, пожалуйста, качество обработки звукозаписи и расставьте таймкоды в технической стенограмме.",
+        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
+        "WriteFieldSet": "Повторно сдать тайм-коды",
+        "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #14
     res = await pm.newTask({
         "Name": "Финализация",
@@ -373,7 +429,24 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
-        "Dependencies": [res.id, res2.id]
+        "Dependencies": [res2.id, res.id]
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Конец процесса
+    await pm.newTask({
+        "Name": "Конец процесса",
+        "ProcessId": p_id,
+        "Description": "Автоматическое завершение процесса.",
+        "IsAutomatic": true,
+        "IsFinal": true,
+        "Dependencies": [res.id, sound_notes_task_id]
     }, options);
 }
 
@@ -478,8 +551,9 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res2.id]
     }, options);
+
     // Задача #13
-    res = await pm.newTask({
+    let { id: time_code_task_id } = await pm.newTask({
         "Name": "Контроль звука и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
@@ -489,16 +563,54 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #13a
-    await pm.newTask({
+    let { id: sound_notes_task_id } =await pm.newTask({
         "Name": "Ознакомиться с замечаниями к обработке звука",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
         "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "IsElemReady": false,
+        "IsElemReady": false
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": sound_notes_task_id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isNotEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Переделка звука
+    res = await pm.newTask({
+        "Name": "Переделка звука",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
+        "Description": "Переделайте, пожалуйста, звук согласно замечаниям.",
+        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
+        "WriteFieldSet": "Выложить отредактированный звук",
+        "IsElemReady": true
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "(AudioReDo === true)"
+    }, options);
+
+    // Повторный контроль звука и расстановка тайм-кодов
+    res = await pm.newTask({
+        "Name": "Повторный контроль звука и расстановка тайм-кодов",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
+        "Description": "Проверьте, пожалуйста, качество обработки звукозаписи и расставьте таймкоды в технической стенограмме.",
+        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
+        "WriteFieldSet": "Повторно сдать тайм-коды",
+        "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #14
     res = await pm.newTask({
         "Name": "Финализация",
@@ -509,6 +621,23 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res.id, res2.id]
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Конец процесса
+    await pm.newTask({
+        "Name": "Конец процесса",
+        "ProcessId": p_id,
+        "Description": "Автоматическое завершение процесса.",
+        "IsAutomatic": true,
+        "IsFinal": true,
+        "Dependencies": [res.id, sound_notes_task_id]
     }, options);
 }
 
@@ -624,8 +753,9 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": false,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #14
-    res = await pm.newTask({
+    let { id: time_code_task_id } = await pm.newTask({
         "Name": "Контроль звука, монтаж музыки и расстановка тайм-кодов - исполнение",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
@@ -635,16 +765,54 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #14b
-    await pm.newTask({
+    let { id: sound_notes_task_id } = await pm.newTask({
         "Name": "Ознакомиться с замечаниями к обработке звука",
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
         "Description": "Пожалуйста, ознакомьтесь с замечаниями к обработке звукозаписи и учтите их в дальнейшей работе.",
         "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
-        "IsElemReady": false,
+        "IsElemReady": false
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": sound_notes_task_id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isNotEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Переделка звука
+    res = await pm.newTask({
+        "Name": "Переделка звука",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSound ? data.ExecutorSound : null,
+        "Description": "Переделайте, пожалуйста, звук согласно замечаниям.",
+        "ElementId": elements["Звук"] ? elements["Звук"].Id : null,
+        "WriteFieldSet": "Выложить отредактированный звук",
+        "IsElemReady": true
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "(AudioReDo === true)"
+    }, options);
+
+    // Повторный контроль звука и расстановка тайм-кодов
+    res = await pm.newTask({
+        "Name": "Повторный контроль звука и расстановка тайм-кодов",
+        "ProcessId": p_id,
+        "ExecutorId": data.ExecutorSoundControl ? data.ExecutorSoundControl : null,
+        "Description": "Проверьте, пожалуйста, качество обработки звукозаписи и расставьте таймкоды в технической стенограмме.",
+        "ElementId": elements["Техническая стенограмма"] ? elements["Техническая стенограмма"].Id : null,
+        "WriteFieldSet": "Повторно сдать музыку и коды",
+        "IsElemReady": true,
         "Dependencies": [res.id]
     }, options);
+
     // Задача #15
     res = await pm.newTask({
         "Name": "Финализация",
@@ -655,6 +823,23 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res.id, res2.id]
+    }, options);
+    await pm.addOrUpdateTaskDep(true, {
+        "TaskId": res.id,
+        "DepTaskId": time_code_task_id,
+        "IsConditional": true,
+        "IsDefault": false,
+        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+    }, options);
+
+    // Конец процесса
+    await pm.newTask({
+        "Name": "Конец процесса",
+        "ProcessId": p_id,
+        "Description": "Автоматическое завершение процесса.",
+        "IsAutomatic": true,
+        "IsFinal": true,
+        "Dependencies": [res.id, sound_notes_task_id]
     }, options);
 }
 

@@ -83,7 +83,10 @@ exports.BaseInApp = class BaseInApp extends Payment {
 
     async insert(data, options) {
         let courseService = this.getService("courses");
-        let course = await courseService.getPriceInfo(data.courseId, options.user, { mobile_app: this._platform });
+        let course = await courseService.getPriceInfo(data.courseId, options.user, {
+            mobile_app: this._platform,
+            promo: data.promo ? data.promo : undefined
+        });
         if (!course.ProductId)
             throw new HttpError(HttpCode.ERR_BAD_REQ, {
                 error: "missingProductId",
@@ -96,6 +99,25 @@ exports.BaseInApp = class BaseInApp extends Payment {
             });
         let { Price, Code } = course.InAppPrices[this._platform].DPrice ?
             course.InAppPrices[this._platform].DPrice : course.InAppPrices[this._platform].Price;
+        if (data.promo) {
+            if (course.Promo) {
+                if (!(course.Promo.InAppPrices && course.Promo.InAppPrices[this._platform] &&
+                    course.Promo.InAppPrices[this._platform].Price))
+                    throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                        error: "missingPromoPlatformPrice",
+                        message: `Курс не продается на платформе "${this._platform}" по промокоду "${course.Promo.PromoCode}".`
+                    });
+                course.Promo.Sum = course.Promo.InAppPrices[this._platform].Price;
+                course.Promo.PromoSum = Price - course.Promo.Sum;
+                Price = course.Promo.Sum;
+                Code = course.Promo.InAppPrices[this._platform].Code;
+            }
+            else
+                throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                    error: "invalidPromoCode",
+                    message: `Недействительный промокод "${data.promo}".`
+                });
+        }
         let pay_data = {
             courseId: data.courseId,
             buyAsGift: false,
@@ -112,7 +134,8 @@ exports.BaseInApp = class BaseInApp extends Payment {
                         Price: Price
                     }
                 ]
-            }
+            },
+            Promo: course.Promo ? course.Promo : undefined
         }
         return super.insert(pay_data, options);
     }

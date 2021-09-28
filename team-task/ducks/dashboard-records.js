@@ -35,14 +35,14 @@ const TOGGLE_MODAL_DND_TO_PUBLISH = `${prefix}/TOGGLE_MODAL_DRAG_N_DROP_TO_PUBLI
 const OPEN_MODAL_DND_TO_PUBLISH = `${prefix}/OPEN_MODAL_DND_TO_PUBLISH`;
 const CLOSE_MODAL_DND_TO_PUBLISH = `${prefix}/CLOSE_MODAL_DND_TO_PUBLISH`;
 const PUBLISH_RECORD = `${prefix}/PUBLISH_RECORD`;
-// const SET_FILTER_FOR_UNPUBLISHED = `${prefix}/SET_FILTER_FOR_UNPUBLISHED`;
-// const SET_FILTER_VALUES_UNPUBLISHED = `${prefix}/SET_FILTER_VALUES_UNPUBLISHED`;
 const SET_FILTER_UNPUBLISHED = `${prefix}/SET_FILTER_UNPUBLISHED`;
 const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
 const CHANGE_DISPLAYED_RECORD = `${prefix}/CHANGE_DISPLAYED_RECORD`;
 const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
 
+const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
+const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
 
 
 const defaultFieldSet = new Set([]);
@@ -55,6 +55,7 @@ export const VIEW_MODE = {
 
 export const ReducerRecord = Record({
     records: [],
+    changedRecords: [],
     fieldSet: defaultFieldSet,
     displayRecords: defaultFieldSet,
     unpublishedRecords: [],
@@ -97,6 +98,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('selectedRecord', payload);
         case SET_NEW_DISPLAYED_RECORDS:
             return state.set('displayRecords', [...payload]);
+        case SET_CHANGED_RECORDS:
+            return state.set('changedRecords', [...payload]);
         default:
             return state
     }
@@ -105,6 +108,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName];
 
 export const recordsSelector = createSelector(stateSelector, state => state.records);
+export const recordsChangedSelector = createSelector(stateSelector, state => state.changedRecords);
 export const displayRecordsSelector = createSelector(stateSelector, state => state.displayRecords);
 export const unpublishedRecordsSelector = createSelector(stateSelector, state => state.unpublishedRecords);
 export const allUnpublishedRecordsSelector = createSelector(stateSelector, state => state.allUnpublishedRecords);
@@ -140,7 +144,7 @@ export const toggleModalDndToPublish = (isOn) => {
     return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
 };
 
-export const openModalDndToPublish = () => { //id, title - CourseName and LessinName, initialDate
+export const openModalDndToPublish = () => {
     return {type: OPEN_MODAL_DND_TO_PUBLISH, payload: true};
 };
 
@@ -168,7 +172,8 @@ export const saga = function* () {
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
         takeEvery(PUBLISH_RECORD, publishRecordSaga),
         takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga),
-        takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga)
+        takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga),
+        takeEvery(RELOAD_RECORDS, reloadRecordsSaga)
     ])
 };
 
@@ -178,8 +183,8 @@ function* addToDisplayedRecordsSaga(data) {
 
         const index = displayedRecords.findIndex(record => record.id === data.payload.id);
 
-        if(index !== -1) {
-            if(displayedRecords[index].CourseName.length < 1) {
+        if (index !== -1) {
+            if (displayedRecords[index].CourseName.length < 1) {
                 displayedRecords[index] = data.payload.newRecord;
             } else {
                 displayedRecords.splice(index, 0, data.payload.newRecord);
@@ -188,24 +193,34 @@ function* addToDisplayedRecordsSaga(data) {
 
         yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
 
-    }catch (e) {
+    } catch (e) {
         showErrorMessage(e.toString())
     }
 }
 
 function* changeDisplayedRecordsSaga(data) {
     try {
-        const displayedRecords = yield select(displayRecordsSelector);
+        const mode = yield select(modeSelector);
+        const newRecord = data.payload.newRecord;
 
-        const index = displayedRecords.findIndex(record => record.id === data.payload.id);
+        const res = yield call( setDateToPublication,{ReadyDate: newRecord.DateObject.toISOString(), lessonId: newRecord.LessonId});
 
-        if(index !== -1) {
-            displayedRecords[index] = data.payload.newRecord;
+        if(res && res.result === 'OK'){
+            const dates = yield select(filterSelector);
+            const records = _.cloneDeep(yield select(recordsChangedSelector));
+
+            const foundedRecordIndex = records.findIndex(record => record.CourseId === +newRecord.CourseId && record.LessonId === +newRecord.LessonId);
+
+            if(foundedRecordIndex !== -1){
+                records[foundedRecordIndex].PubDate = newRecord.DateObject.toISOString();
+                const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
+
+                yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
+                const resultArray = handleServerData(sorted, +mode, dates.st_date, dates.fin_date);
+                yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
+            }
         }
-
-        yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
-
-    }catch (e) {
+    } catch (e) {
         showErrorMessage(e.toString())
     }
 }
@@ -217,9 +232,10 @@ function* publishRecordSaga(data) {
         const res = yield call(setDateToPublication,
             {
                 ReadyDate: data.payload.isoDateString,
-                lessonId: data.payload.lessonId});
+                lessonId: data.payload.lessonId
+            });
 
-        // yield put(getRecords());
+        // yield put(getRecords()); //todo maybe need in future
         const filterValues = yield select(filterUnpublishedSelector);
         yield put(getUnpublishedRecords(filterValues));
 
@@ -238,9 +254,13 @@ function* getUnpublishedRecordsSaga(data) {
 
         const objectParams = {};
 
-        if(filter){
-            if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
-            if(filter.lesson_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
+        if (filter) {
+            if (filter.course_name_unpublished) {
+                objectParams.course_name = filter.course_name_unpublished
+            }
+            if (filter.lesson_name_unpublished) {
+                objectParams.lesson_name = filter.lesson_name_unpublished
+            }
         }
 
         const params = $.param(objectParams);
@@ -282,17 +302,17 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
     let startDate;
     let finishDate;
-    if(!stDate && !finDate){
-        if(sDate && eDate){
-            startDate =  moment(sDate);
-            finishDate =  moment(eDate);
+    if (!stDate && !finDate) {
+        if (sDate && eDate) {
+            startDate = moment(sDate);
+            finishDate = moment(eDate);
         } else {
-            startDate =  moment(defaultStartDate);
-            finishDate =  moment(defaultEndDate);
+            startDate = moment(defaultStartDate);
+            finishDate = moment(defaultEndDate);
         }
     } else {
-        startDate =  moment(stDate);
-        finishDate =  moment(finDate);
+        startDate = moment(stDate);
+        finishDate = moment(finDate);
     }
 
     const daysBetween = finishDate.diff(startDate, "days");
@@ -331,21 +351,32 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             first.Elements.forEach((elem) => {
                 const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
 
-                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {css: "", label: "--",  question: false};
+                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
+                    css: "",
+                    label: "--",
+                    question: false
+                };
             });
 
+            // console.log('first', first)
             if (other && other.length > 0) {
+                // console.log('other', other)
                 other.forEach((item, index) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
-                    item.IsEndOfWeek = moment(currentDate).set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7 && index === other.length - 1;
+                    item.IsEndOfWeek = moment(currentDate).set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0
+                    }).isoWeekday() === 7 && index === other.length - 1;
                     item.CourseLessonName = [item.CourseName, item.LessonName];
-                    item.DateObject = currentDate.set({hour:0,minute:0,second:0,millisecond:0});
+                    item.DateObject = currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0});
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
-                        item[elem.Name] = _state ? {css: _state.css, label: _state.label,  question: elem.HasAlert} : {
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
                             css: "_unknown",
                             label: "",
                             question: false
@@ -366,10 +397,10 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             }
             const objectData = {
                 IsEven: isEven,
-                PubDate: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru').format('DD MMM'),
-                DateObject: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru'), //todo check it
+                PubDate: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru').format('DD MMM'),
+                DateObject: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru'), //todo check it
                 CourseId: null,
-                IsEndOfWeek: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7,
+                IsEndOfWeek: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).isoWeekday() === 7,
                 CourseName: "",
                 LessonId: null,
                 Week: weekHasChanged ? displayWeekRange : '',
@@ -390,15 +421,28 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         }
     }
 
-    // let arrDoubles = [];
-    // resultArray.forEach((el, index) => {
-    //     const foundedDoubles
-    // });
-
-    // console.log('arrDoublkes', arrDoubles)
-
     return resultArray;
 };
+
+function* reloadRecordsSaga() {
+    yield put({type: REQUEST_START});
+
+    try {
+        const params = yield select(paramsSelector);
+
+        const cleanedParams = new URLSearchParams(params);
+        cleanedParams.delete('CourseNameUnpublished');
+        cleanedParams.delete('LessonNameUnpublished');
+
+        const records = yield call(getRecordsReq, cleanedParams);
+
+        yield put({type: SET_RECORDS, payload: records});
+        yield put({type: REQUEST_SUCCESS});
+    } catch (e) {
+        yield put({type: REQUEST_FAIL});
+        yield put(showErrorMessage(e.message));
+    }
+}
 
 function* getRecordsSaga() {
     yield put({type: REQUEST_START});
@@ -413,10 +457,8 @@ function* getRecordsSaga() {
 
         const records = yield call(getRecordsReq, cleanedParams);
 
-        yield put({
-            type: SET_RECORDS,
-            payload: records
-        });
+        yield put({type: SET_RECORDS, payload: records});
+        yield put({type: SET_CHANGED_RECORDS, payload: records});
 
         const fields = new Set();
         records.forEach(rec => {
@@ -451,7 +493,7 @@ function* getRecordsSaga() {
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
+        const finishDate = (filter.fin_date) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
 
         yield put({
             type: CHANGE_VIEW_MODE,
