@@ -2312,6 +2312,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     _getTaskListToStartAfterDel(process, id) {
         let result = [];
+        let dict = {};
         this._get_proc_deps(process);
         let childs = process._childs[id];
         if (childs) {
@@ -2319,44 +2320,45 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 let link = childs[child];
                 this._deleteDep(process, link.Id);
                 let task = this._getProcessTask(process, child);
-                this._calcTaskState(process, task, result);
+                this._calcTaskState(process, task, result, dict);
             }
         }
         return result;
     }
 
-    _calcTaskState(process, task, ext_res) {
+    _calcTaskState(process, task, ext_res, ext_dict) {
         let result = ext_res || [];
         this._get_proc_deps(process);
-        let dict = {};
+        let dict = ext_dict || {};
         let calcState = (task) => {
             let parents = process._parents[task.Id];
             let has_no_parents = (!parents) || (parents && (Object.keys(parents).length === 0));
-            let is_active = true;
-            let is_all_inactive = !has_no_parents;
-            let is_ready = has_no_parents ? true : null;
+            let parent_count = 0;
+            let parent_active = 0;
+            let parent_finished = 0;
             if (!has_no_parents) {
                 for (let parent in parents) {
+                    parent_count++;
                     let plink = parents[parent];
                     if (plink.IsActive) {
-                        is_all_inactive = false;
-                        let is_fired = false;
                         if (plink.IsConditional) {
-                            is_fired = plink.Result === true;
-                            if (plink.Result === false)
-                                is_active = false;
+                            parent_finished += plink.Result === null ? 0 : 1;
+                            parent_active += (plink.Result === null) || (plink.Result === true) ? 1 : 0;
                         }
                         else {
+                            parent_active++;
                             let ptask = this._getProcessTask(process, parent);
-                            is_fired = ptask.State === TaskState.Finished;
+                            if (ptask.State === TaskState.Finished)
+                                parent_finished++;
                         }
-                        if (is_ready === null)
-                            is_ready = true;
-                        is_ready = is_ready && is_fired;
+                    }
+                    else {
+                        parent_finished++;
                     }
                 }
             }
-            is_active = is_active && (!is_all_inactive);
+            let is_active = (parent_count === 0) || (parent_active > 0);
+            let is_ready = is_active && (parent_count === parent_finished);
             let need_calc_childs = false;
             let old_is_active = task.IsActive;
             if (task.IsActive !== is_active) {
@@ -2393,6 +2395,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     _getListToGoBack(process, id, state, isSupervisor) {
         let result = [];
+        let dict = {};
         this._get_proc_deps(process);
         let root = this._getProcessTask(process, id);
         root.State = state;
@@ -2406,7 +2409,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                     if ((!isSupervisor) && (!((task.State === TaskState.Draft) || (task.State === TaskState.ReadyToStart))))
                         throw new HttpError(HttpCode.ERR_BAD_REQ,
                             `Не все зависимые задачи находятся в состоянии "В ожидании" или "Можно приступать".`);
-                    this._calcTaskState(process, task, result);
+                    this._calcTaskState(process, task, result, dict);
                 }
             }
         }
@@ -2425,6 +2428,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
 
     _getListToGoForward(process, id) {
         let result = [];
+        let dict = {};
         this._get_proc_deps(process);
         let root = this._getProcessTask(process, id);
         root.State = TaskState.Finished;
@@ -2433,7 +2437,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
             for (let child in childs) {
                 let task = this._getProcessTask(process, child);
                 if (task)
-                    this._calcTaskState(process, task, result);
+                    this._calcTaskState(process, task, result, dict);
             }
         }
         return result;
@@ -2661,6 +2665,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                         }
 
                                     if (obj_ids.length > 0) {
+                                        let obj_list = {};
                                         for (let i = 0; i < obj_ids.length; i++) {
                                             let expr;
                                             let err_msg;
@@ -2682,19 +2687,26 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                                     throw new Error(`ProcessAPI::updateTask: Unknown modified object type: "${obj_ids[i].type}".`);
                                             }
 
-                                            root_obj = await this._getObjById(obj_ids[i].id, expr, dbOpts);
-                                            memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-                                            collection = root_obj.getCol("DataElements");
-                                            if (collection.count() != 1)
-                                                throw new HttpError(HttpCode.ERR_NOT_FOUND, err_msg);
-                                            let obj = collection.get(0);
-                                            await obj.edit();
-
+                                            let key = `${obj_ids[i].type}:${obj_ids[i].id}`;
+                                            let obj_rec = obj_list[key];
+                                            if (!obj_rec) {
+                                                root_obj = await this._getObjById(obj_ids[i].id, expr, dbOpts);
+                                                memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                                collection = root_obj.getCol("DataElements");
+                                                if (collection.count() != 1)
+                                                    throw new HttpError(HttpCode.ERR_NOT_FOUND, err_msg);
+                                                obj_list[key] = obj_rec = { obj: collection.get(0), is_new: true };
+                                                await obj_rec.obj.edit();
+                                            }
+                                            let obj = obj_rec.obj;
                                             if (obj_ids[i].fields) {
                                                 for (let fld in obj_ids[i].fields) {
                                                     obj[fld](obj_ids[i].fields[fld]);
                                                 }
-                                                mdf_objs.push(obj);
+                                                if (obj_rec.is_new) {
+                                                    mdf_objs.push(obj);
+                                                    obj_rec.is_new = false;
+                                                }
                                             }
 
                                             if (is_task && (obj_ids[i].fields.state === TaskState.ReadyToStart)) {
