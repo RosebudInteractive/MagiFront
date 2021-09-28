@@ -44,7 +44,6 @@ const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
 
 
-
 const defaultFieldSet = new Set([]);
 
 export const VIEW_MODE = {
@@ -140,7 +139,7 @@ export const toggleModalDndToPublish = (isOn) => {
     return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
 };
 
-export const openModalDndToPublish = () => { //id, title - CourseName and LessinName, initialDate
+export const openModalDndToPublish = () => {
     return {type: OPEN_MODAL_DND_TO_PUBLISH, payload: true};
 };
 
@@ -178,8 +177,8 @@ function* addToDisplayedRecordsSaga(data) {
 
         const index = displayedRecords.findIndex(record => record.id === data.payload.id);
 
-        if(index !== -1) {
-            if(displayedRecords[index].CourseName.length < 1) {
+        if (index !== -1) {
+            if (displayedRecords[index].CourseName.length < 1) {
                 displayedRecords[index] = data.payload.newRecord;
             } else {
                 displayedRecords.splice(index, 0, data.payload.newRecord);
@@ -188,7 +187,7 @@ function* addToDisplayedRecordsSaga(data) {
 
         yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
 
-    }catch (e) {
+    } catch (e) {
         showErrorMessage(e.toString())
     }
 }
@@ -196,16 +195,48 @@ function* addToDisplayedRecordsSaga(data) {
 function* changeDisplayedRecordsSaga(data) {
     try {
         const displayedRecords = yield select(displayRecordsSelector);
+        const oldIndex = displayedRecords.findIndex((record) => record.id === data.payload.id);
+        const newIndex = displayedRecords.findIndex((record, ind) => record.DateObject.isSame(data.payload.newRecord.DateObject) && ind !== oldIndex);
 
-        const index = displayedRecords.findIndex(record => record.id === data.payload.id);
 
-        if(index !== -1) {
-            displayedRecords[index] = data.payload.newRecord;
+        if (newIndex !== -1) {
+
+            const newRecordData = {...data.payload.newRecord, id: displayedRecords[newIndex].id,
+                Week: displayedRecords[newIndex].Week,
+                IsEndOfWeek: displayedRecords[newIndex].IsEndOfWeek,
+                PubDate: displayedRecords[newIndex].PubDate,
+                IsEven: displayedRecords[newIndex].IsEven
+            };
+
+            if (displayedRecords[newIndex].CourseName.length < 1) {
+                displayedRecords[newIndex] = newRecordData;
+            } else {
+                displayedRecords.splice(newIndex, 0, newRecordData);
+            }
+
+            displayedRecords[oldIndex] = {
+                id: displayedRecords[oldIndex].id,
+                Week: displayedRecords[oldIndex].Week,
+                IsEndOfWeek: displayedRecords[oldIndex].IsEndOfWeek,
+                PubDate: displayedRecords[oldIndex].PubDate,
+                IsEven: displayedRecords[oldIndex].IsEven,
+                $css: displayedRecords[oldIndex].$css,
+                CourseId: null,
+                CourseName: "",
+                LessonId: null,
+                LessonNum: "",
+                CourseLessonName: ['', ''],
+                LessonName: "",
+                Elements: [],
+                IsPublished: null,
+                ProcessId: null,
+                ProcessState: null
+            };
         }
 
         yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
 
-    }catch (e) {
+    } catch (e) {
         showErrorMessage(e.toString())
     }
 }
@@ -217,7 +248,8 @@ function* publishRecordSaga(data) {
         const res = yield call(setDateToPublication,
             {
                 ReadyDate: data.payload.isoDateString,
-                lessonId: data.payload.lessonId});
+                lessonId: data.payload.lessonId
+            });
 
         // yield put(getRecords());
         const filterValues = yield select(filterUnpublishedSelector);
@@ -238,9 +270,13 @@ function* getUnpublishedRecordsSaga(data) {
 
         const objectParams = {};
 
-        if(filter){
-            if(filter.course_name_unpublished) {objectParams.course_name = filter.course_name_unpublished}
-            if(filter.lesson_name_unpublished) {objectParams.lesson_name = filter.lesson_name_unpublished}
+        if (filter) {
+            if (filter.course_name_unpublished) {
+                objectParams.course_name = filter.course_name_unpublished
+            }
+            if (filter.lesson_name_unpublished) {
+                objectParams.lesson_name = filter.lesson_name_unpublished
+            }
         }
 
         const params = $.param(objectParams);
@@ -282,17 +318,17 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
     let startDate;
     let finishDate;
-    if(!stDate && !finDate){
-        if(sDate && eDate){
-            startDate =  moment(sDate);
-            finishDate =  moment(eDate);
+    if (!stDate && !finDate) {
+        if (sDate && eDate) {
+            startDate = moment(sDate);
+            finishDate = moment(eDate);
         } else {
-            startDate =  moment(defaultStartDate);
-            finishDate =  moment(defaultEndDate);
+            startDate = moment(defaultStartDate);
+            finishDate = moment(defaultEndDate);
         }
     } else {
-        startDate =  moment(stDate);
-        finishDate =  moment(finDate);
+        startDate = moment(stDate);
+        finishDate = moment(finDate);
     }
 
     const daysBetween = finishDate.diff(startDate, "days");
@@ -331,7 +367,11 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             first.Elements.forEach((elem) => {
                 const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
 
-                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {css: "", label: "--",  question: false};
+                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
+                    css: "",
+                    label: "--",
+                    question: false
+                };
             });
 
             if (other && other.length > 0) {
@@ -339,13 +379,18 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                     item.Week = '';
                     item.PubDate = '';
                     item.IsEven = isEven;
-                    item.IsEndOfWeek = moment(currentDate).set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7 && index === other.length - 1;
+                    item.IsEndOfWeek = moment(currentDate).set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0
+                    }).isoWeekday() === 7 && index === other.length - 1;
                     item.CourseLessonName = [item.CourseName, item.LessonName];
-                    item.DateObject = currentDate.set({hour:0,minute:0,second:0,millisecond:0});
+                    item.DateObject = currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0});
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
-                        item[elem.Name] = _state ? {css: _state.css, label: _state.label,  question: elem.HasAlert} : {
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
                             css: "_unknown",
                             label: "",
                             question: false
@@ -366,10 +411,10 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             }
             const objectData = {
                 IsEven: isEven,
-                PubDate: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru').format('DD MMM'),
-                DateObject: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).locale('ru'), //todo check it
+                PubDate: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru').format('DD MMM'),
+                DateObject: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru'), //todo check it
                 CourseId: null,
-                IsEndOfWeek: currentDate.set({hour:0,minute:0,second:0,millisecond:0}).isoWeekday() === 7,
+                IsEndOfWeek: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).isoWeekday() === 7,
                 CourseName: "",
                 LessonId: null,
                 Week: weekHasChanged ? displayWeekRange : '',
@@ -389,13 +434,6 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             isEven = !isEven;
         }
     }
-
-    // let arrDoubles = [];
-    // resultArray.forEach((el, index) => {
-    //     const foundedDoubles
-    // });
-
-    // console.log('arrDoublkes', arrDoubles)
 
     return resultArray;
 };
@@ -451,7 +489,7 @@ function* getRecordsSaga() {
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        const finishDate = (filter.fin_date ) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
+        const finishDate = (filter.fin_date) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
 
         yield put({
             type: CHANGE_VIEW_MODE,
