@@ -118,16 +118,18 @@ export default function TimelinePreview(props) {
         <div className={'timeline-preview__wrapper'}>
             {fsEnable && <Header title={'Ключевые события'} />}
             <div className={"timeline-preview__container"} ref={_preview} style={{..._style}}>
-                <Timeline width={width}
-                          height={height}
-                          theme={Themes.current}
-                          events={_events}
-                          periods={_periods}
-                          zoom={zoom}
-                          levelLimit={4}
-                          zoomSliderStopped={zoomSliderStopped}
-                          fsMode={fsEnable}
-                          key={incKey}/>
+                <div className={"timeline-preview__vertical-container"}>
+                    <Timeline width={width}
+                              height={height}
+                              theme={Themes.current}
+                              events={_events}
+                              periods={_periods}
+                              zoom={zoom}
+                              levelLimit={4}
+                              zoomSliderStopped={zoomSliderStopped}
+                              fsMode={fsEnable}
+                              key={incKey}/>
+                </div>
             </div>
             <Footer onOpenPress={openFullScreen}
                     onClosePress={closeFullScreen}
