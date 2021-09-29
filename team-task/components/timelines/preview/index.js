@@ -3,7 +3,6 @@ import './preview.sass'
 import {Themes, Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
-import ZoomSlider from "./zoom-slider";
 import Header from "timeline/timeline/header";
 import Footer from "timeline/timeline/footer";
 
@@ -11,6 +10,7 @@ export default function TimelinePreview(props) {
     const {background, events, periods} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
+    const [incKey, setIncKey] = useState(0);
     const [zoom, setZoom] = useState(1)
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
     const [fsEnable, setFsEnable] = useState(false)
@@ -20,7 +20,7 @@ export default function TimelinePreview(props) {
     useWindowSize(() => {
         if (_preview.current) {
             setWidth(_preview.current.clientWidth);
-            setHeight(_preview.current.clientHeight)
+            setHeight(_preview.current.clientHeight);
         }
     });
 
@@ -45,8 +45,8 @@ export default function TimelinePreview(props) {
                 setWidth(_preview.current.clientWidth);
                 setHeight(_preview.current.clientHeight)
             }
-        }, 100)
-    }, [fsEnable]);
+        }, 0)
+    }, [fsEnable, zoom]);
 
     const _periods = useMemo(() => {
         return periods ? periods.map((item) => {
@@ -98,11 +98,13 @@ export default function TimelinePreview(props) {
     const openFullScreen = () => {
         setFsEnable(true)
         document.addEventListener('keyup', keyPressHandler)
+        setIncKey(incKey + 1)
     };
 
     const closeFullScreen = () => {
         setFsEnable(false)
         document.removeEventListener('keyup', keyPressHandler)
+        setIncKey(incKey + 1)
     };
 
     const keyPressHandler = (e) => {
@@ -116,13 +118,18 @@ export default function TimelinePreview(props) {
         <div className={'timeline-preview__wrapper'}>
             {fsEnable && <Header title={'Ключевые события'} />}
             <div className={"timeline-preview__container"} ref={_preview} style={{..._style}}>
-                <Timeline width={width} height={height}
-                          theme={Themes.current}
-                          events={_events}
-                          periods={_periods}
-                          zoom={zoom}
-                          levelLimit={4}
-                          zoomSliderStopped={zoomSliderStopped}/>
+                <div className={"timeline-preview__vertical-container"}>
+                    <Timeline width={width}
+                              height={height}
+                              theme={Themes.current}
+                              events={_events}
+                              periods={_periods}
+                              zoom={zoom}
+                              levelLimit={4}
+                              zoomSliderStopped={zoomSliderStopped}
+                              fsMode={fsEnable}
+                              key={incKey}/>
+                </div>
             </div>
             <Footer onOpenPress={openFullScreen}
                     onClosePress={closeFullScreen}

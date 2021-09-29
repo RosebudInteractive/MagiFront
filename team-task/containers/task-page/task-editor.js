@@ -62,7 +62,7 @@ function TaskEditor(props: EditorProps) {
             }
 
             task.Fields && task.Fields.forEach((field) => {
-                _object[field.name] = field.value
+                _object[field.name] = field.type === 'boolean' ? Boolean(field.value) : field.value
             })
 
             props.initialize(_object)
@@ -100,7 +100,8 @@ function TaskEditor(props: EditorProps) {
 
         _value.Fields = {}
         currentElement.Fields.forEach((field) => {
-            _value.Fields[field.name] = editorValues[field.name]
+            const val = editorValues[field.name];
+            _value.Fields[field.name] = field.type === 'boolean' ? Boolean(val) : val
         })
 
         actions.saveTask(_value)

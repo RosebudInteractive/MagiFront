@@ -8,7 +8,7 @@ class Pastel extends Theme {
             color: '#000000',
             // weight: 'bold',
         };
-        this.enableAlpha = false;
+        // this.enableAlpha = false;
         this.palette = [
             '#d6d7cd',
             '#d3bc9c',
