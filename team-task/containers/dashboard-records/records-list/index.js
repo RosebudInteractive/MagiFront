@@ -168,6 +168,7 @@ const Records = (props) => {
                         IsEndOfWeek: toItem.IsEndOfWeek,
                         CourseName: fromItem.CourseName,
                         LessonId: fromItem.LessonId,
+                        CourseId: fromItem.CourseId,
                         Week: toItem.Week,
                         LessonNum: fromItem.LessonNum,
                         CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
@@ -177,8 +178,6 @@ const Records = (props) => {
                         ProcessId: null,
                         ProcessState: null
                     });
-
-                    actions.setPublishRecordDate({isoDateString: toItem.DateObject.toISOString(), lessonId: fromItem.LessonId});
 
                     return false;
                 },
