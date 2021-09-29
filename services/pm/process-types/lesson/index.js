@@ -405,7 +405,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "(AudioReDo === true)"
+        "Expression": "AudioReDo"
     }, options);
 
     // Повторный контроль звука и расстановка тайм-кодов
@@ -436,7 +436,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+        "Expression": "(!AudioReDo)"
     }, options);
 
     // Конец процесса
@@ -596,7 +596,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "(AudioReDo === true)"
+        "Expression": "AudioReDo"
     }, options);
 
     // Повторный контроль звука и расстановка тайм-кодов
@@ -627,7 +627,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+        "Expression": "(!AudioReDo)"
     }, options);
 
     // Конец процесса
@@ -798,7 +798,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "(AudioReDo === true)"
+        "Expression": "AudioReDo"
     }, options);
 
     // Повторный контроль звука и расстановка тайм-кодов
@@ -829,7 +829,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "DepTaskId": time_code_task_id,
         "IsConditional": true,
         "IsDefault": false,
-        "Expression": "isEmpty(AudioNotes) && (!AudioReDo)"
+        "Expression": "(!AudioReDo)"
     }, options);
 
     // Конец процесса
