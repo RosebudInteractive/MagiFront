@@ -101,7 +101,7 @@ function TaskEditor(props: EditorProps) {
         _value.Fields = {}
         currentElement.Fields.forEach((field) => {
             const val = editorValues[field.name];
-            _value.Fields[field.name] = field.type === 'boolean' ? Boolean(val) : editorValues[val]
+            _value.Fields[field.name] = field.type === 'boolean' ? Boolean(val) : val
         })
 
         actions.saveTask(_value)
