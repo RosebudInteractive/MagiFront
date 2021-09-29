@@ -76,7 +76,7 @@ function ProcessEditor(props) {
             }
 
             Object.keys(process.ProcessFields).forEach((field) => {
-                _object[field] = process[field]
+                _object[field] = field.type === 'boolean' ? Boolean(process[field]) : process[field]
             })
 
             props.initialize(_object)
@@ -95,8 +95,9 @@ function ProcessEditor(props) {
             LessonId: +editorValues.LessonId,
         }
 
-        Object.keys(process.ProcessFields).forEach((field) => {
-            _value[field] = editorValues[field]
+        Object.entries(process.ProcessFields).forEach(([fieldName, fieldInfo]) => {
+            const val = editorValues[fieldName];
+            _value[fieldName] = fieldInfo.type === 'boolean' ? Boolean(val) : val
         })
 
         actions.saveProcess(_value)
