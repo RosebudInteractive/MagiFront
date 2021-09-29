@@ -179,20 +179,42 @@ export const saga = function* () {
 
 function* addToDisplayedRecordsSaga(data) {
     try {
-        const displayedRecords = yield select(displayRecordsSelector);
+        const mode = yield select(modeSelector);
+        const newRecord = data.payload.newRecord;
 
-        const index = displayedRecords.findIndex(record => record.id === data.payload.id);
+        const res = yield call(setDateToPublication, {
+            ReadyDate: newRecord.DateObject.toISOString(),
+            lessonId: newRecord.LessonId
+        });
 
-        if (index !== -1) {
-            if (displayedRecords[index].CourseName.length < 1) {
-                displayedRecords[index] = data.payload.newRecord;
-            } else {
-                displayedRecords.splice(index, 0, data.payload.newRecord);
-            }
+        if (res && res.result === 'OK') {
+            const dates = yield select(filterSelector);
+            const records = _.cloneDeep(yield select(recordsChangedSelector));
+
+            const currentDate = moment().locale('ru');
+            const defaultStartDate = currentDate.toISOString();
+            const defaultEndDate = currentDate.add(6, 'days').toISOString();
+
+            records.push({
+                PubDate: newRecord.DateObject.toISOString(),
+                CourseId: newRecord.CourseId,
+                CourseName: newRecord.CourseName,
+                LessonId: newRecord.LessonId,
+                LessonNum: newRecord.LessonNum,
+                LessonName: newRecord.LessonName,
+                Elements: [],
+                IsPublished: newRecord.IsPublished,
+                ProcessId: newRecord.ProcessId,
+                ProcessState: newRecord.ProcessState,
+            });
+            const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
+
+            yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
+            const resultArray = handleServerData(sorted, +mode, dates.st_date ? dates.st_date : defaultStartDate, dates.fin_date ? dates.fin_date : defaultEndDate);
+            yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
+            const filterValues = yield select(filterUnpublishedSelector);
+            yield put(getUnpublishedRecords(filterValues));
         }
-
-        yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: displayedRecords});
-
     } catch (e) {
         showErrorMessage(e.toString())
     }
@@ -203,20 +225,27 @@ function* changeDisplayedRecordsSaga(data) {
         const mode = yield select(modeSelector);
         const newRecord = data.payload.newRecord;
 
-        const res = yield call( setDateToPublication,{ReadyDate: newRecord.DateObject.toISOString(), lessonId: newRecord.LessonId});
+        const res = yield call(setDateToPublication, {
+            ReadyDate: newRecord.DateObject.toISOString(),
+            lessonId: newRecord.LessonId
+        });
 
-        if(res && res.result === 'OK'){
+        if (res && res.result === 'OK') {
             const dates = yield select(filterSelector);
             const records = _.cloneDeep(yield select(recordsChangedSelector));
 
+
             const foundedRecordIndex = records.findIndex(record => record.CourseId === +newRecord.CourseId && record.LessonId === +newRecord.LessonId);
 
-            if(foundedRecordIndex !== -1){
+            if (foundedRecordIndex !== -1) {
+                const currentDate = moment().locale('ru');
+                const defaultStartDate = currentDate.toISOString();
+                const defaultEndDate = currentDate.add(6, 'days').toISOString();
                 records[foundedRecordIndex].PubDate = newRecord.DateObject.toISOString();
                 const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
 
                 yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
-                const resultArray = handleServerData(sorted, +mode, dates.st_date, dates.fin_date);
+                const resultArray = handleServerData(sorted, +mode, dates.st_date ? dates.st_date : defaultStartDate, dates.fin_date ? dates.fin_date : defaultEndDate);
                 yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
             }
         }
