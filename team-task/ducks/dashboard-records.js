@@ -326,19 +326,11 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
     const defaultStartDate = currentDate.toISOString();
     const defaultEndDate = currentDate.add(6, 'days').toISOString();
 
-    const sDate = records.length > 0 ? records[0].PubDate : null;
-    const eDate = records.length > 1 ? records[records.length - 1].PubDate : null;
-
     let startDate;
     let finishDate;
     if (!stDate && !finDate) {
-        if (sDate && eDate) {
-            startDate = moment(sDate);
-            finishDate = moment(eDate);
-        } else {
             startDate = moment(defaultStartDate);
             finishDate = moment(defaultEndDate);
-        }
     } else {
         startDate = moment(stDate);
         finishDate = moment(finDate);
