@@ -311,7 +311,7 @@ function* changeViewModeSaga(data) {
     try {
         yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
         const dates = yield select(filterSelector);
-        const records = _.cloneDeep(yield select(recordsSelector));
+        const records = _.cloneDeep(yield select(recordsChangedSelector));
 
         let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
