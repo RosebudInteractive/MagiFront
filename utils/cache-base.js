@@ -70,6 +70,8 @@ class DataCache {
                         data = this._data[id];
                     data.exp_time = curr_time;
                 }
+                else
+                    data = null;
             }
             return data;
         }
