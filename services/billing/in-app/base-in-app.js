@@ -101,16 +101,23 @@ exports.BaseInApp = class BaseInApp extends Payment {
             course.InAppPrices[this._platform].DPrice : course.InAppPrices[this._platform].Price;
         if (data.promo) {
             if (course.Promo) {
-                if (!(course.Promo.InAppPrices && course.Promo.InAppPrices[this._platform] &&
-                    course.Promo.InAppPrices[this._platform].Price))
-                    throw new HttpError(HttpCode.ERR_BAD_REQ, {
-                        error: "missingPromoPlatformPrice",
-                        message: `Курс не продается на платформе "${this._platform}" по промокоду "${course.Promo.PromoCode}".`
-                    });
-                course.Promo.Sum = course.Promo.InAppPrices[this._platform].Price;
-                course.Promo.PromoSum = Price - course.Promo.Sum;
-                Price = course.Promo.Sum;
-                Code = course.Promo.InAppPrices[this._platform].Code;
+                if (course.Promo.Sum === 0) {
+                    course.Promo.PromoSum = Price;
+                    Price = course.Promo.Sum;
+                    Code = null;
+                }
+                else {
+                    if (!(course.Promo.InAppPrices && course.Promo.InAppPrices[this._platform] &&
+                        course.Promo.InAppPrices[this._platform].Price))
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                            error: "missingPromoPlatformPrice",
+                            message: `Курс не продается на платформе "${this._platform}" по промокоду "${course.Promo.PromoCode}".`
+                        });
+                    course.Promo.Sum = course.Promo.InAppPrices[this._platform].Price;
+                    course.Promo.PromoSum = Price - course.Promo.Sum;
+                    Price = course.Promo.Sum;
+                    Code = course.Promo.InAppPrices[this._platform].Code;
+                }
             }
             else
                 throw new HttpError(HttpCode.ERR_BAD_REQ, {
