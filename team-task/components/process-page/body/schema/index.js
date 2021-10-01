@@ -192,12 +192,13 @@ export default function Schema(props: SchemaProps) {
                                   onUpdateArrow={props.onUpdateDependence}
                                   selected={activeArrow}
                                   setSelected={setActiveArrow}
+                                  horizontalProcess={horizontalProcess}
                                   key={item.id}/>
             })
         } else {
             return null
         }
-    }, [tree, activeTask, activeArrow])
+    }, [tree, activeTask, activeArrow, horizontalProcess])
 
     const keyPressHandler = useCallback((e) => {
         if(e.key === "Escape") {
