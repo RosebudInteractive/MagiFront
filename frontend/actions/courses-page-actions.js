@@ -355,7 +355,7 @@ const calcTestsData = (course) => {
 
 const _mapTimelines = (dataToMap) => {
 
-    const mappedData = dataToMap.map(tm => ({
+    const mappedData = dataToMap && dataToMap.map(tm => ({
         ...tm,
         CourseId: tm.Course ? tm.Course.Id : null,
         LessonId: tm.Lesson ? tm.Lesson.Id : null,
