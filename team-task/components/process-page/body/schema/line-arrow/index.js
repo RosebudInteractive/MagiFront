@@ -2,6 +2,7 @@ import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import Xarrow from 'react-xarrows';
 import './line-arrow.sass'
 import ArrowTooltip from "./arrow-tooltip";
+import {horizontalProcess} from "tt-ducks/app";
 
 export const ARROW_TYPE = {
     DEFAULT: "DEFAULT",
@@ -29,7 +30,7 @@ const COLORS = {
 }
 
 export default (props) => {
-    const {type, item, setSelected, selected} = props
+    const {type, item, setSelected, selected, horizontalProcess} = props
 
     const [color, setColor] = useState('transparent'),
         [strokeWidth, setStrokeWidth] = useState(2),
@@ -107,12 +108,19 @@ export default (props) => {
         } : null
     }, [selected])
 
+    const bringToFront = (type === ARROW_TYPE.IN) || (type === ARROW_TYPE.OUT) || (selected === item.id)
+
     return <Xarrow {...props}
                    divContainerProps={{className: 'xarrow-container'}}
-                   zIndex={selected === item.id ? 2 : 0}
+                   zIndex={bringToFront ? 2 : 0}
                    passProps={passProps}
                    color={color}
                    labels={labels}
+                   showTail={true}
+                   tailShape={'circle'}
+                   tailSize={4}
                    strokeWidth={strokeWidth}
+                   startAnchor= {{ position : horizontalProcess ? "right" : 'bottom', offset: horizontalProcess ? { y: item.offsetStart, x: -4 } : { x: item.offsetStart } }}
+                   endAnchor= {{ position : horizontalProcess ? "left" : 'top', offset: horizontalProcess ? { y: item.offsetEnd } : { x: item.offsetEnd } }}
                    headSize={headSize}/>;
 };
