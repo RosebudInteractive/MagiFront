@@ -311,7 +311,7 @@ function* changeViewModeSaga(data) {
     try {
         yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
         const dates = yield select(filterSelector);
-        const records = _.cloneDeep(yield select(recordsSelector));
+        const records = _.cloneDeep(yield select(recordsChangedSelector));
 
         let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
@@ -326,19 +326,11 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
     const defaultStartDate = currentDate.toISOString();
     const defaultEndDate = currentDate.add(6, 'days').toISOString();
 
-    const sDate = records.length > 0 ? records[0].PubDate : null;
-    const eDate = records.length > 1 ? records[records.length - 1].PubDate : null;
-
     let startDate;
     let finishDate;
     if (!stDate && !finDate) {
-        if (sDate && eDate) {
-            startDate = moment(sDate);
-            finishDate = moment(eDate);
-        } else {
             startDate = moment(defaultStartDate);
             finishDate = moment(defaultEndDate);
-        }
     } else {
         startDate = moment(stDate);
         finishDate = moment(finDate);
@@ -381,15 +373,13 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                 const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
 
                 first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
-                    css: "",
-                    label: "--",
+                    css: "_unknown",
+                    label: "Неизвестно",
                     question: false
                 };
             });
 
-            // console.log('first', first)
             if (other && other.length > 0) {
-                // console.log('other', other)
                 other.forEach((item, index) => {
                     item.Week = '';
                     item.PubDate = '';
@@ -407,7 +397,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                         const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
                         item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
                             css: "_unknown",
-                            label: "",
+                            label: "Неизвестно",
                             question: false
                         };
                     })
@@ -503,7 +493,7 @@ function* getRecordsSaga() {
             fieldObj.header = [{text: el, css: 'up-headers'}];
 
             fieldObj.css = '_container element-style';
-            fieldObj.minWidth = 75;
+            fieldObj.minWidth = 120;
             fieldObj.template = function (val) {
                 const elData = val[el];
 

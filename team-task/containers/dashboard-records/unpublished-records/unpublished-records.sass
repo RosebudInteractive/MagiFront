@@ -9,9 +9,6 @@
   flex: 0 1 33.33%
   max-width: 1000px
   transition: max-width 300ms ease
-  overflow: hidden
-
-
 
   > .title
     margin-bottom: 20px
@@ -51,16 +48,6 @@
 
 .unpublished-records-grid
   display: flex
-  //height: 100%
-  min-height: 650px
-  //.process-elements-grid
-  //  flex-grow: 1
-
-  //.process-page__save-button
-  //  position: absolute
-  //  top: 0
-  //  right: 17px
-
   .elements__hide-button
     margin: 45vh 8px 0 0
     cursor: pointer
@@ -70,28 +57,10 @@
     border-bottom: 9px solid transparent
     border-right: 9px solid $grey40
 
-.unpublished-records-wrapper
-  position: relative
-  margin-top: 0
-
-  .title
-    height: 64px !important
-
-  &._fixed
-    position: fixed
-    top: 16px
-  &._bottom
-    position: absolute
-    bottom: 0
-    margin-top: auto
-
-
 .unpublished-records__grid-panel
-  height: -webkit-fill-available
+  height: calc(100% - 48px)
   width: 300px
   visibility: visible
-  display: flex
-  flex-direction: column
 
   .filters
     left: 0
@@ -103,16 +72,9 @@
     margin-bottom: 24px
 
   .webix-datatable
-    flex: 1 0 auto
     overflow-y: auto
+    height: 90%
 
-    .tt-elements-grid
-    .webix_ss_center_scroll
-      overflow-y: auto
-
-._height-85
-  max-height: 85vh !important
-  overflow-y: scroll !important
 
 .centered-by-flex
   width: 100%
