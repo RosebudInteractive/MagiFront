@@ -53,24 +53,32 @@ const SQL_PUBLISH_TL_PERIOD_MYSQL =
 
 const SQL_DELETE_TL_EVENT_MYSQL =
     "delete from `Entity` where (`Id` in (select `SysParentId` from `Event` where (`State` = 1) and (`SysParentId` in (<%= ids %>))))\n" +
-    "  and (not `Id` in (select distinct `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)))";
+    "  and (not `Id` in (select `EventId` from `TimelineEvent` where `EventId` in (<%= ids %>)\n" +
+    "  union select `EventId` from `CommandEvent` where `EventId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_EVENT_MSSQL =
     "delete from [Entity] where ([Id] in (select [SysParentId] from [Event] where ([State] = 1) and ([SysParentId] in (<%= ids %>))))\n" +
-    "  and (not [Id] in (select distinct [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)))";
+    "  and (not [Id] in (select [EventId] from [TimelineEvent] where [EventId] in (<%= ids %>)\n" +
+    "  union select [EventId] from [CommandEvent] where [EventId] in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MYSQL =
-    "delete from `Period` where (`State` = 1) and (`Id` in (<%= ids %>)) and (not `Id` in (select distinct `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)))";
+    "delete from `Period` where (`State` = 1) and (`Id` in (<%= ids %>))\n" +
+    "  and (not `Id` in (select `PeriodId` from `TimelinePeriod` where `PeriodId` in (<%= ids %>)\n" +
+    "  union select `PeriodId` from `CommandEvent` where `PeriodId` in (<%= ids %>)))";
 
 const SQL_DELETE_TL_PERIOD_MSSQL =
-    "delete from [Period] where ([State] = 1) and ([Id] in (<%= ids %>)) and (not [Id] in (select distinct [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)))";
+    "delete from [Period] where ([State] = 1) and ([Id] in (<%= ids %>))\n" +
+    "  and (not [Id] in (select [PeriodId] from [TimelinePeriod] where [PeriodId] in (<%= ids %>)\n" +
+    "  union select [PeriodId] from [CommandEvent] where [PeriodId] in (<%= ids %>)))";
 
 const TL_MSSQL_DELETE_SCRIPT =
     [
         "update [Event] set [TlCreationId] = null where [TlCreationId] = <%= id %>",
         "update [Event] set [TlPublicId] = null where [TlPublicId] = <%= id %>",
         "update [Period] set [TlCreationId] = null where [TlCreationId] = <%= id %>",
-        "update [Period] set [TlPublicId] = null where [TlPublicId] = <%= id %>"
+        "update [Period] set [TlPublicId] = null where [TlPublicId] = <%= id %>",
+        "delete ce from [Command] c left join [CommandEvent] ce on c.[Id] = ce.[CommandId] where c.[TimelineId] = <%= id %>",
+        "delete c from [Command] c where c.[TimelineId] = <%= id %>"
     ];
 
 const TL_MYSQL_DELETE_SCRIPT =
@@ -78,8 +86,22 @@ const TL_MYSQL_DELETE_SCRIPT =
         "update `Event` set `TlCreationId` = null where `TlCreationId` = <%= id %>",
         "update `Event` set `TlPublicId` = null where `TlPublicId` = <%= id %>",
         "update `Period` set `TlCreationId` = null where `TlCreationId` = <%= id %>",
-        "update `Period` set `TlPublicId` = null where `TlPublicId` = <%= id %>"
+        "update `Period` set `TlPublicId` = null where `TlPublicId` = <%= id %>",
+        "delete ce from `Command` c left join `CommandEvent` ce on c.`Id` = ce.`CommandId` where c.`TimelineId` = <%= id %>",
+        "delete c from `Command` c where c.`TimelineId` = <%= id %>"
     ];
+
+const SQL_GET_TL_COMMAND_MSSQL =
+    "select c.[Id], c.[Number], c.[TimeCode], c.[Code], c.[Args], ce.[Id] CeId, ce.[Number] ArgNumber, ce.[EventId], ce.[PeriodId]\n" +
+    "from [Command] c\n" +
+    "  left join [CommandEvent] ce on c.[Id] = ce.[CommandId]\n" +
+    "where c.[TimelineId] = <%= id %>";
+
+const SQL_GET_TL_COMMAND_MYSQL =
+    "select c.`Id`, c.`Number`, c.`TimeCode`, c.`Code`, c.`Args`, ce.`Id` CeId, ce.`Number` ArgNumber, ce.`EventId`, ce.`PeriodId`\n" +
+    "from `Command` c\n" +
+    "  left join `CommandEvent` ce on c.`Id` = ce.`CommandId`\n" +
+    "where c.`TimelineId` = <%= id %>";
 
 const TL_CREATE = {
     expr: {
@@ -123,6 +145,18 @@ const TL_COPY = {
                     dataObject: {
                         name: "TimelinePeriod"
                     }
+                },
+                {
+                    dataObject: {
+                        name: "Command",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "CommandEvent"
+                                }
+                            }
+                        ]
+                    }
                 }
             ]
         }
@@ -141,6 +175,21 @@ const TL_ADD_PERIOD = {
     expr: {
         model: {
             name: "TimelinePeriod"
+        }
+    }
+};
+
+const TL_ADD_COMMAND = {
+    expr: {
+        model: {
+            name: "Command",
+            childs: [
+                {
+                    dataObject: {
+                        name: "CommandEvent"
+                    }
+                }
+            ]
         }
     }
 };
@@ -353,6 +402,40 @@ const TimelineAPI = class TimelineAPI extends DbObject {
         let opts = options || {};
         out.Events = [];
         out.Periods = [];
+        out.Commands = [];
+
+        let dbOpts = _.defaultsDeep(opts.dbOptions || {});
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(SQL_GET_TL_COMMAND_MYSQL)({ id: id }),
+                mssql: _.template(SQL_GET_TL_COMMAND_MSSQL)({ id: id })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            let cmd_list = {};
+            for (let i = 0; i < records.detail.length; i++){
+                let elem = records.detail[i];
+                let curr_cmd = cmd_list[elem.Id];
+                if (!curr_cmd) {
+                    cmd_list[elem.Id] = curr_cmd = {
+                        Id: elem.Id,
+                        Number: elem.Number,
+                        TimeCode: elem.TimeCode,
+                        Code: elem.Code,
+                        Args: elem.Args,
+                        Events: []
+                    }
+                    out.Commands.push(curr_cmd);
+                }
+                if (elem.CeId) {
+                    curr_cmd.Events.push({
+                        Number: elem.ArgNumber,
+                        EventId: elem.EventId ? elem.EventId : undefined,
+                        PeriodId: elem.PeriodId ? elem.PeriodId : undefined
+                    })
+                }
+            }
+        }
 
         let eventService = this.getService("events", true);
         if (eventService) {
@@ -511,6 +594,28 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                             await tp_root.newObject({
                                 fields: { PeriodId: src_tl.Periods[i].Id }
                             }, dbOpts);
+                        let tc_root = timelineObj.getDataRoot("Command");
+                        for (let i = 0; src_tl.Commands && (i < src_tl.Commands.length); i++) {
+                            let cmd = src_tl.Commands[i];
+                            let { newObject } = await tc_root.newObject({
+                                fields: {
+                                    Number: cmd.Number,
+                                    TimeCode: cmd.TimeCode,
+                                    Code: cmd.Code,
+                                    Args: cmd.Args
+                                }
+                            }, dbOpts);
+                            if (cmd.Events && (cmd.Events.length > 0)) {
+                                let cmdObj = this._db.getObj(newObject);
+                                let ce_root = cmdObj.getDataRoot("CommandEvent");
+                                for (let j = 0; j < cmd.Events.length; j++) {
+                                    let cmde = cmd.Events[j];
+                                    await ce_root.newObject({
+                                        fields: { Number: cmde.Number, EventId: cmde.EventId, PeriodId: cmde.PeriodId }
+                                    }, dbOpts);
+                                }
+                            }
+                        }
                     }
 
                     await root_obj.save(dbOpts);
@@ -803,6 +908,150 @@ const TimelineAPI = class TimelineAPI extends DbObject {
                     if (logModif)
                         console.log(buildLogString(`${is_event ? "Event" : "Period"} item created: Id="${newId}".`));
                     return { result: "OK", id: newId };
+                })
+        }, memDbOptions);
+
+    }
+
+    async addOrUpdateCommand(id, is_new, data, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let inpFields = data || {};
+        let cmdObj = null;
+        let cmdId = inpFields.Id;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this.getTimeline(id, options));
+            })
+                .then(async (timeline) => {
+
+                    let event_list = {};
+                    let period_list = {};
+                    for (let i = 0; timeline.Events && (i < timeline.Events.length); i++)
+                        event_list[timeline.Events[i].Id] = true;
+                    for (let i = 0; timeline.Periods && (i < timeline.Periods.length); i++)
+                        period_list[timeline.Periods[i].Id] = true;
+
+                    let result = await this._getObjById(is_new ? -1 : cmdId, TL_ADD_COMMAND, dbOpts);
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    if (is_new) {
+                        let newHandler = await root_obj.newObject({
+                            fields: { TimelineId: timeline.Id }
+                        }, dbOpts);
+                        cmdObj = this._db.getObj(newHandler.newObject);
+                        cmdId = newHandler.keyValue;
+                    }
+                    else {
+                        let collection = root_obj.getCol("DataElements");
+                        if (collection.count() !== 1)
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Команда (Id =${id}) не найдена.`);
+                        cmdObj = collection.get(0);
+                    }
+
+                    if (typeof (inpFields.Code) === "string")
+                        cmdObj.code(inpFields.Code)
+                    else
+                        if (is_new)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid or missing field "Code" value: ${inpFields.Code}.`);
+
+                    if (typeof (inpFields.TimeCode) === "number")
+                        cmdObj.timeCode(inpFields.TimeCode)
+                    else
+                        if (is_new)
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid or missing field "TimeCode" value: ${inpFields.TimeCode}.`);
+
+                    if (typeof (inpFields.Number) === "number")
+                        cmdObj.number(inpFields.Number)
+                    else
+                        if (is_new)
+                            cmdObj.number(0);
+
+                    if (typeof (inpFields.Args) !== "undefined")
+                        cmdObj.args(JSON.stringify(inpFields.Args));
+
+                    if (inpFields.Events && (Array.isArray(inpFields.Events))) {
+                        let event_root = cmdObj.getDataRoot("CommandEvent");
+                        let collection = event_root.getCol("DataElements");
+                        let obj_list = {};
+                        for (let i = 0; i < collection.count(); i++){
+                            let obj = collection.get(i);
+                            obj_list[obj.number()] = obj;
+                        }
+                        for (let i = 0; i < inpFields.Events.length; i++) {
+                            let elem = inpFields.Events[i];
+                            if ((!(elem.EventId || elem.PeriodId)) || (elem.EventId && elem.PeriodId))
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid combination of "EventId" and "PeriodId" in line ${i}.`);
+                            if (elem.EventId && (!event_list[elem.EventId]))
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Событие (Id=${elem.EventId}) не принадлежит таймлайну (Id=${id}).`);
+                            if (elem.PeriodId && (!period_list[elem.PeriodId]))
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Период (Id=${elem.PeriodId}) не принадлежит таймлайну (Id=${id}).`);
+                            if (typeof (elem.Number) !== "number")
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid "Number" in line ${i}.`);
+                            let curr_obj = obj_list[elem.Number];
+                            if (!curr_obj) {
+                                await event_root.newObject({
+                                    fields: { Number: elem.Number, EventId: elem.EventId, PeriodId: elem.PeriodId }
+                                }, dbOpts);
+                            }
+                            else {
+                                curr_obj.eventId(elem.EventId ? elem.EventId : null);
+                                curr_obj.periodId(elem.PeriodId ? elem.PeriodId : null);
+                                delete obj_list[elem.Number];
+                            }
+                        }
+                        for (let key in obj_list)
+                            collection._del(obj_list[key]);
+                    }
+
+                    await root_obj.save(dbOpts);
+
+                    if (logModif)
+                        console.log(buildLogString(`Command ${is_new ? 'created' : 'updated'}: Id="${cmdId}".`));
+                    return { result: "OK", id: cmdId };
+                })
+        }, memDbOptions);
+
+    }
+
+    async deleteCommand(id, options) {
+        let opts = _.cloneDeep(options || {});
+        opts.user = await this._checkPermissions(AccessFlags.PmAdmin, opts);
+
+        let memDbOptions = { dbRoots: [] };
+        let dbOpts = _.defaultsDeep({ userId: opts.user.Id }, opts.dbOptions || {});
+        let root_obj = null;
+        let cmdObj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, TL_ADD_COMMAND, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() !== 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Команда (Id =${id}) не найдена.`);
+
+                    await root_obj.edit();
+                    cmdObj = collection.get(0);
+                    collection._del(cmdObj)
+
+                    await root_obj.save(dbOpts);
+
+                    if (logModif)
+                        console.log(buildLogString(`Command deleted: Id="${id}".`));
+                    return { result: "OK", id: id };
                 })
         }, memDbOptions);
 
