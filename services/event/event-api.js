@@ -54,6 +54,34 @@ const SQL_GET_PERIOD_LIST_MYSQL =
     "  left join `Timeline` tcr on tcr.`Id` = p.`TlCreationId`\n" +
     "  left join `Timeline` tpb on tpb.`Id` = p.`TlPublicId`";
 
+const SQL_DELETE_EVENT_TL_CMD_MSSQL =
+    "delete ce from [Command] c left join [CommandEvent] ce on c.[Id] = ce.[CommandId]\n" +
+    "  where (c.[TimelineId] = <%= timelineId %>) and (ce.[EventId] = <%= id %>)";
+
+const SQL_DELETE_EVENT_CMD_MSSQL =
+    "delete ce from [CommandEvent] ce where ce.[EventId] = <%= id %>";
+
+const SQL_DELETE_EVENT_TL_CMD_MYSQL =
+    "delete ce from `Command` c left join `CommandEvent` ce on c.`Id` = ce.`CommandId`\n" +
+    "  where (c.`TimelineId` = <%= timelineId %>) and (ce.`EventId` = <%= id %>)";
+
+const SQL_DELETE_EVENT_CMD_MYSQL =
+    "delete ce from `CommandEvent` ce where ce.`EventId` = <%= id %>";
+
+const SQL_DELETE_PERIOD_TL_CMD_MSSQL =
+    "delete ce from [Command] c left join [CommandEvent] ce on c.[Id] = ce.[CommandId]\n" +
+    "  where (c.[TimelineId] = <%= timelineId %>) and (ce.[PeriodId] = <%= id %>)";
+
+const SQL_DELETE_PERIOD_CMD_MSSQL =
+    "delete ce from [CommandEvent] ce where ce.[PeriodId] = <%= id %>";
+
+const SQL_DELETE_PERIOD_TL_CMD_MYSQL =
+    "delete ce from `Command` c left join `CommandEvent` ce on c.`Id` = ce.`CommandId`\n" +
+    "  where (c.`TimelineId` = <%= timelineId %>) and (ce.`PeriodId` = <%= id %>)";
+
+const SQL_DELETE_PERIOD_CMD_MYSQL =
+    "delete ce from `CommandEvent` ce where ce.`PeriodId` = <%= id %>";
+
 const EVENT_DELETE = {
     expr: {
         model: {
@@ -885,9 +913,34 @@ const EventApi = class EventApi extends DbObject {
                         if (col_tl.count() === 0)
                             collection._del(periodObj)
                         else
-                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Период используется в других таймлайнах.`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Период используется в некоторых таймлайнах.`);
 
-                    await root_obj.save(dbOpts);
+                    let tran = await $data.tranStart(dbOpts);
+                    let transactionId = tran.transactionId;
+                    dbOpts.transactionId = tran.transactionId;
+                    try {
+                        let dialect;
+                        if (deleted_from_timeline)
+                            dialect = {
+                                mysql: _.template(SQL_DELETE_PERIOD_TL_CMD_MYSQL)({ id: id, timelineId: timelineId }),
+                                mssql: _.template(SQL_DELETE_PERIOD_TL_CMD_MSSQL)({ id: id, timelineId: timelineId })
+                            }
+                        else
+                            dialect = {
+                                mysql: _.template(SQL_DELETE_PERIOD_CMD_MYSQL)({ id: id }),
+                                mssql: _.template(SQL_DELETE_PERIOD_CMD_MSSQL)({ id: id })
+                            }
+
+                        await $data.execSql({
+                            dialect: dialect
+                        }, dbOpts);
+                        await root_obj.save(dbOpts);
+                        await $data.tranCommit(transactionId)
+                    }
+                    catch (err) {
+                        await $data.tranRollback(transactionId);
+                        throw err;
+                    }
 
                     if (logModif)
                         console.log(buildLogString(`Period deleted ${deleted_from_timeline ? 'from timeline ' + timelineId : ''}: Id="${id}".`));
@@ -1106,9 +1159,34 @@ const EventApi = class EventApi extends DbObject {
                         if (col_tl.count() === 0)
                             collection._del(eventObj)
                         else
-                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Событие используется в других таймлайнах.`);
+                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Событие используется в некоторых таймлайнах.`);
 
-                    await root_obj.save(dbOpts);
+                    let tran = await $data.tranStart(dbOpts);
+                    let transactionId = tran.transactionId;
+                    dbOpts.transactionId = tran.transactionId;
+                    try {
+                        let dialect;
+                        if (deleted_from_timeline)
+                            dialect = {
+                                mysql: _.template(SQL_DELETE_EVENT_TL_CMD_MYSQL)({ id: id, timelineId: timelineId }),
+                                mssql: _.template(SQL_DELETE_EVENT_TL_CMD_MSSQL)({ id: id, timelineId: timelineId })
+                            }
+                        else
+                            dialect = {
+                                mysql: _.template(SQL_DELETE_EVENT_CMD_MYSQL)({ id: id }),
+                                mssql: _.template(SQL_DELETE_EVENT_CMD_MSSQL)({ id: id })
+                            }
+
+                        await $data.execSql({
+                            dialect: dialect
+                        }, dbOpts);
+                        await root_obj.save(dbOpts);
+                        await $data.tranCommit(transactionId)
+                    }
+                    catch (err) {
+                        await $data.tranRollback(transactionId);
+                        throw err;
+                    }
 
                     if (logModif)
                         console.log(buildLogString(`Event deleted ${deleted_from_timeline ? 'from timeline ' + timelineId : ''}: Id="${id}".`));

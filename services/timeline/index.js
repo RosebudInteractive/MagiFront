@@ -102,6 +102,39 @@ function setupTimelines(app) {
                 }
             });
 
+            app.put(`/api/pm/timeline/add-command/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().addOrUpdateCommand(parseInt(req.params.id), true, req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/timeline/upd-command/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().addOrUpdateCommand(parseInt(req.params.id), false, req.body, opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
+            app.put(`/api/pm/timeline/delete-command/:id`, async (req, res, next) => {
+                try {
+                    let opts = _.defaultsDeep({ user: req.user }, req.query);
+                    let rows = await TimelineService().deleteCommand(parseInt(req.params.id), opts);
+                    res.send(rows);
+                }
+                catch (err) {
+                    next(err);
+                }
+            });
+
             app.put(`/api/pm/timeline/:id`, async (req, res, next) => {
                 try {
                     let opts = _.defaultsDeep({ user: req.user }, req.query);

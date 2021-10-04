@@ -135,6 +135,7 @@ const _prodConfig = {
             'common-tools': path.resolve(__dirname, 'common/tools'),
             'common-styles': path.resolve(__dirname, 'common/styles'),
             'timeline': path.resolve(__dirname, 'timeline-lib'),
+            '@tt-types': path.resolve(__dirname, 'team-task/@types'),
         }
     },
     resolveLoader: {

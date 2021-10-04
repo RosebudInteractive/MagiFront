@@ -31,7 +31,7 @@ class NewCourse extends React.Component {
     constructor(props) {
         super(props)
 
-        this.props.getCourse(this.props.courseUrl, {absPath: true});
+        this.props.getCourse(this.props.courseUrl, {abs_path: true});
     }
 
     render() {
