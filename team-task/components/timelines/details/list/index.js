@@ -10,7 +10,7 @@ let _itemsCount = 0;
 
 //todo finish this
 export default function DetailsList(props) {
-    const {actions, items, columnsConfig, idGrid, title, addCompletelyCreated, disabled} = props;
+    const {actions, items, columnsConfig, idGrid, title, addCompletelyCreated, disabled, opportunityToAddCompletelyCreatedItems = true} = props;
 
     const _containerId = `${idGrid}-container`
 
@@ -85,9 +85,9 @@ export default function DetailsList(props) {
                 <button className="open-form-button" onClick={actions.createAction} disabled={disabled}>
                     <PlusIco/>
                 </button>
-                <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated || disabled}>
+                {opportunityToAddCompletelyCreatedItems && <button className="open-form-button" onClick={actions.openFindFormAction} disabled={!addCompletelyCreated || disabled}>
                     <PlusOrangeIco/>
-                </button>
+                </button>}
             </div>
             <div className="grid-container__wrapper">
                 <div className="grid-container details-list-table items-table unselectable" id={_containerId}>

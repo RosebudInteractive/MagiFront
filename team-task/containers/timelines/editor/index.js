@@ -7,16 +7,16 @@ import TimelineHeader, {EDITOR_NAME as HEADER_EDITOR_NAME} from "../../../compon
 import TimelinePreview from "../../../components/timelines/preview";
 import TimelineDetails from "../../../components/timelines/details";
 import {
-    currentTimelineSelector,
-    timelineOpenedSelector,
-    timelinesSelector,
     clearSelectedTimeline,
     createNewTimeline,
+    currentTimelineSelector,
     getOneTimeline,
     getTimelines,
     goBack,
     linkEvent,
     linkPeriod,
+    timelineOpenedSelector,
+    timelinesSelector,
     updateTimeline,
 } from "tt-ducks/timelines";
 import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
@@ -42,6 +42,7 @@ import {Prompt, useLocation,} from "react-router-dom"
 import Modal from "../../../components/modal"
 import EventForm from "../../../components/timelines/details/events/form"
 import PeriodForm from "../../../components/timelines/details/periods/form"
+import ScriptCommandForm from "../../../components/timelines/details/script/command-form"
 import PeriodsFindForm from "../../../components/timelines/details/periods/find-form";
 import EventsFindForm from "../../../components/timelines/details/events/find-form";
 
@@ -63,6 +64,18 @@ import {
     updatePeriodData
 } from "tt-ducks/periods-timeline";
 import {getFormValues, isDirty} from "redux-form";
+import {
+    closeCommandEditorWithConfirmation,
+    commandEditorOpenedSelector,
+    commandsSelector,
+    createNewCommand,
+    currentCommandSelector,
+    openCommandEditor,
+    removeCommand,
+    requestCommands,
+    toggleCommandEditor,
+    updateCommandData
+} from "tt-ducks/script-commands-timeline";
 
 const DEFAULT_TIMELINE = {
     Name: '',
@@ -82,56 +95,91 @@ let sTimeline = null;
 function TimelineEditorContainer(props) {
     const {
         actions, selectedTimeline, lessons,
-        courses, selectedEvent, eventEditorOpened,
+        courses, selectedEvent, selectedCommand, eventEditorOpened,
         selectedPeriod, findedPeriods,
         timelinesAll, findedEvents, periodEditorOpened
-        , events, periods
+        , events, periods, commands, commandEditorOpened
     } = props;
     const [timeline, setTimeline] = useState(null);
     const detailsEditor = useRef(null);
+    const detailsTitle = useRef(null);
     const finderForm = useRef(null);
     const [finderFormOpened, setFinderFormOpened] = useState(false);
     const location = useLocation();
+
+    // const modalDetailsTitle = useMemo(() => {
+    //     return {
+    //         'event': 'Добавление события',
+    //         'period': 'Добавление периода',
+    //         'command': 'Добавление команды скрипта'
+    //     }[detailsTitle.current]
+    // }, [detailsTitle]);
 
     const closeModal = (withConfirmation) => {
         if (withConfirmation) {
             periodEditorOpened && actions.closePeriodWithConfirmation();
             eventEditorOpened && actions.closeEventWithConfirmation();
+            commandEditorOpened && actions.closeCommandEditorWithConfirmation();
         } else {
             actions.toggleEditorToPeriod(false);
             actions.toggleEditorTo(false);
+            actions.toggleCommandEditor(false);
         }
     };
 
     const doubleClickAction = function ({id, type, optionalParam}) {
         if (id && type) {
-            if (type === 'periods') {
-                detailsEditor.current = PeriodForm;
 
-                if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
-                    const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
-                    actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
-                } else {
-                    actions.openPeriodEditor({periodId: id});
-                }
-            }
-            if (type === 'events') {
-                detailsEditor.current = EventForm;
+            switch (type) {
+                case 'periods':
+                    detailsEditor.current = PeriodForm;
+                    detailsTitle.current = 'period'; //todo do with const, for example DETAILS_TITLE = {0: 'Период'} etc
+                    if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
+                        const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
+                        actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
+                    } else {
+                        actions.openPeriodEditor({periodId: id});
+                    }
+                    break;
+                case 'events':
+                    detailsEditor.current = EventForm;
+                    detailsTitle.current = 'event';
 
-                if (sTimeline.Events && sTimeline.Events.length > 0 && sTimeline.Events.find(pr => (pr.Id) && pr.Id === id)) {
-                    actions.openEventEditor({eventId: id, timelineId: sTimeline.Id});
-                } else {
-                    actions.openEventEditor({eventId: id});
-                }
+                    if (sTimeline.Events && sTimeline.Events.length > 0 && sTimeline.Events.find(pr => (pr.Id) && pr.Id === id)) {
+                        actions.openEventEditor({eventId: id, timelineId: sTimeline.Id});
+                    } else {
+                        actions.openEventEditor({eventId: id});
+                    }
+                    break;
+                case 'commands':
+                    detailsEditor.current = ScriptCommandForm;
+                    detailsTitle.current = 'command';
+
+                    if (sTimeline.Commands && sTimeline.Commands.length > 0 && sTimeline.Commands.find(cmd => (cmd.Id) && cmd.Id === id)) {
+                        actions.openCommandEditor({commandId: id, timelineId: sTimeline.Id});
+                    // } else {
+                    //     actions.openEventEditor({eventId: id});
+                    }
+                    break;
+                default:
+                    return;
             }
         } else {
+            console.log('it should never call when we select da commands');
             if (!id && type) {
-                if (type === 'periods') {
-                    detailsEditor.current = PeriodForm;
-                    actions.openPeriodEditor({tableId: optionalParam.row});
+                if(type === 'commands'){
+                    //it never calls
+                    console.log('it should never calls')
                 } else {
-                    detailsEditor.current = EventForm;
-                    actions.openEventEditor({tableId: optionalParam.row});
+                    //it never calls
+                    console.log('it should never calls')
+                    if (type === 'periods') {
+                        detailsEditor.current = PeriodForm;
+                        actions.openPeriodEditor({tableId: optionalParam.row});
+                    } else {
+                        detailsEditor.current = EventForm;
+                        actions.openEventEditor({tableId: optionalParam.row});
+                    }
                 }
             }
         }
@@ -141,9 +189,10 @@ function TimelineEditorContainer(props) {
         if (sTimeline) {
             sTimeline.Events = events;
             sTimeline.Periods = periods;
+            sTimeline.Commands = commands;
         }
 
-    }, [events, periods]);
+    }, [events, periods, commands]);
 
     const onSave = (values) => {
         const _object = {
@@ -186,12 +235,24 @@ function TimelineEditorContainer(props) {
     const detailsCreateAction = (type) => {
         const timelineId = timeline.Id ? timeline.Id : null;
 
-        if (type === 'events') {
-            detailsEditor.current = EventForm;
-            actions.openEventEditor({timelineId: timelineId});
-        } else {
-            detailsEditor.current = PeriodForm;
-            actions.openPeriodEditor({timelineId: timelineId});
+        switch (type) {
+            case 'events':
+                detailsEditor.current = EventForm;
+                detailsTitle.current = 'event';
+                actions.openEventEditor({timelineId: timelineId});
+                break;
+            case 'periods':
+                detailsEditor.current = PeriodForm;
+                detailsTitle.current = 'period';
+                actions.openPeriodEditor({timelineId: timelineId});
+                break;
+            case 'script':
+                detailsEditor.current = ScriptCommandForm;
+                detailsTitle.current = 'command';
+                actions.openCommandEditor({timelineId: timelineId});
+                break;
+            default:
+                return;
         }
     };
 
@@ -228,6 +289,28 @@ function TimelineEditorContainer(props) {
                     if (timeline && timeline.Id) {
                         actions.createNewPeriod({...values, TlCreationId: timeline.Id})
                     } else {
+                        actions.addTemporaryPeriod({...values, State: 1})
+                    }
+                }
+            }
+        }
+
+        if(commandEditorOpened){
+            if (id) {
+                actions.updateCommandData({periodId: id, periodData: values});
+            } else {
+                console.log('should never call, id is missing');
+                if (!id && tableId) {
+                    //should never calls
+                    console.log('should never call')
+                    actions.updatePeriodData({tableId: id, periodData: values})
+                } else {
+                    console.log('it !SHOULD! CALL');
+                    if (timeline && timeline.Id) {
+                        actions.createNewCommand({...values, TlCreationId: timeline.Id})
+                    } else {
+                        //should never calls
+                        console.log('should never call')
                         actions.addTemporaryPeriod({...values, State: 1})
                     }
                 }
@@ -334,10 +417,20 @@ function TimelineEditorContainer(props) {
                             deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removePeriod(id, sTimeline.Id) },
                             createAction: () => { detailsCreateAction('periods') },
                             openFindFormAction: () => { detailsOpenFindFormAction('periods') }
+                        },
+                        script: {
+                            deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removeCommand(id, sTimeline.Id) },
+                            createAction: () => { detailsCreateAction('script') },
+                            doubleClickAction: (id, tableId = null) => doubleClickAction({
+                                id: id,
+                                type: 'commands',
+                                optionalParam: tableId
+                            }),
                         }
                     }}
                                      events={events}
                                      periods={periods}
+                                     scriptTimecodes={commands}
                                      findedEvents={findedEvents}
                                      findedPeriods={findedPeriods}
                                      timelineId={timeline.Id}
@@ -346,12 +439,15 @@ function TimelineEditorContainer(props) {
             }
 
             {
-                ((eventEditorOpened || periodEditorOpened) && timelinesAll && detailsEditor.current) &&
+                ((eventEditorOpened || periodEditorOpened || commandEditorOpened) && timelinesAll && detailsEditor.current) &&
                 <Modal WrappedComponent={detailsEditor.current}
                        customHeader={true}
                        wrappedProps={{
                            eventData: selectedEvent,
                            periodData: selectedPeriod,
+                           commandData: selectedCommand,
+                           events: events,
+                           periods: periods,
                            closeModalCb: closeModal,
                            timelines: timelinesAll,
                            timelineId: timeline.Id,
@@ -392,6 +488,9 @@ const mapState2Props = (state) => {
         courses: coursesSelector(state),
         editorValues: getFormValues(HEADER_EDITOR_NAME)(state),
         hasChanges: isDirty(HEADER_EDITOR_NAME)(state),
+        selectedCommand: currentCommandSelector(state),
+        commandEditorOpened: commandEditorOpenedSelector(state),
+        commands: commandsSelector(state)
     }
 };
 
@@ -431,7 +530,14 @@ const mapDispatch2Props = (dispatch) => {
             createEvents,
             clearSelectedTimeline,
             cleanFoundPeriods,
-            cleanFoundEvents
+            cleanFoundEvents,
+            requestCommands,
+            openCommandEditor,
+            closeCommandEditorWithConfirmation,
+            createNewCommand,
+            updateCommandData,
+            removeCommand,
+            toggleCommandEditor
         }, dispatch)
     }
 };
