@@ -421,7 +421,7 @@ function* getTimelineSaga(data) {
 
         yield put(setEvents(timelineData.Events));
         yield put(setPeriods(timelineData.Periods));
-        yield put(setCommands(timelineData.Commands.map(el => ({...el, Timecode: el.TimeCode/1000}))));
+        yield put(setCommands(timelineData.Commands));
 
         if (data.payload.setToEditor) {
             yield put({type: SET_TIMELINE_TO_EDIT, payload: timelineData});

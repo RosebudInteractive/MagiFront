@@ -107,14 +107,6 @@ function TimelineEditorContainer(props) {
     const [finderFormOpened, setFinderFormOpened] = useState(false);
     const location = useLocation();
 
-    // const modalDetailsTitle = useMemo(() => {
-    //     return {
-    //         'event': 'Добавление события',
-    //         'period': 'Добавление периода',
-    //         'command': 'Добавление команды скрипта'
-    //     }[detailsTitle.current]
-    // }, [detailsTitle]);
-
     const closeModal = (withConfirmation) => {
         if (withConfirmation) {
             periodEditorOpened && actions.closePeriodWithConfirmation();
@@ -157,22 +149,15 @@ function TimelineEditorContainer(props) {
 
                     if (sTimeline.Commands && sTimeline.Commands.length > 0 && sTimeline.Commands.find(cmd => (cmd.Id) && cmd.Id === id)) {
                         actions.openCommandEditor({commandId: id, timelineId: sTimeline.Id});
-                    // } else {
-                    //     actions.openEventEditor({eventId: id});
                     }
                     break;
                 default:
                     return;
             }
         } else {
-            console.log('it should never call when we select da commands');
             if (!id && type) {
                 if(type === 'commands'){
-                    //it never calls
-                    console.log('it should never calls')
                 } else {
-                    //it never calls
-                    console.log('it should never calls')
                     if (type === 'periods') {
                         detailsEditor.current = PeriodForm;
                         actions.openPeriodEditor({tableId: optionalParam.row});
@@ -297,21 +282,13 @@ function TimelineEditorContainer(props) {
 
         if(commandEditorOpened){
             if (id) {
-                actions.updateCommandData({periodId: id, periodData: values});
+                actions.updateCommandData({commandId: id, commandData: values});
             } else {
-                console.log('should never call, id is missing');
                 if (!id && tableId) {
-                    //should never calls
-                    console.log('should never call')
                     actions.updatePeriodData({tableId: id, periodData: values})
                 } else {
-                    console.log('it !SHOULD! CALL');
                     if (timeline && timeline.Id) {
                         actions.createNewCommand(values)
-                    } else {
-                        //should never calls
-                        console.log('should never call')
-                        actions.addTemporaryPeriod({...values, State: 1})
                     }
                 }
             }
@@ -419,7 +396,7 @@ function TimelineEditorContainer(props) {
                             openFindFormAction: () => { detailsOpenFindFormAction('periods') }
                         },
                         script: {
-                            deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removeCommand(id, sTimeline.Id) },
+                            deleteAction: (id) => { (id && (sTimeline && sTimeline.Id)) && actions.removeCommand(id) },
                             createAction: () => { detailsCreateAction('script') },
                             doubleClickAction: (id, tableId = null) => doubleClickAction({
                                 id: id,

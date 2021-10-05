@@ -11,6 +11,8 @@ import {Command} from "../types/script-commands";
 import {currentTimelineSelector, getOneTimeline} from "tt-ducks/timelines";
 import type {Message} from "../types/messages";
 import $ from "jquery";
+import {eventsSelector} from "tt-ducks/events-timeline";
+import {periodsSelector} from "tt-ducks/periods-timeline";
 
 //constants
 
@@ -51,6 +53,13 @@ const COMMAND_CODES = {
     1: 'Show',
     2: 'Hide',
     3: 'Hide'
+};
+
+const NEW_COMMAND_CODES = { //todo rename
+    SHOW_PERIODS: 0,
+    SHOW_EVENTS: 1,
+    HIDE_PERIODS: 2,
+    HIDE_EVENTS: 3,
 };
 //store
 
@@ -149,8 +158,8 @@ export const updateCommandData = ({commandId, commandData, tableId}) => {
     return {type: UPDATE_COMMAND, payload: {...commandData, Id: commandId, tableId: tableId}}
 }
 
-export const removeCommand = (id, timelineId) => {
-    return {type: REMOVE_COMMAND, payload: {id, timelineId}}
+export const removeCommand = (id) => {
+    return {type: REMOVE_COMMAND, payload: id}
 };
 
 export const setCommands = (commands) => {
@@ -215,22 +224,48 @@ function* closeEditorSaga() {
 
 function* setCommandsSaga({payload}) {
     try {
+        const events = yield select(eventsSelector);
+        const periods = yield select(periodsSelector);
         const commands = payload.map((item) => {
             // const
-
+            // timelineData.Commands.map(el => ({...el, Timecode: el.TimeCode/1000, Command: el.Code}
             let command = {...item,
-            //     Timecode: TimeCode,
+
+                Timecode: item.TimeCode !== undefined ? item.TimeCode/1000 : item.Timecode,
+                Command: item.Code !== undefined ? +item.Code : +item.Command,
+                // Events: item.Co
             };
 
-            // if(item.Events){
+            const CommandCode = item.Code !== undefined ? +item.Code : +item.Command;
+
+            if([NEW_COMMAND_CODES.SHOW_EVENTS, NEW_COMMAND_CODES.HIDE_EVENTS].includes(CommandCode)){
+
+                if(item.Events.length > 0){
+                    command.Events =  typeof item.Events[0] === 'number' ? item.Events : item.Events.map(el => el.EventId);
+                    const eventId = typeof item.Events[0] === 'number' ? item.Events[0] : item.Events[0].EventId;
+                    command.FirstArgumentName = eventId ? events.find(el => el.Id === eventId).Name : '';
+                }
+
+            } else {
+                if(item.Periods && item.Periods.length > 0){
+                    command.Periods = item.Periods.map(el => el);
+                    const periodId = item.Periods[0];
+                    command.FirstArgumentName = periodId ? periods.find(el => el.Id === periodId).Name : '';
+                }
+
+                if(item.Events.length > 0 && typeof item.Events[0] !== 'number'){
+                    command.Periods = item.Events.map(el => el.PeriodId);
+                    const periodIdEv = item.Events[0].PeriodId;
+                    command.FirstArgumentName = periodIdEv ? periods.find(el => el.Id === periodIdEv).Name : '';
+                }
+            }
+
+
             //
             // } else {
             //
             // }
 
-
-
-            //todo do mapping when api backend is done
 
             return command;
         });
@@ -269,7 +304,6 @@ function* createCommandsSaga(data) {
 
             yield all(
                 finalCommands.map((ev) => {
-                    console.log(ev);
                     return call(createCommand, ev)
                 })
             );
@@ -342,11 +376,11 @@ function* getCommandSaga(data) {
 
 function* removeCommandSaga(data) {
     const message: Message = {
-        content: `Удалить событие #${data.payload.id}?`,
+        content: `Удалить команду #${data.payload}?`,
         title: "Подтверждение удаления"
     };
 
-    yield put(showUserConfirmation(message))
+    yield put(showUserConfirmation(message));
 
     const {accept} = yield race({
         accept: take(MODAL_MESSAGE_ACCEPT),
@@ -358,11 +392,26 @@ function* removeCommandSaga(data) {
     try {
         yield put({type: START_REQUEST});
 
-        const res = yield call(deleteCommand, data.payload.id, data.payload.timelineId);
+        const res = yield call(deleteCommand, data.payload);
 
 
         yield put({type: SUCCESS_REQUEST});
-        yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
+
+        const commands = yield select(commandsSelector);
+
+        const commandToRemoveIndex = commands.findIndex(com => com.Id === data.payload);
+
+        // let updateDataCommand;
+
+        if(commandToRemoveIndex >= 0){
+
+
+            commands.splice(commandToRemoveIndex, 1);
+
+            yield put(setCommands([...commands]));
+        }
+
+        // yield put(getOneTimeline({id: data.payload.timelineId, setToEditor: true}))
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.toString()));
@@ -373,39 +422,54 @@ function* updateCommandSaga(data) {
     try {
 
         if(data.payload.Id){
-            yield put({type: START_REQUEST});
 
-            yield call(updateCommand, data.payload);
+            const command = data.payload;
+            const tm = yield select(currentTimelineSelector);
 
-            yield put({type: SUCCESS_REQUEST});
-        }
-
-
-        const commands = yield select(commandsSelector);
-
-        const commandToUpdateIndex = commands.findIndex(ev => ev.Id === data.payload.Id);
-        const commandToUpdate = commands[commandToUpdateIndex];
-
-        // let updateDataCommand;
-
-        if(commandToUpdate){
-
-            const updateDataCommand = {...commandToUpdate, Id: data.payload.Id,
-                Name: data.payload.Name,
-                TlCreationId: data.payload.TlCreationId,
-                Month: parseInt(data.payload.Month),
-                Year: parseInt(data.payload.Year),
-                ShortName: data.payload.ShortName,
-                Description: data.payload.Description,
-                DisplayDate: `${data.payload.Day ? data.payload.Day.toString().padStart(2, '0') + '.' : ''}${data.payload.Month ? data.payload.Month.toString().padStart(2, '0') + '.' : ''}${data.payload.Year}`,
-                Day: data.payload.Day ? data.payload.Day : null
+            const mappedCommand = {
+                "Code": command.Command.toString(),
+                "TimeCode": command.Timecode * 1000
             };
 
-            commands.splice(commandToUpdateIndex, 1, updateDataCommand);
+            mappedCommand.Id = command.Id;
 
-            yield put(setCommands([...commands]));
+            if([NEW_COMMAND_CODES.SHOW_EVENTS, NEW_COMMAND_CODES.HIDE_EVENTS].includes(command.Command)){
+                mappedCommand.Events = command.Events.map((el, ind) => ({
+                    Number: ind,
+                    EventId: el
+                }))
+            } else {
+                if([NEW_COMMAND_CODES.SHOW_PERIODS, NEW_COMMAND_CODES.HIDE_PERIODS].includes(command.Command)){
+                    mappedCommand.Events = command.Periods.map((el, ind) => ({
+                        Number: ind,
+                        PeriodId: el
+                    }))
+                }
+            }
+            yield put({type: START_REQUEST});
+
+            yield call(updateCommand, tm.Id, mappedCommand);
+
+            yield put({type: SUCCESS_REQUEST});
+
+            const commands = yield select(commandsSelector);
+
+            const commandToUpdateIndex = commands.findIndex(ev => ev.Id === command.Id);
+            const commandToUpdate = commands[commandToUpdateIndex];
+
+            if(commandToUpdate){
+
+                const updateDataCommand = {...commandToUpdate, ...command, TimeCode: +command.Timecode * 1000};
+
+                commands.splice(commandToUpdateIndex, 1, updateDataCommand);
+
+                yield put(setCommands([...commands]));
+            }
+            yield put(toggleCommandEditor(false))
         }
-        yield put(toggleCommandEditor(false))
+
+
+
     } catch (e) {
         yield put({type: FAIL_REQUEST});
         yield put(showErrorMessage(e.message));
@@ -421,28 +485,26 @@ function* createCommandSaga(data) {
 
         const tm = yield select(currentTimelineSelector);
 
-        console.log('tm', tm)
-
         const mappedCommand = {
-            "Code": COMMAND_CODES[command.Command],
+            "Code": command.Command.toString(),
             "TimeCode": command.Timecode * 1000
         };
 
-        if([1,3].includes(command.Command)){
-            mappedCommand.Events = command.CommandArguments.map((el, ind) => ({
+        if([NEW_COMMAND_CODES.SHOW_EVENTS, NEW_COMMAND_CODES.HIDE_EVENTS].includes(command.Command)){
+            mappedCommand.Events = command.Events.map((el, ind) => ({
                 Number: ind,
                 EventId: el
             }))
         } else {
-            if([0,2].includes(command.Command)){
-                mappedCommand.Events = command.CommandArguments.map((el, ind) => ({
+            if([NEW_COMMAND_CODES.SHOW_PERIODS, NEW_COMMAND_CODES.HIDE_PERIODS].includes(command.Command)){
+                mappedCommand.Events = command.Periods.map((el, ind) => ({
                     Number: ind,
                     PeriodId: el
                 }))
             }
         }
 
-        const id = yield call(createCommand, tm.Id, mappedCommand);
+        const {id} = yield call(createCommand, tm.Id, mappedCommand);
 
         yield put({type: SUCCESS_REQUEST});
 
