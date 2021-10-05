@@ -40,6 +40,6 @@ export type TreeDependence = {
   expression: string,
   hasCondition: boolean,
   disabled: boolean,
-  offsetStart: number,
-  offsetEnd: number,
+  offsetStart: number | undefined,
+  offsetEnd: number | undefined,
 };
