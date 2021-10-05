@@ -65,7 +65,7 @@ export const resizeHandler = (rowCount: number) => {
         const _headerHeight = window.$$('unpublished-records-grid-table').config.headerRowHeight;
 
         setTimeout(() => {
-            let _gridHeight = _height - _headerHeight - 48
+            let _gridHeight = _height - _headerHeight
 
             const _calcHeight = (rowCount * 49) + _headerHeight
             _gridHeight = _calcHeight > _gridHeight ? _calcHeight : _gridHeight

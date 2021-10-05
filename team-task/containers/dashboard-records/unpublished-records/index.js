@@ -180,7 +180,9 @@ function UnpublishedRecords(props) {
                                    onChangeField={onChangeFieldCb}/>
                     </div>
                     <div className={'webix-datatable js-unpublished _with-custom-scroll'}>
-                        <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
+                        <div className={'webix-datatable-wrapper'}>
+                            <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
+                        </div>
                     </div>
                 </div>
         <div className="elements__hide-button" onClick={toggleVisible}/>
