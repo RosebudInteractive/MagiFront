@@ -109,9 +109,10 @@ class App extends Component {
 
     _actionOnMount() {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
-            _recoveryRout = this.props.location.pathname.startsWith('/recovery')
+            _recoveryRout = this.props.location.pathname.startsWith('/recovery'),
+            activationRout = this.props.location.pathname.startsWith('/activation-confirm')
 
-        if (!(_recoveryRout || _errorRout)) {
+        if (!(_recoveryRout || _errorRout || activationRout)) {
             this.props.userActions.whoAmI()
         }
 
