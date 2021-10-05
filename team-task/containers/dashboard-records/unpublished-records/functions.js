@@ -75,10 +75,6 @@ export const resizeHandler = (rowCount: number) => {
     }
 };
 
-export const showColumn  = (columnName, options) => {
-    !window.$$('dashboard-records-grid').isColumnVisible(columnName) && window.$$('dashboard-records-grid').showColumn(columnName, options)
-};
-
 export const convertFilter2Params = (filter) => {
     let _data = {};
 

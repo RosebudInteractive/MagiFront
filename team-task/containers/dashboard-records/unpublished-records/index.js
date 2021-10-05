@@ -44,8 +44,7 @@ function UnpublishedRecords(props) {
         resizeHandler(unpublishedCount)
     }, [unpublishedCount]);
 
-    const _sortRef = useRef({field: null, direction: null}),
-        filter = useRef(null);
+    const filter = useRef(null);
 
     useWindowSize(() => {
         resizeHandler(unpublishedCount)
@@ -65,9 +64,11 @@ function UnpublishedRecords(props) {
     };
 
     useEffect(() => {
-        (!visible) && showColumn('processElements', {spans: true});
-
         props.resizeTriggerFn(visible);
+
+        if (visible) {
+            setTimeout(_onResize, 300);
+        }
     }, [visible]);
 
     const GRID_CONFIG = {
