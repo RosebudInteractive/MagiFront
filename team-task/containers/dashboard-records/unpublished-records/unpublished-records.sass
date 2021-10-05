@@ -9,9 +9,12 @@
   flex: 0 1 33.33%
   max-width: 1000px
   transition: max-width 300ms ease
+  display: flex
+  flex-direction: column
 
-  > .title
+  .title
     margin-bottom: 20px
+    flex: 0 1 auto
 
   .elements__hide-button
     cursor: pointer
@@ -45,7 +48,6 @@
       border-right: none
 
 
-
 .unpublished-records-grid
   display: flex
   .elements__hide-button
@@ -58,11 +60,14 @@
     border-right: 9px solid $grey40
 
 .unpublished-records__grid-panel
-  height: calc(100% - 48px)
+  flex: 1 0 auto
   width: 300px
   visibility: visible
+  display: flex
+  flex-direction: column
 
   .filters
+    flex: 0 1 auto
     left: 0
     display: flex
     flex-direction: column
@@ -72,8 +77,17 @@
     margin-bottom: 24px
 
   .webix-datatable
+    position: relative
+    flex: 1 0 auto
+    overflow-x: hidden
     overflow-y: auto
-    height: 90%
+
+  .webix-datatable-wrapper
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
 
 
 .centered-by-flex
