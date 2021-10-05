@@ -215,15 +215,27 @@ function* closeEditorSaga() {
 
 function* setCommandsSaga({payload}) {
     try {
-        const _commands = payload.map((item) => {
-            let _command = {...item};
+        const commands = payload.map((item) => {
+            // const
+
+            let command = {...item,
+            //     Timecode: TimeCode,
+            };
+
+            // if(item.Events){
+            //
+            // } else {
+            //
+            // }
+
+
 
             //todo do mapping when api backend is done
 
-            return _command;
+            return command;
         });
 
-        yield put({type: SET_COMMANDS, payload: _commands})
+        yield put({type: SET_COMMANDS, payload: commands})
     } catch (e) {
         console.log(e.toString())
     }
@@ -409,8 +421,10 @@ function* createCommandSaga(data) {
 
         const tm = yield select(currentTimelineSelector);
 
+        console.log('tm', tm)
+
         const mappedCommand = {
-            "Code": COMMAND_CODES[toString(command.Command)],
+            "Code": COMMAND_CODES[command.Command],
             "TimeCode": command.Timecode * 1000
         };
 
@@ -421,18 +435,18 @@ function* createCommandSaga(data) {
             }))
         } else {
             if([0,2].includes(command.Command)){
-                mappedCommand.Periods = command.CommandArguments.map((el, ind) => ({
+                mappedCommand.Events = command.CommandArguments.map((el, ind) => ({
                     Number: ind,
                     PeriodId: el
                 }))
             }
         }
 
-        yield call(createCommand, tm.timelineId, mappedCommand);
+        const id = yield call(createCommand, tm.Id, mappedCommand);
 
         yield put({type: SUCCESS_REQUEST});
 
-        // yield put(addTemporaryCommand({...data.payload, Id: id, State: 1}))
+        yield put(addTemporaryCommand({...command, Id: id}))
 
         yield put(toggleCommandEditor(false))
     } catch (e) {

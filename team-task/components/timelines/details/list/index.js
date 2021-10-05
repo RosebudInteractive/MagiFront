@@ -81,7 +81,7 @@ export default function DetailsList(props) {
     return (
         <div className={`details-list ${disabled ? 'disabled' : ''}`}>
             <div className='sticky-block'>
-                <h5 className="form-header _grey70">{title ? title : 'Элементы'}</h5>
+                {/*<h5 className="form-header _grey70">{title ? title : 'Элементы'}</h5>*/}
                 <button className="open-form-button" onClick={actions.createAction} disabled={disabled}>
                     <PlusIco/>
                 </button>

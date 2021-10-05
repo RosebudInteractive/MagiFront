@@ -4,7 +4,7 @@ import {Select, TextBox} from "../../../../ui-kit";
 import './script-command-form.sass'
 import {TIMELINE_STATE} from "../../../../../constants/states";
 
-const SCRIPT_COMMANDS = [
+export const SCRIPT_COMMANDS = [
     {id: 0, name: 'Показать периоды'},
     {id: 1, name: 'Показать события'},
     {id: 2, name: 'Скрыть периоды'},
@@ -16,6 +16,7 @@ export default function ScriptCommandForm(props) {
     const [validIs, setValid] = useState(false);
     const [formPristine, setFormPristine] = useState(true);
     const worksWithEvents = useRef(commandData && [1,3].includes(commandData.Command));
+    const [worksWithEventsState, swwe] = useState(commandData && [1,3].includes(commandData.Command));
 
     const _state = useMemo(() => {
         console.log('commandData.State', commandData);
@@ -23,13 +24,20 @@ export default function ScriptCommandForm(props) {
         return result ? result : {label: "Ошибка", css: "_error"}
     }, [commandData.State]);
 
+    // useState( //() => {
+    //
+    // }, [wo]);
+
     const commandArgumentOptions = useMemo(() => {
-        // let options = (commandData && commandData.Id && commandData.C) ? ;
-        // (commandData && commandData.Id)
-        return worksWithEvents.current !== null && worksWithEvents.current ?
+        return worksWithEventsState !== null && worksWithEventsState ?
             events.map(ev => ({id: ev.Id, name: ev.Name})) :
             periods.map(per => ({id: per.Id, name: per.Name}))
-    }, [worksWithEvents.current]);
+        // let options = (commandData && commandData.Id && commandData.C) ? ;
+        // (commandData && commandData.Id)
+        // return worksWithEvents.current !== null && worksWithEvents.current ?
+        //     events.map(ev => ({id: ev.Id, name: ev.Name})) :
+        //     periods.map(per => ({id: per.Id, name: per.Name}))
+    }, [worksWithEvents.current, worksWithEventsState]);
 
     const formData = useMemo(() => ({
         Timecode: commandData.Timecode,
@@ -86,6 +94,7 @@ export default function ScriptCommandForm(props) {
                         <div className='script-timestamp-form__field'>
                             <Field name="Command"
                                    component={Select}
+                                   required={true}
                                    options={SCRIPT_COMMANDS}
                                    label={"Команда"}
                                    onChange={(val) => {
@@ -104,6 +113,7 @@ export default function ScriptCommandForm(props) {
                             <Field name="CommandArguments"
                                    component={Select}
                                    multiple={true}
+                                   required={true}
                                    options={commandArgumentOptions}
                                    label={"Название"}
                                    placeholder="Название"
@@ -116,7 +126,7 @@ export default function ScriptCommandForm(props) {
 
 
                     <div className='script-timestamp-form__field center'>
-                        <button type={'button'} className="orange-button big-button" disabled={((validIs) && !formPristine) !== true}
+                        <button type={'button'} className="orange-button big-button" disabled={!validIs}
                                 onClick={() => props.onSave({
                                     id: commandData.Id,
                                     tableId: commandData.id,
@@ -128,6 +138,7 @@ export default function ScriptCommandForm(props) {
                     <FormSpy subscription={{values: true, pristine: true, errors: true, submitting, touched: true}}
                              onChange={({values, pristine, errors, submitting, touched}) => {
                                  // console.log('values', values)
+                                 swwe([1,3].includes(values.Command));
                                  worksWithEvents.current = [1,3].includes(values.Command);
                                  setFormPristine(pristine);
                                  setValid(Object.values(errors).length === 0);
@@ -154,15 +165,22 @@ const validate = (values, disableValidationOnFields = []) => {
 
     const errors = {};
 
+    console.log('vals.Timecode', vals.Command)
+
     if(vals.Timecode < 0){
-        vals.Timecode = 'Значение должно быть > 0';
+        errors.Timecode = 'Значение должно быть от 0';
     }
 
-    if(!vals.Timecode){
-        vals.Timecode = 'Обязательное поле';
+    if(vals.Timecode === undefined || vals.Timecode === ''){
+        errors.Timecode = 'Обязательное поле';
     }
 
-    //todo finish this
+    if(vals.Command === undefined || vals.Command === '' || isNaN(vals.Command)){
+        errors.Command = 'Обязательное поле'
+    }
+
+
+
 
 
 

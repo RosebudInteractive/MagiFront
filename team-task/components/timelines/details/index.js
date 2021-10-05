@@ -4,6 +4,7 @@ import {EVENT_STATES} from "../../../constants/events"
 import DetailsList from "./list";
 import {TIMELINE_STATE} from "../../../constants/states";
 import {Nav} from 'rsuite';
+import {SCRIPT_COMMANDS} from "./script/command-form";
 
 //todo finish this, maybe use scriptTimestamps instead of scriptTimecodes ??
 export default function TimelineDetails(props) {
@@ -73,9 +74,15 @@ export default function TimelineDetails(props) {
                     opportunityToAddCompletelyCreatedItems = {false}
                     columnsConfig={[
                         {id: 'Id', header: 'Id', hidden: true},
-                        {id: 'Timecode', header: 'Таймкод', fillspace: true},
-                        {id: 'Command', header: 'Команда',  width: 80, adjust:true, css: "_centered"},
-                        {id: 'FirstArgumentName', header: 'Имя первого элемента',  width: 80, adjust:true, css: "_centered"},
+                        {id: 'Timecode', header: 'Таймкод',  width: 80},
+                        {id: 'Command', header: 'Команда',  width: 80, adjust:true, css: "_centered", format: function (value) {
+                            if(value === 'Hide' || value === 'Show'){
+                                return value === 'Hide' ? 'Скрыть' : 'Показать'
+                            } else {
+                                return SCRIPT_COMMANDS.find(el => el.id === +value).name;
+                            }
+                            }},
+                        {id: 'FirstArgumentName', header: 'Имя первого элемента',  fillspace: true, adjust:true, css: "_centered"},
                         // {id: 'State', header: 'Состояние',  width: 80, options: EVENT_STATES,  template: function (val) {
                         //         const cssWithLabel = Object.values(TIMELINE_STATE).find(item => item.value === parseInt(val.State));
                         //         return `<div class="state-template-block font-body-s">

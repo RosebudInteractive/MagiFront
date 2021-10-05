@@ -307,7 +307,7 @@ function TimelineEditorContainer(props) {
                 } else {
                     console.log('it !SHOULD! CALL');
                     if (timeline && timeline.Id) {
-                        actions.createNewCommand({...values, TlCreationId: timeline.Id})
+                        actions.createNewCommand(values)
                     } else {
                         //should never calls
                         console.log('should never call')
