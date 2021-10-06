@@ -18,6 +18,7 @@ import timelinesReducer, {moduleName as timelinesModule} from "tt-ducks/timeline
 import eventsReducer, {moduleName as eventsModule} from "tt-ducks/events-timeline";
 import periodsReducer, {moduleName as periodsModule} from "tt-ducks/periods-timeline";
 import dashboardRecordsReducer, {moduleName as dashboardRecordsModule} from "tt-ducks/dashboard-records";
+import scriptCommandsTimelineReducer, {moduleName as scriptCommandsTimelineModule} from "tt-ducks/script-commands-timeline";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -37,6 +38,7 @@ export default combineReducers({
     [eventsModule]: eventsReducer,
     [periodsModule]: periodsReducer,
     [dashboardRecordsModule]: dashboardRecordsReducer,
+    [scriptCommandsTimelineModule]: scriptCommandsTimelineReducer,
     routing: routerReducer,
     form: formReducer,
 })
