@@ -599,7 +599,7 @@ function* getRecordsSaga() {
             fieldObj.header = [{text: el, css: 'up-headers'}];
 
             fieldObj.css = '_container element-style';
-            fieldObj.minWidth = 120;
+            fieldObj.minWidth = 130;
             fieldObj.template = function (val) {
                 const elData = val[el];
 
