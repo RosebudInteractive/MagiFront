@@ -34,6 +34,7 @@ export default function DateRangeField(props) {
         return result
     }, [props]);
 
-
-    return <DateRangePicker className="filter-row__field-input _autocomplete" {...renderProps} />
+    return <DateRangePicker className="filter-row__field-input _autocomplete" {...renderProps}
+                            isoWeek={true}
+    />
 }

@@ -2,12 +2,9 @@ import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
-import {checkStatus, parseJSON, commonGetQuery} from "common-tools/fetch-tools";
-import {reset} from "redux-form";
-import {all, takeEvery, put, call, select} from "@redux-saga/core/effects";
+import {commonGetQuery} from "common-tools/fetch-tools";
+import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage} from "tt-ducks/messages";
-
-import PROCESSES from "../mock-data/processes"
 import {PROCESS_STATE} from "../constants/states";
 import {paramsSelector} from "tt-ducks/route";
 import {push} from "react-router-redux/src";
@@ -135,7 +132,7 @@ const _getStateData = (state) => {
     return _state ? {css: _state.css, label: _state.label} : {css: "_error", label: "Ошибка"}
 }
 
-const _fetchProcesses = (params) => {
+export const _fetchProcesses = (params) => {
     // return Promise.resolve(PROCESSES)
     return commonGetQuery("/api/pm/process-list" + (params ? `?${params}` : ""))
 }

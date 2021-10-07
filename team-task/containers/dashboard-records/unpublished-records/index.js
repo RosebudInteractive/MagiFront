@@ -1,10 +1,11 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import './unpublished-records.sass'
 import Webix from "../../../components/Webix";
-import {getFilterConfig, grid2grid, resizeHandler, showColumn} from "./functions";
+import {getFilterConfig, grid2grid, resizeHandler} from "./functions";
 import type {FilterField} from "../../../components/filter/types";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {
+    courseOptionsUnpublishedFilter,
     elementsFieldSetSelector,
     fetchingSelector,
     getUnpublishedRecords,
@@ -12,17 +13,18 @@ import {
     setPublishRecordDate
 } from "tt-ducks/dashboard-records";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
-import {coursesSelector, getDashboardUnpublishedRecords, unpublishedLessons} from "tt-ducks/dictionary";
+import {getDashboardUnpublishedRecords, unpublishedLessons} from "tt-ducks/dictionary";
 import {bindActionCreators} from "redux";
 import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
+import {hasAdminRights, hasOnlyRealAdminRights} from "tt-ducks/auth";
 
 let unpublishedCount = 0;
 
 function UnpublishedRecords(props) {
-    const {unpublishedRecords, actions, allUnpublishedRecords} = props;
+    const {unpublishedRecords, actions, allUnpublishedRecords, courses, hasAdminRights, hasOnlyRealAdminRights} = props;
     const [visible, setVisible] = useState(false);
     const [stateChanger, setChanger] = useState(true);
 
@@ -71,26 +73,27 @@ function UnpublishedRecords(props) {
         }
     }, [visible]);
 
-    const GRID_CONFIG = {
-        view: "datatable",
-        id: 'unpublished-records-grid-table',
-        css: 'tt-element-grid',
-        hover: "row-hover",
-        scroll: "none",
-        headerRowHeight: 40,
-        rowHeight: 49,
-        select: true,
-        editable: false,
-        drag: "move",
-        externalData: grid2grid,
-        columns: [
-            {id: 'Id', header: 'Id', hidden: true},
-            {
-                id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
-                css: '_container doubled-ceil',
-                fillspace: 80,
-                template: function (data) {
-                    return `<div  class="course-lesson-name-ceil">
+    const GRID_CONFIG = useMemo(() => {
+
+        const config = {
+            view: "datatable",
+            id: 'unpublished-records-grid-table',
+            css: 'tt-element-grid',
+            hover: "row-hover",
+            scroll: "none",
+            headerRowHeight: 40,
+            rowHeight: 49,
+            select: true,
+            editable: false,
+            externalData: grid2grid,
+            columns: [
+                {id: 'Id', header: 'Id', hidden: true},
+                {
+                    id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
+                    css: '_container doubled-ceil',
+                    fillspace: 80,
+                    template: function (data) {
+                        return `<div  class="course-lesson-name-ceil">
                         <div class="course-name">
                             ${data.CourseName}                   
                         </div>
@@ -98,52 +101,117 @@ function UnpublishedRecords(props) {
                             ${data.LessonName}       
                         </div>
                    </div>`
-                }
+                    }
+                },
+                {id: 'CourseName', hidden: true, header: [{text: 'Курс'}], fillspace: 40},
+                {
+                    id: 'LessonNum', header: 'Номер', fillspace: 20, css: "_container", template: function (val) {
+                        return `<div class="centered-by-flex">${val.LessonNum}</div>`;
+                    }
+                },
+                {id: 'LessonName', hidden: true, header: [{text: 'Лекция', css: {'text-align': 'center'}}], fillspace: 40},
+            ],
+            on: {
+                onHeaderClick: function () {
+                },
+                onBeforeDragIn: function (context, e) {
+                    return hasOnlyRealAdminRights;
+                },
+                // onBeforeDrag: function (context, e) {
+                //     return hasAdminRights;
+                // }
             },
-            {id: 'CourseName', hidden: true, header: [{text: 'Курс'}], fillspace: 40},
-            {
-                id: 'LessonNum', header: 'Номер', fillspace: 20, css: "_container", template: function (val) {
-                    return `<div class="centered-by-flex">${val.LessonNum}</div>`;
-                }
+            onClick: {
             },
-            {id: 'LessonName', hidden: true, header: [{text: 'Лекция', css: {'text-align': 'center'}}], fillspace: 40},
-        ],
-        on: {
-            onHeaderClick: function () {
-            },
-        },
-        onClick: {
-        },
-        "elem-edit": function (e, data) {
-            if (props.disabled) return
+            "elem-edit": function (e, data) {
+                if (props.disabled) return
+            }
         }
-    };
+
+        if(hasOnlyRealAdminRights){
+            config.drag = 'move'
+        // } else {
+        //     config.drag = 'target'
+        }
+
+        return config;
+        // };
+        // retu
+    }, [hasOnlyRealAdminRights]);
+    //     view: "datatable",
+    //     id: 'unpublished-records-grid-table',
+    //     css: 'tt-element-grid',
+    //     hover: "row-hover",
+    //     scroll: "none",
+    //     headerRowHeight: 40,
+    //     rowHeight: 49,
+    //     select: true,
+    //     editable: false,
+    //     drag: "move",
+    //     externalData: grid2grid,
+    //     columns: [
+    //         {id: 'Id', header: 'Id', hidden: true},
+    //         {
+    //             id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
+    //             css: '_container doubled-ceil',
+    //             fillspace: 80,
+    //             template: function (data) {
+    //                 return `<div  class="course-lesson-name-ceil">
+    //                     <div class="course-name">
+    //                         ${data.CourseName}
+    //                     </div>
+    //                     <div class="lesson-name">
+    //                         ${data.LessonName}
+    //                     </div>
+    //                </div>`
+    //             }
+    //         },
+    //         {id: 'CourseName', hidden: true, header: [{text: 'Курс'}], fillspace: 40},
+    //         {
+    //             id: 'LessonNum', header: 'Номер', fillspace: 20, css: "_container", template: function (val) {
+    //                 return `<div class="centered-by-flex">${val.LessonNum}</div>`;
+    //             }
+    //         },
+    //         {id: 'LessonName', hidden: true, header: [{text: 'Лекция', css: {'text-align': 'center'}}], fillspace: 40},
+    //     ],
+    //     on: {
+    //         onHeaderClick: function () {
+    //         },
+    //     },
+    //     onClick: {
+    //     },
+    //     "elem-edit": function (e, data) {
+    //         if (props.disabled) return
+    //     }
+    // };
 
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
 
-        const selectedRecordByCourse = filter.current ?
-            allUnpublishedRecords.find(record => record.CourseName === filter.current.CourseNameUnpublished) : null;
-        const uniqCourseIds = [...new Set(allUnpublishedRecords.map(record => record.CourseId))];
+        // const selectedRecordByCourse = filter.current ?
+        //     courses.find(record => record.Name === filter.current.CourseNameUnpublished) : null;
 
-        const courseOptions = (allUnpublishedRecords && allUnpublishedRecords.length > 0) ?
+        // console.log('courses', courses)
+        const uniqCourseIds = [...new Set(courses.map(record => record.Id))];
+
+        const courseOptions = (courses && courses.length > 0) ?
             uniqCourseIds.map(uniqId => {
-                const unpublishedRecord = allUnpublishedRecords.find(record => record.CourseId === uniqId);
+                const unpublishedRecord = courses.find(record => record.Id === uniqId);
                 return {
-                    value: unpublishedRecord.CourseName,
-                    label: unpublishedRecord.CourseName
+                    value: unpublishedRecord.Name,
+                    label: unpublishedRecord.Name
                 }
             }) : [];
 
-        const lessonOptions = (allUnpublishedRecords && allUnpublishedRecords.length > 0) ?
-            allUnpublishedRecords.filter(record => selectedRecordByCourse ?
-                record.CourseId === selectedRecordByCourse.CourseId : true).map(c => ({
-                value: c.LessonName,
-                label: c.LessonName
-            })) : [];
+        // const lessonOptions = (allUnpublishedRecords && allUnpublishedRecords.length > 0) ?
+        //     allUnpublishedRecords.filter(record => selectedRecordByCourse ?
+        //         record.CourseId === selectedRecordByCourse.CourseId : true).map(c => ({
+        //         value: c.LessonName,
+        //         label: c.LessonName
+        //     })) : [];
 
-        return getFilterConfig(filter.current, [], {courseOptions, lessonOptions});
-    }, [filter.current, allUnpublishedRecords]);
+        return getFilterConfig(filter.current, [], {courseOptions});
+    }, [courses]);
 
     const _onApplyFilter = (filterData) => {
 
@@ -194,9 +262,11 @@ const mapState2Props = (state) => {
     return {
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state),
-        courses: coursesSelector(state),
+        courses: courseOptionsUnpublishedFilter(state),
         filterSelector: filterSelector(state),
         allUnpublishedRecords: unpublishedLessons(state),
+        hasAdminRights: hasAdminRights(state),
+        hasOnlyRealAdminRights: hasOnlyRealAdminRights(state)
     }
 };
 

@@ -7,7 +7,10 @@ import {
     changePublishRecordDate,
     changeViewMode,
     closeModalDndToPublish,
+    displayRecordsDateRangeString,
     displayRecordsSelector,
+    getCourseFilterOptions,
+    getProcessOptions,
     getUnpublishedRecords,
     modalPublishIsOnSelector,
     openModalDndToPublish,
@@ -26,7 +29,7 @@ import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, dateRange} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
 
@@ -36,6 +39,8 @@ function DashboardRecords(props) {
         actions.hideSideBarMenu();
         actions.getDashboardUnpublishedRecords();
         actions.getUnpublishedRecords();
+        actions.getCourseFilterOptions();
+        actions.getProcessOptions();
 
         return () => actions.showSideBarMenu();
     }, []);
@@ -61,7 +66,7 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} onBack={backAction} onChangeMode={changeMode}/>
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
 
             <div className="dashboard-body">
                 <div className="unpublished-records">
@@ -91,7 +96,8 @@ const mapState2Props = (state) => {
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
         modalPublishOn: modalPublishIsOnSelector(state),
-        selectedRecord: selectedRecordSelector(state)
+        selectedRecord: selectedRecordSelector(state),
+        dateRange: displayRecordsDateRangeString(state)
     }
 };
 
@@ -106,7 +112,9 @@ const mapDispatch2Props = (dispatch) => {
             closeModalDndToPublish,
             openModalDndToPublish,
             changePublishRecordDate,
-            setPublishRecordDate
+            setPublishRecordDate,
+            getCourseFilterOptions,
+            getProcessOptions
         }, dispatch)
     }
 };

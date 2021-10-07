@@ -4,8 +4,15 @@ import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import moment from "moment";
 import {DASHBOARD_PROCESS_STATE} from "../../../constants/states";
 
-export const getFilterConfig = (filter, disableFields = [], courseOptions = []) => {
+export const getFilterConfig = (filter, disableFields = [], courseOptions = [], processOptions = []) => {
     const initialFields = [
+        {
+            name: "ProcessState",
+            placeholder: "Статус Процесса",
+            type: FILTER_FIELD_TYPE.COMBO,
+            value: filter ? filter.ProcessState : null,
+            options: processOptions
+        },
         {
             name: "Course",
             placeholder: "Название курса",
@@ -34,10 +41,13 @@ export const getFilterConfig = (filter, disableFields = [], courseOptions = []) 
 
 export const parseParams = () => {
     const paramsData = {};
+    // woProc = true procState=1,2
     const _params = new URLSearchParams(location.search),
         Course = _params.get("course"),
+        ProcessState = _params.get("procState"),
         DateRangeStart = _params.get("st_date"),
         DateRangeEnd = _params.get("fin_date");
+    ;
 
     const DateRange = [DateRangeStart, DateRangeEnd];
 
@@ -50,7 +60,8 @@ export const parseParams = () => {
     const _filter = convertParam2Filter(
         {
             Course,
-            DateRange
+            DateRange,
+            ProcessState
         });
 
     if (_filter) {
@@ -60,13 +71,27 @@ export const parseParams = () => {
     return paramsData
 };
 
-const convertParam2Filter = ({Course, DateRange}) => {
+const convertParam2Filter = ({Course, DateRange, ProcessState}) => {
     if (!(Course ||
-        DateRange)) return null;
+        DateRange || ProcessState)) return null;
 
     const filter = {};
 
     filter.Course = Course ? +Course : '';
+    // (notifType !== null &&  notifType !== undefined) ? notifType.split(',').map(pr => +pr) : '';
+
+    if(ProcessState) {
+        // filter.ProcessState = ProcessState.split(',').map(pr => +pr);
+        const states = ProcessState.split(',');
+        if(!states.includes(1000)){
+            states.push(1000);
+            filter.ProcessState = states.map(pr => +pr);
+        } else {
+            filter.ProcessState = '';
+        }
+        // states.ProcessState;
+    }
+    filter.ProcessState = ProcessState ? ProcessState.split(',').map(pr => +pr) : '';
     filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null && d !== undefined) ? DateRange : null;
 
     return filter
@@ -123,6 +148,17 @@ export const convertFilter2Params = (filter) => {
     if (filter) {
         if (filter.Course) {
             _data.course = filter.Course
+        }
+        if (filter.ProcessState && filter.ProcessState.length > 0) {
+            // _data.woProc = false;
+
+
+            if(filter.ProcessState.includes(1000)){
+                // _data.procState = filter.ProcessState.join(',').toString();
+                _data.woProc = filter.ProcessState.includes(1000);
+            } else {
+                _data.procState = filter.ProcessState.filter(el => el !== 1000).join(',').toString();
+            }
         }
         if (filter.DateRange) {
             const dates = filter.DateRange;

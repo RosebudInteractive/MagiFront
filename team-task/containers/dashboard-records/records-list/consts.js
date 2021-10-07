@@ -2,7 +2,12 @@ import {getProcessState} from "./functions";
 
 export const MAIN_COLUMNS = [
     {id: 'Week', header: [{text: 'Неделя', css: 'up-headers'}], css: 'week-up'},
-    {id: 'PubDate', css: 'js-change-date', header: [{text: 'Дата', css: 'up-headers'}], width: 70},
+    {id: 'PubDate', css: 'js-change-date', header: [{text: 'Дата', css: 'up-headers'}], width: 90,
+        template: function (val) {
+            return val.IsWeekend ? `<div class="pubdate-weekend">${val.PubDate && val.PubDate.length > 0 ? val.DateObject.format('DD MMM') : ''}<div>${' ' + val.PubDate && val.PubDate.length > 0 ? val.WeekendDay : ''}</div></div>` : `${val.PubDate.split(' ')[0] + ' ' + val.PubDate.split(' ')[1]} <br> ${val.PubDate.split(' ')[2]}`;
+        }
+
+    },
     {
         id: 'LessonNum', header: [{text: '№', css: 'up-headers'}], css: '_container',
         width: 50,
