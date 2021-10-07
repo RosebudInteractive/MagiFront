@@ -197,10 +197,10 @@ const PmDashboard = class PmDashboard extends DbObject {
         mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} >= '${this._dateToString(st_date)}')`);
 
         let fin_date = opts.fin_date ? (opts.fin_date instanceof Date ? opts.fin_date : new Date(opts.fin_date)) :
-            new Date(st_date.getFullYear(), st_date.getMonth(), st_date.getDate(st_date) + 6);
+            new Date(st_date.getFullYear(), st_date.getMonth() + 1, st_date.getDate(st_date) - 1);
         fin_date = new Date(fin_date.getFullYear(), fin_date.getMonth(), fin_date.getDate(fin_date) + 1);
-        mssql_conds.push(`(lc.[ReadyDate] < convert(datetime,'${this._dateToString(fin_date)}'))`);
-        mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} < '${this._dateToString(fin_date)}')`);
+        mssql_conds.push(`(lc.[ReadyDate] <= convert(datetime,'${this._dateToString(fin_date)}'))`);
+        mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} <= '${this._dateToString(fin_date)}')`);
 
         if (opts.course) {
             mssql_conds.push(`(lc.[CourseId] = ${opts.course})`);
