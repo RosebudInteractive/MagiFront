@@ -41,10 +41,10 @@ export const getFilterConfig = (filter, disableFields = [], courseOptions = [], 
 
 export const parseParams = () => {
     const paramsData = {};
-    // woProc = true procState=1,2
     const _params = new URLSearchParams(location.search),
         Course = _params.get("course"),
         ProcessState = _params.get("procState"),
+        WoProc = _params.get("woProc"),
         DateRangeStart = _params.get("st_date"),
         DateRangeEnd = _params.get("fin_date");
     ;
@@ -61,7 +61,8 @@ export const parseParams = () => {
         {
             Course,
             DateRange,
-            ProcessState
+            ProcessState,
+            WoProc
         });
 
     if (_filter) {
@@ -71,25 +72,22 @@ export const parseParams = () => {
     return paramsData
 };
 
-const convertParam2Filter = ({Course, DateRange, ProcessState}) => {
+const convertParam2Filter = ({Course, DateRange, ProcessState, WoProc}) => {
     if (!(Course ||
-        DateRange || ProcessState)) return null;
+        DateRange || ProcessState || WoProc)) return null;
 
     const filter = {};
 
     filter.Course = Course ? +Course : '';
-    // (notifType !== null &&  notifType !== undefined) ? notifType.split(',').map(pr => +pr) : '';
 
-    if(ProcessState) {
-        // filter.ProcessState = ProcessState.split(',').map(pr => +pr);
-        const states = ProcessState.split(',');
-        if(!states.includes(1000)){
+    if(ProcessState || WoProc) {
+        const states = ProcessState ? ProcessState.split(',') : [];
+        if(!WoProc){
             states.push(1000);
             filter.ProcessState = states.map(pr => +pr);
         } else {
-            filter.ProcessState = '';
+            filter.WoProc = true;
         }
-        // states.ProcessState;
     }
     filter.ProcessState = ProcessState ? ProcessState.split(',').map(pr => +pr) : '';
     filter.DateRange = DateRange && DateRange.length === 2 && DateRange.every(d => d !== null && d !== undefined) ? DateRange : null;
@@ -150,15 +148,17 @@ export const convertFilter2Params = (filter) => {
             _data.course = filter.Course
         }
         if (filter.ProcessState && filter.ProcessState.length > 0) {
-            // _data.woProc = false;
 
 
             if(filter.ProcessState.includes(1000)){
-                // _data.procState = filter.ProcessState.join(',').toString();
                 _data.woProc = filter.ProcessState.includes(1000);
             } else {
                 _data.procState = filter.ProcessState.filter(el => el !== 1000).join(',').toString();
             }
+        }
+
+        if(filter.WoProc){
+            _data.woProc = filter.WoProc
         }
         if (filter.DateRange) {
             const dates = filter.DateRange;

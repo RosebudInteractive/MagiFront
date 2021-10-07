@@ -215,8 +215,6 @@ function* getProcessOptionsSaga() {
         yield put({type: REQUEST_START});
         const processes = yield call(_fetchProcesses);
 
-        console.log('processes', processes);
-
         const statusOptions = new Set();
 
         processes.forEach(process => statusOptions.add(process.State));
@@ -258,7 +256,7 @@ function* addToDisplayedRecordsSaga(data) {
 
             const currentDate = moment().locale('ru');
             const defaultStartDate = currentDate.toISOString();
-            const defaultEndDate = currentDate.add(6, 'days').toISOString();
+            const defaultEndDate = currentDate.add(1, 'months').toISOString();
 
             records.push({
                 PubDate: newRecord.DateObject.toISOString(),
@@ -305,7 +303,7 @@ function* changeDisplayedRecordsSaga(data) {
             if (foundedRecordIndex !== -1) {
                 const currentDate = moment().locale('ru');
                 const defaultStartDate = currentDate.toISOString();
-                const defaultEndDate = currentDate.add(6, 'days').toISOString();
+                const defaultEndDate = currentDate.add(1, 'months').toISOString();
                 records[foundedRecordIndex].PubDate = newRecord.DateObject.toISOString();
                 const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
 
@@ -376,6 +374,7 @@ function* changeViewModeSaga(data) {
     try {
         yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
         const dates = yield select(filterSelector);
+
         const records = _.cloneDeep(yield select(recordsChangedSelector));
 
         let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
@@ -389,7 +388,8 @@ function* changeViewModeSaga(data) {
 const handleServerData = (records, mode, stDate = null, finDate = null) => {
     const currentDate = moment().locale('ru');
     const defaultStartDate = currentDate.toISOString();
-    const defaultEndDate = currentDate.add(6, 'days').toISOString();
+    const defaultEndDate = currentDate.add(1, 'months').toISOString();
+
 
     let startDate;
     let finishDate;
@@ -531,8 +531,6 @@ function* reloadRecordsSaga() {
         cleanedParams.delete('CourseNameUnpublished');
         cleanedParams.delete('LessonNameUnpublished');
 
-        console.log('cleaned params', cleanedParams)
-
         const records = yield call(getRecordsReq, cleanedParams);
 
         yield put({type: SET_RECORDS, payload: records});
@@ -554,8 +552,6 @@ function* getRecordsSaga() {
         const cleanedParams = new URLSearchParams(params);
         cleanedParams.delete('CourseNameUnpublished');
         cleanedParams.delete('LessonNameUnpublished');
-
-        console.log('cleanedParams', cleanedParams)
 
         const records = yield call(getRecordsReq, cleanedParams);
 
@@ -622,7 +618,7 @@ function* getRecordsSaga() {
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
 
-        const finishDate = (filter.fin_date) ? filter.fin_date : moment(startDate).add(6, 'days').toISOString();
+        const finishDate = (filter.fin_date) ? filter.fin_date : moment(startDate).add(1, 'months').toISOString();
 
         yield put({
             type: CHANGE_VIEW_MODE,
@@ -642,24 +638,6 @@ function* getRecordsSaga() {
 
         yield put(showErrorMessage(e.message));
 
-    }
-}
-
-function* updateRecordSaga(data) {
-    yield put({type: REQUEST_START});
-
-    try {
-        const newRecord = yield call(updateRecordReq, data.payload);
-        const records = yield select(recordsSelector);
-        const oldRecordIndex = records.findIndex(rec => rec.Id === newRecord.Id);
-        const newRecords = oldRecordIndex !== -1 ? records.splice(oldRecordIndex, 1, newRecord) : records;
-
-        yield put({type: SET_RECORDS, payload: newRecords});
-        yield put({type: REQUEST_SUCCESS});
-    } catch (e) {
-        yield put({type: REQUEST_FAIL});
-        yield put(clearLocationGuard());
-        yield put(showErrorMessage(e.message));
     }
 }
 
@@ -686,5 +664,5 @@ const getUnpublishedRecordsReq = (params) => {
 };
 
 const getCoursesForFilter = () => {
-    return commonGetQuery('/api/adm/courses');
+    return commonGetQuery('/api/courses/list');
 };
