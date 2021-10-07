@@ -9,18 +9,21 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {
     addToDisplayedRecords,
+    courseOptionsUnpublishedFilter,
     displayRecordsSelector,
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
+    processOptionsSelector,
     setPublishRecordDate,
-    setSelectedRecord
+    setRecordsDateRange,
+    setSelectedRecord,
 } from "tt-ducks/dashboard-records";
 import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
-import {coursesSelector} from "tt-ducks/dictionary";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
+import {hasAdminRights} from "tt-ducks/auth";
 
 let recordsCount = 0,
     scrollPosition = 0;
@@ -33,7 +36,9 @@ const Records = (props) => {
         resizeTrigger,
         courses,
         unpublishedPanelOpened,
-        params
+        params,
+        processOptions,
+        hasAdminRights
     } = props;
 
     const location = useLocation();
@@ -76,6 +81,12 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
+        // const [...first, ...second, ...last]=
+        if(recordsCount > 0){
+            const recordsDateRangeStart = dashboardRecords[0].DateObject.format('DD.MM');
+            const recordsDateRangeEnd = dashboardRecords[recordsCount - 1].DateObject.format('DD.MM');
+                actions.setRecordsDateRange(`c ${recordsDateRangeStart} по ${recordsDateRangeEnd}`);
+        }
 
         setTimeout(() => {
             _onResize();
@@ -90,6 +101,7 @@ const Records = (props) => {
 
     useEffect(() => {
         const initState = parseParams();
+        console.log('params:', params);
         if (initState.order) {
             _sortRef.current = initState.order;
             const _grid = window.webix.$$("dashboard-records-grid");
@@ -124,7 +136,7 @@ const Records = (props) => {
             // autowidth:true,
             height: 1000,
             select: true,
-            drag: "target",
+            drag: 'target', //todo disable by hasAdminRights
             editable: false,
             scheme: {
                 $change: function (item) {
@@ -135,6 +147,10 @@ const Records = (props) => {
 
                     if(item.IsEndOfWeek){
                         resultCss += " end-of-week-record"
+                    }
+
+                    if(item.IsWeekend){
+                        resultCss += " weekend"
                     }
 
                     item.$css = resultCss;
@@ -156,40 +172,46 @@ const Records = (props) => {
                         }
                     }
                 },
+                // onBeforeDragIn: function (context, e) {
+                //     return hasAdminRights
+                // },
                 onBeforeDrop: function (context, e) {
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
 
                     scrollPosition = window.scrollY;
-                    actions.addToDisplayedRecords(toItem.id, {
-                        IsEven: toItem.IsEven,
-                        PubDate: toItem.PubDate,
-                        DateObject: toItem.DateObject,
-                        IsEndOfWeek: toItem.IsEndOfWeek,
-                        CourseName: fromItem.CourseName,
-                        LessonId: fromItem.LessonId,
-                        CourseId: fromItem.CourseId,
-                        Week: toItem.Week,
-                        LessonNum: fromItem.LessonNum,
-                        CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
-                        LessonName: fromItem.LessonName,
-                        Elements: [],
-                        IsPublished: null,
-                        ProcessId: null,
-                        ProcessState: null
-                    });
+
+                        actions.addToDisplayedRecords(toItem.id, {
+                            IsEven: toItem.IsEven,
+                            PubDate: toItem.PubDate,
+                            IsWeekend: toItem.IsWeekend,
+                            DateObject: toItem.DateObject,
+                            IsEndOfWeek: toItem.IsEndOfWeek,
+                            CourseName: fromItem.CourseName,
+                            LessonId: fromItem.LessonId,
+                            CourseId: fromItem.CourseId,
+                            Week: toItem.Week,
+                            LessonNum: fromItem.LessonNum,
+                            CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
+                            LessonName: fromItem.LessonName,
+                            Elements: [],
+                            IsPublished: null,
+                            ProcessId: null,
+                            ProcessState: null
+                        });
+
 
                     return false;
                 },
             },
             onClick: { },
         }
-    }, [columnFields]);
+    }, [columnFields, hasAdminRights]);
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
         const optionsCourses = (courses && courses.length > 0) ? courses.map(c => ({value: c.Id, label: c.Name})) : [];
-        return getFilterConfig(filter.current, [], optionsCourses.length > 0 ? optionsCourses : []);
-    }, [filter.current, courses]);
+        return getFilterConfig(filter.current, [], optionsCourses.length > 0 ? optionsCourses : [], processOptions);
+    }, [filter.current, courses, processOptions]);
 
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
@@ -223,11 +245,13 @@ const Records = (props) => {
 const mapState2Props = (state) => {
     return {
         dashboardRecords: displayRecordsSelector(state),
+        processOptions: processOptionsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
+        hasAdminRights: hasAdminRights(state),
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state),
-        courses: coursesSelector(state),
-        params: paramsSelector(state)
+        courses: courseOptionsUnpublishedFilter(state),
+        params: paramsSelector(state),
     }
 };
 
@@ -242,7 +266,8 @@ const mapDispatch2Props = (dispatch) => {
             getRecords,
             setPublishRecordDate,
             addToDisplayedRecords,
-            setSelectedRecord
+            setSelectedRecord,
+            setRecordsDateRange
         }, dispatch)
     }
 };

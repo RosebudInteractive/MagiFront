@@ -8,8 +8,10 @@ import {commonGetQuery} from "tools/fetch-tools";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import _ from "lodash";
 import moment from "moment";
-import {DASHBOARD_ELEMENTS_STATE} from "../constants/states";
+import {ELEMENT_STATE} from "../constants/states";
 import $ from "jquery";
+import {_fetchProcesses} from "tt-ducks/processes";
+import {PROCESS_STATE_LABELS} from "../constants/process";
 
 export const moduleName = 'dashboard-records';
 const prefix = `${appName}/${moduleName}`;
@@ -40,6 +42,11 @@ const ADD_TO_DISPLAYED_RECORDS = `${prefix}/ADD_TO_DISPLAYED_RECORDS`;
 const CHANGE_DISPLAYED_RECORD = `${prefix}/CHANGE_DISPLAYED_RECORD`;
 const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
+const SET_FILTER_COURSE_OPTIONS = `${prefix}/SET_FILTER_COURSE_OPTIONS`;
+const GET_FILTER_OPTIONS_REQUEST = `${prefix}/GET_FILTER_OPTIONS_REQUEST`;
+const SET_PROCESS_OPTIONS = `${prefix}/SET_PROCESS_OPTIONS`;
+const GET_PROCESS_OPTIONS = `${prefix}/GET_PROCESS_OPTIONS`;
+const SET_RECORDS_DATERANGE = `${prefix}/SET_RECORDS_DATERANGE`;
 
 const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
 const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
@@ -61,6 +68,9 @@ export const ReducerRecord = Record({
     unpublishedRecords: [],
     allUnpublishedRecords: [],
     filterUnpublished: [],
+    coursesForUnpublishedFilter: [],
+    processOptions: [],
+    dateRangeString: '',
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
     showModalOfPublishing: false,
@@ -100,6 +110,12 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('displayRecords', [...payload]);
         case SET_CHANGED_RECORDS:
             return state.set('changedRecords', [...payload]);
+        case SET_PROCESS_OPTIONS:
+            return state.set('processOptions', payload);
+        case SET_FILTER_COURSE_OPTIONS:
+            return state.set('coursesForUnpublishedFilter', [...payload]);
+        case SET_RECORDS_DATERANGE:
+            return state.set('dateRangeString', payload);
         default:
             return state
     }
@@ -118,6 +134,9 @@ export const modeSelector = createSelector(stateSelector, state => state.viewMod
 export const modalPublishIsOnSelector = createSelector(stateSelector, state => state.showModalOfPublishing);
 export const filterUnpublishedSelector = createSelector(stateSelector, state => state.filterUnpublished);
 export const selectedRecordSelector = createSelector(stateSelector, state => state.selectedRecord);
+export const courseOptionsUnpublishedFilter = createSelector(stateSelector, state => state.coursesForUnpublishedFilter);
+export const processOptionsSelector = createSelector(stateSelector, state => state.processOptions);
+export const displayRecordsDateRangeString = createSelector(stateSelector, state => state.dateRangeString);
 
 
 export const addToDisplayedRecords = (id, newRecord) => {
@@ -164,18 +183,64 @@ export const setSelectedRecord = (data) => {
     return {type: SET_SELECTED_RECORD_DATA, payload: data}
 }
 
+export const getCourseFilterOptions = () => {
+    return {type: GET_FILTER_OPTIONS_REQUEST}
+};
+
+export const getProcessOptions = () => {
+    return {type: GET_PROCESS_OPTIONS}
+};
+
+export const setRecordsDateRange = (stringDaterange) => {
+    return {type: SET_RECORDS_DATERANGE, payload: stringDaterange}
+};
+
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
         takeEvery(LOAD_UNPUBLISHED_RECORDS, getUnpublishedRecordsSaga),
-        takeEvery(CHANGE_RECORD, updateRecordSaga),
+        // takeEvery(CHANGE_RECORD, updateRecordSaga),
         takeEvery(CHANGE_VIEW_MODE, changeViewModeSaga),
         takeEvery(PUBLISH_RECORD, publishRecordSaga),
         takeEvery(ADD_TO_DISPLAYED_RECORDS, addToDisplayedRecordsSaga),
         takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga),
-        takeEvery(RELOAD_RECORDS, reloadRecordsSaga)
+        takeEvery(RELOAD_RECORDS, reloadRecordsSaga),
+        takeEvery(GET_FILTER_OPTIONS_REQUEST, getCourseFilterCourseOptionsSaga),
+        takeEvery(GET_PROCESS_OPTIONS, getProcessOptionsSaga)
     ])
 };
+
+function* getProcessOptionsSaga() {
+    try {
+        yield put({type: REQUEST_START});
+        const processes = yield call(_fetchProcesses);
+
+        console.log('processes', processes);
+
+        const statusOptions = new Set();
+
+        processes.forEach(process => statusOptions.add(process.State));
+
+        const statusOptionsArray = [...statusOptions].map(x => ({value: x, label: PROCESS_STATE_LABELS[x] ? PROCESS_STATE_LABELS[x] : 'Неизвестно'}));
+
+        statusOptionsArray.push({value: 1000, label: 'Без процесса'}); //todo вынести 1000 в константу WITHOUT_PROCESS_TEXT_FILTER_OPTION;
+
+        yield put({type: SET_PROCESS_OPTIONS, payload: statusOptionsArray});
+    } catch (e) {
+        showErrorMessage(e.toString())
+    }
+}
+
+function* getCourseFilterCourseOptionsSaga() {
+    try {
+        yield put({type: REQUEST_START});
+        const courses =yield call(getCoursesForFilter);
+
+        yield put({type: SET_FILTER_COURSE_OPTIONS, payload: courses});
+    } catch (e) {
+        showErrorMessage(e.toString())
+    }
+}
 
 function* addToDisplayedRecordsSaga(data) {
     try {
@@ -366,11 +431,13 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             first.DateObject = moment(first.PubDate).locale('ru'); //todo check it
             first.IsEven = isEven;
             first.IsEndOfWeek = moment(first.PubDate).locale('ru').isoWeekday() === 7 && other.length === 0;
+            first.IsWeekend = [6,7].includes(moment(first.PubDate).locale('ru').isoWeekday());
+            first.WeekendDay = moment(first.PubDate).locale('ru').format('ddd');
             first.CourseLessonName = [first.CourseName, first.LessonName];
-            first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM');
+            first.PubDate = moment(first.PubDate).locale('ru').format('DD MMM ddd');
 
             first.Elements.forEach((elem) => {
-                const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(item => item.value === elem.State);
+                const _state = Object.values(ELEMENT_STATE).find(item => item.value === elem.State);
 
                 first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
                     css: "_unknown",
@@ -390,11 +457,17 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                         second: 0,
                         millisecond: 0
                     }).isoWeekday() === 7 && index === other.length - 1;
+
+                    if([6,7].includes(moment(currentDate).locale('ru').isoWeekday())){
+                        item.WeekendDay = moment(currentDate).locale('ru').format('ddd');
+                    }
+
+                    item.IsWeekend = [6,7].includes(moment(currentDate).locale('ru').isoWeekday());
                     item.CourseLessonName = [item.CourseName, item.LessonName];
                     item.DateObject = currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0});
 
                     item.Elements.forEach((elem) => {
-                        const _state = Object.values(DASHBOARD_ELEMENTS_STATE).find(st => st.value === elem.State);
+                        const _state = Object.values(ELEMENT_STATE).find(st => st.value === elem.State);
                         item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
                             css: "_unknown",
                             label: "Неизвестно",
@@ -416,10 +489,11 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             }
             const objectData = {
                 IsEven: isEven,
-                PubDate: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru').format('DD MMM'),
+                PubDate: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru').format('DD MMM ddd'),
                 DateObject: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru'), //todo check it
                 CourseId: null,
                 IsEndOfWeek: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).isoWeekday() === 7,
+                IsWeekend: [6,7].includes(moment(currentDate).locale('ru').isoWeekday()),
                 CourseName: "",
                 LessonId: null,
                 Week: weekHasChanged ? displayWeekRange : '',
@@ -431,6 +505,10 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
                 ProcessId: null,
                 ProcessState: null
             };
+
+            if(objectData.IsWeekend){
+                objectData.WeekendDay = moment(currentDate).locale('ru').format('ddd');
+            }
 
             resultArray.push(objectData);
         }
@@ -453,6 +531,8 @@ function* reloadRecordsSaga() {
         cleanedParams.delete('CourseNameUnpublished');
         cleanedParams.delete('LessonNameUnpublished');
 
+        console.log('cleaned params', cleanedParams)
+
         const records = yield call(getRecordsReq, cleanedParams);
 
         yield put({type: SET_RECORDS, payload: records});
@@ -462,6 +542,7 @@ function* reloadRecordsSaga() {
         yield put(showErrorMessage(e.message));
     }
 }
+
 
 function* getRecordsSaga() {
     yield put({type: REQUEST_START});
@@ -474,21 +555,50 @@ function* getRecordsSaga() {
         cleanedParams.delete('CourseNameUnpublished');
         cleanedParams.delete('LessonNameUnpublished');
 
+        console.log('cleanedParams', cleanedParams)
+
         const records = yield call(getRecordsReq, cleanedParams);
 
         yield put({type: SET_RECORDS, payload: records});
         yield put({type: SET_CHANGED_RECORDS, payload: records});
 
         const fields = new Set();
+        const sortOrderObject = {
+            'Звук': 1,
+            'Транскрипт': 2,
+            'Иллюстрации': 3,
+            'Техническая стенограмма': 4,
+            'Список литературы': 5,
+            'Готовые компоненты': 6
+        };
         records.forEach(rec => {
             if (rec.Elements && Array.isArray(rec.Elements)) {
                 rec.Elements.forEach(el => fields.add(el.Name))
             }
         });
 
+        const sortedFeilds = [...fields].sort(function (a,b) {
+            if(sortOrderObject[a] !== undefined && sortOrderObject[b] !== undefined){
+                return sortOrderObject[a] - sortOrderObject[b];
+            }
+
+            if(sortOrderObject[a] === undefined && sortOrderObject[b] !== undefined){
+                return 1;
+            }
+
+            if(sortOrderObject[a] !== undefined && sortOrderObject[b] === undefined){
+                return -1;
+            }
+
+            if(sortOrderObject[a] === undefined && sortOrderObject[b] === undefined){
+                return 0
+            }
+
+        });
+
         const fieldSet = [];
 
-        Array.from(fields).forEach((el, inx) => {
+        sortedFeilds.forEach((el, inx) => {
             const fieldObj = {id: el};
             fieldObj.header = [{text: el, css: 'up-headers'}];
 
@@ -575,15 +685,6 @@ const getUnpublishedRecordsReq = (params) => {
     return commonGetQuery(urlString);
 };
 
-
-const updateRecordReq = (record) => { //todo change url later
-    return fetch(`/some/url`, {
-        method: 'PUT',
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: JSON.stringify(record),
-        credentials: 'include'
-    }).then(checkStatus)
-        .then(parseJSON);
+const getCoursesForFilter = () => {
+    return commonGetQuery('/api/adm/courses');
 };

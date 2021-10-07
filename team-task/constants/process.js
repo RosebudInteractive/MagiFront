@@ -17,3 +17,9 @@ export const PROCESS_FIELDS = [
     "TechTransMusicURL",
     "AllCompsFinalURL"
 ]
+
+export const PROCESS_STATE_LABELS = {
+    1: "Черновик",
+    2: "В работе",
+    3: "Завершен"
+};

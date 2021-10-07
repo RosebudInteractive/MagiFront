@@ -7,14 +7,14 @@ import {Field, Form, FormSpy} from "react-final-form";
 //todo change to Select instead of Form
 
 export default function DashboardRecordsHeader(props) {
-    const {title} = props;
+    const {title, dateRange} = props;
 
     return <div className="dashboard-header">
         <div className="dashboard-back-arrow" onClick={props.onBack}>
             <BackArrow/>
         </div>
         <div className="dashboard-header-field-name">
-            <h6>{title}</h6>
+            <h6>{title} {dateRange}</h6>
 
 
             {/*<Select value={value} todo use it instead of form!*/}

@@ -3,8 +3,13 @@
 .records-page
   position: relative
   border-radius: 10px
+
   .tt-grid
     .webix_column
+      .webix_cell
+        line-height: 1em !important
+        display: flex
+        align-items: center
       &>div.webix_row_select
         background-color: inherit
         color: inherit
@@ -95,6 +100,10 @@
       border: 1px solid #9c3700
       color: #C8372D
 
+    &._in-progress
+      border: 1px solid #9c3700
+      color: #C8372D
+
     .state-circle
       border-radius: 50%
       width: 14px
@@ -169,11 +178,31 @@
   border-radius: 5px
   line-height: 15px !important
 
+
 .end-of-week-record
   margin-bottom: 25px !important
+  &.weekend
+    //background: rgba(156,55,0,0.43) !important
 
 .even-record
   background: #EDF1F3 !important
+
+  &.weekend
+    //background: rgba(156,55,0,0.43) !important
+
+.weekend
+  display: flex
+  align-items: center
+  //background: rgba(156,55,0,0.43) !important
+
+.pubdate-weekend
+  display: flex
+  flex-flow: column nowrap
+  white-space: pre
+  line-height: 1em
+
+  div
+    color: red
 
 .centered-by-flex
   width: 100%
