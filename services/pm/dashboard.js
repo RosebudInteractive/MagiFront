@@ -34,7 +34,7 @@ const SQL_GET_LIST_MSSQL =
     "  left join [User] u on u.[SysParentId] = p.[SupervisorId]\n" +
     "  left join [User] ue on ue.[SysParentId] = ep.[SupervisorId]\n" +
     "where (not lc.[ReadyDate] is NULL) and (not((lc.[State] = 'R') and (c.[State] = 'P') and (p.[Id] is NULL)))<%= filter %>\n" +
-    "order by lc.[ReadyDate], 6, 7, lc.[LessonId]";
+    "order by lc.[ReadyDate], 7, 6, lc.[LessonId]";
 
 const SQL_GET_LIST_MYSQL =
     "select lc.`ReadyDate`, lc.`CourseId`, lc.`LessonId`, cl.`Name` CourseName, ll.`Name` LessonName,\n" +
@@ -55,7 +55,7 @@ const SQL_GET_LIST_MYSQL =
     "  left join `User` u on u.`SysParentId` = p.`SupervisorId`\n" +
     "  left join `User` ue on ue.`SysParentId` = ep.`SupervisorId`\n" +
     "where (not lc.`ReadyDate` is NULL) and (not((lc.`State` = 'R') and (c.`State` = 'P') and (p.`Id` is NULL)))<%= filter %>\n" +
-    "order by lc.`ReadyDate`, 6, 7, lc.`LessonId`";
+    "order by lc.`ReadyDate`, 7, 6, lc.`LessonId`";
 
 const SQL_GET_LSN_LIST_MSSQL =
     "select lc.[CourseId], lc.[LessonId], cl.[Name] CourseName, ll.[Name] LessonName,\n" +
@@ -197,10 +197,10 @@ const PmDashboard = class PmDashboard extends DbObject {
         mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} >= '${this._dateToString(st_date)}')`);
 
         let fin_date = opts.fin_date ? (opts.fin_date instanceof Date ? opts.fin_date : new Date(opts.fin_date)) :
-            new Date(st_date.getFullYear(), st_date.getMonth(), st_date.getDate(st_date) + 6);
+            new Date(st_date.getFullYear(), st_date.getMonth() + 1, st_date.getDate(st_date) - 1);
         fin_date = new Date(fin_date.getFullYear(), fin_date.getMonth(), fin_date.getDate(fin_date) + 1);
-        mssql_conds.push(`(lc.[ReadyDate] < convert(datetime,'${this._dateToString(fin_date)}'))`);
-        mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} < '${this._dateToString(fin_date)}')`);
+        mssql_conds.push(`(lc.[ReadyDate] <= convert(datetime,'${this._dateToString(fin_date)}'))`);
+        mysql_conds.push(`(lc.${'`'}ReadyDate${'`'} <= '${this._dateToString(fin_date)}')`);
 
         if (opts.course) {
             mssql_conds.push(`(lc.[CourseId] = ${opts.course})`);
@@ -210,6 +210,17 @@ const PmDashboard = class PmDashboard extends DbObject {
         if (opts.course_name) {
             mssql_conds.push(`(cl.[Name] like N'%${opts.course_name}%')`);
             mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course_name}%')`);
+        }
+
+        if ((opts.woProc === true) || (opts.woProc === "true")) {
+            mssql_conds.push(`(p.[Id] is NULL)`);
+            mysql_conds.push("(p.`Id` is NULL)");
+        }
+
+        if (opts.procState) {
+            let states = Array.isArray(opts.procState) ? opts.procState : opts.procState.split(',');
+            mssql_conds.push(`(p.[State] in (${states.join(',')}))`);
+            mysql_conds.push(`(p.${'`'}State${'`'} in (${states.join(',')}))`);
         }
 
         if (mysql_conds.length > 0) {
