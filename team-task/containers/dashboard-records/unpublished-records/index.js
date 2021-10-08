@@ -20,12 +20,12 @@ import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname
 import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
-import {hasAdminRights, hasOnlyRealAdminRights} from "tt-ducks/auth";
+import {hasAdminRights} from "tt-ducks/auth";
 
 let unpublishedCount = 0;
 
 function UnpublishedRecords(props) {
-    const {unpublishedRecords, actions, courses, hasOnlyRealAdminRights} = props;
+    const {unpublishedRecords, actions, courses, hasAdminRights} = props;
     const [visible, setVisible] = useState(false);
     const [stateChanger, setChanger] = useState(true);
 
@@ -116,7 +116,7 @@ function UnpublishedRecords(props) {
                 onHeaderClick: function () {
                 },
                 onBeforeDragIn: function (context, e) {
-                    return hasOnlyRealAdminRights;
+                    return hasAdminRights;
                 },
             },
             onClick: {
@@ -126,12 +126,12 @@ function UnpublishedRecords(props) {
             }
         }
 
-        if(hasOnlyRealAdminRights){
+        if(hasAdminRights){
             config.drag = 'move'
         }
 
         return config;
-    }, [hasOnlyRealAdminRights]);
+    }, [hasAdminRights]);
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
 
@@ -202,7 +202,6 @@ const mapState2Props = (state) => {
         filterSelector: filterSelector(state),
         allUnpublishedRecords: unpublishedLessons(state),
         hasAdminRights: hasAdminRights(state),
-        hasOnlyRealAdminRights: hasOnlyRealAdminRights(state)
     }
 };
 

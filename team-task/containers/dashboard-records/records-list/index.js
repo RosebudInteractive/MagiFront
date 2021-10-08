@@ -164,6 +164,9 @@ const Records = (props) => {
                     actions.setSelectedRecord(item)
                 },
                 onItemDblClick: function (data) {
+                    if(!hasAdminRights){
+                        return;
+                    }
                     if (data.column === 'PubDate') {
                         const item = this.getItem(data.row);
 
