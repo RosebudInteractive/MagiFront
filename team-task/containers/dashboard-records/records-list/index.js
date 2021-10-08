@@ -101,7 +101,7 @@ const Records = (props) => {
 
     useEffect(() => {
         const initState = parseParams();
-        console.log('params:', params);
+
         if (initState.order) {
             _sortRef.current = initState.order;
             const _grid = window.webix.$$("dashboard-records-grid");
@@ -172,9 +172,6 @@ const Records = (props) => {
                         }
                     }
                 },
-                // onBeforeDragIn: function (context, e) {
-                //     return hasAdminRights
-                // },
                 onBeforeDrop: function (context, e) {
                     const toItem = this.getItem(context.target);
                     const fromItem = context.from.getItem(context.source[0]);
