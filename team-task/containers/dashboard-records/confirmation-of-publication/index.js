@@ -55,7 +55,6 @@ function ConfirmationOfPublication(props) {
             <DatePicker value={value}
                         label={'Дата публикации'}
                         onChange={onChange}
-                        isoWeek
             />
             <div className="action-buttons">
                 <button type={"button"} onClick={onApply} className={'orange-button big-button _apply'}

@@ -15,7 +15,8 @@ import {
     openModalDndToPublish,
     selectedRecordSelector,
     setPublishRecordDate,
-    unpublishedRecordsSelector
+    unpublishedRecordsSelector,
+    getDashboardUnpublishedLessons
 } from "tt-ducks/dashboard-records"
 
 import Records from "./records-list"
