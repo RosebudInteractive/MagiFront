@@ -8,7 +8,6 @@ export default function DateRangeField(props) {
     const renderProps = useMemo(() => {
         const result = {
             placeholder,
-            // searchable: false,
             ranges: [{
                 label: 'Неделя',
                 value: [new Date(), addDays(new Date(), 6)]
@@ -28,7 +27,7 @@ export default function DateRangeField(props) {
         };
 
         const hasValue = props.value && Array.isArray(props.value) && props.value.every(item => !!item);
-        if (hasValue) result.value = value;
+        result.value = hasValue ? value : [];
 
         return result
     }, [props]);
