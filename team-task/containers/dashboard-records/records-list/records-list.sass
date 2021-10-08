@@ -5,6 +5,18 @@
   border-radius: 10px
 
   .tt-grid
+    .webix_column.up-aligned-flex
+      .webix_cell
+        width: 100%
+        padding-top: 46%
+        align-items: start
+        justify-content: center
+
+    .webix_column.js-change-date
+      .webix_cell
+        width: 100%
+        justify-content: center
+
     .webix_column
       .webix_cell
         line-height: 1em !important
@@ -17,6 +29,14 @@
         .webix_cell
           display: flex
           align-items: center
+
+      &.week-up
+        .webix_cell
+          align-items: start
+          padding-top: 23%
+          justify-content: center
+
+
       .webix_row_select
         border-bottom: 1px solid #010101
         border-top: 1px solid #010101
@@ -26,6 +46,8 @@
       &.webix_first
         .webix_row_select
           border-left: 1px solid #010101
+
+
 
   .filters
     left: 0
@@ -181,19 +203,13 @@
 
 .end-of-week-record
   margin-bottom: 25px !important
-  &.weekend
-    //background: rgba(156,55,0,0.43) !important
 
 .even-record
   background: #EDF1F3 !important
 
-  &.weekend
-    //background: rgba(156,55,0,0.43) !important
-
 .weekend
   display: flex
   align-items: center
-  //background: rgba(156,55,0,0.43) !important
 
 .pubdate-weekend
   display: flex
@@ -209,6 +225,13 @@
   display: flex
   align-items: center
   justify-content: center
+
+//.up-aligned-flex
+//  width: 100%
+//  padding-top: 23%
+//  //display: flex
+//  align-items: start
+//  justify-content: center
 
 .scroll-all-table
   min-width: 100%

@@ -133,10 +133,6 @@ export const userRoleSelector = createSelector(userSelector, (user) => {
     }
 })
 
-export const hasOnlyRealAdminRights = createSelector(userRoleSelector, userRole => {
-    return userRole && userRole === USER_ROLE.ADMIN;
-});
-
 export const hasAdminRights = createSelector(userRoleSelector, (userRole) => {
     return userRole && ((userRole === USER_ROLE.ADMIN) || (userRole === USER_ROLE.PMA))
 })

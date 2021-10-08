@@ -16,3 +16,5 @@ export const RECORD_PUBLISHED_STATES = {
     false: 'Нет',
     undefined: '',
 };
+
+export const PROCESS_STATE_EMPTY_OPTION = {value: 1000, label: 'Без процесса'};

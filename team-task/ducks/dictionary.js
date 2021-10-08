@@ -110,7 +110,6 @@ export const nextTimeSelector = createSelector(stateSelector, state => state.nex
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
 export const coursesSelector = createSelector(stateSelector, state => state.courses);
-export const unpublishedLessons = createSelector(stateSelector, state => state.unpublishedLessons);
 
 export const allUsersDSelector = createSelector(stateSelector, state => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
@@ -158,10 +157,6 @@ export const toggleFetching = (isOn) => {
     return {type: TOGGLE_FETCHING, payload: isOn}
 };
 
-export const getDashboardUnpublishedRecords = () => {
-    return {type: GET_UNPUBLISHED_LESSONS}
-};
-
 
 //sagas:
 
@@ -174,21 +169,10 @@ export const saga = function* () {
         takeEvery(REQUEST_START, fetchingToggle),
         takeEvery(REQUEST_SUCCESS, fetchingToggle),
         takeEvery(REQUEST_FAIL, fetchingToggle),
-        takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedRecordsSaga),
     ])
 };
 
-function* getUnpublishedRecordsSaga() {
-    try {
-        yield put({type: REQUEST_START});
-        const records = yield call(getUnpublishedRecordsReq);
-        yield put({type: SET_UNPUBLISHED_LESSONS, payload: records});
-        yield put({type: REQUEST_SUCCESS});
-    }catch (e) {
-        yield put({type: REQUEST_FAIL});
-        showErrorMessage(e.toString())
-    }
-}
+
 
 function* fetchingToggle(isOn){
     try {
@@ -357,10 +341,6 @@ const _getAllUsers = () => {
 
 const _getLessons = () => {
     return commonGetQuery("/api/lessons-list")
-};
-
-const getUnpublishedRecordsReq = () => {
-    return commonGetQuery(`/api/pm/dashboard/lesson-list`);
 };
 
 const _getAvailableForCreationLessons = () => {

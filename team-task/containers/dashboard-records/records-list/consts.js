@@ -9,10 +9,10 @@ export const MAIN_COLUMNS = [
 
     },
     {
-        id: 'LessonNum', header: [{text: '№', css: 'up-headers'}], css: '_container',
+        id: 'LessonNum', header: [{text: '№', css: 'up-headers'}], css: '_container up-aligned-flex',
         width: 50,
         template: function (val) {
-            return `<div class="centered-by-flex">${val.LessonNum}</div>`;
+            return `<div >${val.LessonNum}</div>`;
         },
     },
     {

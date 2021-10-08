@@ -10,6 +10,7 @@ import {
     displayRecordsDateRangeString,
     displayRecordsSelector,
     getCourseFilterOptions,
+    getDashboardUnpublishedLessons,
     getUnpublishedRecords,
     modalPublishIsOnSelector,
     openModalDndToPublish,
@@ -18,7 +19,6 @@ import {
     unpublishedRecordsSelector
 } from "tt-ducks/dashboard-records"
 
-import {getDashboardUnpublishedRecords} from 'tt-ducks/dictionary'
 import Records from "./records-list"
 import UnpublishedRecords from "./unpublished-records";
 import DashboardRecordsHeader from "./header"
@@ -36,7 +36,7 @@ function DashboardRecords(props) {
 
     useEffect(() => {
         actions.hideSideBarMenu();
-        actions.getDashboardUnpublishedRecords();
+        actions.getDashboardUnpublishedLessons();
         actions.getUnpublishedRecords();
         actions.getCourseFilterOptions();
 
@@ -65,6 +65,7 @@ function DashboardRecords(props) {
     return (
         <div className="dashboard">
             <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
+
             <div className="dashboard-body">
                 <div className="unpublished-records">
                     <UnpublishedRecords unpublishedRecords={unpublishedRecords}
@@ -78,8 +79,11 @@ function DashboardRecords(props) {
                 </div>
             </div>
             {modalPublishOn &&
-            <Modal wrappedProps={{record: selectedRecord, applyAction: changeDate, closeAction: actions.closeModalDndToPublish}}
-                   WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+            <Modal wrappedProps={{
+                record: selectedRecord,
+                applyAction: changeDate,
+                closeAction: actions.closeModalDndToPublish
+            }} WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
                 actions.closeModalDndToPublish();
             }}/>
             }
@@ -104,10 +108,10 @@ const mapDispatch2Props = (dispatch) => {
             hideSideBarMenu,
             showSideBarMenu,
             changeViewMode,
-            getDashboardUnpublishedRecords,
             getUnpublishedRecords,
             closeModalDndToPublish,
             openModalDndToPublish,
+            getDashboardUnpublishedLessons,
             changePublishRecordDate,
             setPublishRecordDate,
             getCourseFilterOptions,

@@ -8,23 +8,24 @@ import {
     courseOptionsUnpublishedFilter,
     elementsFieldSetSelector,
     fetchingSelector,
+    getDashboardUnpublishedLessons,
     getUnpublishedRecords,
     setFilterUnpublished,
-    setPublishRecordDate
+    setPublishRecordDate,
+    unpublishedLessons
 } from "tt-ducks/dashboard-records";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
-import {getDashboardUnpublishedRecords, unpublishedLessons} from "tt-ducks/dictionary";
 import {bindActionCreators} from "redux";
 import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
-import {hasAdminRights, hasOnlyRealAdminRights} from "tt-ducks/auth";
+import {hasAdminRights} from "tt-ducks/auth";
 
 let unpublishedCount = 0;
 
 function UnpublishedRecords(props) {
-    const {unpublishedRecords, actions, allUnpublishedRecords, courses, hasAdminRights, hasOnlyRealAdminRights} = props;
+    const {unpublishedRecords, actions, courses, hasAdminRights} = props;
     const [visible, setVisible] = useState(false);
     const [stateChanger, setChanger] = useState(true);
 
@@ -115,11 +116,8 @@ function UnpublishedRecords(props) {
                 onHeaderClick: function () {
                 },
                 onBeforeDragIn: function (context, e) {
-                    return hasOnlyRealAdminRights;
+                    return hasAdminRights;
                 },
-                // onBeforeDrag: function (context, e) {
-                //     return hasAdminRights;
-                // }
             },
             onClick: {
             },
@@ -128,70 +126,15 @@ function UnpublishedRecords(props) {
             }
         }
 
-        if(hasOnlyRealAdminRights){
+        if(hasAdminRights){
             config.drag = 'move'
-        // } else {
-        //     config.drag = 'target'
         }
 
         return config;
-        // };
-        // retu
-    }, [hasOnlyRealAdminRights]);
-    //     view: "datatable",
-    //     id: 'unpublished-records-grid-table',
-    //     css: 'tt-element-grid',
-    //     hover: "row-hover",
-    //     scroll: "none",
-    //     headerRowHeight: 40,
-    //     rowHeight: 49,
-    //     select: true,
-    //     editable: false,
-    //     drag: "move",
-    //     externalData: grid2grid,
-    //     columns: [
-    //         {id: 'Id', header: 'Id', hidden: true},
-    //         {
-    //             id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
-    //             css: '_container doubled-ceil',
-    //             fillspace: 80,
-    //             template: function (data) {
-    //                 return `<div  class="course-lesson-name-ceil">
-    //                     <div class="course-name">
-    //                         ${data.CourseName}
-    //                     </div>
-    //                     <div class="lesson-name">
-    //                         ${data.LessonName}
-    //                     </div>
-    //                </div>`
-    //             }
-    //         },
-    //         {id: 'CourseName', hidden: true, header: [{text: 'Курс'}], fillspace: 40},
-    //         {
-    //             id: 'LessonNum', header: 'Номер', fillspace: 20, css: "_container", template: function (val) {
-    //                 return `<div class="centered-by-flex">${val.LessonNum}</div>`;
-    //             }
-    //         },
-    //         {id: 'LessonName', hidden: true, header: [{text: 'Лекция', css: {'text-align': 'center'}}], fillspace: 40},
-    //     ],
-    //     on: {
-    //         onHeaderClick: function () {
-    //         },
-    //     },
-    //     onClick: {
-    //     },
-    //     "elem-edit": function (e, data) {
-    //         if (props.disabled) return
-    //     }
-    // };
-
+    }, [hasAdminRights]);
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
 
-        // const selectedRecordByCourse = filter.current ?
-        //     courses.find(record => record.Name === filter.current.CourseNameUnpublished) : null;
-
-        // console.log('courses', courses)
         const uniqCourseIds = [...new Set(courses.map(record => record.Id))];
 
         const courseOptions = (courses && courses.length > 0) ?
@@ -202,13 +145,6 @@ function UnpublishedRecords(props) {
                     label: unpublishedRecord.Name
                 }
             }) : [];
-
-        // const lessonOptions = (allUnpublishedRecords && allUnpublishedRecords.length > 0) ?
-        //     allUnpublishedRecords.filter(record => selectedRecordByCourse ?
-        //         record.CourseId === selectedRecordByCourse.CourseId : true).map(c => ({
-        //         value: c.LessonName,
-        //         label: c.LessonName
-        //     })) : [];
 
         return getFilterConfig(filter.current, [], {courseOptions});
     }, [courses]);
@@ -224,7 +160,7 @@ function UnpublishedRecords(props) {
         }
 
         actions.getUnpublishedRecords($.param(filterToRequest));
-        actions.getDashboardUnpublishedRecords();
+        actions.getDashboardUnpublishedLessons();
     };
 
     const onChangeFieldCb = ({name, value}) => {
@@ -266,7 +202,6 @@ const mapState2Props = (state) => {
         filterSelector: filterSelector(state),
         allUnpublishedRecords: unpublishedLessons(state),
         hasAdminRights: hasAdminRights(state),
-        hasOnlyRealAdminRights: hasOnlyRealAdminRights(state)
     }
 };
 
@@ -281,7 +216,7 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             getUnpublishedRecords,
             setFilterUnpublished,
-            getDashboardUnpublishedRecords
+            getDashboardUnpublishedLessons
         }, dispatch)
     }
 };

@@ -45,6 +45,8 @@ const SET_RECORDS_DATERANGE = `${prefix}/SET_RECORDS_DATERANGE`;
 
 const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
 const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
+const GET_UNPUBLISHED_LESSONS = `${prefix}/GET_UNPUBLISHED_LESSONS`;
+const SET_UNPUBLISHED_LESSONS = `${prefix}/SET_UNPUBLISHED_LESSONS`;
 
 
 const defaultFieldSet = new Set([]);
@@ -65,6 +67,7 @@ export const ReducerRecord = Record({
     filterUnpublished: [],
     coursesForUnpublishedFilter: [],
     dateRangeString: '',
+    unpublishedLessons: [],
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
     showModalOfPublishing: false,
@@ -108,6 +111,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('coursesForUnpublishedFilter', [...payload]);
         case SET_RECORDS_DATERANGE:
             return state.set('dateRangeString', payload);
+        case SET_UNPUBLISHED_LESSONS:
+            return state.set('unpublishedLessons', payload);
         default:
             return state
     }
@@ -119,7 +124,6 @@ export const recordsSelector = createSelector(stateSelector, state => state.reco
 export const recordsChangedSelector = createSelector(stateSelector, state => state.changedRecords);
 export const displayRecordsSelector = createSelector(stateSelector, state => state.displayRecords);
 export const unpublishedRecordsSelector = createSelector(stateSelector, state => state.unpublishedRecords);
-export const allUnpublishedRecordsSelector = createSelector(stateSelector, state => state.allUnpublishedRecords);
 export const fetchingSelector = createSelector(stateSelector, state => state.fetching);
 export const elementsFieldSetSelector = createSelector(stateSelector, state => state.fieldSet);
 export const modeSelector = createSelector(stateSelector, state => state.viewMode);
@@ -128,6 +132,7 @@ export const filterUnpublishedSelector = createSelector(stateSelector, state => 
 export const selectedRecordSelector = createSelector(stateSelector, state => state.selectedRecord);
 export const courseOptionsUnpublishedFilter = createSelector(stateSelector, state => state.coursesForUnpublishedFilter);
 export const displayRecordsDateRangeString = createSelector(stateSelector, state => state.dateRangeString);
+export const unpublishedLessons = createSelector(stateSelector, state => state.unpublishedLessons);
 
 
 export const addToDisplayedRecords = (id, newRecord) => {
@@ -148,10 +153,6 @@ export const setPublishRecordDate = ({isoDateString, lessonId}) => {
 
 export const changePublishRecordDate = (id, newRecord) => {
     return {type: CHANGE_DISPLAYED_RECORD, payload: {id, newRecord}};
-};
-
-export const toggleModalDndToPublish = (isOn) => {
-    return {type: TOGGLE_MODAL_DND_TO_PUBLISH, payload: isOn};
 };
 
 export const openModalDndToPublish = () => {
@@ -182,6 +183,10 @@ export const setRecordsDateRange = (stringDaterange) => {
     return {type: SET_RECORDS_DATERANGE, payload: stringDaterange}
 };
 
+export const getDashboardUnpublishedLessons = () => {
+    return {type: GET_UNPUBLISHED_LESSONS}
+};
+
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
@@ -192,8 +197,21 @@ export const saga = function* () {
         takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga),
         takeEvery(RELOAD_RECORDS, reloadRecordsSaga),
         takeEvery(GET_FILTER_OPTIONS_REQUEST, getCourseFilterCourseOptionsSaga),
+        takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedLessonsSaga),
     ])
 };
+
+function* getUnpublishedLessonsSaga() {
+    try {
+        yield put({type: REQUEST_START});
+        const records = yield call(getUnpublishedLessonsReq);
+        yield put({type: SET_UNPUBLISHED_LESSONS, payload: records});
+        yield put({type: REQUEST_SUCCESS});
+    }catch (e) {
+        yield put({type: REQUEST_FAIL});
+        showErrorMessage(e.toString())
+    }
+}
 
 function* getCourseFilterCourseOptionsSaga() {
     try {
@@ -627,6 +645,10 @@ const getRecordsReq = (params) => {
 const getUnpublishedRecordsReq = (params) => {
     let urlString = `/api/pm/dashboard/lesson-list${params && params.toString().length ? `?${params}` : ''}`;
     return commonGetQuery(urlString);
+};
+
+const getUnpublishedLessonsReq = () => {
+    return commonGetQuery(`/api/pm/dashboard/lesson-list`);
 };
 
 const getCoursesForFilter = () => {
