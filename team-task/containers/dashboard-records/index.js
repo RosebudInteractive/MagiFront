@@ -10,7 +10,6 @@ import {
     displayRecordsDateRangeString,
     displayRecordsSelector,
     getCourseFilterOptions,
-    getProcessOptions,
     getUnpublishedRecords,
     modalPublishIsOnSelector,
     openModalDndToPublish,
@@ -40,7 +39,6 @@ function DashboardRecords(props) {
         actions.getDashboardUnpublishedRecords();
         actions.getUnpublishedRecords();
         actions.getCourseFilterOptions();
-        actions.getProcessOptions();
 
         return () => actions.showSideBarMenu();
     }, []);
@@ -67,22 +65,21 @@ function DashboardRecords(props) {
     return (
         <div className="dashboard">
             <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
-
             <div className="dashboard-body">
                 <div className="unpublished-records">
-
                     <UnpublishedRecords unpublishedRecords={unpublishedRecords}
                                         resizeTriggerFn={unpublishedPanelToggled}/>
                 </div>
 
                 <div className="records">
-                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened}
+                    <Records resizeTrigger={resizeTrigger}
+                             unpublishedPanelOpened={unpublishedPanelOpened}
                              openModalOnPublication={actions.openModalDndToPublish}/>
                 </div>
             </div>
-
             {modalPublishOn &&
-            <Modal wrappedProps={{record: selectedRecord, applyAction: changeDate, closeAction: actions.closeModalDndToPublish}} WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
+            <Modal wrappedProps={{record: selectedRecord, applyAction: changeDate, closeAction: actions.closeModalDndToPublish}}
+                   WrappedComponent={ConfirmationOfPublication} title={'Выбор даты публикации'} closeAction={() => {
                 actions.closeModalDndToPublish();
             }}/>
             }
@@ -114,7 +111,6 @@ const mapDispatch2Props = (dispatch) => {
             changePublishRecordDate,
             setPublishRecordDate,
             getCourseFilterOptions,
-            getProcessOptions
         }, dispatch)
     }
 };
