@@ -1,4 +1,4 @@
-import {FILTER_FIELD_TYPE} from "../../../components/filter/types";
+import {FILTER_FIELD_TYPE} from "../../filter/types";
 import $ from "jquery";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";

@@ -10,8 +10,6 @@ import _ from "lodash";
 import moment from "moment";
 import {ELEMENT_STATE} from "../constants/states";
 import $ from "jquery";
-import {_fetchProcesses} from "tt-ducks/processes";
-import {PROCESS_STATE_LABELS} from "../constants/process";
 import {PROCESS_STATE_EMPTY_OPTION} from "../constants/dashboard-records";
 
 export const moduleName = 'dashboard-records';
@@ -20,7 +18,6 @@ const prefix = `${appName}/${moduleName}`;
 const SET_RECORDS = `${prefix}/SET_RECORDS`;
 const LOAD_DASHBOARD_RECORDS = `${prefix}/LOAD_DASHBOARD_RECORDS`;
 const LOAD_UNPUBLISHED_RECORDS = `${prefix}/LOAD_UNPUBLISHED_RECORDS`;
-const CHANGE_RECORD = `${prefix}/CHANGE_RECORD`;
 
 const CHANGE_VIEW_MODE = `${prefix}/CHANGE_VIEW_MODE`;
 
@@ -45,8 +42,6 @@ const SET_NEW_DISPLAYED_RECORDS = `${prefix}/SET_NEW_DISPLAYED_RECORDS`;
 const SET_SELECTED_RECORD_DATA = `${prefix}/SET_SELECTED_RECORD_DATA`;
 const SET_FILTER_COURSE_OPTIONS = `${prefix}/SET_FILTER_COURSE_OPTIONS`;
 const GET_FILTER_OPTIONS_REQUEST = `${prefix}/GET_FILTER_OPTIONS_REQUEST`;
-const SET_PROCESS_OPTIONS = `${prefix}/SET_PROCESS_OPTIONS`;
-const GET_PROCESS_OPTIONS = `${prefix}/GET_PROCESS_OPTIONS`;
 const SET_RECORDS_DATERANGE = `${prefix}/SET_RECORDS_DATERANGE`;
 
 const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
@@ -72,7 +67,6 @@ export const ReducerRecord = Record({
     allUnpublishedRecords: [],
     filterUnpublished: [],
     coursesForUnpublishedFilter: [],
-    processOptions: [],
     dateRangeString: '',
     unpublishedLessons: [],
     fetching: false,
@@ -114,8 +108,6 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('displayRecords', [...payload]);
         case SET_CHANGED_RECORDS:
             return state.set('changedRecords', [...payload]);
-        case SET_PROCESS_OPTIONS:
-            return state.set('processOptions', payload);
         case SET_FILTER_COURSE_OPTIONS:
             return state.set('coursesForUnpublishedFilter', [...payload]);
         case SET_RECORDS_DATERANGE:
@@ -140,7 +132,6 @@ export const modalPublishIsOnSelector = createSelector(stateSelector, state => s
 export const filterUnpublishedSelector = createSelector(stateSelector, state => state.filterUnpublished);
 export const selectedRecordSelector = createSelector(stateSelector, state => state.selectedRecord);
 export const courseOptionsUnpublishedFilter = createSelector(stateSelector, state => state.coursesForUnpublishedFilter);
-export const processOptionsSelector = createSelector(stateSelector, state => state.processOptions);
 export const displayRecordsDateRangeString = createSelector(stateSelector, state => state.dateRangeString);
 export const unpublishedLessons = createSelector(stateSelector, state => state.unpublishedLessons);
 
@@ -189,10 +180,6 @@ export const getCourseFilterOptions = () => {
     return {type: GET_FILTER_OPTIONS_REQUEST}
 };
 
-export const getProcessOptions = () => {
-    return {type: GET_PROCESS_OPTIONS}
-};
-
 export const setRecordsDateRange = (stringDaterange) => {
     return {type: SET_RECORDS_DATERANGE, payload: stringDaterange}
 };
@@ -211,9 +198,7 @@ export const saga = function* () {
         takeEvery(CHANGE_DISPLAYED_RECORD, changeDisplayedRecordsSaga),
         takeEvery(RELOAD_RECORDS, reloadRecordsSaga),
         takeEvery(GET_FILTER_OPTIONS_REQUEST, getCourseFilterCourseOptionsSaga),
-        takeEvery(GET_PROCESS_OPTIONS, getProcessOptionsSaga),
         takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedLessonsSaga),
-
     ])
 };
 
@@ -228,26 +213,6 @@ function* getUnpublishedLessonsSaga() {
         showErrorMessage(e.toString())
     }
 }
-
-function* getProcessOptionsSaga() {
-    try {
-        yield put({type: REQUEST_START});
-        const processes = yield call(_fetchProcesses);
-
-        const statusOptions = new Set();
-
-        processes.forEach(process => statusOptions.add(process.State));
-
-        const statusOptionsArray = [...statusOptions].map(x => ({value: x, label: PROCESS_STATE_LABELS[x] ? PROCESS_STATE_LABELS[x] : 'Неизвестно'}));
-
-        statusOptionsArray.push(PROCESS_STATE_EMPTY_OPTION);
-
-        yield put({type: SET_PROCESS_OPTIONS, payload: statusOptionsArray});
-    } catch (e) {
-        showErrorMessage(e.toString())
-    }
-}
-
 function* getCourseFilterCourseOptionsSaga() {
     try {
         yield put({type: REQUEST_START});

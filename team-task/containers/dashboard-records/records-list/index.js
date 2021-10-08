@@ -14,7 +14,6 @@ import {
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
-    processOptionsSelector,
     setPublishRecordDate,
     setRecordsDateRange,
     setSelectedRecord,
@@ -24,6 +23,7 @@ import './records-list.sass'
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
 import {hasAdminRights} from "tt-ducks/auth";
+import savedFilters, {FILTER_KEY} from "../../../tools/saved-filters";
 
 let recordsCount = 0,
     scrollPosition = 0;
@@ -37,7 +37,6 @@ const Records = (props) => {
         courses,
         unpublishedPanelOpened,
         params,
-        processOptions,
         hasAdminRights
     } = props;
 
@@ -50,7 +49,8 @@ const Records = (props) => {
     }, [dashboardRecords]);
 
     const _sortRef = useRef({field: null, direction: null}),
-        filter = useRef(null);
+        filter = useRef(null),
+        isMounted = useRef(false);
 
     useWindowSize(() => {
         resizeHandler(recordsCount)
@@ -100,7 +100,15 @@ const Records = (props) => {
     }, [dashboardRecords]);
 
     useEffect(() => {
-        const initState = parseParams();
+        let initState = parseParams();
+
+        if (!isMounted.current && (Object.keys(initState).length === 0)) {
+            initState = savedFilters.getFor(FILTER_KEY.DASHBOARD_PUBLISHED)
+            initState.replacePath = true
+            isMounted.current = true
+        } else {
+            savedFilters.setFor(FILTER_KEY.DASHBOARD_PUBLISHED, {...initState})
+        }
 
         if (initState.order) {
             _sortRef.current = initState.order;
@@ -207,8 +215,8 @@ const Records = (props) => {
 
     const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
         const optionsCourses = (courses && courses.length > 0) ? courses.map(c => ({value: c.Id, label: c.Name})) : [];
-        return getFilterConfig(filter.current, [], optionsCourses.length > 0 ? optionsCourses : [], processOptions);
-    }, [filter.current, courses, processOptions]);
+        return getFilterConfig(filter.current, optionsCourses.length > 0 ? optionsCourses : []);
+    }, [filter.current, courses]);
 
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
@@ -242,7 +250,6 @@ const Records = (props) => {
 const mapState2Props = (state) => {
     return {
         dashboardRecords: displayRecordsSelector(state),
-        processOptions: processOptionsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),
         hasAdminRights: hasAdminRights(state),
         fetching: fetchingSelector(state),
