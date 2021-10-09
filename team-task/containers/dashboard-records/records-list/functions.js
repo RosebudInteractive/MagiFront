@@ -1,8 +1,9 @@
 import $ from 'jquery';
 import moment from 'moment';
-import { GRID_SORT_DIRECTION } from '../../../constants/common';
-import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
-import { FILTER_FIELD_TYPE, } from '../../../@types/common';
+import {GRID_SORT_DIRECTION} from '../../../constants/common';
+import {DASHBOARD_PROCESS_STATE, PROCESS_STATE} from '../../../constants/states';
+import {FILTER_FIELD_TYPE,} from '../../../@types/common';
+
 const processStates = Object.values(PROCESS_STATE)
     .map((state) => ({ label: state.label, value: state.value }));
 processStates.push({ label: 'Без процесса', value: -1 });

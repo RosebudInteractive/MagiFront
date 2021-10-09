@@ -22,7 +22,7 @@ import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname
 import './records-list.sass'
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
-import {hasAdminRights} from "tt-ducks/auth";
+import {hasAdminRights, hasSupervisorRights, userSelector} from "tt-ducks/auth";
 import savedFilters, {FILTER_KEY} from "../../../tools/saved-filters";
 
 let recordsCount = 0,
@@ -81,7 +81,6 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        // const [...first, ...second, ...last]=
         if(recordsCount > 0){
             const recordsDateRangeStart = dashboardRecords[0].DateObject.format('DD.MM');
             const recordsDateRangeEnd = dashboardRecords[recordsCount - 1].DateObject.format('DD.MM');
@@ -182,6 +181,22 @@ const Records = (props) => {
                             props.openModalOnPublication();
                         }
                     }
+
+                    if (data.column === 'ProcessState' && (hasAdminRights || hasSupervisorRights)) {
+                        const item = this.getItem(data.row);
+
+
+                        console.log(item)
+                        if (item && item.ProcessId) {
+                            if(hasAdminRights){
+                                window.open(`/pm/process/${item.ProcessId}`, '_blank');
+                            } else {
+                                if(item.Supervisor.Id === user.Id){
+                                    window.open(`/pm/process/${item.ProcessId}`, '_blank');
+                                }
+                            }
+                        }
+                    }
                 },
                 onBeforeDrop: function (context, e) {
                     const toItem = this.getItem(context.target);
@@ -259,6 +274,8 @@ const mapState2Props = (state) => {
         elementsFieldSet: elementsFieldSetSelector(state),
         courses: courseOptionsUnpublishedFilter(state),
         params: paramsSelector(state),
+        hasSupervisorRights: hasSupervisorRights(state),
+        user: userSelector(state)
     }
 };
 

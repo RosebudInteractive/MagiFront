@@ -45,7 +45,7 @@ export const STATE_COLUMNS = [
         }
     },
     {
-        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], css: "_container process-state-aligned",
+        id: 'ProcessState', header: [{text: 'Процесс', css: 'up-headers'}], css: "_container process-state-aligned js-open-process",
         template: function (val) {
             const state = getProcessState(val.ProcessState);
             return `<div class="centered-by-flex process-state ${state.css}">${state.label}</div>`;

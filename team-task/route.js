@@ -17,7 +17,7 @@ import DashboardRecords from "./containers/dashboard-records"
 type RouterProps = {
     hasSupervisorRights: boolean,
     userRole: string,
-    hasAdminRights: boolean
+    hasAdminRights: boolean,
 }
 
 export default function AppRouter(props: RouterProps) {
@@ -29,7 +29,7 @@ export default function AppRouter(props: RouterProps) {
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
-        <Route path={'/dashboard-records'} render={() => {return props.hasPmaRights ? <DashboardRecords/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/dashboard-records'} render={() => {return  (props.hasSupervisorRights || props.hasAdminRights) ? <DashboardRecords/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
         <Route exact path={'/timelines'}
