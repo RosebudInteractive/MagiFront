@@ -11,7 +11,6 @@ import {
     displayRecordsSelector,
     getCourseFilterOptions,
     getDashboardUnpublishedLessons,
-    getProcessOptions,
     getUnpublishedRecords,
     modalPublishIsOnSelector,
     openModalDndToPublish,
@@ -40,7 +39,6 @@ function DashboardRecords(props) {
         actions.getDashboardUnpublishedLessons();
         actions.getUnpublishedRecords();
         actions.getCourseFilterOptions();
-        actions.getProcessOptions();
 
         return () => actions.showSideBarMenu();
     }, []);
@@ -66,22 +64,20 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction}
-                                    onChangeMode={changeMode}/>
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
 
             <div className="dashboard-body">
                 <div className="unpublished-records">
-
                     <UnpublishedRecords unpublishedRecords={unpublishedRecords}
                                         resizeTriggerFn={unpublishedPanelToggled}/>
                 </div>
 
                 <div className="records">
-                    <Records resizeTrigger={resizeTrigger} unpublishedPanelOpened={unpublishedPanelOpened}
+                    <Records resizeTrigger={resizeTrigger}
+                             unpublishedPanelOpened={unpublishedPanelOpened}
                              openModalOnPublication={actions.openModalDndToPublish}/>
                 </div>
             </div>
-
             {modalPublishOn &&
             <Modal wrappedProps={{
                 record: selectedRecord,
@@ -119,7 +115,6 @@ const mapDispatch2Props = (dispatch) => {
             changePublishRecordDate,
             setPublishRecordDate,
             getCourseFilterOptions,
-            getProcessOptions
         }, dispatch)
     }
 };
