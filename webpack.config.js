@@ -8,8 +8,6 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 const _prodConfig = {
-    mode: 'development',
-    devtool: 'cheap-module-eval-source-map',
     entry: {
         "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
