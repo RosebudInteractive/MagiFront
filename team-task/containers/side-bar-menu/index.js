@@ -41,7 +41,7 @@ function SideBarMenu(props) {
                       title={'Таймлайны'}/>
         }
 
-        { hasPmaRights && <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
+        { hasAdminRights || hasSupervisorRights && <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>}
     </nav>
 }

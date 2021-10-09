@@ -396,6 +396,8 @@ function* changeViewModeSaga(data) {
 
         const records = _.cloneDeep(yield select(recordsChangedSelector));
 
+        records.forEach(rec => rec.SupervisorId = rec.Supervisor.Id);
+
         let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
@@ -587,6 +589,10 @@ function* getRecordsSaga() {
             'Готовые компоненты': 6
         };
         records.forEach(rec => {
+            // if(rec.Supervisor.Id){
+            //
+            // }
+
             if (rec.Elements && Array.isArray(rec.Elements)) {
                 rec.Elements.forEach(el => fields.add(el.Name))
             }
