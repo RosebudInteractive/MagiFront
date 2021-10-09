@@ -10,7 +10,6 @@ import _ from "lodash";
 import moment from "moment";
 import {ELEMENT_STATE} from "../constants/states";
 import $ from "jquery";
-import {PROCESS_STATE_EMPTY_OPTION} from "../constants/dashboard-records";
 
 export const moduleName = 'dashboard-records';
 const prefix = `${appName}/${moduleName}`;
@@ -213,6 +212,7 @@ function* getUnpublishedLessonsSaga() {
         showErrorMessage(e.toString())
     }
 }
+
 function* getCourseFilterCourseOptionsSaga() {
     try {
         yield put({type: REQUEST_START});
@@ -660,5 +660,3 @@ const getUnpublishedLessonsReq = () => {
 const getCoursesForFilter = () => {
     return commonGetQuery('/api/courses/list');
 };
-
-

@@ -83,7 +83,6 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        // const [...first, ...second, ...last]=
         if(recordsCount > 0){
             const recordsDateRangeStart = dashboardRecords[0].DateObject.format('DD.MM');
             const recordsDateRangeEnd = dashboardRecords[recordsCount - 1].DateObject.format('DD.MM');
@@ -294,7 +293,7 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             addToDisplayedRecords,
             setSelectedRecord,
-            setRecordsDateRange,
+            setRecordsDateRange
         }, dispatch)
     }
 };

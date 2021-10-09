@@ -64,8 +64,7 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction}
-                                    onChangeMode={changeMode}/>
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
             <div className="dashboard-body">
                 <div className="unpublished-records">
                     <UnpublishedRecords unpublishedRecords={unpublishedRecords}
