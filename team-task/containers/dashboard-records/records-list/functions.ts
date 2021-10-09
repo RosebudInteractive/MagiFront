@@ -3,7 +3,7 @@ import moment from 'moment';
 import { GRID_SORT_DIRECTION } from '../../../constants/common';
 import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
 import {
-  FilterField, FilterFieldOptions, FilterValue, FILTER_FIELD_TYPE,
+  FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
 } from '../../../@types/common';
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
