@@ -361,7 +361,9 @@ function* changeViewModeSaga(data) {
 
         const records = _.cloneDeep(yield select(recordsChangedSelector));
 
-        records.forEach(rec => rec.SupervisorId = rec.Supervisor.Id);
+        records.forEach(rec => {
+            if (rec.Supervisor) rec.SupervisorId = rec.Supervisor.Id
+        });
 
         let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
