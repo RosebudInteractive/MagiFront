@@ -9,12 +9,12 @@ export default function Footer(props) {
     return (<View style={[style.footer]}>
       <ZoomSlider value={zoom} onChange={onZoomChange} onSliderStop={onSliderStop}/>
       {fullScreenMode
-            ? (<TouchableOpacity onPress={onClosePress} style={{outline: 'none'}}>
+            ? (<TouchableOpacity onPress={onClosePress}>
             <View style={style.button}>
               <CloseButton />
             </View>
           </TouchableOpacity>)
-            : (<TouchableOpacity onPress={onOpenPress} style={{outline: 'none'}}>
+            : (<TouchableOpacity onPress={onOpenPress}>
             <View style={style.button}>
               <OpenButton />
             </View>

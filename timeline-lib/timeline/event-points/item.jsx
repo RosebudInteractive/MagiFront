@@ -145,7 +145,7 @@ export default class EventPoint extends React.PureComponent {
         const { zoom, theme } = this.context;
         const { isActive, x, item, zIndex, index, } = this.props;
         const { top, scale, indent, opacity, flagHeight, needMask, footIndent, } = this.state;
-        const left = x * zoom;
+        const left = x * zoom + 20;
         const wrapperStyle = {
             left,
             zIndex,
@@ -188,6 +188,9 @@ export default class EventPoint extends React.PureComponent {
                 titleStyle.fontWeight = theme.font.weight;
             }
             if (theme.font && theme.font.size) {
+                const lineHeight = theme.font.size + 8;
+                eventStyle.height = lineHeight;
+                titleStyle.lineHeight = lineHeight;
                 titleStyle.fontSize = theme.font.size;
             }
             if (theme.font && theme.font.color) {

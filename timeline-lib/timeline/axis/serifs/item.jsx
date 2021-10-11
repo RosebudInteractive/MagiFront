@@ -12,10 +12,23 @@ class SerifItem extends React.Component {
             visible: true,
         };
     }
+    componentDidUpdate(prevProps) {
+        const { rightBound } = this.props;
+        const { visible } = this.state;
+        if (prevProps.rightBound !== rightBound) {
+            // eslint-disable-next-line no-console
+            console.log(prevProps.rightBound);
+            // eslint-disable-next-line react/no-did-update-set-state
+            if (!visible)
+                this.setState({ visible: true });
+        }
+    }
     onLayout(data) {
         const { rightBound } = this.props;
-        const { x, width } = data;
-        if ((x <= 0) || ((x + width) >= rightBound)) {
+        const { x } = data;
+        if ((x <= 0) || (x > rightBound)) {
+            // eslint-disable-next-line no-console
+            console.log(rightBound);
             this.setState({ visible: false });
         }
         else {
@@ -25,20 +38,20 @@ class SerifItem extends React.Component {
     render() {
         const { x, zoom } = this.context;
         const { index, year, yearPerPixel } = this.props;
-        const left = x * index + (year < 0 ? yearPerPixel * zoom : 0);
+        const left = x * index + (year < 0 ? yearPerPixel * zoom : 0) + 20;
         const { textOffset, visible } = this.state;
         const serifStyle = { left };
         const textStyle = {
             left: left - textOffset,
         };
         return visible && (<React.Fragment>
-            <View style={[styles.serif, serifStyle]}/>
-            <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => {
+        <View style={[styles.serif, serifStyle]}/>
+        <Text style={[styles.text, textStyle]} ref={this.textRef} onLayout={(event) => {
                 this.onLayout(event.nativeEvent.layout);
             }}>
-                {year === 0 ? -1 : year}
-            </Text>
-        </React.Fragment>);
+          {year === 0 ? -1 : year}
+        </Text>
+      </React.Fragment>);
     }
 }
 SerifItem.contextType = SerifsContext;

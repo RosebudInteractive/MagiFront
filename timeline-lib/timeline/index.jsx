@@ -11,7 +11,7 @@ export const HORIZONTAL_INDENT = 10;
 const ITEM_MIN_WIDTH = 50;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, fsMode,} = props;
+    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, } = props;
     const [svgWidth, setSvgWidth] = useState(0);
     const [itemWidth, setItemWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
@@ -78,8 +78,9 @@ export default function TimeAxis(props) {
             // @ts-ignore
             ? viewPort.current.parentNode.clientHeight
             : 0;
-    }, [viewPort.current, height, fsMode]);
+    }, [viewPort.current, height]);
     useEffect(() => {
+        const OFFSET = 20;
         const allItems = [...events, ...periods];
         if (allItems.length === 0)
             return;
@@ -89,10 +90,11 @@ export default function TimeAxis(props) {
         maxYear = maxYear < 0 ? maxYear + 1 : maxYear;
         const roundedMinYear = Math.floor(minYear / 10) * 10;
         const roundedMaxYear = Math.ceil(maxYear / 10) * 10;
-        const startPoint = (roundedMinYear - (roundedMinYear % 10)) - HORIZONTAL_INDENT;
-        const endPoint = (roundedMaxYear + (10 - (roundedMaxYear % 10))) + HORIZONTAL_INDENT;
-        const canvasWidth = width * zoom;
-        const delta = endPoint - startPoint;
+        // const startPoint = (roundedMinYear - (roundedMinYear % 10)) - HORIZONTAL_INDENT;
+        // const endPoint = (roundedMaxYear + (10 - (roundedMaxYear % 10))) + HORIZONTAL_INDENT;
+        const canvasWidth = (width - 2 * OFFSET) * zoom;
+        // const delta = endPoint - startPoint;
+        const delta = roundedMaxYear - roundedMinYear;
         const maxItemsCount = canvasWidth / ITEM_MIN_WIDTH;
         const itemDelta = delta / maxItemsCount;
         let step = STEPS.find((item) => item >= itemDelta) || 0;
@@ -103,7 +105,8 @@ export default function TimeAxis(props) {
         const itemWidthNewValue = canvasWidth / (itemCount);
         const newSerifs = new Array(itemCount + 1)
             .fill(0)
-            .map((item, index) => startPoint + (step * index));
+            // .map((item, index) => startPoint + (step * index));
+            .map((item, index) => roundedMinYear + (step * index));
         let svgWidthNewValue = canvasWidth;
         if (svgWidthNewValue < width)
             svgWidthNewValue = width;
@@ -112,8 +115,10 @@ export default function TimeAxis(props) {
             setSerifs(newSerifs);
         }
         setSvgWidth(svgWidthNewValue);
-        startDate.current = startPoint;
-        yearPerPixel.current = (width) / (endPoint - startPoint);
+        // startDate.current = startPoint;
+        startDate.current = roundedMinYear;
+        // yearPerPixel.current = (width) / (endPoint - startPoint);
+        yearPerPixel.current = (width - 2 * OFFSET) / (roundedMaxYear - roundedMinYear);
     }, [width, zoom, events, periods, lastYearFromLastPoint]);
     useEffect(() => {
         setLastYear(null);
@@ -133,11 +138,11 @@ export default function TimeAxis(props) {
             onItemClick({ type, id });
     }, [onItemClick, activeItem]);
     return !!width && !!yearPerPixel.current
-        ? (<View style={{ width: svgWidth, height: viewPortHeight }} ref={viewPort}>
+        ? (<View style={{ width: svgWidth + 40, height: viewPortHeight }} ref={viewPort}>
         <SerifsContext.Provider value={{
                 x: itemWidth, y: midHeight, zoom, theme,
             }}>
-          <NativeAxis width={svgWidth} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
+          <NativeAxis width={svgWidth + 40} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
           <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={levelLimit} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
           <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={levelLimit} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler}/>
         </SerifsContext.Provider>

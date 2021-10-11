@@ -70,7 +70,7 @@ export default class AnimatedPeriod extends React.Component {
     render() {
         const { zoom, theme } = this.context;
         const { startX, endX, period, isActive, index, } = this.props;
-        const left = startX * zoom;
+        const left = startX * zoom + 20;
         const width = Math.ceil(endX * zoom - left);
         const { top, opacity } = this.state;
         const color = theme ? theme.getColor(index) : period.color;

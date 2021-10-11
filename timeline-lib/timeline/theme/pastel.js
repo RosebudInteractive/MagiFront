@@ -6,6 +6,7 @@ class Pastel extends Theme {
         this.font = {
             family: 'Fira Sans',
             color: '#000000',
+            size: 12,
             // weight: 'bold',
         };
         // this.enableAlpha = false;

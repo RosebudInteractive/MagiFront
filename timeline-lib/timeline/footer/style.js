@@ -7,6 +7,7 @@ export default StyleSheet.create({
         alignItems: 'center',
         height: 49,
         width: '100%',
+        // backgroundColor: 'rgba(47,47,47,0.6)',
         flexDirection: 'row',
     },
     title: {
@@ -19,6 +20,5 @@ export default StyleSheet.create({
     },
     button: {
         marginRight: 12,
-        outline: 'none',
     },
 });

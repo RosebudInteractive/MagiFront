@@ -58,7 +58,7 @@ export default function TimelinePreview(props) {
                 endDay: !!item.RbDay && +item.RbDay,
                 endMonth: !!item.RbMonth && +item.RbMonth,
                 endYear: !!item.RbYear && +item.RbYear,
-                name: item.Name,
+                name: item.ShortName || item.Name,
                 color: hslToHex(item.color),
                 visible: true,
             }
@@ -72,7 +72,7 @@ export default function TimelinePreview(props) {
                 day: !!item.Day && +item.Day,
                 month: !!item.Month && +item.Month,
                 year: !!item.Year && +item.Year,
-                name: item.Name,
+                name: item.ShortName || item.Name,
                 color: item.color,
                 visible: true,
             }
@@ -83,7 +83,7 @@ export default function TimelinePreview(props) {
         const fileName = background ? (background.file ? background.file : background) : null;
 
         return fileName ? {
-            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)) center top / cover, url(/data/${fileName})`,
+            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)), center top / cover no-repeat url(/data/${fileName})`,
         } : {backgroundColor: "#B4B4BB"}
     }, [background]);
 
@@ -125,7 +125,7 @@ export default function TimelinePreview(props) {
                               events={_events}
                               periods={_periods}
                               zoom={zoom}
-                              levelLimit={4}
+                              levelLimit={7}
                               zoomSliderStopped={zoomSliderStopped}
                               fsMode={fsEnable}
                               key={incKey}/>

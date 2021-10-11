@@ -9,9 +9,6 @@ export default StyleSheet.create({
         width: '100%',
         backgroundColor: 'rgba(47,47,47,0.6)',
         flexDirection: 'row',
-        zIndex: 1,
-        borderTopLeftRadius: 8,
-        borderTopRightRadius: 8
     },
     title: {
         fontFamily: 'Fira Sans',
