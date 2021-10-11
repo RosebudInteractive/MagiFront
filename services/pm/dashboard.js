@@ -207,6 +207,11 @@ const PmDashboard = class PmDashboard extends DbObject {
             mysql_conds.push(`(lc.${'`'}CourseId${'`'} = ${opts.course})`);
         }
 
+        if (opts.lesson) {
+            mssql_conds.push(`(lc.[LessonId] = ${opts.lesson})`);
+            mysql_conds.push(`(lc.${'`'}LessonId${'`'} = ${opts.lesson})`);
+        }
+
         if (opts.course_name) {
             mssql_conds.push(`(cl.[Name] like N'%${opts.course_name}%')`);
             mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course_name}%')`);
