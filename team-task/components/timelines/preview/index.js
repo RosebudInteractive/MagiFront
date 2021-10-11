@@ -125,7 +125,7 @@ export default function TimelinePreview(props) {
                               events={_events}
                               periods={_periods}
                               zoom={zoom}
-                              levelLimit={7}
+                              levelLimit={4}
                               zoomSliderStopped={zoomSliderStopped}
                               fsMode={fsEnable}
                               key={incKey}/>
