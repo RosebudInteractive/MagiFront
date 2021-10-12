@@ -16,8 +16,6 @@ class SerifItem extends React.Component {
         const { rightBound } = this.props;
         const { visible } = this.state;
         if (prevProps.rightBound !== rightBound) {
-            // eslint-disable-next-line no-console
-            console.log(prevProps.rightBound);
             // eslint-disable-next-line react/no-did-update-set-state
             if (!visible)
                 this.setState({ visible: true });
@@ -27,8 +25,6 @@ class SerifItem extends React.Component {
         const { rightBound } = this.props;
         const { x } = data;
         if ((x <= 0) || (x > rightBound)) {
-            // eslint-disable-next-line no-console
-            console.log(rightBound);
             this.setState({ visible: false });
         }
         else {

@@ -88,19 +88,17 @@ export default function TimeAxis(props) {
         let maxYear = Math.max(...allItems.map((el) => el.year || el.endYear || 0));
         minYear = minYear < 0 ? minYear + 1 : minYear;
         maxYear = maxYear < 0 ? maxYear + 1 : maxYear;
-        const roundedMinYear = Math.floor(minYear / 10) * 10;
-        const roundedMaxYear = Math.ceil(maxYear / 10) * 10;
-        // const startPoint = (roundedMinYear - (roundedMinYear % 10)) - HORIZONTAL_INDENT;
-        // const endPoint = (roundedMaxYear + (10 - (roundedMaxYear % 10))) + HORIZONTAL_INDENT;
         const canvasWidth = (width - 2 * OFFSET) * zoom;
-        // const delta = endPoint - startPoint;
-        const delta = roundedMaxYear - roundedMinYear;
+        let delta = maxYear - minYear;
         const maxItemsCount = canvasWidth / ITEM_MIN_WIDTH;
         const itemDelta = delta / maxItemsCount;
         let step = STEPS.find((item) => item >= itemDelta) || 0;
         if (!step) {
             step = STEPS[STEPS.length - 1];
         }
+        const roundedMinYear = Math.floor(minYear / step) * step;
+        const roundedMaxYear = Math.ceil(maxYear / step) * step;
+        delta = roundedMaxYear - roundedMinYear;
         const itemCount = Math.floor(delta / (step));
         const itemWidthNewValue = canvasWidth / (itemCount);
         const newSerifs = new Array(itemCount + 1)
