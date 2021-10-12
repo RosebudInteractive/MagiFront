@@ -8,6 +8,7 @@ import {TIMELINE_TYPES_OF_USE} from "../../../constants/timelines";
 import {compose} from "redux";
 import {connect} from "react-redux";
 import CoverUploader from "./cover-uploader";
+import copyToClipboard from "../../../containers/timelines/editor/copy-to-clipboard";
 
 export const EDITOR_NAME = "TIMELINE_EDITOR_HEADER"
 
@@ -61,6 +62,10 @@ function TimelineHeader(props: Props) {
         onSave(editorValues)
     }
 
+    const copyTimeline = () => {
+        if (!!timeline) copyToClipboard(JSON.stringify(timeline))
+    }
+
     return <form className="timeline-editor-header__form" onSubmit={e => e.preventDefault()}>
         <div className="timeline-editor-header">
             <div className='timeline-editor__field-name'>
@@ -68,9 +73,7 @@ function TimelineHeader(props: Props) {
                        placeholder="Название таймлайна" extClass="_grey100 page-title"/>
             </div>
             <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
-            <button className='timeline-editor-header__copy-button grey-button big-button' onClick={copyTimeline}>Copy
-                to clipboard
-            </button>
+            <button className='timeline-editor-header__copy-button grey-button big-button' onClick={copyTimeline}>Copy to clipboard</button>
             <button className="timeline-editor-header__save-button orange-button big-button"
                     disabled={invalid || !dirty}
                     onClick={_onSaveClick}>
