@@ -3062,7 +3062,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                 }
             }
         }
-        if ((!is_finished) || (cnt_finished < process.Tasks.length.length))
+        if ((!is_finished) && (cnt_finished < process.Tasks.length.length))
             throw new HttpError(HttpCode.ERR_BAD_REQ, `Не все задачи процесса завершены или не выполнена завершающая задача.`);
     }
 
