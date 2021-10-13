@@ -27,7 +27,7 @@ export default function PeriodSections(props) {
                     ...item, yLevel: 0, xLevel: 0, xStart, xEnd,
                 };
             });
-            const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit);
+            const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit || 0);
             alignedPeriods.forEach((item) => {
                 const calculatedStartDate = calcDisplayDate(item.startDay, item.startMonth, item.startYear);
                 const calculatedEndDate = calcDisplayDate(item.endDay, item.endMonth, item.endYear);
@@ -40,7 +40,7 @@ export default function PeriodSections(props) {
             });
             setVerticallyAlignedPeriods(alignedPeriods);
         }
-    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis]);
+    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis, y]);
     const periodSections = useMemo(() => (verticallyAlignedPeriods.length > 0
         ? verticallyAlignedPeriods.map((period, index, array) => {
             const isActive = period.id === activeItem;

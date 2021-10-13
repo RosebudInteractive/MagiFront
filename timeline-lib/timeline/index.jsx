@@ -28,7 +28,7 @@ export default function TimeAxis(props) {
             /* eslint-enable no-param-reassign */
         });
         // eslint-disable-next-line max-len
-        const handledEvents = placeByYLevelLimit(events, levelLimit, visibilityChecking);
+        const handledEvents = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
     }
     const calculateVerticalWithZoom = (zoomValue) => {
@@ -40,7 +40,7 @@ export default function TimeAxis(props) {
             item.offset = 0;
             /* eslint-enable no-param-reassign */
         });
-        const handledEvents = placeByYLevelLimit(events, levelLimit, visibilityChecking);
+        const handledEvents = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
     };
     useEffect(() => {
@@ -141,8 +141,8 @@ export default function TimeAxis(props) {
                 x: itemWidth, y: midHeight, zoom, theme,
             }}>
           <NativeAxis width={svgWidth + 40} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
-          <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={levelLimit} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
-          <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={levelLimit} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler}/>
+          <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={levelLimit.events} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
+          <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={levelLimit.periods} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler}/>
         </SerifsContext.Provider>
       </View>)
         : null;
