@@ -22,9 +22,10 @@ class SerifItem extends React.Component {
         }
     }
     onLayout(data) {
-        const { rightBound } = this.props;
+        // const { rightBound } = this.props;
         const { x } = data;
-        if ((x <= 0) || (x > rightBound)) {
+        // if ((x <= 0) || (x > rightBound)) {
+        if (x <= 0) {
             this.setState({ visible: false });
         }
         else {
