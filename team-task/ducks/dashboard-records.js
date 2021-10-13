@@ -47,6 +47,7 @@ const RELOAD_RECORDS = `${prefix}/RELOAD_RECORDS`;
 const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
 const GET_UNPUBLISHED_LESSONS = `${prefix}/GET_UNPUBLISHED_LESSONS`;
 const SET_UNPUBLISHED_LESSONS = `${prefix}/SET_UNPUBLISHED_LESSONS`;
+const GET_PROCESS_FOR_LESSON = `${prefix}/GET_PROCESS_FOR_LESSON`;
 
 
 const defaultFieldSet = new Set([]);
@@ -198,8 +199,13 @@ export const saga = function* () {
         takeEvery(RELOAD_RECORDS, reloadRecordsSaga),
         takeEvery(GET_FILTER_OPTIONS_REQUEST, getCourseFilterCourseOptionsSaga),
         takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedLessonsSaga),
+        // takeEvery(GET_PROCESS_FOR_LESSON, getProcessForLessonSaga),
     ])
 };
+
+// function* getProcessForLessonSaga(){
+//
+// }
 
 function* getUnpublishedLessonsSaga() {
     try {
@@ -229,12 +235,12 @@ function* addToDisplayedRecordsSaga(data) {
         const mode = yield select(modeSelector);
         const newRecord = data.payload.newRecord;
 
-        const res = yield call(setDateToPublication, {
+        const resSetDate = yield call(setDateToPublication, {
             ReadyDate: newRecord.DateObject.toISOString(),
             lessonId: newRecord.LessonId
         });
 
-        if (res && res.result === 'OK') {
+        if (resSetDate && resSetDate.result === 'OK') {
             const dates = yield select(filterSelector);
             const records = _.cloneDeep(yield select(recordsChangedSelector));
 
@@ -242,17 +248,20 @@ function* addToDisplayedRecordsSaga(data) {
             const defaultStartDate = currentDate.toISOString();
             const defaultEndDate = currentDate.add(1, 'months').toISOString();
 
+            const savedRecord = yield call(getRecordByLesson, newRecord.LessonId);
+
+//todo check if savedRecords.length > 1
             records.push({
                 PubDate: newRecord.DateObject.toISOString(),
                 CourseId: newRecord.CourseId,
                 CourseName: newRecord.CourseName,
-                LessonId: newRecord.LessonId,
-                LessonNum: newRecord.LessonNum,
-                LessonName: newRecord.LessonName,
-                Elements: [],
-                IsPublished: newRecord.IsPublished,
-                ProcessId: newRecord.ProcessId,
-                ProcessState: newRecord.ProcessState,
+                LessonId: savedRecord[0].LessonId,
+                LessonNum: savedRecord[0].LessonNum,
+                LessonName: savedRecord[0].LessonName,
+                Elements: savedRecord[0].Elements,
+                IsPublished: savedRecord[0].IsPublished,
+                ProcessId: savedRecord[0].ProcessId,
+                ProcessState: savedRecord[0].ProcessState,
             });
             const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
 
@@ -356,14 +365,26 @@ function* getUnpublishedRecordsSaga(data) {
 
 function* changeViewModeSaga(data) {
     try {
-        yield put({type: SET_VIEW_MODE, payload: +data.payload.mode});
+        const decryptedParams = new URLSearchParams(location.search);
+
+        let viewModeParam = decryptedParams.has('viewMode') ? +decryptedParams.get('viewMode') : null;
+        viewModeParam = viewModeParam ? viewModeParam : +data.payload.mode;
+        yield put({type: SET_VIEW_MODE, payload: viewModeParam});
         const dates = yield select(filterSelector);
 
         const records = _.cloneDeep(yield select(recordsChangedSelector));
 
-        records.forEach(rec => rec.SupervisorId = rec.Supervisor.Id);
+        records.forEach(rec => {
+            if(rec.Supervisor && rec.Supervisor.Id){
+                rec.SupervisorId = rec.Supervisor.Id
+            }
 
-        let resultArray = handleServerData(records, +data.payload.mode, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
+            if(rec.Elements && Array.isArray(rec.Elements)) {
+                rec.ElementFields = rec.Elements.map(el => el.Name);
+            }
+        });
+
+        let resultArray = handleServerData(records, viewModeParam, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
@@ -424,8 +445,9 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
             first.Elements.forEach((elem) => {
                 const _state = Object.values(ELEMENT_STATE).find(item => item.value === elem.State);
+                const elementSupervisorId = (elem.Supervisor && elem.Supervisor.Id) ? elem.Supervisor.Id : null;
 
-                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
+                first[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert, elementId: elem.Id, supervisorId: elementSupervisorId} : {
                     css: "_unknown",
                     label: "Неизвестно",
                     question: false
@@ -454,7 +476,9 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
 
                     item.Elements.forEach((elem) => {
                         const _state = Object.values(ELEMENT_STATE).find(st => st.value === elem.State);
-                        item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert} : {
+                        const elementSupervisorId = (elem.Supervisor && elem.Supervisor.Id) ? elem.Supervisor.Id : null;
+
+                        item[elem.Name] = _state ? {css: _state.css, label: _state.label, question: elem.HasAlert, elementId: elem.Id, supervisorId: elementSupervisorId} : {
                             css: "_unknown",
                             label: "Неизвестно",
                             question: false
@@ -554,10 +578,6 @@ function* getRecordsSaga() {
             'Готовые компоненты': 6
         };
         records.forEach(rec => {
-            // if(rec.Supervisor.Id){
-            //
-            // }
-
             if (rec.Elements && Array.isArray(rec.Elements)) {
                 rec.Elements.forEach(el => fields.add(el.Name))
             }
@@ -645,6 +665,11 @@ const setDateToPublication = ({ReadyDate, lessonId}) => {
 
 const getRecordsReq = (params) => {
     let urlString = `/api/pm/dashboard${params ? `?${params}` : ''}`;
+    return commonGetQuery(urlString);
+};
+
+const getRecordByLesson = (lessonId = null) => {
+    let urlString = `/api/pm/dashboard${lessonId ? `?${new URLSearchParams({lesson: lessonId})}` : ''}`;
     return commonGetQuery(urlString);
 };
 

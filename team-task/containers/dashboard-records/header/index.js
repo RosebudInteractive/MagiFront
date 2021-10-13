@@ -7,7 +7,7 @@ import {Field, Form, FormSpy} from "react-final-form";
 //todo change to Select instead of Form
 
 export default function DashboardRecordsHeader(props) {
-    const {title, dateRange} = props;
+    const {title, dateRange, mode} = props;
 
     return <div className="dashboard-header">
         <div className="dashboard-back-arrow" onClick={props.onBack}>
@@ -22,7 +22,7 @@ export default function DashboardRecordsHeader(props) {
             {/*        onChange={onChange}/>*/}
 
             <Form
-                initialValues={{mode: '0'}}
+                initialValues={{mode: mode}}
                 onSubmit={values => {}}
                 validate={values => {}}
                 subscription={{values: true, pristine: true}}

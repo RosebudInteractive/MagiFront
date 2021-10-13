@@ -1,10 +1,8 @@
 import $ from 'jquery';
 import moment from 'moment';
-import { GRID_SORT_DIRECTION } from '../../../constants/common';
-import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
-import {
-  FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
-} from '../../../@types/common';
+import {GRID_SORT_DIRECTION} from '../../../constants/common';
+import {DASHBOARD_PROCESS_STATE, PROCESS_STATE} from '../../../constants/states';
+import {FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,} from '../../../@types/common';
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
   .map((state) => ({ label: state.label, value: state.value }));
@@ -34,13 +32,13 @@ export const getFilterConfig = (filter: FilterValue, courseOptions = []): Filter
       return null;
     }()),
   },
-  {
-    name: 'ProcessState',
-    placeholder: 'Статус процесса',
-    type: FILTER_FIELD_TYPE.COMBO,
-    value: filter ? filter.ProcessState : null,
-    options: processStates,
-  },
+  // {
+  //   name: 'ProcessState',
+  //   placeholder: 'Статус процесса',
+  //   type: FILTER_FIELD_TYPE.COMBO,
+  //   value: filter ? filter.ProcessState : null,
+  //   options: processStates,
+  // },
 ];
 
 type Params = {
@@ -52,17 +50,17 @@ type FilterParams = {
   Course?: string | null,
   DateRange?: any[] | null,
   ProcessState?: string | null,
-  WoProc: string | null,
+  WoProc?: string | null,
 };
 
 const convertParam2Filter = (data : FilterParams): FilterValue | null => {
   const {
-    Course, DateRange, ProcessState, WoProc,
+    Course, DateRange
   } = data;
 
   const dateRangeEmpty = !DateRange
       || (Array.isArray(DateRange) && DateRange.every((item) => !item));
-  const isEmptyData = !(Course || ProcessState || WoProc) && dateRangeEmpty;
+  const isEmptyData = !(Course) && dateRangeEmpty;
 
   if (isEmptyData) return null;
 
@@ -70,13 +68,13 @@ const convertParam2Filter = (data : FilterParams): FilterValue | null => {
 
   if (Course) filter.Course = +Course;
 
-  if (ProcessState || WoProc) {
-    const states = ProcessState ? ProcessState.split(',') : [];
-    if (WoProc) {
-      states.push('-1');
-    }
-    filter.ProcessState = states.map((pr) => +pr);
-  }
+  // if (ProcessState || WoProc) {
+  //   const states = ProcessState ? ProcessState.split(',') : [];
+  //   if (WoProc) {
+  //     states.push('-1');
+  //   }
+  //   filter.ProcessState = states.map((pr) => +pr);
+  // }
 
   const dateRangeDefined = DateRange
                         && (DateRange.length === 2)
@@ -93,8 +91,8 @@ export const parseParams = () => {
   // eslint-disable-next-line no-restricted-globals
   const searchParams = new URLSearchParams(location.search);
   const Course = searchParams.get('course') || null;
-  const ProcessState = searchParams.get('procState') || null;
-  const WoProc = searchParams.get('woProc') || null;
+  // const ProcessState = searchParams.get('procState') || null;
+  // const WoProc = searchParams.get('woProc') || null;
   const DateRangeStart = searchParams.get('st_date');
   const DateRangeEnd = searchParams.get('fin_date');
 
@@ -113,8 +111,6 @@ export const parseParams = () => {
     {
       Course,
       DateRange,
-      ProcessState,
-      WoProc,
     },
   );
 
