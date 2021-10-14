@@ -5,12 +5,13 @@ import ProcessesIco from "tt-assets/svg/processes.svg"
 import TasksIco from "tt-assets/svg/tasks.svg"
 import NotificationsIco from "tt-assets/svg/notifications.svg"
 import DictionariesIco from "tt-assets/svg/dictionaries.svg"
-import TimelinesIco from "tt-assets/svg/timelines.svg"
+import TimelinesIco from "tt-assets/svg/timeline-v2.svg"
+import PublishPlanIco from "tt-assets/svg/publishplan.svg"
 import ElementIco from "tt-assets/svg/element-arrow.svg"
 import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
-
 import Logo from "tt-assets/svg/logo.svg"
+
 import {hasAdminRights, hasPmaRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 import {newNotifsCountSelector, notificationsSelector, unreadCountSelector} from "tt-ducks/notifications";
@@ -43,7 +44,7 @@ function SideBarMenu(props) {
 
         {
             (hasAdminRights || hasSupervisorRights) &&
-            <MenuLink Icon={TimelinesIco} url={"/dashboard-records"}
+            <MenuLink Icon={PublishPlanIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>
         }
     </nav>

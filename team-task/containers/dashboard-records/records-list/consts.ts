@@ -1,5 +1,5 @@
-import { getProcessState } from './functions';
-import { Dashboard } from '../../../@types/dashboard';
+import {getProcessState} from './functions';
+import {Dashboard} from '../../../@types/dashboard';
 
 export const MAIN_COLUMNS = [
   { id: 'Week', header: [{ text: 'Неделя', css: 'up-headers' }], css: 'week-up' },
@@ -17,7 +17,7 @@ export const MAIN_COLUMNS = [
         const month = pubDate[1];
         const dayOfWeek = pubDate[2];
 
-        return `<div class="pubdate-cell">${day} ${month}<div class="${val.IsWeekend ? 'weekend' : ''}">${dayOfWeek}</div></div>`;
+        return `<div class="pubdate-cell ${val.IsWeekend ? 'weekend' : ''}">${day} ${month}<div >${dayOfWeek}</div></div>`;
       }
       return '';
     },
@@ -54,15 +54,15 @@ export const MAIN_COLUMNS = [
 ];
 
 export const STATE_COLUMNS = [
-  {
-    id: 'IsPublished',
-    header: [{ text: 'Опубликовано', css: 'up-headers' }],
-    css: '_container up-aligned',
-    template(data: Dashboard.Record) {
-      return `<div class='${'is-published'} ${data.IsPublished ? 'published-ok' : ''}'>
-                        </div>`;
-    },
-  },
+  // { todo dont remove this - maybe it will use in future
+  //   id: 'IsPublished',
+  //   header: [{ text: 'Опубликовано', css: 'up-headers' }],
+  //   css: '_container up-aligned',
+  //   template(data: Dashboard.Record) {
+  //     return `<div class='${'is-published'} ${data.IsPublished ? 'published-ok' : ''}'>
+  //                       </div>`;
+  //   },
+  // },
   {
     id: 'ProcessState',
     header: [{ text: 'Процесс', css: 'up-headers' }],
