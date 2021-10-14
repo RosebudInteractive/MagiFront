@@ -245,26 +245,28 @@ function* addToDisplayedRecordsSaga(data) {
 
             const savedRecord = yield call(getRecordByLesson, newRecord.LessonId);
 
-//todo check if savedRecords.length > 1
-            records.push({
-                PubDate: newRecord.DateObject.toISOString(),
-                CourseId: newRecord.CourseId,
-                CourseName: newRecord.CourseName,
-                LessonId: savedRecord[0].LessonId,
-                LessonNum: savedRecord[0].LessonNum,
-                LessonName: savedRecord[0].LessonName,
-                Elements: savedRecord[0].Elements,
-                IsPublished: savedRecord[0].IsPublished,
-                ProcessId: savedRecord[0].ProcessId,
-                ProcessState: savedRecord[0].ProcessState,
-            });
-            const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
+            if(savedRecord) {
+                records.push({
+                    PubDate: newRecord.DateObject.toISOString(),
+                    CourseId: newRecord.CourseId,
+                    CourseName: newRecord.CourseName,
+                    LessonId: savedRecord[0].LessonId,
+                    LessonNum: savedRecord[0].LessonNum,
+                    LessonName: savedRecord[0].LessonName,
+                    Elements: savedRecord[0].Elements,
+                    IsPublished: savedRecord[0].IsPublished,
+                    ProcessId: savedRecord[0].ProcessId,
+                    ProcessState: savedRecord[0].ProcessState,
+                });
+                const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
 
-            yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
-            const resultArray = handleServerData(sorted, +mode, dates.st_date ? dates.st_date : defaultStartDate, dates.fin_date ? dates.fin_date : defaultEndDate);
-            yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
-            const filterValues = yield select(filterUnpublishedSelector);
-            yield put(getUnpublishedRecords(filterValues));
+                yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
+                const resultArray = handleServerData(sorted, +mode, dates.st_date ? dates.st_date : defaultStartDate, dates.fin_date ? dates.fin_date : defaultEndDate);
+                yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
+                const filterValues = yield select(filterUnpublishedSelector);
+                yield put(getUnpublishedRecords(filterValues));
+            }
+
         }
     } catch (e) {
         showErrorMessage(e.toString())

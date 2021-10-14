@@ -279,7 +279,7 @@ const Records = (props) => {
             </div>
         </React.Fragment>
     )
-}
+};
 
 const mapState2Props = (state) => {
     return {

@@ -17,12 +17,11 @@ export default function DashboardRecordsHeader(props) {
             <div className="view-mode">
                 <Select value={mode}
                         onChange={(val) => {
-                            console.log('onchange')
                             props.onChangeMode(val.target.value)
                         }}
                         options={[{name: 'Неделя', id: 0},
-                            {name: 'День', id: 1},
-                            {name: 'Компактный', id: 2}]}
+                                    {name: 'День', id: 1},
+                                    {name: 'Компактный', id: 2}]}
                         placeholder="Режим отображения"
                         label={"Режим отображения"}
                         required={true}/>
