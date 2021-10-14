@@ -14,6 +14,7 @@ import {
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
+    modeSelector,
     setPublishRecordDate,
     setRecordsDateRange,
     setSelectedRecord,
@@ -38,8 +39,7 @@ const Records = (props) => {
         unpublishedPanelOpened,
         params,
         hasAdminRights,
-        hasSupervisorRights,
-        user
+        mode
     } = props;
 
     const location = useLocation();
@@ -68,14 +68,14 @@ const Records = (props) => {
 
     useEffect(() => {
         const elementsFieldsExists = elementsFieldSet && Array.isArray(elementsFieldSet) && elementsFieldSet.length,
-            columns = elementsFieldsExists && !unpublishedPanelOpened
+            columns = elementsFieldsExists
                 ? [...MAIN_COLUMNS, ...elementsFieldSet, ...STATE_COLUMNS]
-                : [...MAIN_COLUMNS, ...STATE_COLUMNS]
+                : [...MAIN_COLUMNS, ...STATE_COLUMNS];
 
         if (JSON.stringify(columnFields) !== JSON.stringify(columns)) {
             setColumnFields(columns);
         }
-    }, [elementsFieldSet, unpublishedPanelOpened]);
+    }, [elementsFieldSet]);
 
     useEffect(() => {
         refreshColumns(columnFields, {needRefresh: true, recordsCount});
@@ -175,8 +175,6 @@ const Records = (props) => {
                     if (!hasAdminRights) {
                         return;
                     }
-                    if (data.column === 'PubDate') {
-                        const item = this.getItem(data.row);
 
                     const item = this.getItem(data.row);
 
@@ -193,10 +191,6 @@ const Records = (props) => {
                     }
 
                     if (data.column === 'ProcessState' && (hasAdminRights || hasSupervisorRights)) {
-                        const item = this.getItem(data.row);
-
-
-                        console.log(item)
                         if (item && item.ProcessId) {
                             if (hasAdminRights) {
                                 window.open(`/pm/process/${item.ProcessId}`, '_blank');
@@ -260,6 +254,7 @@ const Records = (props) => {
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
+        params.viewMode = mode;
         actions.applyFilter(params)
     };
 
@@ -296,7 +291,8 @@ const mapState2Props = (state) => {
         courses: courseOptionsUnpublishedFilter(state),
         params: paramsSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        user: userSelector(state)
+        user: userSelector(state),
+        mode: modeSelector(state)
     }
 };
 

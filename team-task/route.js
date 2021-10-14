@@ -33,7 +33,9 @@ export default function AppRouter(props: RouterProps) {
         <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
         <Route exact path={'/timelines'}
-               render={() => {return (props.hasSupervisorRights || props.hasAdminRights) ? <Timelines/> : <AccessDeniedPlaceholder/>}}/>
+               render={() => {
+                   return (props.hasSupervisorRights || props.hasAdminRights) ? <Timelines/> : <AccessDeniedPlaceholder/>
+               }}/>
         <Route exact path={'/timelines/:timelineId'}
                render={() => {return (props.hasSupervisorRights || props.hasAdminRights) ? <TimelineEditorContainer/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/timelines/new'}  render={() => (<TimelineEditorContainer/>)}/>

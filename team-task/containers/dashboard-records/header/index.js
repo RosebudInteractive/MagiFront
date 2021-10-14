@@ -4,7 +4,7 @@ import "./dashboard-records-header.sass"
 import BackArrow from "tt-assets/svg/back-arrow.svg"
 
 export default function DashboardRecordsHeader(props) {
-    const {title, dateRange} = props;
+    const {title, dateRange, mode} = props;
 
     return <div className="dashboard-header">
         <div className="dashboard-back-arrow" onClick={props.onBack}>

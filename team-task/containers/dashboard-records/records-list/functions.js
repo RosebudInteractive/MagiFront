@@ -29,31 +29,31 @@ export const getFilterConfig = (filter, courseOptions = []) => [
             return null;
         }()),
     },
-    {
-        name: 'ProcessState',
-        placeholder: 'Статус процесса',
-        type: FILTER_FIELD_TYPE.COMBO,
-        value: filter ? filter.ProcessState : null,
-        options: processStates,
-    },
+    // {
+    //   name: 'ProcessState',
+    //   placeholder: 'Статус процесса',
+    //   type: FILTER_FIELD_TYPE.COMBO,
+    //   value: filter ? filter.ProcessState : null,
+    //   options: processStates,
+    // },
 ];
 const convertParam2Filter = (data) => {
-    const { Course, DateRange, ProcessState, WoProc, } = data;
+    const { Course, DateRange } = data;
     const dateRangeEmpty = !DateRange
         || (Array.isArray(DateRange) && DateRange.every((item) => !item));
-    const isEmptyData = !(Course || ProcessState || WoProc) && dateRangeEmpty;
+    const isEmptyData = !(Course) && dateRangeEmpty;
     if (isEmptyData)
         return null;
     const filter = {};
     if (Course)
         filter.Course = +Course;
-    if (ProcessState || WoProc) {
-        const states = ProcessState ? ProcessState.split(',') : [];
-        if (WoProc) {
-            states.push('-1');
-        }
-        filter.ProcessState = states.map((pr) => +pr);
-    }
+    // if (ProcessState || WoProc) {
+    //   const states = ProcessState ? ProcessState.split(',') : [];
+    //   if (WoProc) {
+    //     states.push('-1');
+    //   }
+    //   filter.ProcessState = states.map((pr) => +pr);
+    // }
     const dateRangeDefined = DateRange
         && (DateRange.length === 2)
         && DateRange
@@ -68,8 +68,8 @@ export const parseParams = () => {
     // eslint-disable-next-line no-restricted-globals
     const searchParams = new URLSearchParams(location.search);
     const Course = searchParams.get('course') || null;
-    const ProcessState = searchParams.get('procState') || null;
-    const WoProc = searchParams.get('woProc') || null;
+    // const ProcessState = searchParams.get('procState') || null;
+    // const WoProc = searchParams.get('woProc') || null;
     const DateRangeStart = searchParams.get('st_date');
     const DateRangeEnd = searchParams.get('fin_date');
     const DateRange = [DateRangeStart, DateRangeEnd];
@@ -84,8 +84,6 @@ export const parseParams = () => {
     const filter = convertParam2Filter({
         Course,
         DateRange,
-        ProcessState,
-        WoProc,
     });
     if (filter) {
         paramsData.filter = filter;
