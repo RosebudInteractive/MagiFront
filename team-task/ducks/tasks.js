@@ -72,8 +72,8 @@ export const statesSelector = createSelector(stateSelector, state => state.state
 /**
  * Action Creators
  * */
-export const getTasks = () => {
-    return {type: GET_TASKS_REQUEST}
+export const getTasks = (elementId = null) => {
+    return {type: GET_TASKS_REQUEST, payload: elementId}
 }
 
 export const goToTask = (taskId, notificationUuid) => {
@@ -92,12 +92,18 @@ export const saga = function* () {
 }
 
 
-function* getTasksSaga() {
+function* getTasksSaga(data) {
     yield put({type: GET_TASKS_START})
     try {
         const params = yield select(paramsSelector);
 
-        let _tasks = yield call(_fetchTasks, params);
+        const resultParams = new URLSearchParams(params);
+
+        if(data.payload){
+            resultParams.set('element', +data.payload);
+        }
+
+        let _tasks = yield call(_fetchTasks, resultParams);
 
         _tasks = _tasks.map((task) => {
             return {

@@ -36,6 +36,7 @@ function Tasks(props) {
 
     useEffect(() => {
         let initState = parseParams()
+        const locationSearchUrl = new URLSearchParams(location.search);
 
         if (!isMounted.current && (Object.keys(initState).length === 0)) {
             initState = savedFilters.getFor(FILTER_KEY.TASKS)
@@ -56,14 +57,18 @@ function Tasks(props) {
             filter.current = initState.filter
             initState.filter = convertFilter2Params(initState.filter)
         } else {
+            if(locationSearchUrl.has('element')){
+                initState.filter = {element: +locationSearchUrl.get('element')}
+            }
             filter.current = null
         }
 
-        initState.pathname = location.pathname
-        actions.setInitState(initState)
+        initState.pathname = location.pathname;
+
+        actions.setInitState(initState);
 
         if (!fetching) {
-            actions.getTasks()
+            actions.getTasks(locationSearchUrl.has('element') ? +locationSearchUrl.get('element') : undefined)
         }
     }, [location])
 

@@ -34,7 +34,7 @@ export const parseParams = () => {
         executor = _params.get("executor"),
         hasExecutor = _params.get("hasExecutor"),
         state = _params.get("state"),
-        process = _params.get("process")
+        process = _params.get("process");
 
     let _order = _params.get('order')
     if (_order) {
@@ -42,7 +42,7 @@ export const parseParams = () => {
         paramsData.order = {field: _order[0], direction: _order[1] ? _order[1] : GRID_SORT_DIRECTION.ACS}
     }
 
-    const _filter = convertParam2Filter({hasExecutor, executor, state, process})
+    const _filter = convertParam2Filter({hasExecutor, executor, state, process});
     if (_filter) {
         paramsData.filter = _filter
     }

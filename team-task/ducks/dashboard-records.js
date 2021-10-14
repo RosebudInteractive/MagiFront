@@ -609,14 +609,14 @@ function* getRecordsSaga() {
             fieldObj.header = [{text: el, css: 'up-headers'}];
 
             fieldObj.css = '_container element-style';
-            fieldObj.minWidth = 130;
+            fieldObj.minWidth = 80;
             fieldObj.template = function (val) {
                 const elData = val[el];
 
                 if (elData) {
-                    return `<div style="width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr ${elData.css} ">${elData.label}<div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
+                    return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr state-circle ${elData.css} "><div class="element-status-tooltip-text">${elData.label}</div><div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
                 } else {
-                    return `<div class="state-template-block-dr _unknown"></div>`
+                    return `<div class="state-template-block-dr state-circle _unknown"></div>`
                 }
             };
 
