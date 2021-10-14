@@ -19,6 +19,7 @@
 
     .webix_column
       .webix_cell
+        position: unset
         line-height: 1em !important
         display: flex
         align-items: center
@@ -35,7 +36,6 @@
           align-items: start
           padding-top: 23%
           justify-content: center
-
 
       .webix_row_select
         border-bottom: 1px solid #010101
@@ -67,6 +67,92 @@
   .process-state
     max-width: 90px
     justify-content: center
+
+  .element-hover
+    .element-status-tooltip-text
+      box-shadow: 0 1px 3px 0 dimgrey
+      background: white
+      opacity: 0
+      visibility: hidden
+      width: initial
+      padding: 9px 17px
+      color: black
+      text-align: center
+      left: 50%
+      top: 25px
+      font-size: 1em
+      border-radius: 6px
+      transition: visibility, opacity 300ms ease
+      transform: translateX(-50%)
+      position: absolute
+      z-index: 1
+
+    .element-status-tooltip-text::after
+      content: ""
+      position: absolute
+      bottom: 100%
+      left: 50%
+      margin-left: -5px
+      border-width: 5px
+      border-style: solid
+      border-color: transparent transparent white transparent
+
+    &:hover .element-status-tooltip-text
+      opacity: 1
+      visibility: visible
+
+
+  .state-template-block-dr.state-circle
+    border-radius: 50%
+    width: 14px
+    height: 14px
+    padding: 0
+
+    &._draft
+      border: 1px solid #1f4ff4
+      color: #004CBF
+      background: #004CBF
+
+    &._executing
+      border: 1px solid rgba(206, 154, 0, 0.87)
+      color: $yellow
+      background: $yellow
+
+    &._done
+      border: 1px solid rgba(16, 214, 53, 0.75)
+      color: $green
+      background: $green
+
+    &._error
+      border: 1px solid #EDF6EE70
+      color: $red
+      background: $red
+
+    &._not-ready
+      border: 1px solid #2979FF
+      color: $blue
+      background: $blue
+
+    &._part-ready
+      border: 1px solid #D1941A70
+      color: $yellow
+      background: $yellow
+
+    &._ready
+      border: 1px solid #18CC24
+      color: #01A643
+      background: #01A643
+
+    &._question
+      border: 1px solid #9c3700
+      color: #C8372D
+      background: #C8372D
+
+    &._in-progress
+      border: 1px solid #9c3700
+      color: #C8372D
+      background: #C8372D
+
   .state-template-block-dr, .process-state
     position: absolute
     font-family: Inter
@@ -125,26 +211,6 @@
     &._in-progress
       border: 1px solid #9c3700
       color: #C8372D
-
-    .state-circle
-      border-radius: 50%
-      width: 14px
-      height: 14px
-
-      &._draft
-        background-color: $blue
-
-      &._executing
-        background-color: $yellow
-
-      &._done
-        background-color: $green
-
-      &._error
-        background-color: $red
-
-
-
 
 .webix_ceil_text_row
   display: flex
@@ -255,7 +321,6 @@
   background-color: #DBE3E7 !important
   .options-menu
     opacity: 1
-
 
 .is-published
   width: 100%
