@@ -1,6 +1,6 @@
-import React, {useRef, useEffect} from "react"
-import {FormControl, InputLabel, Select, MenuItem, withStyles, TextField,} from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
+import React, {useEffect, useRef} from "react"
+import {FormControl, InputLabel, MenuItem, Select, withStyles,} from "@material-ui/core"
+import {makeStyles} from "@material-ui/core/styles"
 
 const CssFormControl = withStyles({
     root: {
@@ -120,7 +120,7 @@ export default function UiSelect(props) {
             labelId={`label-for-${id.current}`}
             id={id.current}
             label={props.label}
-            {...props.input}
+            {...{...props.input,...props}}
             variant="outlined"
             disabled={props.disabled}
             readOnly={props.readOnly}

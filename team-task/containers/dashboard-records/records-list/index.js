@@ -14,6 +14,7 @@ import {
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
+    modeSelector,
     setPublishRecordDate,
     setRecordsDateRange,
     setSelectedRecord,
@@ -37,7 +38,8 @@ const Records = (props) => {
         courses,
         unpublishedPanelOpened,
         params,
-        hasAdminRights
+        hasAdminRights,
+        mode
     } = props;
 
     const location = useLocation();
@@ -66,14 +68,14 @@ const Records = (props) => {
 
     useEffect(() => {
         const elementsFieldsExists = elementsFieldSet && Array.isArray(elementsFieldSet) && elementsFieldSet.length,
-            columns = elementsFieldsExists && !unpublishedPanelOpened
+            columns = elementsFieldsExists
                 ? [...MAIN_COLUMNS, ...elementsFieldSet, ...STATE_COLUMNS]
-                : [...MAIN_COLUMNS, ...STATE_COLUMNS]
+                : [...MAIN_COLUMNS, ...STATE_COLUMNS];
 
         if (JSON.stringify(columnFields) !== JSON.stringify(columns)) {
             setColumnFields(columns);
         }
-    }, [elementsFieldSet, unpublishedPanelOpened]);
+    }, [elementsFieldSet]);
 
     useEffect(() => {
         refreshColumns(columnFields, {needRefresh: true, recordsCount});
@@ -81,10 +83,10 @@ const Records = (props) => {
 
     useEffect(() => {
         recordsCount = dashboardRecords.length;
-        if(recordsCount > 0){
+        if (recordsCount > 0) {
             const recordsDateRangeStart = dashboardRecords[0].DateObject.format('DD.MM');
             const recordsDateRangeEnd = dashboardRecords[recordsCount - 1].DateObject.format('DD.MM');
-                actions.setRecordsDateRange(`c ${recordsDateRangeStart} по ${recordsDateRangeEnd}`);
+            actions.setRecordsDateRange(`c ${recordsDateRangeStart} по ${recordsDateRangeEnd}`);
         }
 
         setTimeout(() => {
@@ -102,9 +104,9 @@ const Records = (props) => {
         let initState = parseParams();
 
         if (!isMounted.current && (Object.keys(initState).length === 0)) {
-            initState = savedFilters.getFor(FILTER_KEY.DASHBOARD_PUBLISHED)
-            initState.replacePath = true
-            isMounted.current = true
+            initState = savedFilters.getFor(FILTER_KEY.DASHBOARD_PUBLISHED);
+            initState.replacePath = true;
+            isMounted.current = true;
         } else {
             savedFilters.setFor(FILTER_KEY.DASHBOARD_PUBLISHED, {...initState})
         }
@@ -140,10 +142,9 @@ const Records = (props) => {
             scroll: 'none',
             headerRowHeight: 40,
             rowHeight: 72,
-            // autowidth:true,
             height: 1000,
             select: true,
-            drag: 'target', //todo disable by hasAdminRights
+            drag: 'target',
             editable: false,
             scheme: {
                 $change: function (item) {
@@ -152,11 +153,11 @@ const Records = (props) => {
                         resultCss += " even-record";
                     }
 
-                    if(item.IsEndOfWeek){
+                    if (item.IsEndOfWeek) {
                         resultCss += " end-of-week-record"
                     }
 
-                    if(item.IsWeekend){
+                    if (item.IsWeekend) {
                         resultCss += " weekend"
                     }
 
@@ -165,34 +166,49 @@ const Records = (props) => {
             },
             columns: [],
             on: {
-                onItemClick: function(data) {
+                onItemClick: function (data) {
                     const item = this.getItem(data.row);
 
                     actions.setSelectedRecord(item)
                 },
                 onItemDblClick: function (data) {
-                    if(!hasAdminRights){
+                    if (!hasAdminRights) {
                         return;
                     }
-                    if (data.column === 'PubDate') {
-                        const item = this.getItem(data.row);
 
-                        if (item && item.CourseId && item.LessonId) {
-                            props.openModalOnPublication();
+                    const item = this.getItem(data.row);
+
+                    if (data.column === 'PubDate') {
+                        if ((item && item.CourseId && item.LessonId) && hasAdminRights) {
+                            if (hasAdminRights) {
+                                props.openModalOnPublication();
+                            } else {
+                                if (((item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id))) {
+                                    props.openModalOnPublication();
+                                }
+                            }
                         }
                     }
 
                     if (data.column === 'ProcessState' && (hasAdminRights || hasSupervisorRights)) {
-                        const item = this.getItem(data.row);
-
-
-                        console.log(item)
                         if (item && item.ProcessId) {
-                            if(hasAdminRights){
+                            if (hasAdminRights) {
                                 window.open(`/pm/process/${item.ProcessId}`, '_blank');
                             } else {
-                                if(item.Supervisor.Id === user.Id){
+                                if ((item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id)) {
                                     window.open(`/pm/process/${item.ProcessId}`, '_blank');
+                                }
+                            }
+                        }
+                    }
+
+                    if (item.ElementFields && item.ElementFields.includes(data.column)) {
+                        if (item[data.column] && item[data.column].elementId) {
+                            if (hasAdminRights) {
+                                window.open(`/pm/tasks?element=${item[data.column].elementId}`)
+                            } else {
+                                if (item[data.column].supervisorId && item[data.column].supervisorId === user.Id) {
+                                    window.open(`/pm/tasks?element=${item[data.column].elementId}`)
                                 }
                             }
                         }
@@ -204,30 +220,29 @@ const Records = (props) => {
 
                     scrollPosition = window.scrollY;
 
-                        actions.addToDisplayedRecords(toItem.id, {
-                            IsEven: toItem.IsEven,
-                            PubDate: toItem.PubDate,
-                            IsWeekend: toItem.IsWeekend,
-                            DateObject: toItem.DateObject,
-                            IsEndOfWeek: toItem.IsEndOfWeek,
-                            CourseName: fromItem.CourseName,
-                            LessonId: fromItem.LessonId,
-                            CourseId: fromItem.CourseId,
-                            Week: toItem.Week,
-                            LessonNum: fromItem.LessonNum,
-                            CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
-                            LessonName: fromItem.LessonName,
-                            Elements: [],
-                            IsPublished: null,
-                            ProcessId: null,
-                            ProcessState: null
-                        });
-
+                    actions.addToDisplayedRecords(toItem.id, {
+                        IsEven: toItem.IsEven,
+                        PubDate: toItem.PubDate,
+                        IsWeekend: toItem.IsWeekend,
+                        DateObject: toItem.DateObject,
+                        IsEndOfWeek: toItem.IsEndOfWeek,
+                        CourseName: fromItem.CourseName,
+                        LessonId: fromItem.LessonId,
+                        CourseId: fromItem.CourseId,
+                        Week: toItem.Week,
+                        LessonNum: fromItem.LessonNum,
+                        CourseLessonName: [fromItem.CourseName, fromItem.LessonName],
+                        LessonName: fromItem.LessonName,
+                        Elements: [],
+                        IsPublished: null,
+                        ProcessId: null,
+                        ProcessState: null
+                    });
 
                     return false;
                 },
             },
-            onClick: { },
+            onClick: {},
         }
     }, [columnFields, hasAdminRights]);
 
@@ -239,6 +254,7 @@ const Records = (props) => {
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
+        params.viewMode = mode;
         actions.applyFilter(params)
     };
 
@@ -275,7 +291,8 @@ const mapState2Props = (state) => {
         courses: courseOptionsUnpublishedFilter(state),
         params: paramsSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        user: userSelector(state)
+        user: userSelector(state),
+        mode: modeSelector(state)
     }
 };
 

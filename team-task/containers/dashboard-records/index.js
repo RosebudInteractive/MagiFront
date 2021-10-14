@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useCallback, useEffect, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
@@ -13,6 +13,7 @@ import {
     getDashboardUnpublishedLessons,
     getUnpublishedRecords,
     modalPublishIsOnSelector,
+    modeSelector,
     openModalDndToPublish,
     selectedRecordSelector,
     setPublishRecordDate,
@@ -26,9 +27,10 @@ import {useHistory} from "react-router-dom";
 import Modal from "../../components/modal";
 import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
+import {applyFilter, paramsSelector, setInitState} from "tt-ducks/route";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, dateRange} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, dateRange, vMode, params} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
 
@@ -48,8 +50,26 @@ function DashboardRecords(props) {
         setPanelOpened(panelOpened);
     };
 
+    const applyViewMode = useCallback((mode) => {
+        const newUrlParams = new URLSearchParams(params);
+        const paramsObject = {};
+
+        if(newUrlParams.has('st_date') && newUrlParams.has('fin_date')){
+            paramsObject.st_date = newUrlParams.get('st_date');
+            paramsObject.fin_date = newUrlParams.get('fin_date');
+        }
+
+        if(newUrlParams.has('course')){
+            paramsObject.course = newUrlParams.get('course');
+        }
+
+        paramsObject.viewMode = mode;
+
+        actions.applyFilter(paramsObject);
+    }, [params]);
 
     const changeMode = (mode) => {
+        applyViewMode(mode);
         actions.changeViewMode(mode);
     };
 
@@ -64,7 +84,7 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode}/>
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode} mode={vMode}/>
 
             <div className="dashboard-body">
                 <div className="unpublished-records">
@@ -98,7 +118,9 @@ const mapState2Props = (state) => {
         sideBarMenuVisible: sideBarMenuVisible(state),
         modalPublishOn: modalPublishIsOnSelector(state),
         selectedRecord: selectedRecordSelector(state),
-        dateRange: displayRecordsDateRangeString(state)
+        dateRange: displayRecordsDateRangeString(state),
+        vMode: modeSelector(state),
+        params: paramsSelector(state)
     }
 };
 
@@ -115,6 +137,8 @@ const mapDispatch2Props = (dispatch) => {
             changePublishRecordDate,
             setPublishRecordDate,
             getCourseFilterOptions,
+            setInitState,
+            applyFilter
         }, dispatch)
     }
 };
