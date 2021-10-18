@@ -1,7 +1,3 @@
-/**
- * Created by levan.kiknadze on 05/11/2017.
- */
-
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
@@ -22,7 +18,7 @@ const { getTimeStr, buildLogString } = require('./utils');
 
 const PRODUCT_CODE = "ProtoOne";
 const VERSION_CODE = "1.0.0.1";
-const BUILD_NUM = 42;
+const BUILD_NUM = 43;
 
 //bld.initDatabase()
 function showSysInfo() {

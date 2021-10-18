@@ -849,7 +849,7 @@ exports.Payment = class Payment extends DbObject {
                         if (paidCourses.length > 0) {
                             if (!isRefund)
                                 for (let i = 0; i < paidCourses.length; i++)
-                                    await UsersService().insBookmark(user.Id, paidCourses[i]);
+                                    await UsersService().insBookmark(user.Id, paidCourses[i], undefined, { dbOptions: { userId: dbOpts.userId } });
                             let data = {};
                             data[isRefund ? "deleted" : "added"] = paidCourses;
                             await UsersCache().paidCourses(user.Id, data, dbOpts);
@@ -1133,7 +1133,7 @@ exports.Payment = class Payment extends DbObject {
                         }
                         if (giftCourses.length > 0) {
                             for (let i = 0; i < giftCourses.length; i++)
-                                await UsersService().insBookmark(invoiceData.UserId, giftCourses[i]);
+                                await UsersService().insBookmark(invoiceData.UserId, giftCourses[i], undefined, { dbOptions: { userId: dbOpts.userId } });
                             await UsersCache().giftCourses(invoiceData.UserId,
                                 { added: giftCourses }, data.Promo.Id, data.Promo.PromoSum, dbOpts);
                             if (opts.user){

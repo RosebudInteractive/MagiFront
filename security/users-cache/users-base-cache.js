@@ -13,6 +13,9 @@ const { DbObject } = require('../../database/db-object');
 const { HttpError } = require('../../errors/http-error');
 const { HttpCode } = require("../../const/http-codes");
 const { AccessRights } = require('../access-rights');
+const { buildLogString } = require('../../utils');
+const { ApplicationType, NotificationType,
+    NotifDeliveryType, NotificationTopicType, AllowedNotifDelivery } = require('../../services/notification/const');
 
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
@@ -94,6 +97,18 @@ const GET_SN_PROFILE_MYSQL =
     "select`UserId` from `SNetProfile`\n" +
     "where `ProviderId` = <%= providerId %> and `Identifier` = '<%= identifier %>'";
 
+const GET_NOTIF_CONFIG_MSSQL =
+    "select n.[ItemId]\n" +
+    "from [UserNotification] n\n" +
+    "  join [AllowedNotifDelivery] a on a.[Id] = n.[ItemId]\n" +
+    "where n.[UserId] = <%= id %>";
+
+const GET_NOTIF_CONFIG_MYSQL =
+    "select n.`ItemId`\n" +
+    "from `UserNotification` n\n" +
+    "  join `AllowedNotifDelivery` a on a.`Id` = n.`ItemId`\n" +
+    "where n.`UserId` = <%= id %>";
+
 const USER_USERROLE_EXPRESSION = {
     expr: {
         model: {
@@ -106,6 +121,18 @@ const USER_USERROLE_EXPRESSION = {
                 }
             ]
         }
+    }
+};
+
+const USER_DEVICE_EXPRESSION = {
+    dataObject: {
+        name: "UserDevice"
+    }
+};
+
+const USER_NOTIF_EXPRESSION = {
+    dataObject: {
+        name: "UserNotification"
     }
 };
 
@@ -542,6 +569,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         let root_obj;
         let user = null;
         let dbopts = options || {};
+        let is_device_modified = false;
+        let is_notif_modified = false;
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -559,6 +588,16 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
                 let exp_filtered = user_data.canEditRole &&
                     user_data.alter && user_data.alter.PData ? Object.assign({}, USER_USERROLE_EXPRESSION) : { expr: { model: { name: "User" } } };
+                if (user_data.alter && user_data.alter.device) {
+                    if (!exp_filtered.expr.model.childs)
+                        exp_filtered.expr.model.childs = [];
+                    exp_filtered.expr.model.childs.push(_.cloneDeep(USER_DEVICE_EXPRESSION));
+                }
+                if (user_data.alter && user_data.alter.notifications) {
+                    if (!exp_filtered.expr.model.childs)
+                        exp_filtered.expr.model.childs = [];
+                    exp_filtered.expr.model.childs.push(_.cloneDeep(USER_NOTIF_EXPRESSION));
+                }
                 exp_filtered.expr.predicate = predicate.serialize(true);
                 this._db._deleteRoot(predicate.getRoot());
 
@@ -589,7 +628,64 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             if (editableFields[key]) {
                                 user[this._genGetterName(key)](user_data.alter[key]);
                             }
-                        };
+                        }
+                        if (user_data.alter.device && user_data.alter.device.devId) {
+                            let device = user_data.alter.device;
+                            let type_id = ApplicationType[device.type];
+                            if (device.devId && type_id && device.token) {
+                                let root_dev = user.getDataRoot("UserDevice");
+                                let col_dev = root_dev.getCol("DataElements");
+                                let dev_obj = null;
+                                let devId = device.devId;
+                                for (let i = 0; i < col_dev.count(); i++) {
+                                    let elem = col_dev.get(i);
+                                    if ((elem.devId() === devId) && (elem.appTypeId() === type_id)) {
+                                        dev_obj = elem;
+                                        break;
+                                    }
+                                }
+                                is_device_modified = true;
+                                if (dev_obj) {
+                                    is_device_modified = dev_obj.token() !== device.token;
+                                    dev_obj.token(device.token)
+                                }
+                                else
+                                    await root_dev.newObject(
+                                        { fields: { AppTypeId: type_id, DevId: devId, Token: device.token } }, dbopts)
+                            }
+                            else
+                                throw new Error(`UsersBaseCache::editUser: Invalid "device" section: ${JSON.stringify(device)}.`);
+                        }
+                        if (user_data.alter.notifications) {
+                            let root_notif = user.getDataRoot("UserNotification");
+                            let col_notif = root_notif.getCol("DataElements");
+                            let notif_list = {};
+                            for (let i = 0; i < col_notif.count(); i++){
+                                let elem = col_notif.get(i);
+                                notif_list[elem.itemId()] = elem;
+                            }
+                            for (let notif_key in user_data.alter.notifications) {
+                                let delivery = user_data.alter.notifications[notif_key];
+                                for (let delivery_key in delivery) {
+                                    if (delivery[delivery_key] === true) {
+                                        let item_id = AllowedNotifDelivery[notif_key] &&
+                                            AllowedNotifDelivery[notif_key][delivery_key] ? AllowedNotifDelivery[notif_key][delivery_key] : null;
+                                        if (item_id) {
+                                            if (!notif_list[item_id]) {
+                                                is_notif_modified = true;
+                                                await root_notif.newObject({ fields: { ItemId: item_id } }, dbopts)
+                                            }
+                                            else
+                                                delete notif_list[item_id];
+                                        }
+                                    }
+                                }
+                            }
+                            for (let key in notif_list) {
+                                is_notif_modified = true;
+                                col_notif._del(notif_list[key]);
+                            }
+                        }
                         if (user_data.canEditRole && user_data.alter.PData) {
                             let newPdata = _.cloneDeep(user_data.alter.PData);
                             let roles = _.cloneDeep(user_data.alter.PData.roles)
@@ -637,6 +733,19 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     }
                     return rc.then(() => {
                         return root_obj.save(dbopts)
+                            .then(() => {
+                                if (is_notif_modified || is_device_modified) {
+                                    let notifService = this.getService('notifications', true);
+                                    if (notifService) {
+                                        let options = { dbOptions: dbopts };
+                                        options.new_only = is_device_modified && (!is_notif_modified);
+                                        notifService.updateNotifications(id, options) // We should't wait here
+                                            .catch(err => {
+                                                console.error(buildLogString(`DbUser::insBookmark:toggleBookmark: ${err}`));
+                                            });
+                                    }
+                                }
+                            })
                             .then(() => {
                                 return this.getUserInfoById(user.id(), true)
                             });
@@ -1052,6 +1161,28 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 }
                 return rc;
             });
+    }
+
+    async getNotifInfo(userId) {
+        let info = {};
+        let list = {};
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_NOTIF_CONFIG_MYSQL)({ id: userId }),
+                mssql: _.template(GET_NOTIF_CONFIG_MSSQL)({ id: userId })
+            }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            for (let i = 0; i < result.detail.length; i++)
+                list[result.detail[i].ItemId] = true;
+        };
+        for (let key in AllowedNotifDelivery) {
+            let type = info[key] = {};
+            let ctype = AllowedNotifDelivery[key];
+            for (let key2 in ctype)
+                type[key2] = list[ctype[key2]] ? true : false;
+        }
+        return info;
     }
 
     checkToken(token, isNew, options) {
