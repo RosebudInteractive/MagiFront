@@ -24,7 +24,8 @@ export default function DashboardRecordsHeader(props) {
                                     {name: 'Компактный', id: 2}]}
                         placeholder="Режим отображения"
                         label={"Режим отображения"}
-                        required={true}/>
+                        required={true}
+                />
             </div>
         </div>
     </div>
