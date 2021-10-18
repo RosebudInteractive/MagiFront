@@ -50,6 +50,7 @@ const { setupProcesses } = require('./pm');
 const { setupTimelines } = require('./timeline');
 const { setupEvents } = require('./event');
 const { setupRoles } = require('./role');
+const { setupNotifications } = require('./notification');
 const { buildLogString } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams, ImportTest, ImportTestParams } = require('../database/import');
@@ -227,6 +228,7 @@ function setupAPI(express, app) {
     setupEvents(app);
     setupTimelines(app);
     setupRoles(app);
+    setupNotifications(app);
     
     //
     // Common API options

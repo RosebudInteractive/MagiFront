@@ -15,6 +15,7 @@ const { AccessRights } = require('../security/access-rights');
 const { EpisodeContentType } = require('../const/sql-req-common');
 const { ProductService } = require('./db-product');
 const { parseInt } = require('lodash');
+const { buildLogString } = require('../utils');
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
@@ -438,6 +439,12 @@ const GET_USER_LIST_MYSQL =
     "  join `UserRole` ur on ur.`UserId` = s.`Id`\n" +
     "  join `Role` r on r.`Id` = ur.`RoleId`";
 
+const GET_COURSE_ID_BY_URL_MSSQL =
+    "select [Id] from [Course] where [URL] = '<%= courseUrl %>'";
+
+const GET_COURSE_ID_BY_URL_MYSQL =
+    "select `Id` from `Course` where `URL` = '<%= courseUrl %>'";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
@@ -805,10 +812,37 @@ const DbUser = class DbUser extends DbObject {
         return result;
     }
 
-    getPublic(user) {
-        return new Promise((resolve, reject) => {
-            resolve({ DisplayName: user.DisplayName, Email: user.Email });
-        });
+    async getPublic(user, options) {
+        const NOTIF_MASK = 1;
+        const SUBS_MASK = 2;
+        const ALL_MASK = NOTIF_MASK + SUBS_MASK;
+
+        let opts = _.cloneDeep(options || {});
+        let result = { DisplayName: user.DisplayName, Email: user.Email };
+        if (opts.details) {
+            let details = opts.details.split(',');
+            let mask = 0;
+            for (let i = 0; i < details.length; i++) {
+                let elem = details[i];
+                switch (elem) {
+                    case "notifications":
+                        mask = mask | NOTIF_MASK;
+                        break;
+                    case "subscription":
+                        mask = mask | SUBS_MASK;
+                        break;
+                    case "all":
+                        mask = ALL_MASK;
+                        break;
+                }
+            }
+            if (mask & NOTIF_MASK)
+                result.notifications = await this.getNotifInfo(user.Id);
+            
+            if (mask & SUBS_MASK)
+                result.subscription = await this.getSubsInfo(user.Id);
+        }
+        return result;
     }
 
     getSubsInfo(userId) {
@@ -852,6 +886,10 @@ const DbUser = class DbUser extends DbObject {
                     throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find user '" + userId + "'.");
                
             })
+    }
+
+    async getNotifInfo(userId) {
+        return this._usersCache.getNotifInfo(userId);
     }
 
     async getCoursesForSale(user, options) {
@@ -1541,9 +1579,10 @@ const DbUser = class DbUser extends DbObject {
         return result;
     }
 
-    insBookmark(userId, courseUrl, lessonUrl) {
+    insBookmark(userId, courseUrl, lessonUrl, options) {
         let isLessonBookmark = lessonUrl ? true : false;
         let opts = {};
+        let course_id = null;
         return new Promise((resolve, reject) => {
             let req = {};
             let rc;
@@ -1594,8 +1633,10 @@ const DbUser = class DbUser extends DbObject {
                         let fields = { UserId: userId };
                         if (isLessonBookmark)
                             fields.LessonCourseId = id
-                        else
+                        else {
                             fields.CourseId = id;
+                            course_id = id;
+                        }
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
@@ -1627,14 +1668,25 @@ const DbUser = class DbUser extends DbObject {
                                 }
                                 else
                                     throw res;
+                        if (course_id) {
+                            let notifService = this.getService('notifications', true);
+                            if (notifService) {
+                                notifService.toggleBookmark(userId, course_id, options) // We should't wait here
+                                    .catch(err => {
+                                        console.error(buildLogString(`DbUser::insBookmark:toggleBookmark: ${err}`));
+                                    });
+                            }
+                        }
                         return res;
                     })
             })
     }
 
-    delBookmark(userId, courseUrl, lessonUrl) {
+    delBookmark(userId, courseUrl, lessonUrl, options) {
         let isLessonBookmark = lessonUrl ? true : false;
         let opts = {};
+        let course_id = null;
+        let byUrl = false;
         return new Promise((resolve, reject) => {
             let req = {};
             if (isLessonBookmark) {
@@ -1653,20 +1705,54 @@ const DbUser = class DbUser extends DbObject {
             }
             else {
                 let { isInt, val } = this.convertToNumber(courseUrl);
-                if (isInt)
+                byUrl = !isInt;
+                if (isInt) {
                     req.dialect = {
                         mysql: _.template(DEL_COURSE_BKM_ID_MYSQL)({ userId: userId, id: val }),
                         mssql: _.template(DEL_COURSE_BKM_ID_MSSQL)({ userId: userId, id: val })
                     }
-                else
+                    course_id = val;
+                }
+                else {
                     req.dialect = {
                         mysql: _.template(DEL_COURSE_BKM_MYSQL)({ userId: userId, courseUrl: courseUrl }),
                         mssql: _.template(DEL_COURSE_BKM_MSSQL)({ userId: userId, courseUrl: courseUrl })
                     }
+                    course_id = courseUrl;
+                }
             };
             resolve($data.execSql(req, {}));
         })
             .then((result) => {
+                if (course_id) {
+                    let notifService = this.getService('notifications', true);
+                    if (notifService) {
+                        // We should't wait here
+                        new Promise(resolve => {
+                            let rc = course_id;
+                            if (byUrl) {
+                                let req = {};
+                                req.dialect = {
+                                    mysql: _.template(GET_COURSE_ID_BY_URL_MYSQL)({ courseUrl: courseUrl }),
+                                    mssql: _.template(GET_COURSE_ID_BY_URL_MSSQL)({ courseUrl: courseUrl })
+                                }
+                                rc = $data.execSql(req, {})
+                                    .then(records => {
+                                        if (records && records.detail && (records.detail.length === 1))
+                                            return records.detail[0].Id;
+                                    });
+                            }
+                            resolve(rc);
+                        })
+                            .then(id => {
+                                if (id)
+                                    return notifService.toggleBookmark(userId, id, options);
+                            })
+                            .catch(err => {
+                                console.error(buildLogString(`DbUser::delBookmark:toggleBookmark: ${err}`));
+                            });
+                    }
+                }
                 return { result: "OK" };
             })
     }
