@@ -49,6 +49,15 @@ const GET_UNPUBLISHED_LESSONS = `${prefix}/GET_UNPUBLISHED_LESSONS`;
 const SET_UNPUBLISHED_LESSONS = `${prefix}/SET_UNPUBLISHED_LESSONS`;
 const GET_PROCESS_FOR_LESSON = `${prefix}/GET_PROCESS_FOR_LESSON`;
 
+const FIELDS_SORT_OBJECT_ORDER = {
+    'Звук': 1,
+    'Транскрипт': 2,
+    'Иллюстрации': 3,
+    'Техническая стенограмма': 4,
+    'Список литературы': 5,
+    'Готовые компоненты': 6
+};
+
 
 const defaultFieldSet = new Set([]);
 
@@ -258,6 +267,11 @@ function* addToDisplayedRecordsSaga(data) {
                     ProcessId: savedRecord[0].ProcessId,
                     ProcessState: savedRecord[0].ProcessState,
                 });
+
+                const newFields = identifyElementFields(records);
+
+                yield put({type: SET_FIELDS, payload: newFields});
+
                 const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
 
                 yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
@@ -496,7 +510,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
             const objectData = {
                 IsEven: isEven,
                 PubDate: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru').format('DD MMM ddd'),
-                DateObject: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru'), //todo check it
+                DateObject: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).locale('ru'),
                 CourseId: null,
                 IsEndOfWeek: currentDate.set({hour: 0, minute: 0, second: 0, millisecond: 0}).isoWeekday() === 7,
                 IsWeekend: [6,7].includes(moment(currentDate).locale('ru').isoWeekday()),
@@ -564,62 +578,9 @@ function* getRecordsSaga() {
         yield put({type: SET_RECORDS, payload: records});
         yield put({type: SET_CHANGED_RECORDS, payload: records});
 
-        const fields = new Set();
-        const sortOrderObject = {
-            'Звук': 1,
-            'Транскрипт': 2,
-            'Иллюстрации': 3,
-            'Техническая стенограмма': 4,
-            'Список литературы': 5,
-            'Готовые компоненты': 6
-        };
-        records.forEach(rec => {
-            if (rec.Elements && Array.isArray(rec.Elements)) {
-                rec.Elements.forEach(el => fields.add(el.Name))
-            }
-        });
+        const newFields = identifyElementFields(records);
 
-        const sortedFeilds = [...fields].sort(function (a,b) {
-            if(sortOrderObject[a] !== undefined && sortOrderObject[b] !== undefined){
-                return sortOrderObject[a] - sortOrderObject[b];
-            }
-
-            if(sortOrderObject[a] === undefined && sortOrderObject[b] !== undefined){
-                return 1;
-            }
-
-            if(sortOrderObject[a] !== undefined && sortOrderObject[b] === undefined){
-                return -1;
-            }
-
-            if(sortOrderObject[a] === undefined && sortOrderObject[b] === undefined){
-                return 0
-            }
-
-        });
-
-        const fieldSet = [];
-
-        sortedFeilds.forEach((el, inx) => {
-            const fieldObj = {id: el};
-            fieldObj.header = [{text: el, css: 'up-headers'}];
-
-            fieldObj.css = '_container element-style';
-            fieldObj.minWidth = 80;
-            fieldObj.template = function (val) {
-                const elData = val[el];
-
-                if (elData) {
-                    return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr state-circle ${elData.css} "><div class="element-status-tooltip-text">${elData.label}</div><div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
-                } else {
-                    return `<div class="state-template-block-dr state-circle _unknown"></div>`
-                }
-            };
-
-            fieldSet.push(fieldObj)
-        });
-
-        yield put({type: SET_FIELDS, payload: fieldSet});
+        yield put({type: SET_FIELDS, payload: newFields});
         yield put({type: REQUEST_SUCCESS});
 
         const startDate = filter.st_date ? filter.st_date : moment().toISOString();
@@ -646,6 +607,58 @@ function* getRecordsSaga() {
 
     }
 }
+
+const identifyElementFields = (records) => {
+    const fields = new Set();
+
+    records.forEach(rec => {
+        if (rec.Elements && Array.isArray(rec.Elements)) {
+            rec.Elements.forEach(el => fields.add(el.Name))
+        }
+    });
+
+    const sortedFeilds = [...fields].sort(function (a,b) {
+        if(FIELDS_SORT_OBJECT_ORDER[a] !== undefined && FIELDS_SORT_OBJECT_ORDER[b] !== undefined){
+            return FIELDS_SORT_OBJECT_ORDER[a] - FIELDS_SORT_OBJECT_ORDER[b];
+        }
+
+        if(FIELDS_SORT_OBJECT_ORDER[a] === undefined && FIELDS_SORT_OBJECT_ORDER[b] !== undefined){
+            return 1;
+        }
+
+        if(FIELDS_SORT_OBJECT_ORDER[a] !== undefined && FIELDS_SORT_OBJECT_ORDER[b] === undefined){
+            return -1;
+        }
+
+        if(FIELDS_SORT_OBJECT_ORDER[a] === undefined && FIELDS_SORT_OBJECT_ORDER[b] === undefined){
+            return 0
+        }
+
+    });
+
+    const fieldSet = [];
+
+    sortedFeilds.forEach((el, inx) => {
+        const fieldObj = {id: el};
+        fieldObj.header = [{text: el, css: 'up-headers'}];
+
+        fieldObj.css = '_container element-style';
+        fieldObj.minWidth = 80;
+        fieldObj.template = function (val) {
+            const elData = val[el];
+
+            if (elData) {
+                return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr state-circle ${elData.css} "><div class="element-status-tooltip-text">${elData.label}</div><div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
+            } else {
+                return `<div class="state-template-block-dr state-circle _unknown"></div>`
+            }
+        };
+
+        fieldSet.push(fieldObj)
+    });
+
+    return fieldSet;
+};
 
 const setDateToPublication = ({ReadyDate, lessonId}) => {
     return fetch(`/api/pm/dashboard/lesson/${lessonId}`, {

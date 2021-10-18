@@ -112,7 +112,9 @@ export default function UiSelect(props) {
 
     useEffect(() => {
         id.current = props.id ? props.id : "ui-select-" + Math.floor(Math.random() * 10000)
-    }, [])
+    }, []);
+
+    const propsObj = props.input ? props.input : props;
 
     return <CssFormControl className={"input-field" + (props.extClass ? " " + props.extClass : "")}>
         <InputLabel id={`label-for-${id.current}`}>{props.label}</InputLabel>
@@ -120,7 +122,7 @@ export default function UiSelect(props) {
             labelId={`label-for-${id.current}`}
             id={id.current}
             label={props.label}
-            {...{...props.input,...props}}
+            {...propsObj}
             variant="outlined"
             disabled={props.disabled}
             readOnly={props.readOnly}
