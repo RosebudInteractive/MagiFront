@@ -25,6 +25,7 @@ import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
 import {hasAdminRights, hasSupervisorRights, userSelector} from "tt-ducks/auth";
 import savedFilters, {FILTER_KEY} from "../../../tools/saved-filters";
+import moment from 'moment'
 
 let recordsCount = 0,
     scrollPosition = 0;
@@ -219,6 +220,10 @@ const Records = (props) => {
                     const fromItem = context.from.getItem(context.source[0]);
 
                     scrollPosition = window.scrollY;
+
+                    if(toItem.DateObject.isBefore(moment(), 'day')){
+                        return false;
+                    }
 
                     actions.addToDisplayedRecords(toItem.id, {
                         IsEven: toItem.IsEven,
