@@ -27,6 +27,7 @@ import Modal from "../../components/modal";
 import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
 import {applyFilter, filterSelector, paramsSelector, setInitState} from "tt-ducks/route";
+import {setDashboardViewMode} from 'tt-ducks/route'
 import moment from "moment";
 
 function DashboardRecords(props) {
@@ -67,26 +68,26 @@ function DashboardRecords(props) {
         setDateRange(`с ${stDate} по ${finDate}`);
     }, [filter]);
 
-    const applyViewMode = useCallback((mode) => {
-        const newUrlParams = new URLSearchParams(params);
-        const paramsObject = {};
-
-        if (newUrlParams.has('st_date') && newUrlParams.has('fin_date')) {
-            paramsObject.st_date = newUrlParams.get('st_date');
-            paramsObject.fin_date = newUrlParams.get('fin_date');
-        }
-
-        if (newUrlParams.has('course')) {
-            paramsObject.course = newUrlParams.get('course');
-        }
-
-        paramsObject.viewMode = mode;
-
-        actions.applyFilter(paramsObject);
-    }, [params]);
+    // const applyViewMode = useCallback((mode) => {
+    //     const newUrlParams = new URLSearchParams(params);
+    //     const paramsObject = {};
+    //
+    //     if (newUrlParams.has('st_date') && newUrlParams.has('fin_date')) {
+    //         paramsObject.st_date = newUrlParams.get('st_date');
+    //         paramsObject.fin_date = newUrlParams.get('fin_date');
+    //     }
+    //
+    //     if (newUrlParams.has('course')) {
+    //         paramsObject.course = newUrlParams.get('course');
+    //     }
+    //
+    //     paramsObject.viewMode = mode;
+    //
+    //     actions.applyFilter(paramsObject);
+    // }, [params]);
 
     const changeMode = (mode) => {
-        applyViewMode(mode);
+        actions.setDashboardViewMode(mode);
         actions.changeViewMode(mode);
     };
 
@@ -156,7 +157,8 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             getCourseFilterOptions,
             setInitState,
-            applyFilter
+            applyFilter,
+            setDashboardViewMode
         }, dispatch)
     }
 };

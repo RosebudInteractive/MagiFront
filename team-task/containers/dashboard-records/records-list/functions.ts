@@ -1,8 +1,10 @@
 import $ from 'jquery';
 import moment from 'moment';
-import {GRID_SORT_DIRECTION} from '../../../constants/common';
-import {DASHBOARD_PROCESS_STATE, PROCESS_STATE} from '../../../constants/states';
-import {FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,} from '../../../@types/common';
+import { GRID_SORT_DIRECTION } from '../../../constants/common';
+import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
+import {
+  FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
+} from '../../../@types/common';
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
   .map((state) => ({ label: state.label, value: state.value }));
@@ -43,7 +45,8 @@ export const getFilterConfig = (filter: FilterValue, courseOptions = []): Filter
 
 type Params = {
   order?: { field: string, direction: string };
-  filter?: any
+  filter?: any,
+  viewMode?: number,
 };
 
 type FilterParams = {
@@ -55,7 +58,7 @@ type FilterParams = {
 
 const convertParam2Filter = (data : FilterParams): FilterValue | null => {
   const {
-    Course, DateRange
+    Course, DateRange,
   } = data;
 
   const dateRangeEmpty = !DateRange
@@ -117,6 +120,10 @@ export const parseParams = () => {
   if (filter) {
     paramsData.filter = filter;
   }
+
+  const viewMode = searchParams.get('viewMode');
+
+  if (viewMode) { paramsData.viewMode = +viewMode; }
 
   return paramsData;
 };

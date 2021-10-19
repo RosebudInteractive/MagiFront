@@ -8,6 +8,7 @@ import {push} from "react-router-redux/src";
 import $ from "jquery";
 import {GET_TASKS_FAIL, GET_TASKS_SUCCESS} from "tt-ducks/tasks";
 import {GET_PROCESSES_FAIL, GET_PROCESSES_SUCCESS} from "tt-ducks/processes";
+import equal from 'fast-deep-equal'
 
 /**
  * Constants
@@ -20,13 +21,17 @@ const SET_PATHNAME = `${prefix}/SET_PATHNAME`
 
 const APPLY_FILTER_REQUEST = `${prefix}/APPLY_FILTER_REQUEST`
 const APPLY_FILTER = `${prefix}/APPLY_FILTER`
-const APPLY_FILTER_SILENTLY = `${prefix}/APPLY_FILTER_SILENTLY`
+const CLEAR_FILTER = `${prefix}/CLEAR_FILTER`
 
 const SET_GRID_SORT_ORDER_REQUEST = `${prefix}/SET_GRID_SORT_ORDER_REQUEST`
 const SET_GRID_SORT_ORDER = `${prefix}/SET_GRID_SORT_ORDER`
+const CLEAR_GRID_SORT_ORDER = `${prefix}/CLEAR_GRID_SORT_ORDER`
 
 const SET_ACTIVE_TASK_ID_REQUEST = `${prefix}/SET_ACTIVE_TASK_ID_REQUEST`
 const SET_ACTIVE_TASK_ID = `${prefix}/SET_ACTIVE_TASK_ID`
+
+const SET_DASHBOARD_VIEW_MODE_REQUEST = `${prefix}/SET_DASHBOARD_VIEW_MODE_REQUEST`
+const SET_DASHBOARD_VIEW_MODE = `${prefix}/SET_DASHBOARD_VIEW_MODE`
 
 const BUILD_LOCATION_REQUEST = `${prefix}/BUILD_LOCATION_REQUEST`
 const BUILD_LOCATION = `${prefix}/BUILD_LOCATION`
@@ -44,7 +49,8 @@ export const ReducerRecord = Record({
     order: "",
     filter: {},
     refreshGuard: false,
-    activeTask: null,
+    custom: {}
+
 })
 
 
@@ -56,21 +62,55 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_PATHNAME:
             return state
                 .set("path", payload)
-                .set("order", "")
-                .set("filter", {})
-                .set("activeTask", null);
+                .set("custom", {})
 
         case SET_GRID_SORT_ORDER:
             return state
                 .set("order", payload);
 
+        case CLEAR_GRID_SORT_ORDER:
+            return state
+                .set("order", '');
+
         case SET_ACTIVE_TASK_ID:
             return state
-                .set("activeTask", payload);
+                .update('custom', (custom) => {
+                    if (payload) {
+                        return {...custom, activeTask: payload}
+                    } else {
+                        if (custom.activeTask) {
+                            const result = {...custom};
+                            delete result['activeTask'];
+                            return result
+                        } else {
+                            return custom
+                        }
+                    }
+                });
+
+        case SET_DASHBOARD_VIEW_MODE:
+            return state
+                .update('custom', (custom) => {
+                    if (payload) {
+                        return {...custom, viewMode: payload}
+                    } else {
+                        if (custom.viewMode) {
+                            const result = {...custom};
+                            delete result['viewMode'];
+                            return result
+                        } else {
+                            return custom
+                        }
+                    }
+                });
 
         case APPLY_FILTER:
             return state
                 .set("filter", payload);
+
+        case CLEAR_FILTER:
+            return state
+                .set("filter", {});
 
         case BUILD_LOCATION:
             return state
@@ -95,22 +135,18 @@ export default function reducer(state = new ReducerRecord(), action) {
 const stateSelector = state => state[moduleName]
 const pathSelector = createSelector(stateSelector, state => state.path)
 const refreshGuardSelector = createSelector(stateSelector, state => state.refreshGuard)
-export const activeTaskIdSelector = createSelector(stateSelector, state => state.activeTask)
+const customSelector = createSelector(stateSelector, state => state.custom)
+export const activeTaskIdSelector = createSelector(customSelector, custom => custom.activeTask)
 export const paramsSelector = createSelector(stateSelector, (state) => {
     const params = {...state.filter},
         order = state.order;
 
     if (order) { params.order = order }
-    if (state.activeTask) { params.activeTask = state.activeTask }
 
-    return  $.param(params);
+    return  $.param({...params, ...state.custom});
 });
-
-//get non-parametrized filter
-export const filterSelector = createSelector(stateSelector, (state) => {
-    const params = {...state.filter};
-    return params;
-});
+const orderSelector = createSelector(stateSelector, state => state.order);
+export const filterSelector = createSelector(stateSelector, state => state.filter);
 
 
 /**
@@ -130,6 +166,10 @@ export const setGridSortOrder = (order: GridSortOrder) => {
 
 export const setActiveTaskId = (taskId: number) => {
     return {type: SET_ACTIVE_TASK_ID_REQUEST, payload: taskId}
+}
+
+export const setDashboardViewMode = (viewMode: number) => {
+    return {type: SET_DASHBOARD_VIEW_MODE_REQUEST, payload: viewMode}
 }
 
 export const buildLocation = (replace: boolean = false) => {
@@ -154,6 +194,7 @@ export const saga = function* () {
         takeEvery(APPLY_FILTER_REQUEST, applyFilterSaga),
         takeEvery(SET_GRID_SORT_ORDER_REQUEST, setGridSortOrderSaga),
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
+        takeEvery(SET_DASHBOARD_VIEW_MODE_REQUEST, setDashboardViewModeSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
         takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga),
     ])
@@ -198,6 +239,16 @@ function* setActiveTaskIdSaga(data) {
     yield put({type: CLEAR_GUARD})
 }
 
+function* setDashboardViewModeSaga(data) {
+    const guard = yield select(refreshGuardSelector)
+
+    if (guard) return
+
+    yield put({type: SET_DASHBOARD_VIEW_MODE, payload: data.payload})
+    yield put(buildLocation())
+    yield put({type: CLEAR_GUARD})
+}
+
 function* buildLocationSaga() {
     const path = yield select(pathSelector),
         params = yield select(paramsSelector)
@@ -209,24 +260,39 @@ function* buildLocationSaga() {
 }
 
 function* setInitStateSaga({payload}) {
-
     if (payload.pathname) {
         yield put({type: SET_PATHNAME, payload: payload.pathname})
     }
 
     if (payload.filter) {
-        yield put({ type: APPLY_FILTER, payload: {...payload.filter} })
+        const currentFilter = yield select(filterSelector)
+        if (!equal(currentFilter, payload.filter)) {
+            yield put({ type: APPLY_FILTER, payload: {...payload.filter} })
+        }
+    } else {
+        yield put({ type: CLEAR_FILTER })
     }
+
 
     if (payload.activeTask) {
         yield put({type: SET_ACTIVE_TASK_ID, payload: payload.activeTask})
     }
 
-    if (payload.order) {
-        const _sort: GridSortOrder = payload.order,
-            _value = _sort.direction === GRID_SORT_DIRECTION.ACS ? _sort.field : `${_sort.field},${_sort.direction}`
+    if (payload.viewMode) {
+        yield put({type: SET_DASHBOARD_VIEW_MODE, payload: payload.viewMode})
+    }
 
-        yield put({type: SET_GRID_SORT_ORDER, payload: _value})
+    if (payload.order) {
+        const currentOrder = yield select(orderSelector);
+
+        const sort: GridSortOrder = payload.order,
+            value = sort.direction === GRID_SORT_DIRECTION.ACS ? sort.field : `${sort.field},${sort.direction}`
+
+        if (currentOrder !== value) {
+            yield put({type: SET_GRID_SORT_ORDER, payload: value})
+        }
+    } else {
+        yield put({ type: CLEAR_GRID_SORT_ORDER })
     }
 
     if (payload.replacePath) {
