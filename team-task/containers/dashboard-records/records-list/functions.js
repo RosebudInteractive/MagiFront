@@ -38,7 +38,7 @@ export const getFilterConfig = (filter, courseOptions = []) => [
     // },
 ];
 const convertParam2Filter = (data) => {
-    const { Course, DateRange } = data;
+    const { Course, DateRange, } = data;
     const dateRangeEmpty = !DateRange
         || (Array.isArray(DateRange) && DateRange.every((item) => !item));
     const isEmptyData = !(Course) && dateRangeEmpty;
@@ -87,6 +87,10 @@ export const parseParams = () => {
     });
     if (filter) {
         paramsData.filter = filter;
+    }
+    const viewMode = searchParams.get('viewMode');
+    if (viewMode) {
+        paramsData.viewMode = +viewMode;
     }
     return paramsData;
 };

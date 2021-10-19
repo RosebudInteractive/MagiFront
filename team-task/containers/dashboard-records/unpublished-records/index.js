@@ -16,7 +16,7 @@ import {
 } from "tt-ducks/dashboard-records";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
-import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
@@ -199,7 +199,6 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state),
         courses: courseOptionsUnpublishedFilter(state),
-        filterSelector: filterSelector(state),
         allUnpublishedRecords: unpublishedLessons(state),
         hasAdminRights: hasAdminRights(state),
     }
