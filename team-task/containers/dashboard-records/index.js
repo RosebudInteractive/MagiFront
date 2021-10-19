@@ -7,7 +7,6 @@ import {
     changePublishRecordDate,
     changeViewMode,
     closeModalDndToPublish,
-    displayRecordsDateRangeString,
     displayRecordsSelector,
     getCourseFilterOptions,
     getDashboardUnpublishedLessons,
@@ -27,12 +26,15 @@ import {useHistory} from "react-router-dom";
 import Modal from "../../components/modal";
 import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
-import {applyFilter, paramsSelector, setInitState} from "tt-ducks/route";
+import {applyFilter, filterSelector, paramsSelector, setInitState} from "tt-ducks/route";
+import {setDashboardViewMode} from 'tt-ducks/route'
+import moment from "moment";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, dateRange, vMode, params} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, vMode, params, filter} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
+    const [dateRange, setDateRange] = useState('');
 
     const history = useHistory();
 
@@ -50,26 +52,42 @@ function DashboardRecords(props) {
         setPanelOpened(panelOpened);
     };
 
-    const applyViewMode = useCallback((mode) => {
-        const newUrlParams = new URLSearchParams(params);
-        const paramsObject = {};
+    useEffect(() => {
+        let finDate, stDate;
 
-        if(newUrlParams.has('st_date') && newUrlParams.has('fin_date')){
-            paramsObject.st_date = newUrlParams.get('st_date');
-            paramsObject.fin_date = newUrlParams.get('fin_date');
+        if (filter.st_date && filter.fin_date) {
+            stDate = moment(filter.st_date).locale('ru').format('DD.MM.YY');
+            finDate = moment(filter.fin_date).locale('ru').format('DD.MM.YY');
+        } else {
+            const nowDate = moment().locale('ru');
+
+            stDate = nowDate.format('DD.MM.YY');
+            finDate = nowDate.add(1, 'month').format('DD.MM.YY') //1 month is default value when filter is not used
         }
 
-        if(newUrlParams.has('course')){
-            paramsObject.course = newUrlParams.get('course');
-        }
+        setDateRange(`с ${stDate} по ${finDate}`);
+    }, [filter]);
 
-        paramsObject.viewMode = mode;
-
-        actions.applyFilter(paramsObject);
-    }, [params]);
+    // const applyViewMode = useCallback((mode) => {
+    //     const newUrlParams = new URLSearchParams(params);
+    //     const paramsObject = {};
+    //
+    //     if (newUrlParams.has('st_date') && newUrlParams.has('fin_date')) {
+    //         paramsObject.st_date = newUrlParams.get('st_date');
+    //         paramsObject.fin_date = newUrlParams.get('fin_date');
+    //     }
+    //
+    //     if (newUrlParams.has('course')) {
+    //         paramsObject.course = newUrlParams.get('course');
+    //     }
+    //
+    //     paramsObject.viewMode = mode;
+    //
+    //     actions.applyFilter(paramsObject);
+    // }, [params]);
 
     const changeMode = (mode) => {
-        applyViewMode(mode);
+        actions.setDashboardViewMode(mode);
         actions.changeViewMode(mode);
     };
 
@@ -84,7 +102,8 @@ function DashboardRecords(props) {
 
     return (
         <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction} onChangeMode={changeMode} mode={vMode}/>
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction}
+                                    onChangeMode={changeMode} mode={vMode}/>
 
             <div className="dashboard-body">
                 <div className="unpublished-records">
@@ -118,7 +137,7 @@ const mapState2Props = (state) => {
         sideBarMenuVisible: sideBarMenuVisible(state),
         modalPublishOn: modalPublishIsOnSelector(state),
         selectedRecord: selectedRecordSelector(state),
-        dateRange: displayRecordsDateRangeString(state),
+        filter: filterSelector(state),
         vMode: modeSelector(state),
         params: paramsSelector(state)
     }
@@ -138,7 +157,8 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             getCourseFilterOptions,
             setInitState,
-            applyFilter
+            applyFilter,
+            setDashboardViewMode
         }, dispatch)
     }
 };

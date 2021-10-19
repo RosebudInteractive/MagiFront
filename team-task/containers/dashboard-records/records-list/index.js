@@ -19,12 +19,13 @@ import {
     setRecordsDateRange,
     setSelectedRecord,
 } from "tt-ducks/dashboard-records";
-import {applyFilter, paramsSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import './records-list.sass'
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
 import {hasAdminRights, hasSupervisorRights, userSelector} from "tt-ducks/auth";
 import savedFilters, {FILTER_KEY} from "../../../tools/saved-filters";
+import moment from 'moment'
 
 let recordsCount = 0,
     scrollPosition = 0;
@@ -37,9 +38,9 @@ const Records = (props) => {
         resizeTrigger,
         courses,
         unpublishedPanelOpened,
-        params,
+        filterValue,
         hasAdminRights,
-        mode
+        mode,
     } = props;
 
     const location = useLocation();
@@ -131,7 +132,7 @@ const Records = (props) => {
 
     useEffect(() => {
         actions.getRecords();
-    }, [params]);
+    }, [filterValue]);
 
     const GRID_CONFIG = useMemo(() => {
         return {
@@ -220,6 +221,10 @@ const Records = (props) => {
 
                     scrollPosition = window.scrollY;
 
+                    if(toItem.DateObject.isBefore(moment(), 'day')){
+                        return false;
+                    }
+
                     actions.addToDisplayedRecords(toItem.id, {
                         IsEven: toItem.IsEven,
                         PubDate: toItem.PubDate,
@@ -254,7 +259,6 @@ const Records = (props) => {
     const _onApplyFilter = (filterData) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
-        params.viewMode = mode;
         actions.applyFilter(params)
     };
 
@@ -279,7 +283,7 @@ const Records = (props) => {
             </div>
         </React.Fragment>
     )
-}
+};
 
 const mapState2Props = (state) => {
     return {
@@ -289,10 +293,10 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         elementsFieldSet: elementsFieldSetSelector(state),
         courses: courseOptionsUnpublishedFilter(state),
-        params: paramsSelector(state),
+        filterValue: filterSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
         user: userSelector(state),
-        mode: modeSelector(state)
+        mode: modeSelector(state),
     }
 };
 

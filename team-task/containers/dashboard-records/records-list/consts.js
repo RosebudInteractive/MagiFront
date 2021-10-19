@@ -13,7 +13,7 @@ export const MAIN_COLUMNS = [
                 const day = pubDate[0];
                 const month = pubDate[1];
                 const dayOfWeek = pubDate[2];
-                return `<div class="pubdate-cell">${day} ${month}<div class="${val.IsWeekend ? 'weekend' : ''}">${dayOfWeek}</div></div>`;
+                return `<div class="pubdate-cell ${val.IsWeekend ? 'weekend' : ''}">${day} ${month}<div >${dayOfWeek}</div></div>`;
             }
             return '';
         },
@@ -48,15 +48,15 @@ export const MAIN_COLUMNS = [
     { id: 'LessonName', header: [{ text: 'Название лекции', css: 'up-headers' }], hidden: true },
 ];
 export const STATE_COLUMNS = [
-    {
-        id: 'IsPublished',
-        header: [{ text: 'Опубликовано', css: 'up-headers' }],
-        css: '_container up-aligned',
-        template(data) {
-            return `<div class='${'is-published'} ${data.IsPublished ? 'published-ok' : ''}'>
-                        </div>`;
-        },
-    },
+    // { todo dont remove this - maybe it will use in future
+    //   id: 'IsPublished',
+    //   header: [{ text: 'Опубликовано', css: 'up-headers' }],
+    //   css: '_container up-aligned',
+    //   template(data: Dashboard.Record) {
+    //     return `<div class='${'is-published'} ${data.IsPublished ? 'published-ok' : ''}'>
+    //                       </div>`;
+    //   },
+    // },
     {
         id: 'ProcessState',
         header: [{ text: 'Процесс', css: 'up-headers' }],

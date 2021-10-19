@@ -80,9 +80,15 @@ body
   letter-spacing: 0.75px
   box-sizing: border-box
   cursor: pointer
+  transition: box-shadow 100ms ease
   &:disabled
     opacity: 0.5
     cursor: default
+  &:not(:disabled)
+    &:hover
+      box-shadow: 3px 3px 10px 2px #c8684c
+    &:active
+      box-shadow: 2px 2px 5px 1px #c8684c
 
 .big-button
   height: 48px
