@@ -10,7 +10,6 @@ const { roundNumber, validateEmail } = require('../utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { DbUtils } = require('./db-utils');
-const { number } = require('prop-types');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
