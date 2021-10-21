@@ -185,7 +185,12 @@ function TimelineEditorContainer(props) {
             State: +timeline.State,
             Name: values.Name,
             TypeOfUse: values.TypeOfUse,
-        }
+            Options: {
+                events: +values.EventLevel,
+                periods: +values.PeriodLevel,
+                periodsOverAxis: values.PeriodsOverAxis
+            }
+        };
 
         if (values.Order !== null) {
             _object.Order = +values.Order
