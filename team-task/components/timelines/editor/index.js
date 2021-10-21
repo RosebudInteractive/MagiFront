@@ -19,7 +19,7 @@ type Props = {
 }
 
 function TimelineHeader(props: Props) {
-    const {timeline, lessons, courses,  onSave, invalid, dirty, editorValues} = props
+    const {timeline, lessons, courses, onSave, invalid, dirty, editorValues, onLevelsChanged} = props
 
     useEffect(() => {
         if (timeline) {
@@ -64,9 +64,13 @@ function TimelineHeader(props: Props) {
     return <form className="timeline-editor-header__form" onSubmit={e => e.preventDefault()}>
         <div className="timeline-editor-header">
             <div className='timeline-editor__field-name'>
-                <Field name="Name" component={TitleTextBox} label={"Название таймлайна"} placeholder="Название таймлайна" extClass="_grey100 page-title"/>
+                <Field name="Name" component={TitleTextBox} label={"Название таймлайна"}
+                       placeholder="Название таймлайна" extClass="_grey100 page-title"/>
             </div>
             <div className={"header__timeline-state font-body-s " + _state.css}>{_state.label}</div>
+            <button className='timeline-editor-header__copy-button grey-button big-button' onClick={copyTimeline}>Copy
+                to clipboard
+            </button>
             <button className="timeline-editor-header__save-button orange-button big-button"
                     disabled={invalid || !dirty}
                     onClick={_onSaveClick}>
@@ -75,23 +79,47 @@ function TimelineHeader(props: Props) {
         </div>
         <div className="timeline-form-block">
             <div className="timeline-form">
-                <Field name="TypeOfUse" component={Select} label={"Тип использования"} placeholder="Тип использования" options={_getUseTypes()} required={true}/>
+                <Field name="TypeOfUse" component={Select} label={"Тип использования"} placeholder="Тип использования"
+                       options={_getUseTypes()} required={true}/>
                 {
                     (lessons && editorValues && editorValues.TypeOfUse === 2) &&
-                    <Field name="LessonId" component={Autocomplete} label={"Лекция"} placeholder="Лекция" options={lessonsOptions} required={true}/>
+                    <Field name="LessonId" component={Autocomplete} label={"Лекция"} placeholder="Лекция"
+                           options={lessonsOptions} required={true}/>
                 }
                 {
                     (courses && editorValues && editorValues.TypeOfUse === 1) &&
-                    <Field name="CourseId" component={Autocomplete} label={"Курс"} placeholder="Курс" options={coursesOptions} required={true}/>
+                    <Field name="CourseId" component={Autocomplete} label={"Курс"} placeholder="Курс"
+                           options={coursesOptions} required={true}/>
                 }
                 <Field name="Order" component={TextBox} type={"number"} label={"Номер"} placeholder="Номер"/>
 
                 <Field name="Image" component={CoverUploader}/>
 
                 <div className={'timeline-form-options'}>
-                    <Field name="EventLevel" required = {false} minValue={0} min={0} component={TextBox} type={"number"} label={"Уровни событий"} placeholder="Уровни событий"/>
-                    <Field name="PeriodLevel" required = {false} minValue={0} min={0} component={TextBox} type={"number"} label={"Уровни периодов"} placeholder="Уровни периодов"/>
-                    <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"} placeholder="Показывать периоды над осью"/>
+                    <Field name="EventLevel"
+                           inputProps={{min: 1}}
+                           required={false}
+                           minValue={1}
+                           component={TextBox}
+                           type={"number"}
+                           label={"Уровни событий"}
+                           placeholder="Уровни событий"
+                           onChange={(val) => {
+                               onLevelsChanged({events: +val.target.value})
+                           }}/>
+                    <Field name="PeriodLevel"
+                           inputProps={{min: 1}}
+                           required={false}
+                           minValue={1}
+                           component={TextBox}
+                           type={"number"}
+                           label={"Уровни периодов"}
+                           placeholder="Уровни периодов"
+                           onChange={(val) => {
+                               onLevelsChanged({periods: +val.target.value});
+                           }}/>
+                    <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"}
+                           placeholder="Показывать периоды над осью"/>
                 </div>
 
 
@@ -120,11 +148,11 @@ const validate = (values) => {
         errors.Order = "Больше 0"
     }
 
-    if((values.EventLevel !== null) && (+values.EventLevel < 0)){
+    if ((values.EventLevel !== null) && (+values.EventLevel < 0)) {
         errors.EventLevel = "От 0"
     }
 
-    if((values.PeriodLevel !== null) && (+values.PeriodLevel < 0)){
+    if ((values.PeriodLevel !== null) && (+values.PeriodLevel < 0)) {
         errors.PeriodLevel = "От 0"
     }
 
