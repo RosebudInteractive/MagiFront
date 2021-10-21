@@ -7,6 +7,16 @@ function setupStatistics(app) {
         global.$Services = {};
     global.$Services.statistics = StatisticsService;
 
+    app.get('/api/adm/statistics/user-info', async (req, res, next) => {
+        try {
+            let rows = await StatisticsService().user_info(req.query);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/adm/statistics/stat-report', (req, res, next) => {
         StatisticsService()
             .stat_report(req.query)

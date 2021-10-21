@@ -6,13 +6,12 @@ const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 const Mustache = require('mustache');
-const { roundNumber } = require('../utils');
+const { roundNumber, validateEmail } = require('../utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
-
 
 const GET_STAT_MSSQL =
     "declare @d1 datetime, @d2 datetime\n" +
@@ -309,12 +308,72 @@ const GET_USER_REG_MYSQL =
     "  and u.`RegDate` < '<%= last_date %>'\n" +
     "order by 2 desc";
 
+const GET_USER_INFO_MSSQL =
+    "select u.[SysParentId] [ID], u.[DisplayName] [Имя], u.[Email], u.[RegDate] [Дата рег.], coalesce(sp.[Name], 'Email or unknown') [Способ рег.],\n" +
+    "  ch.[ChequeDate] [Дата покупки], ii.[Name] [Курс], ch.[Sum] [Сумма],\n" +
+    "  case when ch.[PaymentType] = 1 then 'site' when ch.[PaymentType] = 2 then 'ios' when ch.[PaymentType] = 3 then 'android' else '' end [Способ покупки],\n" +
+    "  ch.[PromoCode] [Промокод]\n" +
+    "from [User] u\n" +
+    "  left join [Cheque] ch on ch.[UserId] = u.[SysParentId] and ch.[ChequeTypeId] = 1 and ch.[StateId] = 4\n" +
+    "  left join [InvoiceItem] ii on ii.[InvoiceId] = ch.[InvoiceId]\n" +
+    "  left join [SNetProvider] sp on sp.[Id] = u.[RegProviderId]\n" +
+    "where  u.[<%= field %>] = <%= val %>\n" +
+    "order by ch.[ChequeDate]";
+
+const GET_USER_INFO_MYSQL =
+    "select u.`SysParentId` `ID`, u.`DisplayName` `Имя`, u.`Email`, u.`RegDate` `Дата рег.`, coalesce(sp.`Name`, 'Email or unknown') `Способ рег.`,\n" +
+    "  ch.`ChequeDate` `Дата покупки`, ii.`Name` `Курс`, ch.`Sum` `Сумма`,\n" +
+    "  case when ch.`PaymentType` = 1 then 'site' when ch.`PaymentType` = 2 then 'ios' when ch.`PaymentType` = 3 then 'android' else '' end `Способ покупки`,\n" +
+    "  ch.`PromoCode` `Промокод`\n" +
+    "from `User` u\n" +
+    "  left join `Cheque` ch on ch.`UserId` = u.`SysParentId` and ch.`ChequeTypeId` = 1 and ch.`StateId` = 4\n" +
+    "  left join `InvoiceItem` ii on ii.`InvoiceId` = ch.`InvoiceId`\n" +
+    "  left join `SNetProvider` sp on sp.`Id` = u.`RegProviderId`\n" +
+    "where  u.`<%= field %>` = <%= val %>\n" +
+    "order by ch.`ChequeDate`";
+
 const DEFAULT_FIRST_DATE = new Date("2019-05-08T00:00:00+0300");
 
 const DbStatistics = class DbStatistics extends DbObject {
 
     constructor(options) {
         super(options);
+    }
+
+    async user_info(options) {
+        let opts = _.cloneDeep(options);
+        let val = 0;
+        let field = 'SysParentId';
+        let title = '';
+
+        if (opts.id) {
+            if (validateEmail(opts.id)) {
+                val = `'${opts.id}'`;
+                field = 'Email';
+                title = ` ( Email = ${opts.id} )`
+            }
+            else {
+                let id = Number.parseInt(opts.id);
+                if (!Number.isNaN(id)) {
+                    val = opts.id;
+                    title = ` ( ID = ${opts.id} )`
+                }
+            }
+        }
+
+        let caption = `Информация о пользователе${title}.`;
+        return this._stat_report(caption, async () => {
+            let dbOpts = opts.dbOptions || {};
+            let res_data = [];
+            let dialect = {
+                mysql: _.template(GET_USER_INFO_MYSQL)({ field: field, val: val }),
+                mssql: _.template(GET_USER_INFO_MSSQL)({ field: field, val: val })
+            };
+            let result = await $data.execSql({ dialect: dialect }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0))
+                res_data = result.detail;
+            return res_data;
+        }, opts);
     }
 
     async stat_report(options) {
