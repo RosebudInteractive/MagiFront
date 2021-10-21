@@ -2530,7 +2530,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                             throw new HttpError(HttpCode.ERR_FORBIDDEN,
                                 `Пользователь не может менять задачу в состоянии "${TaskStateStr[taskObj.state()]}".`);
 
-                        if (((typeof (inpFields.ElementId) === "number") || (inpFields.ElementId === null)) &&
+                        if (((typeof (inpFields.ElementId) === "number") || (!inpFields.ElementId)) &&
                             (taskObj.elementId() !== inpFields.ElementId)) {
                             if (!isSupervisor)
                                 throw new HttpError(HttpCode.ERR_FORBIDDEN, `Пользователь не имеет права изменять элемент задачи.`);
@@ -2539,7 +2539,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
                                 if (!elem)
                                     throw new HttpError(HttpCode.ERR_BAD_REQ, `Элемент (ElementId = ${inpFields.ElementId}) не найден.`);
                             }
-                            taskObj.elementId(inpFields.ElementId);
+                            taskObj.elementId(inpFields.ElementId ? inpFields.ElementId : null);
                         }
 
                         if ((typeof (inpFields.IsElemReady) === "boolean") && (taskObj.isElemReady() !== inpFields.IsElemReady)) {
@@ -3139,7 +3139,7 @@ const ProcessAPI = class ProcessAPI extends DbObject {
     }
 
     async sendNotifications(data, options) {
-        let notificationService = this.getService("notifications", true);
+        let notificationService = this.getService("pm-notifications", true);
         if (notificationService)
             await notificationService.newNotification(data, options);
     }
