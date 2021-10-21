@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import './timelines.sass';
 import {
     clearSelectedTimeline,
+    copyTimeline,
     currentTimelineSelector,
     getTimelines,
     openTimelineEditor,
@@ -159,10 +160,14 @@ const Timelines = (props) => {
                 }
             },
             {
-                id: 'publish-btn', header: '', width: 50, css: "_container", fillspace: 10,
+                id: 'publish-btn', header: '', width: 50, css: "_container",
                 template: function(data){
                     return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : ""
                 }
+            },
+            {
+                id: 'copy-btn', header: '', width: 50, css: "_container",
+                template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
             },
             {
                 id: 'del-btn', header: '', width: 50,
@@ -170,10 +175,7 @@ const Timelines = (props) => {
                     return data.State !== 2 ? "<button class='process-elements-grid__button elem-delete remove-timeline-button'/>" : ""
                 }
             },
-            // { todo after backend is done
-            //     id: 'copy-btn', header: '', width: 50, css: "_container", fillspace: 5,
-            //     template: function(){ return  "<button class='grid-button _copy js-copy'/>"}
-            // },
+
         ],
         on: {
             onHeaderClick: function (header) {
@@ -193,7 +195,6 @@ const Timelines = (props) => {
                 const item = this.getItem(id);
 
                 if (item && item.Id) {
-                    // todo open action
                     actions.selectTimeline(item.Id);
                     props.history.push(`timelines/${item.Id}`);
                 }
@@ -217,7 +218,7 @@ const Timelines = (props) => {
                 e.preventDefault();
                 const item = this.getItem(data.row);
                 if (item) {
-                    //todo copy action after api complete
+                    actions.copyTimeline(item.Id)
                 }
             },
             "remove-timeline-button": function (e, data) {
@@ -294,7 +295,8 @@ const mapDispatch2Props = (dispatch) => {
             setTemporaryPeriods,
             updateTimeline,
             publishTimeline,
-            removeTimeline
+            removeTimeline,
+            copyTimeline
         }, dispatch)
     }
 };
