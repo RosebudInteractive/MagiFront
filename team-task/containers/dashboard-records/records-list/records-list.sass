@@ -168,25 +168,25 @@
     border-radius: 32px
 
     .question
-      position: absolute
-      top: 90%
-      left: 50%
-      font-size: 12px
+      text-align: center
+      font-size: 16px
       color: red
       font-weight: bold
-      transform: translateX(-50%)
 
-    &._draft
-      border: 1px solid #1f4ff4
-      color: #004CBF
+      &._error
+        color: $red
 
-    &._executing
-      border: 1px solid rgba(206, 154, 0, 0.87)
-      color: $yellow
+      &._not-ready
+        color: $blue
 
-    &._done
-      border: 1px solid rgba(16, 214, 53, 0.75)
-      color: $green
+      &._part-ready
+        color: $yellow
+
+      &._ready
+        color: #01A643
+
+      &._in-progress
+        color: #C8372D
 
     &._error
       border: 1px solid #EDF6EE70
@@ -203,10 +203,6 @@
     &._ready
       border: 1px solid #18CC24
       color: #01A643
-
-    &._question
-      border: 1px solid #9c3700
-      color: #C8372D
 
     &._in-progress
       border: 1px solid #9c3700

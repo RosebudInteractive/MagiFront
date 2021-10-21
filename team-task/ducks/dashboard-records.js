@@ -445,7 +445,7 @@ const handleServerData = (records, mode, stDate = null, finDate = null) => {
         if (filteredRecords.length) {
             const [first, ...other] = filteredRecords;
             first.Week = weekHasChanged ? displayWeekRange : '';
-            first.DateObject = moment(first.PubDate).locale('ru'); //todo check it
+            first.DateObject = moment(first.PubDate).locale('ru');
             first.IsEven = isEven;
             first.IsEndOfWeek = moment(first.PubDate).locale('ru').isoWeekday() === 7 && other.length === 0;
             first.IsWeekend = [6,7].includes(moment(first.PubDate).locale('ru').isoWeekday());
@@ -648,7 +648,14 @@ const identifyElementFields = (records) => {
             const elData = val[el];
 
             if (elData) {
-                return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;"><div class="state-template-block-dr state-circle ${elData.css} "><div class="element-status-tooltip-text">${elData.label}</div><div class="${elData.question ? 'question' : ''}">${elData.question ? '?' : ''}</div></div></div></div>`;
+                return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
+                            <div class="state-template-block-dr state-circle ${elData.question ? '' : elData.css} ">
+                                
+                                    
+                                <div class="element-status-tooltip-text">${elData.question ? 'Вопрос,' : ''} ${elData.label}</div>
+                                <div class="${elData.question ? 'question ' + elData.css : ''}">${elData.question ? '?' : ''}</div>
+                            </div>
+                        </div>`;
             } else {
                 return `<div class="state-template-block-dr state-circle _unknown"></div>`
             }
