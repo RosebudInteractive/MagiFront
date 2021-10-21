@@ -32,7 +32,11 @@ function ConfirmationOfPublication(props) {
         return () => {
             $("body").removeClass("_no-vertical-scroll")
         }
-    }, [])
+    }, []);
+
+    const dateShouldDisable = function (date) {
+        return (moment(date).isBefore(moment()) && !moment(record.DateObject).isSame(date, 'day'));
+    };
 
     const disableApply = useMemo(() => {
         return !value || record.DateObject.isSame(value)
@@ -55,7 +59,9 @@ function ConfirmationOfPublication(props) {
             <DatePicker value={value}
                         label={'Дата публикации'}
                         onChange={onChange}
-                        minDate={new Date()}
+                        error={false}
+                        helperText={null}
+                        shouldDisableDate={dateShouldDisable}
                         isoWeek
 
             />
