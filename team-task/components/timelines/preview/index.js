@@ -7,7 +7,7 @@ import Header from "timeline/timeline/header";
 import Footer from "timeline/timeline/footer";
 
 export default function TimelinePreview(props) {
-    const {background, events, periods} = props;
+    const {background, events, periods, levels} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [incKey, setIncKey] = useState(0);
@@ -125,7 +125,7 @@ export default function TimelinePreview(props) {
                               events={_events}
                               periods={_periods}
                               zoom={zoom}
-                              levelLimit={4}
+                              levelLimit={levels}
                               zoomSliderStopped={zoomSliderStopped}
                               fsMode={fsEnable}
                               key={incKey}/>
