@@ -388,7 +388,7 @@ function TimelineEditorContainer(props) {
                     <TimelinePreview background={props.editorValues && props.editorValues.Image}
                                      events={events}
                                      periods={periods}
-                                    levels={levels}/>
+                                     levels={levels}/>
                     <TimelineDetails actions={{
                         events: {
                             headerClickAction: () => { },
