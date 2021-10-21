@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo,} from "react";
-import {Autocomplete, Select, TextBox, TitleTextBox} from "../../ui-kit";
+import {Autocomplete, Checkbox, Select, TextBox, TitleTextBox} from "../../ui-kit";
 import {TIMELINE_STATE} from "../../../constants/states";
 import './timeline-editor-header.sass'
 import './timeline-form.sass'
-import {reduxForm, Field, getFormValues} from "redux-form";
+import {Field, getFormValues, reduxForm} from "redux-form";
 import {TIMELINE_TYPES_OF_USE} from "../../../constants/timelines";
 import {compose} from "redux";
 import {connect} from "react-redux";
@@ -30,12 +30,15 @@ function TimelineHeader(props: Props) {
                     file: timeline.Image,
                     meta: timeline.ImageMeta,
                 },
-                Order: timeline.Order ? +timeline.Order : null
-            }
+                Order: timeline.Order ? +timeline.Order : null,
+                EventLevel: timeline.EventLevel ? timeline.EventLevel : null,
+                PeriodLevel: timeline.PeriodLevel ? timeline.PeriodLevel : null,
+                PeriodsOverAxis: timeline.PeriodsOverAxis ? timeline.PeriodsOverAxis : null
+            };
 
             props.initialize(_initValues)
         }
-    }, [timeline])
+    }, [timeline]);
 
     const _getUseTypes = () => {
         return Object.entries(TIMELINE_TYPES_OF_USE).map(type => ({id: parseInt(type[0]), name: type[1]}))
@@ -82,7 +85,16 @@ function TimelineHeader(props: Props) {
                     <Field name="CourseId" component={Autocomplete} label={"Курс"} placeholder="Курс" options={coursesOptions} required={true}/>
                 }
                 <Field name="Order" component={TextBox} type={"number"} label={"Номер"} placeholder="Номер"/>
+
                 <Field name="Image" component={CoverUploader}/>
+
+                <div className={'timeline-form-options'}>
+                    <Field name="EventLevel" required = {false} minValue={1} component={TextBox} type={"number"} label={"Уровни событий"} placeholder="Уровни событий"/>
+                    <Field name="PeriodLevel" required = {false} minValue={1} component={TextBox} type={"number"} label={"Уровни периодов"} placeholder="Уровни периодов"/>
+                    <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"} placeholder="Показывать периоды над осью"/>
+                </div>
+
+
             </div>
         </div>
     </form>

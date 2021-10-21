@@ -131,6 +131,7 @@ export default function UiDatePicker(props) {
         value={extProps.value ? extProps.value : null}
         onChange={onChange}
         onBlur={onBlur}
+        minDateMessage={'Дата должна быть после минимально возможной'}
         KeyboardButtonProps={{
             'aria-label': 'change date',
         }}
