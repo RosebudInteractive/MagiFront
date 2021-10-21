@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -101,6 +101,7 @@ function TimelineEditorContainer(props) {
         , events, periods, commands, commandEditorOpened
     } = props;
     const [timeline, setTimeline] = useState(null);
+    const [levels, setLevels] = useState({events: 3, periods: 3});
     const detailsEditor = useRef(null);
     const detailsTitle = useRef(null);
     const finderForm = useRef(null);
@@ -222,16 +223,6 @@ function TimelineEditorContainer(props) {
         actions.getTimelines();
     };
 
-    const levels = useMemo(() => {
-        return timeline ? {
-            events: typeof timeline.EventLevel === 'number' ? timeline.EventLevel : 2,
-            periods: typeof timeline.PeriodLevel === 'number' ? timeline.PeriodLevel : 2
-        } : {
-            events: 2,
-            periods: 2
-        }
-    }, [timeline]);
-
     const detailsCreateAction = (type) => {
         const timelineId = timeline.Id ? timeline.Id : null;
 
@@ -259,6 +250,10 @@ function TimelineEditorContainer(props) {
     const detailsOpenFindFormAction = (type) => {
         finderForm.current = type === 'events' ? EventsFindForm : PeriodsFindForm;
         setFinderFormOpened(true);
+    };
+
+    const onLevelsChanged = (value) => {
+        setLevels({...levels, ...value})
     };
 
     const onSaveModal = ({id, tableId, values}) => {
@@ -365,6 +360,10 @@ function TimelineEditorContainer(props) {
 
     useEffect(() => {
         if (timeline && timeline.hasOwnProperty('State')) {
+            const options = timeline.Options;
+            if(options){
+                setLevels({events: options.events, periods: options.periods});
+            }
             (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo return this string if behaviour seems to be broken
             // (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses, why it still here but all works fine?!? (but its no vision about where getiign the courses)
         }
@@ -384,7 +383,7 @@ function TimelineEditorContainer(props) {
                 <React.Fragment>
                     <Prompt when={props.hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
-                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave}/>
+                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave} onLevelsChanged={onLevelsChanged}/>
                     <TimelinePreview background={props.editorValues && props.editorValues.Image}
                                      events={events}
                                      periods={periods}
