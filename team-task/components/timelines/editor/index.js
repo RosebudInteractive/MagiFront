@@ -95,8 +95,8 @@ function TimelineHeader(props: Props) {
                 <Field name="Image" component={CoverUploader}/>
 
                 <div className={'timeline-form-options'}>
-                    <Field name="EventLevel" required = {false} minValue={1} component={TextBox} type={"number"} label={"Уровни событий"} placeholder="Уровни событий"/>
-                    <Field name="PeriodLevel" required = {false} minValue={1} component={TextBox} type={"number"} label={"Уровни периодов"} placeholder="Уровни периодов"/>
+                    <Field name="EventLevel" required = {false} minValue={0} min={0} component={TextBox} type={"number"} label={"Уровни событий"} placeholder="Уровни событий"/>
+                    <Field name="PeriodLevel" required = {false} minValue={0} min={0} component={TextBox} type={"number"} label={"Уровни периодов"} placeholder="Уровни периодов"/>
                     <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"} placeholder="Показывать периоды над осью"/>
                 </div>
 
@@ -126,8 +126,16 @@ const validate = (values) => {
         errors.Order = "Больше 0"
     }
 
+    if((values.EventLevel !== null) && (+values.EventLevel < 0)){
+        errors.EventLevel = "От 0"
+    }
+
+    if((values.PeriodLevel !== null) && (+values.PeriodLevel < 0)){
+        errors.PeriodLevel = "От 0"
+    }
+
     return errors
-}
+};
 
 const mapState2Props = (state) => {
     return {

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -222,6 +222,16 @@ function TimelineEditorContainer(props) {
         actions.getTimelines();
     };
 
+    const levels = useMemo(() => {
+        return timeline ? {
+            events: typeof timeline.EventLevel === 'number' ? timeline.EventLevel : 2,
+            periods: typeof timeline.PeriodLevel === 'number' ? timeline.PeriodLevel : 2
+        } : {
+            events: 2,
+            periods: 2
+        }
+    }, [timeline]);
+
     const detailsCreateAction = (type) => {
         const timelineId = timeline.Id ? timeline.Id : null;
 
@@ -375,8 +385,10 @@ function TimelineEditorContainer(props) {
                     <Prompt when={props.hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                     <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave}/>
-                    <TimelinePreview background={props.editorValues && props.editorValues.Image} events={events}
-                                     periods={periods}/>
+                    <TimelinePreview background={props.editorValues && props.editorValues.Image}
+                                     events={events}
+                                     periods={periods}
+                                    levels={levels}/>
                     <TimelineDetails actions={{
                         events: {
                             headerClickAction: () => { },
