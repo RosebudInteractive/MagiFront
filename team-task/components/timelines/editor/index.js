@@ -110,7 +110,7 @@ function TimelineHeader(props: Props) {
                            label={"Уровни событий"}
                            placeholder="Уровни событий"
                            onChange={(val) => {
-                               onLevelsChanged({events: +val.target.value})
+                               val.target.value.length > 0 && val.target.value >= 0 && onLevelsChanged({events: +val.target.value})
                            }}/>
                     <Field name="PeriodLevel"
                            inputProps={{min: 1}}
@@ -121,7 +121,7 @@ function TimelineHeader(props: Props) {
                            label={"Уровни периодов"}
                            placeholder="Уровни периодов"
                            onChange={(val) => {
-                               onLevelsChanged({periods: +val.target.value});
+                               val.target.value.length > 0 && val.target.value >= 0 && onLevelsChanged({periods: +val.target.value});
                            }}/>
                     <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"}
                            placeholder="Показывать периоды над осью"/>
