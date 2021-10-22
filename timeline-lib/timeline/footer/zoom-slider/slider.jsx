@@ -3,6 +3,7 @@ import './zoom-slider.sass';
 import { TouchableOpacity, View } from 'react-native';
 import DecreaseButton from './dec-button';
 import IncreaseButton from './inc-button';
+const SLIDER_STEP = 0.5;
 function startAnimation(oldValue, newValue, onChange) {
     const diff = newValue - oldValue;
     const step = diff <= 1 ? 300 : 500;
@@ -40,11 +41,11 @@ export default function ZoomSlider(props) {
     const decreaseButtonStyle = useMemo(() => ({ opacity: value <= 1 ? 0.4 : 1 }), [value]);
     const increaseButtonStyle = useMemo(() => ({ opacity: value >= 10 ? 0.4 : 1 }), [value]);
     const decreaseValue = () => {
-        const newValue = (myValue - 1) < 1 ? 1 : myValue - 1;
+        const newValue = (myValue - SLIDER_STEP) < 1 ? 1 : myValue - SLIDER_STEP;
         startAnimation(myValue, newValue, onChange);
     };
     const increaseValue = () => {
-        const newValue = (myValue + 1) > 10 ? 10 : myValue + 1;
+        const newValue = (myValue + SLIDER_STEP) > 10 ? 10 : myValue + SLIDER_STEP;
         startAnimation(myValue, newValue, onChange);
     };
     const onMouseDown = () => {

@@ -5,8 +5,8 @@ class Controller {
     currentIndex;
     constructor() {
         this.themesArray = [
-            Pastel,
             Dark,
+            Pastel,
         ];
         this.currentIndex = 0;
     }

@@ -385,9 +385,8 @@ function TimelineEditorContainer(props) {
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                     <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave} onLevelsChanged={onLevelsChanged}/>
                     <TimelinePreview background={props.editorValues && props.editorValues.Image}
-                                     events={events}
-                                     periods={periods}
-                                    levels={levels}/>
+                                     timeline={timeline}
+                                     levels={levels}/>
                     <TimelineDetails actions={{
                         events: {
                             headerClickAction: () => { },
