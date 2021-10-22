@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState, } from 'react';
-import placeByYLevelLimit from '../../helpers/placeByLevel';
+import placeByYLevelLimit from '../../../helpers/placeByLevel';
 import AnimatedPeriod from './item';
-import { calcDisplayDate, calcPeriodPoints } from '../../helpers/tools';
-import { ItemType } from '../../types/common';
+import { calcDisplayDate, calcPeriodPoints } from '../../../helpers/tools';
+import { ItemType } from '../../../types/common';
 export default function PeriodSections(props) {
-    const { startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis, onItemClick, activeItem, } = props;
+    const { startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis, onItemClick, onSetLevelsCount, activeItem, } = props;
     const [verticallyAlignedPeriods, setVerticallyAlignedPeriods] = useState([]);
     const didMountRef = useRef(0);
     useEffect(() => {
@@ -12,9 +12,9 @@ export default function PeriodSections(props) {
             didMountRef.current += 1;
         }
     }, [periods]);
-    const onClickedElement = (id) => {
+    const onClickedElement = (item) => {
         if (onItemClick) {
-            onItemClick({ type: ItemType.Period, id });
+            onItemClick({ type: ItemType.Period, id: item.id, item });
         }
     };
     useEffect(() => {
@@ -27,7 +27,8 @@ export default function PeriodSections(props) {
                     ...item, yLevel: 0, xLevel: 0, xStart, xEnd,
                 };
             });
-            const alignedPeriods = placeByYLevelLimit(periodsWithCoords, levelLimit || 0);
+            const { items: alignedPeriods, levelsCount } = placeByYLevelLimit(periodsWithCoords, levelLimit || 0);
+            onSetLevelsCount(levelsCount);
             alignedPeriods.forEach((item) => {
                 const calculatedStartDate = calcDisplayDate(item.startDay, item.startMonth, item.startYear);
                 const calculatedEndDate = calcDisplayDate(item.endDay, item.endMonth, item.endYear);
@@ -36,7 +37,7 @@ export default function PeriodSections(props) {
                 // eslint-disable-next-line no-param-reassign
                 item.y = elementsOverAxis ? (y - 30) - (item.yLevel * 30) : (y + 30) + (item.yLevel * 30);
                 // eslint-disable-next-line no-param-reassign
-                item.title = item.name;
+                item.title = item.shortName || item.name;
             });
             setVerticallyAlignedPeriods(alignedPeriods);
         }

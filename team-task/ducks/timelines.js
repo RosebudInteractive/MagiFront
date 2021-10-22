@@ -39,6 +39,7 @@ const OPEN_EDITOR = `${prefix}/OPEN_EDITOR`;
 const GO_BACK = `${prefix}/GO_BACK`;
 
 const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
+const COPY_TIMELINE = `${prefix}/COPY_TIMELINE`;
 const UPDATE_TIMELINE_REQUEST = `${prefix}/UPDATE_TIMELINE_REQUEST`;
 const PUBLISH_TIMELINE = `${prefix}/PUBLISH_TIMELINE`;
 const REMOVE_TIMELINE = `${prefix}/REMOVE_TIMELINE`;
@@ -147,6 +148,10 @@ export const goBack = (withConfirmation) => {
     return {type: GO_BACK, payload: withConfirmation}
 };
 
+export const copyTimeline = (tlId) => {
+    return {type: COPY_TIMELINE, payload: tlId}
+};
+
 
 //sagas
 
@@ -163,8 +168,23 @@ export const saga = function* () {
         takeEvery(LINK_EVENT, linkEventSaga),
         takeEvery(LINK_PERIOD, linkPeriodSaga),
         takeEvery(REMOVE_TIMELINE, removeTimelineSaga),
+        takeEvery(COPY_TIMELINE, copyTimelineSaga),
     ])
 };
+
+function* copyTimelineSaga(data) {
+    try {
+        yield put({type: START_REQUEST});
+
+        const res = yield call(copyTimelineReq, data.payload);
+
+        yield put({type: SUCCESS_REQUEST});
+        yield put(getTimelines());
+    } catch (e) {
+        yield put({type: FAIL_REQUEST});
+        yield put(showErrorMessage(e));
+    }
+}
 
 function* removeTimelineSaga(data) {
     try {
@@ -415,6 +435,9 @@ function* getTimelineSaga(data) {
         }
         const timelineData = {
             ...timeline,
+            EventLevel: timeline.Options && timeline.Options.events ? timeline.Options.events : null,
+            PeriodLevel: timeline.Options && timeline.Options.periods ? timeline.Options.periods : null,
+            PeriodsOverAxis: timeline.Options && timeline.Options.periodsOverAxis ? timeline.Options.periodsOverAxis : null,
             CourseId: timeline.Course ? timeline.Course.Id : null,
             LessonId: timeline.Lesson ? timeline.Lesson.Id : null,
         };
@@ -434,6 +457,18 @@ function* getTimelineSaga(data) {
 
 const getTimeline = (timelineId) => {
     return commonGetQuery(`/api/pm/timeline/${timelineId}`);
+};
+
+const copyTimelineReq = (timelineId) => {
+    const body = {CopyFrom: timelineId};
+    return fetch("/api/pm/timeline", {
+        method: 'POST',
+        headers: {"Content-type": "application/json"},
+        credentials: 'include',
+        body: JSON.stringify(body),
+    })
+        .then(checkStatus)
+        .then(parseJSON)
 };
 
 const createTimeline = (timeline) => {
