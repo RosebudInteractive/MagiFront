@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import './preview.sass'
-import {Themes, Timeline} from "timeline/index";
+import {Themes, Timeline, convertData} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
 
 export default function TimelinePreview(props) {
-    const {background, events, periods, levels} = props;
+    const {background, events, periods, levels, timeline} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [incKey, setIncKey] = useState(0);
@@ -48,6 +48,10 @@ export default function TimelinePreview(props) {
             }
         }, 0)
     }, [fsEnable]);
+
+    const converted = useMemo(() => {
+        return convertData(timeline);
+    }, [timeline])
 
     const _periods = useMemo(() => {
         return periods ? periods.map((item) => {
@@ -106,8 +110,8 @@ export default function TimelinePreview(props) {
                   backgroundImage={backgroundFile}
                   height={height}
                   theme={Themes.current}
-                  events={_events}
-                  periods={_periods}
+                  events={converted.Events}
+                  periods={converted.Periods}
                   levelLimit={levels}
                   onFullScreen={openFullScreen}
                   onCloseFullScreen={closeFullScreen}
