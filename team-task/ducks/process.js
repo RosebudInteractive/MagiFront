@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {Record,} from 'immutable'
 import 'whatwg-fetch';
 import {commonGetQuery} from "common-tools/fetch-tools";
-import {all, takeEvery, put, call, select, take} from "@redux-saga/core/effects";
+import {all, call, put, select, take, takeEvery} from "@redux-saga/core/effects";
 import {
     MODAL_MESSAGE_ACCEPT,
     MODAL_MESSAGE_DECLINE,
@@ -15,12 +15,7 @@ import {
 import {hasSupervisorRights,} from "tt-ducks/auth";
 import {reset} from "redux-form";
 import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
-import type {
-    CreatingElement,
-    CreatingProcess,
-    UpdatingElement,
-    UpdatingProcess
-} from "../types/process";
+import type {CreatingElement, CreatingProcess, UpdatingElement, UpdatingProcess} from "../types/process";
 import {push} from "react-router-redux/src";
 import {goToProcess} from "tt-ducks/processes";
 import type {Message} from "../types/messages";
@@ -404,7 +399,22 @@ function* updateElementSaga({payload: element}) {
 }
 
 function* deleteElementSaga({payload: elementId}) {
-    yield put({type: OPERATION_WITH_ELEMENT_START})
+    const message: Message = {
+        content: `Вы действительно хотите удалить элемент ${elementId} из процесса?`,
+        title: "Подтверждение удаления"
+    };
+
+    yield put(showUserConfirmation(message));
+
+    const {accept} = yield race({
+        accept: take(MODAL_MESSAGE_ACCEPT),
+        decline: take(MODAL_MESSAGE_DECLINE)
+    });
+
+    if (!accept) return;
+
+    yield put({type: OPERATION_WITH_ELEMENT_START});
+
     try {
         const process = yield select(processSelector)
         yield call(_deleteElement, elementId)
