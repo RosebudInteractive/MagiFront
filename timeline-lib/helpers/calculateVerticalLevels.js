@@ -1,5 +1,6 @@
-export default function calculateVerticalLevels(records, levelLimit = 4, checkVisibility = true) {
+export default function calculateVerticalLevels(records, levelLimit, checkVisibility = true) {
     const items = [...records].sort((a, b) => a.xStart - b.xStart);
+    let currentLevel = levelLimit || 1;
     const findAndSetLevel = (processedElement, elementIndex) => {
         const intersections = items.filter((item, index) => {
             if (index < elementIndex) {
@@ -12,7 +13,7 @@ export default function calculateVerticalLevels(records, levelLimit = 4, checkVi
             return false;
         });
         if (intersections.length > 0) {
-            const levels = (new Array(levelLimit))
+            const levels = (new Array(currentLevel))
                 .fill(null)
                 .map(() => ({ inUse: false, level: 0, delta: 0 }));
             intersections.forEach((item) => {
@@ -25,9 +26,16 @@ export default function calculateVerticalLevels(records, levelLimit = 4, checkVi
             });
             const allLevelsInUse = levels.every((level) => level.inUse);
             if (allLevelsInUse) {
-                levels.sort((a, b) => a.delta - b.delta);
-                // eslint-disable-next-line no-param-reassign
-                processedElement.yLevel = levels[0].level;
+                if (levelLimit > 0) {
+                    levels.sort((a, b) => a.delta - b.delta);
+                    // eslint-disable-next-line no-param-reassign
+                    processedElement.yLevel = levels[0].level;
+                }
+                else {
+                    // eslint-disable-next-line no-param-reassign
+                    processedElement.yLevel = currentLevel;
+                    currentLevel += 1;
+                }
             }
             else {
                 // eslint-disable-next-line no-param-reassign
@@ -36,5 +44,5 @@ export default function calculateVerticalLevels(records, levelLimit = 4, checkVi
         }
     };
     items.forEach((item, index) => findAndSetLevel(item, index));
-    return items;
+    return { items, levelsCount: currentLevel };
 }

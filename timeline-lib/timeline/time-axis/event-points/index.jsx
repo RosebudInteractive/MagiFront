@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import EventPoint from './item';
-import { isArrayEquals, VERTICAL_STEP } from '../../helpers/tools';
-import { ItemType } from '../../types/common';
+import { isArrayEquals, VERTICAL_STEP } from '../../../helpers/tools';
+import { ItemType } from '../../../types/common';
 export default function EventPoints(props) {
     const { events, startDate, yearPerPixel, y, onRecalculateTimelineEnding, elementsOverAxis, levelLimit, onItemClick, activeItem, } = props;
     const [visible, setVisible] = useState(true);
     const renderedEvents = useRef([]);
     const coordinates = useRef([]);
-    const onClickedElement = (id) => {
+    const onClickedElement = (item) => {
         if (onItemClick) {
-            onItemClick({ type: ItemType.Event, id });
+            onItemClick({ type: ItemType.Event, id: item.id, item });
         }
     };
     useEffect(() => {
@@ -44,6 +44,6 @@ export default function EventPoints(props) {
         const isActive = item.id === activeItem;
         const zIndex = isActive ? events.length : events.length - index - 1;
         return (<EventPoint item={item} visible={item.visible} level={item.yLevel} x={x} y={yValue - 50} axisY={y} isActive={isActive} onMount={onMountCallback} onClick={onClickedElement} onLastPoint={recalculateEndingOfTimeline} zIndex={zIndex} index={index} key={item.id}/>);
-    }), [events, activeItem, yearPerPixel]);
+    }), [events, activeItem, yearPerPixel, y]);
     return visible ? <React.Fragment>{renderElements}</React.Fragment> : null;
 }

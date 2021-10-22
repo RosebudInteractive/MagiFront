@@ -2,7 +2,7 @@ import React from 'react';
 import { Animated, Text, TouchableHighlight, } from 'react-native';
 import SerifsContext from '../serifs/context';
 import styles from './styles';
-import { calcScaleY, hexToRgb, VERTICAL_STEP } from '../../helpers/tools';
+import { calcScaleY, hexToRgb, VERTICAL_STEP } from '../../../helpers/tools';
 import Mask from '../gradient-mask';
 const MAX_WIDTH = 141;
 export default class EventPoint extends React.PureComponent {
@@ -138,7 +138,7 @@ export default class EventPoint extends React.PureComponent {
     onClick() {
         const { onClick, item } = this.props;
         if (onClick) {
-            onClick(item.id);
+            onClick(item);
         }
     }
     render() {
@@ -155,6 +155,7 @@ export default class EventPoint extends React.PureComponent {
         };
         const color = theme ? theme.getColor(index) : item.color;
         const enableAlpha = theme ? theme.enableAlpha : true;
+        item.color = color;
         let backgroundColor = color;
         if (enableAlpha) {
             const { r, g, b } = hexToRgb(color);
@@ -203,7 +204,7 @@ export default class EventPoint extends React.PureComponent {
           <Animated.View>
             <Animated.View style={[styles.event, eventStyle]}>
               <Text numberOfLines={1} style={[styles.title, titleStyle]} onLayout={this.onTextContainerLayout.bind(this)} onTextLayout={this.onTextLayout.bind(this)}>
-                {item.name}
+                {item.shortName || item.name}
               </Text>
               {needMask && <Mask color={backgroundColor} isActive={isActive}/>}
             </Animated.View>

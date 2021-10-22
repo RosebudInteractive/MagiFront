@@ -4,5 +4,5 @@
 /ducks
 /mock-data
 /redux
-/tools
+/tools/**/*.js
 /types
