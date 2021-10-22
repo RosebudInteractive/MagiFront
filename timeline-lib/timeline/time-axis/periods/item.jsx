@@ -2,7 +2,8 @@ import React from 'react';
 import { Animated, Text, TouchableHighlight, } from 'react-native';
 import SerifsContext from '../serifs/context';
 import styles from './styles';
-import { hexToRgb } from '../../helpers/tools';
+import { hexToRgb } from '../../../helpers/tools';
+/* eslint-disable react/sort-comp */
 export default class AnimatedPeriod extends React.Component {
     opacityAnim;
     verticalAnim;
@@ -64,18 +65,19 @@ export default class AnimatedPeriod extends React.Component {
     onPress() {
         const { onClick, period } = this.props;
         if (onClick) {
-            onClick(period.id);
+            onClick(period);
         }
     }
     render() {
         const { zoom, theme } = this.context;
         const { startX, endX, period, isActive, index, } = this.props;
-        const left = startX * zoom;
-        const width = Math.ceil(endX * zoom - left);
+        const left = startX * zoom + 20;
+        const width = Math.ceil(endX * zoom - startX * zoom);
         const { top, opacity } = this.state;
         const color = theme ? theme.getColor(index) : period.color;
         const enableAlpha = theme ? theme.enableAlpha : true;
         let backgroundColor = color;
+        period.color = color;
         if (enableAlpha) {
             const { r, g, b } = hexToRgb(color);
             const alpha = isActive ? 1 : 0.5;

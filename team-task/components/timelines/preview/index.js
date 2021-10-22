@@ -3,50 +3,51 @@ import './preview.sass'
 import {Themes, Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
-import Header from "timeline/timeline/header";
-import Footer from "timeline/timeline/footer";
+import getInnerSize from "../../../tools/get-inner-size";
 
 export default function TimelinePreview(props) {
     const {background, events, periods, levels} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [incKey, setIncKey] = useState(0);
-    const [zoom, setZoom] = useState(1)
-    const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
     const [fsEnable, setFsEnable] = useState(false)
 
-    const _preview = useRef(null);
+    const preview = useRef(null);
 
     useWindowSize(() => {
-        if (_preview.current) {
-            setWidth(_preview.current.clientWidth);
-            setHeight(_preview.current.clientHeight);
+        if (preview.current) {
+            const size = getInnerSize(preview.current);
+            setWidth(size.width);
+            setHeight(size.height);
         }
     });
 
     useEffect(() => {
         setTimeout(() => {
-            if (_preview.current) {
-                setWidth(_preview.current.clientWidth);
-                setHeight(_preview.current.clientHeight)
+            if (preview.current) {
+                const size = getInnerSize(preview.current);
+                setWidth(size.width);
+                setHeight(size.height);
             }
         }, 400)
 
     }, []);
 
     useEffect(() => {
-        if (_preview.current) {
-            setWidth(_preview.current.clientWidth);
-            setHeight(_preview.current.clientHeight)
+        if (preview.current) {
+            const size = getInnerSize(preview.current);
+            setWidth(size.width);
+            setHeight(size.height);
         }
 
         setTimeout(() => {
-            if (_preview.current) {
-                setWidth(_preview.current.clientWidth);
-                setHeight(_preview.current.clientHeight)
+            if (preview.current) {
+                const size = getInnerSize(preview.current);
+                setWidth(size.width);
+                setHeight(size.height);
             }
         }, 0)
-    }, [fsEnable, zoom]);
+    }, [fsEnable]);
 
     const _periods = useMemo(() => {
         return periods ? periods.map((item) => {
@@ -58,7 +59,7 @@ export default function TimelinePreview(props) {
                 endDay: !!item.RbDay && +item.RbDay,
                 endMonth: !!item.RbMonth && +item.RbMonth,
                 endYear: !!item.RbYear && +item.RbYear,
-                name: item.Name,
+                name: item.ShortName || item.Name,
                 color: hslToHex(item.color),
                 visible: true,
             }
@@ -72,28 +73,14 @@ export default function TimelinePreview(props) {
                 day: !!item.Day && +item.Day,
                 month: !!item.Month && +item.Month,
                 year: !!item.Year && +item.Year,
-                name: item.Name,
+                name: item.ShortName || item.Name,
                 color: item.color,
                 visible: true,
             }
         }) : []
     }, [events])
 
-    const _style = useMemo(() => {
-        const fileName = background ? (background.file ? background.file : background) : null;
-
-        return fileName ? {
-            background: `linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)) center top / cover, url(/data/${fileName})`,
-        } : {backgroundColor: "#B4B4BB"}
-    }, [background]);
-
-    const onZoomChange = useCallback((value) => {
-        setZoom(value)
-    }, [zoom]);
-
-    const onSliderStop = (stopped) => {
-        setZoomSliderStopped(stopped)
-    };
+    const backgroundFile = useMemo(() => background ? (background.file ? background.file : background) : null, [background]);
 
     const openFullScreen = () => {
         setFsEnable(true)
@@ -114,30 +101,17 @@ export default function TimelinePreview(props) {
         }
     }
 
-    return <div className={"timeline-preview"  + (fsEnable ? ' _full-screen' : '')} >
-        <div className={'timeline-preview__wrapper'}>
-            {fsEnable && <Header title={'Ключевые события'} />}
-            <div className={"timeline-preview__container"} ref={_preview} style={{..._style}}>
-                <div className={"timeline-preview__vertical-container"}>
-                    <Timeline width={width}
-                              height={height}
-                              theme={Themes.current}
-                              events={_events}
-                              periods={_periods}
-                              zoom={zoom}
-                              levelLimit={levels}
-                              zoomSliderStopped={zoomSliderStopped}
-                              fsMode={fsEnable}
-                              key={incKey}/>
-                </div>
-            </div>
-            <Footer onOpenPress={openFullScreen}
-                    onClosePress={closeFullScreen}
-                    fullScreenMode={fsEnable}
-                    zoom={zoom}
-                    onSliderStop={onSliderStop}
-                    onZoomChange={onZoomChange}/>
-        </div>
+    return <div className={"timeline-preview _with-custom-scroll" + (fsEnable ? ' _full-screen' : '')} ref={preview}>
+        <Timeline width={width}
+                  backgroundImage={backgroundFile}
+                  height={height}
+                  theme={Themes.current}
+                  events={_events}
+                  periods={_periods}
+                  levelLimit={levels}
+                  onFullScreen={openFullScreen}
+                  onCloseFullScreen={closeFullScreen}
+                  />
     </div>
 }
 

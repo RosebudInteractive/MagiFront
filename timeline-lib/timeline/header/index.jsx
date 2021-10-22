@@ -3,12 +3,17 @@ import { Text, TouchableOpacity, View, } from 'react-native';
 import style from './style';
 import Button from './button';
 export default function Header(props) {
-    const { title, onOpenPress } = props;
-    return (<View style={[style.header]}>
+    const { title, width, onOpenPress } = props;
+    const openPress = (event) => {
+        if (onOpenPress) {
+            onOpenPress(event);
+        }
+    };
+    return (<View style={[style.header, { width }]}>
       <Text style={style.title}>{title}</Text>
-      <TouchableOpacity onPress={onOpenPress}>
+      <TouchableOpacity onPress={openPress}>
         <View style={style.button}>
-          {/*<Button />*/}
+          <Button />
         </View>
       </TouchableOpacity>
     </View>);
