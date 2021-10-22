@@ -66,10 +66,13 @@ export default function Timeline(props) {
             <ScrollView ref={horizontalContainerRef} directionalLockEnabled={false} onLayout={handleLayout} horizontal
                         style={styles.timeline}>
                 <View style={{height: '100%', overflow: 'hidden'}} onLayout={setContainerHeight}>
-                    <TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom}
-                              levelLimit={levelLimit} theme={Themes.current} height={containerHeight}
-                              elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped}
-                              visibilityChecking={visibilityChecking} onItemClick={onItemClick}/>
+                    {
+                        containerWidth && containerHeight &&
+                        <TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom}
+                               levelLimit={levelLimit} theme={Themes.current} height={containerHeight}
+                               elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped}
+                               visibilityChecking={visibilityChecking} onItemClick={onItemClick}/>
+                    }
                 </View>
             </ScrollView>
         </ScrollView>

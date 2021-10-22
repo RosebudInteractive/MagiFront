@@ -37,8 +37,17 @@ export default function CourseWrapper(props) {
     });
 
     const timelines = useMemo(() => {
-        return course.Timelines.map(tm => <TimelinePreview key={tm.Id} background={tm.Image ? tm.Image : null}
-                                                           events={tm.Events} periods={tm.Periods}/>);
+        return course.Timelines.map(tm => {
+            const levelLimits = {
+                events: (tm.Options && tm.Options.events) || 0,
+                periods: (tm.Options && tm.Options.periods) || 0
+            }
+
+            return <TimelinePreview key={tm.Id}
+                                    background={tm.Image ? tm.Image : null}
+                                    levels={levelLimits}
+                                    timeline={tm}/>
+        });
     }, [course]);
 
     const _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought;
