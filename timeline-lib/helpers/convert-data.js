@@ -4,6 +4,7 @@ const convertEvents = (events) => (events ? events.map((item) => {
         year: +item.Year,
         name: item.Name,
         color: item.color,
+        visible: true,
     };
     if (item.ShortName)
         dataItem.shortName = item.ShortName;
@@ -23,6 +24,7 @@ const convertPeriods = (periods) => (periods
             endYear: +item.RbYear,
             name: item.Name,
             color: item.color,
+            visible: true,
         };
         if (item.ShortName)
             dataItem.shortName = item.ShortName;
