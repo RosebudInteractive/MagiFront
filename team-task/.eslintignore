@@ -1,4 +1,4 @@
-/components
+/components/**/*.js
 /constants
 /containers/**/*.js
 /ducks

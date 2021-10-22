@@ -20,6 +20,7 @@ export default function TimeAxis(props) {
     const [myLevelLimit, setMyLevelLimit] = useState(null);
     const viewPort = useRef(null);
     const zoomRef = useRef(zoom);
+
     function calculateVertical() {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
@@ -37,6 +38,7 @@ export default function TimeAxis(props) {
             setMyLevelLimit(newValue);
         }
     }
+
     const calculateVerticalWithZoom = (zoomValue) => {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */

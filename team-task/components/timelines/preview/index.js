@@ -5,8 +5,8 @@ import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
 
-export default function TimelinePreview(props) {
-    const {background, events, periods, levels, timeline} = props;
+export default function TimelinePreview(props: Props) {
+    const {timeline, background, levels} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [incKey, setIncKey] = useState(0);
@@ -30,7 +30,6 @@ export default function TimelinePreview(props) {
                 setHeight(size.height);
             }
         }, 400)
-
     }, []);
 
     useEffect(() => {
@@ -50,39 +49,8 @@ export default function TimelinePreview(props) {
     }, [fsEnable]);
 
     const converted = useMemo(() => {
-        return convertData(timeline);
+        return timeline ? convertData(timeline) : {Events: [], Periods: []};
     }, [timeline])
-
-    const _periods = useMemo(() => {
-        return periods ? periods.map((item) => {
-            return {
-                id: item.Id ? item.Id : item.id,
-                startDay: !!item.LbDay && +item.LbDay,
-                startMonth: !!item.LbMonth && +item.LbMonth,
-                startYear: !!item.LbYear && +item.LbYear,
-                endDay: !!item.RbDay && +item.RbDay,
-                endMonth: !!item.RbMonth && +item.RbMonth,
-                endYear: !!item.RbYear && +item.RbYear,
-                name: item.ShortName || item.Name,
-                color: hslToHex(item.color),
-                visible: true,
-            }
-        }) : []
-    }, [periods]);
-
-    const _events = useMemo(() => {
-        return events ? events.map((item) => {
-            return {
-                id: item.Id ? item.Id : item.id,
-                day: !!item.Day && +item.Day,
-                month: !!item.Month && +item.Month,
-                year: !!item.Year && +item.Year,
-                name: item.ShortName || item.Name,
-                color: item.color,
-                visible: true,
-            }
-        }) : []
-    }, [events])
 
     const backgroundFile = useMemo(() => background ? (background.file ? background.file : background) : null, [background]);
 
@@ -106,23 +74,24 @@ export default function TimelinePreview(props) {
     }
 
     return <div className={"timeline-preview _with-custom-scroll" + (fsEnable ? ' _full-screen' : '')} ref={preview}>
-        <Timeline width={width}
-                  backgroundImage={backgroundFile}
-                  height={height}
-                  theme={Themes.current}
-                  events={converted.Events}
-                  periods={converted.Periods}
-                  levelLimit={levels}
-                  onFullScreen={openFullScreen}
-                  onCloseFullScreen={closeFullScreen}
-                  />
+        {timeline && width && height && <Timeline width={width}
+                               backgroundImage={backgroundFile}
+                               height={height}
+                               theme={Themes.current}
+                               events={converted.Events}
+                               periods={converted.Periods}
+                               levelLimit={levels}
+                               onFullScreen={openFullScreen}
+                               onCloseFullScreen={closeFullScreen}
+        />
+        }
     </div>
 }
 
 TimelinePreview.propTypes = {
     background: PropTypes.string,
-    events: PropTypes.array,
-    periods: PropTypes.array
+    timeline: PropTypes.any,
+    levels: PropTypes.any,
 };
 
 
