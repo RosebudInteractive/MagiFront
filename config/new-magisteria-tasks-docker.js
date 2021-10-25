@@ -1,7 +1,7 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
-const pk = require('../../keys');
+const pk = require('/app/keys');
 
 const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
 const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
