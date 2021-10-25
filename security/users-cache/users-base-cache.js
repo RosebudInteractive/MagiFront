@@ -571,6 +571,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         let dbopts = options || {};
         let is_device_modified = false;
         let is_notif_modified = false;
+        let is_device_force = false;
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -630,6 +631,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             }
                         }
                         if (user_data.alter.device && user_data.alter.device.devId) {
+                            is_device_force = user_data.alter.device.forceUpdate === true ? true : false;
                             let device = user_data.alter.device;
                             let type_id = ApplicationType[device.type];
                             if (device.devId && type_id && device.token) {
@@ -644,14 +646,15 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                         break;
                                     }
                                 }
-                                is_device_modified = true;
                                 if (dev_obj) {
-                                    is_device_modified = dev_obj.token() !== device.token;
+                                    is_device_modified = (dev_obj.token() !== device.token);
                                     dev_obj.token(device.token)
                                 }
-                                else
+                                else {
+                                    is_device_modified = true;
                                     await root_dev.newObject(
                                         { fields: { AppTypeId: type_id, DevId: devId, Token: device.token } }, dbopts)
+                                }
                             }
                             else
                                 throw new Error(`UsersBaseCache::editUser: Invalid "device" section: ${JSON.stringify(device)}.`);
@@ -664,6 +667,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                 let elem = col_notif.get(i);
                                 notif_list[elem.itemId()] = elem;
                             }
+                            is_notif_modified = user_data.alter.notifications.forceUpdate === true ? true : false;
                             for (let notif_key in user_data.alter.notifications) {
                                 let delivery = user_data.alter.notifications[notif_key];
                                 for (let delivery_key in delivery) {
@@ -734,11 +738,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     return rc.then(() => {
                         return root_obj.save(dbopts)
                             .then(() => {
-                                if (is_notif_modified || is_device_modified) {
+                                if (is_device_force || is_notif_modified || is_device_modified) {
                                     let notifService = this.getService('notifications', true);
                                     if (notifService) {
                                         let options = { dbOptions: dbopts };
                                         options.new_only = is_device_modified && (!is_notif_modified);
+                                        options.is_device_force = is_device_force;
                                         notifService.updateNotifications(id, options) // We should't wait here
                                             .catch(err => {
                                                 console.error(buildLogString(`DbUser::insBookmark:toggleBookmark: ${err}`));
