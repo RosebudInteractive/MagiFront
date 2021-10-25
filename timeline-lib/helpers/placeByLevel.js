@@ -1,5 +1,5 @@
 import calculateVerticalLevels from './calculateVerticalLevels';
 function placeByYLevelLimit(records, limit, checkVisibility = true) {
-    return calculateVerticalLevels(records, limit + 1, checkVisibility);
+    return calculateVerticalLevels(records, limit, checkVisibility);
 }
 export default placeByYLevelLimit;

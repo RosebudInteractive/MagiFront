@@ -58,7 +58,7 @@ export default function TimeAxis(props) {
             setMyLevelLimit(newValue);
         }
     };
-    const setPeriodsLevelsCount = (levelsCount) => {
+    const setPeriodsLevelsCount = useCallback((levelsCount) => {
         if (!myLevelLimit || (myLevelLimit.periods !== levelsCount)) {
             const newValue = myLevelLimit
                 ? {...myLevelLimit, periods: levelsCount}
@@ -66,7 +66,7 @@ export default function TimeAxis(props) {
 
             setMyLevelLimit(newValue);
         }
-    };
+    }, [myLevelLimit]);
     useEffect(() => {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
