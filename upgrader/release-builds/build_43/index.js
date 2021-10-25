@@ -73,7 +73,7 @@ exports.upgradeDb = async (schema) => {
 
     schema.addModel("NotifMsgRecipient", "e7a20211-a4d4-4ce5-8dd5-35428638dfbd", "RootNotifMsgRecipient", "72665fb2-46d8-4c73-8e0d-4a037c202ec8")
         .addField("MsgId", { type: "dataRef", model: "NotificationMessage", refAction: "parentRestrict", allowNull: false })
-        .addField("Type", { type: "int", allowNull: false }) // 1- topic, 2- endPoint
+        .addField("Type", { type: "int", allowNull: false }) // 1- topic, 2- endpoint
         .addField("Status", { type: "int", allowNull: false }) // 1- pending, 2- ok, 3- error
         .addField("ObjId", { type: "int", allowNull: true })
         .addField("StartedAt", { type: "datetime", allowNull: false })
