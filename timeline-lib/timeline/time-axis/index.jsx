@@ -1,22 +1,23 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
-import { View } from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef, useState,} from 'react';
+import {View} from 'react-native';
 import EventPoints from './event-points';
 import PeriodSections from './periods';
 import placeByYLevelLimit from '../../helpers/placeByLevel';
 import SerifsContext from './serifs/context';
 import NativeAxis from './axis';
-import { calcDisplayDate, calcEventPointPosition, isArrayEquals } from '../../helpers/tools';
-import { ItemType } from '../../types/common';
+import {calcDisplayDate, calcEventPointPosition, isArrayEquals} from '../../helpers/tools';
+import {ItemType} from '../../types/common';
+
 const ITEM_MIN_WIDTH = 50;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, } = props;
+    const {events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme,} = props;
     const [svgWidth, setSvgWidth] = useState(0);
     const [itemWidth, setItemWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
     const [eventsWithCoords, setEventsWithCoords] = useState(events);
     const [lastYearFromLastPoint, setLastYear] = useState(null);
-    const [activeItem, setActiveItem] = useState({ type: null, id: null, item: null });
+    const [activeItem, setActiveItem] = useState({type: null, id: null, item: null});
     const [myLevelLimit, setMyLevelLimit] = useState(null);
     const viewPort = useRef(null);
     const zoomRef = useRef(zoom);
@@ -29,12 +30,12 @@ export default function TimeAxis(props) {
             /* eslint-enable no-param-reassign */
         });
         // eslint-disable-next-line max-len
-        const { items: handledEvents, levelsCount } = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
+        const {items: handledEvents, levelsCount} = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
         if (!myLevelLimit || (myLevelLimit.events !== levelsCount)) {
             const newValue = myLevelLimit
-                ? { ...myLevelLimit, events: levelsCount }
-                : { periods: 0, events: levelsCount };
+                ? {...myLevelLimit, events: levelsCount}
+                : {periods: 0, events: levelsCount};
             setMyLevelLimit(newValue);
         }
     }
@@ -48,12 +49,12 @@ export default function TimeAxis(props) {
             item.offset = 0;
             /* eslint-enable no-param-reassign */
         });
-        const { items: handledEvents, levelsCount } = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
+        const {items: handledEvents, levelsCount} = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
         if (!myLevelLimit || (myLevelLimit.events !== levelsCount)) {
             const newValue = myLevelLimit
-                ? { ...myLevelLimit, events: levelsCount }
-                : { periods: 0, events: levelsCount };
+                ? {...myLevelLimit, events: levelsCount}
+                : {periods: 0, events: levelsCount};
             setMyLevelLimit(newValue);
         }
     };
@@ -62,8 +63,6 @@ export default function TimeAxis(props) {
             const newValue = myLevelLimit
                 ? {...myLevelLimit, periods: levelsCount}
                 : {events: 0, periods: levelsCount};
-
-            console.log(newValue);
 
             setMyLevelLimit(newValue);
         }
@@ -78,8 +77,7 @@ export default function TimeAxis(props) {
         });
         if (visibilityChecking) {
             calculateVertical();
-        }
-        else {
+        } else {
             setEventsWithCoords(events);
         }
     }, [events, periods]);
@@ -92,15 +90,13 @@ export default function TimeAxis(props) {
     const yearPerPixel = useRef(0);
     const startDate = useRef(0);
     useEffect(() => {
-        setMyLevelLimit({ ...levelLimit });
+        setMyLevelLimit({...levelLimit});
         calculateVertical();
     }, [levelLimit]);
     const viewPortHeight = useMemo(() => {
         const need = myLevelLimit
             ? (myLevelLimit.events * 50 + myLevelLimit.periods * 30 + 111)
             : 0;
-
-        console.log(need, height);
 
         return need > (height - 6) ? need : (height - 6);
     }, [height, myLevelLimit]);
@@ -149,33 +145,41 @@ export default function TimeAxis(props) {
     const midHeight = useMemo(() => {
         const value = viewPortHeight - ((myLevelLimit && myLevelLimit.periods) || 0) * 30 - 75;
 
-        console.log("midHeight", value, myLevelLimit);
-
         return value;
     }, [viewPortHeight, myLevelLimit])
 
     const recalculateTimelineEnding = useCallback((lastPointEndingYear) => {
         setLastYear(lastPointEndingYear);
     }, [viewPortHeight, myLevelLimit]);
+
     function onCoordinatesReady() {
         calculateVerticalWithZoom(zoom);
     }
-    const itemClickHandler = useCallback(({ type, id, item }) => {
+
+    const itemClickHandler = useCallback(({type, id, item}) => {
         if ((activeItem.type !== type) || (activeItem.id !== id)) {
-            setActiveItem({ type, id, item });
+            setActiveItem({type, id, item});
         }
         if (onItemClick)
-            onItemClick({ type, id, item });
+            onItemClick({type, id, item});
     }, [onItemClick, activeItem]);
     return !!width && !!yearPerPixel.current && !!myLevelLimit
-        ? (<View style={{ width: svgWidth + 40, height: viewPortHeight }} ref={viewPort}>
-        <SerifsContext.Provider value={{
+        ? (<View style={{width: svgWidth + 40, height: viewPortHeight}} ref={viewPort}>
+            <SerifsContext.Provider value={{
                 x: itemWidth, y: midHeight, zoom, theme,
             }}>
-          <NativeAxis width={svgWidth + 40} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
-          <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
-          <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods} startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler} onSetLevelsCount={setPeriodsLevelsCount}/>
-        </SerifsContext.Provider>
-      </View>)
+                <NativeAxis width={svgWidth + 40} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
+                <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current}
+                             yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady}
+                             onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events}
+                             activeItem={activeItem.type === ItemType.Event ? activeItem.id : null}
+                             onItemClick={itemClickHandler}/>
+                <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods}
+                                startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight}
+                                periods={periods}
+                                activeItem={activeItem.type === ItemType.Period ? activeItem.id : null}
+                                onItemClick={itemClickHandler} onSetLevelsCount={setPeriodsLevelsCount}/>
+            </SerifsContext.Provider>
+        </View>)
         : null;
 }

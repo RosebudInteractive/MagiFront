@@ -41,7 +41,7 @@ export default function PeriodSections(props) {
             });
             setVerticallyAlignedPeriods(alignedPeriods);
         }
-    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis, y]);
+    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis, y, onSetLevelsCount]);
     const periodSections = useMemo(() => (verticallyAlignedPeriods.length > 0
         ? verticallyAlignedPeriods.map((period, index, array) => {
             const isActive = period.id === activeItem;
