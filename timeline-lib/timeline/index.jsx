@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState,} from 'react';
+import React, {useCallback, useMemo, useRef, useState,} from 'react';
 import { ScrollView, View, } from 'react-native';
 import styles from './styles';
 import Themes from './theme';
@@ -48,9 +48,9 @@ export default function Timeline(props) {
     const handleLayout = (e) => {
         setContainerWidth(e.nativeEvent.layout.width - 40);
     };
-    const setContainerHeight = (e) => {
+    const setContainerHeight = () => {
         // eslint-disable-next-line no-console
-        console.log('height', e.nativeEvent.layout.height);
+        // console.log('height', e.nativeEvent.layout.height);
         // setHeight(e.nativeEvent.layout.height);
         // if (e.nativeEvent.layout.width > containerWidth + 40) {
         //   setHeightDelta(7);

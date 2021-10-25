@@ -43,10 +43,15 @@ export default function CourseWrapper(props) {
                 periods: (tm.Options && tm.Options.periods) || 0
             }
 
-            return <TimelinePreview key={tm.Id}
-                                    background={tm.Image ? tm.Image : null}
-                                    levels={levelLimits}
-                                    timeline={tm}/>
+            return <div className='block-wrapper'>
+                <div className="block-title ">Ключевые события </div>
+                <TimelinePreview key={tm.Id}
+                                 background={tm.Image ? tm.Image : null}
+                                 levels={levelLimits}
+                                 timeline={tm}/>
+            </div>
+
+
         });
     }, [course]);
 
