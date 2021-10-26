@@ -30,24 +30,24 @@ exports.AllowedNotifDelivery = {
 };
 
 exports.NotificationMsgType = {
-    custom: 1,
-    course: 2,
-    lesson: 3
+    Custom: 1,
+    Course: 2,
+    Lesson: 3
 };
 
 exports.NotifRecipientType = {
-    topic: 1,
-    endPoint: 2
+    Topic: 1,
+    Endpoint: 2
 };
 
 exports.NotifRecipientStatus = {
-    pending: 1,
-    ok: 2,
-    error: 3
+    Pending: 1,
+    Ok: 2,
+    Error: 3
 };
 
 exports.NotifCallStatus = {
-    pending: 1,
-    ok: 2,
-    error: 3
+    Pending: 1,
+    Ok: 2,
+    Error: 3
 };

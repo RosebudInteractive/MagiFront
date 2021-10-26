@@ -350,6 +350,7 @@ module.exports = {
         accessKeyId: notifProviderOpts && notifProviderOpts.accessKeyId ? notifProviderOpts.accessKeyId : undefined,
         secretAccessKey: notifProviderOpts && notifProviderOpts.secretAccessKey ? notifProviderOpts.secretAccessKey : undefined,
         region: notifProviderOpts && notifProviderOpts.region ? notifProviderOpts.region : undefined,
-        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined
+        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined,
+        providerLogs: notifProviderOpts && notifProviderOpts.logs ? notifProviderOpts.logs : undefined
     }
 };

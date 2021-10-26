@@ -1,6 +1,10 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+const pk = require('../../keys');
+
+const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
+const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
 
 let proxyServer = {
     protocol: 'http',
@@ -19,10 +23,18 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Push notifications",
+            module: "./notification",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {}
+        },
+        {
             name: "Price List update",
             module: "./price-list",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 fb: {
@@ -127,7 +139,8 @@ let options = {
                     facebook: {
                         usageLimitPerc: 90,
                         repairTime: 65 * 60 * 1000,
-                        minDelay: 30 * 1000                    }
+                        minDelay: 30 * 1000
+                    }
                 }
             }
         },
@@ -323,6 +336,14 @@ let options = {
                 idle: 60000
             }
         }
+    },
+    notifications: {
+        provider: notifProvider,
+        accessKeyId: notifProviderOpts && notifProviderOpts.accessKeyId ? notifProviderOpts.accessKeyId : undefined,
+        secretAccessKey: notifProviderOpts && notifProviderOpts.secretAccessKey ? notifProviderOpts.secretAccessKey : undefined,
+        region: notifProviderOpts && notifProviderOpts.region ? notifProviderOpts.region : undefined,
+        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined,
+        providerLogs: notifProviderOpts && notifProviderOpts.logs ? notifProviderOpts.logs : undefined
     }
 };
 

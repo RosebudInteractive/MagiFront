@@ -81,6 +81,72 @@ const GET_ALL_TOPICS_MSSQL =
 const GET_ALL_TOPICS_MYSQL =
     "select `Id`, `TypeId`, `Name`, `ObjId`, `Status`, `ExtData` from `NotificationTopic`";
 
+const GET_NEW_LESSONS_MSSQL =
+    "select lc.[LessonId], lc.[CourseId], lc.[Number], lcp.[Number] Pnumber, l.[URL] LsnURL, c.[URL] CrsURL,\n" +
+    "  ll.[Name] LsnName, cl.[Name] CrsName, t.[Id] TopicId, m.[Id] MsgId\n" +
+    "from [LessonCourse] lc\n" +
+    "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join [LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join [NotificationTopic] t on t.[ObjId] = c.[Id] and t.[TypeId] = " + NotificationTopicType.course + "\n" +
+    "  left join [LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
+    "  left join [NotificationMessage] m on l.[Id] = m.[ObjId] and m.[Type] = " + NotificationMsgType.Lesson + " and m.[Tag] = '<%= tag %>'\n" +
+    "where (c.[State] = 'P') and (lc.[State] = 'R') and (lc.[ReadyDate] >= convert(datetime, '<%= st_date %>'))\n" +
+    "order by lc.[CourseId], lcp.[Number], lc.[Number]";
+
+const GET_NEW_COURSES_MSSQL =
+    "select lc.[LessonId], lc.[CourseId], lc.[Number], lcp.[Number] Pnumber, l.[URL] LsnURL, c.[URL] CrsURL,\n" +
+    "  ll.[Name] LsnName, cl.[Name] CrsName\n" +
+    "from [LessonCourse] lc\n" +
+    "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join [LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join [LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
+    "  left join [NotificationMessage] m on c.[Id] = m.[ObjId] and m.[Type] = " + NotificationMsgType.Course + " and m.[Tag] = '<%= tag %>'\n" +
+    "where (c.[State] = 'P') and (lc.[State] = 'R') and (lc.[ReadyDate] >= convert(datetime, '<%= st_date %>'))\n" +
+    "  and (lc.[Number] = 1) and (lcp.[Number] is NULL) and (m.[Id] is NULL)\n" +
+    "order by lc.[CourseId], lcp.[Number], lc.[Number]";
+
+const GET_NEW_LESSONS_MYSQL =
+    "select lc.`LessonId`, lc.`CourseId`, lc.`Number`, lcp.`Number` Pnumber, l.`URL` LsnURL, c.`URL` CrsURL,\n" +
+    "  ll.`Name` LsnName, cl.`Name` CrsName, t.`Id` TopicId, m.`Id` MsgId\n" +
+    "from `LessonCourse` lc\n" +
+    "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join `LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join `NotificationTopic` t on t.`ObjId` = c.`Id` and t.`TypeId` = " + NotificationTopicType.course + "\n" +
+    "  left join `LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
+    "  left join `NotificationMessage` m on l.`Id` = m.`ObjId` and m.`Type` = " + NotificationMsgType.Lesson + " and m.`Tag` = '<%= tag %>'\n" +
+    "where (c.`State` = 'P') and (lc.`State` = 'R') and (lc.`ReadyDate` >= '<%= st_date %>')\n" +
+    "order by lc.`CourseId`, lcp.`Number`, lc.`Number`";
+
+const GET_NEW_COURSES_MYSQL =
+    "select lc.`LessonId`, lc.`CourseId`, lc.`Number`, lcp.`Number` Pnumber, l.`URL` LsnURL, c.`URL` CrsURL,\n" +
+    "  ll.`Name` LsnName, cl.`Name` CrsName\n" +
+    "from `LessonCourse` lc\n" +
+    "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join `LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join `LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
+    "  left join `NotificationMessage` m on c.`Id` = m.`ObjId` and m.`Type` = " + NotificationMsgType.Course + " and m.`Tag` = '<%= tag %>'\n" +
+    "where (c.`State` = 'P') and (lc.`State` = 'R') and (lc.`ReadyDate` >= '<%= st_date %>')\n" +
+    "  and (lc.`Number` = 1) and (lcp.`Number` is NULL) and (m.`Id` is NULL)\n" +
+    "order by lc.`CourseId`, lcp.`Number`, lc.`Number`";
+
+const GET_ENDPOINS_MSSQL =
+    "select e.[Id], e.[AppTypeId], e.[ActiveUserId], e.[DevId], e.[Token], e.[Status], e.[ExtData]\n" +
+    "from [NotifEndPoint] e\n" +
+    "  join [EndPointUser] u on u.[EndPointId] = e.[Id]<%= cond %>";
+
+const GET_ENDPOINS_MYSQL =
+    "select e.`Id`, e.`AppTypeId`, e.`ActiveUserId`, e.`DevId`, e.`Token`, e.`Status`, e.`ExtData`\n" +
+    "from `NotifEndPoint` e\n" +
+    "  join `EndPointUser` u on u.`EndPointId` = e.`Id`<%= cond %>";
+
 const EP_CREATE = {
     expr: {
         model: {
@@ -250,7 +316,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                     else
                         if (collection.count() === 0) {
                             is_new = true;
-                            let fields = { AppTypeId: new_dev.AppTypeId, DevId: new_dev.DevId, Status: NotifCallStatus.pending };
+                            let fields = { AppTypeId: new_dev.AppTypeId, DevId: new_dev.DevId, Status: NotifCallStatus.Pending };
                             let { newObject } = await root_obj.newObject({ fields: fields }, dbOpts);
                             epObj = this._db.getObj(newObject);
                         }
@@ -314,7 +380,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                     let res = {};
                     await root_obj.edit();
 
-                    let fields = { TypeId: topic.TypeId, Status: NotifCallStatus.pending };
+                    let fields = { TypeId: topic.TypeId, Status: NotifCallStatus.Pending };
                     switch (topic.TypeId) {
                         case NotificationTopicType.course:
                             fields.Name = `COURSE-${topic.ObjId}`;
@@ -370,8 +436,9 @@ const NotificationAPI = class NotificationAPI extends DbObject {
 
     async _onDeleteSubscription(subsObj) { }
 
-    async _onAddSubscription(topic, subsObj) { }
-    
+    async _onAddSubscription(topic, endPoint, subsObj) { }
+    async _onUpdateSubscription(topic, endPoint, subsObj) { }
+
     async _updateSubscription(user_id, end_points, options) {
         let opts = _.cloneDeep(options || {});
         let course_id = typeof (opts.bookmark) === "number" ? opts.bookmark : null;
@@ -486,12 +553,14 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                                 let end_point = end_points[i];
                                 let key = `${topic.Id}:${end_point.Id}`;
                                 if (!subs_list[key]) {
-                                    let fields = { TypeId: NotifDeliveryType.app, TopicId: topic.Id, ObjId: end_point.Id, Status: NotifCallStatus.pending };
+                                    let fields = { TypeId: NotifDeliveryType.app, TopicId: topic.Id, ObjId: end_point.Id, Status: NotifCallStatus.Pending };
                                     let { newObject } = await root_obj.newObject({ fields: fields }, dbOpts);
                                     await this._onAddSubscription(topic, end_point, this._db.getObj(newObject));
                                 }
-                                else
+                                else {
+                                    await this._onUpdateSubscription(topic, end_point, subs_list[key]);
                                     delete subs_list[key];
+                                }
                             }
                         }
                         for (let key in subs_list) {
@@ -535,6 +604,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
     async updateNotifications(user_id, options) {
         let opts = _.cloneDeep(options || {});
         let is_new_only = opts.new_only === "true" || opts.new_only === true;
+        let is_device_force = opts.is_device_force === "true" || opts.is_device_force === true;
         return await this._lock(`${LOCK_KEY_PREFIX}${user_id}`, async () => {
             let { devices, endPoins } = await this._getUserDevices(user_id, options);
             let all_end_points = [];
@@ -542,7 +612,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
             for (let key in devices) {
                 let dev = devices[key];
                 let ep = endPoins[key];
-                if ((!ep) || (ep.ActiveUserId !== user_id) || (ep.Token !== dev.Token))
+                if (is_device_force || (!ep) || (ep.ActiveUserId !== user_id) || (ep.Token !== dev.Token))
                     ep = await this._createOrUpdateDevice(user_id, dev, ep, options);
                 all_end_points.push(ep);
                 if (ep.isNew)
@@ -584,38 +654,86 @@ const NotificationAPI = class NotificationAPI extends DbObject {
         let result = {};
         let mssql = GET_ALL_TOPICS_MSSQL;
         let mysql = GET_ALL_TOPICS_MYSQL;
+        let is_empty = false;
         if (Array.isArray(opts.ids)) {
-            mssql += `\nwhere [Id] in (${opts.ids.join()})`;
-            mysql += `\nwhere ${'`'}Id${'`'} in (${opts.ids.join()})`;
-        }
-        let records = await $data.execSql({
-            dialect: {
-                mysql: _.template(mysql)(),
-                mssql: _.template(mssql)()
+            if (opts.ids.length > 0) {
+                mssql += `\nwhere [Id] in (${opts.ids.join()})`;
+                mysql += `\nwhere ${'`'}Id${'`'} in (${opts.ids.join()})`;
             }
-        }, dbOpts)
-        if (records && records.detail && (records.detail.length > 0)) {
-            for (let i = 0; i < records.detail.length; i++) {
-                let elem = _.clone(records.detail[i]);
-                if (elem.ExtData)
-                    try { elem.ExtData = JSON.parse(elem.ExtData) } catch (err) { elem.ExtData = null }
-                result[elem.Id] = elem;
+            else
+                is_empty = true;
+        }
+        if (!is_empty) {
+            let records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(mysql)(),
+                    mssql: _.template(mssql)()
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length > 0)) {
+                for (let i = 0; i < records.detail.length; i++) {
+                    let elem = _.clone(records.detail[i]);
+                    if (elem.ExtData)
+                        try { elem.ExtData = JSON.parse(elem.ExtData) } catch (err) { elem.ExtData = null }
+                    result[elem.Id] = elem;
+                }
             }
         }
         return result;
     }
 
     async _onPublishMessage(message, recObj, recData) { }
-    
+
     async sendNotification(data, options) {
+        return this._sendNotification(data, undefined, undefined, options);
+    }
+
+    async _getEndpoints(endpoints, users, options) {
+        let opts = _.cloneDeep(options || {});
+        let dbOpts = opts.dbOptions || {};
+        let result = {};
+        let mssql = "";
+        let mysql = "";
+        if (Array.isArray(endpoints) && (endpoints.length > 0)) {
+            mssql += `\nwhere (e.[Id] in (${endpoints.join()}))`;
+            mysql += `\nwhere (e.${'`'}Id${'`'} in (${endpoints.join()}))`;
+        }
+        if (Array.isArray(users) && (users.length > 0)) {
+            mssql += `\n${mssql.length > 0 ? '  or' : 'where'} (u.[UserId] in (${users.join()}))`;
+            mysql += `\n${mysql.length > 0 ? '  or' : 'where'} (u.${'`'}UserId${'`'} in (${users.join()}))`;
+        }
+        if (mysql.length > 0) {
+            let records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_ENDPOINS_MYSQL)({ cond: mysql }),
+                    mssql: _.template(GET_ENDPOINS_MSSQL)({ cond: mysql })
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length > 0)) {
+                let list = {};
+                for (let i = 0; i < records.detail.length; i++) {
+                    let elem = _.clone(records.detail[i]);
+                    if (!list[elem.Id]) {
+                        list[elem.Id] = true;
+                        if (elem.ExtData)
+                            try { elem.ExtData = JSON.parse(elem.ExtData) } catch (err) { elem.ExtData = null }
+                        result[elem.Id] = elem;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    async _sendNotification(data, topics, endpoints, options) {
         let inpData = _.cloneDeep(data || {});
         let opts = _.cloneDeep(options || {});
         let memDbOptions = { dbRoots: [] };
         let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
         let root_obj = null;
 
-        if (!inpData.recepients)
-            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "recepients" field.`);
+        if (!inpData.recipients)
+            throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "recipients" field.`);
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -628,18 +746,26 @@ const NotificationAPI = class NotificationAPI extends DbObject {
 
                     await root_obj.edit();
 
-                    let fields = { Tag: inpData.Tag };
+                    let fields = { Tag: inpData.tag };
                     let msg_body;
+                    if (!inpData.message)
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "message" field.`);
+                    msg_body = inpData.message;
                     switch (inpData.type) {
                         case "custom":
-                            fields.Type = NotificationMsgType.custom;
-                            if (!inpData.message)
-                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "message" field.`);
-                            msg_body = inpData.message;
+                            fields.Type = NotificationMsgType.Custom;
                             break;
                         case "course":
+                            fields.Type = NotificationMsgType.Course;
+                            if (!inpData.courseId)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "courseId" field.`);
+                            fields.ObjId = inpData.courseId;
+                            break;
                         case "lesson":
-                            throw new HttpError(HttpCode.ERR_BAD_REQ, `Unsupported "type": "${inpData.type}".`);
+                            fields.Type = NotificationMsgType.Lesson;
+                            if (!inpData.lessonId)
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "lessonId" field.`);
+                            fields.ObjId = inpData.lessonId;
                             break;
                         default:
                             throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid "type" field: "${inpData.type}".`);
@@ -648,29 +774,61 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                     let { newObject } = await root_obj.newObject({ fields: fields }, dbOpts);
                     let msgObj = this._db.getObj(newObject);
                     
-                    msgObj.body(typeof (msg_body) === "string" ? { default: msg_body } : msg_body);
+                    msgObj.body(typeof (msg_body) === "string" ? { text: msg_body } : msg_body);
                     await root_obj.save(dbOpts)
 
-                    let sendToTopics = async (topic_list) => {
+                    let sendToRecepients = async (recipient_type, ids_list, ext_ids_list) => {
                         let reqOpts = _.cloneDeep(options || {});
-                        if (Array.isArray(topic_list))
-                            reqOpts.ids = topic_list
-                        else
-                            if (typeof (topic_list) === "number")
-                                reqOpts.ids = [topic_list]
-                            else
-                                if (topic_list !== "all")
-                                    throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid "recepients.topic" field: ${inpData.recepients.topic}.`);
-                        let topics = await this._getTopics(reqOpts);
-                        for (let key in topics) {
-                            let topic = topics[key];
+                        let recipients = {};
+                        switch (recipient_type) {
+                            case NotifRecipientType.Topic:
+                                if (Array.isArray(ids_list))
+                                    reqOpts.ids = ids_list
+                                else
+                                    if (typeof (ids_list) === "number")
+                                        reqOpts.ids = [ids_list]
+                                    else
+                                        if (ids_list === "ref") {
+                                            if (!topics)
+                                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "topic" argument.`);
+                                        }
+                                        else
+                                            if (ids_list !== "all")
+                                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid "recipients.topic" field: ${inpData.recipients.topic}.`);
+                                recipients = topics ? topics : await this._getTopics(reqOpts);
+                                break;
+                            case NotifRecipientType.Endpoint:
+                                let _endpoints = null;
+                                let _users = null;
+                                if (Array.isArray(ids_list))
+                                    _endpoints = ids_list
+                                else
+                                    if (typeof (ids_list) === "number")
+                                        _endpoints = [ids_list]
+                                    else
+                                        if (ids_list === "ref") {
+                                            if (!endpoints)
+                                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing "endpoints" argument.`);
+                                        }
+                                if (Array.isArray(ext_ids_list))
+                                    _users = ext_ids_list
+                                else
+                                    if (typeof (ext_ids_list) === "number")
+                                        _users = [ext_ids_list]
+                                recipients = endpoints ? endpoints : await this._getEndpoints(_endpoints, _users, reqOpts);
+                                break;
+                            default:
+                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Invalid "recipient_type" parameter: ${recipient_type}.`);
+                        }
+                        for (let key in recipients) {
+                            let recipient = recipients[key];
                             let root_rec = msgObj.getDataRoot("NotifMsgRecipient");
                             await root_rec.edit();
                             let curr_date = new Date();
                             let fields = {
-                                Type: NotifRecipientType.topic,
-                                Status: NotifRecipientStatus.ok,
-                                ObjId: topic.Id,
+                                Type: recipient_type,
+                                Status: NotifRecipientStatus.Ok,
+                                ObjId: recipient.Id,
                                 StartedAt: curr_date,
                                 FinishedAt: curr_date,
                                 TrialNum: 1,
@@ -678,28 +836,47 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                             }
                             let { newObject } = await root_rec.newObject({ fields: fields }, dbOpts);
                             let recObj = this._db.getObj(newObject);
-                            await this._onPublishMessage(msgObj.body(), recObj, topic);
+                            await this._onPublishMessage(msgObj.body(), recObj, recipient);
                             await root_rec.save(dbOpts)
                         }
                     }
 
-                    for (let key in inpData.recepients) {
-                        switch (key) {
-                            case "topic":
-                                await sendToTopics(inpData.recepients.topic);
-                                break;
-                            default:
-                                throw new HttpError(HttpCode.ERR_BAD_REQ, `Missing or invalid "type" field: ${inpData.type}.`);
-                        }
-                    }
+                    if (inpData.recipients.topic)
+                        await sendToRecepients(NotifRecipientType.Topic, inpData.recipients.topic);
+                    
+                    if (inpData.recipients.endpoint || inpData.recipients.user)
+                        await sendToRecepients(NotifRecipientType.Endpoint, inpData.recipients.endpoint, inpData.recipients.user);
 
                     return { result: "OK" };
                 })
         }, memDbOptions);
     }
 
+    async _getNewCorsesTopicId(dbOpts) {
+        let mssql = `select [Id] from [NotificationTopic] where [TypeId] = ${NotificationTopicType.newCourse}`;
+        let mysql = `${"select`Id` from `NotificationTopic` where `TypeId` = "}${NotificationTopicType.newCourse}`;;
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(mysql)(),
+                mssql: _.template(mssql)()
+            }
+        }, dbOpts)
+        let id = null;
+        if (records && records.detail && (records.detail.length === 1))
+            id = records.detail[0].Id;
+        return id;
+    }
+
     async sendAutoNotifications(data, options) {
+        const AUTO_TAG = "auto";
+        const NEW_COURSE_TITLE_TEMPLATE = 'Вышел новый курс';
+        const NEW_LESSON_TITLE_TEMPLATE = 'Вышла новая лекция';
+        const NEW_COURSE_TEMPLATE = '"<%= name %>"';
+        const NEW_LESSON_TEMPLATE = '"<%= lesson_name %>" в курсе "<%= course_name %>"';
+
+        let result = { courses: 0, lessons: 0 };
         let opts = _.cloneDeep(options || {});
+        let dbOpts = opts.dbOptions || {};
         let inpData = _.cloneDeep(data || {});
         let start_date = new Date();
         if (inpData.startDate instanceof Date)
@@ -714,6 +891,85 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                 if (typeof (inpData.startDate) === "number")
                     start_date = new Date(inpData.startDate);
         start_date = new Date(start_date.getFullYear(), start_date.getMonth(), start_date.getDate());
+        let topics = null;
+        let new_course_topic_id = await this._getNewCorsesTopicId(dbOpts);
+        if (new_course_topic_id) {
+            let records = await $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_NEW_COURSES_MYSQL)({ st_date: this._dateToString(start_date), tag: AUTO_TAG }),
+                    mssql: _.template(GET_NEW_COURSES_MSSQL)({ st_date: this._dateToString(start_date), tag: AUTO_TAG })
+                }
+            }, dbOpts)
+            if (records && records.detail && (records.detail.length > 0)) {
+                topics = topics ? topics : await this._getTopics(options);
+                let _topics = {};
+                _topics[new_course_topic_id] = topics[new_course_topic_id];
+                for (let i = 0; i < records.detail.length; i++) {
+                    let elem = records.detail[0];
+                    let data = {
+                        tag: AUTO_TAG,
+                        type: "course",
+                        message: {
+                            title: _.template(NEW_COURSE_TITLE_TEMPLATE)(),
+                            text: _.template(NEW_COURSE_TEMPLATE)({ name: elem.CrsName }),
+                            custom: {
+                                type: "new-course",
+                                courseId: elem.CourseId
+                            }
+                        },
+                        courseId: elem.CourseId,
+                        recipients: {
+                            topic: "ref"
+                        }
+                    }
+                    await this._sendNotification(data, _topics, undefined, options)
+                    result.courses++;
+                }
+            }
+        }
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_NEW_LESSONS_MYSQL)({ st_date: this._dateToString(start_date), tag: AUTO_TAG }),
+                mssql: _.template(GET_NEW_LESSONS_MSSQL)({ st_date: this._dateToString(start_date), tag: AUTO_TAG })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            topics = topics ? topics : await this._getTopics(options);
+            let already_notified = {};
+            for (let i = 0; i < records.detail.length; i++) {
+                let elem = records.detail[i];
+                if (elem.MsgId)
+                    already_notified[elem.CourseId] = true;
+            }
+            for (let i = 0; i < records.detail.length; i++) {
+                let elem = records.detail[i];
+                if (!(elem.MsgId || already_notified[elem.CourseId])) {
+                    already_notified[elem.CourseId] = true;
+                    let _topics = {};
+                    _topics[elem.TopicId] = topics[elem.TopicId];
+                    let data = {
+                        tag: AUTO_TAG,
+                        type: "lesson",
+                        message: {
+                            title: _.template(NEW_LESSON_TITLE_TEMPLATE)(),
+                            text: _.template(NEW_LESSON_TEMPLATE)({ lesson_name: elem.LsnName, course_name: elem.CrsName }),
+                            custom: {
+                                type: "new-lesson",
+                                courseId: elem.CourseId,
+                                lessonId: elem.LessonId
+                            }
+                        },
+                        lessonId: elem.LessonId,
+                        recipients: {
+                            topic: "ref"
+                        }
+                    }
+                    await this._sendNotification(data, _topics, undefined, options)
+                    result.lessons++;
+                }
+            }
+        }
+        return result;
     }
 }
 
