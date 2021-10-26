@@ -107,10 +107,11 @@ const Records = (props) => {
         if (!isMounted.current && (Object.keys(initState).length === 0)) {
             initState = savedFilters.getFor(FILTER_KEY.DASHBOARD_PUBLISHED);
             initState.replacePath = true;
-            isMounted.current = true;
         } else {
             savedFilters.setFor(FILTER_KEY.DASHBOARD_PUBLISHED, {...initState})
         }
+
+        isMounted.current = true;
 
         if (initState.order) {
             _sortRef.current = initState.order;

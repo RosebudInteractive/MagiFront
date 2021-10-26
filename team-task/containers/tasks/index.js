@@ -35,16 +35,17 @@ function Tasks(props) {
     }, [tasks])
 
     useEffect(() => {
-        let initState = parseParams()
+        let initState = parseParams();
         const locationSearchUrl = new URLSearchParams(location.search);
 
         if (!isMounted.current && (Object.keys(initState).length === 0)) {
             initState = savedFilters.getFor(FILTER_KEY.TASKS)
             initState.replacePath = true
-            isMounted.current = true
         } else {
             savedFilters.setFor(FILTER_KEY.TASKS, {...initState})
         }
+
+        isMounted.current = true;
 
         if (initState.order) {
             _sortRef.current = initState.order
