@@ -53,12 +53,13 @@ function Processes(props) {
         let initState = parseParams()
 
         if (!isMounted.current && (Object.keys(initState).length === 0)) {
-            initState = savedFilters.getFor(FILTER_KEY.PROCESSES)
+            initState = savedFilters.getFor(FILTER_KEY.PROCESSES);
             initState.replacePath = true
-            isMounted.current = true
         } else {
             savedFilters.setFor(FILTER_KEY.PROCESSES, {...initState})
         }
+
+        isMounted.current = true;
 
         if (initState.order) {
             _sortRef.current = initState.order
