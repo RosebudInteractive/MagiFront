@@ -123,11 +123,12 @@ const AwsNotification = class AwsNotification extends NotificationBase{
 
         let result;
         let data;
+        let isGetFailed;
         let status = NotifCallStatus.Ok;
         let endPointArn = epObj.extData() ? epObj.extData().EndpointArn : null;
         if (endPointArn) {
             try {
-                let isGetFailed = true;
+                isGetFailed = true;
                 const command = new GetEndpointAttributesCommand({ EndpointArn: endPointArn });
                 let { Attributes } = await this.#client.send(command);
                 isGetFailed = false;
