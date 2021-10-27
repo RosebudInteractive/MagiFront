@@ -97,12 +97,14 @@ const GET_NEW_LESSONS_MSSQL =
 
 const GET_NEW_COURSES_MSSQL =
     "select lc.[LessonId], lc.[CourseId], lc.[Number], lcp.[Number] Pnumber, l.[URL] LsnURL, c.[URL] CrsURL,\n" +
-    "  ll.[Name] LsnName, cl.[Name] CrsName\n" +
+    "  ll.[Name] LsnName, cl.[Name] CrsName, ctl.[Name] CtgName\n" +
     "from [LessonCourse] lc\n" +
     "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join [LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join [CourseCategory] cc on cc.[CourseId] = c.[Id]\n" +
+    "  join [CategoryLng] ctl on ctl.[CategoryId] = cc.[CategoryId]\n" +
     "  left join [LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
     "  left join [NotificationMessage] m on c.[Id] = m.[ObjId] and m.[Type] = " + NotificationMsgType.Course + " and m.[Tag] = '<%= tag %>'\n" +
     "where (c.[State] = 'P') and (lc.[State] = 'R') and (lc.[ReadyDate] >= convert(datetime, '<%= st_date %>'))\n" +
@@ -125,12 +127,14 @@ const GET_NEW_LESSONS_MYSQL =
 
 const GET_NEW_COURSES_MYSQL =
     "select lc.`LessonId`, lc.`CourseId`, lc.`Number`, lcp.`Number` Pnumber, l.`URL` LsnURL, c.`URL` CrsURL,\n" +
-    "  ll.`Name` LsnName, cl.`Name` CrsName\n" +
+    "  ll.`Name` LsnName, cl.`Name` CrsName, ctl.`Name` CtgName\n" +
     "from `LessonCourse` lc\n" +
     "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join `CourseCategory` cc on cc.`CourseId` = c.`Id`\n" +
+    "  join `CategoryLng` ctl on ctl.`CategoryId` = cc.`CategoryId`\n" +
     "  left join `LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
     "  left join `NotificationMessage` m on c.`Id` = m.`ObjId` and m.`Type` = " + NotificationMsgType.Course + " and m.`Tag` = '<%= tag %>'\n" +
     "where (c.`State` = 'P') and (lc.`State` = 'R') and (lc.`ReadyDate` >= '<%= st_date %>')\n" +
@@ -869,8 +873,9 @@ const NotificationAPI = class NotificationAPI extends DbObject {
 
     async sendAutoNotifications(data, options) {
         const AUTO_TAG = "auto";
-        const NEW_COURSE_TITLE_TEMPLATE = 'Вышел новый курс';
-        const NEW_LESSON_TITLE_TEMPLATE = 'Вышла новая лекция';
+        const NEW_COURSE_TITLE_TEMPLATE = 'Новый курс в разделе "<%= category_name %>"';
+        const NEW_LESSON_TITLE_TEMPLATE = 'Новая лекция';
+        const NEW_SUBLESSON_TITLE_TEMPLATE = 'Новый дополнительный эпизод';
         const NEW_COURSE_TEMPLATE = '"<%= name %>"';
         const NEW_LESSON_TEMPLATE = '"<%= lesson_name %>" в курсе "<%= course_name %>"';
 
@@ -904,26 +909,30 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                 topics = topics ? topics : await this._getTopics(options);
                 let _topics = {};
                 _topics[new_course_topic_id] = topics[new_course_topic_id];
+                let done = {};
                 for (let i = 0; i < records.detail.length; i++) {
                     let elem = records.detail[0];
-                    let data = {
-                        tag: AUTO_TAG,
-                        type: "course",
-                        message: {
-                            title: _.template(NEW_COURSE_TITLE_TEMPLATE)(),
-                            text: _.template(NEW_COURSE_TEMPLATE)({ name: elem.CrsName }),
-                            custom: {
-                                type: "new-course",
-                                courseId: elem.CourseId
+                    if (!done[elem.CourseId]) {
+                        done[elem.CourseId] = true;
+                        let data = {
+                            tag: AUTO_TAG,
+                            type: "course",
+                            message: {
+                                title: _.template(NEW_COURSE_TITLE_TEMPLATE)({ category_name: elem.CtgName }),
+                                text: _.template(NEW_COURSE_TEMPLATE)({ name: elem.CrsName }),
+                                custom: {
+                                    type: "new-course",
+                                    courseId: elem.CourseId
+                                }
+                            },
+                            courseId: elem.CourseId,
+                            recipients: {
+                                topic: "ref"
                             }
-                        },
-                        courseId: elem.CourseId,
-                        recipients: {
-                            topic: "ref"
                         }
+                        await this._sendNotification(data, _topics, undefined, options)
+                        result.courses++;
                     }
-                    await this._sendNotification(data, _topics, undefined, options)
-                    result.courses++;
                 }
             }
         }
@@ -951,7 +960,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                         tag: AUTO_TAG,
                         type: "lesson",
                         message: {
-                            title: _.template(NEW_LESSON_TITLE_TEMPLATE)(),
+                            title: elem.Pnumber ? NEW_SUBLESSON_TITLE_TEMPLATE : NEW_LESSON_TITLE_TEMPLATE,
                             text: _.template(NEW_LESSON_TEMPLATE)({ lesson_name: elem.LsnName, course_name: elem.CrsName }),
                             custom: {
                                 type: "new-lesson",
