@@ -6,6 +6,10 @@ const pk = require('/app/keys');
 const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
 const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
 
+let protocol = pk.protocol ? pk.protocol : 'https';
+let address = pk.address ? pk.address : 'new.magisteria.ru';
+let host = `${protocol}://${address}`;
+
 const feedPath = '/app/feed';
 const uploadPath = '/app/uploads';
 const pricelistPath = '/app/pricelist';
@@ -194,8 +198,8 @@ module.exports = {
     uploadPath: path.join(uploadPath, path.sep),
     dataUrl: '/data',
     proxyServer: {
-        protocol: 'https',
-        address: 'new.magisteria.ru',
+        protocol: protocol,
+        address: address,
         port: null
     },
     server: {

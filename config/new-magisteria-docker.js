@@ -9,12 +9,16 @@ const dockerHostIP = '172.17.0.1';
 const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
 const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
 
+let protocol = pk.protocol ? pk.protocol : 'https';
+let address = pk.address ? pk.address : 'new.magisteria.ru';
+let host = `${protocol}://${address}`;
+
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(uploadPath, path.sep),
     proxyServer: {
-        protocol: 'https',
-        address: 'new.magisteria.ru',
+        protocol: protocol,
+        address: address,
         port: null
     },
     mobileApp: {
@@ -172,7 +176,7 @@ module.exports = {
                 addressBook: "Магистерия",
                 sender: "test@magisteria.ru",
                 senderName: "Magisteria.ru",
-                host: "https://new.magisteria.ru"
+                host: host
             }
         },
         userReg: {
