@@ -136,6 +136,22 @@ const USER_NOTIF_EXPRESSION = {
     }
 };
 
+const USER_CREATE_EXPRESSION = {
+    expr: {
+        model: {
+            name: "User",
+            childs: [
+                {
+                    dataObject: {
+                        name: "UserRole"
+                    }
+                },
+                USER_NOTIF_EXPRESSION
+            ]
+        }
+    }
+};
+
 exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
     static UserToClientJSON(user) {
@@ -355,6 +371,14 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         }).bind(this), options);
     }
 
+    async _createUserNotifsDflt(user) {
+        let root_notif = user.getDataRoot("UserNotification");
+        if (root_notif) {
+            await root_notif.newObject({ fields: { ItemId: AllowedNotifDelivery.bookmark.app } }, {});
+            await root_notif.newObject({ fields: { ItemId: AllowedNotifDelivery.new.app } }, {});
+        }
+    }
+
     createUser(password, userData) {
         let options = { dbRoots: [] };
         let root_obj;
@@ -377,7 +401,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 predicate
                     .addCondition({ field: "Email", op: "=", value: data.Login });
 
-                let exp_filtered = Object.assign({}, USER_USERROLE_EXPRESSION);
+                let exp_filtered = Object.assign({}, USER_CREATE_EXPRESSION);
                 exp_filtered.expr.predicate = predicate.serialize(true);
                 this._db._deleteRoot(predicate.getRoot());
 
@@ -399,11 +423,11 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     let collection = root_obj.getCol("DataElements");
                     if (collection.count() > 0)
                         throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
-                            error:"emailAlreadyRegistered",
+                            error: "emailAlreadyRegistered",
                             message: "Email \"" + data.Login + "\" уже был зарегистрирован."
                         });
 
-                    // Create new user
+                    // Create a new user
 
                     data.PData = data.PData || PData;
                     PData = data.PData;
@@ -418,10 +442,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             return root_obj.newObject({ fields: fields }, {});
                         });
                 })
-                .then((result) => {
+                .then(async (result) => {
                     user = this._db.getObj(result.newObject);
                     if (!user)
                         throw new Error("UsersBaseCache::createUser: Failed to create new user.");
+
+                    await this._createUserNotifsDflt(user);
 
                     let roles = [];
                     if (PData.isAdmin)
@@ -889,7 +915,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                         dataObject: {
                                             name: "UserRole"
                                         }
-                                    }
+                                    },
+                                    USER_NOTIF_EXPRESSION
                                 ]
                             },
                             predicate: predicate.serialize(true)
@@ -921,7 +948,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             return this._activateUser(user); // User is pending for activation, therefore let's activate his
                     }
                     else {
-                        // Create new user
+                        // Create a new user
                         isNewUser = true;
                         let fields = {
                             Name: profile.username,
@@ -944,10 +971,11 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                 fields.PwdHash = hash;
 
                                 return root_obj.newObject({ fields: fields }, {})
-                                    .then((result) => {
+                                    .then(async (result) => {
                                         user = this._db.getObj(result.newObject);
                                         if (!user)
                                             throw new Error("UsersBaseCache::getUserByEmailOrCreate: Failed to create new user.");
+                                        await this._createUserNotifsDflt(user);
                                         return this.getRoleByCode("s");
                                     })
                                     .then((role) => {
@@ -1003,7 +1031,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             IsUpdated: false
                         }
                         if (profile.photos && (profile.photos.length > 0) && profile.photos[0].value)
-                            fields.PhotoUrl = profile.photos[0].value;
+                            fields.PhotoUrl = profile.photos[0].value.length <= 255 ? profile.photos[0].value : null;
                         return root_profile.newObject({ fields: fields }, {})
                             .then(() => {
                                 return root_obj.save();
