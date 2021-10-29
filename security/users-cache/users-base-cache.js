@@ -657,7 +657,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             }
                         }
                         if (user_data.alter.device && user_data.alter.device.devId) {
-                            is_device_force = user_data.alter.device.forceUpdate === true ? true : false;
+                            // Always update unless [user_data.alter.device.forceUpdate === false]
+                            is_device_force = user_data.alter.device.forceUpdate === false ? false : true;
                             let device = user_data.alter.device;
                             let type_id = ApplicationType[device.type];
                             if (device.devId && type_id && device.token) {
