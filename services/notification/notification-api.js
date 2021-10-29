@@ -570,7 +570,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                         for (let key in subs_list) {
                             let subsObj = subs_list[key];
                             await this._onDeleteSubscription(subsObj);
-                            if (subsObj.status() === NotifCallStatus.ok)
+                            if (subsObj.status() === NotifCallStatus.Ok)
                                 collection._del(subsObj);
                         }
 
