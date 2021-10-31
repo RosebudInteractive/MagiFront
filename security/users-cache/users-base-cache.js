@@ -618,6 +618,21 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         }).bind(this), options);
     }
 
+    async _getDeviceActiveUser(type_id, device_id) {
+        let result = null;
+        const REQ_MSSQL = "select [ActiveUserId] from [NotifEndPoint] where ([AppTypeId] = <%= type_id %>) and ([DevId] = '<%= device_id %>')";
+        const REQ_MYSQL = "select `ActiveUserId` from `NotifEndPoint` where (`AppTypeId` = <%= type_id %>) and (`DevId` = '<%= device_id %>')";
+        let recs = await $data.execSql({
+            dialect: {
+                mysql: _.template(REQ_MYSQL)({ type_id: type_id, device_id: device_id }),
+                mssql: _.template(REQ_MSSQL)({ type_id: type_id, device_id: device_id })
+            }
+        }, {});
+        if (recs && recs.detail && (recs.detail.length === 1))
+            result = recs.detail[0].ActiveUserId;
+        return result;
+    }
+
     //
     // Currently we can edit only "Password" and "DisplayName" here
     //
@@ -691,8 +706,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             }
                         }
                         if (user_data.alter.device && user_data.alter.device.devId) {
-                            // Always update unless [user_data.alter.device.forceUpdate === false]
-                            is_device_force = user_data.alter.device.forceUpdate === false ? false : true;
+                            is_device_force = user_data.alter.device.forceUpdate === true ? true : false;
                             let device = user_data.alter.device;
                             let type_id = ApplicationType[device.type];
                             if (device.devId && type_id && device.token) {
@@ -719,6 +733,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                 if (!user.hasAppNotifCfg()) {
                                     user.hasAppNotifCfg(true);
                                     is_notif_modified = await this._createUserAppNotifsDflt(user);
+                                }
+                                if (!(is_device_force || is_device_modified)) {
+                                    let active_user = await this._getDeviceActiveUser(type_id, devId);
+                                    is_device_modified = active_user !== user.id();
                                 }
                             }
                             else
