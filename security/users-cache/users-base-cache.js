@@ -645,6 +645,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         let is_notif_modified = false;
         let is_device_force = false;
         let need_notif_info = false;
+        let curr_dev_id = null;
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -723,12 +724,14 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                 }
                                 if (dev_obj) {
                                     is_device_modified = (dev_obj.token() !== device.token);
-                                    dev_obj.token(device.token)
+                                    dev_obj.token(device.token);
+                                    curr_dev_id = dev_obj.id();
                                 }
                                 else {
                                     is_device_modified = true;
-                                    await root_dev.newObject(
+                                    let { newObject } = await root_dev.newObject(
                                         { fields: { AppTypeId: type_id, DevId: devId, Token: device.token } }, dbopts)
+                                    curr_dev_id = this._db.getObj(newObject).id();
                                 }
                                 if (!user.hasAppNotifCfg()) {
                                     user.hasAppNotifCfg(true);
@@ -828,9 +831,11 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                                         let options = { dbOptions: dbopts };
                                         options.new_only = is_device_modified && (!is_notif_modified);
                                         options.is_device_force = is_device_force;
+                                        options.curr_dev_id = curr_dev_id ? curr_dev_id : undefined;
                                         notifService.updateNotifications(id, options) // We should't wait here
                                             .catch(err => {
-                                                console.error(buildLogString(`DbUser::insBookmark:toggleBookmark: ${err}`));
+                                                console.error(buildLogString(`UsersBaseCache::editUser:updateNotifications: ` +
+                                                    `${err && err.message ? err.message : JSON.stringify(err)}`));
                                             });
                                     }
                                 }
