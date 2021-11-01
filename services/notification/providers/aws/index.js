@@ -67,7 +67,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
         }
         catch (error) {
             if (error instanceof Error)
-                data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                    { errorClass: "Error", message: error.message, stack: error.stack }
             else
                 data = { serializedErr: JSON.stringify(error) };
             status = NotifCallStatus.Error;
@@ -108,11 +109,21 @@ const AwsNotification = class AwsNotification extends NotificationBase{
             data = await this.#client.send(command);
         }
         catch (error) {
-            if (error instanceof Error)
-                data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
-            else
-                data = { serializedErr: JSON.stringify(error) };
-            status = NotifCallStatus.Error;
+            if (error.$metadata && error.message) {
+                const REGEXP_EXISTS = ".*Endpoint (arn:aws:sns[^ ]+) already exists with the same [Tt]oken.*";
+                let match = error.message.match(REGEXP_EXISTS);
+                if (match && Array.isArray(match) && (match.length === 2)) {
+                    data = { EndpointArn: match[1], message: "Already exists, EndpointArn has been retrieved." };
+                }
+            }
+            if (!data) {
+                if (error instanceof Error)
+                    data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                        { errorClass: "Error", message: error.message, stack: error.stack }
+                else
+                    data = { serializedErr: JSON.stringify(error) };
+                status = NotifCallStatus.Error;
+            }
         }
         epObj.extData(data);
         epObj.status(status);
@@ -126,6 +137,12 @@ const AwsNotification = class AwsNotification extends NotificationBase{
         let isGetFailed;
         let status = NotifCallStatus.Ok;
         let endPointArn = epObj.extData() ? epObj.extData().EndpointArn : null;
+        if (!endPointArn) {
+            await this.__createEndpoint(epObj);
+            if (epObj.status(status) === NotifCallStatus.Ok) {
+                endPointArn = epObj.extData() ? epObj.extData().EndpointArn : null;
+            }
+        }
         if (endPointArn) {
             try {
                 isGetFailed = true;
@@ -148,7 +165,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
                     result = this.__createEndpoint(epObj)
                 else {
                     if (error instanceof Error)
-                        data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                        data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                            { errorClass: "Error", message: error.message, stack: error.stack }
                     else
                         data = { serializedErr: JSON.stringify(error) };
                     status = NotifCallStatus.Error;
@@ -158,8 +176,6 @@ const AwsNotification = class AwsNotification extends NotificationBase{
                 return result;
             }
         }
-        else
-            result = this.__createEndpoint(epObj);
         return result;
     }
 
@@ -173,7 +189,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
         }
         catch (error) {
             if (error instanceof Error)
-                data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                    { errorClass: "Error", message: error.message, stack: error.stack }
             else
                 data = { serializedErr: JSON.stringify(error) };
             status = NotifCallStatus.Error;
@@ -203,7 +220,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
                     return this._onAddSubscription(topic, endPoint, subsObj)
                 else {
                     if (error instanceof Error)
-                        data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                        data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                            { errorClass: "Error", message: error.message, stack: error.stack }
                     else
                         data = { serializedErr: JSON.stringify(error) };
                     status = NotifCallStatus.Error;
@@ -240,7 +258,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
         }
         catch (error) {
             if (error instanceof Error)
-                data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                    { errorClass: "Error", message: error.message, stack: error.stack }
             else
                 data = { serializedErr: JSON.stringify(error) };
             status = NotifCallStatus.Error;
@@ -327,7 +346,8 @@ const AwsNotification = class AwsNotification extends NotificationBase{
         }
         catch (error) {
             if (error instanceof Error)
-                data = error.$metadata ? error : { errorClass: "Error", message: error.message, stack: error.stack }
+                data = error.$metadata ? { message: error.message, $metadata: error.$metadata } :
+                    { errorClass: "Error", message: error.message, stack: error.stack }
             else
                 data = { serializedErr: JSON.stringify(error) };
             status = NotifCallStatus.Error;

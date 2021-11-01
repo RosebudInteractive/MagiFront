@@ -18,10 +18,10 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const logModif = config.has("debug.notification.logModif") ? config.get("debug.notification.logModif") : false;
 
 const GET_USER_DEVICES_MSSQL =
-    "select [AppTypeId], [DevId], [Token] from [UserDevice] where [UserId] = <%= id %>";
+    "select [Id], [AppTypeId], [DevId], [Token] from [UserDevice] where [UserId] = <%= id %>";
 
 const GET_USER_DEVICES_MYSQL =
-    "select `AppTypeId`, `DevId`, `Token` from `UserDevice` where `UserId` = <%= id %>";
+    "select `Id`, `AppTypeId`, `DevId`, `Token` from `UserDevice` where `UserId` = <%= id %>";
 
 const GET_USER_ENDPOINTS_MSSQL =
     "select e.[Id], e.[AppTypeId], e.[DevId], e.[Token], e.[ActiveUserId], e.[Status], e.[ExtData]\n" +
@@ -235,6 +235,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                 for (let i = 0; i < records.detail.length; i++) {
                     let elem = records.detail[i];
                     let out = {
+                        Id: elem.Id,
                         AppTypeId: elem.AppTypeId,
                         DevId: elem.DevId,
                         Token: elem.Token
@@ -286,7 +287,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
 
     async _onCreateEndpoint(epObj) { }
 
-    async _createOrUpdateDevice(user_id, new_dev, old_dev, options) {
+    async _createOrUpdateDevice(set_active_user, user_id, new_dev, old_dev, options) {
         let opts = _.cloneDeep(options || {});
         let memDbOptions = { dbRoots: [] };
         let dbOpts = _.defaultsDeep({ userId: opts.user ? opts.user.Id : undefined }, opts.dbOptions || {});
@@ -320,20 +321,24 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                     else
                         if (collection.count() === 0) {
                             is_new = true;
-                            let fields = { AppTypeId: new_dev.AppTypeId, DevId: new_dev.DevId, Status: NotifCallStatus.Pending };
+                            let fields = {
+                                AppTypeId: new_dev.AppTypeId,
+                                DevId: new_dev.DevId,
+                                Status: NotifCallStatus.Pending
+                            };
                             let { newObject } = await root_obj.newObject({ fields: fields }, dbOpts);
                             epObj = this._db.getObj(newObject);
                         }
                         else
                             throw new Error(`NotificationAPI::_createOrUpdateDevice:: Duplicate end point: (${new_dev.AppTypeId}:${new_dev.DevId})`);
                     
-                    if (epObj.activeUserId() !== user_id) {
+                    if (is_new || (set_active_user && (epObj.activeUserId() !== user_id))) {
                         is_new = true;
                         epObj.activeUserId(user_id);
                         let root_usr = epObj.getDataRoot("EndPointUser");
                         let col_usr = root_usr.getCol("DataElements");
                         let is_found = false;
-                        for (let i = 0; i < col_usr.count(); i++){
+                        for (let i = 0; i < col_usr.count(); i++) {
                             if (col_usr.get(i).userId() === user_id) {
                                 is_found = true;
                                 break;
@@ -616,11 +621,14 @@ const NotificationAPI = class NotificationAPI extends DbObject {
             for (let key in devices) {
                 let dev = devices[key];
                 let ep = endPoins[key];
-                if (is_device_force || (!ep) || (ep.ActiveUserId !== user_id) || (ep.Token !== dev.Token))
-                    ep = await this._createOrUpdateDevice(user_id, dev, ep, options);
-                all_end_points.push(ep);
-                if (ep.isNew)
-                    new_end_points.push(ep);
+                let set_active_user = ep && (ep.ActiveUserId !== user_id) && (opts.curr_dev_id === dev.Id) ? true : false;
+                if (is_device_force || (!ep) || (ep.Token !== dev.Token) || set_active_user)
+                    ep = await this._createOrUpdateDevice(set_active_user, user_id, dev, ep, options);
+                if (ep.ActiveUserId === user_id) {
+                    all_end_points.push(ep);
+                    if (ep.isNew)
+                        new_end_points.push(ep);
+                }
                 delete endPoins[key];
             }
             for (let key in endPoins)
