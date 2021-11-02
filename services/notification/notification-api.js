@@ -621,7 +621,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
             for (let key in devices) {
                 let dev = devices[key];
                 let ep = endPoins[key];
-                let set_active_user = ep && (ep.ActiveUserId !== user_id) && (opts.curr_dev_id === dev.Id) ? true : false;
+                let set_active_user = ((!ep) || (ep.ActiveUserId !== user_id)) && (opts.curr_dev_id === dev.Id) ? true : false;
                 let change_token = ep && (ep.ActiveUserId === user_id) && (ep.Token !== dev.Token) ? true : false;
                 if (is_device_force || (!ep) || change_token || set_active_user)
                     ep = await this._createOrUpdateDevice(set_active_user, user_id, dev, ep, options);
