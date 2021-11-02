@@ -347,7 +347,7 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                         if (!is_found)
                             await root_usr.newObject({ fields: { UserId: user_id } }, dbOpts);
                     }
-                    if (epObj.token() !== new_dev.Token) {
+                    if ((epObj.activeUserId() === user_id) && (epObj.token() !== new_dev.Token)) {
                         epObj.token(new_dev.Token);
                     }
 
@@ -622,7 +622,8 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                 let dev = devices[key];
                 let ep = endPoins[key];
                 let set_active_user = ep && (ep.ActiveUserId !== user_id) && (opts.curr_dev_id === dev.Id) ? true : false;
-                if (is_device_force || (!ep) || (ep.Token !== dev.Token) || set_active_user)
+                let change_token = ep && (ep.ActiveUserId === user_id) && (ep.Token !== dev.Token) ? true : false;
+                if (is_device_force || (!ep) || change_token || set_active_user)
                     ep = await this._createOrUpdateDevice(set_active_user, user_id, dev, ep, options);
                 if (ep.ActiveUserId === user_id) {
                     all_end_points.push(ep);
