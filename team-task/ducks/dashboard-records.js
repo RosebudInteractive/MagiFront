@@ -48,6 +48,10 @@ const SET_CHANGED_RECORDS = `${prefix}/SET_CHANGED_RECORDS`;
 const GET_UNPUBLISHED_LESSONS = `${prefix}/GET_UNPUBLISHED_LESSONS`;
 const SET_UNPUBLISHED_LESSONS = `${prefix}/SET_UNPUBLISHED_LESSONS`;
 const GET_PROCESS_FOR_LESSON = `${prefix}/GET_PROCESS_FOR_LESSON`;
+const TOGGLE_MENU_OPTIONS = `${prefix}/TOGGLE_MENU_OPTIONS`;
+const SET_ADDITIONAL_INFO = `${prefix}/SET_ADDITIONAL_INFO`;
+const REMOVE_FROM_PUBLISHED = `${prefix}/REMOVE_FROM_PUBLISHED`;
+
 
 const FIELDS_SORT_OBJECT_ORDER = {
     'Звук': 1,
@@ -81,7 +85,9 @@ export const ReducerRecord = Record({
     fetching: false,
     viewMode: VIEW_MODE.WEEK,
     showModalOfPublishing: false,
-    selectedRecord: null
+    selectedRecord: null,
+    menuOptionsOpened: false,
+    additionalInfo: {lessonsCount: 0, additionalEpisodesCount: 0, allCount: 0}
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -123,6 +129,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state.set('dateRangeString', payload);
         case SET_UNPUBLISHED_LESSONS:
             return state.set('unpublishedLessons', payload);
+        case SET_ADDITIONAL_INFO:
+            return state.set('additionalInfo', payload);
+        case TOGGLE_MENU_OPTIONS:
+            return state.set('menuOptionsOpened', payload);
         default:
             return state
     }
@@ -143,6 +153,8 @@ export const selectedRecordSelector = createSelector(stateSelector, state => sta
 export const courseOptionsUnpublishedFilter = createSelector(stateSelector, state => state.coursesForUnpublishedFilter);
 export const displayRecordsDateRangeString = createSelector(stateSelector, state => state.dateRangeString);
 export const unpublishedLessons = createSelector(stateSelector, state => state.unpublishedLessons);
+export const menuOptionsOpenedSelector = createSelector(stateSelector, state => state.menuOptionsOpened);
+export const additionalInfoSelector = createSelector(stateSelector, state => state.additionalInfo);
 
 
 export const addToDisplayedRecords = (id, newRecord) => {
@@ -159,6 +171,10 @@ export const getUnpublishedRecords = (params = null) => {
 
 export const setPublishRecordDate = ({isoDateString, lessonId}) => {
     return {type: PUBLISH_RECORD, payload: {isoDateString, lessonId}};
+};
+
+export const toggleMenuOptions = (isOn) => {
+    return {type: TOGGLE_MENU_OPTIONS, payload: isOn};
 };
 
 export const changePublishRecordDate = (id, newRecord) => {
@@ -197,6 +213,10 @@ export const getDashboardUnpublishedLessons = () => {
     return {type: GET_UNPUBLISHED_LESSONS}
 };
 
+export const removeFromPublished = (record) => {
+   return {type: REMOVE_FROM_PUBLISHED, payload: record}
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(LOAD_DASHBOARD_RECORDS, getRecordsSaga),
@@ -208,6 +228,7 @@ export const saga = function* () {
         takeEvery(RELOAD_RECORDS, reloadRecordsSaga),
         takeEvery(GET_FILTER_OPTIONS_REQUEST, getCourseFilterCourseOptionsSaga),
         takeEvery(GET_UNPUBLISHED_LESSONS, getUnpublishedLessonsSaga),
+        takeEvery(REMOVE_FROM_PUBLISHED, removeRecordFromPublishedSaga),
     ])
 };
 
@@ -282,6 +303,41 @@ function* addToDisplayedRecordsSaga(data) {
             }
 
         }
+    } catch (e) {
+        showErrorMessage(e.toString())
+    }
+}
+
+function* removeRecordFromPublishedSaga(data){
+    try {
+        const record = data.payload;
+
+        const res = yield call(setDateToPublication, {
+            ReadyDate: null,
+            lessonId: record.LessonId
+        });
+
+        if (res && res.result === 'OK') {
+            const dates = yield select(filterSelector);
+            const records = _.cloneDeep(yield select(recordsChangedSelector));
+
+
+            const foundedRecordIndex = records.findIndex(record => record.CourseId === +record.CourseId && record.LessonId === +record.LessonId);
+
+            if (foundedRecordIndex !== -1) {
+                const currentDate = moment().locale('ru');
+                const defaultStartDate = currentDate.toISOString();
+                const defaultEndDate = currentDate.add(1, 'months').toISOString();
+                records.splice(foundedRecordIndex, 1);
+                const sorted = records.sort((left, right) => moment(left.PubDate).diff(moment(right.PubDate)));
+
+                yield put({type: SET_CHANGED_RECORDS, payload: _.cloneDeep(sorted)});
+                const resultArray = handleServerData(sorted, +mode, dates.st_date ? dates.st_date : defaultStartDate, dates.fin_date ? dates.fin_date : defaultEndDate);
+                yield put({type: SET_NEW_DISPLAYED_RECORDS, payload: resultArray});
+            }
+        }
+
+
     } catch (e) {
         showErrorMessage(e.toString())
     }
@@ -385,17 +441,34 @@ function* changeViewModeSaga(data) {
 
         const records = _.cloneDeep(yield select(recordsChangedSelector));
 
-        records.forEach(rec => {
+        records.forEach((rec) => {
             if (rec.Supervisor) rec.SupervisorId = rec.Supervisor.Id;
 
 
             if(rec.Elements && Array.isArray(rec.Elements)) {
                 rec.ElementFields = rec.Elements.map(el => el.Name);
             }
+
         });
+
+        let lessonsCount, additionalEpisodesCount, allCount;
+
+        lessonsCount = records.filter(rec => {
+            return rec.LessonNum.toString().includes('.');
+        }).length;
+
+        additionalEpisodesCount = records.filter(rec => !rec.LessonNum.includes('.')).length;
+        allCount = records.length;
+
+        yield put({type: SET_ADDITIONAL_INFO, payload: {lessonsCount,additionalEpisodesCount,allCount}});
+
+
 
         let resultArray = handleServerData(records, viewModeParam, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
+        resultArray.forEach((el, index) => {
+            el.id = index
+        });
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
         showErrorMessage(e.toString())
