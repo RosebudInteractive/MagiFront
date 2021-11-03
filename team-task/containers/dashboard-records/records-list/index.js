@@ -40,7 +40,6 @@ const Records = (props) => {
         unpublishedPanelOpened,
         filterValue,
         hasAdminRights,
-        mode,
     } = props;
 
     const location = useLocation();
@@ -141,9 +140,9 @@ const Records = (props) => {
             css: 'tt-grid scroll-all-table dashboard-table',
             hover: "bluelight-hover",
             scroll: 'none',
-            headerRowHeight: 40,
+            headerRowHeight: 60,
             rowHeight: 72,
-            height: 1000,
+            height: 774,
             select: true,
             drag: 'target',
             editable: false,
@@ -262,21 +261,25 @@ const Records = (props) => {
         actions.applyFilter(params)
     };
 
+    const onChangeFilterVisibility = useCallback(() => {
+        setTimeout(() => {
+            resizeHandler(recordsCount);
+        }, 200)
+    }, [dashboardRecords])
 
     return (
         <React.Fragment>
             <div className="records-page form">
-                <div className="filters">
+                <div className="filters" id='published-records-filter'>
                     {
                         (courses && courses.length > 0) &&
                         <FilterRow fields={FILTER_CONFIG}
                                    onApply={_onApplyFilter}
-                                   onChangeVisibility={_onResize}/>
+                                   onChangeVisibility={onChangeFilterVisibility}/>
                     }
                 </div>
-
                 <div className="horizontal-scroll-grid">
-                    <div className="grid-container dashboard-records-table unselectable">
+                    <div className="grid-container dashboard-records-table unselectable _with-custom-scroll" id='published-records'>
                         <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
                     </div>
                 </div>

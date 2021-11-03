@@ -4,7 +4,26 @@
   position: relative
   border-radius: 10px
 
+  .dashboard-records-table
+    position: relative
+    overflow-x: hidden
+    overflow-y: auto
+
+    &::-webkit-scrollbar-track
+      margin-top: 61px
+
+    &::-webkit-scrollbar-thumb
+      background-clip: padding-box
+
   .tt-grid
+    .webix_ss_header
+      margin: 0
+      position: fixed
+      z-index: 2
+
+    .webix_ss_body
+      padding-top: 61px
+
     .webix_column.up-aligned-flex
       .webix_cell
         width: 100%
@@ -48,7 +67,6 @@
           border-left: 1px solid #010101
 
 
-
   .filters
     left: 0
     display: flex
@@ -57,8 +75,10 @@
   &.form
     overflow-x: auto
     height: auto
-    min-height: calc(100vh - 136px)
+    max-height: calc(100vh - 48px)
+    min-height: calc(100vh - 160px)
     overflow-y: hidden
+
 
   .filter-button
     align-self: flex-end
