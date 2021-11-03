@@ -1,9 +1,10 @@
-import React, {useCallback, useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {
+    additionalInfoSelector,
     changePublishRecordDate,
     changeViewMode,
     closeModalDndToPublish,
@@ -26,12 +27,11 @@ import {useHistory} from "react-router-dom";
 import Modal from "../../components/modal";
 import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
-import {applyFilter, filterSelector, paramsSelector, setInitState} from "tt-ducks/route";
-import {setDashboardViewMode} from 'tt-ducks/route'
+import {applyFilter, filterSelector, paramsSelector, setDashboardViewMode, setInitState} from "tt-ducks/route";
 import moment from "moment";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, vMode, params, filter} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, vMode, params, filter, additionalInfo} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
     const [dateRange, setDateRange] = useState('');
@@ -101,8 +101,8 @@ function DashboardRecords(props) {
     };
 
     return (
-        <div className="dashboard">
-            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} onBack={backAction}
+        <div className="dashboard" >
+            <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} additionalInfo={additionalInfo} onBack={backAction}
                                     onChangeMode={changeMode} mode={vMode}/>
 
             <div className="dashboard-body">
@@ -139,7 +139,8 @@ const mapState2Props = (state) => {
         selectedRecord: selectedRecordSelector(state),
         filter: filterSelector(state),
         vMode: modeSelector(state),
-        params: paramsSelector(state)
+        params: paramsSelector(state),
+        additionalInfo: additionalInfoSelector(state)
     }
 };
 

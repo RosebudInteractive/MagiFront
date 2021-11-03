@@ -89,8 +89,12 @@ export const parseParams = () => {
         paramsData.filter = filter;
     }
     const viewMode = searchParams.get('viewMode');
+    const activeRecord = searchParams.get('activeRecord');
     if (viewMode) {
         paramsData.viewMode = +viewMode;
+    }
+    if (activeRecord) {
+        paramsData.activeRecord = +activeRecord;
     }
     return paramsData;
 };
