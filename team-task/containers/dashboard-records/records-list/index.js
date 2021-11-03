@@ -14,14 +14,12 @@ import {
     elementsFieldSetSelector,
     fetchingSelector,
     getRecords,
-    menuOptionsOpenedSelector,
     modeSelector,
     removeFromPublished,
     selectedRecordSelector,
     setPublishRecordDate,
     setRecordsDateRange,
     setSelectedRecord,
-    toggleMenuOptions
 } from "tt-ducks/dashboard-records";
 import {
     applyFilter,
@@ -54,21 +52,12 @@ const Records = (props) => {
         unpublishedPanelOpened,
         filterValue,
         hasAdminRights,
-        menuOptionsOpened,
-        selectedRecord,
-        paramsValue,
         dashboardActiveRecord,
-        mode,
     } = props;
 
     const location = useLocation();
 
     const [columnFields, setColumnFields] = useState([...MAIN_COLUMNS, ...STATE_COLUMNS]);
-    const [menuOptionCoords, setMenuOptionCoords] = useState({top: '0px', left: '0px'});
-    // const []
-    const windowScrollRef = useRef(window.scrollY);
-
-    const[scrollPos, setScrollPos] = useState(0);
 
     const _onResize = useCallback(() => {
         resizeHandler(recordsCount);
@@ -83,8 +72,7 @@ const Records = (props) => {
     });
 
     const nullifyReadyDate = (record) => {
-        // const nullifiedRecord record.PubDate = null;
-        actions.removeFromPublished(record.id, record);
+        actions.removeFromPublished(record);
     };
 
     useEffect(() => {
@@ -339,7 +327,6 @@ const mapState2Props = (state) => {
         hasSupervisorRights: hasSupervisorRights(state),
         user: userSelector(state),
         mode: modeSelector(state),
-        menuOptionsOpened: menuOptionsOpenedSelector(state),
         selectedRecord: selectedRecordSelector(state),
         dashboardActiveRecord: dashboardActiveRecordSelector(state)
     }
@@ -358,7 +345,6 @@ const mapDispatch2Props = (dispatch) => {
             addToDisplayedRecords,
             setSelectedRecord,
             setRecordsDateRange,
-            toggleMenuOptions,
             setDashboardActiveRecord,
             removeFromPublished
         }, dispatch)
