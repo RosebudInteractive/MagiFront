@@ -1,6 +1,14 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+const pk = require('/app/keys');
+
+const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
+const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
+
+let protocol = pk.protocol ? pk.protocol : 'https';
+let address = pk.address ? pk.address : 'new.magisteria.ru';
+let host = `${protocol}://${address}`;
 
 const feedPath = '/app/feed';
 const uploadPath = '/app/uploads';
@@ -10,6 +18,14 @@ const dockerHostIP = '172.17.0.1';
 
 module.exports = {
     tasks: [
+        {
+            name: "Push notifications",
+            module: "./notification",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 2,22,42 * * * *", // run every 20 min
+            options: {}
+        },
         {
             name: "Price List update",
             module: "./price-list",
@@ -182,8 +198,8 @@ module.exports = {
     uploadPath: path.join(uploadPath, path.sep),
     dataUrl: '/data',
     proxyServer: {
-        protocol: 'https',
-        address: 'new.magisteria.ru',
+        protocol: protocol,
+        address: address,
         port: null
     },
     server: {
@@ -378,5 +394,13 @@ module.exports = {
                 idle: 60000
             }
         }
+    },
+    notifications: {
+        provider: notifProvider,
+        accessKeyId: notifProviderOpts && notifProviderOpts.accessKeyId ? notifProviderOpts.accessKeyId : undefined,
+        secretAccessKey: notifProviderOpts && notifProviderOpts.secretAccessKey ? notifProviderOpts.secretAccessKey : undefined,
+        region: notifProviderOpts && notifProviderOpts.region ? notifProviderOpts.region : undefined,
+        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined,
+        providerLogs: notifProviderOpts && notifProviderOpts.logs ? notifProviderOpts.logs : undefined
     }
 };

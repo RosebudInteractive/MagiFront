@@ -76,7 +76,8 @@ const Notification = class Notification extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
-        if (!(access_rights & (AccessFlags.Administrator | AccessFlags.PmAdmin))) {
+        if ((opts.myOnly === "true") || (opts.myOnly === true) ||
+            (!(access_rights & (AccessFlags.Administrator | AccessFlags.PmAdmin)))) {
             // For current user only
             mssql_conds.push(`(n.[UserId] = ${opts.user.Id})`);
             mysql_conds.push(`(n.${'`'}UserId${'`'} = ${opts.user.Id})`);

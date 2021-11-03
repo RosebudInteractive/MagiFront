@@ -116,6 +116,20 @@ const PmDashboard = class PmDashboard extends DbObject {
         let mssql_conds = [];
         let mysql_conds = [];
 
+        let showLesson = (opts.showLesson === "true") || (opts.showLesson === true);
+        let showSubLesson = (opts.showSubLesson === "true") || (opts.showSubLesson === true);
+
+        if (showLesson || showSubLesson) {
+            if (!(showLesson && showSubLesson))
+                if (showLesson) {
+                    mssql_conds.push(`(lcp.[Id] is NULL)`);
+                    mysql_conds.push(`(lcp.${'`'}Id${'`'} is NULL)`);
+                }
+                else {
+                    mssql_conds.push(`(not (lcp.[Id] is NULL))`);
+                    mysql_conds.push(`(not (lcp.${'`'}Id${'`'} is NULL))`);
+                }
+        }
         if (opts.course_name) {
             mssql_conds.push(`(cl.[Name] like N'%${opts.course_name}%')`);
             mysql_conds.push(`(cl.${'`'}Name${'`'} like '%${opts.course_name}%')`);
