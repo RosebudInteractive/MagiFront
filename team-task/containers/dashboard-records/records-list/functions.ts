@@ -48,6 +48,7 @@ type Params = {
   order?: { field: string, direction: string };
   filter?: any,
   viewMode?: number,
+  activeRecord?: number
 };
 
 type FilterParams = {
@@ -123,8 +124,10 @@ export const parseParams = () => {
   }
 
   const viewMode = searchParams.get('viewMode');
+  const activeRecord = searchParams.get('activeRecord');
 
   if (viewMode) { paramsData.viewMode = +viewMode; }
+  if (activeRecord) { paramsData.activeRecord = +activeRecord; }
 
   return paramsData;
 };

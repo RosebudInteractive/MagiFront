@@ -164,7 +164,7 @@ const Records = (props) => {
             scroll: 'none',
             headerRowHeight: 60,
             rowHeight: 72,
-            height: 774,
+            height: 1000,
             select: true,
             drag: 'target',
             editable: false,
