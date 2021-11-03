@@ -123,20 +123,28 @@ export const convertFilter2Params = (filter) => {
     return data;
 };
 export const resizeHandler = (rowCount) => {
-    const $form = $('.form');
-    const height = $form.height() || 0;
-    const width = $form.width() || 0;
     // @ts-ignore
     if (window.$$('dashboard-records-grid')) {
         // @ts-ignore
         const { headerRowHeight } = window.$$('dashboard-records-grid').config;
         setTimeout(() => {
-            let gridHeight = height - headerRowHeight - 48;
-            const calcHeight = (rowCount * 80) + headerRowHeight + 60 + Math.ceil((rowCount / 7) * 15);
+            const $form = $('.form');
+            const $grid = $('#published-records');
+            const $filters = $('#published-records-filter');
+            const formHeight = $form.height() || 0;
+            const width = $form.width() || 0;
+            const filterHeight = $filters.height() || 0;
+            const wrapperHeight = formHeight - filterHeight;
+            $grid.height(wrapperHeight);
+            let gridHeight = wrapperHeight - headerRowHeight;
+            const calcHeight = (rowCount * 79) + headerRowHeight + (Math.floor(rowCount / 7) * 24) - 2;
             // eslint-disable-next-line no-restricted-globals
             gridHeight = (calcHeight && calcHeight > 0 && !isNaN(calcHeight)) ? calcHeight : gridHeight;
+            if (gridHeight < wrapperHeight) {
+                $grid.height('auto');
+            }
             // @ts-ignore
-            window.$$('dashboard-records-grid').$setSize(width, gridHeight);
+            window.$$('dashboard-records-grid').$setSize(width - 8, gridHeight);
             $('.horizontal-scroll-grid').height(gridHeight);
         }, 200);
     }

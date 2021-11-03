@@ -1,8 +1,11 @@
 import $ from 'jquery';
 import moment from 'moment';
-import {GRID_SORT_DIRECTION} from '../../../constants/common';
-import {DASHBOARD_PROCESS_STATE, PROCESS_STATE} from '../../../constants/states';
-import {FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,} from '../../../@types/common';
+import { GRID_SORT_DIRECTION } from '../../../constants/common';
+import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
+import {
+  FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
+} from '../../../@types/common';
+import Coordinates = JQuery.Coordinates;
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
   .map((state) => ({ label: state.label, value: state.value }));
@@ -45,7 +48,6 @@ type Params = {
   order?: { field: string, direction: string };
   filter?: any,
   viewMode?: number,
-  activeRecord?: number
 };
 
 type FilterParams = {
@@ -121,10 +123,8 @@ export const parseParams = () => {
   }
 
   const viewMode = searchParams.get('viewMode');
-  const activeRecord = searchParams.get('activeRecord');
 
   if (viewMode) { paramsData.viewMode = +viewMode; }
-  if (activeRecord) { paramsData.activeRecord = +activeRecord; }
 
   return paramsData;
 };
@@ -161,25 +161,35 @@ export const convertFilter2Params = (filter: FilterValue): any => {
 };
 
 export const resizeHandler = (rowCount: number) => {
-  const $form = $('.form');
-  const height: number = $form.height() || 0;
-  const width: number = $form.width() || 0;
-
   // @ts-ignore
   if (window.$$('dashboard-records-grid')) {
     // @ts-ignore
     const { headerRowHeight } = window.$$('dashboard-records-grid').config;
 
     setTimeout(() => {
-      let gridHeight = height - headerRowHeight - 48;
+      const $form = $('.form');
+      const $grid = $('#published-records');
+      const $filters = $('#published-records-filter');
+      const formHeight: number = $form.height() || 0;
+      const width: number = $form.width() || 0;
+      const filterHeight: number = $filters.height() || 0;
 
-      const calcHeight = (rowCount * 80) + headerRowHeight + 60 + Math.ceil((rowCount / 7) * 15);
+      const wrapperHeight = formHeight - filterHeight;
+      $grid.height(wrapperHeight);
+
+      let gridHeight = wrapperHeight - headerRowHeight;
+
+      const calcHeight = (rowCount * 79) + headerRowHeight + (Math.floor(rowCount / 7) * 24) - 2;
 
       // eslint-disable-next-line no-restricted-globals
       gridHeight = (calcHeight && calcHeight > 0 && !isNaN(calcHeight)) ? calcHeight : gridHeight;
 
+      if (gridHeight < wrapperHeight) {
+        $grid.height('auto');
+      }
+
       // @ts-ignore
-      window.$$('dashboard-records-grid').$setSize(width, gridHeight);
+      window.$$('dashboard-records-grid').$setSize(width - 8, gridHeight);
       $('.horizontal-scroll-grid').height(gridHeight);
     }, 200);
   }
