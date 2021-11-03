@@ -1,17 +1,27 @@
-import React from "react"
+import React, {useMemo} from "react"
 import {Select} from "../../../components/ui-kit";
 import "./dashboard-records-header.sass"
 import BackArrow from "tt-assets/svg/back-arrow.svg"
+import {getCountSubsTitle, Lessons} from "tools/word-tools";
 
 export default function DashboardRecordsHeader(props) {
-    const {title, dateRange, mode} = props;
+    const {title, dateRange, mode, additionalInfo} = props;
+
+    const infoString = useMemo(() => {
+        return `${additionalInfo.lessonsCount} ${Lessons.getCountTitle(additionalInfo.lessonsCount)}, 
+        ${additionalInfo.additionalEpisodesCount} ${getCountSubsTitle(additionalInfo.additionalEpisodesCount)}, ${additionalInfo.allCount} всего`
+    }, [additionalInfo])
 
     return <div className="dashboard-header">
         <div className="dashboard-back-arrow" onClick={props.onBack}>
             <BackArrow/>
         </div>
         <div className="dashboard-header-field-name">
-            <h6>{title} {dateRange}</h6>
+            <div>
+                <h6>{title} {dateRange} </h6>
+                <p>{infoString}</p>
+            </div>
+
 
 
             <div className="view-mode">

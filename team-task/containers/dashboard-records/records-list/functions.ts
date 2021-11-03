@@ -1,10 +1,8 @@
 import $ from 'jquery';
 import moment from 'moment';
-import { GRID_SORT_DIRECTION } from '../../../constants/common';
-import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/states';
-import {
-  FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
-} from '../../../@types/common';
+import {GRID_SORT_DIRECTION} from '../../../constants/common';
+import {DASHBOARD_PROCESS_STATE, PROCESS_STATE} from '../../../constants/states';
+import {FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,} from '../../../@types/common';
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
   .map((state) => ({ label: state.label, value: state.value }));
@@ -47,6 +45,7 @@ type Params = {
   order?: { field: string, direction: string };
   filter?: any,
   viewMode?: number,
+  activeRecord?: number
 };
 
 type FilterParams = {
@@ -122,8 +121,10 @@ export const parseParams = () => {
   }
 
   const viewMode = searchParams.get('viewMode');
+  const activeRecord = searchParams.get('activeRecord');
 
   if (viewMode) { paramsData.viewMode = +viewMode; }
+  if (activeRecord) { paramsData.activeRecord = +activeRecord; }
 
   return paramsData;
 };

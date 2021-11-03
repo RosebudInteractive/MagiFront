@@ -1,5 +1,6 @@
 import { getProcessState } from './functions';
 export const MAIN_COLUMNS = [
+    { id: 'id', hidden: true },
     { id: 'Week', header: [{ text: 'Неделя', css: 'up-headers' }], css: 'week-up' },
     {
         id: 'PubDate',
