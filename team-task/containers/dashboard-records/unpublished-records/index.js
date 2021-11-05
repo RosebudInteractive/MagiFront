@@ -21,6 +21,8 @@ import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
 import {hasAdminRights} from "tt-ducks/auth";
+import type {GridSortOrder} from "../../../types/grid";
+import {GRID_SORT_DIRECTION} from "../../../constants/common";
 
 let unpublishedCount = 0;
 
@@ -36,7 +38,7 @@ function UnpublishedRecords(props) {
     };
 
     useEffect(() => {
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('scroll', handleScroll, {passive: true});
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
@@ -47,7 +49,12 @@ function UnpublishedRecords(props) {
         resizeHandler(unpublishedCount)
     }, [unpublishedCount]);
 
-    const filter = useRef(null);
+    const _sortRef = useRef({field: null, direction: null}),
+    filter = useRef(null);
+
+    // useEffect(() => {
+    //
+    // }, [])
 
     useWindowSize(() => {
         resizeHandler(unpublishedCount)
@@ -110,23 +117,38 @@ function UnpublishedRecords(props) {
                         return `<div class="centered-by-flex">${val.LessonNum}</div>`;
                     }
                 },
-                {id: 'LessonName', hidden: true, header: [{text: 'Лекция', css: {'text-align': 'center'}}], fillspace: 40},
+                {
+                    id: 'LessonName',
+                    hidden: true,
+                    header: [{text: 'Лекция', css: {'text-align': 'center'}}],
+                    fillspace: 40
+                },
             ],
             on: {
-                onHeaderClick: function () {
+                onHeaderClick: function (header) {
+                    const _sort: GridSortOrder = _sortRef.current;
+
+                    if (header.column !== _sort.field) {
+                        _sort.field = header.column
+                        _sort.direction = GRID_SORT_DIRECTION.ACS
+                    } else {
+                        _sort.direction = _sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : _sort.type = GRID_SORT_DIRECTION.ACS
+                    }
+
+                    actions.setGridSortOrder(_sort);
+                    this.markSorting(_sort.field, _sort.direction);
                 },
                 onBeforeDragIn: function (context, e) {
                     return hasAdminRights;
                 },
             },
-            onClick: {
-            },
+            onClick: {},
             "elem-edit": function (e, data) {
                 if (props.disabled) return
             }
         }
 
-        if(hasAdminRights){
+        if (hasAdminRights) {
             config.drag = 'move'
         }
 
@@ -157,6 +179,15 @@ function UnpublishedRecords(props) {
         if (filterData) {
             filterToRequest.course_name = filterData.CourseNameUnpublished;
             filterToRequest.lesson_name = filterData.LessonNameUnpublished;
+
+            if(filterData.ShowLesson !== undefined){
+                filterToRequest.showLesson = filterData.ShowLesson;
+            }
+
+            if(filterData.ShowSubLesson !== undefined){
+                filterToRequest.showSubLesson = filterData.ShowSubLesson;
+            }
+
         }
 
         actions.getUnpublishedRecords($.param(filterToRequest));
@@ -176,20 +207,21 @@ function UnpublishedRecords(props) {
 
 
     return (<div className={"unpublished-records-block" + (!visible ? " _hidden" : "")}>
-            <h6 className="title _grey100">Неопубликованные лекции</h6>
-                <div className="unpublished-records__grid-panel ">
-                    <div className="filters">
-                        <FilterRow fields={FILTER_CONFIG}
-                                   onApply={_onApplyFilter}
-                                   onChangeVisibility={_onResize}
-                                   onChangeField={onChangeFieldCb}/>
-                    </div>
-                    <div className={'webix-datatable js-unpublished _with-custom-scroll'}>
-                        <div className={'webix-datatable-wrapper'}>
-                            <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
-                        </div>
-                    </div>
+        <h6 className="title _grey100">Неопубликованные лекции</h6>
+        <div className="unpublished-records__grid-panel ">
+            <div className="filters">
+                <FilterRow fields={FILTER_CONFIG}
+                           onApply={_onApplyFilter}
+                           onChangeVisibility={_onResize}
+                           onChangeField={onChangeFieldCb}
+                           disableDefaultWidthBasis={true}/>
+            </div>
+            <div className={'webix-datatable js-unpublished _with-custom-scroll'}>
+                <div className={'webix-datatable-wrapper'}>
+                    <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
                 </div>
+            </div>
+        </div>
         <div className="elements__hide-button" onClick={toggleVisible}/>
     </div>)
 }

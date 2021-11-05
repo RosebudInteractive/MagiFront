@@ -1,14 +1,23 @@
 import React from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
-import {SelectField, AutocompleteField, DateRangeField, UserField, ComboField, TextField} from './fields';
+import {
+    AutocompleteField,
+    CheckBoxField,
+    ComboField,
+    DateRangeField,
+    SelectField,
+    TextField,
+    UserField
+} from './fields';
 import 'rsuite/dist/styles/rsuite-default.css'
 
 type FieldProps = {
     ...FilterField,
     basis: number,
     onChange: (ChangeFieldEvent) => void,
-    onClean: ?Function
+    onClean: ?Function,
+    disableDefaultWidthBasis?: boolean
 }
 
 export default function Field(props: FieldProps) {
@@ -38,12 +47,15 @@ export default function Field(props: FieldProps) {
             case FILTER_FIELD_TYPE.USER:
                 return <UserField {...props}/>
 
+            case FILTER_FIELD_TYPE.CHECKBOX:
+                return <CheckBoxField {...props}/>
+
             default:
                 return null
         }
     }
 
-    return <div className="filter-row__field" style={css}>
+    return <div className="filter-row__field" style={props.disableDefaultWidthBasis ? {} : css}>
         {getFieldControl()}
     </div>
 }
