@@ -32,13 +32,16 @@ const SET_ACTIVE_TASK_ID = `${prefix}/SET_ACTIVE_TASK_ID`
 
 const SET_DASHBOARD_VIEW_MODE_REQUEST = `${prefix}/SET_DASHBOARD_VIEW_MODE_REQUEST`
 const SET_DASHBOARD_VIEW_MODE = `${prefix}/SET_DASHBOARD_VIEW_MODE`
+const SET_DASHBOARD_ACTIVE_RECORD = `${prefix}/SET_DASHBOARD_ACTIVE_RECORD`
 
 const BUILD_LOCATION_REQUEST = `${prefix}/BUILD_LOCATION_REQUEST`
 const BUILD_LOCATION = `${prefix}/BUILD_LOCATION`
 const CLEAR_GUARD = `${prefix}/CLEAR_GUARD`
 
 const SET_INIT_STATE_REQUEST = `${prefix}/SET_INIT_STATE_REQUEST`
+const SET_DASHBOARD_ACTIVE_RECORD_REQUEST = `${prefix}/SET_DASHBOARD_ACTIVE_RECORD_REQUEST`
 
+const SET_GRID_SORT_ORDER_REQUEST_SILENTLY = `${prefix}/SET_GRID_SORT_ORDER_REQUEST_SILENTLY`
 
 
 /**
@@ -103,6 +106,21 @@ export default function reducer(state = new ReducerRecord(), action) {
                         }
                     }
                 });
+        case SET_DASHBOARD_ACTIVE_RECORD:
+            return state
+                .update('custom', (custom) => {
+                    if (payload) {
+                        return {...custom, activeRecord: payload}
+                    } else {
+                        if (custom.activeRecord) {
+                            const result = {...custom};
+                            delete result['activeRecord'];
+                            return result
+                        } else {
+                            return custom
+                        }
+                    }
+                });
 
         case APPLY_FILTER:
             return state
@@ -137,13 +155,16 @@ const pathSelector = createSelector(stateSelector, state => state.path)
 const refreshGuardSelector = createSelector(stateSelector, state => state.refreshGuard)
 const customSelector = createSelector(stateSelector, state => state.custom)
 export const activeTaskIdSelector = createSelector(customSelector, custom => custom.activeTask)
+export const dashboardActiveRecordSelector = createSelector(customSelector, custom => custom.activeRecord)
 export const paramsSelector = createSelector(stateSelector, (state) => {
     const params = {...state.filter},
         order = state.order;
 
-    if (order) { params.order = order }
+    if (order) {
+        params.order = order
+    }
 
-    return  $.param({...params, ...state.custom});
+    return $.param({...params, ...state.custom});
 });
 const orderSelector = createSelector(stateSelector, state => state.order);
 export const filterSelector = createSelector(stateSelector, state => state.filter);
@@ -164,12 +185,20 @@ export const setGridSortOrder = (order: GridSortOrder) => {
     return {type: SET_GRID_SORT_ORDER_REQUEST, payload: order}
 }
 
+export const setGridSortOrderSilently = (order: GridSortOrder) => {
+    return {type: SET_GRID_SORT_ORDER_REQUEST_SILENTLY, payload: order}
+}
+
 export const setActiveTaskId = (taskId: number) => {
     return {type: SET_ACTIVE_TASK_ID_REQUEST, payload: taskId}
 }
 
 export const setDashboardViewMode = (viewMode: number) => {
     return {type: SET_DASHBOARD_VIEW_MODE_REQUEST, payload: viewMode}
+}
+
+export const setDashboardActiveRecord = (recordId: number) => {
+    return {type: SET_DASHBOARD_ACTIVE_RECORD_REQUEST, payload: recordId}
 }
 
 export const buildLocation = (replace: boolean = false) => {
@@ -181,7 +210,7 @@ export const setInitState = (data) => {
 }
 
 export const clearLocationGuard = () => {
-    return { type: CLEAR_GUARD }
+    return {type: CLEAR_GUARD}
 }
 
 
@@ -193,8 +222,10 @@ export const saga = function* () {
         takeEvery(SET_PATHNAME_REQUEST, setPathnameSaga),
         takeEvery(APPLY_FILTER_REQUEST, applyFilterSaga),
         takeEvery(SET_GRID_SORT_ORDER_REQUEST, setGridSortOrderSaga),
+        takeEvery(SET_GRID_SORT_ORDER_REQUEST_SILENTLY, setGridSortOrderSilentlySaga),
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(SET_DASHBOARD_VIEW_MODE_REQUEST, setDashboardViewModeSaga),
+        takeEvery(SET_DASHBOARD_ACTIVE_RECORD_REQUEST, setDashboardActiveRecordSaga),
         takeEvery(BUILD_LOCATION_REQUEST, buildLocationSaga),
         takeEvery(SET_INIT_STATE_REQUEST, setInitStateSaga),
     ])
@@ -213,7 +244,7 @@ function* applyFilterSaga(data) {
 
     if (guard) return
 
-    yield put({ type: APPLY_FILTER, payload: {...data.payload} })
+    yield put({type: APPLY_FILTER, payload: {...data.payload}})
     yield put(buildLocation())
 }
 
@@ -229,12 +260,29 @@ function* setGridSortOrderSaga(data) {
     yield put(buildLocation())
 }
 
+function* setGridSortOrderSilentlySaga(data) {
+    const _sort: GridSortOrder = data.payload,
+        _value = _sort.direction === GRID_SORT_DIRECTION.ACS ? _sort.field : `${_sort.field},${_sort.direction}`
+
+    yield put({type: SET_GRID_SORT_ORDER, payload: _value})
+}
+
 function* setActiveTaskIdSaga(data) {
     const guard = yield select(refreshGuardSelector)
 
     if (guard) return
 
     yield put({type: SET_ACTIVE_TASK_ID, payload: data.payload})
+    yield put(buildLocation())
+    yield put({type: CLEAR_GUARD})
+}
+
+function* setDashboardActiveRecordSaga(data) {
+    const guard = yield select(refreshGuardSelector)
+
+    if (guard) return
+
+    yield put({type: SET_DASHBOARD_ACTIVE_RECORD, payload: data.payload})
     yield put(buildLocation())
     yield put({type: CLEAR_GUARD})
 }
@@ -267,10 +315,10 @@ function* setInitStateSaga({payload}) {
     if (payload.filter) {
         const currentFilter = yield select(filterSelector)
         if (!equal(currentFilter, payload.filter)) {
-            yield put({ type: APPLY_FILTER, payload: {...payload.filter} })
+            yield put({type: APPLY_FILTER, payload: {...payload.filter}})
         }
     } else {
-        yield put({ type: CLEAR_FILTER })
+        yield put({type: CLEAR_FILTER})
     }
 
 
@@ -280,6 +328,10 @@ function* setInitStateSaga({payload}) {
 
     if (payload.viewMode) {
         yield put({type: SET_DASHBOARD_VIEW_MODE, payload: payload.viewMode})
+    }
+
+    if (payload.activeRecord) {
+        yield put({type: SET_DASHBOARD_ACTIVE_RECORD, payload: payload.activeRecord})
     }
 
     if (payload.order) {
@@ -292,7 +344,7 @@ function* setInitStateSaga({payload}) {
             yield put({type: SET_GRID_SORT_ORDER, payload: value})
         }
     } else {
-        yield put({ type: CLEAR_GRID_SORT_ORDER })
+        yield put({type: CLEAR_GRID_SORT_ORDER})
     }
 
     if (payload.replacePath) {

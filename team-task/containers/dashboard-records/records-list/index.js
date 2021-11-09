@@ -3,7 +3,7 @@ import {convertFilter2Params, getFilterConfig, parseParams, refreshColumns, resi
 import type {FilterField} from "../../../components/filter/types";
 import FilterRow from "../../../components/filter";
 import Webix from "../../../components/Webix";
-import {useLocation} from "react-router-dom"
+import {useLocation, withRouter} from "react-router-dom"
 import {hideSideBarMenu, showSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -15,11 +15,22 @@ import {
     fetchingSelector,
     getRecords,
     modeSelector,
+    removeFromPublished,
+    selectedRecordSelector,
     setPublishRecordDate,
     setRecordsDateRange,
     setSelectedRecord,
 } from "tt-ducks/dashboard-records";
-import {applyFilter, filterSelector, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {
+    applyFilter,
+    dashboardActiveRecordSelector,
+    filterSelector,
+    paramsSelector,
+    setDashboardActiveRecord,
+    setGridSortOrder,
+    setInitState,
+    setPathname
+} from "tt-ducks/route";
 import './records-list.sass'
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {MAIN_COLUMNS, STATE_COLUMNS} from "./consts";
@@ -28,7 +39,8 @@ import savedFilters, {FILTER_KEY} from "../../../tools/saved-filters";
 import moment from 'moment'
 
 let recordsCount = 0,
-    scrollPosition = 0;
+    scrollPosition = 0,
+    dActiveRecord = null;
 
 const Records = (props) => {
     const {
@@ -40,7 +52,7 @@ const Records = (props) => {
         unpublishedPanelOpened,
         filterValue,
         hasAdminRights,
-        mode,
+        dashboardActiveRecord,
     } = props;
 
     const location = useLocation();
@@ -58,6 +70,14 @@ const Records = (props) => {
     useWindowSize(() => {
         resizeHandler(recordsCount)
     });
+
+    const nullifyReadyDate = (record) => {
+        actions.removeFromPublished(record);
+    };
+
+    useEffect(() => {
+        dActiveRecord = +dashboardActiveRecord;
+    }, [dashboardActiveRecord]);
 
     useEffect(() => {
         const grid = window.webix.$$("dashboard-records-grid");
@@ -168,10 +188,18 @@ const Records = (props) => {
             },
             columns: [],
             on: {
+                onAfterLoad: function (data){
+                    if(dActiveRecord && typeof +dActiveRecord === 'number') {
+                            this.showItem(dActiveRecord)
+                    }
+                },
                 onItemClick: function (data) {
                     const item = this.getItem(data.row);
 
-                    actions.setSelectedRecord(item)
+                    if (item) {
+                        actions.setDashboardActiveRecord(item.id);
+                        actions.setSelectedRecord(item)
+                    }
                 },
                 onItemDblClick: function (data) {
                     if (!hasAdminRights) {
@@ -295,9 +323,12 @@ const mapState2Props = (state) => {
         elementsFieldSet: elementsFieldSetSelector(state),
         courses: courseOptionsUnpublishedFilter(state),
         filterValue: filterSelector(state),
+        paramsValue: paramsSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
         user: userSelector(state),
         mode: modeSelector(state),
+        selectedRecord: selectedRecordSelector(state),
+        dashboardActiveRecord: dashboardActiveRecordSelector(state)
     }
 };
 
@@ -313,9 +344,11 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             addToDisplayedRecords,
             setSelectedRecord,
-            setRecordsDateRange
+            setRecordsDateRange,
+            setDashboardActiveRecord,
+            removeFromPublished
         }, dispatch)
     }
 };
 
-export default connect(mapState2Props, mapDispatch2Props)(Records)
+export default connect(mapState2Props, mapDispatch2Props)(withRouter(Records))

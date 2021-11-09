@@ -2,6 +2,7 @@ import {getProcessState} from './functions';
 import {Dashboard} from '../../../@types/dashboard';
 
 export const MAIN_COLUMNS = [
+  { id: 'id', hidden: true },
   { id: 'Week', header: [{ text: 'Неделя', css: 'up-headers' }], css: 'week-up' },
   {
     id: 'PubDate',

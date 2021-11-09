@@ -8,7 +8,8 @@ type FilterProps = {
     fields: Array<FilterField>,
     onApply: Function,
     onChangeField?: Function,
-    onChangeVisibility: Function
+    onChangeVisibility: Function,
+    disableDefaultWidthBasis?: boolean
 }
 
 export default function Filter(props: FilterProps) {
@@ -59,9 +60,11 @@ export default function Filter(props: FilterProps) {
     return <React.Fragment>
         <Button onClick={_onFilterClick} opened={visible} active={_isActiveFilter}/>
         <Row fields={fields}
+             useDefaultBasisWidth
              onChangeField={_onChange}
              onCleanField={_onClean}
              visible={visible}
+             disableDefaultWidthBasis={props.disableDefaultWidthBasis}
              onApply={_onApply}
              onClear={_onClear}/>
     </React.Fragment>
