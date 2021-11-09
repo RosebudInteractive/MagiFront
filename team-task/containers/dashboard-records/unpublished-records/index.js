@@ -16,7 +16,7 @@ import {
 } from "tt-ducks/dashboard-records";
 import {hideSideBarMenu, showSideBarMenu} from "tt-ducks/app";
 import {bindActionCreators} from "redux";
-import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {applyFilter, setGridSortOrder, setGridSortOrderSilently, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import FilterRow from "../../../components/filter";
 import $ from "jquery";
@@ -50,7 +50,8 @@ function UnpublishedRecords(props) {
     }, [unpublishedCount]);
 
     const _sortRef = useRef({field: null, direction: null}),
-    filter = useRef(null);
+    filter = useRef(null),
+    filterAndOrderRef = useRef(null);
 
     // useEffect(() => {
     //
@@ -99,7 +100,7 @@ function UnpublishedRecords(props) {
                 {
                     id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
                     css: '_container doubled-ceil',
-                    fillspace: 80,
+                    fillspace: 75,
                     template: function (data) {
                         return `<div  class="course-lesson-name-ceil">
                         <div class="course-name">
@@ -111,9 +112,9 @@ function UnpublishedRecords(props) {
                    </div>`
                     }
                 },
-                {id: 'CourseName', hidden: true, header: [{text: 'Курс'}], fillspace: 40},
+                {id: 'CourseName', hidden: true, header: [{text: 'Курс'}]},
                 {
-                    id: 'LessonNum', header: 'Номер', fillspace: 20, css: "_container", template: function (val) {
+                    id: 'LessonNum', header: [{text: 'Номер', css: 'centered-by-flex'}], fillspace: 25, css: "_container", template: function (val) {
                         return `<div class="centered-by-flex">${val.LessonNum}</div>`;
                     }
                 },
@@ -121,12 +122,17 @@ function UnpublishedRecords(props) {
                     id: 'LessonName',
                     hidden: true,
                     header: [{text: 'Лекция', css: {'text-align': 'center'}}],
-                    fillspace: 40
                 },
             ],
             on: {
                 onHeaderClick: function (header) {
                     const _sort: GridSortOrder = _sortRef.current;
+
+                    let paramsObject = {};
+
+                    if(filterAndOrderRef.current){
+                        paramsObject = filterAndOrderRef.current
+                    }
 
                     if (header.column !== _sort.field) {
                         _sort.field = header.column
@@ -135,8 +141,24 @@ function UnpublishedRecords(props) {
                         _sort.direction = _sort.direction === GRID_SORT_DIRECTION.ACS ? GRID_SORT_DIRECTION.DESC : _sort.type = GRID_SORT_DIRECTION.ACS
                     }
 
-                    actions.setGridSortOrder(_sort);
-                    this.markSorting(_sort.field, _sort.direction);
+                    const sortMark = {..._sort};
+
+                    if(_sort.field === 'CourseLessonName'){
+                        _sort.field = 'LessonName'
+                    }
+
+                    if(_sort.field === 'LessonNum'){
+                        _sort.field = 'Number'
+                    }
+
+                    paramsObject.order = _sort.direction === GRID_SORT_DIRECTION.ACS ? _sort.field : `${_sort.field},${_sort.direction}`;
+
+                    actions.setGridSortOrderSilently(_sort);
+                    _sortRef.current = sortMark;
+
+                    actions.getUnpublishedRecords($.param(paramsObject));
+                    actions.getDashboardUnpublishedLessons();
+                    this.markSorting(sortMark.field, sortMark.direction);
                 },
                 onBeforeDragIn: function (context, e) {
                     return hasAdminRights;
@@ -188,6 +210,13 @@ function UnpublishedRecords(props) {
                 filterToRequest.showSubLesson = filterData.ShowSubLesson;
             }
 
+        }
+
+        filterAndOrderRef.current = filterToRequest;
+
+        if(!filterData){
+            _sortRef.current = {field: null, direction: null};
+            filterAndOrderRef.current = null;
         }
 
         actions.getUnpublishedRecords($.param(filterToRequest));
@@ -247,7 +276,8 @@ const mapDispatch2Props = (dispatch) => {
             setPublishRecordDate,
             getUnpublishedRecords,
             setFilterUnpublished,
-            getDashboardUnpublishedLessons
+            getDashboardUnpublishedLessons,
+            setGridSortOrderSilently
         }, dispatch)
     }
 };
