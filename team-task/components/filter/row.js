@@ -31,7 +31,7 @@ export default function Row(props: RowProps) {
         }))
     }, [fields])
 
-    const _basis = fields.length ? Math.round(100 / fields.length) : 100
+    const _basis = fields.length ? Math.round(100 / fields.filter(field => !field.notInRow).length) : 100;
 
     const _clear = () => {
         const _fields = extFields.map((item) => {

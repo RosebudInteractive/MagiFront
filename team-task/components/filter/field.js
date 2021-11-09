@@ -17,7 +17,8 @@ type FieldProps = {
     basis: number,
     onChange: (ChangeFieldEvent) => void,
     onClean: ?Function,
-    disableDefaultWidthBasis?: boolean
+    disableDefaultWidthBasis?: boolean,
+    customClassOrCss?: string | Object
 }
 
 export default function Field(props: FieldProps) {
@@ -25,7 +26,8 @@ export default function Field(props: FieldProps) {
     const css = {
         flexBasis: `${props.basis}%`,
         maxWidth: `${props.basis}%`,
-    }
+        ...(props.customClassOrCss ? props.customClassOrCss : {})
+    };
 
     const getFieldControl = () => {
         switch (props.type) {
