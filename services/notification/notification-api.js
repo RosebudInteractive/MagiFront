@@ -97,7 +97,7 @@ const GET_NEW_LESSONS_MSSQL =
 
 const GET_NEW_COURSES_MSSQL =
     "select lc.[LessonId], lc.[CourseId], lc.[Number], lcp.[Number] Pnumber, l.[URL] LsnURL, c.[URL] CrsURL,\n" +
-    "  ll.[Name] LsnName, cl.[Name] CrsName, ctl.[Name] CtgName\n" +
+    "  ll.[Name] LsnName, cl.[Name] CrsName, ctl.[Name] CtgName, c.[OneLesson]\n" +
     "from [LessonCourse] lc\n" +
     "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -127,7 +127,7 @@ const GET_NEW_LESSONS_MYSQL =
 
 const GET_NEW_COURSES_MYSQL =
     "select lc.`LessonId`, lc.`CourseId`, lc.`Number`, lcp.`Number` Pnumber, l.`URL` LsnURL, c.`URL` CrsURL,\n" +
-    "  ll.`Name` LsnName, cl.`Name` CrsName, ctl.`Name` CtgName\n" +
+    "  ll.`Name` LsnName, cl.`Name` CrsName, ctl.`Name` CtgName, c.`OneLesson`\n" +
     "from `LessonCourse` lc\n" +
     "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -882,10 +882,10 @@ const NotificationAPI = class NotificationAPI extends DbObject {
 
     async sendAutoNotifications(data, options) {
         const AUTO_TAG = "auto";
-        const NEW_COURSE_TITLE_TEMPLATE = 'Новый курс в разделе "<%= category_name %>"';
+        const NEW_COURSE_TITLE_TEMPLATE = '<%= tp %> в разделе "<%= category_name %>"';
         const NEW_LESSON_TITLE_TEMPLATE = 'Новая лекция';
         const NEW_SUBLESSON_TITLE_TEMPLATE = 'Новый дополнительный эпизод';
-        const NEW_COURSE_TEMPLATE = '"<%= name %>"';
+        const NEW_COURSE_TEMPLATE = '<%= name %>';
         const NEW_LESSON_TEMPLATE = '"<%= lesson_name %>" в курсе "<%= course_name %>"';
 
         let result = { courses: 0, lessons: 0 };
@@ -923,15 +923,17 @@ const NotificationAPI = class NotificationAPI extends DbObject {
                     let elem = records.detail[0];
                     if (!done[elem.CourseId]) {
                         done[elem.CourseId] = true;
+                        let tp = elem.OneLesson ? "Новая лекция" : "Новый курс";
                         let data = {
                             tag: AUTO_TAG,
                             type: "course",
                             message: {
-                                title: _.template(NEW_COURSE_TITLE_TEMPLATE)({ category_name: elem.CtgName }),
+                                title: _.template(NEW_COURSE_TITLE_TEMPLATE)({ tp: tp, category_name: elem.CtgName }),
                                 text: _.template(NEW_COURSE_TEMPLATE)({ name: elem.CrsName }),
                                 custom: {
-                                    type: "new-course",
-                                    courseId: elem.CourseId
+                                    type: elem.OneLesson ? "new-lesson" : "new-course",
+                                    courseId: elem.CourseId,
+                                    lessonId: elem.OneLesson ? elem.LessonId : undefined
                                 }
                             },
                             courseId: elem.CourseId,
