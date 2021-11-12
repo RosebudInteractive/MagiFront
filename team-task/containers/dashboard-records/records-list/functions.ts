@@ -5,7 +5,6 @@ import { DASHBOARD_PROCESS_STATE, PROCESS_STATE } from '../../../constants/state
 import {
   FILTER_FIELD_TYPE, FilterField, FilterFieldOptions, FilterValue,
 } from '../../../@types/common';
-import Coordinates = JQuery.Coordinates;
 
 const processStates: FilterFieldOptions[] = Object.values(PROCESS_STATE)
   .map((state) => ({ label: state.label, value: state.value }));
