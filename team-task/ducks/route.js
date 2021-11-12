@@ -41,6 +41,8 @@ const CLEAR_GUARD = `${prefix}/CLEAR_GUARD`
 const SET_INIT_STATE_REQUEST = `${prefix}/SET_INIT_STATE_REQUEST`
 const SET_DASHBOARD_ACTIVE_RECORD_REQUEST = `${prefix}/SET_DASHBOARD_ACTIVE_RECORD_REQUEST`
 
+const SET_GRID_SORT_ORDER_REQUEST_SILENTLY = `${prefix}/SET_GRID_SORT_ORDER_REQUEST_SILENTLY`
+
 
 /**
  * Reducer
@@ -186,6 +188,10 @@ export const setGridSortOrder = (order: GridSortOrder) => {
     return {type: SET_GRID_SORT_ORDER_REQUEST, payload: order}
 }
 
+export const setGridSortOrderSilently = (order: GridSortOrder) => {
+    return {type: SET_GRID_SORT_ORDER_REQUEST_SILENTLY, payload: order}
+}
+
 export const setActiveTaskId = (taskId: number) => {
     return {type: SET_ACTIVE_TASK_ID_REQUEST, payload: taskId}
 }
@@ -219,6 +225,7 @@ export const saga = function* () {
         takeEvery(SET_PATHNAME_REQUEST, setPathnameSaga),
         takeEvery(APPLY_FILTER_REQUEST, applyFilterSaga),
         takeEvery(SET_GRID_SORT_ORDER_REQUEST, setGridSortOrderSaga),
+        takeEvery(SET_GRID_SORT_ORDER_REQUEST_SILENTLY, setGridSortOrderSilentlySaga),
         takeEvery(SET_ACTIVE_TASK_ID_REQUEST, setActiveTaskIdSaga),
         takeEvery(SET_DASHBOARD_VIEW_MODE_REQUEST, setDashboardViewModeSaga),
         takeEvery(SET_DASHBOARD_ACTIVE_RECORD_REQUEST, setDashboardActiveRecordSaga),
@@ -254,6 +261,13 @@ function* setGridSortOrderSaga(data) {
 
     yield put({type: SET_GRID_SORT_ORDER, payload: _value})
     yield put(buildLocation())
+}
+
+function* setGridSortOrderSilentlySaga(data) {
+    const _sort: GridSortOrder = data.payload,
+        _value = _sort.direction === GRID_SORT_DIRECTION.ACS ? _sort.field : `${_sort.field},${_sort.direction}`
+
+    yield put({type: SET_GRID_SORT_ORDER, payload: _value})
 }
 
 function* setActiveTaskIdSaga(data) {

@@ -4,7 +4,8 @@ export const FILTER_FIELD_TYPE = {
     SELECT: "select",
     AUTOCOMPLETE: "autocomplete",
     DATE_RANGE: "date-range",
-    USER: "user"
+    USER: "user",
+    CHECKBOX: "checkbox"
 }
 
 

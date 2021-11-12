@@ -1,22 +1,38 @@
-import React from "react"
+import React, {useMemo} from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
-import {SelectField, AutocompleteField, DateRangeField, UserField, ComboField, TextField} from './fields';
+import {
+    AutocompleteField,
+    CheckBoxField,
+    ComboField,
+    DateRangeField,
+    SelectField,
+    TextField,
+    UserField
+} from './fields';
 import 'rsuite/dist/styles/rsuite-default.css'
 
 type FieldProps = {
     ...FilterField,
     basis: number,
     onChange: (ChangeFieldEvent) => void,
-    onClean: ?Function
+    onClean?: Function,
+    disableDefaultWidthBasis: boolean
 }
 
 export default function Field(props: FieldProps) {
 
-    const css = {
-        flexBasis: `${props.basis}%`,
-        maxWidth: `${props.basis}%`,
-    }
+    const { disableDefaultWidthBasis, basis } = props;
+
+    const wrapperStyle = useMemo(() => {
+        return disableDefaultWidthBasis
+            ? {}
+            : {
+                flexBasis: `${basis}%`,
+                maxWidth: `${basis}%`,
+            }
+        },
+        [basis, disableDefaultWidthBasis]);
 
     const getFieldControl = () => {
         switch (props.type) {
@@ -38,12 +54,15 @@ export default function Field(props: FieldProps) {
             case FILTER_FIELD_TYPE.USER:
                 return <UserField {...props}/>
 
+            case FILTER_FIELD_TYPE.CHECKBOX:
+                return <CheckBoxField {...props}/>
+
             default:
                 return null
         }
     }
 
-    return <div className="filter-row__field" style={css}>
+    return <div className="filter-row__field" style={wrapperStyle}>
         {getFieldControl()}
     </div>
 }

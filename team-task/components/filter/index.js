@@ -8,11 +8,12 @@ type FilterProps = {
     fields: Array<FilterField>,
     onApply: Function,
     onChangeField?: Function,
-    onChangeVisibility: Function
+    onChangeVisibility: Function,
+    disableDefaultWidthBasis?: boolean
 }
 
 export default function Filter(props: FilterProps) {
-    const {fields, onChangeField} = props;
+    const { fields, onChangeField, disableDefaultWidthBasis } = props;
 
     const [visible, setVisible] = useState(false)
     const [activeSwitcher, toggleActive] = useState(false)
@@ -62,6 +63,7 @@ export default function Filter(props: FilterProps) {
              onChangeField={_onChange}
              onCleanField={_onClean}
              visible={visible}
+             disableDefaultWidthBasis={!!disableDefaultWidthBasis}
              onApply={_onApply}
              onClear={_onClear}/>
     </React.Fragment>
