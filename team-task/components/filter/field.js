@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useMemo} from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
 import {
@@ -16,16 +16,23 @@ type FieldProps = {
     ...FilterField,
     basis: number,
     onChange: (ChangeFieldEvent) => void,
-    onClean: ?Function,
-    disableDefaultWidthBasis?: boolean
+    onClean?: Function,
+    disableDefaultWidthBasis: boolean
 }
 
 export default function Field(props: FieldProps) {
 
-    const css = {
-        flexBasis: `${props.basis}%`,
-        maxWidth: `${props.basis}%`,
-    }
+    const { disableDefaultWidthBasis, basis } = props;
+
+    const wrapperStyle = useMemo(() => {
+        return disableDefaultWidthBasis
+            ? {}
+            : {
+                flexBasis: `${basis}%`,
+                maxWidth: `${basis}%`,
+            }
+        },
+        [basis, disableDefaultWidthBasis]);
 
     const getFieldControl = () => {
         switch (props.type) {
@@ -55,7 +62,7 @@ export default function Field(props: FieldProps) {
         }
     }
 
-    return <div className="filter-row__field" style={props.disableDefaultWidthBasis ? {} : css}>
+    return <div className="filter-row__field" style={wrapperStyle}>
         {getFieldControl()}
     </div>
 }

@@ -13,7 +13,7 @@ type FilterProps = {
 }
 
 export default function Filter(props: FilterProps) {
-    const {fields, onChangeField} = props;
+    const { fields, onChangeField, disableDefaultWidthBasis } = props;
 
     const [visible, setVisible] = useState(false)
     const [activeSwitcher, toggleActive] = useState(false)
@@ -60,11 +60,10 @@ export default function Filter(props: FilterProps) {
     return <React.Fragment>
         <Button onClick={_onFilterClick} opened={visible} active={_isActiveFilter}/>
         <Row fields={fields}
-             useDefaultBasisWidth
              onChangeField={_onChange}
              onCleanField={_onClean}
              visible={visible}
-             disableDefaultWidthBasis={props.disableDefaultWidthBasis}
+             disableDefaultWidthBasis={!!disableDefaultWidthBasis}
              onApply={_onApply}
              onClear={_onClear}/>
     </React.Fragment>
