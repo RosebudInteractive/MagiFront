@@ -204,7 +204,7 @@ const Records = (props) => {
                                 guard = true
                                 document.getElementById('published-records').scrollTop = item.offsetTop;
                             }
-                        }, 0)
+                        }, 400)
                     }
                 },
                 onAfterSelect: function (selObj) {
