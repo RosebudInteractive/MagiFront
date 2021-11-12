@@ -26,7 +26,7 @@ export default function Field(props: FieldProps) {
     const css = {
         flexBasis: `${props.basis}%`,
         maxWidth: `${props.basis}%`,
-        ...(props.customClassOrCss ? props.customClassOrCss : {})
+        ...((props.customClassOrCss && (typeof props.customClassOrCss !== 'string')) ? props.customClassOrCss : {})
     };
 
     const getFieldControl = () => {
@@ -57,7 +57,7 @@ export default function Field(props: FieldProps) {
         }
     }
 
-    return <div className="filter-row__field" style={props.disableDefaultWidthBasis ? {} : css}>
+    return <div className={`filter-row__field ${(typeof props.customClassOrCss === 'string') ? props.customClassOrCss : ''}`} style={props.disableDefaultWidthBasis ? {} : css}>
         {getFieldControl()}
     </div>
 }
