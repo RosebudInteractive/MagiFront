@@ -6,6 +6,9 @@ const pk = require('/app/keys');
 const uploadPath = '/app/uploads';
 const dockerHostIP = '172.17.0.1';
 
+const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
+const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
+
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(uploadPath, path.sep),
@@ -363,5 +366,13 @@ module.exports = {
         android: {
             credentialsPath: pk.mobileApp.android.credentialsPath
         }
+    },
+    notifications: {
+        provider: notifProvider,
+        accessKeyId: notifProviderOpts && notifProviderOpts.accessKeyId ? notifProviderOpts.accessKeyId : undefined,
+        secretAccessKey: notifProviderOpts && notifProviderOpts.secretAccessKey ? notifProviderOpts.secretAccessKey : undefined,
+        region: notifProviderOpts && notifProviderOpts.region ? notifProviderOpts.region : undefined,
+        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined,
+        providerLogs: notifProviderOpts && notifProviderOpts.logs ? notifProviderOpts.logs : undefined
     }
 };
