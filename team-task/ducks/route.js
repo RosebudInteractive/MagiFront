@@ -56,6 +56,7 @@ export const ReducerRecord = Record({
 
 })
 
+const EMPTY_FILTER = {};
 
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action;
@@ -167,7 +168,9 @@ export const paramsSelector = createSelector(stateSelector, (state) => {
     return $.param({...params, ...state.custom});
 });
 const orderSelector = createSelector(stateSelector, state => state.order);
-export const filterSelector = createSelector(stateSelector, state => state.filter);
+export const filterSelector = createSelector(stateSelector, state => {
+    return (Object.keys(state.filter).length > 0) ? state.filter : EMPTY_FILTER
+});
 
 
 /**
@@ -331,7 +334,10 @@ function* setInitStateSaga({payload}) {
     }
 
     if (payload.activeRecord) {
-        yield put({type: SET_DASHBOARD_ACTIVE_RECORD, payload: payload.activeRecord})
+        const activeRecord = yield select(dashboardActiveRecordSelector)
+        if (activeRecord !== payload.activeRecord) {
+            yield put({type: SET_DASHBOARD_ACTIVE_RECORD, payload: payload.activeRecord})
+        }
     }
 
     if (payload.order) {

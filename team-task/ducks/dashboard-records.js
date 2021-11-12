@@ -454,7 +454,7 @@ function* changeViewModeSaga(data) {
         let resultArray = handleServerData(records, viewModeParam, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
         resultArray.forEach((el, index) => {
-            el.id = index
+            el.id = index + 1;
         });
         yield put({type: SET_DISPLAY_RECORDS, payload: resultArray});
     } catch (e) {
@@ -677,7 +677,7 @@ const identifyElementFields = (records) => {
         }
     });
 
-    const sortedFeilds = [...fields].sort(function (a,b) {
+    const sortedFields = [...fields].sort(function (a,b) {
         if(FIELDS_SORT_OBJECT_ORDER[a] !== undefined && FIELDS_SORT_OBJECT_ORDER[b] !== undefined){
             return FIELDS_SORT_OBJECT_ORDER[a] - FIELDS_SORT_OBJECT_ORDER[b];
         }
@@ -698,7 +698,7 @@ const identifyElementFields = (records) => {
 
     const fieldSet = [];
 
-    sortedFeilds.forEach((el, inx) => {
+    sortedFields.forEach((el, inx) => {
         const fieldObj = {id: el};
         fieldObj.header = [{text: el, css: 'up-headers'}];
 
@@ -710,8 +710,6 @@ const identifyElementFields = (records) => {
             if (elData) {
                 return `<div class="element-hover" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
                             <div class="state-template-block-dr state-circle ${elData.question ? '' : elData.css} ">
-                                
-                                    
                                 <div class="element-status-tooltip-text">${elData.question ? 'Вопрос,' : ''} ${elData.label}</div>
                                 <div class="${elData.question ? 'question ' + elData.css : ''}">${elData.question ? '?' : ''}</div>
                             </div>

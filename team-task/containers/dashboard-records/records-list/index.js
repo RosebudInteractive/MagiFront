@@ -40,7 +40,8 @@ import moment from 'moment'
 
 let recordsCount = 0,
     scrollPosition = 0,
-    dActiveRecord = null;
+    activeRecord = null,
+    guard = false;
 
 const Records = (props) => {
     const {
@@ -76,12 +77,10 @@ const Records = (props) => {
     };
 
     useEffect(() => {
-        dActiveRecord = +dashboardActiveRecord;
+        activeRecord = +dashboardActiveRecord;
     }, [dashboardActiveRecord]);
 
     useEffect(() => {
-        const grid = window.webix.$$("dashboard-records-grid");
-
         setTimeout(() => {
             _onResize();
         }, 300);
@@ -128,7 +127,12 @@ const Records = (props) => {
             initState = savedFilters.getFor(FILTER_KEY.DASHBOARD_PUBLISHED);
             initState.replacePath = true;
         } else {
-            savedFilters.setFor(FILTER_KEY.DASHBOARD_PUBLISHED, {...initState})
+            let savedState = {...initState};
+            if (!!initState.activeRecord) {
+                const {activeRecord, ...otherProps} = initState
+                savedState = {...otherProps}
+            }
+            savedFilters.setFor(FILTER_KEY.DASHBOARD_PUBLISHED, savedState)
         }
 
         isMounted.current = true;
@@ -188,17 +192,34 @@ const Records = (props) => {
             },
             columns: [],
             on: {
-                onAfterLoad: function (data){
-                    if(dActiveRecord && typeof +dActiveRecord === 'number') {
-                            this.showItem(dActiveRecord)
+                onAfterLoad: function () {
+                    if (activeRecord && typeof +activeRecord === 'number') {
+
+                        if (guard) return
+                        document.getElementById('published-records').scrollIntoView();
+                        let grid = this;
+                        setTimeout(() => {
+                            const item = grid.getItemNode({row: activeRecord});
+                            if (item) {
+                                guard = true
+                                document.getElementById('published-records').scrollTop = item.offsetTop;
+                            }
+                        }, 0)
                     }
                 },
-                onItemClick: function (data) {
-                    const item = this.getItem(data.row);
-
-                    if (item) {
-                        actions.setDashboardActiveRecord(item.id);
-                        actions.setSelectedRecord(item)
+                onAfterSelect: function (selObj) {
+                    if (+selObj.id !== +activeRecord) {
+                        guard = true;
+                        actions.setDashboardActiveRecord(+selObj.id);
+                        const item = this.getSelectedItem();
+                        actions.setSelectedRecord(item);
+                    }
+                },
+                onAfterRender: function () {
+                    const selected = this.getSelectedItem();
+                    const sameSelected = selected && (selected.id === activeRecord);
+                    if (activeRecord && this.getItem(activeRecord) && !sameSelected) {
+                        this.select(activeRecord)
                     }
                 },
                 onItemDblClick: function (data) {
@@ -297,6 +318,10 @@ const Records = (props) => {
         }, 200)
     }, [dashboardRecords])
 
+    const grid = useMemo(() => {
+        return <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
+        }, [dashboardRecords, GRID_CONFIG])
+
     return (
         <React.Fragment>
             <div className="records-page form">
@@ -309,8 +334,9 @@ const Records = (props) => {
                     }
                 </div>
                 <div className="horizontal-scroll-grid">
-                    <div className="grid-container dashboard-records-table unselectable _with-custom-scroll" id='published-records'>
-                        <Webix ui={GRID_CONFIG} data={dashboardRecords}/>
+                    <div className="grid-container dashboard-records-table unselectable _with-custom-scroll"
+                         id='published-records'>
+                        {grid}
                     </div>
                 </div>
             </div>
