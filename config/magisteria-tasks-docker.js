@@ -3,6 +3,9 @@ const os = require('os');
 const defer = require('config/defer').deferConfig;
 const pk = require('/app/keys');
 
+const notifProvider = pk.notifications && pk.notifications.provider ? pk.notifications.provider : undefined;
+const notifProviderOpts = notifProvider ? pk.notifications[notifProvider] : undefined;
+
 const feedPath = '/app/feed';
 const uploadPath = '/app/uploads';
 const pricelistPath = '/app/pricelist';
@@ -11,6 +14,14 @@ const dockerHostIP = '172.17.0.1';
 
 module.exports = {
     tasks: [
+        {
+            name: "Push notifications",
+            module: "./notification",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 2,22,42 * * * *", // run every 20 min
+            options: {}
+        },
         {
             name: "Price List update",
             module: "./price-list",
@@ -389,5 +400,13 @@ module.exports = {
                 idle: 60000
             }
         }
+    },
+    notifications: {
+        provider: notifProvider,
+        accessKeyId: notifProviderOpts && notifProviderOpts.accessKeyId ? notifProviderOpts.accessKeyId : undefined,
+        secretAccessKey: notifProviderOpts && notifProviderOpts.secretAccessKey ? notifProviderOpts.secretAccessKey : undefined,
+        region: notifProviderOpts && notifProviderOpts.region ? notifProviderOpts.region : undefined,
+        platformApp: notifProviderOpts && notifProviderOpts.platformApp ? notifProviderOpts.platformApp : undefined,
+        providerLogs: notifProviderOpts && notifProviderOpts.logs ? notifProviderOpts.logs : undefined
     }
 };
