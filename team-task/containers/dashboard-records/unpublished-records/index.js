@@ -51,11 +51,7 @@ function UnpublishedRecords(props) {
 
     const _sortRef = useRef({field: null, direction: null}),
     filter = useRef(null),
-    filterAndOrderRef = useRef(null);
-
-    // useEffect(() => {
-    //
-    // }, [])
+    filterAndOrderRef = useRef({});
 
     useWindowSize(() => {
         resizeHandler(unpublishedCount)
@@ -100,7 +96,7 @@ function UnpublishedRecords(props) {
                 {
                     id: 'CourseLessonName', header: `<div class="doubled-aligned">Курс <br/>Лекция</div>`,
                     css: '_container doubled-ceil',
-                    fillspace: 75,
+                    fillspace: true,
                     template: function (data) {
                         return `<div  class="course-lesson-name-ceil">
                         <div class="course-name">
@@ -114,7 +110,7 @@ function UnpublishedRecords(props) {
                 },
                 {id: 'CourseName', hidden: true, header: [{text: 'Курс'}]},
                 {
-                    id: 'LessonNum', header: [{text: 'Номер', css: 'centered-by-flex'}], fillspace: 25, css: "_container", template: function (val) {
+                    id: 'LessonNum', header: [{text: 'Номер', css: 'centered-by-flex'}], width: 80, css: "_container", template: function (val) {
                         return `<div class="centered-by-flex">${val.LessonNum}</div>`;
                     }
                 },
@@ -128,11 +124,7 @@ function UnpublishedRecords(props) {
                 onHeaderClick: function (header) {
                     const _sort: GridSortOrder = _sortRef.current;
 
-                    let paramsObject = {};
-
-                    if(filterAndOrderRef.current){
-                        paramsObject = filterAndOrderRef.current
-                    }
+                    let paramsObject = filterAndOrderRef.current;
 
                     if (header.column !== _sort.field) {
                         _sort.field = header.column
@@ -194,30 +186,28 @@ function UnpublishedRecords(props) {
     }, [courses]);
 
     const _onApplyFilter = (filterData) => {
-
         filter.current = filterData;
         const filterToRequest = {};
 
         if (filterData) {
-            filterToRequest.course_name = filterData.CourseNameUnpublished;
-            filterToRequest.lesson_name = filterData.LessonNameUnpublished;
+            if (filterData.CourseNameUnpublished) { filterToRequest.course_name = filterData.CourseNameUnpublished; }
+            if (filterData.LessonNameUnpublished) { filterToRequest.lesson_name = filterData.LessonNameUnpublished; }
 
-            if(filterData.ShowLesson !== undefined){
+            const needSeparateLessonsAndSubs = filterData.ShowLesson !== filterData.ShowSubLesson;
+
+            if(needSeparateLessonsAndSubs && filterData.ShowLesson){
                 filterToRequest.showLesson = filterData.ShowLesson;
             }
 
-            if(filterData.ShowSubLesson !== undefined){
+            if(needSeparateLessonsAndSubs && filterData.ShowSubLesson){
                 filterToRequest.showSubLesson = filterData.ShowSubLesson;
             }
-
         }
 
+        if (filterAndOrderRef.current.order) {
+            filterToRequest.order = filterAndOrderRef.current.order;
+        }
         filterAndOrderRef.current = filterToRequest;
-
-        if(!filterData){
-            _sortRef.current = {field: null, direction: null};
-            filterAndOrderRef.current = null;
-        }
 
         actions.getUnpublishedRecords($.param(filterToRequest));
         actions.getDashboardUnpublishedLessons();
@@ -234,7 +224,6 @@ function UnpublishedRecords(props) {
         }
     };
 
-
     return (<div className={"unpublished-records-block" + (!visible ? " _hidden" : "")}>
         <h6 className="title _grey100">Неопубликованные лекции</h6>
         <div className="unpublished-records__grid-panel ">
@@ -246,7 +235,7 @@ function UnpublishedRecords(props) {
                            disableDefaultWidthBasis={true}/>
             </div>
             <div className={'webix-datatable js-unpublished _with-custom-scroll'}>
-                <div className={'webix-datatable-wrapper'}>
+                <div className={'webix-datatable-wrapper unpublished-records__grid'}>
                     <Webix ui={GRID_CONFIG} data={unpublishedRecords}/>
                 </div>
             </div>

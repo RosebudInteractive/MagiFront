@@ -12,11 +12,11 @@ type RowProps = {
     onChangeField: (ChangeFieldEvent) => void,
     onCleanField: Function,
     visible: boolean,
-    disableDefaultWidthBasis?: boolean
+    disableDefaultWidthBasis: boolean
 }
 
 export default function Row(props: RowProps) {
-    const {fields, visible} = props
+    const {fields, visible, disableDefaultWidthBasis} = props
 
     const [extFields, setExtFields] = useState([])
     const [forceUpdate, setForceUpdate] = useState(false)
@@ -57,7 +57,10 @@ export default function Row(props: RowProps) {
         <div className="filter-row">
             {
                 extFields.map((item, index) => {
-                    return <Field {...item} key={index} disableDefaultWidthBasis={props.disableDefaultWidthBasis} basis={_basis} onChange={onFieldChange}
+                    return <Field {...item}
+                                  disableDefaultWidthBasis={disableDefaultWidthBasis}
+                                  key={index} basis={_basis}
+                                  onChange={onFieldChange}
                                   onClean={props.onCleanField}/>
                 })
             }
@@ -86,7 +89,7 @@ const getEmptyFieldValue = (field: FilterField) => {
         case FILTER_FIELD_TYPE.DATE_RANGE:
             return [undefined, undefined];
         case FILTER_FIELD_TYPE.CHECKBOX:
-            return undefined;
+            return false;
         default:
             return null
     }
