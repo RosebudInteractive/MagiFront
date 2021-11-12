@@ -149,7 +149,6 @@ function UnpublishedRecords(props) {
                     _sortRef.current = sortMark;
 
                     actions.getUnpublishedRecords($.param(paramsObject));
-                    actions.getDashboardUnpublishedLessons();
                     this.markSorting(sortMark.field, sortMark.direction);
                 },
                 onBeforeDragIn: function (context, e) {
@@ -210,7 +209,6 @@ function UnpublishedRecords(props) {
         filterAndOrderRef.current = filterToRequest;
 
         actions.getUnpublishedRecords($.param(filterToRequest));
-        actions.getDashboardUnpublishedLessons();
     };
 
     const onChangeFieldCb = ({name, value}) => {
