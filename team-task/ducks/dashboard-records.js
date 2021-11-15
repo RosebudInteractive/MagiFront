@@ -438,18 +438,13 @@ function* changeViewModeSaga(data) {
 
         });
 
-        let lessonsCount, additionalEpisodesCount, allCount;
+        const allCount = records.length;
 
-        lessonsCount = records.filter(rec => {
-            return rec.LessonNum.toString().includes('.');
-        }).length;
+        const additionalEpisodesCount = records.filter(rec => rec.LessonNum.toString().includes('.')).length;
 
-        additionalEpisodesCount = records.filter(rec => !rec.LessonNum.includes('.')).length;
-        allCount = records.length;
+        const lessonsCount = records.filter(rec => !rec.LessonNum.includes('.')).length;
 
         yield put({type: SET_ADDITIONAL_INFO, payload: {lessonsCount,additionalEpisodesCount,allCount}});
-
-
 
         let resultArray = handleServerData(records, viewModeParam, dates.st_date ? dates.st_date : data.payload.st_date, dates.fin_date ? dates.fin_date : data.payload.fin_date);
 
