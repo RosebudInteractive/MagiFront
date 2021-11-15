@@ -211,6 +211,8 @@ const Records = (props) => {
                     if (+selObj.id !== +activeRecord) {
                         guard = true;
                         actions.setDashboardActiveRecord(+selObj.id);
+                        const item = this.getSelectedItem();
+                        actions.setSelectedRecord(item);
                     }
                 },
                 onAfterRender: function () {
