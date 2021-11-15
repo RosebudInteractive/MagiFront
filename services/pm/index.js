@@ -23,7 +23,7 @@ function setupProcesses(app) {
 
     if (!global.$Services)
         global.$Services = {};
-    global.$Services.notifications = NotificationService;
+    global.$Services["pm-notifications"] = NotificationService;
 
     if (!global.$Services)
         global.$Services = {};

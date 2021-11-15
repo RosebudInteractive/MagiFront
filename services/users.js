@@ -188,7 +188,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .insBookmark(req.user.Id, req.params.course_url, req.params.lesson_url)
+                .insBookmark(req.user.Id, req.params.course_url, req.params.lesson_url, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })
@@ -202,7 +202,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .insBookmark(req.user.Id, req.params.course_url)
+                .insBookmark(req.user.Id, req.params.course_url, undefined, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })
@@ -216,7 +216,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .delBookmark(req.user.Id, req.params.course_url, req.params.lesson_url)
+                .delBookmark(req.user.Id, req.params.course_url, req.params.lesson_url, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })
@@ -230,7 +230,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .delBookmark(req.user.Id, req.params.course_url)
+                .delBookmark(req.user.Id, req.params.course_url, undefined, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })
@@ -267,6 +267,20 @@ function setupUsers(app) {
                 });
     });
 
+    app.get('/api/users/notif-info', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().getNotifInfo(req.user.Id);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/adm/users/info', async (req, res, next) => {
         try {
             let rows = await UsersService().getUserInfo(req.query);
@@ -280,9 +294,11 @@ function setupUsers(app) {
     app.get('/api/users/list', async (req, res, next) => {
         try {
             if (!req.user)
-                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' });
-            let rows = await UsersService().getUserList(req.user, req.query);
-            res.send(rows);
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().getUserList(req.user, req.query);
+                res.send(rows);
+            }
         }
         catch (err) {
             next(err);
@@ -294,7 +310,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getPublic(req.user)
+                .getPublic(req.user, req.query)
                 .then(rows => {
                     res.send(rows);
                 })

@@ -368,5 +368,8 @@ module.exports = {
                 { price: 3000, coeff: 1.05 }
             ]
         }
+    },
+    notifications: {
+        
     }
 };

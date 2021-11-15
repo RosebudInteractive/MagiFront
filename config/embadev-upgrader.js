@@ -29,7 +29,7 @@ let options = {
             connection_options: { requestTimeout: 0 },
             provider_options: {},
             pool: {
-                max: 5,
+                max: 10,
                 min: 0,
                 idle: 60000
             }
@@ -41,7 +41,7 @@ let options = {
             connection_options: {},
             provider_options: {},
             pool: {
-                max: 5,
+                max: 10,
                 min: 0,
                 idle: 60000
             }

@@ -165,9 +165,11 @@ const GET_USER_PURCHASE_MYSQL =
     "order by 2 desc";
 
 const GET_COURSE_PURCHASE_MSSQL =
-    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
+    "select tt.Course, convert(varchar,lc.ReadyDate,23) PubDate, tt.Qty, tt.TotSum, tt.TotIosSum, tt.TotAndroidSum, tt.GiftQty \n" +
     "from\n" +
-    "  (select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, sum(case when c.[PaymentType] = 2 then (ii.[Price] * ii.[Qty]) else 0 end) TotIosSum,\n" +
+    "(select t.Id, t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
+    "from\n" +
+    "  (select cs.[Id], cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, sum(case when c.[PaymentType] = 2 then (ii.[Price] * ii.[Qty]) else 0 end) TotIosSum,\n" +
     "    sum(case when c.[PaymentType] = 3 then (ii.[Price] * ii.[Qty]) else 0 end) TotAndroidSum,\n" +
     "    0 as GiftQty\n" +
     "  from[Cheque] c\n" +
@@ -177,9 +179,9 @@ const GET_COURSE_PURCHASE_MSSQL =
     "    join[CourseLng] cl on cl.[CourseId] = cs.[Id]\n" +
     "  where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
-    "  group by cl.[Name]\n" +
+    "  group by cs.[Id], cl.[Name]\n" +
     "  union all\n" +
-    "  select cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
+    "  select cs.[Id], cl.[Name] Course, count(*) Qty, sum(ii.[Price] * ii.[Qty]) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
     "  from[PromoCode] ppc\n" +
     "    join[InvoiceItem] ii on ii.[ProductId] = ppc.[PromoProductId]\n" +
     "    join[Invoice] i on i.[Id] = ii.[InvoiceId]\n" +
@@ -190,21 +192,24 @@ const GET_COURSE_PURCHASE_MSSQL =
     "    join[CourseLng] cl on cl.[CourseId] = cs.[Id]\n" +
     "  where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "    and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
-    "  group by cl.[Name]\n" +
+    "  group by cs.[Id], cl.[Name]\n" +
     "  union all\n" +
-    "  select cl.[Name] Course, 0, 0, 0, 0, count(*)\n" +
+    "  select cl.[CourseId] Id, cl.[Name] Course, 0, 0, 0, 0, count(*)\n" +
     "  from[UserGiftCourse] gc\n" +
     "    join[CourseLng] cl on cl.[CourseId] = gc.[CourseId]\n" +
     "  where(gc.[TimeCr] >= convert(datetime, '<%= first_date %>'))\n" +
     "    and(gc.[TimeCr] < convert(datetime, '<%= last_date %>'))\n" +
-    "  group by cl.[Name]) as t\n" +
-    "group by t.Course\n" +
-    "order by 3 desc";
+    "  group by cl.[CourseId], cl.[Name]) as t\n" +
+    "group by t.Id, t.Course) as tt\n" +
+    "left join [LessonCourse] lc on lc.[CourseId] = tt.[Id] and lc.[Number] = 1 and lc.[ParentId] is NULL\n" +
+    "order by 4 desc";
 
 const GET_COURSE_PURCHASE_MYSQL =
-    "select t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
+    "select tt.Course, DATE_FORMAT(lc.ReadyDate, '%Y-%m-%d') PubDate, tt.Qty, tt.TotSum, tt.TotIosSum, tt.TotAndroidSum, tt.GiftQty \n" +
     "from\n" +
-    "  (select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, sum(case when c.`PaymentType` = 2 then (ii.`Price` * ii.`Qty`) else 0 end) TotIosSum,\n" +
+    "(select t.Id, t.Course, sum(t.Qty) Qty, sum(t.TotSum) TotSum, sum(t.TotIosSum) TotIosSum, sum(t.TotAndroidSum) TotAndroidSum, sum(t.GiftQty) GiftQty\n" +
+    "from\n" +
+    "  (select cs.`Id`, cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, sum(case when c.`PaymentType` = 2 then (ii.`Price` * ii.`Qty`) else 0 end) TotIosSum,\n" +
     "    sum(case when c.`PaymentType` = 3 then (ii.`Price` * ii.`Qty`) else 0 end) TotAndroidSum,\n" +
     "    0 as GiftQty\n" +
     "  from`Cheque` c\n" +
@@ -214,9 +219,9 @@ const GET_COURSE_PURCHASE_MYSQL =
     "    join`CourseLng` cl on cl.`CourseId` = cs.`Id`\n" +
     "  where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
     "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
-    "  group by cl.`Name`\n" +
+    "  group by cs.`Id`, cl.`Name`\n" +
     "  union all\n" +
-    "  select cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
+    "  select cs.`Id`, cl.`Name` Course, count(*) Qty, sum(ii.`Price` * ii.`Qty`) TotSum, 0 as TotIosSum, 0 as TotAndroidSum, 0 as GiftQty\n" +
     "  from`PromoCode` ppc\n" +
     "    join`InvoiceItem` ii on ii.`ProductId` = ppc.`PromoProductId`\n" +
     "    join`Invoice` i on i.`Id` = ii.`InvoiceId`\n" +
@@ -227,16 +232,17 @@ const GET_COURSE_PURCHASE_MYSQL =
     "    join`CourseLng` cl on cl.`CourseId` = cs.`Id`\n" +
     "  where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>')\n" +
     "    and(c.`ChequeDate` < '<%= last_date %>')\n" +
-    "  group by cl.`Name`\n" +
+    "  group by cs.`Id`, cl.`Name`\n" +
     "  union all\n" +
-    "  select cl.`Name` Course, 0, 0, 0, 0, count(*)\n" +
+    "  select cl.`CourseId` Id, cl.`Name` Course, 0, 0, 0, 0, count(*)\n" +
     "  from`UserGiftCourse` gc\n" +
     "    join`CourseLng` cl on cl.`CourseId` = gc.`CourseId`\n" +
     "  where(gc.`TimeCr` >= '<%= first_date %>')\n" +
     "    and(gc.`TimeCr` < '<%= last_date %>')\n" +
-    "  group by cl.`Name`) as t\n" +
-    "group by t.Course\n" +
-    "order by 3 desc";
+    "  group by cl.`CourseId`, cl.`Name`) as t\n" +
+    "group by t.Id, t.Course) as tt\n" +
+    "left join `LessonCourse` lc on lc.`CourseId` = tt.`Id` and lc.`Number` = 1 and lc.`ParentId` is NULL\n" +
+    "order by 4 desc";
 
 const GET_COURSE_LISTEN_MSSQL =
     "select cl.[CourseId] Id, cl.[Name] Course,\n" +
