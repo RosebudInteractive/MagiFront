@@ -8,7 +8,7 @@ import {
     hasPmaRights,
     hasPmRights,
     hasSupervisorRights,
-    initializedSelector,
+    initializedSelector, permissionsSelector,
     userAuthSelector,
     userRoleSelector,
     whoAmI
@@ -33,7 +33,16 @@ import NotificationRefresher from "./components/notification-refresher";
 window.webix = webix
 
 function App(props) {
-    const {fetching, actions, userInitialized, isUserAuthorized, hasPmRights, hasSupervisorRights, userRole, hasAdminRights, hasPmaRights} = props;
+    const {
+        fetching, actions,
+        userInitialized,
+        isUserAuthorized,
+        hasPmRights,
+        hasSupervisorRights,
+        userRole,
+        hasAdminRights,
+        permissions
+    } = props;
 
     let location = useLocation();
 
@@ -57,7 +66,11 @@ function App(props) {
                 <SideBarMenu/>
                 <div className="tt-main-area__info-panel">
                     <Breadcrumb/>
-                    <AppRouter hasPmaRights={hasPmaRights} hasSupervisorRights={hasSupervisorRights} hasAdminRights={hasAdminRights} userRole={userRole}/>
+                    <AppRouter hasSupervisorRights={hasSupervisorRights}
+                               hasAdminRights={hasAdminRights}
+                               userRole={userRole}
+                               permissions={permissions}
+                    />
                 </div>
             </div>
             <ReduxModalDialog/>
@@ -78,6 +91,7 @@ function App(props) {
 function mapStateToProps(state,) {
     return {
         isUserAuthorized: userAuthSelector(state),
+        permissions: permissionsSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
         userInitialized: initializedSelector(state),

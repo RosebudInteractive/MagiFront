@@ -211,8 +211,6 @@ const Records = (props) => {
                     if (+selObj.id !== +activeRecord) {
                         guard = true;
                         actions.setDashboardActiveRecord(+selObj.id);
-                        const item = this.getSelectedItem();
-                        actions.setSelectedRecord(item);
                     }
                 },
                 onAfterRender: function () {
@@ -232,9 +230,11 @@ const Records = (props) => {
                     if (data.column === 'PubDate') {
                         if ((item && item.CourseId && item.LessonId) && hasAdminRights) {
                             if (hasAdminRights) {
+                                actions.setSelectedRecord(item);
                                 props.openModalOnPublication();
                             } else {
                                 if (((item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id))) {
+                                    actions.setSelectedRecord(item);
                                     props.openModalOnPublication();
                                 }
                             }

@@ -34,6 +34,7 @@ const LOGOUT_FAIL = `${prefix}/LOGOUT_FAIL`
 export const ReducerRecord = Record({
     initialized: false,
     user: null,
+    permissions: null,
     authorized: false,
     loading: false,
     error: null
@@ -93,6 +94,10 @@ export const stateSelector = state => state[moduleName]
 export const userSelector = createSelector(stateSelector, state => state.user)
 export const userAuthSelector = createSelector(stateSelector, state => state.authorized)
 export const initializedSelector = createSelector(stateSelector, state => state.initialized)
+export const permissionsSelector = createSelector(userSelector, user => user && user.PData && user.PData.permissions
+    ? user.PData.permissions
+    : {});
+
 export const hasSupervisorRights = createSelector(userSelector, (user) => {
     return user && user.PData && user.PData.roles && (user.PData.roles.pma || user.PData.roles.pms)
 });
