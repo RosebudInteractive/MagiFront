@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useMemo, useState} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import "./dashboard-records.sass"
@@ -29,9 +29,10 @@ import ConfirmationOfPublication from "./confirmation-of-publication";
 import 'react-splitter-layout/lib/index.css';
 import {applyFilter, filterSelector, paramsSelector, setDashboardViewMode, setInitState} from "tt-ducks/route";
 import moment from "moment";
+import {permissionsSelector} from "tt-ducks/auth";
 
 function DashboardRecords(props) {
-    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, vMode, params, filter, additionalInfo} = props;
+    const {sideBarMenuVisible, actions, unpublishedRecords, modalPublishOn, selectedRecord, vMode, permissions, filter, additionalInfo} = props;
     const [resizeTrigger, triggerResize] = useState(true);
     const [unpublishedPanelOpened, setPanelOpened] = useState(false);
     const [dateRange, setDateRange] = useState('');
@@ -68,24 +69,6 @@ function DashboardRecords(props) {
         setDateRange(`с ${stDate} по ${finDate}`);
     }, [filter]);
 
-    // const applyViewMode = useCallback((mode) => {
-    //     const newUrlParams = new URLSearchParams(params);
-    //     const paramsObject = {};
-    //
-    //     if (newUrlParams.has('st_date') && newUrlParams.has('fin_date')) {
-    //         paramsObject.st_date = newUrlParams.get('st_date');
-    //         paramsObject.fin_date = newUrlParams.get('fin_date');
-    //     }
-    //
-    //     if (newUrlParams.has('course')) {
-    //         paramsObject.course = newUrlParams.get('course');
-    //     }
-    //
-    //     paramsObject.viewMode = mode;
-    //
-    //     actions.applyFilter(paramsObject);
-    // }, [params]);
-
     const changeMode = (mode) => {
         actions.setDashboardViewMode(mode);
         actions.changeViewMode(mode);
@@ -100,17 +83,21 @@ function DashboardRecords(props) {
         history.push('/')
     };
 
+    const accessLevel = useMemo(() => permissions.dsb && permissions.dsb.al || 0, [permissions])
+
     return (
         <div className="dashboard" >
             <DashboardRecordsHeader title={'Издательский план'} dateRange={dateRange} additionalInfo={additionalInfo} onBack={backAction}
                                     onChangeMode={changeMode} mode={vMode}/>
 
             <div className="dashboard-body">
-                <div className="unpublished-records">
-                    <UnpublishedRecords unpublishedRecords={unpublishedRecords}
-                                        resizeTriggerFn={unpublishedPanelToggled}/>
-                </div>
-
+                {
+                    (accessLevel > 1) &&
+                    <div className="unpublished-records">
+                        <UnpublishedRecords unpublishedRecords={unpublishedRecords}
+                                            resizeTriggerFn={unpublishedPanelToggled}/>
+                    </div>
+                }
                 <div className="records">
                     <Records resizeTrigger={resizeTrigger}
                              unpublishedPanelOpened={unpublishedPanelOpened}
@@ -132,6 +119,7 @@ function DashboardRecords(props) {
 
 const mapState2Props = (state) => {
     return {
+        permissions: permissionsSelector(state),
         unpublishedRecords: unpublishedRecordsSelector(state),
         dashboardRecords: displayRecordsSelector(state),
         sideBarMenuVisible: sideBarMenuVisible(state),

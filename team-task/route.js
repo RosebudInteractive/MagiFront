@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {Route, Switch,} from 'react-router-dom'
 import Tasks from "./containers/tasks";
@@ -18,29 +18,32 @@ type RouterProps = {
     hasSupervisorRights: boolean,
     userRole: string,
     hasAdminRights: boolean,
+    permissions: any,
 }
 
 export default function AppRouter(props: RouterProps) {
 
-    const { userRole } = props
+    const { userRole, hasSupervisorRights, hasAdminRights, permissions } = props;
 
-    const _hasAdminRights = (userRole === USER_ROLE.PMA) || (userRole === USER_ROLE.ADMIN)
+    const _hasAdminRights = (userRole === USER_ROLE.PMA) || (userRole === USER_ROLE.ADMIN);
+
+    const hasDashboardAccess = useMemo(() => permissions.dsb && permissions.dsb.al, [permissions])
 
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
-        <Route path={'/dashboard-records'} render={() => {return  (props.hasSupervisorRights || props.hasAdminRights) ? <DashboardRecords/> : <AccessDeniedPlaceholder/>}}/>
-        <Route path={'/processes'} render={() => {return props.hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/dashboard-records'} render={() => {return  hasDashboardAccess ? <DashboardRecords/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/processes'} render={() => {return hasSupervisorRights ? <Processes/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/notifications'}  render={() => (<Notifications showModal={false}/>)}/>
         <Route exact path={'/timelines'}
                render={() => {
-                   return (props.hasSupervisorRights || props.hasAdminRights) ? <Timelines/> : <AccessDeniedPlaceholder/>
+                   return (hasSupervisorRights || hasAdminRights) ? <Timelines/> : <AccessDeniedPlaceholder/>
                }}/>
         <Route exact path={'/timelines/:timelineId'}
-               render={() => {return (props.hasSupervisorRights || props.hasAdminRights) ? <TimelineEditorContainer/> : <AccessDeniedPlaceholder/>}}/>
+               render={() => {return (hasSupervisorRights || hasAdminRights) ? <TimelineEditorContainer/> : <AccessDeniedPlaceholder/>}}/>
         <Route exact path={'/timelines/new'}  render={() => (<TimelineEditorContainer/>)}/>
         <Route exact path={'/notifications/task/:taskId'} render={() => (<Notifications showModal={true}/>)}/>
-        <Route path={'/process/:processId'} render={() => {return props.hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
+        <Route path={'/process/:processId'} render={() => {return hasSupervisorRights ? <ProcessEditor/> : <AccessDeniedPlaceholder/>}}/>
         <Route path={'/dictionaries/:dictionaryName'} render={({match}) => {
             if (_hasAdminRights) {
                 switch (match.params.dictionaryName) {
