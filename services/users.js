@@ -19,6 +19,34 @@ function setupUsers(app) {
         global.$Services = {};
     global.$Services.users = UsersService;
 
+    app.get('/api/users/interest', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().getInterests(req.user.Id);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
+    app.post('/api/users/interest', async (req, res, next) => {
+        try {
+            if (!req.user)
+                res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+            else {
+                let rows = await UsersService().setInterests(req.user.Id, req.body);
+                res.send(rows);
+            }
+        }
+        catch (err) {
+            next(err);
+        }
+    });
+
     app.get('/api/users/courses-for-sale', async (req, res, next) => {
         try {
             let rows = await UsersService().getCoursesForSale(req.user ? req.user : null, req.query);
