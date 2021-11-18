@@ -279,7 +279,7 @@ const AwsNotification = class AwsNotification extends NotificationBase{
             else
                 aps.alert = message.text;
             if (message.custom)
-                apns.custom = message.custom;
+                apns.data = message.custom;
             return apns;
         }
         let buildGCM = () => {
