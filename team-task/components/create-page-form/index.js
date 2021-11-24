@@ -20,6 +20,7 @@ function CreateProcessForm(props) {
                 Params: {
                     UseAuthorPictures: editorValues.UseAuthorPictures,
                     UseMusic: editorValues.UseMusic,
+                    HasTest: editorValues.HasTest,
                     ExecutorSound: editorValues.ExecutorSound ? +editorValues.ExecutorSound : null,
                     ExecutorSoundControl: editorValues.ExecutorSoundControl ? +editorValues.ExecutorSoundControl : null,
                     ExecutorTranscript: editorValues.ExecutorTranscript ? +editorValues.ExecutorTranscript : null,
@@ -28,6 +29,7 @@ function CreateProcessForm(props) {
                     ExecutorText: editorValues.ExecutorText ? +editorValues.ExecutorText : null,
                     ExecutorLiterature: editorValues.ExecutorLiterature ? +editorValues.ExecutorLiterature : null,
                     ExecutorReadyComponents: editorValues.ExecutorReadyComponents ? +editorValues.ExecutorReadyComponents : null,
+                    ExecutorTest: editorValues.ExecutorTest ? +editorValues.ExecutorTest : null,
                     StructName: "Lesson Process Proto"
                 }
             })
@@ -53,6 +55,7 @@ function CreateProcessForm(props) {
             SupervisorId: userId,
             UseAuthorPictures: false,
             UseMusic: false,
+            HasTest: false,
         })
 
         $("body").addClass("_no-vertical-scroll")
@@ -78,6 +81,7 @@ function CreateProcessForm(props) {
             <div className="dialog__fields-wrapper _with-custom-scroll">
                 <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
                 <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
+                <Field component={Checkbox} name={"HasTest"} label={"Тесты"}/>
                 <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getUsers()}/>
@@ -86,6 +90,7 @@ function CreateProcessForm(props) {
                 <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getUsers()}/>
+                <Field component={Select} name={"ExecutorTest"} label={"Исполнитель - Тесты"} options={_getUsers()}/>
             </div>
             <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!(props.hasChanges && props.editorValid)}>
                 Применить
