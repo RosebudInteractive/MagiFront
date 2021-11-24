@@ -63,6 +63,6 @@ exports.scriptUpgrade = async (options) => {
                 throw new HttpError(HttpCode.ERR_NOT_FOUND, `Описание структуры процесса "${STRUCT_NAME}" не найдено.`);
         }, {});
 
-    if (id)
-        await ProcessService().deleteStructFromCache(id);
+    // if (id)
+    //     await ProcessService().deleteStructFromCache(id);
 };
