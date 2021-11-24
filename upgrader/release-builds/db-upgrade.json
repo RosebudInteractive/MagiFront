@@ -380,6 +380,15 @@
                 "mysql": "./build_44/upgrade_44_mysql.sql"
             },
             "upgrader": "./build_44"
+        },
+        "45": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_45/upgrade_45_mssql.sql",
+                "mysql": "./build_45/upgrade_45_mysql.sql"
+            },
+            "upgrader": "./build_45"
         }
     }
 }
