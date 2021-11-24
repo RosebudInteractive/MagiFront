@@ -18,12 +18,13 @@ type FieldProps = {
     onChange: (ChangeFieldEvent) => void,
     onClean?: Function,
     disableDefaultWidthBasis: boolean,
-    customClassOrCss?: string | Object
+    className?: string,
+    style?: Object,
 }
 
 export default function Field(props: FieldProps) {
 
-    const { disableDefaultWidthBasis, basis } = props;
+    const { disableDefaultWidthBasis, basis, style, className } = props;
 
     const wrapperStyle = useMemo(() => {
         return disableDefaultWidthBasis
@@ -31,10 +32,10 @@ export default function Field(props: FieldProps) {
             : {
                 flexBasis: `${basis}%`,
                 maxWidth: `${basis}%`,
-                ...((props.customClassOrCss && (typeof props.customClassOrCss !== 'string')) ? props.customClassOrCss : {})
+                ...(style || {})
             }
         },
-        [basis, disableDefaultWidthBasis]);
+        [basis, disableDefaultWidthBasis, style]);
 
     const getFieldControl = () => {
         switch (props.type) {
@@ -64,7 +65,7 @@ export default function Field(props: FieldProps) {
         }
     }
 
-    return <div className={`filter-row__field ${(typeof props.customClassOrCss === 'string') ? props.customClassOrCss : ''}`} style={wrapperStyle}>
+    return <div className={`filter-row__field ${className || ''}`} style={wrapperStyle}>
         {getFieldControl()}
     </div>
 }

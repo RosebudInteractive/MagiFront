@@ -10,6 +10,6 @@ export default function CheckBoxField(props) {
     return <div className="filter-row__field-wrapper">
         <Checkbox className={'checkbox-field'}
                   onChange={onChange}
-                  checked={props.value ? props.value : false}>{props.placeholder}</Checkbox>
+                  checked={!!props.value}>{props.placeholder}</Checkbox>
     </div>
 }

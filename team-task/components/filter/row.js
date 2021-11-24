@@ -4,7 +4,6 @@ import {FILTER_FIELD_TYPE} from "./types";
 import Field from "./field";
 import ClearIcon from "tt-assets/svg/close.svg"
 
-
 type RowProps = {
     fields: Array<FilterField>,
     onApply: Function,

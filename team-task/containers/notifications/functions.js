@@ -36,12 +36,13 @@ export const getFilterConfig = (filter, disableFields = []) => {
             name: "MyOnly",
             placeholder: 'Только свои',
             type: FILTER_FIELD_TYPE.CHECKBOX,
-            value: filter ? filter.MyOnly : undefined,
-            customClassOrCss: {
+            value: filter ? filter.MyOnly : false,
+            style: {
                 display: 'block',
                 position: 'absolute',
-                top: '118px',
-                right: '135px'
+                top: 40,
+                right: 0,
+                width: '25%',
             },
             notInRow: true
         }
