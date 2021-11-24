@@ -426,6 +426,10 @@ const ProcessAPI = class ProcessAPI extends DbObject {
         return result;
     }
 
+    async deleteStructFromCache(id) {
+        return this._struct_cache.deleteCacheItem(id);
+    }
+
     async getProcessList(options) {
         let result = [];
         let opts = _.cloneDeep(options || {});

@@ -389,6 +389,15 @@
                 "mysql": "./build_45/upgrade_45_mysql.sql"
             },
             "upgrader": "./build_45"
+        },
+        "46": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_46/upgrade_46_mssql.sql",
+                "mysql": "./build_46/upgrade_46_mysql.sql"
+            },
+            "upgrader": "./build_46"
         }
     }
 }
