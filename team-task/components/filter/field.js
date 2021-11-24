@@ -17,7 +17,8 @@ type FieldProps = {
     basis: number,
     onChange: (ChangeFieldEvent) => void,
     onClean?: Function,
-    disableDefaultWidthBasis: boolean
+    disableDefaultWidthBasis: boolean,
+    customClassOrCss?: string | Object
 }
 
 export default function Field(props: FieldProps) {
@@ -30,6 +31,7 @@ export default function Field(props: FieldProps) {
             : {
                 flexBasis: `${basis}%`,
                 maxWidth: `${basis}%`,
+                ...((props.customClassOrCss && (typeof props.customClassOrCss !== 'string')) ? props.customClassOrCss : {})
             }
         },
         [basis, disableDefaultWidthBasis]);
@@ -62,7 +64,7 @@ export default function Field(props: FieldProps) {
         }
     }
 
-    return <div className="filter-row__field" style={wrapperStyle}>
+    return <div className={`filter-row__field ${(typeof props.customClassOrCss === 'string') ? props.customClassOrCss : ''}`} style={wrapperStyle}>
         {getFieldControl()}
     </div>
 }

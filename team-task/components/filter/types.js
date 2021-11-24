@@ -19,7 +19,9 @@ export type FilterField = {
     placeholder: ?string,
     type: string,
     options: ?Array<FilterFieldOptions>,
-    value: ?string | Array<number> | UserFilterFieldValue
+    value: ?string | Array<number> | UserFilterFieldValue,
+    customClassOrCss?: string | Object,
+    notInRow?: boolean
 }
 
 export type FilterFieldOptions = {
