@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useMemo} from "react"
 import type {ChangeFieldEvent, FilterField} from "./types";
 import {FILTER_FIELD_TYPE} from "./types";
 import {
@@ -16,18 +16,26 @@ type FieldProps = {
     ...FilterField,
     basis: number,
     onChange: (ChangeFieldEvent) => void,
-    onClean: ?Function,
-    disableDefaultWidthBasis?: boolean,
-    customClassOrCss?: string | Object
+    onClean?: Function,
+    disableDefaultWidthBasis: boolean,
+    className?: string,
+    style?: Object,
 }
 
 export default function Field(props: FieldProps) {
 
-    const css = {
-        flexBasis: `${props.basis}%`,
-        maxWidth: `${props.basis}%`,
-        ...((props.customClassOrCss && (typeof props.customClassOrCss !== 'string')) ? props.customClassOrCss : {})
-    };
+    const { disableDefaultWidthBasis, basis, style, className } = props;
+
+    const wrapperStyle = useMemo(() => {
+        return disableDefaultWidthBasis
+            ? {}
+            : {
+                flexBasis: `${basis}%`,
+                maxWidth: `${basis}%`,
+                ...(style || {})
+            }
+        },
+        [basis, disableDefaultWidthBasis, style]);
 
     const getFieldControl = () => {
         switch (props.type) {
@@ -57,7 +65,7 @@ export default function Field(props: FieldProps) {
         }
     }
 
-    return <div className={`filter-row__field ${(typeof props.customClassOrCss === 'string') ? props.customClassOrCss : ''}`} style={props.disableDefaultWidthBasis ? {} : css}>
+    return <div className={`filter-row__field ${className || ''}`} style={wrapperStyle}>
         {getFieldControl()}
     </div>
 }
