@@ -78,6 +78,10 @@ exports.structure = {
         "AudioReDo": {
             "caption": "Переделать звук",
             "type": "boolean"
+        },
+        "TestURL": {
+            "caption": "Тест",
+            "type": "string"
         }
     },
     Elements: [
@@ -255,6 +259,17 @@ exports.structure = {
                     "AllCompsFinalURL"
                 ]
             }
+        },
+        {
+            Name: "Тест",
+            ViewFields: [
+                "TestURL"
+            ],
+            WriteFields: {
+                "Сдать готовый тест": [
+                    "TestURL"
+                ]
+            }
         }
     ]
 
@@ -262,6 +277,7 @@ exports.structure = {
 
 async function process_1(pm, p_id, supervisor_id, elements, data, options) {
     // Процесс №1 (без музыки и без картинок автора)
+    let has_test = typeof (data.HasTest) === 'boolean' ? data.HasTest : false;
     // Задача #1
     let res = await pm.newTask({
         "Name": "Регистрация новой записи",
@@ -346,7 +362,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
-        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
+        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "IsElemReady": false,
         "Dependencies": [res5.id]
     }, options);
@@ -426,7 +442,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
         "Description": "Подготовка к публикации.",
-        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
+        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : null,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res2.id, res.id]
@@ -438,6 +454,20 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
         "IsDefault": false,
         "Expression": "(!AudioReDo)"
     }, options);
+
+    if (has_test)
+        // Задача #15
+        res = await pm.newTask({
+            "Name": "Тест",
+            "ProcessId": p_id,
+            "ExecutorId": data.ExecutorTest ? data.ExecutorTest :
+                (elements["Тест"] && elements["Тест"].SupervisorId ? elements["Тест"].SupervisorId : supervisor_id),
+            "Description": "Подготовьте, пожалуйста, проверочный тест.",
+            "ElementId": elements["Тест"] ? elements["Тест"].Id : null,
+            "WriteFieldSet": "Сдать готовый тест",
+            "IsElemReady": true,
+            "Dependencies": [res.id]
+        }, options);
 
     // Конец процесса
     await pm.newTask({
@@ -452,6 +482,7 @@ async function process_1(pm, p_id, supervisor_id, elements, data, options) {
 
 async function process_2(pm, p_id, supervisor_id, elements, data, options) {
     // Процесс №2 (с картинками автора и без музыки)
+    let has_test = typeof (data.HasTest) === 'boolean' ? data.HasTest : false;
     // Задача #1
     let res = await pm.newTask({
         "Name": "Регистрация новой записи",
@@ -536,7 +567,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
-        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
+        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "IsElemReady": false,
         "Dependencies": [res5.id]
     }, options);
@@ -617,7 +648,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
         "Description": "Подготовка к публикации.",
-        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
+        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : null,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res.id, res2.id]
@@ -629,6 +660,20 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
         "IsDefault": false,
         "Expression": "(!AudioReDo)"
     }, options);
+
+    if (has_test)
+        // Задача #15
+        res = await pm.newTask({
+            "Name": "Тест",
+            "ProcessId": p_id,
+            "ExecutorId": data.ExecutorTest ? data.ExecutorTest :
+                (elements["Тест"] && elements["Тест"].SupervisorId ? elements["Тест"].SupervisorId : supervisor_id),
+            "Description": "Подготовьте, пожалуйста, проверочный тест.",
+            "ElementId": elements["Тест"] ? elements["Тест"].Id : null,
+            "WriteFieldSet": "Сдать готовый тест",
+            "IsElemReady": true,
+            "Dependencies": [res.id]
+        }, options);
 
     // Конец процесса
     await pm.newTask({
@@ -643,6 +688,7 @@ async function process_2(pm, p_id, supervisor_id, elements, data, options) {
 
 async function process_3(pm, p_id, supervisor_id, elements, data, options) {
     // Процесс №3 (с музыкой и без картинок автора)
+    let has_test = typeof (data.HasTest) === 'boolean' ? data.HasTest : false;
     // Задача #1
     let res = await pm.newTask({
         "Name": "Регистрация новой записи",
@@ -727,7 +773,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorLiterature ? data.ExecutorLiterature : null,
         "Description": "Запросить у автора список литературы.",
-        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : supervisor_id,
+        "ElementId": elements["Список литературы"] ? elements["Список литературы"].Id : null,
         "IsElemReady": false,
         "Dependencies": [res5.id]
     }, options);
@@ -819,7 +865,7 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "ProcessId": p_id,
         "ExecutorId": data.ExecutorReadyComponents ? data.ExecutorReadyComponents : supervisor_id,
         "Description": "Подготовка к публикации.",
-        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : supervisor_id,
+        "ElementId": elements["Готовые компоненты"] ? elements["Готовые компоненты"].Id : null,
         "WriteFieldSet": "Финализировать",
         "IsElemReady": true,
         "Dependencies": [res.id, res2.id]
@@ -831,6 +877,20 @@ async function process_3(pm, p_id, supervisor_id, elements, data, options) {
         "IsDefault": false,
         "Expression": "(!AudioReDo)"
     }, options);
+
+    if (has_test)
+        // Задача #16
+        res = await pm.newTask({
+            "Name": "Тест",
+            "ProcessId": p_id,
+            "ExecutorId": data.ExecutorTest ? data.ExecutorTest :
+                (elements["Тест"] && elements["Тест"].SupervisorId ? elements["Тест"].SupervisorId : supervisor_id),
+            "Description": "Подготовьте, пожалуйста, проверочный тест.",
+            "ElementId": elements["Тест"] ? elements["Тест"].Id : null,
+            "WriteFieldSet": "Сдать готовый тест",
+            "IsElemReady": true,
+            "Dependencies": [res.id]
+        }, options);
 
     // Конец процесса
     await pm.newTask({

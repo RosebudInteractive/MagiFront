@@ -445,6 +445,18 @@ const GET_COURSE_ID_BY_URL_MSSQL =
 const GET_COURSE_ID_BY_URL_MYSQL =
     "select `Id` from `Course` where `URL` = '<%= courseUrl %>'";
 
+const GET_INTEREST_MSSQL =
+    "select cl.[CategoryId] Id, cl.[Name]\n" +
+    "from [UserInterest] i\n" +
+    "  join [CategoryLng] cl on cl.[CategoryId] = i.[CategoryId]\n" +
+    "where i.[UserId] = <%= id %>";
+    
+const GET_INTEREST_MYSQL =
+    "select cl.`CategoryId` Id, cl.`Name`\n" +
+    "from `UserInterest` i\n" +
+    "  join `CategoryLng` cl on cl.`CategoryId` = i.`CategoryId`\n" +
+    "where i.`UserId` = <%= id %>";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
 const CACHE_PREFIX = "user:";
@@ -712,6 +724,77 @@ const DbUser = class DbUser extends DbObject {
                     
                     await root_obj.save(dbOpts);
                     await this.cacheDel(this._getTranLockKey(userId));
+                    return { result: "OK" };
+                })
+        }, memDbOptions);
+    }
+
+    async getInterests(userId, options) {
+        let result = [];
+        let opts = _.cloneDeep(options || {});
+        let dbOpts = _.defaultsDeep({ userId: userId }, opts.dbOptions || {});
+        let records = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_INTEREST_MYSQL)({ id: userId }),
+                mssql: _.template(GET_INTEREST_MSSQL)({ id: userId })
+            }
+        }, dbOpts)
+        if (records && records.detail && (records.detail.length > 0)) {
+            records.detail.forEach(elem => {
+                result.push({
+                    Id: elem.Id,
+                    Name: elem.Name
+                });
+            })
+        }
+        return result;
+    }
+
+    async setInterests(userId, data, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let categories = _.clone(data);
+        if (!Array.isArray(categories))
+            throw new HttpError(HttpCode.ERR_BAD_REQ, "Invalid categories list.");
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjects({ expr: { model: { name: "UserInterest" } } }, { field: "UserId", op: "=", value: userId }, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    let col = root_obj.getCol("DataElements");
+                    let currList = {};
+                    for (let i = 0; i < col.count(); i++) {
+                        let obj = col.get(i);
+                        currList[obj.categoryId()] = obj;
+                    }
+                    let newList = {};
+                    for (let i = 0; i < categories.length; i++) {
+                        let catId = categories[i];
+                        if (!newList[catId]) {
+                            newList[catId] = true;
+                            let obj = currList[catId];
+                            if (!obj) {
+                                await root_obj.newObject({
+                                    fields: { UserId: userId, CategoryId: catId }
+                                }, dbOpts);
+                            }
+                            else
+                                delete currList[catId];
+                        }
+                    }
+
+                    for (let key in currList)
+                        col._del(currList[key]);
+                    
+                    await root_obj.save(dbOpts);
                     return { result: "OK" };
                 })
         }, memDbOptions);
