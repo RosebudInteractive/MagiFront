@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, } from 'react';
+// import { View } from 'react-native';
 import EventPoints from './event-points';
 import PeriodSections from './periods';
 import placeByYLevelLimit from '../../helpers/placeByLevel';
@@ -185,7 +186,8 @@ export default function TimeAxis(props) {
     }
     useEffect(() => {
         if ((workAreaWidth === undefined) && (rightPadding !== undefined)) {
-            setWorkAreaWidth(width - SETTINGS.horizontalPadding - rightPadding);
+            const canvasWidth = width < SETTINGS.canvas.minWidth ? SETTINGS.canvas.minWidth : width;
+            setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
         }
     }, [rightPadding]);
     const itemClickHandler = useCallback(({ type, id, item }) => {

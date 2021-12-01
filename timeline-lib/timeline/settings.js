@@ -4,11 +4,12 @@ class Settings {
     zoom;
     axis;
     period;
+    canvas;
     constructor() {
         this.axis = {
             itemMinWidth: 50,
         };
-        this.horizontalPadding = 100;
+        this.horizontalPadding = 40;
         this.message = {
             minWidth: 236,
             maxWidth: 356,
@@ -28,6 +29,9 @@ class Settings {
         this.period = {
             emptyWidth: 50,
             minTitleWidth: 150,
+        };
+        this.canvas = {
+            minWidth: 700,
         };
     }
     isVerticalViewport(width) {

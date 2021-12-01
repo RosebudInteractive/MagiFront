@@ -6,8 +6,6 @@ export default function getWidthOfText(txt, fontName, fontSize, fontWeight) {
         context = canvas.getContext('2d');
     }
     const font = `${fontWeight} ${fontSize}px ${fontName}`;
-    // eslint-disable-next-line no-console
-    console.log(font);
     context.font = font;
     return context.measureText(txt).width;
 }
