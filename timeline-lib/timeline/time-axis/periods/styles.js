@@ -14,9 +14,10 @@ export default StyleSheet.create({
         fontFamily: 'Fira Sans',
         fontWeight: '400',
         fontSize: 10,
+        marginRight: 8,
     },
     dateTitle: {
         opacity: 0.57,
-        marginHorizontal: 8,
+        // marginRight: 8,
     },
 });

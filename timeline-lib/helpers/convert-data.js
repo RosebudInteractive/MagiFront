@@ -3,8 +3,7 @@ const convertEvents = (events) => (events ? events.map((item) => {
         id: item.Id ? item.Id : item.id,
         year: +item.Year,
         name: item.Name,
-        color: item.color,
-        visible: true,
+        color: item.color ? item.color : '#FFFFFF',
     };
     if (item.ShortName)
         dataItem.shortName = item.ShortName;
@@ -23,8 +22,7 @@ const convertPeriods = (periods) => (periods
             startYear: +item.LbYear,
             endYear: +item.RbYear,
             name: item.Name,
-            color: item.color,
-            visible: true,
+            color: item.color ? item.color : '#FFFFFF',
         };
         if (item.ShortName)
             dataItem.shortName = item.ShortName;

@@ -9,6 +9,7 @@ export default StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         cursor: 'pointer',
+        paddingHorizontal: 8,
     },
     title: {
         color: 'white',
@@ -18,6 +19,6 @@ export default StyleSheet.create({
     },
     dateTitle: {
         opacity: 0.57,
-        marginHorizontal: 8,
+        marginRight: 8,
     },
 });

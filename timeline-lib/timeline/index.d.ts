@@ -1,6 +1,7 @@
 /// <reference types="react" />
 import { Event } from '../types/event';
 import { Period } from '../types/period';
+import './timeline.sass';
 declare type Props = {
     backgroundImage: string;
     events: Event.VisualItem[];

@@ -6,6 +6,7 @@ declare type Props = {
     elementsOverAxis: boolean;
     yearPerPixel: number;
     y: number;
+    zoom: number;
     onCoordinatesReady: Function;
     onRecalculateTimelineEnding: Function;
     levelLimit: number;

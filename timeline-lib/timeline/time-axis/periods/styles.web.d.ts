@@ -8,6 +8,7 @@ declare namespace _default {
         const justifyContent: "flex-start";
         const alignItems: "center";
         const cursor: string;
+        const paddingHorizontal: number;
     }
     namespace title {
         const color: string;
@@ -17,7 +18,7 @@ declare namespace _default {
     }
     namespace dateTitle {
         const opacity: number;
-        const marginHorizontal: number;
+        const marginRight: number;
     }
 }
 export default _default;

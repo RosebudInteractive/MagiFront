@@ -1,27 +1,39 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState,} from 'react';
-import {View} from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, } from 'react';
 import EventPoints from './event-points';
 import PeriodSections from './periods';
 import placeByYLevelLimit from '../../helpers/placeByLevel';
 import SerifsContext from './serifs/context';
 import NativeAxis from './axis';
-import {calcDisplayDate, calcEventPointPosition, isArrayEquals} from '../../helpers/tools';
-import {ItemType} from '../../types/common';
-
-const ITEM_MIN_WIDTH = 50;
+import { calcDisplayDate, calcEventPointPosition, calcPeriodPoints, isArrayEquals, } from '../../helpers/tools';
+import { ItemType } from '../../types/common';
+import SETTINGS from '../settings';
+const ITEM_MIN_WIDTH = SETTINGS.axis.itemMinWidth;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const {events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme,} = props;
+    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, } = props;
     const [svgWidth, setSvgWidth] = useState(0);
-    const [itemWidth, setItemWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
     const [eventsWithCoords, setEventsWithCoords] = useState(events);
-    const [lastYearFromLastPoint, setLastYear] = useState(null);
-    const [activeItem, setActiveItem] = useState({type: null, id: null, item: null});
+    const [activeItem, setActiveItem] = useState({ type: null, id: null, item: null });
     const [myLevelLimit, setMyLevelLimit] = useState(null);
-    const viewPort = useRef(null);
+    const [needCorrectionOnBC, setNeedCorrectionOnBC] = useState(false);
+    const [rightPadding, setRightPadding] = useState(undefined);
+    const [workAreaWidth, setWorkAreaWidth] = useState(undefined);
+    const [minDate, setMinDate] = useState(undefined);
+    const [maxDate, setMaxDate] = useState(undefined);
+    const memoPaddingRight = useMemo(() => rightPadding || SETTINGS.horizontalPadding, [rightPadding]);
+    // todo: При изменении ширины viewport-а канва НЕ МЕНЯЕТ свой размер
+    const axisWidth = useMemo(() => ({
+        workArea: (workAreaWidth || width) - SETTINGS.horizontalPadding - memoPaddingRight,
+        withPadding: width,
+    }), [width, rightPadding, workAreaWidth]);
     const zoomRef = useRef(zoom);
-
+    const pixelsInYear = useMemo(() => {
+        if (!minDate || !maxDate)
+            return 0;
+        const tempWidth = workAreaWidth || width - SETTINGS.horizontalPadding - memoPaddingRight;
+        return tempWidth / (maxDate - minDate);
+    }, [minDate, maxDate, workAreaWidth, memoPaddingRight]);
     function calculateVertical() {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
@@ -30,17 +42,18 @@ export default function TimeAxis(props) {
             /* eslint-enable no-param-reassign */
         });
         // eslint-disable-next-line max-len
-        const {items: handledEvents, levelsCount} = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
+        const { items: handledEvents, levelsCount } = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
         if (!myLevelLimit || (myLevelLimit.events !== levelsCount)) {
             const newValue = myLevelLimit
-                ? {...myLevelLimit, events: levelsCount}
-                : {periods: 0, events: levelsCount};
+                ? { ...myLevelLimit, events: levelsCount }
+                : { periods: 0, events: levelsCount };
             setMyLevelLimit(newValue);
         }
     }
-
     const calculateVerticalWithZoom = (zoomValue) => {
+        let lastYearCoordinate = 0;
+        let right = 0;
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
             item.xStart = item.left * zoomValue;
@@ -48,22 +61,27 @@ export default function TimeAxis(props) {
             item.yLevel = 0;
             item.offset = 0;
             /* eslint-enable no-param-reassign */
+            lastYearCoordinate = item.xStart > lastYearCoordinate ? item.xStart : lastYearCoordinate;
+            right = item.xEnd > right ? item.xEnd : right;
         });
-        const {items: handledEvents, levelsCount} = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
+        const { items: handledEvents, levelsCount } = placeByYLevelLimit(events, levelLimit.events, visibilityChecking);
         setEventsWithCoords(handledEvents);
+        const padding = right - lastYearCoordinate;
+        setRightPadding(padding > SETTINGS.horizontalPadding
+            ? padding + 20
+            : SETTINGS.horizontalPadding);
         if (!myLevelLimit || (myLevelLimit.events !== levelsCount)) {
             const newValue = myLevelLimit
-                ? {...myLevelLimit, events: levelsCount}
-                : {periods: 0, events: levelsCount};
+                ? { ...myLevelLimit, events: levelsCount }
+                : { periods: 0, events: levelsCount };
             setMyLevelLimit(newValue);
         }
     };
     const setPeriodsLevelsCount = useCallback((levelsCount) => {
         if (!myLevelLimit || (myLevelLimit.periods !== levelsCount)) {
             const newValue = myLevelLimit
-                ? {...myLevelLimit, periods: levelsCount}
-                : {events: 0, periods: levelsCount};
-
+                ? { ...myLevelLimit, periods: levelsCount }
+                : { events: 0, periods: levelsCount };
             setMyLevelLimit(newValue);
         }
     }, [myLevelLimit]);
@@ -71,115 +89,129 @@ export default function TimeAxis(props) {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
             item.displayDate = calcDisplayDate(item.day, item.month, item.year, true);
-            item.calculatedDate = calcEventPointPosition(item);
+            item.calculatedDate = calcEventPointPosition(item, needCorrectionOnBC);
             item.yLevel = item.yLevel ? item.yLevel : 0;
             /* eslint-enable no-param-reassign */
         });
         if (visibilityChecking) {
             calculateVertical();
-        } else {
+        }
+        else {
             setEventsWithCoords(events);
         }
-    }, [events, periods]);
+        periods.forEach((item) => {
+            const { start, end } = calcPeriodPoints(item, needCorrectionOnBC);
+            const calculatedStartDate = calcDisplayDate(item.startDay, item.startMonth, item.startYear);
+            const calculatedEndDate = calcDisplayDate(item.endDay, item.endMonth, item.endYear);
+            /* eslint-disable no-param-reassign */
+            item.calculatedDateStart = start;
+            item.calculatedDateEnd = end;
+            item.displayDate = `${calculatedStartDate} - ${calculatedEndDate}`;
+            item.title = item.shortName || item.name;
+            /* eslint-enable no-param-reassign */
+        });
+    }, [events, periods, needCorrectionOnBC]);
     useEffect(() => {
         if (zoomSliderStopped && zoomRef.current !== zoom) {
             zoomRef.current = zoom;
             calculateVerticalWithZoom(zoom);
         }
     }, [zoom, zoomSliderStopped]);
-    const yearPerPixel = useRef(0);
     const startDate = useRef(0);
     useEffect(() => {
-        setMyLevelLimit({...levelLimit});
+        setMyLevelLimit({ ...levelLimit });
         calculateVertical();
     }, [levelLimit]);
     const viewPortHeight = useMemo(() => {
         const need = myLevelLimit
             ? (myLevelLimit.events * 50 + myLevelLimit.periods * 30 + 111)
             : 0;
-
-        return need > (height - 6) ? need : (height - 6);
+        return need > height ? need : height;
     }, [height, myLevelLimit]);
-    useEffect(() => {
-        const OFFSET = 20;
+    useLayoutEffect(() => {
         const allItems = [...events, ...periods];
         if (allItems.length === 0)
             return;
-        let minYear = Math.min(...allItems.map((el) => el.year || el.startYear || 0));
-        let maxYear = Math.max(...allItems.map((el) => el.year || el.endYear || 0));
-        minYear = minYear < 0 ? minYear + 1 : minYear;
-        maxYear = maxYear < 0 ? maxYear + 1 : maxYear;
-        const canvasWidth = (width - 2 * OFFSET) * zoom;
+        const minYear = Math.min(...allItems.map((el) => el.year || el.startYear || 0));
+        const maxYear = Math.max(...allItems.map((el) => el.year || el.endYear || 0));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const start = Math.min(...allItems.map((el) => el.calculatedDate || el.calculatedDateStart || 0));
+        // minYear = minYear < 0 ? minYear + 1 : minYear;
+        // maxYear = maxYear < 0 ? maxYear + 1 : maxYear;
+        const workWidth = workAreaWidth
+            ? workAreaWidth * zoom
+            : axisWidth.workArea * zoom;
         let delta = maxYear - minYear;
-        const maxItemsCount = canvasWidth / ITEM_MIN_WIDTH;
+        const maxItemsCount = workWidth / ITEM_MIN_WIDTH;
         const itemDelta = delta / maxItemsCount;
         let step = STEPS.find((item) => item >= itemDelta) || 0;
         if (!step) {
             step = STEPS[STEPS.length - 1];
         }
         const roundedMinYear = Math.floor(minYear / step) * step;
-        const roundedMaxYear = Math.ceil(maxYear / step) * step;
+        const roundedMaxYear = Math.ceil((maxYear + step) / step) * step;
         delta = roundedMaxYear - roundedMinYear;
-        const itemCount = Math.floor(delta / (step));
-        const itemWidthNewValue = canvasWidth / (itemCount);
-        const newSerifs = new Array(itemCount + 1)
+        const itemCount = Math.ceil(delta / (step));
+        // const itemWidthNewValue = canvasWidth / (itemCount);
+        const newSerifs = new Array(itemCount)
             .fill(0)
-            // .map((item, index) => startPoint + (step * index));
             .map((item, index) => roundedMinYear + (step * index));
-        let svgWidthNewValue = canvasWidth;
-        if (svgWidthNewValue < width)
-            svgWidthNewValue = width;
-        setItemWidth(itemWidthNewValue);
+        const svgWidthNewValue = workWidth + SETTINGS.horizontalPadding + memoPaddingRight;
         if (!isArrayEquals(serifs, newSerifs)) {
             setSerifs(newSerifs);
         }
         setSvgWidth(svgWidthNewValue);
-        // startDate.current = startPoint;
-        startDate.current = roundedMinYear;
-        // yearPerPixel.current = (width) / (endPoint - startPoint);
-        yearPerPixel.current = (width - 2 * OFFSET) / (roundedMaxYear - roundedMinYear);
-    }, [width, zoom, events, periods, lastYearFromLastPoint]);
+        startDate.current = start;
+        const needBCDelta = (roundedMinYear < 0) && (roundedMaxYear > 0);
+        if (needCorrectionOnBC !== needBCDelta) {
+            setNeedCorrectionOnBC(needBCDelta);
+        }
+        // }, [axisWidth, width, zoom, events, periods, lastYearFromLastPoint, myLevelLimit]);
+    }, [axisWidth, zoom, events, periods, myLevelLimit, memoPaddingRight]);
     useEffect(() => {
-        setLastYear(null);
+        const allItems = [...events, ...periods];
+        if (allItems.length === 0)
+            return;
+        const minYear = Math.min(...allItems.map((el) => el.year || el.startYear || 0));
+        const maxYear = Math.max(...allItems.map((el) => el.year || el.endYear || 0));
+        setMinDate(minYear);
+        setMaxDate(maxYear);
     }, [events, periods]);
-    const midHeight = useMemo(() => {
-        const value = viewPortHeight - ((myLevelLimit && myLevelLimit.periods) || 0) * 30 - 75;
-
-        return value;
-    }, [viewPortHeight, myLevelLimit])
-
-    const recalculateTimelineEnding = useCallback((lastPointEndingYear) => {
-        setLastYear(lastPointEndingYear);
+    const midHeight = viewPortHeight - (myLevelLimit && myLevelLimit.periods || 0) * 30 - 75;
+    const recalculateTimelineEnding = useCallback(() => {
     }, [viewPortHeight, myLevelLimit]);
-
     function onCoordinatesReady() {
         calculateVerticalWithZoom(zoom);
     }
-
-    const itemClickHandler = useCallback(({type, id, item}) => {
+    useEffect(() => {
+        if ((workAreaWidth === undefined) && (rightPadding !== undefined)) {
+            setWorkAreaWidth(width - SETTINGS.horizontalPadding - rightPadding);
+        }
+    }, [rightPadding]);
+    const itemClickHandler = useCallback(({ type, id, item }) => {
         if ((activeItem.type !== type) || (activeItem.id !== id)) {
-            setActiveItem({type, id, item});
+            setActiveItem({ type, id, item });
         }
         if (onItemClick)
-            onItemClick({type, id, item});
+            onItemClick({ type, id, item });
     }, [onItemClick, activeItem]);
-    return !!width && !!yearPerPixel.current && !!myLevelLimit
-        ? (<View style={{width: svgWidth + 40, height: viewPortHeight}} ref={viewPort}>
-            <SerifsContext.Provider value={{
-                x: itemWidth, y: midHeight, zoom, theme,
+    return !!width && !!pixelsInYear && !!myLevelLimit
+        ? (<div className="timeline-canvas" style={{
+                width: svgWidth,
+                height: viewPortHeight,
             }}>
-                <NativeAxis width={svgWidth + 40} top={midHeight} serifs={serifs} yearPerPixel={yearPerPixel.current}/>
-                <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current}
-                             yearPerPixel={yearPerPixel.current} y={midHeight} onCoordinatesReady={onCoordinatesReady}
-                             onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events}
-                             activeItem={activeItem.type === ItemType.Event ? activeItem.id : null}
-                             onItemClick={itemClickHandler}/>
-                <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods}
-                                startDate={startDate.current} yearPerPixel={yearPerPixel.current} y={midHeight}
-                                periods={periods}
-                                activeItem={activeItem.type === ItemType.Period ? activeItem.id : null}
-                                onItemClick={itemClickHandler} onSetLevelsCount={setPeriodsLevelsCount}/>
-            </SerifsContext.Provider>
-        </View>)
+        <SerifsContext.Provider value={{
+                needCorrectionOnBC, zoom, theme,
+            }}>
+          <NativeAxis width={svgWidth} startDate={startDate.current} top={midHeight} serifs={serifs} yearPerPixel={pixelsInYear}/>
+          <div className="timeline-canvas__inner" style={{
+                marginLeft: SETTINGS.horizontalPadding,
+                width: `calc(100% - ${memoPaddingRight + SETTINGS.horizontalPadding}px)`,
+            }}>
+            <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} zoom={zoom} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
+            <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler} onSetLevelsCount={setPeriodsLevelsCount}/>
+          </div>
+        </SerifsContext.Provider>
+      </div>)
         : null;
 }

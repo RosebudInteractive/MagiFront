@@ -1,9 +1,10 @@
 export const VERTICAL_STEP = 50;
-export function calcEventPointPosition(event) {
-    const year = event.year < 0 ? event.year + 1 : event.year;
+export function calcEventPointPosition(event, needCorrectionOnBC) {
+    const needCorrectYear = needCorrectionOnBC && event.year > 1;
+    const year = needCorrectYear ? event.year - 1 : event.year;
     return year
-        + (event.month ? (event.month - 1) / 12 : 0.5)
-        + (event.day ? event.day / (12 * 30) : (0.5 / 12));
+        + (event.month ? (event.month - 1) / 12 : 0)
+        + (event.day ? (event.day - 1) / (12 * 30) : 0);
 }
 export function isArrayEquals(array1, array2) {
     return array1.length === array2.length && array1.every((value, index) => value === array2[index]);
@@ -15,7 +16,6 @@ export function calcScaleY(level, top) {
     const noScaleHeight = VERTICAL_STEP - top;
     return height / noScaleHeight;
 }
-// eslint-disable-next-line max-len
 export function calcDisplayDate(day, month, year, showBC = false) {
     const BC = year < 1;
     const absYear = Math.abs(year);
@@ -23,15 +23,17 @@ export function calcDisplayDate(day, month, year, showBC = false) {
     const monthText = month ? `${month}.` : '';
     return `${dayText}${monthText}${absYear}${showBC && BC ? ' до н.э.' : ''}`;
 }
-export function calcPeriodPoints(period) {
-    const startYear = period.startYear < 0 ? period.startYear + 1 : period.startYear;
-    const endYear = period.endYear < 0 ? period.endYear + 1 : period.endYear;
+export function calcPeriodPoints(period, needCorrectionOnBC) {
+    const needCorrectStartYear = needCorrectionOnBC && period.startYear > 1;
+    const needCorrectEndYear = needCorrectionOnBC && period.endYear > 1;
+    const startYear = needCorrectStartYear ? period.startYear - 1 : period.startYear;
+    const endYear = needCorrectEndYear ? period.endYear - 1 : period.endYear;
     const start = startYear
-        + (period.startMonth ? (period.startMonth - 1) / 12 : 0.5)
-        + (period.startDay ? period.startDay / (12 * 30) : (0.5 / 12));
+        + (period.startMonth ? (period.startMonth - 1) / 12 : 0)
+        + (period.startDay ? period.startDay / (12 * 30) : 0);
     const end = endYear
-        + (period.endMonth ? (period.endMonth - 1) / 12 : 0.5)
-        + (period.endDay ? period.endDay / (12 * 30) : (0.5 / 12));
+        + (period.endMonth ? (period.endMonth - 1) / 12 : (11 / 12))
+        + (period.endDay ? period.endDay / (12 * 30) : (1 / 12));
     return { start, end };
 }
 export function hexToRgb(hex) {
@@ -63,7 +65,8 @@ export function transformPeriodToVisual(item) {
     return {
         ...item,
         displayDate: '',
-        calculatedDate: 0,
+        calculatedDateStart: 0,
+        calculatedDateEnd: 0,
         width: 0,
         left: 0,
         y: 0,

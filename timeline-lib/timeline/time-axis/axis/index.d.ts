@@ -4,6 +4,7 @@ declare type Props = {
     top: number;
     serifs: any;
     yearPerPixel: number;
+    startDate: number;
 };
 export default function Axis(props: Props): JSX.Element;
 export {};

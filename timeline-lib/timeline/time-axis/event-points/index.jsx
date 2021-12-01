@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import EventPoint from './item';
-import { isArrayEquals, VERTICAL_STEP } from '../../../helpers/tools';
+import { VERTICAL_STEP } from '../../../helpers/tools';
 import { ItemType } from '../../../types/common';
+import isEventsEqual from './is-events-equal';
 export default function EventPoints(props) {
-    const { events, startDate, yearPerPixel, y, onRecalculateTimelineEnding, elementsOverAxis, levelLimit, onItemClick, activeItem, } = props;
+    const { events, startDate, yearPerPixel, y, onRecalculateTimelineEnding, elementsOverAxis, levelLimit, onItemClick, activeItem, zoom, } = props;
     const [visible, setVisible] = useState(true);
     const renderedEvents = useRef([]);
     const coordinates = useRef([]);
@@ -17,7 +18,7 @@ export default function EventPoints(props) {
             setVisible(true);
     }, [visible]);
     useEffect(() => {
-        if (!isArrayEquals(renderedEvents.current, events)) {
+        if (!isEventsEqual(renderedEvents.current, events)) {
             renderedEvents.current = [...events];
             coordinates.current = [];
             setVisible(false);
@@ -37,13 +38,15 @@ export default function EventPoints(props) {
         }
     }, []);
     const renderElements = useMemo(() => events.map((item, index) => {
-        const x = (item.calculatedDate - startDate) * yearPerPixel;
+        const x = (item.calculatedDate - startDate) * yearPerPixel * zoom;
         const yValue = elementsOverAxis
             ? (y - (60 * levelLimit)) - (item.yLevel * VERTICAL_STEP)
             : y - (item.yLevel * VERTICAL_STEP);
         const isActive = item.id === activeItem;
         const zIndex = isActive ? events.length : events.length - index - 1;
+        // eslint-disable-next-line no-param-reassign
+        item.left = x;
         return (<EventPoint item={item} visible={item.visible} level={item.yLevel} x={x} y={yValue - 50} axisY={y} isActive={isActive} onMount={onMountCallback} onClick={onClickedElement} onLastPoint={recalculateEndingOfTimeline} zIndex={zIndex} index={index} key={item.id}/>);
-    }), [events, activeItem, yearPerPixel, y]);
+    }), [events, activeItem, yearPerPixel, y, zoom]);
     return visible ? <React.Fragment>{renderElements}</React.Fragment> : null;
 }

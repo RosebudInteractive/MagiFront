@@ -2,8 +2,8 @@ import React from 'react';
 import { LayoutRectangle } from 'react-native';
 declare type Props = {
     yearPerPixel: number;
+    startDate: number;
     year: number;
-    index: number;
     rightBound: number;
 };
 declare type State = {
@@ -13,7 +13,7 @@ declare type State = {
 declare class SerifItem extends React.Component<Props, State> {
     private readonly textRef;
     constructor(props: Props);
-    componentDidUpdate(prevProps: Readonly<Props>): void;
+    componentDidUpdate(): void;
     onLayout(data: LayoutRectangle): void;
     render(): false | JSX.Element;
 }

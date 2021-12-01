@@ -1,8 +1,7 @@
 import React from 'react';
 import { Theme } from '../../../types/theme';
 export interface ISerif {
-    x: number;
-    y: number;
+    needCorrectionOnBC: boolean;
     zoom: number;
     theme: Theme | null;
 }

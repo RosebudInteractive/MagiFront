@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, } from 'react';
 import placeByYLevelLimit from '../../../helpers/placeByLevel';
 import AnimatedPeriod from './item';
-import { calcDisplayDate, calcPeriodPoints } from '../../../helpers/tools';
 import { ItemType } from '../../../types/common';
 export default function PeriodSections(props) {
     const { startDate, yearPerPixel, periods, levelLimit, y, elementsOverAxis, onItemClick, onSetLevelsCount, activeItem, } = props;
@@ -19,29 +18,29 @@ export default function PeriodSections(props) {
     };
     useEffect(() => {
         if (periods.length > 0) {
-            const periodsWithCoords = periods.map((item) => {
-                const { start, end } = calcPeriodPoints(item);
-                const xStart = Math.abs(start - startDate) * yearPerPixel;
-                const xEnd = Math.abs(end - startDate) * yearPerPixel;
-                return {
-                    ...item, yLevel: 0, xLevel: 0, xStart, xEnd,
-                };
+            // const periodsWithCoords =
+            periods.forEach((item) => {
+                const xStart = Math.abs(item.calculatedDateStart - startDate) * yearPerPixel;
+                const xEnd = Math.abs(item.calculatedDateEnd - startDate) * yearPerPixel;
+                /* eslint-disable no-param-reassign */
+                item.yLevel = 0;
+                item.xStart = xStart;
+                item.xEnd = xEnd;
+                /* eslint-enable no-param-reassign */
+                // return item;
+                // return {
+                //   ...item, yLevel: 0, xLevel: 0, xStart, xEnd,
+                // };
             });
-            const { items: alignedPeriods, levelsCount } = placeByYLevelLimit(periodsWithCoords, levelLimit || 0);
-            onSetLevelsCount(levelsCount);
+            const { items: alignedPeriods, levelsCount } = placeByYLevelLimit(periods, levelLimit || 0);
             alignedPeriods.forEach((item) => {
-                const calculatedStartDate = calcDisplayDate(item.startDay, item.startMonth, item.startYear);
-                const calculatedEndDate = calcDisplayDate(item.endDay, item.endMonth, item.endYear);
-                // eslint-disable-next-line no-param-reassign
-                item.displayDate = `${calculatedStartDate} - ${calculatedEndDate}`;
                 // eslint-disable-next-line no-param-reassign
                 item.y = elementsOverAxis ? (y - 30) - (item.yLevel * 30) : (y + 30) + (item.yLevel * 30);
-                // eslint-disable-next-line no-param-reassign
-                item.title = item.shortName || item.name;
             });
+            onSetLevelsCount(levelsCount);
             setVerticallyAlignedPeriods(alignedPeriods);
         }
-    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis, y, onSetLevelsCount]);
+    }, [periods, startDate, yearPerPixel, levelLimit, elementsOverAxis, y]);
     const periodSections = useMemo(() => (verticallyAlignedPeriods.length > 0
         ? verticallyAlignedPeriods.map((period, index, array) => {
             const isActive = period.id === activeItem;
