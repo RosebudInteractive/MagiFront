@@ -5,6 +5,12 @@ declare type Props = {
     item: VisualItem;
     indent: number;
     onClose: (event: GestureResponderEvent) => void;
+    pinned?: boolean;
 };
-export default function Message(props: Props): JSX.Element;
-export {};
+declare function Message(props: Props): JSX.Element;
+declare namespace Message {
+    var defaultProps: {
+        pinned: boolean;
+    };
+}
+export default Message;

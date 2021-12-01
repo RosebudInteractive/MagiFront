@@ -1,30 +1,116 @@
-import React, {useCallback, useMemo, useRef, useState,} from 'react';
-import { ScrollView, View, } from 'react-native';
-import styles from './styles';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
 import Themes from './theme';
 import Header from './header';
 import Footer from './footer';
 import TimeAxis from './time-axis';
 import Message from '../detail-message';
+import './timeline.sass';
+import ZoomHandler, { OffsetEnum } from '../helpers/zoom-handler';
+import wrap from '../helpers/zoom-container';
+import SETTINGS from './settings';
+let scrollHandlerGuard = false;
 export default function Timeline(props) {
-    const { backgroundImage, events, periods, levelLimit, visibilityChecking, elementsOverAxis, height, onFullScreen, onCloseFullScreen } = props;
+    const { backgroundImage, events, periods, levelLimit, visibilityChecking, elementsOverAxis, } = props;
     const [fsEnable, setFsEnable] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
     const [activeItem, setActiveItem] = useState(null);
     const [containerWidth, setContainerWidth] = useState(0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [height, setHeight] = useState(494);
+    const [isVertical, setIsVertical] = useState(false);
+    const [activeInViewport, setActiveInViewport] = useState(false);
+    const [offsetDefined, setOffsetDefined] = useState(false);
     const horizontalContainerRef = useRef(null);
-
+    const { width } = useResizeDetector({ targetRef: horizontalContainerRef });
     const openFullScreen = () => {
         setFsEnable(true);
-        if (onFullScreen) onFullScreen()
     };
-
     const closeFullScreen = () => {
         setFsEnable(false);
-        if (onCloseFullScreen) onCloseFullScreen()
     };
-
+    const calcOffsetForEvent = (event) => {
+        if (horizontalContainerRef.current) {
+            const { left } = event;
+            const { scrollLeft } = horizontalContainerRef.current;
+            return left + SETTINGS.horizontalPadding - scrollLeft;
+        }
+        return 0;
+    };
+    const calcOffsetForPeriod = (period) => {
+        if (horizontalContainerRef.current) {
+            const { left, width: periodWidth } = period;
+            const { scrollLeft } = horizontalContainerRef.current;
+            let startValue = left + SETTINGS.horizontalPadding - scrollLeft;
+            let endValue = startValue + periodWidth;
+            if (startValue < 0)
+                startValue = 0;
+            if (endValue > (width || 0))
+                endValue = width || 0;
+            return startValue + (endValue - startValue) / 2;
+        }
+        return 0;
+    };
+    const calculateOffset = (active) => {
+        if (active) {
+            switch (active.type) {
+                case 'event': return calcOffsetForEvent(active.item);
+                case 'period': return calcOffsetForPeriod(active.item);
+                default: return 0;
+            }
+        }
+        return 0;
+    };
+    const defineOffset = (active) => {
+        const xValue = calculateOffset(active);
+        if (xValue) {
+            ZoomHandler.setOffset(xValue);
+            setOffsetDefined(true);
+            setActiveInViewport(true);
+        }
+    };
+    const adjustActiveItem = () => {
+        if (activeItem) {
+            scrollHandlerGuard = true;
+            if (!offsetDefined)
+                defineOffset(activeItem);
+            if (activeItem.type === 'event') {
+                const newOffset = calculateOffset(activeItem);
+                ZoomHandler.adjustForNewOffset(newOffset, zoom);
+            }
+            else {
+                ZoomHandler.adjustForZoom(zoom);
+                defineOffset(activeItem);
+            }
+            setTimeout(() => {
+                scrollHandlerGuard = false;
+            }, 0);
+        }
+    };
+    const fixActiveItemOffset = (newScrollPosition) => {
+        if (activeItem) {
+            const { left, width: itemWidth } = activeItem.item;
+            const xValue = left + SETTINGS.horizontalPadding - newScrollPosition;
+            const visible = ((xValue + itemWidth) > 0) && (xValue < (width || 0));
+            if (visible !== activeInViewport) {
+                if (!visible) {
+                    setOffsetDefined(false);
+                    ZoomHandler.setOffset(OffsetEnum.CENTER);
+                }
+                setActiveInViewport(visible);
+            }
+            if (visible && !scrollHandlerGuard) {
+                if (offsetDefined) {
+                    const newOffset = calculateOffset(activeItem);
+                    ZoomHandler.setOffset(newOffset);
+                }
+                else {
+                    defineOffset(activeItem);
+                }
+            }
+        }
+    };
     const onZoomChange = useCallback((value) => {
         setZoom(value);
     }, []);
@@ -33,52 +119,68 @@ export default function Timeline(props) {
     }, []);
     const containerHeight = useMemo(() => height, [levelLimit, height]);
     // @ts-ignore
-    const onItemClick = ({ item }) => {
-        setActiveItem(item);
+    const onItemClick = ({ type, item }) => {
+        setActiveItem({ type, item });
+        defineOffset({ type, item });
     };
     const messageClose = () => {
         setActiveItem(null);
+        setActiveInViewport(false);
+        ZoomHandler.setOffset(OffsetEnum.CENTER);
+        setOffsetDefined(false);
+    };
+    useEffect(() => {
+        ZoomHandler.setWidth(width || 0);
+        setIsVertical(SETTINGS.isVerticalViewport(width || 0));
+        if (horizontalContainerRef.current) {
+            const { scrollLeft } = horizontalContainerRef.current;
+            fixActiveItemOffset(scrollLeft);
+        }
+    }, [width]);
+    // useEffect(() => {
+    //   if (!offsetDefined) {
+    //     ZoomHandler.setOffset(OffsetEnum.CENTER);
+    //   }
+    // }, [offsetDefined]);
+    useEffect(() => {
+        if (horizontalContainerRef.current) {
+            ZoomHandler.setContainer(wrap(horizontalContainerRef.current));
+            ZoomHandler.setWidth(horizontalContainerRef.current.clientWidth);
+            setContainerWidth(horizontalContainerRef.current.clientWidth);
+        }
+    }, [horizontalContainerRef]);
+    // useEffect(() => {
+    //   setIsVertical(SETTINGS.isVerticalViewport(containerWidth));
+    // }, [containerWidth]);
+    useLayoutEffect(() => {
+        if (activeItem && activeInViewport) {
+            adjustActiveItem();
+        }
+        else {
+            ZoomHandler.adjustForZoom(zoom);
+        }
+    }, [zoom]);
+    const scrollHandler = (e) => {
+        // @ts-ignore
+        const pos = (e.nativeEvent.target && e.nativeEvent.target.scrollLeft) || 0;
+        ZoomHandler.setScrollPosition(pos);
+        fixActiveItemOffset(pos);
     };
     const background = useMemo(() => ({
-        // @ts-ignore
-        backgroundImage: `linear-gradient(180deg, #00000070, #00000094), url(/data/${backgroundImage})`,
+        backgroundImage: `linear-gradient(180deg, #00000070, #00000094), url(${backgroundImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
     }), [backgroundImage]);
-    const handleLayout = (e) => {
-        setContainerWidth(e.nativeEvent.layout.width - 40);
-    };
-    const setContainerHeight = () => {
-        // eslint-disable-next-line no-console
-        // console.log('height', e.nativeEvent.layout.height);
-        // setHeight(e.nativeEvent.layout.height);
-        // if (e.nativeEvent.layout.width > containerWidth + 40) {
-        //   setHeightDelta(7);
-        // } else {
-        //   setHeightDelta(0);
-        // }
-        // setHeight(0);
-    };
-
-    return (<View style={[styles.mainContainer, background]}>
-        {fsEnable && <Header title="Ключевые события" width="100%"/>}
-        <ScrollView style={styles.timelineContainer}>
-            <ScrollView ref={horizontalContainerRef} directionalLockEnabled={false} onLayout={handleLayout} horizontal
-                        style={styles.timeline}>
-                <View style={{height: '100%', overflow: 'hidden'}} onLayout={setContainerHeight}>
-                    {
-                        containerWidth && containerHeight &&
-                        <TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom}
-                               levelLimit={levelLimit} theme={Themes.current} height={containerHeight}
-                               elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped}
-                               visibilityChecking={visibilityChecking} onItemClick={onItemClick}/>
-                    }
-                </View>
-            </ScrollView>
-        </ScrollView>
-        <Footer onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom}
-                onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
-        {activeItem
-        && <Message item={activeItem} onClose={messageClose} indent={fsEnable ? 49 : 0}/>}
-    </View>);
+    return (<div className={`timeline-wrapper${isVertical ? ' _vertical' : ''}`} style={background}>
+      {fsEnable && <Header title="Ключевые события" width="100%"/>}
+      <div className="timeline-container" onScroll={scrollHandler} ref={horizontalContainerRef}>
+        {/*<div className="vertical-line"/>*/}
+        {containerWidth
+            && containerHeight
+            && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={onItemClick}/>)}
+      </div>
+      <Footer onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom} onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
+      {activeItem
+            && (<Message item={activeItem.item} onClose={messageClose} indent={fsEnable ? 49 : 0} pinned={isVertical}/>)}
+    </div>);
 }

@@ -1,0 +1,33 @@
+.timeline-wrapper
+  width: 100%
+  height: 500px
+  position: relative
+  &._vertical
+    display: flex
+    height: auto
+    .timeline-container
+      height: 500px
+
+.timeline-container
+  overflow: auto
+
+.timeline-canvas
+  position: relative
+  //transition: all 50ms ease
+
+.timeline-canvas__inner
+  position: relative
+  width: 100%
+  height: calc(100% - 4px)
+  //height: 100%
+  top: 0
+
+.vertical-line
+  position: absolute
+  height: 100%
+  width: 1px
+  background-color: orangered
+  left: 50%
+  transform: translateX(-50%)
+
+

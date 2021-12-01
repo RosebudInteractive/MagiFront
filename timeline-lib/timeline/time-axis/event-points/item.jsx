@@ -6,6 +6,7 @@ import { calcScaleY, hexToRgb, VERTICAL_STEP } from '../../../helpers/tools';
 import Mask from '../gradient-mask';
 const MAX_WIDTH = 141;
 export default class EventPoint extends React.PureComponent {
+    // eslint-disable-next-line react/sort-comp
     opacityAnim;
     verticalAnim;
     constructor(props) {
@@ -142,10 +143,11 @@ export default class EventPoint extends React.PureComponent {
         }
     }
     render() {
-        const { zoom, theme } = this.context;
+        const { theme } = this.context;
         const { isActive, x, item, zIndex, index, } = this.props;
         const { top, scale, indent, opacity, flagHeight, needMask, footIndent, } = this.state;
-        const left = x * zoom + 20;
+        // const left = x * zoom;
+        const left = x;
         const wrapperStyle = {
             left,
             zIndex,
@@ -181,20 +183,20 @@ export default class EventPoint extends React.PureComponent {
             transform: [{ translateY: footIndent }],
         };
         const titleStyle = {};
-        if (theme) {
-            if (theme.font && theme.font.family) {
+        if (theme && theme.font) {
+            if (theme.font.family) {
                 titleStyle.fontFamily = theme.font.family;
             }
-            if (theme.font && theme.font.weight) {
+            if (theme.font.weight) {
                 titleStyle.fontWeight = theme.font.weight;
             }
-            if (theme.font && theme.font.size) {
+            if (theme.font.size) {
                 const lineHeight = theme.font.size + 8;
                 eventStyle.height = lineHeight;
                 titleStyle.lineHeight = lineHeight;
                 titleStyle.fontSize = theme.font.size;
             }
-            if (theme.font && theme.font.color) {
+            if (theme.font.color) {
                 titleStyle.color = theme.font.color;
             }
         }

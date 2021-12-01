@@ -52,7 +52,15 @@ export default function TimelinePreview(props: Props) {
         return timeline ? convertData(timeline) : {Events: [], Periods: []};
     }, [timeline])
 
-    const backgroundFile = useMemo(() => background ? (background.file ? background.file : background) : null, [background]);
+    const backgroundFile = useMemo(() => {
+        const fileName = background
+            ? (background.file
+                ? background.file
+                : background)
+            : null
+
+        return fileName ? '/data/' + fileName : null
+    }, [background]);
 
     const openFullScreen = () => {
         setFsEnable(true)

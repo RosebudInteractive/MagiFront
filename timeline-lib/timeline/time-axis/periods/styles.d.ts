@@ -13,10 +13,10 @@ declare namespace _default {
         const fontFamily: string;
         const fontWeight: "400";
         const fontSize: number;
+        const marginRight: number;
     }
     namespace dateTitle {
         const opacity: number;
-        const marginHorizontal: number;
     }
 }
 export default _default;

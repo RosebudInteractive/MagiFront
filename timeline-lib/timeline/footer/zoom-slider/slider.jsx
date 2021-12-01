@@ -1,18 +1,30 @@
-import React, { useMemo, useRef, useState, } from 'react';
+import React, { useEffect, useMemo, useRef, useState, } from 'react';
 import './zoom-slider.sass';
 import { TouchableOpacity, View } from 'react-native';
 import DecreaseButton from './dec-button';
 import IncreaseButton from './inc-button';
-const SLIDER_STEP = 0.5;
-function startAnimation(oldValue, newValue, onChange) {
+import SETTINGS from '../../settings';
+import queue from './queue';
+// import queue from './queue';
+const SLIDER_STEP = SETTINGS.zoom.step;
+let nextValue = 0;
+function customBaseLog(val) {
+    return Math.log(val) / Math.log(SETTINGS.zoom.multiplier);
+}
+function startAnimation(oldValue, newValue, onChange, onFinish) {
     const diff = newValue - oldValue;
-    const step = diff <= 1 ? 300 : 500;
+    const step = diff <= 1 ? SETTINGS.zoom.animation.shortTime : SETTINGS.zoom.animation.longTime;
     const part = diff / step;
     const start = performance.now();
-    requestAnimationFrame(function callback(time) {
+    nextValue = newValue;
+    requestAnimationFrame(function callback() {
+        const time = performance.now();
         const diffTime = time - start;
         if (diffTime > step) {
-            setTimeout(() => onChange(newValue), 100);
+            onChange(newValue);
+            if (onFinish) {
+                onFinish();
+            }
             return;
         }
         const newVol = oldValue + part * diffTime;
@@ -21,32 +33,50 @@ function startAnimation(oldValue, newValue, onChange) {
     });
 }
 export default function ZoomSlider(props) {
-    const { value, onChange, onSliderStop } = props;
-    // const [myValue, setMyValue] = useState<number>(0);
+    const { value, onChange, onSliderStop, } = props;
     const [mouseButtonPressed, setMouseButtonPressed] = useState(false);
     const slider = useRef(null);
-    const myValue = useMemo(() => Math.round(value * 100) / 100, [value]);
+    const myValue = useMemo(() => Math.round(customBaseLog(value) * 100) / 100, [value]);
+    useEffect(() => {
+        nextValue = customBaseLog(value);
+    }, []);
+    const onChangeDecorator = (zoomValue) => {
+        onChange(SETTINGS.zoom.multiplier ** zoomValue);
+    };
     const onChangeValue = (e) => {
         const newValue = Math.round((+e.currentTarget.value / 100) * 100) / 100;
         const delta = Math.abs(newValue - myValue);
         if (!delta)
             return;
         if ((delta < 0.5) || mouseButtonPressed) {
-            onChange(newValue);
+            onChangeDecorator(newValue);
+            nextValue = newValue;
         }
         else {
-            startAnimation(myValue, newValue, onChange);
+            startAnimation(myValue, newValue, onChangeDecorator);
         }
     };
-    const decreaseButtonStyle = useMemo(() => ({ opacity: value <= 1 ? 0.4 : 1 }), [value]);
-    const increaseButtonStyle = useMemo(() => ({ opacity: value >= 10 ? 0.4 : 1 }), [value]);
+    const decreaseButtonStyle = useMemo(() => ({
+        opacity: myValue <= SETTINGS.zoom.min ? 0.4 : 1,
+    }), [myValue]);
+    const increaseButtonStyle = useMemo(() => ({
+        opacity: myValue >= SETTINGS.zoom.max ? 0.4 : 1,
+    }), [myValue]);
     const decreaseValue = () => {
-        const newValue = (myValue - SLIDER_STEP) < 1 ? 1 : myValue - SLIDER_STEP;
-        startAnimation(myValue, newValue, onChange);
+        const newValue = (nextValue - SLIDER_STEP) < SETTINGS.zoom.min
+            ? SETTINGS.zoom.min
+            : nextValue - SLIDER_STEP;
+        queue.add(startAnimation, nextValue, newValue, onChangeDecorator);
+        // onChangeDecorator(newValue);
+        nextValue = newValue;
     };
     const increaseValue = () => {
-        const newValue = (myValue + SLIDER_STEP) > 10 ? 10 : myValue + SLIDER_STEP;
-        startAnimation(myValue, newValue, onChange);
+        const newValue = (nextValue + SLIDER_STEP) > SETTINGS.zoom.max
+            ? SETTINGS.zoom.max
+            : nextValue + SLIDER_STEP;
+        queue.add(startAnimation, nextValue, newValue, onChangeDecorator);
+        // onChangeDecorator(newValue);
+        nextValue = newValue;
     };
     const onMouseDown = () => {
         onSliderStop(false);
@@ -66,7 +96,7 @@ export default function ZoomSlider(props) {
         </View>
       </TouchableOpacity>
       <div className="range-slider__control">
-        <input ref={slider} onMouseUp={onMouseUp} onMouseDown={onMouseDown} onMouseMove={onMouseMove} type="range" min={100} max={1000} value={myValue * 100} id="myRange" onChange={onChangeValue}/>
+        <input ref={slider} onMouseUp={onMouseUp} onMouseDown={onMouseDown} onMouseMove={onMouseMove} type="range" min={SETTINGS.zoom.min * 100} max={SETTINGS.zoom.max * 100} value={myValue * 100} id="myRange" onChange={onChangeValue}/>
       </div>
       <TouchableOpacity onPress={increaseValue}>
         <View style={increaseButtonStyle}>
