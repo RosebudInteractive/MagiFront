@@ -8,16 +8,17 @@ export default StyleSheet.create({
         height: 24,
         justifyContent: 'flex-start',
         alignItems: 'center',
+        cursor: 'pointer',
+        paddingHorizontal: 8,
     },
     title: {
         color: 'white',
         fontFamily: 'Fira Sans',
         fontWeight: '400',
         fontSize: 10,
-        marginRight: 8,
     },
     dateTitle: {
         opacity: 0.57,
-        // marginRight: 8,
+        marginRight: 8,
     },
 });

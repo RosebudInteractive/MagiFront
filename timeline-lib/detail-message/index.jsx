@@ -23,7 +23,7 @@ export default function Message(props) {
     return (<View style={[styles.wrapper, wrapperStyle]}>
       <View style={[styles.header, { backgroundColor: item.color }]}>
         <View style={styles.headerText}>
-          <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.title} numberOfLines={3}>{item.name}</Text>
           <Text style={styles.date}>{item.displayDate}</Text>
         </View>
         <TouchableOpacity onPress={onClose}>
