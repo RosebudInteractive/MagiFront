@@ -8,9 +8,10 @@ import getInnerSize from "../../../tools/get-inner-size";
 export default function TimelinePreview(props: Props) {
     const {timeline, background, levels} = props;
     const [width, setWidth] = useState(0);
-    const [height, setHeight] = useState(0);
+    const [height, setHeight] = useState(500);
     const [incKey, setIncKey] = useState(0);
     const [fsEnable, setFsEnable] = useState(false)
+    const [isVertical, setIsVertical] = useState(false)
 
     const preview = useRef(null);
 
@@ -81,17 +82,28 @@ export default function TimelinePreview(props: Props) {
         }
     }
 
-    return <div className={"timeline-preview _with-custom-scroll" + (fsEnable ? ' _full-screen' : '')} ref={preview}>
-        {timeline && width && height && <Timeline width={width}
-                               backgroundImage={backgroundFile}
-                               height={height}
-                               theme={Themes.current}
-                               events={converted.Events}
-                               periods={converted.Periods}
-                               levelLimit={levels}
-                               onFullScreen={openFullScreen}
-                               onCloseFullScreen={closeFullScreen}
-        />
+    const changeOrientation = useCallback((vertical: boolean) => {
+        setIsVertical(vertical);
+    }, [isVertical])
+
+    return <div className={"timeline-preview _with-custom-scroll" + (fsEnable ? ' _full-screen' : '') + (isVertical ? ' _vertical' : '')} ref={preview}>
+        {
+            !!timeline
+            && width
+            && height
+            && <Timeline width={width}
+                         elementsOverAxis={false}
+                         visibilityChecking={false}
+                         backgroundImage={backgroundFile}
+                         height={height}
+                         theme={Themes.current}
+                         events={converted.Events}
+                         periods={converted.Periods}
+                         levelLimit={levels}
+                         onFullScreen={openFullScreen}
+                         onCloseFullScreen={closeFullScreen}
+                         onChangeOrientation={changeOrientation}
+            />
         }
     </div>
 }

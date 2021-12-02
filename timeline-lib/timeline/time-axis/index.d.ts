@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import { Event } from '../../types/event';
 import { Period } from '../../types/period';
-import { LevelLimit } from '../../types/common';
+import { ActiveItem, LevelLimit } from '../../types/common';
 import { Theme } from '../../types/theme';
 declare type Props = {
     theme: Theme;
@@ -14,8 +14,9 @@ declare type Props = {
     zoomSliderStopped: boolean;
     visibilityChecking: boolean;
     elementsOverAxis: boolean;
-    onItemClick?: Function;
+    onItemClick: Function;
     onItemDoubleClick?: Function;
+    activeItem: ActiveItem | null;
 };
 export default function TimeAxis(props: Props): JSX.Element | null;
 export {};

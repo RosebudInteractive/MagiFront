@@ -11,14 +11,12 @@ import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
 let scrollHandlerGuard = false;
 export default function Timeline(props) {
-    const { backgroundImage, events, periods, levelLimit, visibilityChecking, elementsOverAxis, } = props;
+    const { backgroundImage, events, periods, height, levelLimit, visibilityChecking, elementsOverAxis, onFullScreen, onCloseFullScreen, onChangeOrientation, } = props;
     const [fsEnable, setFsEnable] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
     const [activeItem, setActiveItem] = useState(null);
     const [containerWidth, setContainerWidth] = useState(0);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [height, setHeight] = useState(494);
     const [isVertical, setIsVertical] = useState(false);
     const [activeInViewport, setActiveInViewport] = useState(false);
     const [offsetDefined, setOffsetDefined] = useState(false);
@@ -26,9 +24,13 @@ export default function Timeline(props) {
     const { width } = useResizeDetector({ targetRef: horizontalContainerRef });
     const openFullScreen = () => {
         setFsEnable(true);
+        if (onFullScreen)
+            onFullScreen();
     };
     const closeFullScreen = () => {
         setFsEnable(false);
+        if (onCloseFullScreen)
+            onCloseFullScreen();
     };
     const calcOffsetForEvent = (event) => {
         if (horizontalContainerRef.current) {
@@ -88,6 +90,31 @@ export default function Timeline(props) {
             }, 0);
         }
     };
+    // const getEventInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
+    //   const { left, width: itemWidth } = item;
+    //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
+    //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
+    // };
+    //
+    // const getPeriodInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
+    //   const { left, width: itemWidth } = item;
+    //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
+    //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
+    // };
+    //
+    // const getActiveItemInViewPort = (scrollPosition: number): boolean => {
+    //   if (activeItem) {
+    //     switch (activeItem.type) {
+    //       case 'event': return getEventInViewPort(activeItem.item, scrollPosition);
+    //
+    //       case 'period': return calcOffsetForPeriod(activeItem.item);
+    //
+    //       default: return false;
+    //     }
+    //   }
+    //
+    //   return false;
+    // }
     const fixActiveItemOffset = (newScrollPosition) => {
         if (activeItem) {
             const { left, width: itemWidth } = activeItem.item;
@@ -117,12 +144,13 @@ export default function Timeline(props) {
     const onZoomSliderStop = useCallback((stopped) => {
         setZoomSliderStopped(stopped);
     }, []);
-    const containerHeight = useMemo(() => height, [levelLimit, height]);
-    // @ts-ignore
-    const onItemClick = ({ type, item }) => {
-        setActiveItem({ type, item });
-        defineOffset({ type, item });
-    };
+    const containerHeight = useMemo(() => (height ? height - 6 : 0), [levelLimit, height]);
+    const itemClickHandler = useCallback(({ type, id, item }) => {
+        if (!activeItem || (activeItem.type !== type) || (activeItem.id !== id)) {
+            setActiveItem({ type, id, item });
+        }
+        defineOffset({ type, id, item });
+    }, [activeItem]);
     const messageClose = () => {
         setActiveItem(null);
         setActiveInViewport(false);
@@ -171,13 +199,19 @@ export default function Timeline(props) {
         backgroundPosition: 'center',
         backgroundSize: 'cover',
     }), [backgroundImage]);
+    const containerStyle = useMemo(() => ({
+        height: height,
+    }), [height]);
+    useEffect(() => {
+        if (onChangeOrientation)
+            onChangeOrientation(isVertical);
+    }, [isVertical]);
     return (<div className={`timeline-wrapper${isVertical ? ' _vertical' : ''}`} style={background}>
       {fsEnable && <Header title="Ключевые события" width="100%"/>}
-      <div className="timeline-container" onScroll={scrollHandler} ref={horizontalContainerRef}>
-        {/*<div className="vertical-line"/>*/}
+      <div className="timeline-container" onScroll={scrollHandler} style={containerStyle} ref={horizontalContainerRef}>
         {containerWidth
             && containerHeight
-            && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={onItemClick}/>)}
+            && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={itemClickHandler} activeItem={activeItem}/>)}
       </div>
       <Footer onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom} onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
       {activeItem

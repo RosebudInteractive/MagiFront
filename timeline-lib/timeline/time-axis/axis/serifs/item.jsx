@@ -15,15 +15,15 @@ class SerifItem extends React.Component {
         };
     }
     // componentDidUpdate(prevProps: Readonly<Props>) {
-    componentDidUpdate() {
-        // const { rightBound } = this.props;
-        const { visible } = this.state;
-        // if (prevProps.rightBound !== rightBound) {
-        // eslint-disable-next-line react/no-did-update-set-state
-        if (!visible)
-            this.setState({ visible: true });
-        // }
-    }
+    // componentDidUpdate() {
+    //   // const { rightBound } = this.props;
+    //   const { visible } = this.state;
+    //
+    //   // if (prevProps.rightBound !== rightBound) {
+    //   // eslint-disable-next-line react/no-did-update-set-state
+    //   if (!visible) this.setState({ visible: true });
+    //   // }
+    // }
     onLayout(data) {
         // const { rightBound } = this.props;
         const { x } = data;

@@ -13,7 +13,6 @@ declare type State = {
 declare class SerifItem extends React.Component<Props, State> {
     private readonly textRef;
     constructor(props: Props);
-    componentDidUpdate(): void;
     onLayout(data: LayoutRectangle): void;
     render(): false | JSX.Element;
 }

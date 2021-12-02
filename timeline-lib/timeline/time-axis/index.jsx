@@ -1,21 +1,19 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, } from 'react';
-// import { View } from 'react-native';
 import EventPoints from './event-points';
 import PeriodSections from './periods';
 import placeByYLevelLimit from '../../helpers/placeByLevel';
 import SerifsContext from './serifs/context';
 import NativeAxis from './axis';
 import { calcDisplayDate, calcEventPointPosition, calcPeriodPoints, isArrayEquals, } from '../../helpers/tools';
-import { ItemType } from '../../types/common';
+import { ItemType, } from '../../types/common';
 import SETTINGS from '../settings';
 const ITEM_MIN_WIDTH = SETTINGS.axis.itemMinWidth;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, } = props;
+    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, activeItem, } = props;
     const [svgWidth, setSvgWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
     const [eventsWithCoords, setEventsWithCoords] = useState(events);
-    const [activeItem, setActiveItem] = useState({ type: null, id: null, item: null });
     const [myLevelLimit, setMyLevelLimit] = useState(null);
     const [needCorrectionOnBC, setNeedCorrectionOnBC] = useState(false);
     const [rightPadding, setRightPadding] = useState(undefined);
@@ -52,13 +50,13 @@ export default function TimeAxis(props) {
             setMyLevelLimit(newValue);
         }
     }
-    const calculateVerticalWithZoom = (zoomValue) => {
+    const calculateVerticalWithZoom = () => {
         let lastYearCoordinate = 0;
         let right = 0;
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
-            item.xStart = item.left * zoomValue;
-            item.xEnd = item.left * zoomValue + item.width;
+            item.xStart = item.left;
+            item.xEnd = item.left + item.width;
             item.yLevel = 0;
             item.offset = 0;
             /* eslint-enable no-param-reassign */
@@ -115,9 +113,13 @@ export default function TimeAxis(props) {
     useEffect(() => {
         if (zoomSliderStopped && zoomRef.current !== zoom) {
             zoomRef.current = zoom;
-            calculateVerticalWithZoom(zoom);
+            calculateVerticalWithZoom();
         }
     }, [zoom, zoomSliderStopped]);
+    useEffect(() => {
+        if (workAreaWidth !== undefined)
+            calculateVerticalWithZoom();
+    }, [workAreaWidth]);
     const startDate = useRef(0);
     useEffect(() => {
         setMyLevelLimit({ ...levelLimit });
@@ -182,7 +184,7 @@ export default function TimeAxis(props) {
     const recalculateTimelineEnding = useCallback(() => {
     }, [viewPortHeight, myLevelLimit]);
     function onCoordinatesReady() {
-        calculateVerticalWithZoom(zoom);
+        calculateVerticalWithZoom();
     }
     useEffect(() => {
         if ((workAreaWidth === undefined) && (rightPadding !== undefined)) {
@@ -190,13 +192,6 @@ export default function TimeAxis(props) {
             setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
         }
     }, [rightPadding]);
-    const itemClickHandler = useCallback(({ type, id, item }) => {
-        if ((activeItem.type !== type) || (activeItem.id !== id)) {
-            setActiveItem({ type, id, item });
-        }
-        if (onItemClick)
-            onItemClick({ type, id, item });
-    }, [onItemClick, activeItem]);
     return !!width && !!pixelsInYear && !!myLevelLimit
         ? (<div className="timeline-canvas" style={{
                 width: svgWidth,
@@ -210,8 +205,8 @@ export default function TimeAxis(props) {
                 marginLeft: SETTINGS.horizontalPadding,
                 width: `calc(100% - ${memoPaddingRight + SETTINGS.horizontalPadding}px)`,
             }}>
-            <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} zoom={zoom} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events} activeItem={activeItem.type === ItemType.Event ? activeItem.id : null} onItemClick={itemClickHandler}/>
-            <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} periods={periods} activeItem={activeItem.type === ItemType.Period ? activeItem.id : null} onItemClick={itemClickHandler} onSetLevelsCount={setPeriodsLevelsCount}/>
+            <EventPoints elementsOverAxis={elementsOverAxis} events={eventsWithCoords} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} zoom={zoom} onCoordinatesReady={onCoordinatesReady} onRecalculateTimelineEnding={recalculateTimelineEnding} levelLimit={myLevelLimit.events} activeItem={activeItem && (activeItem.type === ItemType.Event) ? activeItem.id : null} onItemClick={onItemClick}/>
+            <PeriodSections elementsOverAxis={elementsOverAxis} levelLimit={myLevelLimit.periods} startDate={startDate.current} yearPerPixel={pixelsInYear} y={midHeight} periods={periods} activeItem={activeItem && (activeItem.type === ItemType.Period) ? activeItem.id : null} onItemClick={onItemClick} onSetLevelsCount={setPeriodsLevelsCount}/>
           </div>
         </SerifsContext.Provider>
       </div>)
