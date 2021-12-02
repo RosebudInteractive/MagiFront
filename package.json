@@ -136,7 +136,7 @@
     "react-lineto": "^3.2.0",
     "react-meta-tags": "^0.7.1",
     "react-native-svg": "^12.1.1",
-    "react-native-web": "^0.17.1",
+    "react-native-web": "^0.17.5",
     "react-redux": "^5.1.2",
     "react-resize-detector": "^6.7.6",
     "react-responsive-carousel": "^3.2.9",
