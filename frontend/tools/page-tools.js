@@ -247,6 +247,15 @@ export const isIOS13 = () => {
     }
 }
 
+export const getIOSVersion = () => {
+    if (Platform.os.family === "iOS") {
+        let _version = Platform.os.version.split('.')
+        return +_version[0]
+    } else {
+        return false
+    }
+}
+
 export const getCurrencySign = () => {
     if (Platform.os.family === "Android") {
         let _version = Platform.os.version.split('.')

@@ -5,8 +5,10 @@ import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
 import Platform from "platform";
+import {getIOSVersion} from "tools/page-tools";
 
-const isIE = Platform.name === 'IE'
+const iosVer = getIOSVersion();
+const isDeprecatedBrowser = (Platform.name === 'IE') || (iosVer && iosVer < 14);
 let enableSwitch = true;
 
 export default function TimelinePreview(props: Props) {
@@ -114,7 +116,7 @@ export default function TimelinePreview(props: Props) {
         setIsVertical(vertical);
     }, [isVertical])
 
-    return !isIE &&
+    return !isDeprecatedBrowser &&
         <div className={
             "timeline-preview _with-custom-scroll"
             + (fsEnable ? ' _full-screen' : '')
