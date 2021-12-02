@@ -5,6 +5,7 @@ import './timeline.sass';
 declare type Props = {
     backgroundImage: string;
     height: number;
+    enableToSwitchFS: boolean;
     events: Event.VisualItem[];
     periods: Period.VisualItem[];
     levelLimit: {

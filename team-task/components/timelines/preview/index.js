@@ -4,6 +4,10 @@ import {Themes, Timeline, convertData} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
+import Platform from "platform";
+
+const isIE = Platform.name === 'IE'
+let enableSwitch = true;
 
 export default function TimelinePreview(props: Props) {
     const {timeline, background, levels} = props;
@@ -12,16 +16,40 @@ export default function TimelinePreview(props: Props) {
     const [incKey, setIncKey] = useState(0);
     const [fsEnable, setFsEnable] = useState(false)
     const [isVertical, setIsVertical] = useState(false)
+    const [enableFSSwitch, setEnableFSSwitch] = useState(true)
 
     const preview = useRef(null);
 
-    useWindowSize(() => {
+    const resizeHandler = () => {
+        const width = window.innerWidth;
+    };
+
+    useEffect(() => {
+        window.addEventListener('resize', resizeHandler);
+
+        resizeHandler();
+        return () => {
+            window.removeEventListener('resize', resizeHandler);
+        }
+    }, [])
+
+    useWindowSize((data) => {
         if (preview.current) {
             const size = getInnerSize(preview.current);
             setWidth(size.width);
             setHeight(size.height);
         }
-    });
+
+        if (enableSwitch && (data.width < 900)) {
+            enableSwitch = false;
+            setEnableFSSwitch(enableSwitch);
+        }
+
+        if (!enableSwitch && (data.width >= 900)) {
+            enableSwitch = true;
+            setEnableFSSwitch(enableSwitch);
+        }
+    }, [enableFSSwitch]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -86,26 +114,33 @@ export default function TimelinePreview(props: Props) {
         setIsVertical(vertical);
     }, [isVertical])
 
-    return <div className={"timeline-preview _with-custom-scroll" + (fsEnable ? ' _full-screen' : '') + (isVertical ? ' _vertical' : '')} ref={preview}>
-        {
-            !!timeline
-            && width
-            && height
-            && <Timeline width={width}
-                         elementsOverAxis={false}
-                         visibilityChecking={false}
-                         backgroundImage={backgroundFile}
-                         height={height}
-                         theme={Themes.current}
-                         events={converted.Events}
-                         periods={converted.Periods}
-                         levelLimit={levels}
-                         onFullScreen={openFullScreen}
-                         onCloseFullScreen={closeFullScreen}
-                         onChangeOrientation={changeOrientation}
-            />
+    return !isIE &&
+        <div className={
+            "timeline-preview _with-custom-scroll"
+            + (fsEnable ? ' _full-screen' : '')
+            + (isVertical ? ' _vertical' : '')
         }
-    </div>
+             ref={preview}>
+            {
+                !!timeline
+                && width
+                && height
+                && <Timeline width={width}
+                             elementsOverAxis={false}
+                             visibilityChecking={false}
+                             enableToSwitchFS={enableFSSwitch}
+                             backgroundImage={backgroundFile}
+                             height={height}
+                             theme={Themes.current}
+                             events={converted.Events}
+                             periods={converted.Periods}
+                             levelLimit={levels}
+                             onFullScreen={openFullScreen}
+                             onCloseFullScreen={closeFullScreen}
+                             onChangeOrientation={changeOrientation}
+                />
+            }
+        </div>
 }
 
 TimelinePreview.propTypes = {

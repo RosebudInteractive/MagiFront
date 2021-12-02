@@ -11,7 +11,7 @@ import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
 let scrollHandlerGuard = false;
 export default function Timeline(props) {
-    const { backgroundImage, events, periods, height, levelLimit, visibilityChecking, elementsOverAxis, onFullScreen, onCloseFullScreen, onChangeOrientation, } = props;
+    const { backgroundImage, events, periods, height, levelLimit, visibilityChecking, elementsOverAxis, enableToSwitchFS, onFullScreen, onCloseFullScreen, onChangeOrientation, } = props;
     const [fsEnable, setFsEnable] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
@@ -144,7 +144,7 @@ export default function Timeline(props) {
     const onZoomSliderStop = useCallback((stopped) => {
         setZoomSliderStopped(stopped);
     }, []);
-    const containerHeight = useMemo(() => (height ? height - 6 : 0), [levelLimit, height]);
+    const containerHeight = useMemo(() => (height ? height - 8 : 0), [levelLimit, height]);
     const itemClickHandler = useCallback(({ type, id, item }) => {
         if (!activeItem || (activeItem.type !== type) || (activeItem.id !== id)) {
             setActiveItem({ type, id, item });
@@ -199,9 +199,7 @@ export default function Timeline(props) {
         backgroundPosition: 'center',
         backgroundSize: 'cover',
     }), [backgroundImage]);
-    const containerStyle = useMemo(() => ({
-        height: height,
-    }), [height]);
+    const containerStyle = useMemo(() => ({ height }), [height]);
     useEffect(() => {
         if (onChangeOrientation)
             onChangeOrientation(isVertical);
@@ -213,7 +211,7 @@ export default function Timeline(props) {
             && containerHeight
             && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={itemClickHandler} activeItem={activeItem}/>)}
       </div>
-      <Footer onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom} onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
+      <Footer enableToSwitchFS={enableToSwitchFS} onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom} onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
       {activeItem
             && (<Message item={activeItem.item} onClose={messageClose} indent={fsEnable ? 49 : 0} pinned={isVertical}/>)}
     </div>);
