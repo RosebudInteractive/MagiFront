@@ -35,7 +35,7 @@ class Settings {
         };
     }
     isVerticalViewport(width) {
-        return width < this.message.minWidth * this.message.viewportCheckpoint;
+        return width ? width < this.message.minWidth * this.message.viewportCheckpoint : false;
     }
 }
 const SETTINGS = new Settings();

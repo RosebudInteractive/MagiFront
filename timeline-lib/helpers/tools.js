@@ -32,8 +32,8 @@ export function calcPeriodPoints(period, needCorrectionOnBC) {
         + (period.startMonth ? (period.startMonth - 1) / 12 : 0)
         + (period.startDay ? period.startDay / (12 * 30) : 0);
     const end = endYear
-        + (period.endMonth ? (period.endMonth - 1) / 12 : (11 / 12))
-        + (period.endDay ? period.endDay / (12 * 30) : (1 / 12));
+        + (period.endMonth ? (period.endMonth - 1) / 12 : 0)
+        + (period.endDay ? period.endDay / (12 * 30) : 0);
     return { start, end };
 }
 export function hexToRgb(hex) {

@@ -36,3 +36,8 @@ export interface IScrollable {
     scrollTo(x: number): void;
     scrollLeft: number;
 }
+export declare type ActiveItem = {
+    type: ItemType;
+    id: number;
+    item: VisualItem;
+};
