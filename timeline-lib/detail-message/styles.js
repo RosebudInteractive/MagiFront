@@ -5,7 +5,7 @@ export default StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 8,
-        zIndex: 100,
+        zIndex: 10,
         left: 21,
     },
     header: {
