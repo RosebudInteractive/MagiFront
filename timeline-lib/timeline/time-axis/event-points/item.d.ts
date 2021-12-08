@@ -27,6 +27,8 @@ declare type State = {
 export default class EventPoint extends React.PureComponent<Props, State> {
     private opacityAnim;
     private verticalAnim;
+    private readonly setViewRef;
+    private viewRef;
     constructor(props: Props);
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void;
     onTextLayout(event: NativeSyntheticEvent<TextLayoutEventData>): void;

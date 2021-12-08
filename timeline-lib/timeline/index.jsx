@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, } from 'react';
-import { useResizeDetector } from 'react-resize-detector';
+import { useResizeDetector } from 'react-resize-detector/build/withPolyfill';
 import Themes from './theme';
 import Header from './header';
 import Footer from './footer';
@@ -11,7 +11,7 @@ import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
 let scrollHandlerGuard = false;
 export default function Timeline(props) {
-    const { backgroundImage, events, periods, height, levelLimit, visibilityChecking, elementsOverAxis, enableToSwitchFS, onFullScreen, onCloseFullScreen, onChangeOrientation, } = props;
+    const { backgroundImage, events, periods, height, levelLimit, visibilityChecking, elementsOverAxis, enableToSwitchFS, onFullScreen, onCloseFullScreen, onChangeOrientation, isDeprecatedBrowser, } = props;
     const [fsEnable, setFsEnable] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [zoomSliderStopped, setZoomSliderStopped] = useState(true);
@@ -195,7 +195,7 @@ export default function Timeline(props) {
         fixActiveItemOffset(pos);
     };
     const background = useMemo(() => ({
-        backgroundImage: `linear-gradient(180deg, #00000070, #00000094), url(${backgroundImage})`,
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)),url(${backgroundImage})`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
     }), [backgroundImage]);
@@ -209,7 +209,7 @@ export default function Timeline(props) {
       <div className="timeline-container" onScroll={scrollHandler} style={containerStyle} ref={horizontalContainerRef}>
         {containerWidth
             && containerHeight
-            && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={itemClickHandler} activeItem={activeItem}/>)}
+            && (<TimeAxis events={events} periods={periods} width={containerWidth} zoom={zoom} levelLimit={levelLimit} theme={Themes.current} height={containerHeight} elementsOverAxis={elementsOverAxis} zoomSliderStopped={zoomSliderStopped} visibilityChecking={visibilityChecking} onItemClick={itemClickHandler} activeItem={activeItem} isDeprecatedBrowser={isDeprecatedBrowser}/>)}
       </div>
       <Footer enableToSwitchFS={enableToSwitchFS} onOpenPress={openFullScreen} onClosePress={closeFullScreen} fullScreenMode={fsEnable} zoom={zoom} onSliderStop={onZoomSliderStop} onZoomChange={onZoomChange}/>
       {activeItem

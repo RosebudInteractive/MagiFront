@@ -9,10 +9,28 @@ export default class EventPoint extends React.PureComponent {
     // eslint-disable-next-line react/sort-comp
     opacityAnim;
     verticalAnim;
+    setViewRef;
+    viewRef;
     constructor(props) {
         super(props);
         this.opacityAnim = new Animated.Value(1);
         this.verticalAnim = new Animated.Value(1);
+        this.viewRef = null;
+        this.setViewRef = (element) => {
+            const { isDeprecatedBrowser } = this.context;
+            if (!isDeprecatedBrowser || !element)
+                return;
+            setTimeout(() => {
+                const width = element.clientWidth;
+                const { onMount, x, item } = this.props;
+                if (onMount && width) {
+                    this.viewRef = element;
+                    item.left = x;
+                    item.width = width;
+                    onMount(item.id);
+                }
+            }, 0);
+        };
         this.state = {
             needMask: false,
             flagHeight: 0,
@@ -96,6 +114,7 @@ export default class EventPoint extends React.PureComponent {
             }).start();
         }
     }
+    // eslint-disable-next-line react/sort-comp
     onTextLayout(event) {
         if (event.nativeEvent.lines.length > 1) {
             this.setState({
@@ -128,7 +147,9 @@ export default class EventPoint extends React.PureComponent {
     }
     onViewLayout(event) {
         const data = event.nativeEvent.layout;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { width } = data;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { onMount, x, item } = this.props;
         if (onMount && width) {
             item.left = x;
@@ -143,7 +164,7 @@ export default class EventPoint extends React.PureComponent {
         }
     }
     render() {
-        const { theme } = this.context;
+        const { theme, isDeprecatedBrowser } = this.context;
         const { isActive, x, item, zIndex, index, } = this.props;
         const { top, scale, indent, opacity, flagHeight, needMask, footIndent, } = this.state;
         // const left = x * zoom;
@@ -200,8 +221,15 @@ export default class EventPoint extends React.PureComponent {
                 titleStyle.color = theme.font.color;
             }
         }
+        if (isDeprecatedBrowser && this.viewRef) {
+            const width = this.viewRef.clientWidth;
+            if (item.width !== width)
+                item.width = width;
+        }
         /* eslint-disable react/jsx-no-bind */
-        return (<Animated.View style={[styles.wrapper, wrapperStyle]} onLayout={this.onViewLayout.bind(this)}>
+        return (<Animated.View style={[styles.wrapper, wrapperStyle]} onLayout={this.onViewLayout.bind(this)}
+        // @ts-ignore
+        ref={this.setViewRef}>
         <TouchableHighlight onPress={this.onClick.bind(this)} underlayColor="transparent">
           <Animated.View>
             <Animated.View style={[styles.event, eventStyle]}>
