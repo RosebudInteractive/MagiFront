@@ -27,11 +27,13 @@ export default function TimelinePreview(props: Props) {
         }
 
         if (enableSwitch && (data.width < 900)) {
+            console.log(data.width)
             enableSwitch = false;
             setEnableFSSwitch(enableSwitch);
         }
 
         if (!enableSwitch && (data.width >= 900)) {
+            console.log(data.width)
             enableSwitch = true;
             setEnableFSSwitch(enableSwitch);
         }
@@ -99,6 +101,15 @@ export default function TimelinePreview(props: Props) {
     const changeOrientation = useCallback((vertical: boolean) => {
         setIsVertical(vertical);
     }, [isVertical])
+
+    useEffect(() => {
+        if (preview.current) {
+            const size = getInnerSize(preview.current);
+            console.log(size)
+            if (width !== size.width) setWidth(size.width);
+            if (height !== size.height) setHeight(size.height);
+        }
+    }, [isVertical]);
 
     return <div className={
         "timeline-preview _with-custom-scroll"
