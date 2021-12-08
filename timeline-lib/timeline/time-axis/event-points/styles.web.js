@@ -26,7 +26,7 @@ export default StyleSheet.create({
         fontSize: 10,
         lineHeight: 18,
         width: 'auto',
-        marginTop: 2,
+        // marginTop: 2,
     },
     date: {
         marginLeft: 8,

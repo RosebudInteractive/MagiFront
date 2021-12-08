@@ -12,6 +12,8 @@ export default class AnimatedPeriod extends React.Component {
     dateWidth;
     titleWidth;
     periodWidth;
+    viewRef;
+    setViewRef;
     constructor(props) {
         super(props);
         this.opacityAnim = new Animated.Value(1);
@@ -19,6 +21,7 @@ export default class AnimatedPeriod extends React.Component {
         this.dateWidth = undefined;
         this.titleWidth = undefined;
         this.periodWidth = undefined;
+        this.viewRef = null;
         this.state = {
             opacity: this.opacityAnim.interpolate({
                 inputRange: [0, 1],
@@ -31,6 +34,24 @@ export default class AnimatedPeriod extends React.Component {
             showDate: false,
             showTitle: false,
         };
+        this.setViewRef = (element) => {
+            if (!element)
+                return;
+            this.viewRef = element;
+            this.calculateDeprecated();
+        };
+    }
+    calculateDeprecated() {
+        const { isDeprecatedBrowser } = this.context;
+        if (!isDeprecatedBrowser)
+            return;
+        if (this.viewRef) {
+            const width = this.viewRef.clientWidth;
+            if (this.periodWidth !== width) {
+                this.periodWidth = width;
+                this.calculateTextVisible();
+            }
+        }
     }
     calculateTextVisible() {
         const { period } = this.props;
@@ -63,10 +84,6 @@ export default class AnimatedPeriod extends React.Component {
             this.dateWidth = undefined;
             this.titleWidth = undefined;
             this.periodWidth = undefined;
-            // this.setState({
-            //   showDate: true,
-            //   showTitle: true,
-            // });
         }
     }
     componentDidUpdate(prevProps, prevState) {
@@ -108,6 +125,7 @@ export default class AnimatedPeriod extends React.Component {
                 useNativeDriver: true,
             }).start();
         }
+        this.calculateDeprecated();
     }
     onPress() {
         const { onClick, period } = this.props;
@@ -168,7 +186,9 @@ export default class AnimatedPeriod extends React.Component {
         // this.onTextLayout.bind(this)
         /* eslint-disable react/jsx-no-bind */
         return (<TouchableHighlight onPress={this.onPress.bind(this)} underlayColor="transparent">
-        <Animated.View style={[styles.period, style]} onLayout={this.onPeriodLayout.bind(this)}>
+        <Animated.View style={[styles.period, style]} onLayout={this.onPeriodLayout.bind(this)}
+        // @ts-ignore
+        ref={this.setViewRef}>
           {showDate
                 && (<Text numberOfLines={1} style={[styles.title, styles.dateTitle, dateStyle]}>
                 {period.displayDate}

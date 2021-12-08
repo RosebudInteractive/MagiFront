@@ -10,7 +10,7 @@ import SETTINGS from '../settings';
 const ITEM_MIN_WIDTH = SETTINGS.axis.itemMinWidth;
 const STEPS = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props) {
-    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, activeItem, } = props;
+    const { events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking, elementsOverAxis, onItemClick, theme, activeItem, isDeprecatedBrowser, } = props;
     const [svgWidth, setSvgWidth] = useState(0);
     const [serifs, setSerifs] = useState([]);
     const [eventsWithCoords, setEventsWithCoords] = useState(events);
@@ -76,14 +76,14 @@ export default function TimeAxis(props) {
             setMyLevelLimit(newValue);
         }
     };
-    const setPeriodsLevelsCount = useCallback((levelsCount) => {
+    const setPeriodsLevelsCount = (levelsCount) => {
         if (!myLevelLimit || (myLevelLimit.periods !== levelsCount)) {
             const newValue = myLevelLimit
                 ? { ...myLevelLimit, periods: levelsCount }
                 : { events: 0, periods: levelsCount };
             setMyLevelLimit(newValue);
         }
-    }, [myLevelLimit]);
+    };
     useEffect(() => {
         events.forEach((item) => {
             /* eslint-disable no-param-reassign */
@@ -198,7 +198,7 @@ export default function TimeAxis(props) {
                 height: viewPortHeight,
             }}>
         <SerifsContext.Provider value={{
-                needCorrectionOnBC, zoom, theme,
+                needCorrectionOnBC, zoom, theme, isDeprecatedBrowser,
             }}>
           <NativeAxis width={svgWidth} startDate={startDate.current} top={midHeight} serifs={serifs} yearPerPixel={pixelsInYear}/>
           <div className="timeline-canvas__inner" style={{

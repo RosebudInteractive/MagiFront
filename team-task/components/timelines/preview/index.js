@@ -4,11 +4,8 @@ import {Themes, Timeline, convertData} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
-import Platform from "platform";
-import {getIOSVersion} from "tools/page-tools";
+import {PlatformTool} from "tools/platform-tools";
 
-const iosVer = getIOSVersion();
-const isDeprecatedBrowser = (Platform.name === 'IE') || (iosVer && iosVer < 14);
 let enableSwitch = true;
 
 export default function TimelinePreview(props: Props) {
@@ -21,19 +18,6 @@ export default function TimelinePreview(props: Props) {
     const [enableFSSwitch, setEnableFSSwitch] = useState(true)
 
     const preview = useRef(null);
-
-    const resizeHandler = () => {
-        const width = window.innerWidth;
-    };
-
-    useEffect(() => {
-        window.addEventListener('resize', resizeHandler);
-
-        resizeHandler();
-        return () => {
-            window.removeEventListener('resize', resizeHandler);
-        }
-    }, [])
 
     useWindowSize((data) => {
         if (preview.current) {
@@ -116,33 +100,34 @@ export default function TimelinePreview(props: Props) {
         setIsVertical(vertical);
     }, [isVertical])
 
-    return !isDeprecatedBrowser &&
-        <div className={
-            "timeline-preview _with-custom-scroll"
-            + (fsEnable ? ' _full-screen' : '')
-            + (isVertical ? ' _vertical' : '')
+    return <div className={
+        "timeline-preview _with-custom-scroll"
+        + (fsEnable ? ' _full-screen' : '')
+        + (isVertical ? ' _vertical' : '')
+    }
+                ref={preview}>
+        {
+            !!timeline
+            && width
+            && height
+            && !PlatformTool.timeline.isUnsupportedBrowser()
+            && <Timeline width={width}
+                         elementsOverAxis={false}
+                         visibilityChecking={false}
+                         enableToSwitchFS={enableFSSwitch}
+                         backgroundImage={backgroundFile}
+                         height={height}
+                         theme={Themes.current}
+                         events={converted.Events}
+                         periods={converted.Periods}
+                         levelLimit={levels}
+                         onFullScreen={openFullScreen}
+                         onCloseFullScreen={closeFullScreen}
+                         onChangeOrientation={changeOrientation}
+                         isDeprecatedBrowser={PlatformTool.timeline.isDeprecatedBrowser()}
+            />
         }
-             ref={preview}>
-            {
-                !!timeline
-                && width
-                && height
-                && <Timeline width={width}
-                             elementsOverAxis={false}
-                             visibilityChecking={false}
-                             enableToSwitchFS={enableFSSwitch}
-                             backgroundImage={backgroundFile}
-                             height={height}
-                             theme={Themes.current}
-                             events={converted.Events}
-                             periods={converted.Periods}
-                             levelLimit={levels}
-                             onFullScreen={openFullScreen}
-                             onCloseFullScreen={closeFullScreen}
-                             onChangeOrientation={changeOrientation}
-                />
-            }
-        </div>
+    </div>
 }
 
 TimelinePreview.propTypes = {

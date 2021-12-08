@@ -24,6 +24,10 @@ export default function EventPoints(props) {
             setVisible(false);
         }
     }, [events]);
+    useEffect(() => {
+        // todo: надо сделать удаление эвента при unmount, но пока и так работает. Костыль!
+        coordinates.current = [];
+    }, [yearPerPixel]);
     function onMountCallback(itemId) {
         coordinates.current.push(itemId);
         if (coordinates.current.length === events.length) {

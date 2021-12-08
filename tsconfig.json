@@ -93,6 +93,7 @@
     /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "team-task/**/*.ts"
+    "team-task/**/*.ts",
+    "frontend/**/*.ts"
   ]
 }

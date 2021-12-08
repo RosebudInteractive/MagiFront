@@ -17,6 +17,7 @@ declare type Props = {
     onItemClick: Function;
     onItemDoubleClick?: Function;
     activeItem: ActiveItem | null;
+    isDeprecatedBrowser: boolean;
 };
 export default function TimeAxis(props: Props): JSX.Element | null;
 export {};

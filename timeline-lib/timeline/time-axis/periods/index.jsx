@@ -27,10 +27,6 @@ export default function PeriodSections(props) {
                 item.xStart = xStart;
                 item.xEnd = xEnd;
                 /* eslint-enable no-param-reassign */
-                // return item;
-                // return {
-                //   ...item, yLevel: 0, xLevel: 0, xStart, xEnd,
-                // };
             });
             const { items: alignedPeriods, levelsCount } = placeByYLevelLimit(periods, levelLimit || 0);
             alignedPeriods.forEach((item) => {

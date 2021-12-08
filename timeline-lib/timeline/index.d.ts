@@ -17,6 +17,7 @@ declare type Props = {
     onFullScreen?: Function;
     onCloseFullScreen?: Function;
     onChangeOrientation?: Function;
+    isDeprecatedBrowser: boolean;
 };
 export default function Timeline(props: Props): JSX.Element;
 export {};

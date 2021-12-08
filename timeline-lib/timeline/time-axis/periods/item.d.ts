@@ -23,7 +23,10 @@ export default class AnimatedPeriod extends React.Component<Props, State> {
     private dateWidth;
     private titleWidth;
     private periodWidth;
+    private viewRef;
+    private readonly setViewRef;
     constructor(props: Props);
+    calculateDeprecated(): void;
     calculateTextVisible(): void;
     UNSAFE_componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void;
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>): void;

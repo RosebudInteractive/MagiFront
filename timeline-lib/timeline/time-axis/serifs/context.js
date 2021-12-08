@@ -1,6 +1,7 @@
 import React from 'react';
 const SerifsContext = React.createContext({
     needCorrectionOnBC: false,
+    isDeprecatedBrowser: false,
     // x: 0,
     // y: 0,
     zoom: 1,
