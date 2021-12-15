@@ -58,6 +58,7 @@ const _prodConfig = {
                 exclude: [
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
+                    path.resolve(__dirname, "./timeline-lib"),
                 ],
                 // language=JSRegexp
                 test: /\.(js|jsx|ts|tsx)$/
@@ -194,6 +195,7 @@ const _devConfig = {
                 exclude: [
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
+                    path.resolve(__dirname, "timeline-lib"),
                 ],
             },
             {
