@@ -1,6 +1,8 @@
 import {SelectPicker} from "rsuite";
 import React from "react";
 
+console.log('DEBUG', SelectPicker)
+
 export default function SelectField(props) {
     const _onClean = () => {
         if (props.onClean) props.onClean(props.name)
