@@ -5,9 +5,17 @@ let ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
+const getClientEnvironment = require('./env');
+const paths = require('./paths');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
-console.log(NODE_ENV);
+const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
+
+console.log(__dirname)
 
 const _prodConfig = {
     mode: 'production',
@@ -155,7 +163,6 @@ const _prodConfig = {
     },
 };
 
-
 const hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true';
 const _devConfig = {
     mode: 'development',
@@ -164,21 +171,28 @@ const _devConfig = {
         'babel-polyfill': 'babel-polyfill',
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         main: ['./frontend/index', hotMiddlewareScript],
-        adm: ['./src/index', hotMiddlewareScript],
-        mailing: ['./mailing/index', hotMiddlewareScript],
-        "team-task": ['./team-task/index', hotMiddlewareScript],
-        "test-app": ['./test-app/index', hotMiddlewareScript],
+        // adm: ['./src/index', hotMiddlewareScript],
+        // mailing: ['./mailing/index', hotMiddlewareScript],
+        // "team-task": ['./team-task/index', hotMiddlewareScript],
+        // "test-app": ['./test-app/index', hotMiddlewareScript],
         // 'player-main': ['./scripts/player-main', hotMiddlewareScript],
         // 'player-app': ['./scripts/native-app-player/player-app', hotMiddlewareScript],
         // 'player-app-test': ['./scripts/native-app-player/example', hotMiddlewareScript],
         // 'workshop-main': ['./scripts/workshop-main', hotMiddlewareScript],
     },
     output: {
-        path: path.join(__dirname, 'static'),
+        path: undefined,
         filename: '[name].js',
-        publicPath: '/static/'
+        publicPath: paths.publicUrlOrPath,
     },
     plugins: [
+        new HtmlWebpackPlugin(
+            {
+                inject: true,
+                template: paths.appHtml,
+            },
+        ),
+        new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
@@ -273,22 +287,22 @@ const _devConfig = {
         extensions: ['.js', '.jsx'],
         alias: {
             'react-native$': 'react-native-web',
-            "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
+            "underscore": path.resolve(__dirname, '../scripts/lib/underscore'),
             // "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
-            "template": path.resolve(__dirname, 'scripts/lib/template'),
-            "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
-            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
-            'script-lib': path.resolve(__dirname, 'scripts/lib'),
-            'tt-ducks': path.resolve(__dirname, 'team-task/ducks'),
-            'tt-assets': path.resolve(__dirname, 'team-task/assets'),
-            'adm-ducks': path.resolve(__dirname, 'src/ducks'),
-            'adm-styles': path.resolve(__dirname, 'src/styles'),
-            'ducks': path.resolve(__dirname, 'frontend/ducks'),
-            'actions': path.resolve(__dirname, 'frontend/actions'),
-            'tools': path.resolve(__dirname, 'frontend/tools'),
-            'common-tools': path.resolve(__dirname, 'common/tools'),
-            'common-styles': path.resolve(__dirname, 'common/styles'),
-            'timeline': path.resolve(__dirname, 'timeline-lib'),
+            "template": path.resolve(__dirname, '../scripts/lib/template'),
+            "work-shop": path.resolve(__dirname, '../scripts/widgets/work-shop'),
+            'jquery-ui': path.resolve(__dirname, '../scripts/lib/jquery-ui'),
+            'script-lib': path.resolve(__dirname, '../scripts/lib'),
+            'tt-ducks': path.resolve(__dirname, '../team-task/ducks'),
+            'tt-assets': path.resolve(__dirname, '../team-task/assets'),
+            'adm-ducks': path.resolve(__dirname, '../src/ducks'),
+            'adm-styles': path.resolve(__dirname, '../src/styles'),
+            'ducks': path.resolve(__dirname, '../frontend/ducks'),
+            'actions': path.resolve(__dirname, '../frontend/actions'),
+            'tools': path.resolve(__dirname, '../frontend/tools'),
+            'common-tools': path.resolve(__dirname, '../common/tools'),
+            'common-styles': path.resolve(__dirname, '../common/styles'),
+            'timeline': path.resolve(__dirname, '../timeline-lib'),
         }
     },
     resolveLoader: {
@@ -298,4 +312,9 @@ const _devConfig = {
     }
 };
 
-module.exports = NODE_ENV === 'development' ? _devConfig : _prodConfig;
+module.exports = function (webpackEnv) {
+    const isEnvDevelopment = webpackEnv === 'development';
+    const isEnvProduction = webpackEnv === 'production';
+
+    return isEnvDevelopment ? _devConfig : _prodConfig;
+}
