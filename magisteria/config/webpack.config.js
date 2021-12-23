@@ -216,16 +216,21 @@ module.exports = function (webpackEnv, argv) {
                         name: 'static/media/[name].[hash:8].[ext]',
                     },
                 },
+                // todo: Использовать такой лоадер для adm когда будет разделение проектов
+                // {
+                //     test: /\.(svg)$/,
+                //     use: {
+                //         loader: 'file-loader',
+                //         options: {
+                //             name: "static/svg/[name].[hash:8].[ext]",
+                //             esModule: false
+                //         }
+                //     },
+                // }
                 {
-                    test: /\.(svg)$/,
-                    use: {
-                        loader: 'file-loader',
-                        options: {
-                            name: "static/svg/[name].[hash:8].[ext]",
-                            esModule: false
-                        }
-                    },
-                }
+                    test: /\.svg$/,
+                    use: ['@svgr/webpack'],
+                },
             ]
         },
         resolve: {

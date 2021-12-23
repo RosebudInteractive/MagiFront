@@ -6,7 +6,7 @@ import App from './containers/App'
 import "./styles/font-awesome.min.css"
 import 'adm-styles/general/general.css'
 import 'adm-styles/webix/webix.css'
-import 'adm-styles/app.css'
+// import 'adm-styles/app.css'
 import { store } from './redux/configureStore'
 import { Router } from 'react-router-dom'
 import history from './history'
