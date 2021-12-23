@@ -1,0 +1,42 @@
+.clipboard-data__container
+  width: 100%
+  height: 200px
+  display: flex
+  flex-direction: row
+  margin-top: 10px
+
+.clipboard-data__input
+  flex-grow: 1
+  border-radius: 8px
+  width: calc(100% - 100px)
+  margin-right: 20px
+  outline: none
+
+.clipboard-data__apply-button
+  height: 32px
+  outline: none
+  border: 1px solid orangered
+  background-color: #C8684C
+  color: #FFFFFF
+  font-size: 14px
+  border-radius: 8px
+  cursor: pointer
+  transition: opacity 300ms ease
+  flex: 0 1 90px
+
+  &:not(:disabled)
+    &:hover
+      border-right: 2px solid orangered
+      border-bottom: 2px solid orangered
+
+    &:active
+      opacity: 0.7
+      border-right: 1px solid orangered
+      border-bottom: 1px solid orangered
+
+  &:disabled
+    opacity: 0.5
+    cursor: default
+
+
+

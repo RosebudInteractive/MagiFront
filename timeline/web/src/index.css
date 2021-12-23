@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  /*src: url("./fonts/FiraSans-Regular.eot");*/
+  src: url("fonts/FiraSans-Regular.woff2") format("woff2"), url("fonts/FiraSans-Regular.woff") format("woff");
+  src: url("fonts/FiraSans-Regular.ttf") format('truetype');
+  font-weight: 400;
+  font-style: normal; }
+
+@font-face {
+  font-family: 'PT Serif';
+  /*src: url("./fonts/FiraSans-Regular.eot");*/
+  src: url("fonts/PTSerif-Regular.ttf");
+  font-weight: 400;
+  font-style: normal; }

@@ -1,0 +1,165 @@
+{
+  "name": "@rosebud/timeline",
+  "main": "dist/timeline.js",
+  "types": "dist/timeline.d.ts",
+  "version": "0.1.0",
+  "private": true,
+  "main:src": "src/index",
+  "dependencies": {
+    "@svgr/webpack": "5.5.0",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^12.1.2",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^27.4.2",
+    "babel-plugin-named-asset-import": "^0.3.7",
+    "babel-preset-react-app": "^10.0.0",
+    "bfj": "^7.0.2",
+    "camelcase": "^6.1.0",
+    "case-sensitive-paths-webpack-plugin": "2.3.0",
+    "css-loader": "4.3.0",
+    "dotenv": "8.2.0",
+    "dotenv-expand": "5.1.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-testing-library": "^5.0.1",
+    "eslint-webpack-plugin": "^3.1.1",
+    "file-loader": "6.1.1",
+    "fs-extra": "^9.0.1",
+    "identity-obj-proxy": "3.0.0",
+    "jest": "26.6.0",
+    "jest-circus": "26.6.0",
+    "jest-resolve": "26.6.0",
+    "jest-watch-typeahead": "0.6.1",
+    "mini-css-extract-plugin": "0.11.3",
+    "pnp-webpack-plugin": "1.6.4",
+    "postcss-flexbugs-fixes": "4.2.1",
+    "postcss-normalize": "8.0.1",
+    "postcss-preset-env": "6.7.0",
+    "postcss-safe-parser": "5.0.2",
+    "prompts": "2.4.0",
+    "react": "^17.0.2",
+    "react-app-polyfill": "^2.0.0",
+    "react-dom": "^17.0.2",
+    "react-native-linear-gradient": "^2.5.6",
+    "react-native-svg": "^12.1.1",
+    "react-native-web": "^0.17.5",
+    "react-refresh": "^0.11.0",
+    "react-resize-detector": "^6.7.6",
+    "resolve": "1.18.1",
+    "resolve-url-loader": "^3.1.2",
+    "semver": "7.3.2",
+    "ts-pnp": "1.2.0",
+    "url-loader": "4.1.1",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "build:dev": "webpack --mode=development --watch --progress",
+    "build:prod": "webpack --mode production --progress"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "setupFiles": [
+      "react-app-polyfill/jsdom"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "testRunner": "/Users/levan/WebstormProjects/timeline-web/node_modules/jest-circus/runner.js",
+    "transform": {
+      "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/config/jest/babelTransform.js",
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "modulePaths": [],
+    "moduleNameMapper": {
+      "^react-native$": "react-native-web",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ],
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ],
+    "resetMocks": true
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/plugin-proposal-decorators": "^7.16.4",
+    "@babel/plugin-proposal-private-methods": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "^7.16.5",
+    "@babel/preset-typescript": "^7.16.0",
+    "@testing-library/dom": "^8.11.1",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-native": "^0.66.8",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "babel-loader": "^8.2.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "core-js": "^3.19.3",
+    "css-minimizer-webpack-plugin": "^3.2.0",
+    "declare-react-module": "^1.13.0",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb": "^19.0.2",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "postcss-loader": "^6.2.1",
+    "sass": "^1.44.0",
+    "sass-loader": "^12.4.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.2.5",
+    "ts-loader": "8.1.0",
+    "typescript": "^4.5.4",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0",
+    "webpack-manifest-plugin": "^4.0.2",
+    "workbox-webpack-plugin": "^6.4.2"
+  }
+}

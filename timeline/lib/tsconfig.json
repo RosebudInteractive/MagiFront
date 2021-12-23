@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "target": "esnext",
+    "jsx": "react",
+    "skipLibCheck": true,
+    "declarationMap": true,
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*"]
+}
