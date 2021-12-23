@@ -1,0 +1,32 @@
+.ctrl_buttons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    z-index: 10;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.ctrl_buttons .btn {
+    width: 150px;
+    margin-top: 6px;
+    padding: 4px 0 4px 0;
+}
+
+.debug_console {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 50vh;
+    z-index: 10;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    overflow-y: scroll;
+}
+
+.debug_console .debug_message {
+    color: #239d57;
+    padding: 2px 10px 2px 0;
+}

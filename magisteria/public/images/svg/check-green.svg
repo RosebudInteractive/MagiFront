@@ -1,0 +1,18 @@
+<svg width="22" height="20" viewBox="0 0 22 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Ok</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-33034 -4748)">
+<g id="Ok">
+<g id="Line 2">
+<use xlink:href="#path0_stroke" transform="matrix(-0.680451 0.732793 -0.732793 -0.680451 33054 4749)" fill="#3D9440"/>
+</g>
+<g id="Line 3">
+<use xlink:href="#path1_stroke" transform="matrix(-0.695795 -0.71824 0.71824 -0.695795 33043.8 4763)" fill="#3D9440"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_stroke" d="M 1 -2C 0.447715 -2 0 -1.55228 0 -1C 0 -0.447715 0.447715 0 1 0L 1 -2ZM 18.105 0C 18.6573 0 19.105 -0.447715 19.105 -1C 19.105 -1.55228 18.6573 -2 18.105 -2L 18.105 0ZM 1 0L 18.105 0L 18.105 -2L 1 -2L 1 0Z"/>
+<path id="path1_stroke" d="M 1 -2C 0.447715 -2 0 -1.55228 0 -1C 0 -0.447715 0.447715 0 1 0L 1 -2ZM 10.1383 0C 10.6906 0 11.1383 -0.447715 11.1383 -1C 11.1383 -1.55228 10.6906 -2 10.1383 -2L 10.1383 0ZM 1 0L 10.1383 0L 10.1383 -2L 1 -2L 1 0Z"/>
+</defs>
+</svg>
