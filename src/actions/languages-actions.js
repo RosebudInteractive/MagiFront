@@ -19,7 +19,7 @@ export const getLanguages = ()=> {
             payload: null
         });
 
-        fetch("/api/languages/", {method: 'GET', credentials: 'include'})
+        fetch("/api/languages", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

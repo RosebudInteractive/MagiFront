@@ -29,31 +29,31 @@ export default function StoreButton(props) {
     const _getSmallImage = () => {
         return _isMobilePlatform ?
             type === STORE_BUTTON_TYPE.APPLE ?
-                "/assets/images/store-popup/apple-ico.png"
+                "/images/store-popup/apple-ico.png"
                 :
                 disabled ?
-                    "/assets/images/store-popup/android-ico-disabled.png"
+                    "/images/store-popup/android-ico-disabled.png"
                     :
-                    "/assets/images/store-popup/android-ico.png"
+                    "/images/store-popup/android-ico.png"
             :
             type === STORE_BUTTON_TYPE.APPLE ?
-                "/assets/images/store-popup/app-store-small.png"
+                "/images/store-popup/app-store-small.png"
                 :
                 disabled ?
-                    "/assets/images/store-popup/google-play-small-disabled.png"
+                    "/images/store-popup/google-play-small-disabled.png"
                     :
-                    "/assets/images/store-popup/google-play-small.png"
+                    "/images/store-popup/google-play-small.png"
 
     }
 
     const _getBigImage = () => {
         return type === STORE_BUTTON_TYPE.APPLE ?
-            "/assets/images/store-popup/app-store.png"
+            "/images/store-popup/app-store.png"
             :
             disabled ?
-                "/assets/images/store-popup/google-play-disabled.png"
+                "/images/store-popup/google-play-disabled.png"
                 :
-                "/assets/images/store-popup/google-play.png"
+                "/images/store-popup/google-play.png"
     }
 
     const _image = size === STORE_BUTTON_SIZE.BIG ? _getBigImage() : _getSmallImage()

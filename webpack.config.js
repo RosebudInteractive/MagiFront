@@ -128,7 +128,7 @@ const _prodConfig = {
             // "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
-            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
+            'jquery-ui': path.resolve(__dirname, 'public/scripts/lib/jquery-ui'),
             'script-lib': path.resolve(__dirname, 'scripts/lib'),
             'tt-ducks': path.resolve(__dirname, 'team-task/ducks'),
             'tt-assets': path.resolve(__dirname, 'team-task/assets'),
@@ -147,11 +147,6 @@ const _prodConfig = {
         alias: {
             'text': 'raw-loader',
         }
-    },
-    devServer: {
-        proxy: {
-            '/api': 'https://new.magisteria.ru',
-        },
     },
 };
 

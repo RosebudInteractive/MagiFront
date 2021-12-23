@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import "./query-form.sass"
-import SearchLogo from '../../../../assets/svg/search.svg';
+import SearchLogo from './search.svg';
 
 export default class QueryForm extends React.Component {
 

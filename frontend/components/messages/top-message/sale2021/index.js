@@ -32,7 +32,7 @@ export default function Sale2021(props) {
 
     const _onReady = () => {
         setReady(true)
-        setTimeout(()=> {_onResize()}, 300)
+        setTimeout(()=> {_onResize()}, 500)
     }
 
     const _close = () => {
@@ -64,7 +64,7 @@ export default function Sale2021(props) {
 
     return <div className="top-message__sale2021-popup">
         <div className="sale2021-popup__info-block__wrapper">
-            <img className="left-image" src="/assets/images/sale2021/left.png"/>
+            <img className="left-image" src="/images/sale2021/left.png"/>
             <div className="text-block">
                 <div className="text-block__content _mobile">С Новым Годом!</div>
                 <div className="text-block__content _desktop">С Новым Годом и Рождеством!</div>
@@ -77,7 +77,7 @@ export default function Sale2021(props) {
                 <img className="_desktop" src={Arrow} alt="Arrow" />
                 <img className="_phone" src={ArrowPhone} alt="Arrow" />
             </div>
-            <img className="right-image" src="/assets/images/sale2021/right.png"/>
+            <img className="right-image" src="/images/sale2021/right.png"/>
         </div>
         <div className="sale2021-popup__close-button">
             <button type="button" className="balloon-wrapper__close" onClick={_close}>Закрыть</button>

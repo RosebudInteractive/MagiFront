@@ -91,7 +91,7 @@ export const loadVersion = () => {
             payload: null
         });
 
-        fetch('/static/version.json')
+        fetch('/version.json')
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

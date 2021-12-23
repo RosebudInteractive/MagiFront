@@ -6,7 +6,7 @@ import {fetchingSelector, tokenGuardEnable, getAppOptions} from "ducks/app";
 import {whoAmI} from "actions/user-actions";
 import {useLocation, useHistory} from "react-router-dom";
 import "./app.sass"
-import {sendMessage} from "../scripts/native-app-player/message-handler";
+import {sendMessage} from "../public/scripts/native-app-player/message-handler";
 
 function App(props) {
 

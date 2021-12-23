@@ -1,6 +1,6 @@
 export const HOSTS = {
     'www.litres.ru': {
-        image: '/assets/images/logo-litres.png',
+        image: '/images/logo-litres.png',
         order: 1,
         id: 'litres-link',
         width: 34,
@@ -8,7 +8,7 @@ export const HOSTS = {
         title: 'ЛитРес',
     },
     'ru.bookmate.com': {
-        image: '/assets/images/logo-bookmate.png',
+        image: '/images/logo-bookmate.png',
         order: 2,
         id: 'bookmate-link',
         width: 16,
@@ -16,7 +16,7 @@ export const HOSTS = {
         title: 'Bookmate',
     },
     'www.storytel.com': {
-        image: '/assets/images/logo-storytel.png',
+        image: '/images/logo-storytel.png',
         order: 3,
         id: 'storytel-link',
         width: 28,
@@ -24,7 +24,7 @@ export const HOSTS = {
         title: 'Storytel',
     },
     'zvukislov.ru': {
-        image: '/assets/images/logo-zs.png',
+        image: '/images/logo-zs.png',
         order: 4,
         id: 'zvukislov-link',
         width: 26,
@@ -35,7 +35,7 @@ export const HOSTS = {
 
 const OLD_HOSTS  = {
     'www.litres.ru': {
-        image: '/assets/images/lit-res.png',
+        image: '/images/lit-res.png',
         order: 1,
         svg: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#litres"/>',
         id: 'litres-link',
@@ -43,7 +43,7 @@ const OLD_HOSTS  = {
         height: 12,
     },
     'ru.bookmate.com': {
-        image: '/assets/images/book-mate.png',
+        image: '/images/book-mate.png',
         order: 2,
         svg: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmate"/>',
         id: 'bookmate-link',
@@ -51,7 +51,7 @@ const OLD_HOSTS  = {
         height: 31,
     },
     'www.storytel.com': {
-        image: '/assets/images/storytel.png',
+        image: '/images/storytel.png',
         order: 3,
         svg: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#storytel"/>',
         id: 'storytel-link',
@@ -59,7 +59,7 @@ const OLD_HOSTS  = {
         height: 56,
     },
     'zvukislov.ru': {
-        image: '/assets/images/word-sounds.png',
+        image: '/images/word-sounds.png',
         order: 4,
         svg: '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#zvukislov"/>',
         id: 'zvukislov-link',

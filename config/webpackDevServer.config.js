@@ -98,18 +98,31 @@ module.exports = function (proxy, allowedHost) {
       // See https://github.com/facebook/create-react-app/issues/387.
       disableDotRule: true,
       index: paths.publicUrlOrPath,
+      rewrites: [
+        // { from: /^\/$/, to: '/views/landing.html' },
+        { from: /^\/adm/, to: '/adm-index.html' },
+        { from: /^\/pm/, to: '/pm-index.html' },
+        { from: /^\/mailing/, to: '/mail-index.html' },
+        { from: /^\/test-app/, to: '/tests-index.html' },
+        // { from: /./, to: '/views/404.html' }
+      ]
     },
     public: allowedHost,
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
     // proxy,
     proxy: {
-      '/api': {
-        target: 'https://new.magisteria.ru',
+      '/api/': {
+        target: 'http://localhost:3000',
         secure: false,
         changeOrigin: true,
       },
       '/data': {
-        target: 'https://new.magisteria.ru',
+        target: 'http://localhost:3000',
+        secure: false,
+        changeOrigin: true,
+      },
+      '/doc/': {
+        target: 'http://localhost:3000',
         secure: false,
         changeOrigin: true,
       },

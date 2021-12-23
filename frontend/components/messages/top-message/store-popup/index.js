@@ -54,8 +54,8 @@ export default function StorePopup(props) {
         <div className="store-popup__info-block__wrapper">
             <div className={"store-popup__info-block _big" + (_isMobilePlatform ? " _mobile" : " _desktop")}>
                 <div className="phone-image">
-                    <img className="phone-image__main" src="/assets/images/store-popup/phone.png" width="276" height="263"/>
-                    <img className="phone-image__pods" src="/assets/images/store-popup/pods.png"/>
+                    <img className="phone-image__main" src="/images/store-popup/phone.png" width="276" height="263"/>
+                    <img className="phone-image__pods" src="/images/store-popup/pods.png"/>
                 </div>
                 <div className="text-block">
                     <div className="text-block__content font-universal__title-small _white">Загрузите мобильное приложение</div>

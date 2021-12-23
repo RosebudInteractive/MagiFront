@@ -1,14 +1,11 @@
 {
   "name": "magisteria",
   "version": "9.0.1",
-  "description": "Magistery workshop & admin site",
+  "description": "Magisteria fronent",
   "main": "index.js",
   "scripts": {
-    "start:old": "node server.js",
-    "start": "node pack-scripts/start.js",
-    "build": "./node_modules/.bin/webpack",
-    "prepare-build": "npm version patch",
-    "flow": "flow"
+    "start": "node scripts/start.js",
+    "build": "node scripts/build.js"
   },
   "author": "",
   "license": "ISC",
@@ -37,6 +34,8 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "bfj": "^7.0.2",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^0.28.9",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.24.2",

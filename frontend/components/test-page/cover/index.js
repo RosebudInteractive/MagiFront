@@ -10,7 +10,7 @@ import './cover.sass'
 import {SocialBlock} from "../social-block";
 import ShareIcon from "../share-icon.svg"
 import {Link} from "react-router-dom";
-import {sendMessage} from "../../../../scripts/native-app-player/message-handler";
+import {sendMessage} from "../../../../public/scripts/native-app-player/message-handler";
 
 const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 

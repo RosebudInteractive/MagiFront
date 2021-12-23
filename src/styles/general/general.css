@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url("fonts/DejaVuSans.ttf") format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+body,
+html {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+body div,
+html div {
+  user-select: none;
+}
+.ws-container {
+  width: 100%;
+  height: 100%;
+  background-color: #2f2f2f;
+  /*padding-top: 48px;*/
+  /*background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);*/
+  /*background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%); }*/
+}
+
+.ws-container.youtube {
+  padding: 75px 0 109px;
+  -webkit-box-sizing: border-box;
+}
+
+.youtube-embedded-player {
+  position: relative }
+
+.ws-container-mini {
+  position: absolute;
+  width: 250px;
+  height: 157px;
+  background-color: #2f2f2f;
+  /*padding-top: 48px;*/
+  background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+  background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+}
+
+@media (max-width: 900px) {
+  .ws-container-mini {
+    width: 145px;
+    height: 91px; } }

@@ -14,10 +14,10 @@ export const Card = (props) => {
             <span className="font-universal__body-large">Банковская карта</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/visa.png" width="25" height="25" alt=""/>
+                    <img src="/images/visa.png" width="25" height="25" alt=""/>
                 </div>
                 <div className="payment-method__icon">
-                    <img src="/assets/images/mastercard.png" width="19" height="18" alt=""/>
+                    <img src="/images/mastercard.png" width="19" height="18" alt=""/>
                 </div>
             </div>
         </label>
@@ -32,7 +32,7 @@ export const Yandex = (props) => {
             <span className="font-universal__body-large">ЮMoney</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/iomoney.png" width={86} height={18} alt="iomoney"/>
+                    <img src="/images/iomoney.png" width={86} height={18} alt="iomoney"/>
                 </div>
             </div>
         </label>
@@ -47,7 +47,7 @@ export const Sberbank = (props) => {
             <span className="font-universal__body-large">Сбербанк онлайн</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/sber.png" width="18" height="18" alt=""/>
+                    <img src="/images/sber.png" width="18" height="18" alt=""/>
                 </div>
             </div>
         </label>
@@ -62,7 +62,7 @@ export const Alfa = (props) => {
             <span className="font-universal__body-large">Альфа-клик</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/alfa.png" width="12" height="18" alt=""/>
+                    <img src="/images/alfa.png" width="12" height="18" alt=""/>
                 </div>
             </div>
         </label>
@@ -77,7 +77,7 @@ export const Qiwi = (props) => {
             <span className="font-universal__body-large">QIWI Кошелек</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/qiwi.png" width="16" height="16" alt=""/>
+                    <img src="/images/qiwi.png" width="16" height="16" alt=""/>
                 </div>
             </div>
         </label>
@@ -92,7 +92,7 @@ export const WebMoney = (props) => {
             <span className="font-universal__body-large">Webmoney</span>
             <div className="payment-method__icons">
                 <div className="payment-method__icon">
-                    <img src="/assets/images/webmoney.png" width="19" height="18" alt=""/>
+                    <img src="/images/webmoney.png" width="19" height="18" alt=""/>
                 </div>
             </div>
         </label>

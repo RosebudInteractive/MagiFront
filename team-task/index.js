@@ -3,7 +3,7 @@ import {render} from 'react-dom'
 import {Provider} from 'react-redux'
 
 import App from './App'
-import '../css/webix.css'
+import './assets/styles/webix/webix.css'
 import {store} from './redux/configureStore'
 import {Router} from 'react-router-dom'
 import history from './history'
