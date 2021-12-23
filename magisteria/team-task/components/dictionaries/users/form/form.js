@@ -11,11 +11,24 @@ import {
     toggleUserForm,
     userFormOpenedSelector,
 } from "tt-ducks/users-dictionary";
+
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
 import {hasAdminRights} from "tt-ducks/auth";
+import Permissions from "../../access-rights/form/permissions";
+import {
+    fetchingSelector,
+    getRights,
+    permissionSchemeSelector,
+    rightsDictionarySelector,
+    rolesPermissionsSelector
+} from "tt-ducks/access-rights-dictionary";
 
+import rightsMerger from "../../access-rights/rights-merger";
+
+
+//todo import validators
 const vRequired = value => (value ? undefined : 'Обязательное поле');
 const vMinValue = min => value =>
     isNaN(value) || value >= min ? undefined : `Необходимое количество символов ${min}`;
@@ -26,7 +39,7 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const { userData, visible, actions, isAdmin} = props;
+    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
 
     useEffect(()=>{
         setActionCreate(!(userData && userData.Id));
@@ -38,6 +51,11 @@ const UserForm = (props) => {
         props.history.push(`/dictionaries/users`);
     };
 
+    const permissionSchemeLinear = useMemo(() => {
+        rightsMerger.init(permissionScheme);
+        return rightsMerger.getMergedRolesLinear(rolesPermissions);
+    }, [permissionScheme, roles, userData, rolesPermissions]);
+
     const userRoles = useMemo(() => {
         return Object.entries(USER_ROLE_STRINGS)
             .map((val) => {
@@ -47,7 +65,7 @@ const UserForm = (props) => {
                     null
             })
             .filter(item => !!item);
-    }, [isAdmin])
+    }, [isAdmin]);
 
     const handleSubmit = (userInfo) => {
         const _oldRoles = {...userData.PData.roles}
@@ -102,46 +120,64 @@ const UserForm = (props) => {
                     {
                         (userForm) => (
                             <form className='user-form' onSubmit={ e => {e.preventDefault(); handleSubmit(userForm.values)} }>
-                                <div className='user-form__field email-field'>
-                                    <Field name="email"
-                                           component={TextBox}
-                                           type="text"
-                                           placeholder="Почта"
-                                           label={"Почта"}
-                                           validate={ComposeValidators(vRequired, vMustBeEmail)}
-                                           disabled={!createAction}/>
-                                    {
-                                        (createAction) &&
-                                        <button disabled={vMustBeEmail(userForm.values.email) !== undefined} type="button" className='search-button' onClick={() => findUserByEmail(userForm)}>
-                                            Поиск
-                                        </button>
-                                    }
-                                </div>
-                                <div className='user-form__field'>
-                                    <Field name="displayName"
-                                           component={TextBox}
-                                           type="text"
-                                           placeholder="Имя"
-                                           label={"Имя"}
-                                           disabled={true}/>
-                                </div>
-                                <div className='user-form__field'>
-                                    <Field name="role"
-                                           component={Select}
-                                           label={"Роль"}
-                                           required={true}
-                                           options={userRoles}
-                                           validate={ComposeValidators(vRequired)}>
-                                    </Field>
+                                <div className={'user-form-fields'}>
+                                    <div className='user-form__field email-field'>
+                                        <Field name="email"
+                                               component={TextBox}
+                                               type="text"
+                                               placeholder="Почта"
+                                               label={"Почта"}
+                                               validate={ComposeValidators(vRequired, vMustBeEmail)}
+                                               disabled={!createAction}/>
+                                        {
+                                            (createAction) &&
+                                            <button disabled={vMustBeEmail(userForm.values.email) !== undefined} type="button" className='search-button' onClick={() => findUserByEmail(userForm)}>
+                                                Поиск
+                                            </button>
+                                        }
+                                    </div>
+                                    <div className='user-form__field'>
+                                        <Field name="displayName"
+                                               component={TextBox}
+                                               type="text"
+                                               placeholder="Имя"
+                                               label={"Имя"}
+                                               disabled={true}/>
+                                    </div>
+                                    <div className='user-form__field'>
+                                        <Field name="role"
+                                               component={Select}
+                                               label={"Роль"}
+                                               required={true}
+                                               options={userRoles}
+                                               validate={ComposeValidators(vRequired)}>
+                                        </Field>
+                                    </div>
+
+
+
+
+                                    <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid || userForm.pristine}>
+                                        Применить
+                                    </button>
+
                                 </div>
 
-                                <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid || userForm.pristine}>
-                                   Применить
-                                </button>
+                                <div className={'user-permissions'}>
+                                    {roles &&
+                                    <Permissions readOnly = {true} permissionScheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
+                                    }
+                                </div>
+
+
                             </form>
                         )
                     }
                 </Form>
+
+
+
+
             </div>
         </div>
     )
@@ -149,15 +185,20 @@ const UserForm = (props) => {
 
 const mapState2Props = (state) => {
     return {
+        roles: rightsDictionarySelector(state),
+        rolesPermissions: rolesPermissionsSelector(state),
+        fetching: fetchingSelector(state),
         userData: selectedUserSelector(state),
         visible: userFormOpenedSelector(state),
         isAdmin: hasAdminRights(state),
+        permissionScheme: permissionSchemeSelector(state)
     }
 };
 
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
+            getRights,
             toggleUserForm,
             cleanSelectedUser,
             findUserByEmail,

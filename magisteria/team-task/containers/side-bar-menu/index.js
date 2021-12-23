@@ -1,4 +1,4 @@
-import React, {useMemo, useState,} from "react"
+import React, {useState,} from "react"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ProcessesIco from "tt-assets/svg/processes.svg"
@@ -12,17 +12,13 @@ import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 import Logo from "tt-assets/svg/logo.svg"
 
-import {hasAdminRights, hasPmaRights, hasSupervisorRights, permissionsSelector} from "tt-ducks/auth";
+import {hasAdminRights, hasPmaRights, hasSupervisorRights} from "tt-ducks/auth";
 import {sideBarMenuVisible} from "tt-ducks/app";
 import {newNotifsCountSelector, notificationsSelector, unreadCountSelector} from "tt-ducks/notifications";
 
-// Todo: сделать из этого компонент, а не контейнер
-
 function SideBarMenu(props) {
 
-    const { hasAdminRights, hasSupervisorRights, sideBarMenuVisible, unreadNotificationsCount, newNotifsCount, permissions } = props;
-
-    const hasDashboardAccess = useMemo(() => permissions.dsb && permissions.dsb.al, [permissions])
+    const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, unreadNotificationsCount, newNotifsCount,} = props
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -37,6 +33,7 @@ function SideBarMenu(props) {
             <MenuList Icon={DictionariesIco} title={"Справочники"}>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/rights"} title={"Роли"}/>
             </MenuList>
         }
 
@@ -47,7 +44,7 @@ function SideBarMenu(props) {
         }
 
         {
-            hasDashboardAccess &&
+            (hasAdminRights || hasSupervisorRights) &&
             <MenuLink Icon={PublishPlanIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>
         }
@@ -101,7 +98,6 @@ function MenuList(props: MenuListProps) {
 
 const mapState2Props = (state) => {
     return {
-        permissions: permissionsSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
         hasAdminRights: hasAdminRights(state),
         hasPmaRights: hasPmaRights(state),

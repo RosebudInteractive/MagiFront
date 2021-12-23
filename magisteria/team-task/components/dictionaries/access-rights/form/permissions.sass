@@ -1,0 +1,147 @@
+@import "~tt-assets/styles/colors"
+
+.email-field
+  display: flex
+  flex-flow: row nowrap
+  column-gap: 10px
+
+.rs-dropdown-item-content
+   padding: 0 !important
+
+.rs-dropdown.rs-dropdown-placement-bottom-start.rs-dropdown-expand
+  //max-width: 384.5px
+.permission-item
+  min-height: 35px
+  display: flex
+  justify-content: space-between
+  flex-flow: row nowrap
+  align-items: center
+  padding: 0 0
+
+
+
+
+  div:first-child
+    font-size: 12px
+    padding-left: 8px
+    width: 50%
+    text-align: center
+
+  div:nth-child(2)
+    width: 50%
+    text-align: left
+    padding-right: 5px
+
+    .rs-picker-input
+      width: 100%
+      max-width: 212px
+      .rs-picker-toggle
+        width: 100%
+        left: 0
+        max-width: 210px
+        .rs-picker-toggle-value
+          color: black
+          font-size: 10px
+          padding-top: 2px
+          text-align: right
+
+    .rs-picker-input.rs-picker-focused
+      border-color: #C8684C !important
+    .rs-picker-select-menu-item:not(.rs-picker-select-menu-item-disabled):hover
+    .rs-picker-input:not(.rs-picker-disabled):hover
+      border-color: rgb(210, 210, 214)
+.rs-nav.rs-nav-vertical .rs-dropdown > .rs-dropdown-toggle
+  padding: 0
+  height: 100%
+  min-height: 47.44px
+  width: 100%
+
+.rs-dropdown-item > .rs-dropdown-item-content
+  padding: 0
+  width: 100%
+  border-radius: 6px
+.rs-sidenav-collapse-in.rs-dropdown-item > .rs-dropdown-item-content, .rs-sidenav-collapse-in.rs-dropdown-item-submenu > .rs-dropdown-item-content > .rs-dropdown-menu-toggle
+  padding: 0
+
+.rs-dropdown.rs-dropdown-placement-bottom-start.rs-dropdown-expand
+  max-width: 384.5px
+.rs-btn.rs-btn-subtle.rs-dropdown-toggle
+  border-radius: 8px
+  text-align: center
+  font-size: 13px
+  display: flex
+  align-items: center
+  justify-content: center
+  max-width: 298px
+
+  .rs-dropdown-toggle-caret
+    right: 16px
+    top: 17px
+
+  .rs-ripple-pond
+    border-radius: 8px
+
+
+.title-drop-d
+  position: absolute
+  left: 4%
+.right-form__field
+  min-width: 170.8px
+  width: 100%
+  height: 50px
+
+  .rs-sidenav-default
+    background-color: transparent
+
+  &.permissions
+    display: none
+
+.inner-content__close-button
+  position: absolute
+  right: 5px
+  top: 5px
+  padding: 15px
+  font-size: 0
+  cursor: pointer
+  background-color: transparent
+  &:before, &:after
+    content: ""
+    position: absolute
+    top: 50%
+    left: 50%
+    -webkit-transform: translate(-50%, -50%)
+    -ms-transform: translate(-50%, -50%)
+    transform: translate(-50%, -50%)
+    width: 15px
+    height: 2px
+    background-color: $grey40
+    -webkit-transition: background-color 0.3s ease
+    transition: background-color 0.3s ease
+  &:before
+    -webkit-transform: translate(-50%, -50%) rotate(45deg)
+    -ms-transform: translate(-50%, -50%) rotate(45deg)
+    transform: translate(-50%, -50%) rotate(45deg)
+  &:after
+    -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+    -ms-transform: translate(-50%, -50%) rotate(-45deg)
+    transform: translate(-50%, -50%) rotate(-45deg)
+
+
+.right-form__confirm-button
+  margin-left: auto
+
+.search-button
+  border-radius: 8px
+
+a.rs-btn.rs-btn-subtle
+  padding-left: 5px
+
+.selected-option
+  width: 100% !important
+  font-size: 10px !important
+  text-align: right !important
+
+  &.grey
+    color: grey
+  &.black
+    color: black

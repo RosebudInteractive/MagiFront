@@ -14,13 +14,6 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {componentOwnersSelector} from "tt-ducks/dictionary";
 
-// const vRequired = value => (value ? undefined : 'Обязательное поле'); todo use it and import from tools/validators
-// const vMinValue = min => value =>
-//     isNaN(value) || value >= min ? undefined : `Необходимое количество символов ${min}`;
-// const vMustBeEmail = value => (EMAIL_REGEXP.test(value) ? undefined : 'Не соответствует формату почты');
-// const ComposeValidators = (...validators) => value =>
-//     validators.reduce((error, validator) => error || validator(value), undefined);
-
 
 const ComponentForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
