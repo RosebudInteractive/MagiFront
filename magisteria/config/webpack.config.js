@@ -88,7 +88,7 @@ module.exports = function (webpackEnv, argv) {
             pathinfo: isEnvDevelopment,
             filename: isEnvProduction
                 ? 'static/js/[name].[chunkhash:8].js'
-                : isEnvDevelopment && 'static/js/[name].[chunkhash:8].bundle.js',
+                : isEnvDevelopment && 'static/js/[name].[hash:8].bundle.js',
             publicPath: paths.publicUrlOrPath,
         },
         plugins: [
