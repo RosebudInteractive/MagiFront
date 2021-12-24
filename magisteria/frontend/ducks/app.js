@@ -362,7 +362,7 @@ function* sale2021PopupCloseSaga() {
 function* sale2022PopupCloseSaga() {
     let _date = new Date(new Date().setFullYear(new Date().getFullYear() + 10))
 
-    $.cookie('_CONFIRMED_SALE2021_POPUP', true, { expires: _date, path: "/" })
+    $.cookie('_CONFIRMED_SALE2022_POPUP', true, { expires: _date, path: "/" })
 
     yield put(loadLocalSettings())
 }
