@@ -1,0 +1,105 @@
+@import "~tools/variables.sass"
+@import "~tools/mixins.sass"
+
+.top-message__sale2022-popup
+  background: #102B62 linear-gradient(#143198, #14319880)
+  height: 140px
+  display: flex
+  justify-content: center
+  overflow: hidden
+  @media (max-width: $tablet-width)
+    height: 64px
+
+.sale2022-popup__image
+  position: absolute
+  top: 0
+  z-index: 0
+  height: 140px
+  @media (max-width: $tablet-width)
+    height: 64px
+
+  &._left
+    left: 0
+    @media (max-width: 1279px)
+      left: calc(100vw - 1279px)
+    @media (max-width: $tablet-width)
+      left: 0
+    @media (max-width: 579px)
+      left: calc(100vw - 579px)
+    @media (max-width: $mobile-phone-width)
+      left: -76px
+
+  &._center
+    left: 50%
+    transform: translateX(-50%)
+    z-index: 1
+
+  &._right
+    right: 0
+    @media (max-width: 1279px)
+      right: calc(100vw - 1279px)
+    @media (max-width: $tablet-width)
+      right: 0
+    @media (max-width: 579px)
+      right: calc(100vw - 579px)
+    @media (max-width: $mobile-phone-width)
+      right: -73px
+
+  //.sale2022-popup__info-block__wrapper
+  //  display: flex
+  //  max-width: 50%
+  //  @media (max-width: $tablet-width)
+  //    max-width: 70%
+  //
+  //  .left-image, .right-image
+  //    position: absolute
+  //    top: 0
+  //    z-index: 0
+  //    height: 140px
+  //    @media (max-width: $mobile-phone-width)
+  //      height: 64px
+  //
+  //
+  //  .left-image
+  //    left: 0
+  //    @media (max-width: 879px)
+  //      left: calc(100% - 879px)
+  //      //width: 502px
+  //    @media (max-width: $mobile-phone-width)
+  //      //width: 230px
+  //      left: -76px
+  //
+  //  .right-image
+  //    right: 0
+  //    @media (max-width: 879px)
+  //      right: calc(100vw - 879px)
+  //      //right: -104px
+  //      //width: 525px
+  //    @media (max-width: $mobile-phone-width)
+  //      //width: 240px
+  //      right: -113px
+
+
+.sale2022-popup__close-button
+  display: flex
+  align-items: center
+  position: absolute
+  height: 100%
+  right: 0
+
+  .balloon-wrapper__close
+    padding: 0
+    margin: 0 20px
+    height: 32px
+    width: 32px
+    border-radius: 50%
+    background-color: $color-dark-03
+
+    &:before, &:after
+      background-color: $color-white-06
+
+    &:hover
+      background-color: $color-dark-06
+      &:before, &:after
+        background-color: $color-white
+

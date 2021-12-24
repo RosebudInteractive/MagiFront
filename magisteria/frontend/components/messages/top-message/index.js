@@ -7,6 +7,7 @@ import StorePopup from "./store-popup";
 import {mobileAppSelector, popupSelector} from "ducks/version";
 import {localSettingsSelector, storePopupClose, setAppDivTop, sale2021PopupClose} from "ducks/app";
 import Sale2021 from "./sale2021";
+import Sale2022 from "./sale2022";
 
 const _divRef = React.createRef()
 
@@ -36,6 +37,11 @@ function TopMessage(props) {
                     onReady={_onResize}/>
         <Sale2021 config={config.sale2021}
                   confirmed={localSettings.popup.sale2021PopupConfirmed}
+                  onClose={props.actions.sale2021PopupClose}
+                  onReady={_onResize}
+                  headerVisible={headerVisible && pageHeaderState.visibility}/>
+        <Sale2022 config={config.sale2022}
+                  confirmed={localSettings.popup.sale2022PopupConfirmed}
                   onClose={props.actions.sale2021PopupClose}
                   onReady={_onResize}
                   headerVisible={headerVisible && pageHeaderState.visibility}/>

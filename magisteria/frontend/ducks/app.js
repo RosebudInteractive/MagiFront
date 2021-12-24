@@ -38,6 +38,7 @@ export const SET_CURRENT_GA_URL = `${prefix}/SET_CURRENT_URL`;
 
 const STORE_POPUP_CLOSE_REQUEST = `${prefix}/STORE_POPUP_CLOSE_REQUEST`;
 const SALE2021_POPUP_CLOSE_REQUEST = `${prefix}/SALE2021_POPUP_CLOSE_REQUEST`;
+const SALE2022_POPUP_CLOSE_REQUEST = `${prefix}/SALE2022_POPUP_CLOSE_REQUEST`;
 const CONFIRM_COOKIES_REQUEST = `${prefix}/CONFIRM_COOKIES_REQUEST`;
 
 const LOAD_LOCAL_SETTINGS_REQUEST = `${prefix}/LOAD_LOCAL_SETTINGS_REQUEST`;
@@ -64,6 +65,7 @@ const StatRecord = Record({
 const PopupSettings = Record({
     storePopupConfirmedMode: null,
     sale2021PopupConfirmed: false,
+    sale2022PopupConfirmed: false,
     cookiesConfirmed: true
 })
 
@@ -230,6 +232,10 @@ export const sale2021PopupClose = () => {
     return {type: SALE2021_POPUP_CLOSE_REQUEST}
 }
 
+export const sale2022PopupClose = () => {
+    return {type: SALE2022_POPUP_CLOSE_REQUEST}
+}
+
 export const cookiesMessageClose = () => {
     return {type: CONFIRM_COOKIES_REQUEST}
 }
@@ -254,6 +260,7 @@ export const saga = function* () {
         takeEvery(CONFIRM_COOKIES_REQUEST, cookiesMessageCloseSaga),
         takeEvery(STORE_POPUP_CLOSE_REQUEST, storePopupCloseSaga),
         takeEvery(SALE2021_POPUP_CLOSE_REQUEST, sale2021PopupCloseSaga),
+        takeEvery(SALE2022_POPUP_CLOSE_REQUEST, sale2022PopupCloseSaga),
         takeEvery(LOAD_LOCAL_SETTINGS_REQUEST, loadLocalSettingsSaga),
         takeEvery(SET_APP_DIV_TOP_REQUEST, setAppDivTopSaga),
     ])
@@ -352,15 +359,24 @@ function* sale2021PopupCloseSaga() {
     yield put(loadLocalSettings())
 }
 
+function* sale2022PopupCloseSaga() {
+    let _date = new Date(new Date().setFullYear(new Date().getFullYear() + 10))
+
+    $.cookie('_CONFIRMED_SALE2021_POPUP', true, { expires: _date, path: "/" })
+
+    yield put(loadLocalSettings())
+}
+
 function* loadLocalSettingsSaga() {
     let cookiesConfirmed = !!$.cookie('magisteria_cookies_confirm'),
         storePopupConfirmedMode = $.cookie('_CONFIRMED_STORE_POPUP_MODE'),
-        sale2021PopupConfirmed = !!$.cookie('_CONFIRMED_SALE2021_POPUP')
+        sale2021PopupConfirmed = !!$.cookie('_CONFIRMED_SALE2021_POPUP'),
+        sale2022PopupConfirmed = !!$.cookie('_CONFIRMED_SALE2022_POPUP')
 
     storePopupConfirmedMode = storePopupConfirmedMode ? +storePopupConfirmedMode : 0
 
     const _settings = {
-        popup: {cookiesConfirmed, storePopupConfirmedMode, sale2021PopupConfirmed}
+        popup: {cookiesConfirmed, storePopupConfirmedMode, sale2021PopupConfirmed, sale2022PopupConfirmed}
     }
 
     yield put({type: APPLY_LOCAL_SETTINGS, payload: _settings})
