@@ -124,7 +124,7 @@ module.exports = function (webpackEnv, argv) {
                 allChunks: true
             }),
             new CopyWebpackPlugin([
-                {from: './public/version.json', to: './version.json'},
+                {from: './public/version.json', to: './static/version.json'},
                 {from: './public/css', to: './static/css'},
                 {from: './public/fonts', to: './static/fonts'},
                 {from: './public/images', to: './static/images'},

@@ -55,6 +55,7 @@ export const UsersRecord = Record({
 export const ReducerRecord = Record({
     lessons: [],
     courses: [],
+    allCourses: [],
     unpublishedLessons: [],
     availableForCreationLessons: [],
     users: new UsersRecord(),
@@ -62,8 +63,6 @@ export const ReducerRecord = Record({
     nextTimeToLoadData: 0,
     fetching: false
 });
-
-
 
 //reducer
 
@@ -80,6 +79,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['users', 'pmu'], payload.pmu)
                 .set('lessons', payload.lessons)
                 .set('courses', payload.courses.Courses)
+                .set('allCourses', payload.allCourses)
                 .set('availableForCreationLessons', payload.availableForCreationLessons);
         case SET_NEXT_TIME_TO_LOAD:
             return state.set('nextTimeToLoadData', payload);
@@ -109,7 +109,9 @@ const stateSelector = state => state[moduleName];
 export const nextTimeSelector = createSelector(stateSelector, state => state.nextTimeToLoadData);
 export const dictionaryFetching = createSelector(stateSelector, state => state.fetching);
 export const lessonsSelector = createSelector(stateSelector, state => state.lessons);
+// todo: проверить где используется этот селектор, возможно надо заменить на allCourses
 export const coursesSelector = createSelector(stateSelector, state => state.courses);
+export const allCoursesSelector = createSelector(stateSelector, state => state.allCourses);
 
 export const allUsersDSelector = createSelector(stateSelector, state => {
     const allUsers = [...state.users.a, ...state.users.pma, ...state.users.pms, ...state.users.pme, ...state.users.pmu];
@@ -199,7 +201,8 @@ function* getDictionaryDataSaga(data) {
                 _pmu,
                 _lessons,
                 _availableForCreationLessons,
-                _courses
+                _courses,
+                allCourses,
             ] = yield all([
                 call(_getAUsers),
                 call(_getPmaUsers),
@@ -209,6 +212,7 @@ function* getDictionaryDataSaga(data) {
                 call(_getLessons),
                 call(_getAvailableForCreationLessons),
                 call(_getCourses),
+                call(getAllCourses),
             ]);
 
             if(_a && _pma && _pms && _pme && _pmu && _lessons && _courses){
@@ -223,7 +227,8 @@ function* getDictionaryDataSaga(data) {
                         pmu: _pmu,
                         lessons: _lessons,
                         availableForCreationLessons: _availableForCreationLessons,
-                        courses: _courses
+                        courses: _courses,
+                        allCourses,
                     }
                 });
 
@@ -371,4 +376,6 @@ const _getCourses = () => {
     return commonGetQuery('/api/courses');
 };
 
-
+const getAllCourses = () => {
+    return commonGetQuery('/api/courses/list')
+};

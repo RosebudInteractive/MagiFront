@@ -58,8 +58,8 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "build:dev": "webpack --mode=development --watch --progress",
-    "build:prod": "webpack --mode production --progress"
+    "start": "webpack --mode=development --watch --progress",
+    "build": "webpack --mode production --progress"
   },
   "browserslist": {
     "production": [
