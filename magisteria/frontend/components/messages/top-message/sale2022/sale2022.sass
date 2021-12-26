@@ -5,81 +5,109 @@
   background: #102B62 linear-gradient(#143198, #14319880)
   height: 140px
   display: flex
-  justify-content: center
+  justify-content: space-between
   overflow: hidden
   position: relative
   @media (max-width: $tablet-width)
     height: 64px
 
-.sale2022-popup__image
+.sale2022-popup__wrapper
   position: absolute
+  left: 50%
+  transform: translateX(-50%)
+  display: flex
+  flex-wrap: nowrap
+  justify-content: space-between
+  width: 100%
+  min-width: 1197px
+  @media (max-width: $tablet-width)
+    min-width: 533px
+
+.sale2022-popup__image
+  border: none
+  outline: none
   top: 0
   z-index: 0
   height: 140px
+  position: relative
   @media (max-width: $tablet-width)
     height: 64px
 
+  &._with-background
+    &:after
+      content: ''
+      background: #102B62 linear-gradient(#143198, #14319880)
+      position: absolute
+      height: 100%
+      top: 0
+      z-index: -1
+    &._left
+      &:after
+        width: calc(100% - 35px)
+        left: 0
+    &._right
+      &:after
+        width: calc(100% - 45px)
+        right: 0
+
   &._left
     left: 0
-    @media (max-width: 1279px)
-      left: calc(100vw - 1279px)
+    margin-right: 125px
     @media (max-width: $tablet-width)
-      left: 0
-    @media (max-width: 579px)
-      left: calc(100vw - 579px)
-    @media (max-width: $mobile-phone-width)
-      left: -76px
+      margin-right: 50px
 
   &._center
     left: 50%
     transform: translateX(-50%)
     z-index: 1
+    position: absolute
 
   &._right
     right: 0
-    @media (max-width: 1279px)
-      right: calc(100vw - 1279px)
+    margin-left: 125px
     @media (max-width: $tablet-width)
-      right: 0
-    @media (max-width: 579px)
-      right: calc(100vw - 579px)
-    @media (max-width: $mobile-phone-width)
-      right: -73px
+      margin-left: 50px
 
-  //.sale2022-popup__info-block__wrapper
-  //  display: flex
-  //  max-width: 50%
-  //  @media (max-width: $tablet-width)
-  //    max-width: 70%
-  //
-  //  .left-image, .right-image
-  //    position: absolute
-  //    top: 0
-  //    z-index: 0
-  //    height: 140px
-  //    @media (max-width: $mobile-phone-width)
-  //      height: 64px
-  //
-  //
-  //  .left-image
-  //    left: 0
-  //    @media (max-width: 879px)
-  //      left: calc(100% - 879px)
-  //      //width: 502px
-  //    @media (max-width: $mobile-phone-width)
-  //      //width: 230px
-  //      left: -76px
-  //
-  //  .right-image
-  //    right: 0
-  //    @media (max-width: 879px)
-  //      right: calc(100vw - 879px)
-  //      //right: -104px
-  //      //width: 525px
-  //    @media (max-width: $mobile-phone-width)
-  //      //width: 240px
-  //      right: -113px
 
+.sale2022-popup__stars-block
+  position: absolute
+  width: 100%
+  z-index: -1
+
+.sale2022-popup__star
+  opacity: 0.6
+  position: absolute
+  &:before, &:after
+    content: ''
+    background-color: #FDD25C
+    position: absolute
+
+  &.big
+    &:before
+      width: 3px
+      height: 1px
+      left: 0
+      top: 1px
+    &:after
+      width: 1px
+      height: 3px
+      left: 1px
+      top: 0
+
+  &.small
+    width: 1px
+    height: 1px
+    background-color: #FDD25C
+
+  &.left
+    margin-left: -235px
+    @media (max-width: $tablet-width)
+      margin-left: -116px
+
+  &.right
+    margin-left: 235px
+    @media (max-width: $tablet-width)
+      margin-left: 116px
 
 .sale2022-popup__close-button
   display: flex
