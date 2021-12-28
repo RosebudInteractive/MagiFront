@@ -61,6 +61,15 @@
     transform: translateX(-50%)
     z-index: 1
     position: absolute
+    &._desktop
+      display: block
+      @media (max-width: $tablet-width)
+        display: none
+    &._mobile
+      display: none
+      @media (max-width: $tablet-width)
+        display: block
+
 
   &._right
     right: 0
