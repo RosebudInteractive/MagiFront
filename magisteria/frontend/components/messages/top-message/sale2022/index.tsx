@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import "./sale2022.sass"
 import Left from './left.png';
 import Center from './center.png';
+import CenterMobile from './center-mobile.png';
 import Right from './right.png';
 
 const STARS_COUNT : number = 200;
@@ -47,6 +48,8 @@ export default function Sale2021(props: Props): JSX.Element | null {
                 <img className='sale2022-popup__image' src={Left} alt={'santa'}/>
             </div>
             <img className="sale2022-popup__image _center" src={Center} alt={'2022'}/>
+            <img className="sale2022-popup__image _center _desktop" src={Center} alt={'2022'}/>
+            <img className="sale2022-popup__image _center _mobile" src={CenterMobile} alt={'2022'}/>
             <div className="sale2022-popup__image _with-background _right">
                 <img className='sale2022-popup__image' src={Right} alt={'christmas'}/>
             </div>
