@@ -13,9 +13,9 @@ import {
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {hasAdminRights} from "tt-ducks/auth";
-import Permissions from "./permissions";
+import Permissions from "../../permissions/permissions";
 import validators from "../../../../tools/validators"
-import rightsMerger from "../rights-merger";
+import roleMerger from "../../../../tools/role-merger";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -49,8 +49,6 @@ const RightForm = (props) => {
 
     const changePermissions = function (value, pItem) {
 
-        rightsMerger.logIt();
-
         const permissionObject = {
             ...permissionBody ? permissionBody : {},
             [`${pItem.parentCode}`]: {
@@ -77,9 +75,9 @@ const RightForm = (props) => {
     };
 
     const permissionSchemeLinear = useMemo(() => {
-        rightsMerger.init(permissionScheme);
+        roleMerger.init(permissionScheme);
 
-        return rightsMerger.getMergedLinearStructure(roleData);
+        return roleMerger.getMergedLinearStructure(roleData);
     }, [permissionScheme, roleData]);
 
     return (
@@ -108,69 +106,75 @@ const RightForm = (props) => {
                                 applyChanges(roleForm.values);
                                 closeModalForm()
                             }}>
-                                <div className="left-side">
-                                    <div className='right-form__field email-field'>
-                                        <Field name="Code"
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Код"
-                                               label={"Код"}
-                                               validate={validators.required}
-                                               disabled={!createAction}/>
-                                    </div>
-                                    <div className='right-form__field'>
-                                        <Field name="Name"
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Название"
-                                               validate={validators.required}
-                                               label={"Название"}
-                                        />
-                                    </div>
+                                <div className="fields-container">
+                                    <div className="left-side">
+                                        <div className='right-form__field email-field'>
+                                            <Field name="Code"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Код"
+                                                   label={"Код"}
+                                                   validate={validators.required}
+                                                   disabled={!createAction}/>
+                                        </div>
+                                        <div className='right-form__field'>
+                                            <Field name="Name"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Название"
+                                                   validate={validators.required}
+                                                   label={"Название"}
+                                            />
+                                        </div>
 
-                                    <div className='right-form__field'>
-                                        <Field name="ShortCode"
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Краткое название"
-                                               validate={validators.required}
-                                               label={"Краткое название"}
-                                        />
+                                        <div className='right-form__field'>
+                                            <Field name="ShortCode"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Краткое название"
+                                                   validate={validators.required}
+                                                   label={"Краткое название"}
+                                            />
+                                        </div>
+
+                                        <div className='right-form__field'>
+                                            <Field name="Description"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   validate={validators.required}
+                                                   placeholder="Описание"
+                                                   label={"Описание"}
+                                            />
+                                        </div>
+
+                                        <div className='right-form__field permissions'>
+                                            <Field name="Permissions"
+                                                   hidden
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Разрешения"
+                                                   label={"Разрешения"}
+                                            />
+                                        </div>
+
+
                                     </div>
-
-                                    <div className='right-form__field'>
-                                        <Field name="Description"
-                                               component={TextBox}
-                                               type="text"
-                                               validate={validators.required}
-                                               placeholder="Описание"
-                                               label={"Описание"}
-                                        />
+                                    <div className="right-side">
+                                        <div className='right-form__field'>
+                                            <Permissions permissionScheme={permissionSchemeLinear} onDirty={dirtyForm} onChangeCb = {changePermissions} opened={true}/>
+                                        </div>
                                     </div>
-
-                                    <div className='right-form__field permissions'>
-                                        <Field name="Permissions"
-                                               hidden
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Разрешения"
-                                               label={"Разрешения"}
-                                        />
-                                    </div>
-
-
                                 </div>
-                                <div className="right-side">
-                                    <div className='right-form__field'>
-                                        <Permissions permissionScheme={permissionSchemeLinear} onDirty={dirtyForm} onChangeCb = {changePermissions}/>
-                                    </div>
+
+                                <div className="action-buttons">
+                                    <button type='submit'
+                                            className="right-form__confirm-button orange-button big-button"
+                                            disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty} >
+                                        Применить
+                                    </button>
                                 </div>
 
-                                <button type='submit'
-                                        className="right-form__confirm-button orange-button big-button"
-                                        disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty} >
-                                    Применить
-                                </button>
+
                             </form>
                         )
                     }

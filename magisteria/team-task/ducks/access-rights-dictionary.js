@@ -53,29 +53,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('rights', payload);
         case SET_PERMISSION_SCHEME:
-            const key = Object.entries(payload).map(ent => ent[0])[0];
             return state
-                .set('permissionScheme', {...payload,
-                    [`${key}`]: {...payload[key],
-                    items: {...payload[key].items, tp: { // todo remove tp and wer permissions
-                                alias: "testPermission",
-                                dataType: "enum",
-                                default: 1,
-                                mergeType: "max",
-                                title: "Тестовое разрешение",
-                                type: "item",
-                                values: {0: "Нет доступа", 1: "Просмотр", 2: "Просмотр и редактирование", 3: "Полный"}
-                            }, wer: {
-            alias: "werPermission",
-                dataType: "enum",
-        default: 1,
-                mergeType: "max",
-                title: "Wer разрешение",
-                type: "item",
-                values: {0: "Нет доступа", 1: "Просмотр", 2: "Просмотр и редактирование", 3: "Полный"}
-        }},
-
-                    }});
+                .set('permissionScheme', payload);
         case START_REQUEST:
             return state
                 .set('fetching', true);

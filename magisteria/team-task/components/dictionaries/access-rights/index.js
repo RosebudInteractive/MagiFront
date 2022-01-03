@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
-// import type {GridSortOrder} from "../../../types/grid";//todo add this or not
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
@@ -15,16 +14,15 @@ import {
     toggleRightForm,
 } from "tt-ducks/access-rights-dictionary";
 import {userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
-import {bindActionCreators, Dispatch} from "redux";
+import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import './access-rights.sass'
-import type {FilterField} from "../../filter/types";
 import RightForm from './form'
 
 let _rightsCount = 0;
 
-const AccessRights = (props: any) => {
+const AccessRights = (props) => {
     const {rights, fetching, actions} = props;
     const location = useLocation();
     const _sortRef = useRef({field: null, direction: null}),
@@ -35,8 +33,18 @@ const AccessRights = (props: any) => {
     });
 
     useEffect(() => {
-        _rightsCount = props.rights.length;
+        _rightsCount = rights.length;
         _onResize();
+
+        if (rights.length > 0) {
+            const splitedPathname = location.pathname.split('/');
+            const locationComponentId = +(splitedPathname[splitedPathname.length - 1]);
+
+            if (Number.isInteger(locationComponentId)) {
+                actions.selectRight(locationComponentId);
+                actions.toggleRightForm(true);
+            }
+        }
     }, [rights]);
 
     useEffect(() => {
@@ -88,7 +96,7 @@ const AccessRights = (props: any) => {
         ],
         on: {
             onHeaderClick: function (header) {
-                const _sort: GridSortOrder = _sortRef.current;
+                const _sort = _sortRef.current;
 
                 if (header.column !== _sort.field) {
                     _sort.field = header.column
@@ -111,12 +119,12 @@ const AccessRights = (props: any) => {
             }
         },
         onClick: {
-            "elem-delete": function (e: any, data: any) {
+            "elem-delete": function () {
             }
         },
     };
 
-    const FILTER_CONFIG: Array<FilterField> = useMemo(() => {
+    const FILTER_CONFIG = useMemo(() => {
         return getFilterConfig(filter.current)
     }, [filter.current]);
 
@@ -132,11 +140,11 @@ const AccessRights = (props: any) => {
             <div className="dictionary-rights-page form _scrollable-y">
                 <h5 className="form-header _grey70">Справочник ролей</h5>
                 <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-                <div className="grid-container rights-table">
+                <div className="grid-container rights-table unselectable">
                     <Webix ui={GRID_CONFIG} data={rights}/>
                 </div>
                 {props.modalVisible
-                    ? <Route exact path="/dictionaries/rights/:id" component={RightForm}/>
+                    ? <Route path="/dictionaries/rights/:id" component={RightForm}/>
                     : null
                 }
 
@@ -146,7 +154,7 @@ const AccessRights = (props: any) => {
     )
 };
 
-const mapState2Props = (state: any) => {
+const mapState2Props = (state) => {
     return {
         rights: rightsDictionarySelector(state),
         fetching: fetchingSelector(state),
@@ -155,7 +163,7 @@ const mapState2Props = (state: any) => {
     }
 };
 
-const mapDispatch2Props = (dispatch: Dispatch<any>) => {
+const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
             getRights,

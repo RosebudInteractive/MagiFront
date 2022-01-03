@@ -8,8 +8,6 @@
 .rs-dropdown-item-content
    padding: 0 !important
 
-.rs-dropdown.rs-dropdown-placement-bottom-start.rs-dropdown-expand
-  //max-width: 384.5px
 .permission-item
   min-height: 35px
   display: flex
@@ -18,14 +16,9 @@
   align-items: center
   padding: 0 0
 
-
-
-
-  div:first-child
+  .permission-title
     font-size: 12px
-    padding-left: 8px
-    width: 50%
-    text-align: center
+    padding-left: 35px
 
   div:nth-child(2)
     width: 50%
@@ -48,6 +41,7 @@
     .rs-picker-input.rs-picker-focused
       border-color: #C8684C !important
     .rs-picker-select-menu-item:not(.rs-picker-select-menu-item-disabled):hover
+      background-color: #ffebd9
     .rs-picker-input:not(.rs-picker-disabled):hover
       border-color: rgb(210, 210, 214)
 .rs-nav.rs-nav-vertical .rs-dropdown > .rs-dropdown-toggle
@@ -63,8 +57,6 @@
 .rs-sidenav-collapse-in.rs-dropdown-item > .rs-dropdown-item-content, .rs-sidenav-collapse-in.rs-dropdown-item-submenu > .rs-dropdown-item-content > .rs-dropdown-menu-toggle
   padding: 0
 
-.rs-dropdown.rs-dropdown-placement-bottom-start.rs-dropdown-expand
-  max-width: 384.5px
 .rs-btn.rs-btn-subtle.rs-dropdown-toggle
   border-radius: 8px
   text-align: center
@@ -72,7 +64,6 @@
   display: flex
   align-items: center
   justify-content: center
-  max-width: 298px
 
   .rs-dropdown-toggle-caret
     right: 16px
@@ -145,3 +136,19 @@ a.rs-btn.rs-btn-subtle
     color: grey
   &.black
     color: black
+
+
+.permission-menu-options
+
+  .rs-picker-select-menu-item.rs-picker-select-menu-item-active
+    border-color: grey !important
+    color: #C8684C !important
+    background-color: oldlace
+  .rs-picker-select-menu-item:not(.rs-picker-select-menu-item-disabled):hover
+    background-color: #ffebd9
+  .rs-picker-select-menu-item.rs-picker-select-menu-item-focus
+    color: #575757
+    background-color: unset
+    text-decoration: none
+
+

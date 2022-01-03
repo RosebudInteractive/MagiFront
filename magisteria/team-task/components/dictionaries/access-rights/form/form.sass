@@ -26,6 +26,8 @@
   position: relative
   box-sizing: border-box
   padding: 16px 16px 16px 16px
+  width: auto
+  max-width: unset !important
 
   .title
     align-self: flex-start
@@ -38,93 +40,30 @@
 
 .right-form
   display: flex
-  flex-flow: row wrap
-  row-gap: 10px
-  column-gap: 20px
-  justify-content: space-around
-  max-width: 507px
+  flex-flow: column nowrap
+  justify-content: space-between
+
+  .fields-container
+    display: flex
+    flex-flow: row nowrap
+    width: 100%
+    justify-content: space-between
 
   .left-side
+    width: 30%
     display: flex
-    flex: 0 0 31%
+    min-width: 240px
+    max-width: 400px
     flex-flow: column nowrap
     row-gap: 10px
 
   .right-side
-    flex:  0 0 62%
+    width: 60%
+    min-width: 240px
     max-width: 400.5px
+    padding-left: 20px
 
-//    .permission-item
-//      min-height: 35px
-//      display: flex
-//      justify-content: space-between
-//      flex-flow: row nowrap
-//      align-items: center
-//      padding: 0 0
-//
-//      div:first-child
-//        font-size: 12px
-//        padding-left: 8px
-//        width: 50%
-//        text-align: center
-//      div:nth-child(2)
-//        width: 50%
-//        text-align: left
-//        padding-right: 5px
-//        //padding-top: 9px
-//
-//        .rs-picker-input
-//          width: 100%
-//          max-width: 212px
-//          .rs-picker-toggle
-//            width: 100%
-//            left: 0
-//            max-width: 210px
-//            .rs-picker-toggle-value
-//              color: black
-//              font-size: 10px
-//              padding-top: 2px
-//              text-align: right
-//
-//        .rs-picker-input.rs-picker-focused
-//          border-color: #C8684C !important
-//        .rs-picker-select-menu-item:not(.rs-picker-select-menu-item-disabled):hover
-//        .rs-picker-input:not(.rs-picker-disabled):hover
-//          border-color: rgb(210, 210, 214)
-//          //background-color: #e9ddd8
-//    .rs-nav.rs-nav-vertical .rs-dropdown > .rs-dropdown-toggle
-//      padding: 0
-//      height: 100%
-//      min-height: 47.44px
-//      width: 100%
-//
-//    .rs-dropdown-item > .rs-dropdown-item-content
-//      padding: 0
-//      width: 100%
-//    .rs-sidenav-collapse-in.rs-dropdown-item > .rs-dropdown-item-content, .rs-sidenav-collapse-in.rs-dropdown-item-submenu > .rs-dropdown-item-content > .rs-dropdown-menu-toggle
-//      padding: 0
-//
-//    .rs-dropdown.rs-dropdown-placement-bottom-start.rs-dropdown-expand
-//      max-width: 384.5px
-//    .rs-btn.rs-btn-subtle.rs-dropdown-toggle
-//      border-radius: 8px
-//      text-align: center
-//      font-size: 13px
-//      display: flex
-//      align-items: center
-//      justify-content: center
-//
-//      .rs-dropdown-toggle-caret
-//        right: 16px
-//        top: 17px
-//
-//      .rs-ripple-pond
-//        border-radius: 8px
-//
-//
-//.title-drop-d
-//  position: absolute
-//  left: 4%
+
 .right-form__field
   min-width: 170.8px
   width: 100%
@@ -176,12 +115,6 @@
 a.rs-btn.rs-btn-subtle
   padding-left: 5px
 
-//.selected-option
-//  width: 100% !important
-//  font-size: 10px !important
-//  text-align: right !important
-//
-//  &.grey
-//    color: grey
-//  &.black
-//    color: black
+
+.action-buttons
+  margin-top: 20px

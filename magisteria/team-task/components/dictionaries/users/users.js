@@ -189,7 +189,7 @@ const DictionaryUsers = (props) => {
                 </div>
 
                 {props.modalVisible
-                    ? <Route exact path="/dictionaries/users/:id" component={UserForm} />
+                    ? <Route path="/dictionaries/users/:id" component={UserForm} />
                     : null
                 }
             </div>

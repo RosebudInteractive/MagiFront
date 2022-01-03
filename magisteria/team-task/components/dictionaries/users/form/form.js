@@ -16,7 +16,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
 import {hasAdminRights} from "tt-ducks/auth";
-import Permissions from "../../access-rights/form/permissions";
+import Permissions from "../../permissions/permissions";
 import {
     fetchingSelector,
     getRights,
@@ -25,7 +25,7 @@ import {
     rolesPermissionsSelector
 } from "tt-ducks/access-rights-dictionary";
 
-import rightsMerger from "../../access-rights/rights-merger";
+import roleMerger from "../../../../tools/role-merger";
 
 
 //todo import validators
@@ -52,8 +52,8 @@ const UserForm = (props) => {
     };
 
     const permissionSchemeLinear = useMemo(() => {
-        rightsMerger.init(permissionScheme);
-        return rightsMerger.getMergedRolesLinear(rolesPermissions);
+        roleMerger.init(permissionScheme);
+        return roleMerger.getMergedRolesLinear(rolesPermissions);
     }, [permissionScheme, roles, userData, rolesPermissions]);
 
     const userRoles = useMemo(() => {

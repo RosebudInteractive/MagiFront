@@ -10,69 +10,35 @@ type Role = {
   Permissions?: Object,
 };
 
-type GetMergedRoleFn = {
-  (role: Role): Role;
-};
-
-interface RightsMerger {
+interface RoleMerger {
   defaultScheme: Object,
   init: Function,
-  getMergedRole: GetMergedRoleFn,
+  getMergedRole: (role: Role) => Role,
   getMergedLinearStructure: Function,
-  logIt: Function,
   getMergedRoles: Function,
   getMergedRolesLinear: Function
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const dS = {
-  dsb: {
-    alias: 'dashboard',
-    type: 'group',
-    title: 'Панель управления издательским планом',
-    items: {
-      al: {
-        alias: 'accessLevel',
-        type: 'item',
-        title: 'Уровень доступа',
-        dataType: 'enum',
-        mergeType: 'max',
-        values: {
-          0: 'Нет доступа',
-          1: 'Просмотр',
-          2: 'Просмотр и редактирование',
-          3: 'Полный',
-        },
-        default: 0,
-      },
-    },
-  },
-};
-
-const rightsMerger: RightsMerger = { // todo rename to roleMerger
+const roleMerger: RoleMerger = {
   defaultScheme: {},
   init(scheme: Object) {
-    rightsMerger.defaultScheme = scheme;
+    roleMerger.defaultScheme = scheme;
   },
-  logIt() {
-    console.log(rightsMerger);
-  },
-
-  getMergedRoles(roles: any[]) { // подумать над названием
+  getMergedRoles(roles: any[]) {
     const rolesPermissionsArray = roles.map((role) => role.Permissions);
     const rolesPermissionsMerged = _.merge({}, ...rolesPermissionsArray);
     return { ...roles[0], Permissions: rolesPermissionsMerged };
   },
 
   getMergedRolesLinear(roles: any []) {
-    const role = rightsMerger.getMergedRoles(roles); //
+    const role = roleMerger.getMergedRoles(roles); //
 
-    return rightsMerger.getMergedLinearStructure(role);
+    return roleMerger.getMergedLinearStructure(role);
   },
   getMergedRole(role) {
     const schemePermissions = {};
 
-    Object.entries(rightsMerger.defaultScheme).map((permission) => {
+    Object.entries(roleMerger.defaultScheme).map((permission) => {
       // @ts-ignore
       schemePermissions[permission[0]] = {};
 
@@ -84,13 +50,14 @@ const rightsMerger: RightsMerger = { // todo rename to roleMerger
     });
 
     const mergedPermissions = _.merge(schemePermissions, role.Permissions);
-    console.log('{...role, Permissions: mergedPermissions}, ', { ...role, Permissions: mergedPermissions });
+
+
     return { ...role, Permissions: mergedPermissions };
   },
   getMergedLinearStructure(role: any) {
     let result = [];
-    if (rightsMerger.defaultScheme !== null && role !== null) {
-      result = Object.entries(rightsMerger.defaultScheme)
+    if (roleMerger.defaultScheme !== null && role !== null) {
+      result = Object.entries(roleMerger.defaultScheme)
         .map((permission) => {
           const item: any = {};
           item.title = permission[1].title;
@@ -125,4 +92,4 @@ const rightsMerger: RightsMerger = { // todo rename to roleMerger
   },
 };
 
-export default rightsMerger;
+export default roleMerger;
