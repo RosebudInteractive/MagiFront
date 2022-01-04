@@ -99,7 +99,10 @@
   },
   "include": [
     "team-task/**/*.ts",
+    "team-task/**/*.tsx",
     "frontend/**/*.ts",
-    "frontend/**/*.tsx"
+    "frontend/**/*.tsx",
+    "mailing/**/*.ts",
+    "mailing/**/*.tsx"
   ]
 }
