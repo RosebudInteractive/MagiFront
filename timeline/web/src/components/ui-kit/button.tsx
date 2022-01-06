@@ -1,5 +1,4 @@
 import React from "react"
-import './ui-kit.sass'
 
 interface Props {
   title: string,

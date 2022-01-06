@@ -1,8 +1,7 @@
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
-import './App.css';
-import { View } from 'react-native';
+import './App.sass';
 import emitter from '@rosebud/timeline/src/timeline-controller/emitter';
 import { Event } from '@rosebud/timeline/src/types/event';
 import { Period } from '@rosebud/timeline/src/types/period';
@@ -16,7 +15,6 @@ import CheckVisibilitySwitcher from './components/check-visibility-switcher';
 import RiseUpOverXAxis from './components/rise-up-over-x-axis';
 import PlayerControls from './components/player-controls';
 import generator from './helpers/time-generator';
-import styles from './styles';
 import ThemePicker from './components/theme-picker';
 import ClipboardData from './components/clipboard-data';
 import { isDeprecatedBrowser, isUnsupportedBrowser } from './helpers/platform-tools';
@@ -27,7 +25,7 @@ type TimelineData = {
 };
 
 function App() {
-  const [dataIndex, setDataIndex] = useState(-1);
+  const [dataIndex, setDataIndex] = useState(0);
   const [importedData, setImportedData] = useState<TimelineData | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [themeIndex, setThemeIndex] = useState(0);
@@ -117,20 +115,20 @@ function App() {
   };
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.rowContainer}>
-        <DataPicker onChange={onDataSetChange} />
+    <div className="main-container">
+      <div className="row-container">
+        <DataPicker onChange={onDataSetChange} events={EVENTS} />
         <ThemePicker onChange={onThemeChange} />
         <RiseUpOverXAxis toggleRising={risingChanged} />
         <CheckVisibilitySwitcher switchVisibilityChecking={
           (value: boolean) => setVisibilityChecking(value)
         }
         />
-      </View>
-      <View style={styles.rowContainer}>
+      </div>
+      <div className="row-container">
         <LevelLimit onChange={onEventsLevelLimitChange} value={eventsLevelLimit} title="События" />
         <LevelLimit onChange={onPeriodsLevelLimitChange} value={periodsLevelLimit} title="Периоды" />
-      </View>
+      </div>
 
       <PlayerControls
         onPlay={play}
@@ -152,7 +150,7 @@ function App() {
       />
       )}
       <ClipboardData onApplyClick={applyData} />
-    </View>
+    </div>
   );
 }
 
