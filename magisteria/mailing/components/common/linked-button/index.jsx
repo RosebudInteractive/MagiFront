@@ -1,8 +1,5 @@
-import React from "react"
-import PropTypes from 'prop-types'
-import "./linked-button.sass"
-
-
+import React from "react";
+import "./linked-button.sass";
 const STYLE = {
     CELL: {
         padding: "20px 0 0",
@@ -10,7 +7,6 @@ const STYLE = {
     BUTTON: {
         TABLE: {
             width: "100%",
-            callSpacing: 0,
             borderCollapse: "collapse",
             height: "43px"
         },
@@ -50,33 +46,22 @@ const STYLE = {
             width: "100%"
         }
     },
-}
-
-
-export default class LinkedButton extends React.Component {
-
-    static propTypes = {
-        link: PropTypes.object,
-        caption: PropTypes.string,
-        isMobile: PropTypes.bool,
-    }
-
-    render() {
-        return <td style={ STYLE.BUTTON.CELL }>
-            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
-                <table style={STYLE.BUTTON.TABLE}>
-                    <tbody >
-                    <tr>
-                        <td style={STYLE.BUTTON.ITEM} className="linked-button">
-                            <a target="_blank" href={this.props.link} style={STYLE.BUTTON.LINK}>
-                                <span style={STYLE.BUTTON.LINK}>{this.props.caption}</span>
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+};
+export default function LinkedButton(props) {
+    const { link, caption, } = props;
+    return <td style={STYLE.BUTTON.CELL}>
+    <a target="_blank" href={link} style={STYLE.BUTTON.LINK}>
+      <table style={STYLE.BUTTON.TABLE} cellSpacing="0">
+        <tbody>
+        <tr>
+          <td style={STYLE.BUTTON.ITEM} className="linked-button">
+            <a target="_blank" href={link} style={STYLE.BUTTON.LINK}>
+              <span style={STYLE.BUTTON.LINK}>{caption}</span>
             </a>
-        </td>
-
-    }
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </a>
+  </td>;
 }

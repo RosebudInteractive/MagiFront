@@ -1,11 +1,4 @@
-import { Event } from '@rosebud/timeline/src/types/event'
-
-export type EventDataItem = {
-    label: string,
-    data: Event.DataItem[]
-}
-
-export type EventsData = EventDataItem[]
+import { EventsData } from '@rosebud/timeline/src/types/event'
 
 const EVENTS: EventsData = [
     {

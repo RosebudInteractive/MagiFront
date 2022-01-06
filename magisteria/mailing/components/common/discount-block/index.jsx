@@ -1,8 +1,6 @@
-import React from "react"
-import PropTypes from 'prop-types'
-import "./course-discount-block.sass"
-import LinkedButton from "../common/linked-button";
-
+import React from "react";
+import "./discount-block.sass";
+import LinkedButton from "../linked-button";
 const STYLE = {
     TABLE: {
         borderSpacing: "0",
@@ -70,7 +68,7 @@ const STYLE = {
         },
         DISCOUNT: {
             TABLE: {
-                borderSpacing:0,
+                borderSpacing: 0,
                 fontFamily: "arial,helvetica,sans-serif",
                 background: "#FFFFFF",
                 borderCollapse: "collapse",
@@ -115,60 +113,43 @@ const STYLE = {
             },
         }
     }
-
+};
+export default function DiscountBlock(props) {
+    const { promo, header, description } = props;
+    return <tr>
+    <td style={STYLE.TABLE_ROW}>
+      <table className="course-promo__table">
+        <tbody>
+        <tr>
+          <td>
+            {/* @ts-ignore */}
+            <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
+              <tbody>
+                <tr style={STYLE.DISCOUNT.HEADER}>
+                  <td>{header}</td>
+                </tr>
+                <tr style={STYLE.DISCOUNT.DESCR}>
+                  <td>{description}</td>
+                </tr>
+              </tbody>
+            </table>
+            {/* @ts-ignore */}
+            <table style={STYLE.TABLE} align="right" width="40%" className="column-table _right">
+              <tbody>
+                <tr style={{ display: "block" }}>
+                  <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                    <div style={STYLE.DISCOUNT.PROMO}>{promo}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>;
 }
-
-
-export default class CourseDiscountBlock extends React.Component {
-    static propTypes = {
-        search: PropTypes.string,
-        discounts: PropTypes.object
-    }
-
-    render() {
-        const _discount = this._getDiscount()
-
-        if (!_discount) return null
-
-        return <tr>
-            <td style={STYLE.TABLE_ROW}>
-                <table className="course-promo__table">
-                    <tbody style={STYLE.BODY}>
-                        <tr>
-                            <td>
-                                <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
-                                    <tr style={STYLE.DISCOUNT.HEADER}>
-                                        <td>{`Получите скидку ${_discount.value}%`}</td>
-                                    </tr>
-                                    <tr style={STYLE.DISCOUNT.DESCR}>
-                                        <td>{_discount.descr}</td>
-                                    </tr>
-                                </table>
-                                <table style={STYLE.TABLE} align="right" width="40%" className="column-table _right">
-                                    <tr style={{display: "block"}}>
-                                        <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                                            <div style={STYLE.DISCOUNT.PROMO}>{_discount.promo}</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-            </tr>
-    }
-
-    _getDiscount() {
-        const _params = new URLSearchParams(this.props.search),
-            _promo = _params.get('promo'),
-            _level = _params.get('lvl'),
-            _discount = _level && this.props.discounts.get(+_level - 1)
-
-        return _discount && {promo : _promo, value: _discount.value, descr: _discount.descr}
-    }
-}
-

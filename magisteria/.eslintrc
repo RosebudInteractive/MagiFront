@@ -9,6 +9,9 @@
   "plugins": [
     "react"
   ],
+  "globals": {
+    "JSX": true
+  },
   "rules": {
     "no-debugger": 0,
     "no-console": 0,
