@@ -7,7 +7,7 @@ import Social from "../components/common/social";
 import DiscountBlock from "../components/common/discount-block";
 import "../components/common/common.sass"
 
-const IMAGE_URL: string = window.location.origin + '/data/2019/01/Padenie-Ikara-Ok-1558-Hudozhnik-Piter-Breygel-Starshiy-Niderl-Pieter-Bruegel-de-Oude-ok-1525-1569.jpg'
+const IMAGE_URL: string = window.location.origin + '/data/2022/01/birthday-5-6f728f0d-0d44-4431-b5d1-6d8f9e58338e.png'
 
 type Gift = {
   header: string,
@@ -56,41 +56,45 @@ export default function NY22Promo(): JSX.Element {
         <table align="center" style={STYLES.MAIN_TABLE}>
           <tbody>
           <Logo/>
-          <Cover altText={'Win'} linkUrl={window.location.origin} imageUrl={IMAGE_URL}/>
+          <Cover altText={'Win'} linkUrl={window.location.origin} imageUrl={IMAGE_URL} height={165}/>
           <tr>
             <td>
-              <tr>
-                <td style={STYLES.PARAGRAPH.GREETING}>
-                  {message}
-                </td>
-              </tr>
-              <tr>
-                <td style={STYLES.PARAGRAPH.COMMON}>
-                  {
-                    `Накануне Нового Года мы объявили о конкурсе, в котором поучаствуют
-                    все, кто купил хотя бы один курс, начиная с 1 декабря 2021 года. Среди этих людей мы
-                    отобрали ${gift.winnerCount} победителей, кому мы вручаем бессрочные промокоды на 
-                    ${gift.courseCount} курсов. И рады сообщить, что одним из этих счастливчиков стали Вы!`
-                  }
-                </td>
-              </tr>
-              <tr>
-                <td style={STYLES.PARAGRAPH.COMMON}>
-                  Ниже - промокод, который Вы можете использовать для получения любых курсов совершенно бесплатно и в
-                  любое время, когда Вам потребуется тот или иной цикл лекций.
-                </td>
-              </tr>
-              <DiscountBlock promo={promo}
-                             header={gift.header}
-                             description={'используйте промокод для любого из платных курсов Магистерии!'}/>
-              <tr>
-                <td style={STYLES.PARAGRAPH.LAST}>
-                  Надеемся, что этот выигрыш порадует Вас и принесет пользу в таком важном деле, как саморазвитие!
-                </td>
-              </tr>
-              <tr>
-                <td style={STYLES.PARAGRAPH.LAST}>С наилучшими пожеланиями в Новом Году, Магистерия.</td>
-              </tr>
+              <table>
+                <tbody>
+                <tr>
+                  <td style={STYLES.PARAGRAPH.GREETING}>
+                    {message}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={STYLES.PARAGRAPH.COMMON}>
+                    {
+                      `Накануне Нового Года мы объявили о конкурсе, в котором поучаствуют все, кто купил хотя бы один курс
+                     после 1 декабря 2021 года. Среди этих людей мы отобрали ${gift.winnerCount} победителей, кому мы 
+                     вручаем бессрочные промокоды на ${gift.courseCount} курсов. И рады сообщить, что одним из этих 
+                     счастливчиков стали Вы!`
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td style={STYLES.PARAGRAPH.COMMON}>
+                    Ниже - промокод, который Вы можете использовать для получения любых курсов совершенно бесплатно и в
+                    любое время, когда Вам потребуется тот или иной цикл лекций.
+                  </td>
+                </tr>
+                <DiscountBlock promo={promo}
+                               header={gift.header}
+                               description={'используйте промокод для любого из платных курсов Магистерии!'}/>
+                <tr>
+                  <td style={STYLES.PARAGRAPH.LAST}>
+                    Надеемся, что этот выигрыш порадует Вас и принесет пользу в таком важном деле, как саморазвитие!
+                  </td>
+                </tr>
+                <tr>
+                  <td style={STYLES.PARAGRAPH.LAST}>С наилучшими пожеланиями в Новом Году, Магистерия.</td>
+                </tr>
+                </tbody>
+              </table>
             </td>
           </tr>
           <Social/>

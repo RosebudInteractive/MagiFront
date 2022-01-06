@@ -124,23 +124,27 @@ export default function DiscountBlock(props) {
           <td>
             {/* @ts-ignore */}
             <table style={STYLE.TABLE} align="left" width="56%" className="column-table _left">
-              <tr style={STYLE.DISCOUNT.HEADER}>
-                <td>{header}</td>
-              </tr>
-              <tr style={STYLE.DISCOUNT.DESCR}>
-                <td>{description}</td>
-              </tr>
+              <tbody>
+                <tr style={STYLE.DISCOUNT.HEADER}>
+                  <td>{header}</td>
+                </tr>
+                <tr style={STYLE.DISCOUNT.DESCR}>
+                  <td>{description}</td>
+                </tr>
+              </tbody>
             </table>
             {/* @ts-ignore */}
             <table style={STYLE.TABLE} align="right" width="40%" className="column-table _right">
-              <tr style={{ display: "block" }}>
-                <td style={STYLE.DISCOUNT.PROMO_ROW}>
-                  <div style={STYLE.DISCOUNT.PROMO}>{promo}</div>
-                </td>
-              </tr>
-              <tr>
-                <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
-              </tr>
+              <tbody>
+                <tr style={{ display: "block" }}>
+                  <td style={STYLE.DISCOUNT.PROMO_ROW}>
+                    <div style={STYLE.DISCOUNT.PROMO}>{promo}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
+                </tr>
+              </tbody>
             </table>
           </td>
         </tr>

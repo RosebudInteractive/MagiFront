@@ -60,20 +60,24 @@ type Props = {
   linkUrl: string;
   imageUrl: string;
   altText: string;
+  height?: number;
 }
 
 export default function Cover(props: Props): JSX.Element {
 
-  const { imageUrl, linkUrl, altText } = props;
+  const {imageUrl, linkUrl, altText, height} = props;
 
   return <React.Fragment>
     <tr>
       <td style={STYLE.IMAGE_CELL}>
         <a target="_blank" href={linkUrl}>
-          <img src={imageUrl} width="552" alt={altText} style={STYLE.IMG}/>
+          {
+            height
+              ? <img src={imageUrl} width="552" height={height.toString()} alt={altText} style={STYLE.IMG}/>
+              : <img src={imageUrl} width="552" alt={altText} style={STYLE.IMG}/>
+          }
         </a>
       </td>
     </tr>
   </React.Fragment>
 }
-
