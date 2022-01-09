@@ -66,7 +66,7 @@ export default function OurBirthday() {
                       ${gift.text}. Вы можете воспользоваться им в течение всего года вплоть до 31 декабря.`}
                   </td>
                 </tr>
-                <DiscountBlock promo={promo} header={gift.header} description={<div>используйте промокод для любого из платных курсов до 31&nbsp;декабря
+                <DiscountBlock promo={promo} header={gift.header} description={<div>Используйте промокод для любого из платных курсов до 31&nbsp;декабря
                                  2022</div>}/>
                 <tr>
                   <td style={STYLES.PARAGRAPH.LAST}>
