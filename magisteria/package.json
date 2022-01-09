@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "ts-watch": "tsc --project tsconfig.json -watch"
+    "ts": "tsc --project tsconfig.json -watch"
   },
   "author": "",
   "license": "ISC",

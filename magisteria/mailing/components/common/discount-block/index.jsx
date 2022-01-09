@@ -142,7 +142,7 @@ export default function DiscountBlock(props) {
                   </td>
                 </tr>
                 <tr>
-                  <LinkedButton caption={"Выбрать курс"} link={window.location.origin} isMobile={false}/>
+                  <LinkedButton caption={"Выбрать курс"} link={window.location.origin}/>
                 </tr>
               </tbody>
             </table>

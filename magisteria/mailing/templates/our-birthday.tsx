@@ -86,7 +86,7 @@ export default function OurBirthday(): JSX.Element {
                 </tr>
                 <DiscountBlock promo={promo}
                                header={gift.header}
-                               description={<div>используйте промокод для любого из платных курсов до 31&nbsp;декабря
+                               description={<div>Используйте промокод для любого из платных курсов до 31&nbsp;декабря
                                  2022</div>}/>
                 <tr>
                   <td style={STYLES.PARAGRAPH.LAST}>
