@@ -9,7 +9,7 @@ import Webix from "../../Webix";
 import type {FilterField} from "../../filter/types";
 import {
     deleteUser,
-    fetchingSelector,
+    fetchingSelector as userDictionaryFetching,
     getUsers,
     selectUser,
     toggleUserForm,
@@ -24,6 +24,12 @@ import './users.sass'
 import PlusIco from "tt-assets/svg/plus.svg";
 import UserForm from "./form/form";
 import {hasAdminRights} from "tt-ducks/auth";
+import {
+    fetchingSelector as rolesFetching,
+    getRights,
+    getRolesWithPermissions,
+    rolesPermissionsSelector
+} from "tt-ducks/access-rights-dictionary";
 
 let _usersCount = 0;
 
@@ -79,7 +85,9 @@ const DictionaryUsers = (props) => {
         actions.setInitState(initState);
 
         if (!fetching) {
-            actions.getUsers()
+            actions.getUsers();
+            actions.getRolesWithPermissions();
+            actions.getRights();
         }
 
 
@@ -181,7 +189,7 @@ const DictionaryUsers = (props) => {
                 </div>
 
                 {props.modalVisible
-                    ? <Route exact path="/dictionaries/users/:id" component={UserForm} />
+                    ? <Route path="/dictionaries/users/:id" component={UserForm} />
                     : null
                 }
             </div>
@@ -193,7 +201,8 @@ const DictionaryUsers = (props) => {
 const mapState2Props = (state) => {
     return {
         users: usersDictionarySelector(state),
-        fetching: fetchingSelector(state),
+        rolesPermissions: rolesPermissionsSelector(state),
+        fetching: userDictionaryFetching(state) || rolesFetching(state),
         modalVisible: userFormOpenedSelector(state),
         isAdmin: hasAdminRights(state),
     }
@@ -203,6 +212,8 @@ const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
             getUsers,
+            getRights,
+            getRolesWithPermissions,
             applyFilter,
             setInitState,
             setPathname,
