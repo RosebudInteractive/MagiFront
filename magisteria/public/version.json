@@ -3,17 +3,17 @@
   "popup": {
     "storePopup": {
       "ios": {
-        "visible": false
+        "visible": true
       },
       "android": {
-        "visible": false
+        "visible": true
       }
     },
     "sale2021": {
       "visible": false
     },
     "sale2022": {
-      "visible": true
+      "visible": false
     }
   },
   "mobileApp": {
