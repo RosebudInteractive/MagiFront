@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useState} from "react";
 import "./permissions.sass"
 import {Dropdown, InputPicker, Nav, Sidenav} from 'rsuite';
 
@@ -6,14 +6,16 @@ import {Dropdown, InputPicker, Nav, Sidenav} from 'rsuite';
 const Permissions = (props) => {
     const {permissionScheme, onDirty, onChangeCb, readOnly, opened} = props;
     const [permissionVals, setPermissionVals] = useState(new Map());
-    const refs = useRef({});
 
-    const onChange = (value, pItem) => {
+    const onChange = (value, pItem, ev) => {
+
         const pVals = new Map(permissionVals);
         const newVal = value !== null ? value : pItem.default;
 
-        if (newVal === pItem.default) {
-            pVals.has(pItem.permissionCode) && pVals.delete(pItem.permissionCode);
+        if (newVal === pItem.value) {
+            if(pVals.has(pItem.permissionCode)){
+                pVals.delete(pItem.permissionCode);
+            }
         } else {
             pVals.set(pItem.permissionCode, newVal);
         }
@@ -30,7 +32,6 @@ const Permissions = (props) => {
 
         setPermissionVals(pVals);
     };
-
 
     const cleanable = function (permissionItem, val) {
         if (readOnly) {
@@ -71,16 +72,16 @@ const Permissions = (props) => {
                                                     pointerEvents: readOnly ? 'none' : 'auto',
                                                     color: 'orange'
                                                 }} size="xs" menuStyle={{fontSize: '12px', color: 'orange !important'}}
-                                                             ref={el => refs.current[permissionItem.permissionCode] = el}
                                                              cleanable={cleanable(permissionItem, permissionVals.get(permissionItem.permissionCode))}
                                                              data={permissionItem.values}
                                                              renderValue={(v, i) => {
                                                                  return <div
                                                                      className={`selected-option ${(v === permissionItem.default) ? 'grey' : 'black'}`}>{i.label}</div>;
                                                              }}
-                                                             value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode) : permissionItem.default}
-                                                             onChange={val => onChange(val, permissionItem)}
-                                                             defaultValue={permissionItem.value}/>
+                                                             value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode) : permissionItem.value}
+                                                             onChange={(val, ev) => onChange(val, permissionItem, ev)}
+                                                             defaultValue={permissionItem.value}
+                                                             />
                                             </div>
                                         </div>
 
