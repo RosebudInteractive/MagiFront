@@ -6,6 +6,7 @@ import DiscountTitle from "../../../../billing/discount-title";
 import PropTypes from "prop-types";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import GiftButton from "../../../../billing/gift-button";
+import AvailabilityTitle from "../../../availability-title";
 
 class BillingBlock extends React.Component {
 
@@ -36,6 +37,7 @@ class BillingBlock extends React.Component {
                 </div>
             </div>
             <GiftButton course={course}/>
+            <AvailabilityTitle/>
         </React.Fragment>
     }
 }

@@ -8,6 +8,7 @@ import $ from "jquery";
 import GiftButton from "../../billing/gift-button";
 import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 import {localSettingsSelector} from "ducks/app";
+import AvailabilityTitle from "../availability-title";
 
 const REFRESH_INTERVAL = 60 * 1000
 
@@ -57,6 +58,7 @@ class MobileButton extends React.Component {
                     </div>
                 </div>
                 <DiscountTitle course={course}/>
+                <AvailabilityTitle />
             </div>
     }
 
