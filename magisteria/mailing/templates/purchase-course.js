@@ -61,7 +61,7 @@ class PurchaseCourse extends React.Component {
                                         </tr>
                                         <tr><td style={STYLES.PARAGRAPH.COMMON}>Вы можете приступить к просмотру и чтению лекций в любое время.</td></tr>
                                         <tr><td style={STYLE.TEXT}>Для просмотра авторизуйтесь на Магистерии под той учетной записью, в которой Вы оплатили этот курс.</td></tr>
-                                        <CourseDiscountBlock search={this.props.location.search} discounts={this.props.discounts}/>
+                                        <CourseDiscountBlock searchParams={this.props.location.search} discounts={this.props.discounts}/>
                                         <tr>
                                             <td style={STYLES.PARAGRAPH.COMMON}>
                                                 Доступ к курсу не ограничивается по времени. Вы можете изучать его в своем ритме, прерывать прослушивание в любом месте,

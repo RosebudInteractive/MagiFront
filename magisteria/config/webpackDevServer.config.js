@@ -10,6 +10,7 @@ const paths = require('./paths');
 const getHttpsConfig = require('./getHttpsConfig');
 
 const host = process.env.HOST || '0.0.0.0';
+const proxyUrl = process.env.PROXY_URL || 'http://localhost:3000';
 const sockHost = process.env.WDS_SOCKET_HOST;
 const sockPath = process.env.WDS_SOCKET_PATH; // default: '/sockjs-node'
 const sockPort = process.env.WDS_SOCKET_PORT;
@@ -112,17 +113,17 @@ module.exports = function (proxy, allowedHost) {
     // proxy,
     proxy: {
       '/api/': {
-        target: 'http://localhost:3000',
+        target: proxyUrl,
         secure: false,
         changeOrigin: true,
       },
       '/data': {
-        target: 'http://localhost:3000',
+        target: proxyUrl,
         secure: false,
         changeOrigin: true,
       },
       '/doc/': {
-        target: 'http://localhost:3000',
+        target: proxyUrl,
         secure: false,
         changeOrigin: true,
       },

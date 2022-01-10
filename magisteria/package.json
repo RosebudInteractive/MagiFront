@@ -1,11 +1,12 @@
 {
   "name": "magisteria",
   "version": "9.0.1",
-  "description": "Magisteria fronent",
+  "description": "Magisteria frontend",
   "main": "index.js",
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "ts": "tsc --project tsconfig.json -watch"
   },
   "author": "",
   "license": "ISC",
@@ -42,13 +43,11 @@
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.26.1",
-    "express": "^4.16.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^1.1.6",
     "flow-bin": "^0.145.0",
     "html-webpack-plugin": "^4.5.2",
     "mini-css-extract-plugin": "^0.5.0",
-    "morgan": "^1.9.1",
     "node-sass": "^4.11.0",
     "postcss-loader": "^2.0.10",
     "precss": "^2.0.0",

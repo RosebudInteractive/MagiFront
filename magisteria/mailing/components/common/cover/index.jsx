@@ -1,6 +1,4 @@
-import React from "react"
-import PropTypes from 'prop-types'
-
+import React from "react";
 const STYLE = {
     TITLE: {
         fontFamily: "Arial",
@@ -36,7 +34,7 @@ const STYLE = {
             color: "#2F2F2F",
         },
     },
-    IMG : {
+    IMG: {
         border: 0,
         width: "100%",
         display: "block",
@@ -44,27 +42,18 @@ const STYLE = {
     IMAGE_CELL: {
         width: "552px",
     }
+};
+export default function Cover(props) {
+    const { imageUrl, linkUrl, altText, height } = props;
+    return <React.Fragment>
+    <tr>
+      <td style={STYLE.IMAGE_CELL}>
+        <a target="_blank" href={linkUrl}>
+          {height
+            ? <img src={imageUrl} width="552" height={height.toString()} alt={altText} style={STYLE.IMG}/>
+            : <img src={imageUrl} width="552" alt={altText} style={STYLE.IMG}/>}
+        </a>
+      </td>
+    </tr>
+  </React.Fragment>;
 }
-
-export default class CourseCover extends React.Component {
-
-    static propTypes = {
-        course: PropTypes.object,
-    }
-
-    render() {
-        const {course} = this.props,
-            _coverUrl = course.LandCover ? course.LandCover : course.Cover
-
-        return <React.Fragment>
-                <tr>
-                    <td style={STYLE.IMAGE_CELL}>
-                        <a target="_blank" href={course.URL}>
-                            <img src={_coverUrl} width="552" alt={course.Name} style={STYLE.IMG}/>
-                        </a>
-                    </td>
-                </tr>
-            </React.Fragment>
-    }
-}
-

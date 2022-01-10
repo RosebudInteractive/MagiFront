@@ -19,7 +19,7 @@ import {
     timelinesSelector,
     updateTimeline,
 } from "tt-ducks/timelines";
-import {coursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
+import {allCoursesSelector, getAllLessons, lessonsSelector} from "tt-ducks/dictionary";
 import {
     addTemporaryEvent,
     cleanFound as cleanFoundEvents,
@@ -477,7 +477,7 @@ const mapState2Props = (state) => {
         periodEditorOpened: periodEditorOpenedSelector(state),
         selectedPeriod: currentPeriodSelector(state),
         findedPeriods: findedPeriodsSelector(state),
-        courses: coursesSelector(state),
+        courses: allCoursesSelector(state),
         editorValues: getFormValues(HEADER_EDITOR_NAME)(state),
         hasChanges: isDirty(HEADER_EDITOR_NAME)(state),
         selectedCommand: currentCommandSelector(state),

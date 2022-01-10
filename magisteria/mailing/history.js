@@ -1,5 +1,5 @@
-import createBrowserHistory from 'history/createBrowserHistory'
+import {createBrowserHistory} from "history"
 
-const browserHistory = createBrowserHistory()
+const browserHistory = createBrowserHistory({basename: "mailing"})
 
 export default browserHistory

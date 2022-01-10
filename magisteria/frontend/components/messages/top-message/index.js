@@ -5,8 +5,9 @@ import {bindActionCreators} from 'redux';
 import "./top-message.sass"
 import StorePopup from "./store-popup";
 import {mobileAppSelector, popupSelector} from "ducks/version";
-import {localSettingsSelector, storePopupClose, setAppDivTop, sale2021PopupClose} from "ducks/app";
+import {localSettingsSelector, storePopupClose, setAppDivTop, sale2021PopupClose, sale2022PopupClose} from "ducks/app";
 import Sale2021 from "./sale2021";
+import Sale2022 from "./sale2022";
 
 const _divRef = React.createRef()
 
@@ -39,6 +40,11 @@ function TopMessage(props) {
                   onClose={props.actions.sale2021PopupClose}
                   onReady={_onResize}
                   headerVisible={headerVisible && pageHeaderState.visibility}/>
+        <Sale2022 config={config.sale2022}
+                  confirmed={localSettings.popup.sale2022PopupConfirmed}
+                  onClose={props.actions.sale2022PopupClose}
+                  onReady={_onResize}
+                  headerVisible={headerVisible && pageHeaderState.visibility}/>
     </div>
 }
 
@@ -57,7 +63,12 @@ const mapState2Props = (state) => {
 
 const masDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({storePopupClose, sale2021PopupClose, setAppDivTop}, dispatch)
+        actions: bindActionCreators({
+            storePopupClose,
+            sale2021PopupClose,
+            sale2022PopupClose,
+            setAppDivTop
+        }, dispatch)
     }
 }
 

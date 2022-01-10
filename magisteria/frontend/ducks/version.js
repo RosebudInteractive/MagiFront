@@ -34,7 +34,8 @@ const MobileAppRecord = Record({
 
 const PopupRecord = Record({
     storePopup: new StorePopupRecord(),
-    sale2021: new Record({ visible: false })
+    sale2021: new Record({ visible: false }),
+    sale2022: new Record({ visible: false })
 })
 /**
  * Reducer
@@ -91,7 +92,7 @@ export const loadVersion = () => {
             payload: null
         });
 
-        fetch('/version.json')
+        fetch('/static/version.json')
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

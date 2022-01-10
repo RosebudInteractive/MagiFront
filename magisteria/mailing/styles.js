@@ -1,16 +1,14 @@
 export const STYLES = {
-    CENTER_WRAPPER : {
+    CENTER_WRAPPER: {
         width: "100%",
         tableLayout: "fixed",
         paddingBottom: "7px",
     },
-
     WEBKIT: {
         maxWidth: "600px",
     },
-
     MAIN_TABLE: {
-        borderSpacing:0,
+        borderSpacing: 0,
         fontFamily: "arial,helvetica,sans-serif",
         background: "#FFFFFF",
         borderCollapse: "collapse",
@@ -21,7 +19,7 @@ export const STYLES = {
         verticalAlign: "top",
     },
     MAIN_TABLE_EXT: {
-        borderSpacing:0,
+        borderSpacing: 0,
         fontFamily: "arial,helvetica,sans-serif",
         background: "#FFFFFF",
         borderCollapse: "collapse",
@@ -31,7 +29,7 @@ export const STYLES = {
         border: "none",
         verticalAlign: "top",
     },
-        SPACE_TABLE: {
+    SPACE_TABLE: {
         width: "24px",
         padding: "0px",
         color: "rgb(255, 255, 255)"
@@ -39,18 +37,15 @@ export const STYLES = {
     CONTENT_TABLE: {
         padding: "0px",
     },
-
     LOGO: {
         height: "80px"
     },
-
     LINK: {
         fontStyle: "normal",
         color: "#C8684C",
         display: "inline",
         textDecoration: "none"
     },
-
     PARAGRAPH: {
         GREETING: {
             paddingTop: "30px",
@@ -80,7 +75,6 @@ export const STYLES = {
             lineHeight: "130%",
         },
     },
-
     PROMO: {
         display: "inline",
         paddingTop: "9px",
@@ -94,4 +88,4 @@ export const STYLES = {
         color: "#2B2B2B",
         backgroundColor: "rgba(0, 0, 0, 0.05)"
     },
-}
+};

@@ -20,3 +20,10 @@ export namespace Event {
     public calculatedDate: number;
   }
 }
+
+export type EventDataItem = {
+  label: string,
+  data: Event.DataItem[]
+}
+
+export type EventsData = EventDataItem[]
