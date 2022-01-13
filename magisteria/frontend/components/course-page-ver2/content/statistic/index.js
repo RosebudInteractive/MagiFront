@@ -14,7 +14,7 @@ import {SocialBlock} from "./social-block";
  import BillingBlock from "./billing-block";
  import ReviewButton from "./review-button";
  import {localSettingsSelector} from "ducks/app";
- import AvailabilityTitle from "../../availability-title";
+ import AvailabilityTitle from "./availability-title";
 
 const FIXED_BLOCK_MARGIN_TOP = 58
 

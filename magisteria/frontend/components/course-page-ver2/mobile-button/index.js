@@ -8,7 +8,7 @@ import $ from "jquery";
 import GiftButton from "../../billing/gift-button";
 import CourseDiscounts, {getExpireTitle} from "tools/course-discount";
 import {localSettingsSelector} from "ducks/app";
-import AvailabilityTitle from "../availability-title";
+import AvailabilityTitle from "../content/statistic/availability-title";
 
 const REFRESH_INTERVAL = 60 * 1000
 
@@ -58,14 +58,13 @@ class MobileButton extends React.Component {
                     </div>
                 </div>
                 <DiscountTitle course={course}/>
-                <AvailabilityTitle />
             </div>
     }
 
     _getMarginBottom() {
         let _message = $('.js-cookies-popup')
 
-        return (_message && _message.length) ? _message.height() + 8 : 6
+        return (_message && _message.length) ? _message.height() : 6
     }
 }
 
