@@ -26,6 +26,8 @@ import {
 } from "tt-ducks/access-rights-dictionary";
 
 import roleMerger from "../../../../tools/role-merger";
+import Box from "@material-ui/core/Box";
+import Chip from "@material-ui/core/Chip";
 
 
 //todo import validators
@@ -53,7 +55,7 @@ const UserForm = (props) => {
 
     const permissionSchemeLinear = useMemo(() => {
         roleMerger.init(permissionScheme);
-        return roleMerger.getMergedRolesLinear(rolesPermissions);
+        return roleMerger.getMergedRolesLinearByMaxValue(rolesPermissions);
     }, [permissionScheme, roles, userData, rolesPermissions]);
 
     const userRoles = useMemo(() => {
@@ -95,7 +97,7 @@ const UserForm = (props) => {
     const userFormData = useMemo(() => ({
         displayName: (userData && userData.DisplayName) ? userData.DisplayName : '',
         email: (userData && userData.Email) ? userData.Email : '',
-        role: (userData && userData.Role) ? userData.Role : ''
+        role: (userData && userData.Role) ? [...userData.Role] : []
     }), [userData]);
 
     return (
@@ -147,9 +149,18 @@ const UserForm = (props) => {
                                     <div className='user-form__field'>
                                         <Field name="role"
                                                component={Select}
+                                               multiple={true}
                                                label={"Роль"}
                                                required={true}
                                                options={userRoles}
+                                               renderValue={(selected) => (
+                                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                       {selected.map((value) => (
+                                                           <Chip key={value} label={value} />
+                                                       ))}
+                                                   </Box>
+                                               )}
+                                               multipleWithCheckboxes={true}
                                                validate={ComposeValidators(vRequired)}>
                                         </Field>
                                     </div>

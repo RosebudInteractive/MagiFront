@@ -1,6 +1,8 @@
 import React, {useEffect, useRef} from "react"
 import {FormControl, InputLabel, MenuItem, Select, withStyles,} from "@material-ui/core"
 import {makeStyles} from "@material-ui/core/styles"
+import Checkbox from "@material-ui/core/Checkbox/Checkbox";
+import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 
 const CssFormControl = withStyles({
     root: {
@@ -127,6 +129,7 @@ export default function UiSelect(props) {
             disabled={props.disabled}
             readOnly={props.readOnly}
             ref={select}
+            renderValue={props.renderValue}
             MenuProps={{
                 classes: { paper: classes.menuPaper },
                 transitionDuration: 50,
@@ -138,7 +141,17 @@ export default function UiSelect(props) {
         >
             { !props.required && <MenuItem value="" classes={ {root: classes.listItem} }/> }
             {
-                props.options && props.options.map((item, index) => {return <MenuItem classes={ {root: classes.listItem} } value={item.id} key={index}>{item.name}</MenuItem>})
+                (props.options && !props.multipleWithCheckboxes) && props.options.map((item, index) => {return <MenuItem classes={ {root: classes.listItem} } value={item.id} key={index}>{item.name}</MenuItem>})
+            }
+
+
+            {
+                (props.options && props.multipleWithCheckboxes) && props.options.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                            <Checkbox  />
+                            <ListItemText primary={item.name} />
+                        </MenuItem>
+                    ))
             }
         </Select>
     </CssFormControl>

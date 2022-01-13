@@ -76,7 +76,7 @@ const Permissions = (props) => {
                                                              data={permissionItem.values}
                                                              renderValue={(v, i) => {
                                                                  return <div
-                                                                     className={`selected-option ${(v === permissionItem.default) ? 'grey' : 'black'}`}>{i.label}</div>;
+                                                                     className={`selected-option ${(v === permissionItem.default || readOnly) ? 'grey' : 'black'}`}>{i.label}</div>;
                                                              }}
                                                              value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode) : permissionItem.value}
                                                              onChange={(val, ev) => onChange(val, permissionItem, ev)}

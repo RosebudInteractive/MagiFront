@@ -1,4 +1,7 @@
 import _ from 'lodash';
+function customizer(objValue, srcValue) {
+    return objValue >= srcValue ? objValue : srcValue;
+}
 const roleMerger = {
     defaultScheme: {},
     init(scheme) {
@@ -9,8 +12,17 @@ const roleMerger = {
         const rolesPermissionsMerged = _.merge({}, ...rolesPermissionsArray);
         return { ...roles[0], Permissions: rolesPermissionsMerged };
     },
+    getMergedRolesByMaxValue(roles) {
+        const rolesPermissionsArray = roles.map((role) => role.Permissions);
+        const rolesPermissionsMerged = _.mergeWith({}, ...rolesPermissionsArray, customizer);
+        return { ...roles[0], Permissions: rolesPermissionsMerged };
+    },
     getMergedRolesLinear(roles) {
         const role = roleMerger.getMergedRoles(roles); //
+        return roleMerger.getMergedLinearStructure(role);
+    },
+    getMergedRolesLinearByMaxValue(roles) {
+        const role = roleMerger.getMergedRolesByMaxValue(roles); //
         return roleMerger.getMergedLinearStructure(role);
     },
     getMergedRole(role) {

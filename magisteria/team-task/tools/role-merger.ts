@@ -16,7 +16,13 @@ interface RoleMerger {
   getMergedRole: (role: Role) => Role,
   getMergedLinearStructure: Function,
   getMergedRoles: Function,
+  getMergedRolesByMaxValue: Function,
+  getMergedRolesLinearByMaxValue: Function,
   getMergedRolesLinear: Function
+}
+
+function customizer(objValue: number, srcValue: number) {
+  return objValue >= srcValue ? objValue : srcValue;
 }
 
 const roleMerger: RoleMerger = {
@@ -30,8 +36,20 @@ const roleMerger: RoleMerger = {
     return { ...roles[0], Permissions: rolesPermissionsMerged };
   },
 
+  getMergedRolesByMaxValue(roles: any[]) {
+    const rolesPermissionsArray = roles.map((role) => role.Permissions);
+    const rolesPermissionsMerged = _.mergeWith({}, ...rolesPermissionsArray, customizer);
+    return { ...roles[0], Permissions: rolesPermissionsMerged };
+  },
+
   getMergedRolesLinear(roles: any []) {
     const role = roleMerger.getMergedRoles(roles); //
+
+    return roleMerger.getMergedLinearStructure(role);
+  },
+
+  getMergedRolesLinearByMaxValue(roles: any []) {
+    const role = roleMerger.getMergedRolesByMaxValue(roles); //
 
     return roleMerger.getMergedLinearStructure(role);
   },
