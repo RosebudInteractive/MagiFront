@@ -8,13 +8,13 @@ export default function AvailabilityTitle() {
       <div className="_image">
         <Card />
       </div>
-      <div className="_text">После покупки, курс будет доступен всегда.</div>
+      <div className="_text">После покупки курс будет доступен всегда</div>
     </div>
     <div className="course__availability-title__item font-universal__body-small">
       <div className="_image">
         <Play />
       </div>
-      <div className="_text">Смотреть, слушать и читать можно будет в любое удобное время.</div>
+      <div className="_text">Смотреть, слушать и читать можно будет в любое удобное время</div>
     </div>
   </div>;
 }
