@@ -11,13 +11,14 @@ type Props = {
   item: VisualItem,
   indent: number,
   onClose: (event: GestureResponderEvent) => void,
+  onCenter: (event: GestureResponderEvent) => void,
   pinned?: boolean,
 };
 
 // eslint-disable-next-line react/function-component-definition
 export default function Message(props: Props): JSX.Element {
   const {
-    item, onClose, indent, pinned,
+    item, onClose, onCenter, indent, pinned,
   } = props;
 
   const wrapperStyle = useMemo<ViewStyle>(
@@ -41,6 +42,7 @@ export default function Message(props: Props): JSX.Element {
 
   return (
     <View style={[styles.wrapper, wrapperStyle]}>
+      <TouchableOpacity onPress={onCenter}>
       <View style={[styles.header, { backgroundColor: item.color }]}>
         <View style={styles.headerText}>
           <Text style={styles.title} numberOfLines={3}>{item.name}</Text>
@@ -59,6 +61,7 @@ export default function Message(props: Props): JSX.Element {
           <Text style={styles.description}>{item.description}</Text>
         </View>
       </View>
+      </TouchableOpacity>
     </View>
   );
 }
