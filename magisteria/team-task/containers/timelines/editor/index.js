@@ -102,6 +102,7 @@ function TimelineEditorContainer(props) {
     } = props;
     const [timeline, setTimeline] = useState(null);
     const [levels, setLevels] = useState({events: 3, periods: 3});
+    const [minLineWidth, setMinLineWidth] = useState(1000);
     const detailsEditor = useRef(null);
     const detailsTitle = useRef(null);
     const finderForm = useRef(null);
@@ -126,7 +127,7 @@ function TimelineEditorContainer(props) {
             switch (type) {
                 case 'periods':
                     detailsEditor.current = PeriodForm;
-                    detailsTitle.current = 'period'; //todo do with const, for example DETAILS_TITLE = {0: 'Период'} etc
+                    detailsTitle.current = 'period';
                     if (sTimeline.Periods && sTimeline.Periods.length > 0 && sTimeline.Periods.find(pr => (pr.Id) && pr.Id === id)) {
                         const periodToSet = sTimeline.Periods.find(pr => pr.Id === id);
                         actions.openPeriodEditor({periodId: id, period: periodToSet, timelineId: sTimeline.Id});
@@ -383,10 +384,11 @@ function TimelineEditorContainer(props) {
                 <React.Fragment>
                     <Prompt when={props.hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
-                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave} onLevelsChanged={onLevelsChanged}/>
+                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave} onLevelsChanged={onLevelsChanged} onMinLineWidthChanged={(val) => setMinLineWidth(val)}/>
                     <TimelinePreview background={props.editorValues && props.editorValues.Image}
                                      timeline={timeline}
-                                     levels={levels}/>
+                                     levels={levels}
+                                     minLineWidth={minLineWidth}/>
                     <TimelineDetails actions={{
                         events: {
                             headerClickAction: () => { },

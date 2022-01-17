@@ -20,7 +20,7 @@ type Props = {
 }
 
 function TimelineHeader(props: Props) {
-    const {timeline, lessons, courses, onSave, invalid, dirty, editorValues, onLevelsChanged} = props
+    const {timeline, lessons, courses, onSave, invalid, dirty, editorValues, onLevelsChanged, onMinLineWidthChanged} = props
 
     useEffect(() => {
         if (timeline) {
@@ -34,7 +34,8 @@ function TimelineHeader(props: Props) {
                 Order: timeline.Order ? +timeline.Order : null,
                 EventLevel: timeline.EventLevel ? timeline.EventLevel : null,
                 PeriodLevel: timeline.PeriodLevel ? timeline.PeriodLevel : null,
-                PeriodsOverAxis: timeline.PeriodsOverAxis ? timeline.PeriodsOverAxis : null
+                PeriodsOverAxis: timeline.PeriodsOverAxis ? timeline.PeriodsOverAxis : null,
+                MinLineWidth: timeline.MinLineWidth ? timeline.MinLineWidth : 1000
             };
 
             props.initialize(_initValues)
@@ -122,6 +123,18 @@ function TimelineHeader(props: Props) {
                            placeholder="Уровни периодов"
                            onChange={(val) => {
                                val.target.value.length > 0 && val.target.value >= 0 && onLevelsChanged({periods: +val.target.value});
+                           }}/>
+
+                    <Field name="MinLineWidth"
+                           inputProps={{min: 500}}
+                           required={false}
+                           minValue={500}
+                           component={TextBox}
+                           type={"number"}
+                           label={"Минимальная ширина"}
+                           placeholder="Минимальная ширина"
+                           onChange={(val) => {
+                               val.target.value.length > 0 && val.target.value >= 0 && onMinLineWidthChanged( +val.target.value);
                            }}/>
                     <Field name="PeriodsOverAxis" component={Checkbox} label={"Периоды над осью"}
                            placeholder="Показывать периоды над осью"/>
