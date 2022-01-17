@@ -131,8 +131,8 @@ function TimelineHeader(props: Props) {
                            minValue={500}
                            component={TextBox}
                            type={"number"}
-                           label={"Минимальная ширина"}
-                           placeholder="Минимальная ширина"
+                           label={"Мин.ширина"}
+                           placeholder="Мин.ширина"
                            onChange={(val) => {
                                val.target.value.length > 0 && val.target.value >= 0 && onMinLineWidthChanged( +val.target.value);
                            }}/>
