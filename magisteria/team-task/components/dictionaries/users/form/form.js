@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form} from "react-final-form";
 import {USER_ROLE_STRINGS} from "../../../../constants/dictionary-users";
 import "./form.sass"
-import {Select, TextBox} from '../../../ui-kit'
+import {MultipleSelect, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedUser,
     findUserByEmail,
@@ -148,7 +148,7 @@ const UserForm = (props) => {
                                     </div>
                                     <div className='user-form__field'>
                                         <Field name="role"
-                                               component={Select}
+                                               component={MultipleSelect}
                                                multiple={true}
                                                label={"Роль"}
                                                required={true}
@@ -160,7 +160,6 @@ const UserForm = (props) => {
                                                        ))}
                                                    </Box>
                                                )}
-                                               multipleWithCheckboxes={true}
                                                validate={ComposeValidators(vRequired)}>
                                         </Field>
                                     </div>
