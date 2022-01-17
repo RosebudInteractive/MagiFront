@@ -190,7 +190,8 @@ function TimelineEditorContainer(props) {
             Options: {
                 events: +values.EventLevel,
                 periods: +values.PeriodLevel,
-                periodsOverAxis: values.PeriodsOverAxis
+                periodsOverAxis: values.PeriodsOverAxis,
+                minLineWidth: +values.MinLineWidth
             }
         };
 
