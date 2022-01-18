@@ -77,14 +77,17 @@ const UserForm = (props) => {
             if (_oldRoles.pms) delete _oldRoles.pms
             if (_oldRoles.pme) delete _oldRoles.pme
             if (_oldRoles.pmu) delete _oldRoles.pmu
+            if (_oldRoles.a) delete _oldRoles.a
 
-            _oldRoles[userInfo.role] = 1
+            userInfo.role.map(role => {
+                _oldRoles[role] = 1
+            });
         }
 
         const data = {...userData,
             PData: {
                 roles: _oldRoles,
-                isAdmin: (userInfo.role && (userInfo.role === 'a'))
+                isAdmin: (userInfo.role && (userInfo.role === 'a')) || (userInfo.role && userInfo.role.length > 1 && userInfo.role.includes('a'))
             }};
         actions.saveUserChanges(data);
         closeModalForm()
@@ -154,9 +157,9 @@ const UserForm = (props) => {
                                                required={true}
                                                options={userRoles}
                                                renderValue={(selected) => (
-                                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxWidth: '240px' }}>
                                                        {selected.map((value) => (
-                                                           <Chip key={value} label={value} />
+                                                           <Chip key={value} label={USER_ROLE_STRINGS[value]} />
                                                        ))}
                                                    </Box>
                                                )}

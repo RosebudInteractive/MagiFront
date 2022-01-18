@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react"
+import React, {useEffect, useRef, useState} from "react"
 import {FormControl, InputLabel, MenuItem, Select, withStyles,} from "@material-ui/core"
 import {makeStyles} from "@material-ui/core/styles"
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
@@ -7,6 +7,7 @@ import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 const CssFormControl = withStyles({
     root: {
         minHeight: "48px",
+        maxWidth: '240px',
         '& label': {
             "font-family": "Inter",
             "font-size": "13px",
@@ -46,6 +47,9 @@ const CssFormControl = withStyles({
                 borderRadius: "8px",
                 padding: "7px !important",
                 border: '1px solid #D2D2D6',
+                height: '30px',
+                maxWidth: '240px',
+                overflowX: 'auto',
                 "-webkit-transition": "border, background 300ms ease-out",
                 "-moz-transition": "border, background 300ms ease-out",
                 "-o-transition": "border, background 300ms ease-out",
@@ -95,7 +99,6 @@ const useStyles = makeStyles(theme => ({
 
     },
     listItem: {
-        color: 'red',
         fontFamily: "Inter",
         "font-size": "11px",
         "font-style": "normal",
@@ -113,6 +116,17 @@ export default function UiMultiSelect(props) {
 
     const id = useRef(),
         select = useRef()
+
+    const [values, setValues] = useState(props.input.value);
+
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+
+
+        setValues(value);
+    };
 
     useEffect(() => {
         id.current = props.id ? props.id : "ui-multi-select" + Math.floor(Math.random() * 10000)
@@ -135,7 +149,9 @@ export default function UiMultiSelect(props) {
             disabled={props.disabled}
             readOnly={props.readOnly}
             ref={select}
+            // value={values}
             renderValue={props.renderValue}
+            // onChange={handleChange}
             MenuProps={{
                 classes: { paper: classes.menuPaper },
                 transitionDuration: 50,
@@ -148,8 +164,8 @@ export default function UiMultiSelect(props) {
 
             {
                 props.options && props.options.map((item, index) => (
-                        <MenuItem onClick={logClick} key={item.id} value={item} classes={ {root: classes.listItem} }>
-                            <Checkbox checked={props.value && props.value.indexOf(item.name) > -1}/>
+                        <MenuItem onClick={logClick} key={index} value={item.id} classes={ {root: classes.listItem} }>
+                            <Checkbox color={'orange'} checked={props.input.value && props.input.value.indexOf(item.id) > -1}/>
                             <ListItemText primary={item.name} />
                         </MenuItem>
                     ))
