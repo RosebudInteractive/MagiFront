@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import './preview.sass'
-import {Themes, Timeline, convertData} from "timeline/index";
+import {convertData, Themes, Timeline} from "timeline/index";
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "../../../tools/get-inner-size";
@@ -9,7 +9,7 @@ import {PlatformTool} from "tools/platform-tools";
 let enableSwitch = true;
 
 export default function TimelinePreview(props: Props) {
-    const {timeline, background, levels} = props;
+    const {timeline, background, levels, minLineWidth} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(500);
     const [incKey, setIncKey] = useState(0);
@@ -27,13 +27,11 @@ export default function TimelinePreview(props: Props) {
         }
 
         if (enableSwitch && (data.width < 900)) {
-            console.log(data.width)
             enableSwitch = false;
             setEnableFSSwitch(enableSwitch);
         }
 
         if (!enableSwitch && (data.width >= 900)) {
-            console.log(data.width)
             enableSwitch = true;
             setEnableFSSwitch(enableSwitch);
         }
@@ -130,6 +128,7 @@ export default function TimelinePreview(props: Props) {
                          height={height}
                          theme={Themes.current}
                          events={converted.Events}
+                         minLineWidth={minLineWidth}
                          periods={converted.Periods}
                          levelLimit={levels}
                          onFullScreen={openFullScreen}
