@@ -70,6 +70,8 @@ export default function TimeAxis(props: Props): JSX.Element | null {
   const [minDate, setMinDate] = useState<number | undefined>(undefined);
   const [maxDate, setMaxDate] = useState<number | undefined>(undefined);
 
+  const startDate = useRef<number>(0);
+
   const memoPaddingRight: number = useMemo(
     () => rightPadding || SETTINGS.horizontalPadding,
     [rightPadding],
@@ -197,6 +199,12 @@ export default function TimeAxis(props: Props): JSX.Element | null {
       item.title = item.shortName || item.name;
       /* eslint-enable no-param-reassign */
     });
+
+    const allItems: Array<IDateSortable> = [...events, ...periods];
+    const start = Math.min(...allItems.map(
+      (el: IDateSortable) => el.calculatedDate || el.calculatedDateStart || 0,
+    ));
+    startDate.current = start;
   }, [events, periods, needCorrectionOnBC]);
 
   useEffect(() => {
@@ -211,7 +219,7 @@ export default function TimeAxis(props: Props): JSX.Element | null {
     if (workAreaWidth !== undefined) calculateVerticalWithZoom();
   }, [workAreaWidth]);
 
-  const startDate = useRef<number>(0);
+
 
   useEffect(() => {
     setMyLevelLimit({ ...levelLimit });
@@ -233,13 +241,6 @@ export default function TimeAxis(props: Props): JSX.Element | null {
 
     const minYear = Math.min(...allItems.map((el: IDateSortable) => el.year || el.startYear || 0));
     const maxYear = Math.max(...allItems.map((el: IDateSortable) => el.year || el.endYear || 0));
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const start = Math.min(...allItems.map(
-      (el: IDateSortable) => el.calculatedDate || el.calculatedDateStart || 0,
-    ));
-
-    // minYear = minYear < 0 ? minYear + 1 : minYear;
-    // maxYear = maxYear < 0 ? maxYear + 1 : maxYear;
 
     const workWidth = workAreaWidth
       ? workAreaWidth * zoom
@@ -274,7 +275,6 @@ export default function TimeAxis(props: Props): JSX.Element | null {
       setSerifs(newSerifs);
     }
     setSvgWidth(svgWidthNewValue);
-    startDate.current = start;
 
     const needBCDelta = (roundedMinYear < 0) && (roundedMaxYear > 0);
 
