@@ -59,6 +59,17 @@ class ZoomHandler {
     this.zoom = newZoom;
   }
 
+  centrifyPosition(newValue: number) {
+    if (this.scrollContainer) {
+      const delta = newValue - (this.scrollPosition + this.width / 2);
+      this.scrollContainer.scrollTo(this.scrollPosition + delta);
+    }
+  }
+
+  getZoomToFit(widthToFit: number): number {
+    return ((this.scrollContainer) && (this.width < widthToFit)) ? this.width * this.zoom / widthToFit: 0;
+  }
+
   adjustForZoom(newZoom: number) {
     if (this.scrollContainer) {
       const leftOfViewPortMid = this.scrollPosition + this.getOffset() - SETTINGS.horizontalPadding;
