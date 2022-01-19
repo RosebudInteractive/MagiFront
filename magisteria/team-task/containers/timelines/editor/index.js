@@ -365,6 +365,7 @@ function TimelineEditorContainer(props) {
             const options = timeline.Options;
             if(options){
                 setLevels({events: options.events, periods: options.periods});
+                setMinLineWidth(options.minLineWidth || 1000);
             }
             (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo return this string if behaviour seems to be broken
             // (!lessons || lessons.length === 0) && actions.getAllLessons(true, false); // todo for courses, why it still here but all works fine?!? (but its no vision about where getiign the courses)
@@ -385,7 +386,12 @@ function TimelineEditorContainer(props) {
                 <React.Fragment>
                     <Prompt when={props.hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
-                    <TimelineHeader timeline={timeline} lessons={lessons} courses={courses} onSave={onSave} onLevelsChanged={onLevelsChanged} onMinLineWidthChanged={(val) => setMinLineWidth(val)}/>
+                    <TimelineHeader timeline={timeline}
+                                    lessons={lessons}
+                                    courses={courses}
+                                    onSave={onSave}
+                                    onLevelsChanged={onLevelsChanged}
+                                    onMinLineWidthChanged={(val) => setMinLineWidth(val)}/>
                     <TimelinePreview background={props.editorValues && props.editorValues.Image}
                                      timeline={timeline}
                                      levels={levels}
