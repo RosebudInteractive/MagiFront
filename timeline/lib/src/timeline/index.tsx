@@ -14,9 +14,8 @@ import './timeline.sass';
 import ZoomHandler, { OffsetEnum } from '../helpers/zoom-handler';
 import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
-import { GestureResponderEvent } from 'react-native';
 
-type TimelineProps = {
+type Props = {
   backgroundImage: string,
   height: number,
   enableToSwitchFS: boolean,
@@ -32,13 +31,13 @@ type TimelineProps = {
   // eslint-disable-next-line react/require-default-props
   onChangeOrientation? : Function,
   isDeprecatedBrowser: boolean,
-  userDefinedWidth: number
+  minWidth: number,
 };
 
 let scrollHandlerGuard: boolean = false;
 
 // eslint-disable-next-line react/function-component-definition
-export default function Timeline(props: TimelineProps): JSX.Element {
+export default function Timeline(props: Props): JSX.Element {
   const {
     backgroundImage,
     events,
@@ -52,7 +51,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     onCloseFullScreen,
     onChangeOrientation,
     isDeprecatedBrowser,
-    userDefinedWidth
   } = props;
 
   const [fsEnable, setFsEnable] = useState<boolean>(false);
@@ -222,20 +220,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     setOffsetDefined(false);
   };
 
-  const messageCenter = (e: GestureResponderEvent) => {
-    if (activeItem) {
-      e.preventDefault();
-      console.log(activeItem);
-      const item = activeItem.item;
-      const newZoom = ZoomHandler.getZoomToFit(item.width * 2);
-      ZoomHandler.centrifyPosition(item.left + (item.width / 2));
-      if (newZoom > 0) {
-        ZoomHandler.adjustForZoom(newZoom);
-        setZoom(newZoom);
-      }
-    };
-  };
-
   useEffect(() => {
     ZoomHandler.setWidth(width || 0);
     setIsVertical(SETTINGS.isVerticalViewport(width || 0));
@@ -254,10 +238,8 @@ export default function Timeline(props: TimelineProps): JSX.Element {
   useEffect(() => {
     if (horizontalContainerRef.current) {
       ZoomHandler.setContainer(wrap(horizontalContainerRef.current));
-      ZoomHandler.setWidth(userDefinedWidth);
-      setContainerWidth(userDefinedWidth);
-//      ZoomHandler.setWidth(horizontalContainerRef.current.clientWidth);
-//      setContainerWidth(horizontalContainerRef.current.clientWidth);
+      ZoomHandler.setWidth(horizontalContainerRef.current.clientWidth);
+      setContainerWidth(horizontalContainerRef.current.clientWidth);
     }
   }, [horizontalContainerRef]);
 
@@ -337,7 +319,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
       && (
       <Message
         item={activeItem.item}
-        onCenter={messageCenter}
         onClose={messageClose}
         indent={fsEnable ? 49 : 0}
         pinned={isVertical}

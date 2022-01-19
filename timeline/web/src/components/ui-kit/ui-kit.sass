@@ -35,6 +35,9 @@
 
 .ui-container__select
   min-width: 200px
+
+.ui-container__edit
+  box-sizing: border-box
   border-radius: 4px
   padding: 4px 8px
   border: 1px solid rgba(255, 69, 0, 0.3)
@@ -43,3 +46,9 @@
     border: 1px solid rgb(255, 69, 0)
     cursor: pointer
 
+.ui-container__input
+  outline: none
+  &:focus-visible,
+  &:active
+    border: 1px solid rgb(255, 69, 0)
+    cursor: pointer

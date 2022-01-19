@@ -13,6 +13,7 @@ interface IProps {
   visibilityChecking: boolean,
   elementsOverAxis: boolean,
   isDeprecatedBrowser: boolean,
+  minWidth: number;
 }
 
 type StateData = {
@@ -22,7 +23,7 @@ type StateData = {
 
 export default function TestWrapper(props: IProps): JSX.Element {
   const {
-    levelLimit, visibilityChecking, elementsOverAxis, events, periods, isDeprecatedBrowser
+    levelLimit, visibilityChecking, elementsOverAxis, events, periods, isDeprecatedBrowser, minWidth
   } = props;
 
   const [eventsWithVisibility, setVisibilityEvents] = useState<Event.VisualItem[]>([]);
@@ -53,7 +54,7 @@ export default function TestWrapper(props: IProps): JSX.Element {
     <Timeline backgroundImage='background.jpg'
               enableToSwitchFS={true}
               height={500}
-              userDefinedWidth={4000}
+              minWidth={minWidth}
               events={eventsWithVisibility}
               periods={periodsWithVisibility}
               levelLimit={levelLimit}
