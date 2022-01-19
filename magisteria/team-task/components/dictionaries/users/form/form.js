@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Field, Form} from "react-final-form";
+import {Field, Form, FormSpy} from "react-final-form";
 import {USER_ROLE_STRINGS} from "../../../../constants/dictionary-users";
 import "./form.sass"
 import {MultipleSelect, TextBox} from '../../../ui-kit'
@@ -41,6 +41,7 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
+    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData.PData.roles));
     const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
 
     useEffect(()=>{
@@ -55,8 +56,10 @@ const UserForm = (props) => {
 
     const permissionSchemeLinear = useMemo(() => {
         roleMerger.init(permissionScheme);
-        return roleMerger.getMergedRolesLinearByMaxValue(rolesPermissions);
-    }, [permissionScheme, roles, userData, rolesPermissions]);
+        return roleMerger.getMergedRolesLinearByMaxValue(rolesPermissions.filter(role => userRolesArray.includes(role.ShortCode)));
+    }, [permissionScheme, roles, rolesPermissions, userRolesArray]);
+
+
 
     const userRoles = useMemo(() => {
         return Object.entries(USER_ROLE_STRINGS)
@@ -181,6 +184,11 @@ const UserForm = (props) => {
                                     <Permissions readOnly = {true} permissionScheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
                                     }
                                 </div>
+
+                                <FormSpy subscription={{values: true}}
+                                         onChange={({values}) => {
+                                             setUserRolesArray(values.role)
+                                         }}/>
 
 
                             </form>

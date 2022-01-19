@@ -31,9 +31,6 @@ const CssFormControl = withStyles({
             "&.MuiInputLabel-shrink": {
                 "transform": "translate(16px, 2px) scale(0.75)",
             },
-            // "&.MuiFormLabel-filled": {
-            //     opacity: 0,
-            // }
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
@@ -149,9 +146,7 @@ export default function UiMultiSelect(props) {
             disabled={props.disabled}
             readOnly={props.readOnly}
             ref={select}
-            // value={values}
             renderValue={props.renderValue}
-            // onChange={handleChange}
             MenuProps={{
                 classes: { paper: classes.menuPaper },
                 transitionDuration: 50,
@@ -165,7 +160,7 @@ export default function UiMultiSelect(props) {
             {
                 props.options && props.options.map((item, index) => (
                         <MenuItem onClick={logClick} key={index} value={item.id} classes={ {root: classes.listItem} }>
-                            <Checkbox color={'orange'} checked={props.input.value && props.input.value.indexOf(item.id) > -1}/>
+                            <Checkbox color={'default'} checked={props.input.value && props.input.value.indexOf(item.id) > -1}/>
                             <ListItemText primary={item.name} />
                         </MenuItem>
                     ))
