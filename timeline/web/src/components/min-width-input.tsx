@@ -12,7 +12,7 @@ export default function MinWidthInput(props: Props): JSX.Element {
   const changeHandler = (newValue: string) => {
     if (value !== +newValue) {
       if (onChange) {
-        onChange(+value);
+        onChange(+newValue);
       }
     }
   };

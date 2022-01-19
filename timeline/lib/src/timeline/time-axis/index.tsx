@@ -43,6 +43,7 @@ type Props = {
   onItemDoubleClick?: Function,
   activeItem: ActiveItem | null;
   isDeprecatedBrowser: boolean;
+  minWidth?: number,
 };
 
 type AxisWidth = {
@@ -57,7 +58,7 @@ const STEPS: number[] = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props: Props): JSX.Element | null {
   const {
     events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking,
-    elementsOverAxis, onItemClick, theme, activeItem, isDeprecatedBrowser,
+    elementsOverAxis, onItemClick, theme, activeItem, isDeprecatedBrowser, minWidth
   } = props;
 
   const [svgWidth, setSvgWidth] = useState(0);
@@ -299,10 +300,21 @@ export default function TimeAxis(props: Props): JSX.Element | null {
 
   useEffect(() => {
     if ((workAreaWidth === undefined) && (rightPadding !== undefined)) {
-      const canvasWidth = width < SETTINGS.canvas.minWidth ? SETTINGS.canvas.minWidth : width;
+      const minWidthValue = minWidth || SETTINGS.canvas.minWidth;
+
+      const canvasWidth = width < minWidthValue ? minWidthValue : width;
       setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
     }
-  }, [rightPadding]);
+  }, [rightPadding, minWidth]);
+
+  useEffect(() => {
+    if (rightPadding !== undefined) {
+      const minWidthValue = minWidth || SETTINGS.canvas.minWidth;
+
+      const canvasWidth = width < minWidthValue ? minWidthValue : width;
+      setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
+    } 
+  }, [minWidth])
 
   return !!width && !!pixelsInYear && !!myLevelLimit
     ? (

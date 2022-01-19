@@ -145,32 +145,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     }
   };
 
-  // const getEventInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
-  //   const { left, width: itemWidth } = item;
-  //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
-  //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
-  // };
-  //
-  // const getPeriodInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
-  //   const { left, width: itemWidth } = item;
-  //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
-  //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
-  // };
-  //
-  // const getActiveItemInViewPort = (scrollPosition: number): boolean => {
-  //   if (activeItem) {
-  //     switch (activeItem.type) {
-  //       case 'event': return getEventInViewPort(activeItem.item, scrollPosition);
-  //
-  //       case 'period': return calcOffsetForPeriod(activeItem.item);
-  //
-  //       default: return false;
-  //     }
-  //   }
-  //
-  //   return false;
-  // }
-
   const fixActiveItemOffset = (newScrollPosition: number) => {
     if (activeItem) {
       const { left, width: itemWidth } = activeItem.item;
@@ -245,12 +219,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     }
   }, [width]);
 
-  // useEffect(() => {
-  //   if (!offsetDefined) {
-  //     ZoomHandler.setOffset(OffsetEnum.CENTER);
-  //   }
-  // }, [offsetDefined]);
-
   useEffect(() => {
     if (horizontalContainerRef.current) {
       ZoomHandler.setContainer(wrap(horizontalContainerRef.current));
@@ -258,10 +226,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
       setContainerWidth(horizontalContainerRef.current.clientWidth);
     }
   }, [horizontalContainerRef]);
-
-  // useEffect(() => {
-  //   setIsVertical(SETTINGS.isVerticalViewport(containerWidth));
-  // }, [containerWidth]);
 
   useLayoutEffect(() => {
     if (activeItem && activeInViewport) {
@@ -308,6 +272,7 @@ export default function Timeline(props: TimelineProps): JSX.Element {
                 events={events}
                 periods={periods}
                 width={containerWidth}
+                minWidth={userDefinedWidth}
                 zoom={zoom}
                 levelLimit={levelLimit}
                 theme={Themes.current}
