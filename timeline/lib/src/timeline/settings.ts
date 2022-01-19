@@ -47,7 +47,7 @@ class Settings {
     };
 
     this.canvas = {
-      minWidth: 4000,
+      minWidth: 700,
     };
   }
 
