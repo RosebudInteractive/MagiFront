@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Themes } from '@rosebud/timeline/src';
 import { Picker } from "./ui-kit";
 
@@ -6,7 +6,7 @@ type Props = {
   onChange?: Function,
 }
 
-export default function ThemePicker(props: Props): JSX.Element | null {
+export default function ThemePicker(props: Props): JSX.Element {
 
   const onChange = (itemValue: number) => {
     if (props.onChange) {
@@ -25,6 +25,4 @@ export default function ThemePicker(props: Props): JSX.Element | null {
   }, [])
 
   return <Picker title={'Тема'} options={options} onChange={onChange}/>
-
-
 }

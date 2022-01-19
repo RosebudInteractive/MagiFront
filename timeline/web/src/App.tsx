@@ -18,6 +18,7 @@ import generator from './helpers/time-generator';
 import ThemePicker from './components/theme-picker';
 import ClipboardData from './components/clipboard-data';
 import { isDeprecatedBrowser, isUnsupportedBrowser } from './helpers/platform-tools';
+import MinWidthInput from './components/min-width-input';
 
 type TimelineData = {
   Events: Event.DataItem[],
@@ -36,6 +37,7 @@ function App() {
   const [visibilityChecking, setVisibilityChecking] = useState<boolean>(true);
   const [elementsOverAxis, setElementsOverAxis] = useState(false);
   const [scriptTime, setScriptTime] = useState<number>(0);
+  const [minWidth, setMinWidth] = useState<number>(700);
 
   const onDataSetChange = useCallback((index) => {
     setImportedData(null);
@@ -114,6 +116,10 @@ function App() {
     console.log(JSON.stringify(tlData));
   };
 
+  const onMinWidthChange = (value: number) => {
+    setMinWidth(value);
+  };
+
   return (
     <div className="main-container">
       <div className="row-container">
@@ -128,6 +134,7 @@ function App() {
       <div className="row-container">
         <LevelLimit onChange={onEventsLevelLimitChange} value={eventsLevelLimit} title="События" />
         <LevelLimit onChange={onPeriodsLevelLimitChange} value={periodsLevelLimit} title="Периоды" />
+        <MinWidthInput onChange={onMinWidthChange} value={minWidth} />
       </div>
 
       <PlayerControls
@@ -141,6 +148,7 @@ function App() {
       />
       {events && !isUnsupportedBrowser() && (
       <TestWrapper
+        minWidth={minWidth}
         elementsOverAxis={elementsOverAxis}
         events={events}
         periods={periods}

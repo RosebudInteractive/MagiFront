@@ -31,6 +31,7 @@ type Props = {
   // eslint-disable-next-line react/require-default-props
   onChangeOrientation? : Function,
   isDeprecatedBrowser: boolean,
+  minWidth: number,
 };
 
 let scrollHandlerGuard: boolean = false;

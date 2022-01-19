@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react';
+import React, { useState, } from 'react';
 
 type Props = {
   title: string,
@@ -28,7 +28,7 @@ export default function Picker(props: Props): JSX.Element {
     <div className='ui-container'>
       <div className='ui-container__title'>{title}</div>
       <select
-        className='ui-container__select'
+        className='ui-container__edit ui-container__select'
         value={selectedValue}
         onChange={nativeChange}
       >
@@ -36,5 +36,4 @@ export default function Picker(props: Props): JSX.Element {
       </select>
     </div>
   )
-
 }
