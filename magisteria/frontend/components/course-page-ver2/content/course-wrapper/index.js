@@ -43,11 +43,14 @@ export default function CourseWrapper(props) {
                 periods: (tm.Options && tm.Options.periods) || 0
             }
 
+            const minWidth = (tm.Options && tm.Options.minLineWidth) || 0
+
             return <div className='block-wrapper'>
                 <div className="block-title ">Ключевые события </div>
                 <TimelinePreview key={tm.Id}
                                  background={tm.Image ? tm.Image : null}
                                  levels={levelLimits}
+                                 minLineWidth={minWidth}
                                  timeline={tm}/>
             </div>
 

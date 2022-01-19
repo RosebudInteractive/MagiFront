@@ -8,7 +8,7 @@ import {PlatformTool} from "tools/platform-tools";
 
 let enableSwitch = true;
 
-export default function TimelinePreview(props: Props) {
+export default function TimelinePreview(props) {
     const {timeline, background, levels, minLineWidth} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(500);
@@ -128,7 +128,7 @@ export default function TimelinePreview(props: Props) {
                          height={height}
                          theme={Themes.current}
                          events={converted.Events}
-                         minLineWidth={minLineWidth}
+                         userDefinedWidth={minLineWidth}
                          periods={converted.Periods}
                          levelLimit={levels}
                          onFullScreen={openFullScreen}
