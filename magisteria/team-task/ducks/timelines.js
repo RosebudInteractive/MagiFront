@@ -10,9 +10,9 @@ import {checkStatus, parseJSON} from "../../src/tools/fetch-tools";
 import {commonGetQuery} from "tools/fetch-tools";
 import {createEvents, setEvents} from "tt-ducks/events-timeline";
 import {createPeriods, setPeriods} from "tt-ducks/periods-timeline";
-import type {Message} from "../types/messages";
 import {reset} from "redux-form";
 import {setCommands} from "tt-ducks/script-commands-timeline";
+import type {Message} from "../types/messages";
 
 //constants
 
@@ -438,6 +438,7 @@ function* getTimelineSaga(data) {
             EventLevel: timeline.Options && timeline.Options.events ? timeline.Options.events : null,
             PeriodLevel: timeline.Options && timeline.Options.periods ? timeline.Options.periods : null,
             PeriodsOverAxis: timeline.Options && timeline.Options.periodsOverAxis ? timeline.Options.periodsOverAxis : null,
+            MinLineWidth:  timeline.Options && timeline.Options.minLineWidth ? timeline.Options.minLineWidth : 1000,
             CourseId: timeline.Course ? timeline.Course.Id : null,
             LessonId: timeline.Lesson ? timeline.Lesson.Id : null,
         };

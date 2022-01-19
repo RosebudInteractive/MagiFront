@@ -54,7 +54,7 @@ export default function TestWrapper(props: IProps): JSX.Element {
     <Timeline backgroundImage='background.jpg'
               enableToSwitchFS={true}
               height={500}
-              minWidth={minWidth}
+              userDefinedWidth={4000}
               events={eventsWithVisibility}
               periods={periodsWithVisibility}
               levelLimit={levelLimit}
