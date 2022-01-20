@@ -265,8 +265,8 @@ export default function Timeline(props: TimelineProps): JSX.Element {
       >
         {/*<div className="vertical-line" />*/}
         {
-              containerWidth
-              && containerHeight
+              !!containerWidth
+              && !!containerHeight
               && (
               <TimeAxis
                 events={events}
