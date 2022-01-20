@@ -75,6 +75,14 @@ export default function TimeAxis(props: Props): JSX.Element | null {
     [rightPadding],
   );
 
+  useLayoutEffect(() => {
+    const newValue: LevelLimit = myLevelLimit
+      ? { ...myLevelLimit, periods: levelLimit.periods }
+      : { periods: 0, events: 0 };
+
+    setMyLevelLimit(newValue)
+  }, [periods]);
+
   // todo: При изменении ширины viewport-а канва НЕ МЕНЯЕТ свой размер
   const axisWidth: AxisWidth = useMemo(() => ({
     workArea: (workAreaWidth || width) - SETTINGS.horizontalPadding - memoPaddingRight,
@@ -162,7 +170,7 @@ export default function TimeAxis(props: Props): JSX.Element | null {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     events.forEach((item) => {
       /* eslint-disable no-param-reassign */
       item.displayDate = calcDisplayDate(item.day, item.month, item.year, true);
