@@ -321,7 +321,7 @@ export default function TimeAxis(props: Props): JSX.Element | null {
 
       const canvasWidth = width < minWidthValue ? minWidthValue : width;
       setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
-    } 
+    }
   }, [minWidth])
 
   return !!width && !!pixelsInYear && !!myLevelLimit
