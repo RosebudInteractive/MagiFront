@@ -31,7 +31,7 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [themeIndex, setThemeIndex] = useState(0);
   const [eventsLevelLimit, setEventsLevelLimit] = useState(4);
-  const [periodsLevelLimit, setPeriodsLevelLimit] = useState(3);
+  const [periodsLevelLimit, setPeriodsLevelLimit] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [stopped, setStopped] = useState(true);
   const [visibilityChecking, setVisibilityChecking] = useState<boolean>(true);

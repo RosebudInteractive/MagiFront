@@ -64,7 +64,12 @@ export default function TimelinePreview(props) {
     }, [fsEnable]);
 
     const converted = useMemo(() => {
-        return timeline ? convertData(timeline) : {Events: [], Periods: []};
+        const data = timeline ? convertData(timeline) : {Events: [], Periods: []};
+
+        return {
+            Events: data.Events.map(item => ({...item, visible: true})),
+            Periods: data.Periods.map(item => ({...item, visible: true})),
+        }
     }, [timeline])
 
     const backgroundFile = useMemo(() => {
@@ -117,8 +122,8 @@ export default function TimelinePreview(props) {
                 ref={preview}>
         {
             !!timeline
-            && width
-            && height
+            && !!width
+            && !!height
             && !PlatformTool.timeline.isUnsupportedBrowser()
             && <Timeline width={width}
                          elementsOverAxis={false}

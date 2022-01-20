@@ -78,14 +78,6 @@ export default function TimeAxis(props: Props): JSX.Element | null {
     [rightPadding],
   );
 
-  useLayoutEffect(() => {
-    const newValue: LevelLimit = myLevelLimit
-      ? { ...myLevelLimit, periods: levelLimit.periods }
-      : { periods: 0, events: 0 };
-
-    setMyLevelLimit(newValue)
-  }, [periods]);
-
   // todo: При изменении ширины viewport-а канва НЕ МЕНЯЕТ свой размер
   const axisWidth: AxisWidth = useMemo(() => ({
     workArea: (workAreaWidth || width) - SETTINGS.horizontalPadding - memoPaddingRight,
@@ -206,6 +198,8 @@ export default function TimeAxis(props: Props): JSX.Element | null {
       (el: IDateSortable) => el.calculatedDate || el.calculatedDateStart || 0,
     ));
     startDate.current = start;
+
+    setMyLevelLimit({ ...levelLimit })
   }, [events, periods, needCorrectionOnBC]);
 
   useEffect(() => {
@@ -219,8 +213,6 @@ export default function TimeAxis(props: Props): JSX.Element | null {
   useEffect(() => {
     if (workAreaWidth !== undefined) calculateVerticalWithZoom();
   }, [workAreaWidth]);
-
-
 
   useEffect(() => {
     setMyLevelLimit({ ...levelLimit });
