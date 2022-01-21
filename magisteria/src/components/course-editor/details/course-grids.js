@@ -44,8 +44,8 @@ export class CourseLessons extends GridControl{
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Name', header: 'Название', fillspace: true},
-            {id: 'State', header: 'Состояние', width: 90, editor: 'select',
+            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
+            {id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 90, editor: 'select',
                 options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]},
             {id: 'LanguageName', header: 'Язык курса', width: 90},
             {id: 'ReadyDate', header: 'Дата готовности', width: 120, format: this._formatDate,},

@@ -1,6 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 
 import * as authorsActions from "../../actions/authorsListActions";
 import * as commonDlgActions from '../../actions/CommonDlgActions';
@@ -155,8 +155,8 @@ class AuthorsPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'FirstName', header: 'Имя', width: 200},
-                {id: 'LastName', header: 'Фамилия', width: 300},
+                {id: 'FirstName', header: ['Имя', {content:"textFilter"}], width: 200},
+                {id: 'LastName', header: ['Фамилия', {content:"textFilter"}], width: 300},
                 {id: "Description", header: "Описание", fillspace: true},
             ],
             on: {
