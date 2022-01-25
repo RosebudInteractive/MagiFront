@@ -1,8 +1,8 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Field, Form} from "react-final-form";
+import {Field, Form, FormSpy} from "react-final-form";
 import {USER_ROLE_STRINGS} from "../../../../constants/dictionary-users";
 import "./form.sass"
-import {Select, TextBox} from '../../../ui-kit'
+import {MultipleSelect, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedUser,
     findUserByEmail,
@@ -26,6 +26,8 @@ import {
 } from "tt-ducks/access-rights-dictionary";
 
 import roleMerger from "../../../../tools/role-merger";
+import Box from "@material-ui/core/Box";
+import Chip from "@material-ui/core/Chip";
 
 
 //todo import validators
@@ -39,6 +41,7 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
+    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData.PData.roles));
     const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
 
     useEffect(()=>{
@@ -53,8 +56,10 @@ const UserForm = (props) => {
 
     const permissionSchemeLinear = useMemo(() => {
         roleMerger.init(permissionScheme);
-        return roleMerger.getMergedRolesLinear(rolesPermissions);
-    }, [permissionScheme, roles, userData, rolesPermissions]);
+        return roleMerger.getMergedRolesLinearByMaxValue(rolesPermissions.filter(role => userRolesArray.includes(role.ShortCode)));
+    }, [permissionScheme, roles, rolesPermissions, userRolesArray]);
+
+
 
     const userRoles = useMemo(() => {
         return Object.entries(USER_ROLE_STRINGS)
@@ -75,14 +80,17 @@ const UserForm = (props) => {
             if (_oldRoles.pms) delete _oldRoles.pms
             if (_oldRoles.pme) delete _oldRoles.pme
             if (_oldRoles.pmu) delete _oldRoles.pmu
+            if (_oldRoles.a) delete _oldRoles.a
 
-            _oldRoles[userInfo.role] = 1
+            userInfo.role.map(role => {
+                _oldRoles[role] = 1
+            });
         }
 
         const data = {...userData,
             PData: {
                 roles: _oldRoles,
-                isAdmin: (userInfo.role && (userInfo.role === 'a'))
+                isAdmin: (userInfo.role && (userInfo.role === 'a')) || (userInfo.role && userInfo.role.length > 1 && userInfo.role.includes('a'))
             }};
         actions.saveUserChanges(data);
         closeModalForm()
@@ -95,7 +103,7 @@ const UserForm = (props) => {
     const userFormData = useMemo(() => ({
         displayName: (userData && userData.DisplayName) ? userData.DisplayName : '',
         email: (userData && userData.Email) ? userData.Email : '',
-        role: (userData && userData.Role) ? userData.Role : ''
+        role: (userData && userData.Role) ? [...userData.Role] : []
     }), [userData]);
 
     return (
@@ -146,10 +154,18 @@ const UserForm = (props) => {
                                     </div>
                                     <div className='user-form__field'>
                                         <Field name="role"
-                                               component={Select}
+                                               component={MultipleSelect}
+                                               multiple={true}
                                                label={"Роль"}
                                                required={true}
                                                options={userRoles}
+                                               renderValue={(selected) => (
+                                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxWidth: '240px' }}>
+                                                       {selected.map((value) => (
+                                                           <Chip key={value} label={USER_ROLE_STRINGS[value]} />
+                                                       ))}
+                                                   </Box>
+                                               )}
                                                validate={ComposeValidators(vRequired)}>
                                         </Field>
                                     </div>
@@ -168,6 +184,11 @@ const UserForm = (props) => {
                                     <Permissions readOnly = {true} permissionScheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
                                     }
                                 </div>
+
+                                <FormSpy subscription={{values: true}}
+                                         onChange={({values}) => {
+                                             setUserRolesArray(values.role)
+                                         }}/>
 
 
                             </form>

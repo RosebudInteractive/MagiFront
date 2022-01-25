@@ -1,10 +1,13 @@
-import React, {useEffect, useRef} from "react"
+import React, {useEffect, useRef, useState} from "react"
 import {FormControl, InputLabel, MenuItem, Select, withStyles,} from "@material-ui/core"
 import {makeStyles} from "@material-ui/core/styles"
+import Checkbox from "@material-ui/core/Checkbox/Checkbox";
+import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 
 const CssFormControl = withStyles({
     root: {
-        minHeight: "48px",
+        minHeight: "60px",
+        maxWidth: '240px',
         '& label': {
             "font-family": "Inter",
             "font-size": "13px",
@@ -28,9 +31,6 @@ const CssFormControl = withStyles({
             "&.MuiInputLabel-shrink": {
                 "transform": "translate(16px, 2px) scale(0.75)",
             },
-            // "&.MuiFormLabel-filled": {
-            //     opacity: 0,
-            // }
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
@@ -41,9 +41,14 @@ const CssFormControl = withStyles({
             },
             // "& select": {
             "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
                 borderRadius: "8px",
-                padding: "15px 16px",
+                padding: "7px !important",
                 border: '1px solid #D2D2D6',
+                height: '60px',
+                maxWidth: '240px',
+                overflowX: 'auto',
                 "-webkit-transition": "border, background 300ms ease-out",
                 "-moz-transition": "border, background 300ms ease-out",
                 "-o-transition": "border, background 300ms ease-out",
@@ -54,7 +59,7 @@ const CssFormControl = withStyles({
                 "font-size": "13px",
                 "line-height": "15px",
                 "letter-spacing": "0.15px",
-                "color": "#19191D",
+                "color": "#f2ff48",
             },
             '&:hover .MuiSelect-select:not(.Mui-disabled)': {
                 backgroundColor: "#E5E5E7",
@@ -89,34 +94,50 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(2)
     },
     menuPaper: {
-        maxHeight: 200
+        maxHeight: 200,
+
     },
     listItem: {
         fontFamily: "Inter",
-        "font-size": "14px",
+        "font-size": "11px",
         "font-style": "normal",
         "font-weight": "400",
-        "line-height": "22px",
+        "line-height": "12px",
         "letter-spacing": "0.25px",
         "text-align": "left",
-        "min-height": "34px",
+        "min-height": "14px",
     }
 }));
 
 
-export default function UiSelect(props) {
+export default function UiMultiSelect(props) {
     const classes = useStyles();
 
     const id = useRef(),
         select = useRef()
 
+    const [values, setValues] = useState(props.input.value);
+
+    const handleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+
+
+        setValues(value);
+    };
+
     useEffect(() => {
-        id.current = props.id ? props.id : "ui-select-" + Math.floor(Math.random() * 10000)
+        id.current = props.id ? props.id : "ui-multi-select" + Math.floor(Math.random() * 10000)
     }, []);
 
     const propsObj = props.input ? props.input : props;
 
-    return <CssFormControl className={"input-field" + (props.extClass ? " " + props.extClass : "")}>
+    const logClick = (e) => {
+        console.log('menuitem clicked')
+    }
+
+    return <CssFormControl className={"input-field multi-select _with-custom-scroll" + (props.extClass ? " " + props.extClass : "")}>
         <InputLabel id={`label-for-${id.current}`}>{props.label}</InputLabel>
         <Select
             labelId={`label-for-${id.current}`}
@@ -137,11 +158,15 @@ export default function UiSelect(props) {
                 transformOrigin: { vertical: 'top', horizontal: 'left' }
             }}
         >
-            { !props.required && <MenuItem value="" classes={ {root: classes.listItem} }/> }
-            {
-                props.options && props.options.map((item, index) => {return <MenuItem classes={ {root: classes.listItem} } value={item.id} key={index}>{item.name}</MenuItem>})
-            }
 
+            {
+                props.options && props.options.map((item, index) => (
+                        <MenuItem onClick={logClick} key={index} value={item.id} classes={ {root: classes.listItem} }>
+                            <Checkbox color={'default'} checked={props.input.value && props.input.value.indexOf(item.id) > -1}/>
+                            <ListItemText primary={item.name} />
+                        </MenuItem>
+                    ))
+            }
         </Select>
     </CssFormControl>
 }
