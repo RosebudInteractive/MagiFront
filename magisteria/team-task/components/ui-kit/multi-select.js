@@ -6,7 +6,7 @@ import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 
 const CssFormControl = withStyles({
     root: {
-        minHeight: "48px",
+        minHeight: "60px",
         maxWidth: '240px',
         '& label': {
             "font-family": "Inter",
@@ -41,10 +41,12 @@ const CssFormControl = withStyles({
             },
             // "& select": {
             "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
                 borderRadius: "8px",
                 padding: "7px !important",
                 border: '1px solid #D2D2D6',
-                height: '30px',
+                height: '60px',
                 maxWidth: '240px',
                 overflowX: 'auto',
                 "-webkit-transition": "border, background 300ms ease-out",
@@ -135,7 +137,7 @@ export default function UiMultiSelect(props) {
         console.log('menuitem clicked')
     }
 
-    return <CssFormControl className={"input-field multi-select" + (props.extClass ? " " + props.extClass : "")}>
+    return <CssFormControl className={"input-field multi-select _with-custom-scroll" + (props.extClass ? " " + props.extClass : "")}>
         <InputLabel id={`label-for-${id.current}`}>{props.label}</InputLabel>
         <Select
             labelId={`label-for-${id.current}`}
