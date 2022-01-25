@@ -4,10 +4,10 @@ import history from '../../../history'
 import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {select, remove,} from '../../../actions/subLessonsActions'
+import {remove, select,} from '../../../actions/subLessonsActions'
 import {set} from '../../../actions/lesson/parent-lesson-actions';
 import {enableButtonsSelector} from "adm-ducks/app";
-import {moveObjectUp, moveObjectDown} from "../../../reducers/tools";
+import {moveObjectDown, moveObjectUp} from "../../../reducers/tools";
 
 class SublessonsGrid extends React.Component {
 
@@ -97,9 +97,9 @@ class SubLessons extends GridControl {
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Name', header: 'Название', fillspace: true},
+            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
             {
-                id: 'State', header: 'Состояние', width: 90, editor: 'select',
+                id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 90, editor: 'select',
                 options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
             },
             {id: 'LanguageName', header: 'Язык курса', width: 90},

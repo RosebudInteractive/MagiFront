@@ -4,7 +4,7 @@ import history from '../../../history'
 import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {select, remove, moveUp, moveDown} from '../../../actions/lesson/lessonMainEpisodesActions'
+import {moveDown, moveUp, remove, select} from '../../../actions/lesson/lessonMainEpisodesActions'
 import {enableButtonsSelector} from "adm-ducks/app";
 
 class EpisodesGrid extends React.Component {
@@ -53,9 +53,9 @@ class Episodes extends GridControl {
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Name', header: 'Название', fillspace: true},
+            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
             {
-                id: 'State', header: 'Состояние', width: 90, editor: 'select',
+                id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 90, editor: 'select',
                 options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
             },
             {id: 'LanguageName', header: 'Язык курса', width: 90},

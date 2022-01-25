@@ -1,14 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import GridControl from "../../gridControl";
-import {change as changeValue} from 'redux-form'
+import {change as changeValue, formValueSelector} from 'redux-form'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as resourcesActions from '../../../actions/resources-actions';
 import ResourceForm from "../../resource-form";
 import MultiResourceForm from "../../multi-resource-form";
 import {enableButtonsSelector} from "adm-ducks/app";
-import {formValueSelector} from "redux-form";
 
 const NEW_RESOURCE = {
     Id: null,
@@ -235,8 +234,8 @@ class LessonResources extends GridControl {
     _getColumns() {
         let _columns = [
             {id: 'FileId', header: 'FileId', width: 60,},
-            {id: 'Name', header: 'Название', width: 300,},
-            {id: 'Description', header: 'Описание', fillspace: true,},
+            {id: 'Name', header: ['Название', {content:"textFilter"}], width: 300,},
+            {id: 'Description', header: ['Описание', {content:"textFilter"}], fillspace: true,},
         ];
 
         _columns.push(...super._getColumns());

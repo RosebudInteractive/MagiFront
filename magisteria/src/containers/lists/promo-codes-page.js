@@ -3,16 +3,16 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import {
-    getPromoCodes,
     createPromo,
-    editCurrentPromo,
     deletePromo,
-    promosSelector,
-    loadingSelector,
+    editCurrentPromo,
+    getPromoCodes,
     loadedSelector,
+    loadingSelector,
+    promosSelector,
     showEditorSelector,
 } from "adm-ducks/promo-codes";
-import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
+import {cancelDelete, showDeleteConfirmation} from '../../actions/CommonDlgActions';
 import PromoEditor from '../../components/promos/editor'
 
 import Webix from '../../components/Webix';
@@ -223,8 +223,8 @@ class PromosPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Code', header: 'Код', width: 230},
-                {id: "Description", header: "Описание", fillspace: true},
+                {id: 'Code', header: ['Код', {content:"textFilter"}], width: 230},
+                {id: "Description", header: ['Описание', {content:"textFilter"}], fillspace: true},
                 {id: "Rest", header: "Осталось", width: 150},
             ],
             on: {

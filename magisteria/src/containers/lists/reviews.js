@@ -215,7 +215,7 @@ class ReviewsPage extends React.Component {
             columns: [
                 {id: 'ReviewDate', header: 'Дата', width: 150, format: this._formatDate},
                 {id: 'CourseId', header: ['Курс',  {content:"selectFilter"}], width: 330, editor: 'select', options: this._getCourses()},
-                {id: "UserName", header: "Пользователь", width: 150},
+                {id: "UserName", header: ["Пользователь", {content: 'textFilter'}], width: 150},
                 {id: "Review", header: "Отзыв",  fillspace: true, adjust: "data", minColumnWidth: 200},
                 {
                     id: 'Status', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',

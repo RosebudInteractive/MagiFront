@@ -1,6 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 
 import * as categoriesActions from "../../actions/categoriesListActions";
 import * as commonDlgActions from '../../actions/CommonDlgActions';
@@ -157,7 +157,7 @@ class CategoriesPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название', width: 400},
+                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 400},
                 {id: "ParentName", header: "Родительская категория", fillspace: true},
             ],
             on: {
