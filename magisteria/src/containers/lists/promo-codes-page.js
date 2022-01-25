@@ -223,9 +223,9 @@ class PromosPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Code', header: ['Код', {content:"textFilter"}], width: 230},
-                {id: "Description", header: ['Описание', {content:"textFilter"}], fillspace: true},
-                {id: "Rest", header: "Осталось", width: 150},
+                {id: 'Code', header: ['Код', {content:"textFilter"}], width: 230, sort: 'text'},
+                {id: "Description", header: ['Описание', {content:"textFilter"}], fillspace: true, sort: 'text'},
+                {id: "Rest", header: "Осталось", width: 150, sort: 'text'},
             ],
             on: {
                 onAfterSelect: function (selObj) {

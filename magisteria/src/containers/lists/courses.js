@@ -185,16 +185,16 @@ class Courses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 350},
+                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 350, sort: 'text'},
                 {
-                    id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
+                    id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select', sort: 'string',
                     options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {
                         id: 'A',
                         value: 'Архив'
                     }]
                 },
-                {id: 'LanguageName', header: ['Язык курса', {content:"selectFilter"}], width: 200},
-                {id: "Description", header: "Описание курса", fillspace: true},
+                {id: 'LanguageName', header: ['Язык курса', {content:"selectFilter"}], width: 200, sort: 'text'},
+                {id: "Description", header: "Описание курса", fillspace: true, sort: 'text'},
             ],
             on: {
                 onAfterSelect: function (selObj) {
