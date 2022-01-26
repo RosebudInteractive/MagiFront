@@ -16,6 +16,7 @@ import {hasAdminRights} from "tt-ducks/auth";
 import Permissions from "../../permissions/permissions";
 import validators from "../../../../tools/validators"
 import roleMerger from "../../../../tools/role-merger";
+// import TextArea from "../../../../../src/components/common/text-area";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -140,6 +141,7 @@ const RightForm = (props) => {
                                         <div className='right-form__field'>
                                             <Field name="Description"
                                                    component={TextBox}
+                                                   multiline={true}
                                                    type="text"
                                                    validate={validators.required}
                                                    placeholder="Описание"
