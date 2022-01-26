@@ -12,7 +12,8 @@ const PATHES = {
     dictionaries: "Справочники",
     components: "Компоненты",
     users: "Пользователи",
-    timelines: "Таймлайны"
+    timelines: "Таймлайны",
+    rights: 'Роли'
 };
 
 const BreadcrumbLink = props => <Breadcrumb.Item {...props} key={props.index}/>;

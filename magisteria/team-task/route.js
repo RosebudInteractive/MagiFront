@@ -27,6 +27,8 @@ export default function AppRouter(props: RouterProps) {
 
     const _hasAdminRights = (userRole === USER_ROLE.PMA) || (userRole === USER_ROLE.ADMIN)
 
+    const isAdmin = (userRole === USER_ROLE.ADMIN);
+
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
         <Route path={'/tasks/:taskId'} component={FullPageTaskEditor}/>
@@ -50,7 +52,7 @@ export default function AppRouter(props: RouterProps) {
                     case 'components':
                         return <DictionaryComponents/>;
                     case 'rights':
-                        return <AccessRights/>;
+                        return  isAdmin ? <AccessRights/> : <AccessDeniedPlaceholder/>;
                     default:
                         return;
                 }

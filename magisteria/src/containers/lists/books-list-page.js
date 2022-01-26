@@ -3,18 +3,19 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import {
-    getBooks,
-    createBook,
-    editCurrentBook,
-    deleteBook,
-    moveUp,
-    moveDown,
-    saveChanges,
     booksSelector,
+    createBook,
+    deleteBook,
+    editCurrentBook,
+    getBooks,
+    loadedSelector,
     loadingSelector,
-    loadedSelector, showEditorSelector,
+    moveDown,
+    moveUp,
+    saveChanges,
+    showEditorSelector,
 } from "adm-ducks/books";
-import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
+import {cancelDelete, showDeleteConfirmation} from '../../actions/CommonDlgActions';
 import BookEditor from '../../components/books/editor'
 
 import Webix from '../../components/Webix';
@@ -250,8 +251,8 @@ class BooksPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название книги', width: 230},
-                {id: "Description", header: "Описание курса", fillspace: true},
+                {id: 'Name', header: ['Название книги', {content:"textFilter"}], width: 230},
+                {id: "Description", header: ['Описание курса', {content:"textFilter"}], fillspace: true},
             ],
             on: {
                 onAfterSelect: function (selObj) {

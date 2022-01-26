@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from "prop-types";
 import ReferenceDialog from "../dialogs/reference-dialog";
-import {createNewReference, editReference, clearReference} from '../../../actions/references-actions';
+import {clearReference, createNewReference, editReference} from '../../../actions/references-actions';
 import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import {enableButtonsSelector} from "adm-ducks/app";
 import GridControl from "../../gridControl";
@@ -195,8 +195,8 @@ class LessonReferences extends GridControl {
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Description', header: 'Описание', fillspace: true},
-            {id: 'URL', header: 'URL', width: 120},
+            {id: 'Description', header: ['Описание', {content:"textFilter"}], fillspace: true},
+            {id: 'URL', header: ['URL', {content:"textFilter"}], width: 120},
         ];
 
         _columns.push(...super._getColumns());

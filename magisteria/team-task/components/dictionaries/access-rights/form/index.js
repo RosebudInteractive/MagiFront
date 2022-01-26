@@ -66,8 +66,15 @@ const RightForm = (props) => {
     };
 
     const applyChanges = function (values) {
+        const permissionBodyKeys = _.keys(permissionBody);
+        let newPermissionBody = {};
+
+        if(permissionBodyKeys.length > 0 && permissionBodyKeys.some(pK => _.keys(permissionBody[pK]).length > 0)){
+          newPermissionBody = permissionBody
+        }
+
         roleData && roleData.Id && actions.saveRightChanges(roleData.Id, {
-            Permissions: permissionBody,
+            Permissions: newPermissionBody,
             Code: values.Code,
             Name: values.Name,
             ShortCode: values.ShortCode,
@@ -135,6 +142,7 @@ const RightForm = (props) => {
                                                    placeholder="Краткое название"
                                                    validate={validators.required}
                                                    label={"Краткое название"}
+                                                   disabled={true}
                                             />
                                         </div>
 
