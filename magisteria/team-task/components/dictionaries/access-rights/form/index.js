@@ -48,7 +48,7 @@ const RightForm = (props) => {
        setFormIsDirty(value)
     };
 
-    const changePermissions = function (value, pItem) {
+    const changePermissions = function (value, pItem, type) {
 
         const permissionObject = {
             ...permissionBody ? permissionBody : {},
@@ -58,7 +58,7 @@ const RightForm = (props) => {
             }
         };
 
-        if(value === pItem.default){
+        if(value === pItem.default && type === 0){
             delete permissionObject[pItem.parentCode][pItem.permissionCode];
         }
 
@@ -146,11 +146,13 @@ const RightForm = (props) => {
                                             />
                                         </div>
 
-                                        <div className='right-form__field'>
+                                        <div className='right-form__field role-description'>
                                             <Field name="Description"
                                                    component={TextBox}
                                                    multiline={true}
+                                                   rows={3}
                                                    type="text"
+                                                   extClass={'_with-custom-scroll'}
                                                    validate={validators.required}
                                                    placeholder="Описание"
                                                    label={"Описание"}

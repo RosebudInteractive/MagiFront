@@ -159,8 +159,9 @@ const UserForm = (props) => {
                                                label={"Роль"}
                                                required={true}
                                                options={userRoles}
+
                                                renderValue={(selected) => (
-                                                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxWidth: '240px' }}>
+                                                   <Box className={'_with-custom-scroll'} sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxWidth: '240px' }}>
                                                        {selected.map((value) => (
                                                            <Chip key={value} label={USER_ROLE_STRINGS[value]} />
                                                        ))}
