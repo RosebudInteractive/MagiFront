@@ -27,7 +27,7 @@ export default function LevelLimit(props: Props) {
   };
 
   const decLimit = () => {
-    if (value < 0) return;
+    if (value <= 0) return;
 
     if (props.onChange) { props.onChange(value - 1); }
   };
@@ -44,8 +44,8 @@ export default function LevelLimit(props: Props) {
       </Text>
 
       <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-        <Button title={"+"} onClick={incLimit} className={'level-limit__button'} />
-        <Button title={"-"} onClick={decLimit} className={'level-limit__button'} />
+        <Button title={"+"} onClick={incLimit} className={'level-limit__button'} disabled={value===MAX_LEVEL_LIMIT}/>
+        <Button title={"-"} onClick={decLimit} className={'level-limit__button'} disabled={value===0}/>
       </View>
     </View>
   );

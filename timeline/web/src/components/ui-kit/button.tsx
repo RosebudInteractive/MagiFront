@@ -8,9 +8,9 @@ interface Props {
 }
 
 function Button(props: Props): JSX.Element {
-  const { title, onClick, className } = props;
+  const { title, onClick, className, disabled } = props;
 
-  return <button className={"ui-button ui-orange" + (className ? ` ${className}`: "")} onClick={onClick}>{title}</button>
+  return <button className={"ui-button ui-orange" + (className ? ` ${className}`: "")} onClick={onClick} disabled={disabled}>{title}</button>
 }
 
 export default React.memo(Button)

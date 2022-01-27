@@ -3,7 +3,7 @@
   border: 1px solid orangered
   border-radius: 8px
   opacity: 0.8
-  &:hover
+  &:hover:not(:disabled)
     opacity: 1
   &:active
     border-width: 1px
@@ -17,6 +17,10 @@
   font-size: 16px
   color: #FFFFFF
   box-sizing: border-box
+  transition: filter 300ms ease
+  &:disabled
+    filter: grayscale(.8)
+    cursor: default
 
 .ui-container
   display: flex
