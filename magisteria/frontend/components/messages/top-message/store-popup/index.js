@@ -65,7 +65,7 @@ export default function StorePopup(props) {
                 <div className={"buttons-block" + (_isMobilePlatform ? " _single" : " _all")}>
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.APPLE}
-                                 link={mobileAppLinks.ios}
+                                 link={mobileAppLinks.ios.message}
                                  visible={!_isMobilePlatform || _isAppleMobile}/>
                     <StoreButton size={STORE_BUTTON_SIZE.BIG}
                                  type={STORE_BUTTON_TYPE.ANDROID}
@@ -80,7 +80,7 @@ export default function StorePopup(props) {
                     <div className="store-popup__mobile-logo">
                         <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                      type={STORE_BUTTON_TYPE.APPLE}
-                                     link={mobileAppLinks.ios}
+                                     link={mobileAppLinks.ios.message}
                                      visible={isMobileAppleDevice()}/>
                         <div className="button-border"/>
                         <StoreButton size={STORE_BUTTON_SIZE.SMALL}
@@ -102,7 +102,7 @@ export default function StorePopup(props) {
                             <React.Fragment>
                                 <StoreButton size={STORE_BUTTON_SIZE.SMALL}
                                              type={STORE_BUTTON_TYPE.APPLE}
-                                             link={mobileAppLinks.ios}
+                                             link={mobileAppLinks.ios.message}
                                              visible={true}/>
                                 <div className="button-border"/>
                                 <StoreButton size={STORE_BUTTON_SIZE.SMALL}
