@@ -89,7 +89,7 @@ function Inner(props) {
                     <div className="store-buttons-block">
                         <div className="font-universal__title-smallx _title">Мобильное приложение</div>
                         <div className="_buttons">
-                            <StoreButton type={STORE_BUTTON_TYPE.APPLE} link={mobileAppLinks.ios}/>
+                            <StoreButton type={STORE_BUTTON_TYPE.APPLE} link={mobileAppLinks.ios.footer}/>
                             <StoreButton type={STORE_BUTTON_TYPE.ANDROID} link={mobileAppLinks.android}
                                          disabled={mode !== MOBILE_STORE_MODE.BOTH}/>
                         </div>
