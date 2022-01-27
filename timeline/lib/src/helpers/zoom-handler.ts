@@ -47,7 +47,10 @@ class ZoomHandler {
   }
 
   setScrollPosition(value: number) {
-    this.scrollPosition = value;
+    if (this.scrollContainer) {
+      this.scrollContainer.scrollTo(value);
+      this.scrollPosition = value;
+    }
   }
 
   adjustForNewOffset(newValue: number, newZoom: number) {
@@ -66,8 +69,24 @@ class ZoomHandler {
     }
   }
 
+  getCentrifyPosition(newValue: number) {
+    if (this.scrollContainer) {
+      const delta = newValue - (this.scrollPosition + this.width / 2);
+      let newP = this.scrollPosition + delta;
+      if (newP < 0) newP = 0; 
+      return newP;
+    } 
+    return 0;
+  }
+
+  getPosition(){
+    return this.scrollPosition;
+  }
+  
   getZoomToFit(widthToFit: number): number {
-    return ((this.scrollContainer) && (this.width < widthToFit)) ? this.width * this.zoom / widthToFit: 0;
+//    return ((this.scrollContainer) && (this.width < widthToFit)) ? this.width * this.zoom / widthToFit: 0;
+    if ((widthToFit > (this.width / 3)) && (widthToFit < (this.width * 2 / 3))) return 0;
+    return (this.scrollContainer) && (this.zoom * (this.width / 2) / widthToFit) || 0;
   }
 
   adjustForZoom(newZoom: number) {

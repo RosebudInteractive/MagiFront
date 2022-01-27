@@ -221,18 +221,110 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     ZoomHandler.setOffset(OffsetEnum.CENTER);
     setOffsetDefined(false);
   };
+  function startDoubleAnimation(
+    oldValue1: number,
+    newValue1: number,
+    oldValue2: number,
+    newValue2: number,
+    step: number, 
+    onChange1: Function,
+    onChange2: Function
+  ): void {
+    const diff1 = (newValue1)? newValue1 - oldValue1: 0;
+    const diff2 = (newValue2)? newValue2 - oldValue2: 0;
+    const part1 = diff1 / step;
+    const part2 = diff2 / step;
+    const start = performance.now();
+  
+    requestAnimationFrame(function callback() {
+      const time = performance.now();
+      const diffTime = time - start;
+      if (diffTime > step) {
+        if (newValue1)
+          onChange1(newValue1);
+        if (newValue2)
+          onChange2(newValue2);
+        return;
+      }
+      const newVal1 = oldValue1 + part1 * diffTime;
+      const newVal2 = oldValue2 + part2 * diffTime;
+      if (newValue1)
+        onChange1(newVal1);
+      if (newValue2)
+        onChange1(newVal2);
+      requestAnimationFrame(callback);
+    });
+  };
+
+  function circ(timeFraction: number) {
+    return 1 - Math.sin(Math.acos(timeFraction));
+  }
+
+  function pow(timeFraction: number) {
+    return Math.pow(timeFraction, 2)
+  }
+  const timeFunc = (value: number)=>pow(value);
+
+  function startAnimation(
+    oldValue: number,
+    newValue: number,
+    totalTime: number, 
+    onChange: Function,
+    onFinish?: Function,
+  ): void {
+    const diff = newValue - oldValue;
+    //const step = diff <= threshold ? SETTINGS.zoom.animation.shortTime : SETTINGS.zoom.animation.longTime;
+    const start = performance.now();
+  
+    requestAnimationFrame(function callback() {
+      const time = performance.now();
+      const diffTime = time - start;
+  
+      if (diffTime > totalTime) {
+        onChange(newValue);
+
+        if (onFinish) { onFinish(); }
+        return;
+      }
+  
+      const newVol = oldValue + diff * timeFunc(diffTime / totalTime);
+      onChange(newVol); //Math.round(newVol * 100) / 100
+      requestAnimationFrame(callback);
+    });
+  };
+
+  function scrollTo(value: number){
+    ZoomHandler.setScrollPosition(value);
+  }
 
   const messageCenter = (e: GestureResponderEvent) => {
     if (activeItem) {
       e.preventDefault();
-      console.log(activeItem);
       const item = activeItem.item;
-      const newZoom = ZoomHandler.getZoomToFit(item.width * 2);
-      ZoomHandler.centrifyPosition(item.left + (item.width / 2));
-      if (newZoom > 0) {
-        ZoomHandler.adjustForZoom(newZoom);
-        setZoom(newZoom);
-      }
+      const newZoom = (activeItem.type == 'period')?ZoomHandler.getZoomToFit(item.width):0;
+      const currentScrollPosition = ZoomHandler.getPosition();
+      const newScrollPosition = ZoomHandler.getCentrifyPosition(item.left + ((activeItem.type == 'period')?(item.width / 2):0));
+      console.log(`scrollPosition: ${currentScrollPosition},newScrollPosition:${newScrollPosition}`);
+//      if (newScrollPosition || newZoom)
+//        startDoubleAnimation(currentScrollPosition, newScrollPosition, zoom, newZoom, 1000, scrollTo, setZoom );
+//      if (newZoom > 0) {
+//        ZoomHandler.adjustForZoom(newZoom);
+//        setZoom(newZoom);
+//      };
+      if (newScrollPosition)
+        startAnimation(currentScrollPosition, newScrollPosition, 500, ZoomHandler.setScrollPosition.bind(ZoomHandler), ()=>{
+          if (newZoom)
+            startAnimation(zoom, newZoom, 500, setZoom);
+        } ); else {
+          if (newZoom)
+            startAnimation(zoom, newZoom, 500, setZoom);
+        }
+/*      
+      if (newScrollPosition)
+        startAnimation(currentScrollPosition, newScrollPosition, 1000, ZoomHandler.setScrollPosition);
+      if (newZoom)
+        startAnimation(zoom, newZoom, 1000, (value: number)=>{ setZoom(value); ZoomHandler.adjustForZoom(value)} );
+*/        
     };
   };
 
