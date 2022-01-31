@@ -13,11 +13,7 @@ const Permissions = (props) => {
 
         let isClean = false;
 
-        if(ev.target.classList.contains('rs-picker-toggle-clean')){
-            isClean = true;
-        } else {
-            isClean = false;
-        }
+        isClean = !!ev.target.classList.contains('rs-picker-toggle-clean');
 
         const pVals = new Map(permissionVals);
         const newVal = value !== null ? value : pItem.default;
@@ -71,7 +67,6 @@ const Permissions = (props) => {
     return (
         <Sidenav defaultOpenKeys={(readOnly || opened) ? [0] : []}>
             <Sidenav.Body>
-
                 <Nav>
                     {permissionScheme &&
                     permissionScheme.map((permission, index) => {
@@ -106,7 +101,7 @@ const Permissions = (props) => {
                                                              value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode).value : permissionItem.value}
                                                              onChange={(val, ev) => onChange(val, permissionItem, ev)}
                                                              defaultValue={permissionItem.value}
-                                                             />
+                                                />
                                             </div>
                                         </div>
 

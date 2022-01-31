@@ -149,8 +149,9 @@ const RightForm = (props) => {
                                         <div className='right-form__field role-description'>
                                             <Field name="Description"
                                                    component={TextBox}
-                                                   multiline={true}
-                                                   rows={3}
+                                                   multiline
+                                                   // todo @deprecated Use `maxRows` instead. Change on v5
+                                                   rowsMax={4}
                                                    type="text"
                                                    extClass={'_with-custom-scroll'}
                                                    validate={validators.required}
