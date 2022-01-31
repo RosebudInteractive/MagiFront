@@ -9,24 +9,44 @@ const Permissions = (props) => {
 
     const onChange = (value, pItem, ev) => {
 
+        ev.persist();
+
+        let isClean = false;
+
+        isClean = !!ev.target.classList.contains('rs-picker-toggle-clean');
+
         const pVals = new Map(permissionVals);
         const newVal = value !== null ? value : pItem.default;
 
-        if (newVal === pItem.value) {
-            if(pVals.has(pItem.permissionCode)){
-                pVals.delete(pItem.permissionCode);
+        let valType = 1;
+
+        if(isClean) {
+            if(value === null){
+                valType = 0;
             }
         } else {
-            pVals.set(pItem.permissionCode, newVal);
+            valType = 1
         }
 
-        onChangeCb && onChangeCb(newVal, pItem);
+        if (newVal === pItem.value && !isClean) {
+            pVals.set(pItem.permissionCode, {value: newVal, type: valType});
+
+                pVals.set(pItem.permissionCode, {value: newVal, type: valType});
+        } else {
+            pVals.set(pItem.permissionCode, {value: newVal, type: valType}); // 0 - default(grey), 1(black) - set by hand
+        }
+
+        onChangeCb && onChangeCb(newVal, pItem, valType);
 
         if (pVals.size === 0) {
             onDirty && onDirty(false)
         } else {
             if (value !== pItem.value) {
                 onDirty && onDirty(true)
+            } else {
+                if(pItem.fromScheme && !permissionVals.has(pItem.permissionCode)) {
+                    onDirty && onDirty(true)
+                }
             }
         }
 
@@ -34,18 +54,19 @@ const Permissions = (props) => {
     };
 
     const cleanable = function (permissionItem, val) {
+
         if (readOnly) {
             return false;
         }
 
+        //
         return permissionVals.has(permissionItem.permissionCode) ?
-            permissionVals.get(permissionItem.permissionCode) !== permissionItem.default : (permissionItem.default !== permissionItem.value);
+            permissionVals.get(permissionItem.permissionCode).type !== 0 : (permissionItem.default !== permissionItem.value || (!permissionItem.fromScheme && permissionItem.default === permissionItem.value));
     };
 
     return (
         <Sidenav defaultOpenKeys={(readOnly || opened) ? [0] : []}>
             <Sidenav.Body>
-
                 <Nav>
                     {permissionScheme &&
                     permissionScheme.map((permission, index) => {
@@ -57,7 +78,6 @@ const Permissions = (props) => {
                             justifyContent: 'center',
                             transition: 'height .8s ease .5s',
                             minWidth: '298px',
-                            maxWidth: '298px',
                             pointerEvents: readOnly ? 'none' : 'auto'
                         }
                         } key={index} eventKey={index} title={<div className={'title-drop-d'}>{permission.title}</div>}>
@@ -76,12 +96,12 @@ const Permissions = (props) => {
                                                              data={permissionItem.values}
                                                              renderValue={(v, i) => {
                                                                  return <div
-                                                                     className={`selected-option ${(v === permissionItem.default || readOnly) ? 'grey' : 'black'}`}>{i.label}</div>;
+                                                                     className={`selected-option ${((permissionVals.has(permissionItem.permissionCode) && permissionVals.get(permissionItem.permissionCode).type === 0) || readOnly || (permissionItem.fromScheme && !permissionVals.has(permissionItem.permissionCode) && v === permissionItem.default)) ? 'grey' : 'black'}`}>{i.label}</div>;
                                                              }}
-                                                             value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode) : permissionItem.value}
+                                                             value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode).value : permissionItem.value}
                                                              onChange={(val, ev) => onChange(val, permissionItem, ev)}
                                                              defaultValue={permissionItem.value}
-                                                             />
+                                                />
                                             </div>
                                         </div>
 

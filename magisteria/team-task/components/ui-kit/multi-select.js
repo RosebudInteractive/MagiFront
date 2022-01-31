@@ -44,9 +44,10 @@ const CssFormControl = withStyles({
                 display: "flex",
                 alignItems: "center",
                 borderRadius: "8px",
-                padding: "7px !important",
+                padding: "14px 7px !important",
+                overflowY: "auto",
                 border: '1px solid #D2D2D6',
-                height: '60px',
+                // height: '60px',
                 maxWidth: '240px',
                 overflowX: 'auto',
                 "-webkit-transition": "border, background 300ms ease-out",
@@ -81,6 +82,10 @@ const CssFormControl = withStyles({
             "line-height": "22px",
             "letter-spacing": "0.25px",
             "color": "#4A4B57"
+        },
+        "& .MuiChip-root": {
+            flex: "1 0 32px",
+            maxWidth: 200
         }
     },
 })(FormControl);

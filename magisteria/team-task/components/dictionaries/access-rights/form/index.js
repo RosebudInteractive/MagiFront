@@ -16,6 +16,7 @@ import {hasAdminRights} from "tt-ducks/auth";
 import Permissions from "../../permissions/permissions";
 import validators from "../../../../tools/validators"
 import roleMerger from "../../../../tools/role-merger";
+// import TextArea from "../../../../../src/components/common/text-area";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -47,7 +48,7 @@ const RightForm = (props) => {
        setFormIsDirty(value)
     };
 
-    const changePermissions = function (value, pItem) {
+    const changePermissions = function (value, pItem, type) {
 
         const permissionObject = {
             ...permissionBody ? permissionBody : {},
@@ -57,7 +58,7 @@ const RightForm = (props) => {
             }
         };
 
-        if(value === pItem.default){
+        if(value === pItem.default && type === 0){
             delete permissionObject[pItem.parentCode][pItem.permissionCode];
         }
 
@@ -145,10 +146,14 @@ const RightForm = (props) => {
                                             />
                                         </div>
 
-                                        <div className='right-form__field'>
+                                        <div className='right-form__field role-description'>
                                             <Field name="Description"
                                                    component={TextBox}
+                                                   multiline
+                                                   // todo @deprecated Use `maxRows` instead. Change on v5
+                                                   rowsMax={4}
                                                    type="text"
+                                                   extClass={'_with-custom-scroll'}
                                                    validate={validators.required}
                                                    placeholder="Описание"
                                                    label={"Описание"}

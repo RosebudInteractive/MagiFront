@@ -2,11 +2,9 @@ import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
-import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
-import type {FilterField} from "../../filter/types";
 import {
     deleteUser,
     fetchingSelector as userDictionaryFetching,
@@ -30,6 +28,8 @@ import {
     getRolesWithPermissions,
     rolesPermissionsSelector
 } from "tt-ducks/access-rights-dictionary";
+import type {GridSortOrder} from "../../../types/grid";
+import type {FilterField} from "../../filter/types";
 
 let _usersCount = 0;
 
@@ -184,7 +184,7 @@ const DictionaryUsers = (props) => {
                 <button className="open-form-button" onClick={openUserForm}>
                     <PlusIco/>
                 </button>
-                <div className="grid-container users-table">
+                <div className="grid-container users-table unselectable">
                     <Webix ui={GRID_CONFIG} data={users}/>
                 </div>
 
