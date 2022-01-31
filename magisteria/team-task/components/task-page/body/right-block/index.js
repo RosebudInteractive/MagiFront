@@ -1,6 +1,6 @@
 import React, {useMemo} from "react"
 import {Field} from "redux-form";
-import {TextBox, Select, DatePicker} from "../../../ui-kit";
+import {DatePicker, Select, TextBox} from "../../../ui-kit";
 import CommentBlock, {Comment} from "./сomment-block";
 import "./right-block.sass"
 import {TASK_STATE} from "../../../../constants/states";
@@ -50,7 +50,7 @@ export default function RightBlock(props: TaskBodyProps) {
     }, [task])
 
     return <div className="body__right-block">
-        <Field component={Select} name={"ExecutorId"} label={"Испольнитель"} options={_getUsers()} disabled={_lock.executor} readOnly={_lock.executor}/>
+        <Field component={Select} name={"ExecutorId"} label={"Исполнитель"} options={_getUsers()} disabled={_lock.executor} readOnly={_lock.executor}/>
         <Field component={Select} name={"State"} label={"Состояние"} options={_stateOptions} disabled={_lock.state} readOnly={_lock.state} required={true}/>
         { _alertLog && <Comment {..._alertLog}/> }
         <Field component={DatePicker} name={"DueDate"} label={"Дата исполнения"} disabled={_lock.dueDate} readOnly={_lock.dueDate}/>

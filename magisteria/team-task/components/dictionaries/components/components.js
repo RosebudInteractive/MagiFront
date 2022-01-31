@@ -2,11 +2,9 @@ import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Route, useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
-import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
-import type {FilterField} from "../../filter/types";
 import {
     componentFormOpenedSelector,
     componentsDictionarySelector,
@@ -21,6 +19,8 @@ import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks
 import {connect} from "react-redux";
 import './components.sass'
 import ComponentForm from "./form/form";
+import type {GridSortOrder} from "../../../types/grid";
+import type {FilterField} from "../../filter/types";
 
 let _componentsCount = 0;
 
@@ -155,7 +155,7 @@ const DictionaryComponents = (props) => {
             <div className="dictionary-components-page form _scrollable-y">
                 <h5 className="form-header _grey70">Справочник компонентов</h5>
                 <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
-                <div className="grid-container components-table">
+                <div className="grid-container components-table unselectable">
                     <Webix ui={GRID_CONFIG} data={components}/>
                 </div>
                 {props.modalVisible
