@@ -133,8 +133,8 @@ class EpisodeContent extends GridControl {
         let _columns = [
             {id: 'FileId', header: 'FileId', width: 120, sort: 'int'},
             {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true, width: 300, sort: 'text'},
-            {id: 'StartTime', header: ['Время начала', {content:"textFilter"}], width: 90, sort: 'text'},
-            {id: 'Duration', header:  ['Длительность', {content:"textFilter"}], width: 90, sort: 'text'},
+            {id: 'StartTime', header: ['Время начала', {content:"textFilter"}], width: 90, sort: 'int'},
+            {id: 'Duration', header:  ['Длительность', {content:"textFilter"}], width: 90, sort: 'int'},
             // {id: 'FileName', header: 'Файл', width: 300,},
             {
                 id: 'CompType',
