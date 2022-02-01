@@ -42,7 +42,7 @@ export default function StorePopup(props) {
         // e.returnValue = false
 
         // setTimeout(() => {
-        window.open(_isAppleMobile ? mobileAppLinks.ios : mobileAppLinks.android)
+        window.open(_isAppleMobile ? mobileAppLinks.ios.message : mobileAppLinks.android)
         // }, 1000);
     }
 
