@@ -155,9 +155,9 @@ class AuthorsPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'FirstName', header: ['Имя', {content:"textFilter"}], width: 200},
-                {id: 'LastName', header: ['Фамилия', {content:"textFilter"}], width: 300},
-                {id: "Description", header: "Описание", fillspace: true},
+                {id: 'FirstName', header: ['Имя', {content:"textFilter"}], width: 200, sort: 'text'},
+                {id: 'LastName', header: ['Фамилия', {content:"textFilter"}], width: 300, sort: 'text'},
+                {id: "Description", header: "Описание", fillspace: true, sort: 'text'},
             ],
             on: {
                 onAfterSelect: function (selObj) {

@@ -253,8 +253,8 @@ class TestQuestions extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'Number', header: '#', width: 30},
-            {id: 'Text', header: 'Текст вопроса', fillspace: true},
+            {id: 'Number', header: '#', width: 30, sort: 'int'},
+            {id: 'Text', header: ['Текст вопроса', {content:"textFilter"}], fillspace: true, sort: 'text'},
         ];
 
         _columns.push(...super._getColumns());

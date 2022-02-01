@@ -131,16 +131,17 @@ class EpisodeContent extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'FileId', header: 'FileId', width: 120,},
-            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true, width: 300, },
-            {id: 'StartTime', header: ['Время начала', {content:"textFilter"}], width: 90},
-            {id: 'Duration', header:  ['Длительность', {content:"textFilter"}], width: 90,},
+            {id: 'FileId', header: 'FileId', width: 120, sort: 'int'},
+            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true, width: 300, sort: 'text'},
+            {id: 'StartTime', header: ['Время начала', {content:"textFilter"}], width: 90, sort: 'int'},
+            {id: 'Duration', header:  ['Длительность', {content:"textFilter"}], width: 90, sort: 'int'},
             // {id: 'FileName', header: 'Файл', width: 300,},
             {
                 id: 'CompType',
                 header: ['Тип', {content:"selectFilter"}],
                 width: 150,
                 editor: 'select',
+                sort: 'text',
                 options: [
                     {id: 'PIC', value: 'Изображение'},
                     {id: 'VDO', value: 'Видео'},

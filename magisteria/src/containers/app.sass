@@ -88,6 +88,35 @@
       height: 100%
 
 
+.webix_ss_sort_desc:before, .webix_ss_sort_asc:before
+  content: "" !important
+  position: absolute
+  top: 50%
+  right: 2px
+
+  width: 6px
+  height: 6px
+  border: 1px solid #9696A0
+  border-left: none
+  border-top: none
+  -webkit-transition: -webkit-transform 0.3s ease
+  transition: -webkit-transform 0.3s ease
+  transition: transform 0.3s ease, -webkit-transform 0.3s ease
+
+.webix_ss_sort_desc:before
+  -webkit-transform: translateY(-50%) rotate(45deg)
+  -ms-transform: translateY(-50%) rotate(45deg)
+  transform: translateY(-50%) rotate(45deg)
+
+
+.webix_ss_sort_asc:before
+  -webkit-transform: translateY(-50%) rotate(-135deg)
+  -ms-transform: translateY(-50%) rotate(-135deg)
+  transform: translateY(-50%) rotate(-135deg)
+  margin-top: -3px
+
+.webix_ss_sort_single .webix_ss_sort_num
+  display: none
 
 
 

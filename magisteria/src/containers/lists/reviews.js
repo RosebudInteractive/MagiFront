@@ -213,12 +213,12 @@ class ReviewsPage extends React.Component {
             editable: false,
             tooltip:true,
             columns: [
-                {id: 'ReviewDate', header: 'Дата', width: 150, format: this._formatDate},
-                {id: 'CourseId', header: ['Курс',  {content:"selectFilter"}], width: 330, editor: 'select', options: this._getCourses()},
+                {id: 'ReviewDate', header: 'Дата', width: 150, format: this._formatDate, sort: 'date'},
+                {id: 'CourseId', header: ['Курс',  {content:"selectFilter"}], width: 330, editor: 'select', options: this._getCourses(), sort: 'int'},
                 {id: "UserName", header: ["Пользователь", {content: 'textFilter'}], width: 150},
-                {id: "Review", header: "Отзыв",  fillspace: true, adjust: "data", minColumnWidth: 200},
+                {id: "Review", header: "Отзыв",  fillspace: true, adjust: "data", minColumnWidth: 200, sort: 'text'},
                 {
-                    id: 'Status', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
+                    id: 'Status', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select', sort: 'text',
                     options: [
                         {id: '1', value: 'Опубликованный'},
                         {id: '2', value: 'На модерации'},
