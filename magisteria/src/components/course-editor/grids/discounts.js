@@ -185,15 +185,15 @@ class CourseDiscounts extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'Code', header: 'Код', width: 150,},
-            {id: 'Perc', header: 'Скидка, %', width: 100, format: function (value) {
+            {id: 'Code', header: ['Код', {content:"textFilter"}], width: 150, sort: 'text'},
+            {id: 'Perc', header: ['Скидка, %', {content:"textFilter"}], sort: 'int', width: 100, format: function (value) {
                     return `${value}%`
                 }},
-            {id: 'TtlMinutes', header: 'Длительность', width: 150, format: function (value) {
+            {id: 'TtlMinutes', header: 'Длительность', sort: 'int', width: 150, format: function (value) {
                     return `${Math.round(value / 60)} ч. ${(value % 60)} мин.`
                 }},
-            {id: 'LastDate', header: 'Дата окончания', width: 150, format: this._formatDate},
-            {id: 'Description', header: 'Описание', fillspace: true,},
+            {id: 'LastDate', header: 'Дата окончания', width: 150, format: this._formatDate, sort: 'date'},
+            {id: 'Description', header: ['Описание', {content:"textFilter"}], fillspace: true, sort: 'text'},
         ];
 
         _columns.push(...super._getColumns());

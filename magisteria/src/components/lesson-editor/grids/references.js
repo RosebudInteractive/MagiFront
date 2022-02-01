@@ -194,9 +194,9 @@ class LessonReferences extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'Number', header: '#', width: 30},
-            {id: 'Description', header: ['Описание', {content:"textFilter"}], fillspace: true},
-            {id: 'URL', header: ['URL', {content:"textFilter"}], width: 120},
+            {id: 'Number', header: '#', width: 30, sort: 'int'},
+            {id: 'Description', header: ['Описание', {content:"textFilter"}], fillspace: true, sort: 'text'},
+            {id: 'URL', header: ['URL', {content:"textFilter"}], width: 120, sort: 'text'},
         ];
 
         _columns.push(...super._getColumns());

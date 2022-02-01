@@ -189,9 +189,9 @@ class EpisodeToc extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'Number', header: '#', width: 30},
-            {id: 'Topic', header: ['Название', {content:"textFilter"}], fillspace: true},
-            {id: 'StartTime', header: ['Метка времени', {content:"textFilter"}], width: 200,},
+            {id: 'Number', header: '#', width: 30, sort: 'int'},
+            {id: 'Topic', header: ['Название', {content:"textFilter"}], fillspace: true, sort: 'text'},
+            {id: 'StartTime', header: ['Метка времени', {content:"textFilter"}], width: 200, sort: 'int'},
         ];
 
         _columns.push(...super._getColumns());

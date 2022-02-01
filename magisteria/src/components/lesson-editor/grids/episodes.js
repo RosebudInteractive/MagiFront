@@ -52,13 +52,13 @@ class Episodes extends GridControl {
 
     _getColumns() {
         let _columns = [
-            {id: 'Number', header: '#', width: 30},
-            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
+            {id: 'Number', header: '#', width: 30, sort: 'int'},
+            {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true, sort: 'text'},
             {
-                id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 90, editor: 'select',
+                id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 90, editor: 'select', sort: 'text',
                 options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
             },
-            {id: 'LanguageName', header: 'Язык курса', width: 90},
+            {id: 'LanguageName', header: 'Язык курса', width: 90, sort: 'text'},
         ];
 
         _columns.push(...super._getColumns());

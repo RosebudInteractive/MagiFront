@@ -157,8 +157,8 @@ class CategoriesPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 400},
-                {id: "ParentName", header: "Родительская категория", fillspace: true},
+                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 400, sort: 'text'},
+                {id: "ParentName", header: "Родительская категория", fillspace: true, sort: 'text'},
             ],
             on: {
                 onAfterSelect: function (selObj) {

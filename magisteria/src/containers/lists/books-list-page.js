@@ -251,8 +251,8 @@ class BooksPage extends React.Component {
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: ['Название книги', {content:"textFilter"}], width: 230},
-                {id: "Description", header: ['Описание курса', {content:"textFilter"}], fillspace: true},
+                {id: 'Name', header: ['Название книги', {content:"textFilter"}], width: 230, sort: 'text'},
+                {id: "Description", header: ['Описание курса', {content:"textFilter"}], fillspace: true, sort: 'text'},
             ],
             on: {
                 onAfterSelect: function (selObj) {
