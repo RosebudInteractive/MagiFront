@@ -21,7 +21,7 @@ import {fetchingSelector} from "../../../../ducks/access-rights-dictionary";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const {roleData, visible, actions, isAdmin, permissionScheme} = props;
+    const {roleData, visible, actions, isAdmin, permissionScheme, fetching} = props;
 
     const [formIsDirty, setFormIsDirty] = useState(false);
     const [permissionBody, setPermissionBody] = useState(null);

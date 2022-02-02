@@ -42,7 +42,7 @@ const ComposeValidators = (...validators) => value =>
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
     const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData ? props.userData.PData.roles : []));
-    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
+    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions, fetching} = props;
 
     useEffect(()=>{
         setActionCreate(!(userData && userData.Id));
@@ -111,7 +111,7 @@ const UserForm = (props) => {
     }), [userData]);
 
     return (
-        visible &&
+        (visible && !fetching) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
