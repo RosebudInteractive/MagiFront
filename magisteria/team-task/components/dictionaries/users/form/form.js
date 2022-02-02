@@ -66,7 +66,7 @@ const UserForm = (props) => {
 
 
     const userRoles = useMemo(() => {
-        return Object.entries(USER_ROLE_STRINGS)
+        return Object.entries(rolesWithNames)
             .map((val) => {
                 return (val !== USER_ROLE_STRINGS.a) || ((val === USER_ROLE_STRINGS) && isAdmin) ?
                     {id: val[0], name: val[1]}
@@ -74,7 +74,7 @@ const UserForm = (props) => {
                     null
             })
             .filter(item => !!item);
-    }, [isAdmin]);
+    }, [isAdmin, rolesWithNames]);
 
     const handleSubmit = (userInfo) => {
         const _oldRoles = {...userData.PData.roles}
