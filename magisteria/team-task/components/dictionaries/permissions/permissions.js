@@ -79,6 +79,24 @@ const Permissions = (props) => {
 
     const permissionItems = (items, index) => items.map((permissionItem, inx) => {
 
+        const renderValueClassName = (permissionItem, value) => {
+            let className = 'black';
+
+            if((permissionVals.has(permissionItem.permissionCode) && permissionVals.get(permissionItem.permissionCode).type === 0)){
+                className = 'grey'
+            }
+
+            if(readOnly){
+                className = 'grey'
+            }
+
+            if((permissionItem.fromScheme && !permissionVals.has(permissionItem.permissionCode) && value === permissionItem.default)){
+                className = 'grey'
+            }
+
+            return className;
+        }
+
         return <Dropdown.Item style={{padding: 0}} key={inx} eventKey={`${index}-${inx}`}>
             <div className='permission-item'>
                 <div className='permission-title'>{permissionItem.title}</div>
@@ -91,7 +109,7 @@ const Permissions = (props) => {
                                  data={permissionItem.values}
                                  renderValue={(v, i) => {
                                      return <div
-                                         className={`selected-option ${((permissionVals.has(permissionItem.permissionCode) && permissionVals.get(permissionItem.permissionCode).type === 0) || readOnly || (permissionItem.fromScheme && !permissionVals.has(permissionItem.permissionCode) && v === permissionItem.default)) ? 'grey' : 'black'}`}>{i.label}</div>;
+                                         className={`selected-option ${renderValueClassName(permissionItem, v)}`}>{i.label}</div>;
                                  }}
                                  value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode).value : permissionItem.value}
                                  onChange={(val, ev) => onChange(val, permissionItem, ev)}

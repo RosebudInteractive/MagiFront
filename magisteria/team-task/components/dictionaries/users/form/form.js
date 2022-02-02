@@ -48,6 +48,10 @@ const UserForm = (props) => {
         setActionCreate(!(userData && userData.Id));
     }, [userData]);
 
+    const rolesWithNames = useMemo(() => {
+        return Object.fromEntries(roles.map(role => [role.ShortCode, role.Name]));
+    }, [roles]);
+
     const closeModalForm = () => {
         actions.toggleUserForm(false);
         actions.cleanSelectedUser();
@@ -163,7 +167,7 @@ const UserForm = (props) => {
                                                renderValue={(selected) => (
                                                    <Box className={'user-form__roles _with-custom-scroll'}>
                                                        {selected.map((value) => (
-                                                           <Chip key={value} label={USER_ROLE_STRINGS[value]} />
+                                                           <Chip key={value} label={rolesWithNames[value]} />
                                                        ))}
                                                    </Box>
                                                )}

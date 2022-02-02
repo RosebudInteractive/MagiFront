@@ -16,6 +16,7 @@ import {hasAdminRights} from "tt-ducks/auth";
 import Permissions from "../../permissions/permissions";
 import validators from "../../../../tools/validators"
 import roleMerger from "../../../../tools/role-merger";
+import {fetchingSelector} from "../../../../ducks/access-rights-dictionary";
 // import TextArea from "../../../../../src/components/common/text-area";
 
 const RightForm = (props) => {
@@ -89,7 +90,7 @@ const RightForm = (props) => {
     }, [permissionScheme, roleData]);
 
     return (
-        visible &&
+        (visible && !fetching) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
@@ -202,7 +203,8 @@ const mapState2Props = (state) => {
         roleData: selectedRightSelector(state),
         visible: rightFormOpenedSelector(state),
         isAdmin: hasAdminRights(state),
-        permissionScheme: permissionSchemeSelector(state)
+        permissionScheme: permissionSchemeSelector(state),
+        fetching: fetchingSelector(state)
     }
 };
 

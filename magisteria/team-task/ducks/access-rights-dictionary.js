@@ -135,8 +135,6 @@ function* getRolesWithPermissionsSaga() {
     try {
         const rights = yield call(_getRights);
 
-
-
         const roleIds = rights.map(x => x.Id);
 
         if(roleIds.length > 0){
