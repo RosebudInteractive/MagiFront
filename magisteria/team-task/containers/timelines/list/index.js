@@ -2,11 +2,9 @@ import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {useLocation, withRouter} from 'react-router-dom';
 import {useWindowSize} from "../../../tools/window-resize-hook";
 import {convertFilter2Params, getFilterConfig, parseParams, resizeHandler} from "./functions";
-import type {GridSortOrder} from "../../../types/grid";
 import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../../components/filter";
 import Webix from "../../../components/Webix";
-import type {FilterField} from "../../../components/filter/types";
 import {taskSelector} from "tt-ducks/task";
 import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
@@ -24,6 +22,7 @@ import {
     timelineOpenedSelector,
     timelinesFetchingSelector,
     timelinesSelector,
+    unpublishTimeline,
     updateTimeline
 } from "tt-ducks/timelines";
 import {setTemporaryPeriods} from "tt-ducks/periods-timeline";
@@ -33,6 +32,8 @@ import {TimelineStatuses, TimelineTypesOfUse} from "../../../constants/timelines
 import {hideSideBarMenu, sideBarMenuVisible} from "tt-ducks/app";
 import PlusIco from "tt-assets/svg/plus.svg";
 import {TIMELINE_STATE} from "../../../constants/states";
+import type {GridSortOrder} from "../../../types/grid";
+import type {FilterField} from "../../../components/filter/types";
 
 let timelinesCount = 0;
 
@@ -162,7 +163,7 @@ const Timelines = (props) => {
             {
                 id: 'publish-btn', header: '', width: 50, css: "_container",
                 template: function(data){
-                    return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : ""
+                    return data && data.State !== 2 ?  "<button class='grid-button _publish js-publish'/>" : "<button class='grid-button _unpublish js-unpublish'/>"
                 }
             },
             {
@@ -207,10 +208,14 @@ const Timelines = (props) => {
                 const item = this.getItem(data.row);
                 if (item) {
                     actions.publishTimeline(item.Id, true);
-                    // actions.updateTimeline(item.Id, {
-                    //     ...item,
-                    //     State: 2
-                    // });
+                    actions.getTimelines();
+                }
+            },
+            "js-unpublish": function (e, data) {
+                e.preventDefault()
+                const item = this.getItem(data.row);
+                if (item) {
+                    actions.unpublishTimeline(item.Id, true);
                     actions.getTimelines();
                 }
             },
@@ -295,6 +300,7 @@ const mapDispatch2Props = (dispatch) => {
             setTemporaryPeriods,
             updateTimeline,
             publishTimeline,
+            unpublishTimeline,
             removeTimeline,
             copyTimeline
         }, dispatch)

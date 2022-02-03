@@ -42,6 +42,7 @@ const CREATE_NEW_TIMELINE = `${prefix}/CREATE_NEW_TIMELINE`;
 const COPY_TIMELINE = `${prefix}/COPY_TIMELINE`;
 const UPDATE_TIMELINE_REQUEST = `${prefix}/UPDATE_TIMELINE_REQUEST`;
 const PUBLISH_TIMELINE = `${prefix}/PUBLISH_TIMELINE`;
+const UNPUBLISH_TIMELINE = `${prefix}/UNPUBLISH_TIMELINE`;
 const REMOVE_TIMELINE = `${prefix}/REMOVE_TIMELINE`;
 const LINK_EVENT = `${prefix}/LINK_EVENT`;
 const LINK_PERIOD = `${prefix}/LINK_PERIOD`;
@@ -136,6 +137,10 @@ export const publishTimeline = (id, withConfirmation = true) => {
    return {type: PUBLISH_TIMELINE, payload: {id, withConfirmation}}
 };
 
+export const unpublishTimeline = (id, withConfirmation = true) => {
+    return {type: UNPUBLISH_TIMELINE, payload: {id, withConfirmation}}
+};
+
 export const selectTimeline = (timelineId) => {
     return {type: SELECT_TIMELINE, payload: timelineId}
 };
@@ -165,6 +170,7 @@ export const saga = function* () {
         takeEvery(GET_TIMELINE, getTimelineSaga),
         takeEvery(UPDATE_TIMELINE_REQUEST, updateTimelineSaga),
         takeEvery(PUBLISH_TIMELINE, publishTimelineSaga),
+        takeEvery(UNPUBLISH_TIMELINE, unpublishTimelineSaga),
         takeEvery(LINK_EVENT, linkEventSaga),
         takeEvery(LINK_PERIOD, linkPeriodSaga),
         takeEvery(REMOVE_TIMELINE, removeTimelineSaga),
@@ -208,6 +214,39 @@ function* removeTimelineSaga(data) {
     }catch (e) {
         yield put({type: REMOVE_TIMELINE});
         console.log(e);
+        showErrorMessage(e.toString());
+    }
+}
+
+function* unpublishTimelineSaga(data) {
+    try {
+        if(data.payload.withConfirmation){
+            const message: Message = {
+                content: `Снять таймлайн с публиккации?`,
+                title: "Подтверждение"
+            };
+
+            yield put(showUserConfirmation(message));
+
+            const {accept} = yield race({
+                accept: take(MODAL_MESSAGE_ACCEPT),
+                decline: take(MODAL_MESSAGE_DECLINE)
+            });
+
+            if (!accept) return;
+
+            yield put({type: START_REQUEST});
+            yield call(changeTimeline, data.payload.id, {State: 1});
+            yield put(getTimelines());
+            yield put({type: SUCCESS_REQUEST});
+        } else {
+            yield call(changeTimeline, data.payload.id, {State: 1});
+            yield put(getTimelines());
+            yield put({type: SUCCESS_REQUEST});
+        }
+    }catch (e) {
+        yield put({type: FAIL_REQUEST});
+        console.log(e.toString());
         showErrorMessage(e.toString());
     }
 }

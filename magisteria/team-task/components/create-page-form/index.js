@@ -1,6 +1,6 @@
 import React, {useEffect} from "react"
 import {change, Field, getFormValues, isDirty, isValid, reduxForm} from "redux-form";
-import {Checkbox, Select, TextBox, Autocomplete} from "../ui-kit";
+import {Autocomplete, Checkbox, Select, TextBox} from "../ui-kit";
 import "./create-page-form.sass"
 import {compose} from "redux";
 import {connect} from "react-redux";
@@ -21,6 +21,7 @@ function CreateProcessForm(props) {
                     UseAuthorPictures: editorValues.UseAuthorPictures,
                     UseMusic: editorValues.UseMusic,
                     HasTest: editorValues.HasTest,
+                    HasLiterature: editorValues.HasLiterature,
                     ExecutorSound: editorValues.ExecutorSound ? +editorValues.ExecutorSound : null,
                     ExecutorSoundControl: editorValues.ExecutorSoundControl ? +editorValues.ExecutorSoundControl : null,
                     ExecutorTranscript: editorValues.ExecutorTranscript ? +editorValues.ExecutorTranscript : null,
@@ -56,6 +57,7 @@ function CreateProcessForm(props) {
             UseAuthorPictures: false,
             UseMusic: false,
             HasTest: false,
+            HasLiterature: false
         })
 
         $("body").addClass("_no-vertical-scroll")
@@ -75,13 +77,14 @@ function CreateProcessForm(props) {
     return <form className="modal-form" action={"javascript:void(0)"}>
         <div className="modal-form__dialog create-process-dialog _with-custom-scroll">
             <h6 className="_grey100">Создание нового процесса</h6>
-            <Field component={TextBox} name={"Name"} label={"Название"}/>
+            <Field component={TextBox} name={"Name"} label={"Название"} extClass={'height-100-input-inside-mui-form-control'}/>
             <Field component={Autocomplete} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
             <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getSupervisors()} required={true} readOnly={!canChangeSupervisor} disabled={!canChangeSupervisor}/>
             <div className="dialog__fields-wrapper _with-custom-scroll">
                 <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
                 <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
                 <Field component={Checkbox} name={"HasTest"} label={"Тесты"}/>
+                <Field component={Checkbox} name={"HasLiterature"} label={"Литература"}/>
                 <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getUsers()}/>
                 <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getUsers()}/>
