@@ -4,7 +4,7 @@ import React, {
 import EventPoints from './event-points';
 import PeriodSections from './periods';
 import placeByYLevelLimit from '../../helpers/placeByLevel';
-import SerifsContext from './serifs/context';
+import SerifsContext, { ISerif } from './serifs/context';
 import NativeAxis from './axis';
 import {
   calcDisplayDate, calcEventPointPosition, calcPeriodPoints, isArrayEquals,
@@ -16,6 +16,8 @@ import {
 } from '../../types/common';
 import { Theme } from '../../types/theme';
 import SETTINGS from '../settings';
+import Viewport from './viewport';
+import Canvas from './canvas';
 
 declare interface IDateSortable{
   year?: number,
@@ -58,7 +60,7 @@ const STEPS: number[] = [1, 2, 5, 10, 25, 50, 100];
 export default function TimeAxis(props: Props): JSX.Element | null {
   const {
     events, width, height, zoom, periods, levelLimit, zoomSliderStopped, visibilityChecking,
-    elementsOverAxis, onItemClick, theme, activeItem, isDeprecatedBrowser, minWidth
+    elementsOverAxis, onItemClick, theme, activeItem, isDeprecatedBrowser, minWidth,
   } = props;
 
   const [svgWidth, setSvgWidth] = useState(0);
@@ -199,7 +201,7 @@ export default function TimeAxis(props: Props): JSX.Element | null {
     ));
     startDate.current = start;
 
-    setMyLevelLimit({ ...levelLimit })
+    setMyLevelLimit({ ...levelLimit });
   }, [events, periods, needCorrectionOnBC]);
 
   useEffect(() => {
@@ -314,22 +316,16 @@ export default function TimeAxis(props: Props): JSX.Element | null {
       const canvasWidth = width < minWidthValue ? minWidthValue : width;
       setWorkAreaWidth(canvasWidth - SETTINGS.horizontalPadding - rightPadding);
     }
-  }, [minWidth])
+  }, [minWidth]);
+
+  const contextValue: ISerif = useMemo<ISerif>(() => ({
+    needCorrectionOnBC, zoom, theme, isDeprecatedBrowser,
+  }), [needCorrectionOnBC, zoom, theme, isDeprecatedBrowser]);
 
   return !!width && !!pixelsInYear && !!myLevelLimit
     ? (
-      <div
-        className="timeline-canvas"
-        style={{
-          width: svgWidth,
-          height: viewPortHeight,
-        }}
-      >
-        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-        <SerifsContext.Provider value={{
-          needCorrectionOnBC, zoom, theme, isDeprecatedBrowser,
-        }}
-        >
+      <Viewport width={svgWidth} height={viewPortHeight}>
+        <SerifsContext.Provider value={contextValue}>
           <NativeAxis
             width={svgWidth}
             startDate={startDate.current}
@@ -337,12 +333,9 @@ export default function TimeAxis(props: Props): JSX.Element | null {
             serifs={serifs}
             yearPerPixel={pixelsInYear}
           />
-          <div
-            className="timeline-canvas__inner"
-            style={{
-              marginLeft: SETTINGS.horizontalPadding,
-              width: `calc(100% - ${memoPaddingRight + SETTINGS.horizontalPadding}px)`,
-            }}
+          <Canvas
+            paddingLeft={SETTINGS.horizontalPadding}
+            paddingRight={memoPaddingRight + SETTINGS.horizontalPadding}
           >
             <EventPoints
               elementsOverAxis={elementsOverAxis}
@@ -373,9 +366,9 @@ export default function TimeAxis(props: Props): JSX.Element | null {
               onItemClick={onItemClick}
               onSetLevelsCount={setPeriodsLevelsCount}
             />
-          </div>
+          </Canvas>
         </SerifsContext.Provider>
-      </div>
+      </Viewport>
     )
     : null;
 }
