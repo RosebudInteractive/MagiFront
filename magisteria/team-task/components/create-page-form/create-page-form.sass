@@ -1,8 +1,6 @@
 .create-process-dialog
   max-height: calc(100% - 100px)
   overflow: auto
-  width: 45% !important //todo get rid of 'important', use it here cause it overrides by class 'modal-form__dialog'
-  max-width: 800px !important //todo get rid of 'important', use it here cause it overrides by class 'modal-form__dialog'
 
   .dialog__fields-wrapper
     margin: 12px 0
@@ -20,6 +18,10 @@
     &::-webkit-scrollbar-thumb
       border-radius: 8px 64px 64px 8px
 
+.modal-form__dialog.create-process-dialog
+  width: 45%
+  max-width: 800px
+  min-width: 520px
 
 .height-100-input-inside-mui-form-control // todo check the _with-custom-scroll, and check how it combines with dialog__fields-wrapper
   .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-formControl

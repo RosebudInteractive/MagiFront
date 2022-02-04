@@ -238,6 +238,7 @@ class CourseEditor extends React.Component {
             State: editorValues.state,
             Cover: editorValues.cover.file,
             CoverMeta: editorValues.cover.meta,
+            CoverDescription: editorValues.coverDescription,
             LanguageId: editorValues.languageId,
             URL: editorValues.URL,
             Description: editorValues.description,
