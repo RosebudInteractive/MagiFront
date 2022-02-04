@@ -41,12 +41,16 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData.PData.roles));
-    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
+    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData ? props.userData.PData.roles : []));
+    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions, fetching} = props;
 
     useEffect(()=>{
         setActionCreate(!(userData && userData.Id));
     }, [userData]);
+
+    const rolesWithNames = useMemo(() => {
+        return Object.fromEntries(roles.map(role => [role.ShortCode, role.Name]));
+    }, [roles]);
 
     const closeModalForm = () => {
         actions.toggleUserForm(false);
@@ -62,7 +66,7 @@ const UserForm = (props) => {
 
 
     const userRoles = useMemo(() => {
-        return Object.entries(USER_ROLE_STRINGS)
+        return Object.entries(rolesWithNames)
             .map((val) => {
                 return (val !== USER_ROLE_STRINGS.a) || ((val === USER_ROLE_STRINGS) && isAdmin) ?
                     {id: val[0], name: val[1]}
@@ -70,7 +74,7 @@ const UserForm = (props) => {
                     null
             })
             .filter(item => !!item);
-    }, [isAdmin]);
+    }, [isAdmin, rolesWithNames]);
 
     const handleSubmit = (userInfo) => {
         const _oldRoles = {...userData.PData.roles}
@@ -107,7 +111,7 @@ const UserForm = (props) => {
     }), [userData]);
 
     return (
-        visible &&
+        (visible && !fetching) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
@@ -163,7 +167,7 @@ const UserForm = (props) => {
                                                renderValue={(selected) => (
                                                    <Box className={'user-form__roles _with-custom-scroll'}>
                                                        {selected.map((value) => (
-                                                           <Chip key={value} label={USER_ROLE_STRINGS[value]} />
+                                                           <Chip key={value} label={rolesWithNames[value]} />
                                                        ))}
                                                    </Box>
                                                )}
