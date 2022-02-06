@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from "react-redux";
-import { bindActionCreators } from 'redux';
-import {reduxForm, Field, formValueSelector, change as changeFieldValue} from 'redux-form'
+import {bindActionCreators} from 'redux';
+import {change as changeFieldValue, Field, formValueSelector, reduxForm} from 'redux-form'
 import {CheckBox, TextBox,} from '../common/input-controls'
 import TextArea from '../common/text-area'
 import Select from '../common/select-control'
@@ -54,6 +54,7 @@ class CourseEditorForm extends React.Component {
                     meta: course.CoverMeta,
                     mask: course.Mask,
                 },
+                coverDescription: course.CoverDescription,
                 oneLesson: course.OneLesson,
                 fixed: _fixed,
                 fixDescription: _fixDescription,
@@ -102,6 +103,7 @@ class CourseEditorForm extends React.Component {
                 <Field component={TextArea} enableHtml={false} name="extLinksValues" label="Ссылки на другие ресурсы"
                        disabled={_disabled}/>
                 <Field component={Cover} name="cover" label="Обложка курса" disabled={_disabled}/>
+                <Field component={TextBox} name="coverDescription" label="Описание обложки курса" disabled={_disabled}/>
                 <Field component={CheckBox} name="oneLesson" label="Курс с одиночной лекцией"
                        disabled={_oneLessonDisable}/>
                 <Field component={TextBox} name="videoIntroLink" label="Презентация курса" placeholder="Введите URL YouTube"

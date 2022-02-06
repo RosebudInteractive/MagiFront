@@ -64,50 +64,77 @@ const Permissions = (props) => {
             permissionVals.get(permissionItem.permissionCode).type !== 0 : (permissionItem.default !== permissionItem.value || (!permissionItem.fromScheme && permissionItem.default === permissionItem.value));
     };
 
+    const dropdownStyles = {
+        background: 'white',
+        borderRadius: '8px',
+        border: '1px #d2d2d6 solid',
+        height: 'auto',
+        justifyContent: 'center',
+        transition: 'height .8s ease .5s',
+        minWidth: '298px',
+        pointerEvents: readOnly ? 'none' : 'auto'
+    };
+
+    const dropdownTitle = (title) => <div className={'title-drop-d'}>{title}</div>;
+
+    const permissionItems = (items, index) => items.map((permissionItem, inx) => {
+
+        const renderValueClassName = (permissionItem, value) => {
+            let className = 'black';
+
+            if((permissionVals.has(permissionItem.permissionCode) && permissionVals.get(permissionItem.permissionCode).type === 0)){
+                className = 'grey'
+            }
+
+            if(readOnly){
+                className = 'grey'
+            }
+
+            if((permissionItem.fromScheme && !permissionVals.has(permissionItem.permissionCode) && value === permissionItem.default)){
+                className = 'grey'
+            }
+
+            return className;
+        }
+
+        return <Dropdown.Item style={{padding: 0}} key={inx} eventKey={`${index}-${inx}`}>
+            <div className='permission-item'>
+                <div className='permission-title'>{permissionItem.title}</div>
+                <div className='permission-value'>
+                    <InputPicker menuClassName={'permission-menu-options'} style={{
+                        pointerEvents: readOnly ? 'none' : 'auto',
+                        color: 'orange'
+                    }} size="xs" menuStyle={{fontSize: '12px', color: 'orange !important'}}
+                                 cleanable={cleanable(permissionItem, permissionVals.get(permissionItem.permissionCode))}
+                                 data={permissionItem.values}
+                                 renderValue={(v, i) => {
+                                     return <div
+                                         className={`selected-option ${renderValueClassName(permissionItem, v)}`}>{i.label}</div>;
+                                 }}
+                                 value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode).value : permissionItem.value}
+                                 onChange={(val, ev) => onChange(val, permissionItem, ev)}
+                                 defaultValue={permissionItem.value}
+                    />
+                </div>
+            </div>
+
+        </Dropdown.Item>
+
+    })
+
     return (
         <Sidenav defaultOpenKeys={(readOnly || opened) ? [0] : []}>
             <Sidenav.Body>
+
                 <Nav>
                     {permissionScheme &&
                     permissionScheme.map((permission, index) => {
-                        return <Dropdown style={{
-                            background: 'white',
-                            borderRadius: '8px',
-                            border: '1px #d2d2d6 solid',
-                            height: 'auto',
-                            justifyContent: 'center',
-                            transition: 'height .8s ease .5s',
-                            minWidth: '298px',
-                            pointerEvents: readOnly ? 'none' : 'auto'
-                        }
-                        } key={index} eventKey={index} title={<div className={'title-drop-d'}>{permission.title}</div>}>
+                        return <Dropdown style={dropdownStyles}
+                                         key={index}
+                                         eventKey={index}
+                                         title={dropdownTitle(permission.title)}>
                             {
-                                permission.items.map((permissionItem, inx) => {
-
-                                    return <Dropdown.Item style={{padding: 0}} key={inx} eventKey={`${index}-${inx}`}>
-                                        <div className='permission-item'>
-                                            <div className='permission-title'>{permissionItem.title}</div>
-                                            <div className='permission-value'>
-                                                <InputPicker menuClassName={'permission-menu-options'} style={{
-                                                    pointerEvents: readOnly ? 'none' : 'auto',
-                                                    color: 'orange'
-                                                }} size="xs" menuStyle={{fontSize: '12px', color: 'orange !important'}}
-                                                             cleanable={cleanable(permissionItem, permissionVals.get(permissionItem.permissionCode))}
-                                                             data={permissionItem.values}
-                                                             renderValue={(v, i) => {
-                                                                 return <div
-                                                                     className={`selected-option ${((permissionVals.has(permissionItem.permissionCode) && permissionVals.get(permissionItem.permissionCode).type === 0) || readOnly || (permissionItem.fromScheme && !permissionVals.has(permissionItem.permissionCode) && v === permissionItem.default)) ? 'grey' : 'black'}`}>{i.label}</div>;
-                                                             }}
-                                                             value={permissionVals.has(permissionItem.permissionCode) ? permissionVals.get(permissionItem.permissionCode).value : permissionItem.value}
-                                                             onChange={(val, ev) => onChange(val, permissionItem, ev)}
-                                                             defaultValue={permissionItem.value}
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </Dropdown.Item>
-
-                                })
+                                permissionItems(permission.items, index)
                             }
                         </Dropdown>
                     })

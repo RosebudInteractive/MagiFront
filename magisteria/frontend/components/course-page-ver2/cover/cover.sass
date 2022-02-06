@@ -1,4 +1,4 @@
-@import "../../../tools/variables"
+@import '~tools/variables'
 
 .course-page__cover
   .page-header
@@ -110,3 +110,25 @@
       margin: 0 5px
       @media(max-width: 899px)
         font-size: 12px
+
+
+.course-page__cover-description
+  position: absolute
+  font-family: 'Fira Sans'
+  font-size: 12px
+  font-style: italic
+  font-weight: 400
+  line-height: 16px
+  letter-spacing: 0
+  color: rgba(47, 47, 47, 0.3)
+  text-align: left
+  right: 93px
+  bottom: -10px
+  width: calc(100% - 186px)
+  @media (max-width: $tablet-width)
+    right: 39px
+    width: calc(100% - 78px)
+  @media (max-width: $mobile-phone-width)
+    right: 20px
+    width: calc(100% - 40px)
+

@@ -138,10 +138,6 @@ export default function UiMultiSelect(props) {
 
     const propsObj = props.input ? props.input : props;
 
-    const logClick = (e) => {
-        console.log('menuitem clicked')
-    }
-
     return <CssFormControl className={"input-field multi-select _with-custom-scroll" + (props.extClass ? " " + props.extClass : "")}>
         <InputLabel id={`label-for-${id.current}`}>{props.label}</InputLabel>
         <Select
@@ -166,7 +162,7 @@ export default function UiMultiSelect(props) {
 
             {
                 props.options && props.options.map((item, index) => (
-                        <MenuItem onClick={logClick} key={index} value={item.id} classes={ {root: classes.listItem} }>
+                        <MenuItem key={index} value={item.id} classes={ {root: classes.listItem} }>
                             <Checkbox color={'default'} checked={props.input.value && props.input.value.indexOf(item.id) > -1}/>
                             <ListItemText primary={item.name} />
                         </MenuItem>

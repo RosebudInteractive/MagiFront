@@ -10,9 +10,20 @@
     padding-right: 8px
     overflow-y: scroll
 
-  &._with-custom-scroll
+  &._with-custom-scroll  //_with-custom-scroll sets the box-sizing to border-box, be patient here
+
     &::-webkit-scrollbar-track
       border-radius: 8px 64px 64px 8px
 
     &::-webkit-scrollbar-thumb
       border-radius: 8px 64px 64px 8px
+
+.modal-form__dialog.create-process-dialog
+  width: 45%
+  max-width: 800px
+  min-width: 520px
+
+.height-100-input-inside-mui-form-control // todo check the _with-custom-scroll, and check how it combines with dialog__fields-wrapper
+  .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-formControl
+    input
+      height: 100%
