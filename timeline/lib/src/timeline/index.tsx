@@ -15,6 +15,7 @@ import ZoomHandler, { OffsetEnum } from '../helpers/zoom-handler';
 import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
 import { GestureResponderEvent } from 'react-native';
+import { References } from '../types/references';
 
 type TimelineProps = {
   backgroundImage: string,
@@ -22,6 +23,7 @@ type TimelineProps = {
   enableToSwitchFS: boolean,
   events: Event.VisualItem[],
   periods: Period.VisualItem[],
+  references: References
   levelLimit: { events: number, periods: number },
   visibilityChecking: boolean,
   elementsOverAxis: boolean,
@@ -43,6 +45,7 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     backgroundImage,
     events,
     periods,
+    references,
     height,
     levelLimit,
     visibilityChecking,
@@ -144,32 +147,6 @@ export default function Timeline(props: TimelineProps): JSX.Element {
       }, 0);
     }
   };
-
-  // const getEventInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
-  //   const { left, width: itemWidth } = item;
-  //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
-  //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
-  // };
-  //
-  // const getPeriodInViewPort = (item: VisualItem, scrollPosition: number): boolean => {
-  //   const { left, width: itemWidth } = item;
-  //   const xValue = left + SETTINGS.horizontalPadding - scrollPosition;
-  //   return ((xValue + itemWidth) > 0) && (xValue < (width || 0));
-  // };
-  //
-  // const getActiveItemInViewPort = (scrollPosition: number): boolean => {
-  //   if (activeItem) {
-  //     switch (activeItem.type) {
-  //       case 'event': return getEventInViewPort(activeItem.item, scrollPosition);
-  //
-  //       case 'period': return calcOffsetForPeriod(activeItem.item);
-  //
-  //       default: return false;
-  //     }
-  //   }
-  //
-  //   return false;
-  // }
 
   const fixActiveItemOffset = (newScrollPosition: number) => {
     if (activeItem) {
@@ -428,6 +405,7 @@ export default function Timeline(props: TimelineProps): JSX.Element {
       { activeItem
       && (
       <Message
+        references={references}
         item={activeItem.item}
         onCenter={messageCenter}
         onClose={messageClose}

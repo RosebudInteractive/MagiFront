@@ -8,6 +8,7 @@ export namespace Event {
     public month?: number;
 
     public year: number;
+
   }
 
   export declare class VisualItem extends VI {

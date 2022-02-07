@@ -1,14 +1,17 @@
 import { Event } from '../types/event';
 import { Period } from '../types/period';
+import { References } from '../types/references';
 
 declare interface InputTimelineData {
   Events: any[],
-  Periods: any[]
+  Periods: any[],
+  References: References,
 }
 
 type TimelineData = {
   Events: Event.DataItem[],
   Periods: Period.DataItem[]
+  Refs: References,
 };
 
 const convertEvents = (events: any[]): Event.DataItem[] | [] => (events ? events.map((item) => {
@@ -47,10 +50,15 @@ const convertPeriods = (periods: any[]): Period.DataItem[] | [] => (periods
     return dataItem;
   }) : []);
 
+const convertReferences = (r: References)=>{
+  return {};
+};
+
 export default function convertData(data: InputTimelineData): TimelineData {
-  const { Events, Periods } = data;
+  const { Events, Periods, References } = data;
   return {
     Events: convertEvents(Events),
     Periods: convertPeriods(Periods),
+    Refs: convertReferences(References),
   };
 }

@@ -112,21 +112,40 @@ module.exports = function (proxy, allowedHost) {
     // proxy,
     proxy: {
       '/api/': {
-        target: 'http://localhost:3000',
+        target: 'https://magisteria.ru',
         secure: false,
         changeOrigin: true,
       },
       '/data': {
-        target: 'http://localhost:3000',
+        target: 'https://magisteria.ru',
         secure: false,
         changeOrigin: true,
       },
       '/doc/': {
-        target: 'http://localhost:3000',
+        target: 'https://magisteria.ru',
         secure: false,
         changeOrigin: true,
       },
     },
+    /*
+    proxyDev: {
+      '/api/': {
+        target: 'https://dev.magisteria.ru',
+        secure: false,
+        changeOrigin: true,
+      },
+      '/data': {
+        target: 'https://dev.magisteria.ru',
+        secure: false,
+        changeOrigin: true,
+      },
+      '/doc/': {
+        target: 'https://dev.magisteria.ru',
+        secure: false,
+        changeOrigin: true,
+      },
+    },
+    */
     before(app, server) {
       // Keep `evalSourceMapMiddleware` and `errorOverlayMiddleware`
       // middlewares before `redirectServedPath` otherwise will not have any effect

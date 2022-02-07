@@ -5,10 +5,12 @@ import { Event } from "@rosebud/timeline/src/types/event";
 import { Period } from "@rosebud/timeline/src/types/period";
 import { transformEventToVisual, transformPeriodToVisual } from "@rosebud/timeline/src/helpers/tools";
 import './wrapper.sass'
+import { References } from '@rosebud/timeline/src/types/references';
 
 interface IProps {
   events: Event.DataItem[],
   periods: Period.DataItem[],
+  references: References;
   levelLimit: { events: number, periods: number },
   visibilityChecking: boolean,
   elementsOverAxis: boolean,
@@ -22,7 +24,7 @@ type StateData = {
 
 export default function TestWrapper(props: IProps): JSX.Element {
   const {
-    levelLimit, visibilityChecking, elementsOverAxis, events, periods, isDeprecatedBrowser
+    levelLimit, visibilityChecking, elementsOverAxis, events, periods, references, isDeprecatedBrowser
   } = props;
 
   const [eventsWithVisibility, setVisibilityEvents] = useState<Event.VisualItem[]>([]);
@@ -56,6 +58,7 @@ export default function TestWrapper(props: IProps): JSX.Element {
               userDefinedWidth={4000}
               events={eventsWithVisibility}
               periods={periodsWithVisibility}
+              references={references}
               levelLimit={levelLimit}
               elementsOverAxis={elementsOverAxis}
               visibilityChecking={visibilityChecking}

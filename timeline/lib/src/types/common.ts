@@ -9,6 +9,9 @@ export declare class DataItem {
   public shortName?: string;
 
   public description?: string;
+
+  public references?: number[][];
+
 }
 
 export declare class VisualItem extends DataItem implements IVerticalPlaceable {
@@ -29,6 +32,8 @@ export declare class VisualItem extends DataItem implements IVerticalPlaceable {
   public visible: boolean;
 
   public offset: number;
+
+  public visibleReferences?: boolean;
 }
 
 export interface IVerticalPlaceable {

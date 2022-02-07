@@ -6,11 +6,13 @@ import { View } from 'react-native';
 import emitter from '@rosebud/timeline/src/timeline-controller/emitter';
 import { Event } from '@rosebud/timeline/src/types/event';
 import { Period } from '@rosebud/timeline/src/types/period';
+import { References } from '@rosebud/timeline/src/types/references';
 import { convertData, Themes } from '@rosebud/timeline/src';
 import TestWrapper from './components/test-wrapper';
 import DataPicker from './components/data-picker';
 import EVENTS from './data/events';
 import PERIODS from './data/periods';
+import REFERENCES from './data/references';
 import LevelLimit from './components/level-limit';
 import CheckVisibilitySwitcher from './components/check-visibility-switcher';
 import RiseUpOverXAxis from './components/rise-up-over-x-axis';
@@ -23,7 +25,8 @@ import { isDeprecatedBrowser, isUnsupportedBrowser } from './helpers/platform-to
 
 type TimelineData = {
   Events: Event.DataItem[],
-  Periods: Period.DataItem[]
+  Periods: Period.DataItem[],
+  Refs: References,
 };
 
 function App() {
@@ -70,6 +73,12 @@ function App() {
       return PERIODS[dataIndex].data;
     }
     return [];
+  }, [dataIndex, importedData]);
+
+  const references: References = useMemo(() => {
+    if (importedData) { return importedData.Refs; }
+
+    return (dataIndex !== -1) ? REFERENCES[dataIndex] : {};
   }, [dataIndex, importedData]);
 
   const risingChanged = (value: boolean) => {
@@ -146,6 +155,7 @@ function App() {
         elementsOverAxis={elementsOverAxis}
         events={events}
         periods={periods}
+        references={references}
         levelLimit={{ events: eventsLevelLimit, periods: periodsLevelLimit }}
         visibilityChecking={visibilityChecking}
         isDeprecatedBrowser={isDeprecatedBrowser()}
