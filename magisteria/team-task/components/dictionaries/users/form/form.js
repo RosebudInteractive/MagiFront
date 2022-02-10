@@ -186,7 +186,7 @@ const UserForm = (props) => {
 
                                 <div className={'user-permissions'}>
                                     {roles &&
-                                    <Permissions readOnly = {true} permissionScheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
+                                    <Permissions readOnly = {true} scheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
                                     }
                                 </div>
 

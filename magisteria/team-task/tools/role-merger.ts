@@ -1,113 +1,94 @@
-import _ from 'lodash';
+import {
+  Scheme,
+  Role,
+  MergedRole,
+  SchemeItem,
+  MergedItem,
+  SchemeGroup,
+  RoleRightsItem,
+  RoleRightsGroup,
+  MergedGroup,
+  MergedScheme, RoleRightsValue,
+} from '../@types/permissions';
+import { roleWithDsbFullAccess, scheme as testScheme } from './mock-data';
 
-type Role = {
-  Code: String,
-  Description: String,
-  IsBuiltIn: boolean,
-  Name: String,
-  Id: Number,
-  ShortCode: String,
-  Permissions?: Object,
-};
+export type RoleMergeFunction = (roles: Array<Role>) => MergedRole;
 
-interface RoleMerger {
-  defaultScheme: Object,
-  init: Function,
-  getMergedRole: (role: Role) => Role,
-  getMergedLinearStructure: Function,
-  getMergedRoles: Function,
-  getMergedRolesByMaxValue: Function,
-  getMergedRolesLinearByMaxValue: Function,
-  getMergedRolesLinear: Function
-}
+export function getRoleMergeClojure(scheme: Scheme): RoleMergeFunction {
+  const currentScheme: Scheme = scheme;
 
-function customizer(objValue: number, srcValue: number) {
-  return objValue >= srcValue ? objValue : srcValue;
-}
+  function isValue(
+    node: RoleRightsItem | RoleRightsGroup | RoleRightsValue,
+  ): node is RoleRightsValue {
+    return ['string', 'number'].includes(typeof node);
+  }
 
-const roleMerger: RoleMerger = {
-  defaultScheme: {},
-  init(scheme: Object) {
-    roleMerger.defaultScheme = scheme;
-  },
-  getMergedRoles(roles: any[]) {
-    const rolesPermissionsArray = roles.map((role) => role.Permissions);
-    const rolesPermissionsMerged = _.merge({}, ...rolesPermissionsArray);
-    return { ...roles[0], Permissions: rolesPermissionsMerged };
-  },
+  function getRoleItem(role: Role, path: Array<string>): RoleRightsValue | null {
+    let current: RoleRightsItem | RoleRightsGroup | RoleRightsValue = role.permissions;
 
-  getMergedRolesByMaxValue(roles: any[]) {
-    const rolesPermissionsArray = roles.map((role) => role.Permissions);
-    const rolesPermissionsMerged = _.mergeWith({}, ...rolesPermissionsArray, customizer);
-    return { ...roles[0], Permissions: rolesPermissionsMerged };
-  },
-
-  getMergedRolesLinear(roles: any []) {
-    const role = roleMerger.getMergedRoles(roles); //
-
-    return roleMerger.getMergedLinearStructure(role);
-  },
-
-  getMergedRolesLinearByMaxValue(roles: any []) {
-    const role = roleMerger.getMergedRolesByMaxValue(roles); //
-
-    return roleMerger.getMergedLinearStructure(role);
-  },
-  getMergedRole(role) {
-    const schemePermissions = {};
-
-    Object.entries(roleMerger.defaultScheme).map((permission) => {
-      // @ts-ignore
-      schemePermissions[permission[0]] = {};
-
-      // eslint-disable-next-line array-callback-return
-      Object.entries(permission[1].items).map((pItem) => {
-        // @ts-ignore
-        schemePermissions[permission[0]][pItem[0]] = pItem[1].default;
-      });
+    const found = path.every((key) => {
+      if (isValue(current)) return false;
+      current = current[key];
+      return !!current;
     });
 
-    const mergedPermissions = _.merge(schemePermissions, role.Permissions);
+    return found && isValue(current) ? current as RoleRightsValue : null;
+  }
 
+  function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+    return value !== null && value !== undefined;
+  }
 
-    return { ...role, Permissions: mergedPermissions };
-  },
-  getMergedLinearStructure(role: any) {
-    let result = [];
-    if (roleMerger.defaultScheme !== null && role !== null) {
-      result = Object.entries(roleMerger.defaultScheme)
-        .map((permission) => {
-          const item: any = {};
-          item.title = permission[1].title;
-          item.permissionCode = permission[0].toString();
+  function mergeItem(item: SchemeItem, path: Array<string>, roles: Array<Role>): MergedItem {
+    const values: Array<RoleRightsValue> = roles
+      .map((role) => getRoleItem(role, path))
+      .filter(notEmpty);
 
-          item.items = (permission[1].items && Object.keys(permission[1].items).length > 0)
-            ? Object.entries(permission[1].items).map((itemValue: any) => {
-              const value = _.get(role.Permissions, `${permission[0]}.${itemValue[0]}`);
+    const numValues = values.map((value) => value as number);
 
-              return {
-                title: itemValue[1].title,
-                dataType: itemValue[1].dataType,
-                value: value === undefined ? itemValue[1].default : value,
-                fromScheme: value === undefined,
-                default: itemValue[1].default,
-                roleId: role.Id,
-                permissionCode: itemValue[0],
-                parentCode: permission[0],
-                name: itemValue[1].alias,
-                values: Object.entries(itemValue[1].values).map((val) => ({
-                  label: val[1],
-                  value: +val[0],
-                })),
-              };
-            }) : [];
+    return {
+      ...item,
+      isDefault: values.length === 0,
+      mergedValue: values.length
+        ? Math.max(...numValues)
+        : undefined,
+    };
+  }
 
-          return item;
-        });
-    }
+  function mergeGroup(node: SchemeGroup, path: Array<string>, roles: Array<Role>): any {
+    const group: MergedGroup = { ...node, items: {} };
 
-    return result;
-  },
-};
+    return Object.entries(node.items).reduce((mergedGroup: MergedGroup, [key, item]) => {
+      if (item.type === 'group') {
+        // eslint-disable-next-line no-param-reassign
+        mergedGroup.items[key] = mergeGroup(item as SchemeGroup, [...path, key], roles);
+      }
 
-export default roleMerger;
+      if (item.type === 'item') {
+        // eslint-disable-next-line no-param-reassign
+        mergedGroup.items[key] = mergeItem(item as SchemeItem, [...path, key], roles);
+      }
+
+      return mergedGroup;
+    },
+    group);
+  }
+
+  return (roles: Array<Role>): MergedScheme => {
+    const result: MergedScheme = {};
+
+    return Object.entries(currentScheme).reduce((resultRole, [key, item]) => {
+      if (item.type === 'group') {
+        // eslint-disable-next-line no-param-reassign
+        resultRole[key] = mergeGroup(item, [key], roles);
+      }
+      return resultRole;
+    }, result);
+  };
+}
+
+export default getRoleMergeClojure;
+
+const mergeFunction = getRoleMergeClojure(testScheme);
+
+console.log(mergeFunction([roleWithDsbFullAccess]));

@@ -94,8 +94,12 @@
     /* Advanced Options */
     "skipLibCheck": true,
     /* Skip type checking of declaration files. */
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
     /* Disallow inconsistently-cased references to the same file. */
+    "lib": [
+//      "esnext.full",
+      "dom"
+    ]
   },
   "include": [
     "team-task/**/*.ts",

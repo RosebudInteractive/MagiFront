@@ -15,9 +15,8 @@ import {connect} from "react-redux";
 import {hasAdminRights} from "tt-ducks/auth";
 import Permissions from "../../permissions/permissions";
 import validators from "../../../../tools/validators"
-import roleMerger from "../../../../tools/role-merger";
-import {fetchingSelector} from "../../../../ducks/access-rights-dictionary";
-// import TextArea from "../../../../../src/components/common/text-area";
+import {getRoleMergeClojure} from "../../../../tools/role-merger";
+import {fetchingSelector} from "tt-ducks/access-rights-dictionary";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -46,7 +45,7 @@ const RightForm = (props) => {
     }), [roleData]);
 
     const dirtyForm = function (value) {
-       setFormIsDirty(value)
+        setFormIsDirty(value)
     };
 
     const changePermissions = function (value, pItem, type) {
@@ -59,7 +58,7 @@ const RightForm = (props) => {
             }
         };
 
-        if(value === pItem.default && type === 0){
+        if (value === pItem.default && type === 0) {
             delete permissionObject[pItem.parentCode][pItem.permissionCode];
         }
 
@@ -70,8 +69,8 @@ const RightForm = (props) => {
         const permissionBodyKeys = _.keys(permissionBody);
         let newPermissionBody = {};
 
-        if(permissionBodyKeys.length > 0 && permissionBodyKeys.some(pK => _.keys(permissionBody[pK]).length > 0)){
-          newPermissionBody = permissionBody
+        if (permissionBodyKeys.length > 0 && permissionBodyKeys.some(pK => _.keys(permissionBody[pK]).length > 0)) {
+            newPermissionBody = permissionBody
         }
 
         roleData && roleData.Id && actions.saveRightChanges(roleData.Id, {
@@ -83,11 +82,9 @@ const RightForm = (props) => {
         });
     };
 
-    const permissionSchemeLinear = useMemo(() => {
-        roleMerger.init(permissionScheme);
+    const mergeRole = useMemo(() => getRoleMergeClojure(permissionScheme), [permissionScheme]);
 
-        return roleMerger.getMergedLinearStructure(roleData);
-    }, [permissionScheme, roleData]);
+    const mergedScheme = useMemo(() => mergeRole(roleData ? [...roleData] : []), [roleData]);
 
     return (
         (visible && !fetching) &&
@@ -151,7 +148,7 @@ const RightForm = (props) => {
                                             <Field name="Description"
                                                    component={TextBox}
                                                    multiline
-                                                   // todo @deprecated Use `maxRows` instead. Change on v5
+                                                // todo @deprecated Use `maxRows` instead. Change on v5
                                                    rowsMax={4}
                                                    type="text"
                                                    extClass={'_with-custom-scroll'}
@@ -175,7 +172,8 @@ const RightForm = (props) => {
                                     </div>
                                     <div className="right-side">
                                         <div className='right-form__field'>
-                                            <Permissions permissionScheme={permissionSchemeLinear} onDirty={dirtyForm} onChangeCb = {changePermissions} opened={true}/>
+                                            <Permissions scheme={mergedScheme} onDirty={dirtyForm}
+                                                         onChangeCb={changePermissions} opened={true}/>
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +181,7 @@ const RightForm = (props) => {
                                 <div className="action-buttons">
                                     <button type='submit'
                                             className="right-form__confirm-button orange-button big-button"
-                                            disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty} >
+                                            disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty}>
                                         Применить
                                     </button>
                                 </div>
