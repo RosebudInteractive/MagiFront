@@ -11,7 +11,7 @@ const Viewport = function ({ width, height, children }: ViewportProps): JSX.Elem
 
   return (
     <div className="timeline-canvas" style={style}>
-      {/* {children} */}
+      {children}
     </div>
   );
 };
