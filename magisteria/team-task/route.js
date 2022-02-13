@@ -13,7 +13,7 @@ import {USER_ROLE} from "./constants/common";
 import Timelines from "./containers/timelines/list";
 import TimelineEditorContainer from "./containers/timelines/editor"
 import DashboardRecords from "./containers/dashboard-records"
-import AccessRights from "./components/dictionaries/access-rights";
+import AccessRights from "./components/dictionaries/roles";
 
 type RouterProps = {
     hasSupervisorRights: boolean,

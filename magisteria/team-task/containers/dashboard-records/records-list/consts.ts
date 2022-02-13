@@ -1,5 +1,5 @@
-import {getProcessState} from './functions';
-import {Dashboard} from '../../../@types/dashboard';
+import { getProcessState } from './functions';
+import { Dashboard } from '../../../@types/dashboard';
 
 export const MAIN_COLUMNS = [
   { id: 'id', hidden: true },

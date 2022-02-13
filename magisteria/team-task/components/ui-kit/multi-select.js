@@ -7,7 +7,6 @@ import ListItemText from "@material-ui/core/ListItemText/ListItemText";
 const CssFormControl = withStyles({
     root: {
         minHeight: "60px",
-        maxWidth: '240px',
         '& label': {
             "font-family": "Inter",
             "font-size": "13px",
@@ -39,7 +38,6 @@ const CssFormControl = withStyles({
             '& fieldset legend': {
                 display: "none"
             },
-            // "& select": {
             "& .MuiSelect-select": {
                 display: "flex",
                 alignItems: "center",
@@ -47,8 +45,6 @@ const CssFormControl = withStyles({
                 padding: "14px 7px !important",
                 overflowY: "auto",
                 border: '1px solid #D2D2D6',
-                // height: '60px',
-                maxWidth: '240px',
                 overflowX: 'auto',
                 "-webkit-transition": "border, background 300ms ease-out",
                 "-moz-transition": "border, background 300ms ease-out",

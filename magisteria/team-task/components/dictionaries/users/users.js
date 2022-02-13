@@ -20,7 +20,7 @@ import {connect} from "react-redux";
 import {USER_ROLE_STRINGS} from "../../../constants/dictionary-users";
 import './users.sass'
 import PlusIco from "tt-assets/svg/plus.svg";
-import UserForm from "./form/form";
+import UserForm from "./form";
 import {hasAdminRights} from "tt-ducks/auth";
 import {
     fetchingSelector as rolesFetching,
