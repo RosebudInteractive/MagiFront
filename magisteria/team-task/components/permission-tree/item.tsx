@@ -55,10 +55,10 @@ export default function Item({
         <div className="permission-title">{permission.title}</div>
         <div className="permission-value">
           <InputPicker
+            readOnly={readonly}
             menuClassName="permission-tree__menu-options"
             style={inputStyle}
             size="s"
-            // menuStyle={{ fontSize: '12px', color: 'orange !important' }}
             cleanable={cleanable}
             data={mappedData}
             renderValue={(value, item) => (

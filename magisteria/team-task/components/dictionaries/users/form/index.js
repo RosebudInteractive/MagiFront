@@ -183,9 +183,6 @@ const UserForm = (props) => {
                                         </Field>
                                     </div>
 
-
-
-
                                     <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid || userForm.pristine}>
                                         Применить
                                     </button>
@@ -193,9 +190,7 @@ const UserForm = (props) => {
                                 </div>
 
                                 <div className={'user-permissions'}>
-                                    {roles &&
-                                    <Permissions readOnly = {true} scheme={mergedScheme} onChange={() => {}}/>
-                                    }
+                                    { roles && <Permissions readonly={true} scheme={mergedScheme} /> }
                                 </div>
 
                                 <FormSpy subscription={{values: true}}

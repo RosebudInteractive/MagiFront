@@ -29,9 +29,7 @@ export default function Item({ permission, readonly, onChange, path, }) {
       <div className="permission-item">
         <div className="permission-title">{permission.title}</div>
         <div className="permission-value">
-          <InputPicker menuClassName="permission-tree__menu-options" style={inputStyle} size="s" 
-    // menuStyle={{ fontSize: '12px', color: 'orange !important' }}
-    cleanable={cleanable} data={mappedData} renderValue={(value, item) => (<div className={`selected-option ${valueClassName}`}>
+          <InputPicker readOnly={readonly} menuClassName="permission-tree__menu-options" style={inputStyle} size="s" cleanable={cleanable} data={mappedData} renderValue={(value, item) => (<div className={`selected-option ${valueClassName}`}>
                 {item && !isArray(item) ? item.label : ''}
               </div>)} value={inputValue} onChange={handleChange} defaultValue={permission.default}/>
         </div>
