@@ -25,6 +25,21 @@ type TimelineData = {
   Periods: Period.DataItem[]
 };
 
+export interface ViewportProps extends JSX.ElementChildrenAttribute {
+  width: number;
+  height: number;
+}
+
+function Viewport ({ width, height, children }: ViewportProps): JSX.Element {
+  const style = React.useMemo(() => ({ width, height }), [width, height]);
+
+  return (
+    <div className="timeline-canvas" style={style}>
+      {children}
+    </div>
+  );
+};
+
 function App() {
   const [dataIndex, setDataIndex] = useState(0);
   const [importedData, setImportedData] = useState<TimelineData | null>(null);
@@ -122,6 +137,7 @@ function App() {
 
   return (
     <div className="main-container">
+      <Viewport height={100} width={300}>TEST</Viewport>
       <div className="row-container">
         <DataPicker onChange={onDataSetChange} events={EVENTS} />
         <ThemePicker onChange={onThemeChange} />

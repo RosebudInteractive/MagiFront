@@ -27,5 +27,6 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
     'import/extensions': 'off',
+    "react/require-default-props": [2, { ignoreFunctionalComponents: true }]
   },
 };

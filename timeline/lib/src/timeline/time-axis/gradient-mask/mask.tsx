@@ -5,7 +5,7 @@ import styles from './styles';
 type Props = {
   color: string,
   isActive: boolean,
-}
+};
 
 export default function Mask(props: Props) {
   const { color, isActive } = props;

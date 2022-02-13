@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "ts": "tsc --project tsconfig.json -watch"
+    "ts": "tsc --project tsconfig.json -watch",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -98,6 +99,7 @@
     "got": "^11.8.2",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
+    "jest": "^27.5.1",
     "jquery": "^3.3.1",
     "jquery-mousewheel": "^3.1.13",
     "jquery.cookie": "^1.4.1",
@@ -179,7 +181,7 @@
     "text-loader": "0.0.1",
     "transliteration": "^2.1.11",
     "truncate-html": "^1.0.1",
-    "typescript": "^4.4.3",
+    "typescript": "^4.5.5",
     "url-loader": "^0.6.2",
     "url-search-params-polyfill": "^6.0.0",
     "uuid": "^3.3.2",
