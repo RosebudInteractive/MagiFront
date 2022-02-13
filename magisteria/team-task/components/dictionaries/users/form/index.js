@@ -16,7 +16,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "../../../../../common/constants/common-consts";
 import {hasAdminRights} from "tt-ducks/auth";
-import Permissions from "../../permissions/permissions";
+import Permissions from "../../../permission-tree";
 import {
     fetchingSelector,
     getRights,
@@ -25,7 +25,7 @@ import {
     rolesPermissionsSelector
 } from "tt-ducks/access-rights-dictionary";
 
-import roleMerger from "../../../../tools/role-merger";
+import {getRoleMergeClojure} from "../../../../tools/permission-functions";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 
@@ -42,7 +42,10 @@ const ComposeValidators = (...validators) => value =>
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
     const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData ? props.userData.PData.roles : []));
+    // rolesPermissions - roles array
     const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions, fetching} = props;
+
+    useEffect(() => {getRights()}, [])
 
     useEffect(()=>{
         setActionCreate(!(userData && userData.Id));
@@ -58,11 +61,16 @@ const UserForm = (props) => {
         props.history.push(`/dictionaries/users`);
     };
 
-    const permissionSchemeLinear = useMemo(() => {
-        roleMerger.init(permissionScheme);
-        return roleMerger.getMergedRolesLinearByMaxValue(rolesPermissions.filter(role => userRolesArray.includes(role.ShortCode)));
-    }, [permissionScheme, roles, rolesPermissions, userRolesArray]);
+    const mergeRole = useMemo(() => permissionScheme ? getRoleMergeClojure(permissionScheme) : null, [permissionScheme]);
 
+    const mergedScheme = useMemo(() => {
+        if (!mergeRole) return
+
+        const roles = Array.isArray(rolesPermissions)
+            ? rolesPermissions.filter(role => userRolesArray.includes(role.shortCode))
+            : [];
+        return mergeRole(roles);
+    }, [rolesPermissions, userRolesArray]);
 
 
     const userRoles = useMemo(() => {
@@ -111,7 +119,7 @@ const UserForm = (props) => {
     }), [userData]);
 
     return (
-        (visible && !fetching) &&
+        (visible && !fetching && !!mergedScheme) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
@@ -186,7 +194,7 @@ const UserForm = (props) => {
 
                                 <div className={'user-permissions'}>
                                     {roles &&
-                                    <Permissions readOnly = {true} scheme={permissionSchemeLinear} onDirty={() => {}} onChangeCb = {() => {}}/>
+                                    <Permissions readOnly = {true} scheme={mergedScheme} onChange={() => {}}/>
                                     }
                                 </div>
 

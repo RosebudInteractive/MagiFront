@@ -1,27 +1,3 @@
-// declare namespace Permissions {
-//   type SchemeValue = { label: string; value: number };
-//
-//   type SchemeItem = {
-//     dataType: 'enum' | 'string';
-//     default: number | string;
-//     fromScheme: boolean;
-//     name: string;
-//     parentCode: string;
-//     permissionCode: string;
-//     roleId: number;
-//     title: string;
-//     value: number | string;
-//     values: Array<SchemeValue>;
-//   };
-//
-//   type SchemeGroup = {
-//     permissionCode: string
-//     title: string;
-//     items: Array<SchemeItem>;
-//   };
-//
-//
-// }
 export type RoleRightsValue = number | string;
 export type RoleRightsItem = { [key: string]: RoleRightsValue };
 export type RoleRightsGroup = { [key: string]: RoleRightsItem | RoleRightsGroup };
@@ -36,8 +12,14 @@ export interface Role {
   permissions: RoleRightsGroup,
 }
 
-export interface MergedRole {
-  Permissions?: RoleRightsGroup,
+export interface ServerRole {
+  Id: number;
+  Code: string;
+  Name: string;
+  ShortCode: string;
+  Description: string;
+  IsBuiltIn: boolean; // признак "системности", дана админу
+  Permissions: RoleRightsGroup,
 }
 
 export interface MergedItem extends SchemeItem{

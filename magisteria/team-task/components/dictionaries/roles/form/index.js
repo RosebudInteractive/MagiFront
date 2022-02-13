@@ -13,10 +13,11 @@ import {
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {hasAdminRights} from "tt-ducks/auth";
-import Permissions from "../../permissions/permissions";
+import Permissions from "../../../permission-tree";
 import validators from "../../../../tools/validators"
-import {getRoleMergeClojure} from "../../../../tools/role-merger";
+import {getPermissionsFromScheme, getRoleMergeClojure} from "../../../../tools/permission-functions";
 import {fetchingSelector} from "tt-ducks/access-rights-dictionary";
+import {RoleRightsValue} from "../../../../@types/permissions";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -37,54 +38,50 @@ const RightForm = (props) => {
     };
 
     const roleFormData = useMemo(() => ({
-        Code: (roleData && roleData.Code) ? roleData.Code : '',
-        Name: (roleData && roleData.Name) ? roleData.Name : '',
-        ShortCode: (roleData && roleData.ShortCode) ? roleData.ShortCode : '',
-        Description: (roleData && roleData.Description) ? roleData.Description : '',
-        Permissions: (roleData && roleData.Permissions) ? roleData.Permissions : '',
+        Code: (roleData && roleData.code) ? roleData.code : '',
+        Name: (roleData && roleData.name) ? roleData.name : '',
+        ShortCode: (roleData && roleData.shortCode) ? roleData.shortCode : '',
+        Description: (roleData && roleData.description) ? roleData.description : '',
+        Permissions: (roleData && roleData.permissions) ? roleData.permissions : '',
     }), [roleData]);
 
     const dirtyForm = function (value) {
         setFormIsDirty(value)
     };
 
-    const changePermissions = function (value, pItem, type) {
+    const onChangePermission = (path: Array<string>, value: RoleRightsValue | undefined) => {
+        const newPermissions = {...permissionBody};
 
-        const permissionObject = {
-            ...permissionBody ? permissionBody : {},
-            [`${pItem.parentCode}`]: {
-                ...permissionBody ? permissionBody[`${pItem.parentCode}`] : {},
-                [`${pItem.permissionCode}`]: value
-            }
-        };
+        const permission = path.reduce((current, key) => current
+            ? current.type === 'group' ? current.items[key] : current[key]
+            : null, newPermissions);
 
-        if (value === pItem.default && type === 0) {
-            delete permissionObject[pItem.parentCode][pItem.permissionCode];
+        if (permission) {
+            permission.mergedValue = value;
+            permission.isDefault = value === undefined;
+            setPermissionBody(newPermissions);
         }
-
-        setPermissionBody(permissionObject);
     };
 
+    useEffect(() => {
+        setFormIsDirty(!_.isEqual(mergedScheme, permissionBody))
+    }, [permissionBody])
+
     const applyChanges = function (values) {
-        const permissionBodyKeys = _.keys(permissionBody);
-        let newPermissionBody = {};
-
-        if (permissionBodyKeys.length > 0 && permissionBodyKeys.some(pK => _.keys(permissionBody[pK]).length > 0)) {
-            newPermissionBody = permissionBody
-        }
-
-        roleData && roleData.Id && actions.saveRightChanges(roleData.Id, {
-            Permissions: newPermissionBody,
-            Code: values.Code,
-            Name: values.Name,
-            ShortCode: values.ShortCode,
-            Description: values.Description
+        roleData && roleData.id && actions.saveRightChanges(roleData.id, {
+            Permissions: getPermissionsFromScheme(permissionBody),
+            Code: values.code,
+            Name: values.name,
+            ShortCode: values.shortCode,
+            Description: values.description
         });
     };
 
     const mergeRole = useMemo(() => getRoleMergeClojure(permissionScheme), [permissionScheme]);
 
-    const mergedScheme = useMemo(() => mergeRole(roleData ? [...roleData] : []), [roleData]);
+    const mergedScheme = useMemo(() => mergeRole(roleData ? [roleData] : []), [roleData]);
+
+    useEffect(() => {setPermissionBody(_.cloneDeep(mergedScheme))}, [mergedScheme])
 
     return (
         (visible && !fetching) &&
@@ -172,8 +169,8 @@ const RightForm = (props) => {
                                     </div>
                                     <div className="right-side">
                                         <div className='right-form__field'>
-                                            <Permissions scheme={mergedScheme} onDirty={dirtyForm}
-                                                         onChangeCb={changePermissions} opened={true}/>
+                                            <Permissions scheme={permissionBody} onDirty={dirtyForm}
+                                                         onChange={onChangePermission} opened={true}/>
                                         </div>
                                     </div>
                                 </div>
@@ -193,7 +190,7 @@ const RightForm = (props) => {
                 </Form>
             </div>
         </div>
-    )
+    );
 };
 
 const mapState2Props = (state) => {

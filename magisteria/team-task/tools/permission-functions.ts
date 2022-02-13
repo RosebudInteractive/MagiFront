@@ -1,7 +1,7 @@
 import {
   Scheme,
   Role,
-  MergedRole,
+  ServerRole,
   SchemeItem,
   MergedItem,
   SchemeGroup,
@@ -10,9 +10,8 @@ import {
   MergedGroup,
   MergedScheme, RoleRightsValue,
 } from '../@types/permissions';
-import { roleWithDsbFullAccess, scheme as testScheme } from './mock-data';
 
-export type RoleMergeFunction = (roles: Array<Role>) => MergedRole;
+export type RoleMergeFunction = (roles: Array<Role>) => MergedScheme;
 
 export function getRoleMergeClojure(scheme: Scheme): RoleMergeFunction {
   const currentScheme: Scheme = scheme;
@@ -29,7 +28,7 @@ export function getRoleMergeClojure(scheme: Scheme): RoleMergeFunction {
     const found = path.every((key) => {
       if (isValue(current)) return false;
       current = current[key];
-      return !!current;
+      return current !== undefined;
     });
 
     return found && isValue(current) ? current as RoleRightsValue : null;
@@ -55,7 +54,7 @@ export function getRoleMergeClojure(scheme: Scheme): RoleMergeFunction {
     };
   }
 
-  function mergeGroup(node: SchemeGroup, path: Array<string>, roles: Array<Role>): any {
+  function mergeGroup(node: SchemeGroup, path: Array<string>, roles: Array<Role>): MergedGroup {
     const group: MergedGroup = { ...node, items: {} };
 
     return Object.entries(node.items).reduce((mergedGroup: MergedGroup, [key, item]) => {
@@ -87,8 +86,54 @@ export function getRoleMergeClojure(scheme: Scheme): RoleMergeFunction {
   };
 }
 
+export function getPermissionsFromScheme(mergedScheme: MergedScheme): RoleRightsGroup {
+  function itemIsGroup(checkingItem: MergedGroup | MergedItem): checkingItem is MergedGroup {
+    return checkingItem.type === 'group';
+  }
+
+  function getPermission(mergedItem: MergedItem): RoleRightsValue | null {
+    return (mergedItem.isDefault || mergedItem.mergedValue === undefined)
+      ? null
+      : mergedItem.mergedValue;
+  }
+
+  function handleGroup(mergedGroup: MergedGroup): RoleRightsGroup | null {
+    const group: RoleRightsGroup = Object.entries(mergedGroup.items)
+      .reduce((current, [key, groupItem]) => {
+        const value = itemIsGroup(groupItem)
+          ? handleGroup(groupItem)
+          : getPermission(groupItem);
+
+        if (value !== null) { return { ...current, [key]: value }; }
+
+        return current;
+      }, {});
+
+    return Object.keys(group).length > 0 ? group : null;
+  }
+
+  return Object.entries(mergedScheme)
+    .reduce((current, [key, groupItem]) => {
+      const value = itemIsGroup(groupItem)
+        ? handleGroup(groupItem)
+        : getPermission(groupItem);
+
+      if (value) { return { ...current, [key]: value }; }
+
+      return current;
+    }, {});
+}
+
+export function getRoleWithLowCaseKeys(serverRole: ServerRole): Role {
+  return {
+    id: serverRole.Id,
+    name: serverRole.Name,
+    code: serverRole.Code,
+    shortCode: serverRole.ShortCode,
+    description: serverRole.Description,
+    isBuiltIn: serverRole.IsBuiltIn,
+    permissions: serverRole.Permissions,
+  };
+}
+
 export default getRoleMergeClojure;
-
-const mergeFunction = getRoleMergeClojure(testScheme);
-
-console.log(mergeFunction([roleWithDsbFullAccess]));

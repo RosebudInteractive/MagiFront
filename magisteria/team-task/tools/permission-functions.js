@@ -1,4 +1,3 @@
-import { roleWithDsbFullAccess, scheme as testScheme } from './mock-data';
 export function getRoleMergeClojure(scheme) {
     const currentScheme = scheme;
     function isValue(node) {
@@ -10,7 +9,7 @@ export function getRoleMergeClojure(scheme) {
             if (isValue(current))
                 return false;
             current = current[key];
-            return !!current;
+            return current !== undefined;
         });
         return found && isValue(current) ? current : null;
     }
@@ -55,6 +54,48 @@ export function getRoleMergeClojure(scheme) {
         }, result);
     };
 }
+export function getPermissionsFromScheme(mergedScheme) {
+    function itemIsGroup(checkingItem) {
+        return checkingItem.type === 'group';
+    }
+    function getPermission(mergedItem) {
+        return (mergedItem.isDefault || mergedItem.mergedValue === undefined)
+            ? null
+            : mergedItem.mergedValue;
+    }
+    function handleGroup(mergedGroup) {
+        const group = Object.entries(mergedGroup.items)
+            .reduce((current, [key, groupItem]) => {
+            const value = itemIsGroup(groupItem)
+                ? handleGroup(groupItem)
+                : getPermission(groupItem);
+            if (value !== null) {
+                return { ...current, [key]: value };
+            }
+            return current;
+        }, {});
+        return Object.keys(group).length > 0 ? group : null;
+    }
+    return Object.entries(mergedScheme)
+        .reduce((current, [key, groupItem]) => {
+        const value = itemIsGroup(groupItem)
+            ? handleGroup(groupItem)
+            : getPermission(groupItem);
+        if (value) {
+            return { ...current, [key]: value };
+        }
+        return current;
+    }, {});
+}
+export function getRoleWithLowCaseKeys(serverRole) {
+    return {
+        id: serverRole.Id,
+        name: serverRole.Name,
+        code: serverRole.Code,
+        shortCode: serverRole.ShortCode,
+        description: serverRole.Description,
+        isBuiltIn: serverRole.IsBuiltIn,
+        permissions: serverRole.Permissions,
+    };
+}
 export default getRoleMergeClojure;
-const mergeFunction = getRoleMergeClojure(testScheme);
-console.log(mergeFunction([roleWithDsbFullAccess]));

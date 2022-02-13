@@ -5,6 +5,7 @@ import {commonGetQuery, update} from "common-tools/fetch-tools";
 import {all, call, put, select, takeEvery} from "@redux-saga/core/effects";
 import {showErrorMessage, showInfo} from "tt-ducks/messages";
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
+import {getRoleWithLowCaseKeys} from "../tools/permission-functions";
 
 //constants
 
@@ -144,7 +145,7 @@ function* getRolesWithPermissionsSaga() {
             }));
 
 
-            yield put({type: SET_ROLES_WITH_PERMISSIONS, payload: rolesFullInfo})
+            yield put({type: SET_ROLES_WITH_PERMISSIONS, payload: rolesFullInfo.map((role) => getRoleWithLowCaseKeys(role))})
         }
 
         yield put({type: SUCCESS_REQUEST});
@@ -166,7 +167,7 @@ function* getRightsSaga() {
         ]);
 
         yield put({type: SUCCESS_REQUEST});
-        yield put({type: SET_RIGHTS, payload: rights});
+        yield put({type: SET_RIGHTS, payload: rights}); //.map((role) => getRoleWithLowCaseKeys(role))});
 
         yield put({type: SET_PERMISSION_SCHEME, payload: permissionScheme});
         yield put({type: SUCCESS_REQUEST});
@@ -183,7 +184,7 @@ function* selectRightByIdSaga({payload}) {
 
         const role = yield call(getRoleReq, payload);
 
-        yield put(setSelectedRight(role));
+        yield put(setSelectedRight(getRoleWithLowCaseKeys(role)));
 
         yield put({type: SUCCESS_REQUEST});
     } catch (e) {
@@ -194,7 +195,6 @@ function* selectRightByIdSaga({payload}) {
 
 function* changeRightSaga(data) {
     try {
-
          const res = yield call(_updateRight, data.payload.roleId, data.payload.roleData);
 
          if (res.status === 403) {
