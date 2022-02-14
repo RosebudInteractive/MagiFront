@@ -34,6 +34,7 @@ function SideBarMenu(props) {
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/components"} title={"Компоненты"}/>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/users"} title={"Пользователи"}/>
                 <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/rights"} title={"Роли"}/>
+                <MenuLink Icon={ElementIco} nested={true} url={"/dictionaries/task-types"} title={"Типы задач"}/>
             </MenuList>
         }
 

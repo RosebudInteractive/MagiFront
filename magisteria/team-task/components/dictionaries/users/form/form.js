@@ -41,7 +41,7 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData.PData.roles));
+    const [userRolesArray, setUserRolesArray] = useState(props.userData ? Object.keys(props.userData.PData.roles) : []);
     const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
 
     useEffect(()=>{
