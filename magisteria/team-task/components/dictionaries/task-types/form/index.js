@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form} from "react-final-form";
 import "./task-type-form.sass"
+import "../../editor-form.sass"
 import {MultipleSelect, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedComponent,
@@ -10,10 +11,10 @@ import {
 } from "tt-ducks/components-dictionary";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {createTaskType, currentTaskTypeSelector, selectTaskType} from "../../../../ducks/task";
+import {createTaskType, currentTaskTypeSelector, selectTaskType} from "tt-ducks/task";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
-import {getRights, rightsDictionarySelector} from "../../../../ducks/access-rights-dictionary";
+import {getRights, rightsDictionarySelector} from "tt-ducks/access-rights-dictionary";
 import './task-type-form.sass'
 
 
@@ -21,7 +22,7 @@ const TaskTypeForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
     const {actions, taskTypeData, roles} = props;
 
-    useEffect(()=>{
+    useEffect(() => {
         setActionCreate(!(taskTypeData && taskTypeData.Id));
         actions.getRights()
     }, [taskTypeData]);
@@ -41,7 +42,6 @@ const TaskTypeForm = (props) => {
         console.log('roleOptions', roleOptions)
         console.log('roles', roles)
     }, [roleOptions, roles]);
-
 
 
     const closeModalForm = () => {
@@ -105,11 +105,14 @@ const TaskTypeForm = (props) => {
                     }>
                     {
                         (taskTypeForm) => (
-                            <form className='task-type-form' onSubmit={e => {e.preventDefault(); handleSubmit(taskTypeForm.values)}}>
+                            <form className='editor-form task-type-form' onSubmit={e => {
+                                e.preventDefault();
+                                handleSubmit(taskTypeForm.values)
+                            }}>
 
-                                <div className="task-type-form-fields">
-                                    <div className='task-type-form-info'>
-                                        <div className='task-type-form__field email-field'>
+                                <div className="editor-form__two-pane-container">
+                                    <div className='left-pane with-fields-column'>
+                                        <div className='task-type-form__field'>
                                             <Field
                                                 name="code"
                                                 component={TextBox}
@@ -139,10 +142,7 @@ const TaskTypeForm = (props) => {
                                             />
                                         </div>
                                     </div>
-
-
-
-                                    <div className={'task-type-form__roles'}>
+                                    <div className={'right-pane'}>
                                         <div className='task-type-form__field'>
                                             <Field
                                                 name="roles"
@@ -155,7 +155,7 @@ const TaskTypeForm = (props) => {
                                                 renderValue={(selected) => (
                                                     <Box className={'user-form__roles _with-custom-scroll'}>
                                                         {selected.map((value) => (
-                                                            <Chip key={value} label={roleNames[value]} />
+                                                            <Chip key={value} label={roleNames[value]}/>
                                                         ))}
                                                     </Box>
                                                 )}
@@ -163,7 +163,6 @@ const TaskTypeForm = (props) => {
                                         </div>
                                     </div>
                                 </div>
-
 
 
                                 {/*<div className='component-form__field'>*/}
@@ -185,10 +184,13 @@ const TaskTypeForm = (props) => {
                                 {/*           disabled={true}>*/}
                                 {/*    </Field>*/}
                                 {/*</div>*/}
-
-                                <button type='submit' className="task-type-form__confirm-button orange-button big-button" disabled={!taskTypeForm.valid || taskTypeForm.pristine}>
-                                    Применить
-                                </button>
+                                <div className='editor-form__action-buttons'>
+                                    <button type='submit'
+                                            className="task-type-form__confirm-button orange-button big-button"
+                                            disabled={!taskTypeForm.valid || taskTypeForm.pristine}>
+                                        Применить
+                                    </button>
+                                </div>
 
                             </form>
                         )
