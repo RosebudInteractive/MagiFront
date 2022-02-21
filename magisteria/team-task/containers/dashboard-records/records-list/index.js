@@ -54,6 +54,7 @@ const Records = (props) => {
         filterValue,
         hasAdminRights,
         dashboardActiveRecord,
+        user,
     } = props;
 
     const location = useLocation();
@@ -223,46 +224,37 @@ const Records = (props) => {
                     }
                 },
                 onItemDblClick: function (data) {
-                    if (!hasAdminRights) {
+                    const hasModifyRights = hasAdminRights || hasSupervisorRights
+
+                    if (!hasModifyRights) {
                         return;
                     }
 
                     const item = this.getItem(data.row);
+                    const matchSupervisor = (item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id)
 
                     if (data.column === 'PubDate') {
-                        if ((item && item.CourseId && item.LessonId) && hasAdminRights) {
-                            if (hasAdminRights) {
+                        if (item && item.CourseId && item.LessonId) {
+                            if (hasAdminRights || matchSupervisor) {
                                 actions.setSelectedRecord(item);
                                 props.openModalOnPublication();
-                            } else {
-                                if (((item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id))) {
-                                    actions.setSelectedRecord(item);
-                                    props.openModalOnPublication();
-                                }
                             }
                         }
                     }
 
-                    if (data.column === 'ProcessState' && (hasAdminRights || hasSupervisorRights)) {
+                    if (data.column === 'ProcessState') {
                         if (item && item.ProcessId) {
-                            if (hasAdminRights) {
+                            if (hasAdminRights || matchSupervisor) {
                                 window.open(`/pm/process/${item.ProcessId}`, '_blank');
-                            } else {
-                                if ((item.Supervisor && item.Supervisor.Id) && (item.Supervisor.Id === user.Id)) {
-                                    window.open(`/pm/process/${item.ProcessId}`, '_blank');
-                                }
                             }
                         }
                     }
 
                     if (item.ElementFields && item.ElementFields.includes(data.column)) {
                         if (item[data.column] && item[data.column].elementId) {
-                            if (hasAdminRights) {
+                            const isElementSupervisor = item[data.column].supervisorId && item[data.column].supervisorId === user.Id
+                            if (hasAdminRights || isElementSupervisor) {
                                 window.open(`/pm/tasks?element=${item[data.column].elementId}`)
-                            } else {
-                                if (item[data.column].supervisorId && item[data.column].supervisorId === user.Id) {
-                                    window.open(`/pm/tasks?element=${item[data.column].elementId}`)
-                                }
                             }
                         }
                     }
