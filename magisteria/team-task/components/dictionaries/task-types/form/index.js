@@ -2,21 +2,27 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form} from "react-final-form";
 import "./task-type-form.sass"
 import "../../editor-form.sass"
-import {MultipleSelect, TextBox} from '../../../ui-kit'
-import {
-    cleanSelectedComponent,
-    getComponents,
-    saveComponentChanges,
-    toggleComponentForm
-} from "tt-ducks/components-dictionary";
+import {MultipleSelect, TextBox } from '../../../ui-kit'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {createTaskType, currentTaskTypeSelector, selectTaskType} from "tt-ducks/task";
+import {
+        createTaskType, 
+        currentTaskTypeSelector, 
+        selectTaskType, 
+        updateTaskType,
+        getTaskType
+    } from "tt-ducks/task";
+
+import {
+        getRights, 
+        rolesPermissionsSelector,
+        rightsDictionarySelector,
+        getRolesWithPermissions
+    } from "tt-ducks/access-rights-dictionary";
+
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
-import {getRights, rightsDictionarySelector} from "tt-ducks/access-rights-dictionary";
 import './task-type-form.sass'
-
 
 const TaskTypeForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
@@ -24,8 +30,11 @@ const TaskTypeForm = (props) => {
 
     useEffect(() => {
         setActionCreate(!(taskTypeData && taskTypeData.Id));
-        actions.getRights()
-    }, [taskTypeData]);
+        actions.getRights();
+        actions.getRolesWithPermissions();
+//        actions.getTaskType();
+
+    }, [taskTypeData.Id]);
 
 
     const roleOptions = useMemo(() => {
@@ -39,50 +48,40 @@ const TaskTypeForm = (props) => {
     }, [roles]);
 
     useEffect(() => {
-        console.log('roleOptions', roleOptions)
-        console.log('roles', roles)
+        console.log('roleOptions', roleOptions);
+        console.log('roles', roles);
     }, [roleOptions, roles]);
 
 
     const closeModalForm = () => {
         console.log('close');
-        // actions.toggleComponentForm(false);
-        // actions.cleanSelectedComponent();
         actions.selectTaskType();
         props.history.push(`/dictionaries/task-types`);
     };
 
-    // const roleNames =
-
-    // const responsibles = useMemo(() => {
-    //     if(componentOwners.length > 0 && componentOwners.some(sup => sup.hasOwnProperty('Id'))){
-    //         return componentOwners.map(sup => ({id: sup.Id, name: sup.DisplayName}))
-    //     }
-    // }, [componentOwners]);
-
     const handleSubmit = (data) => {
         console.log('handleSubmit data ', data)
 
-        actions.createTaskType(data);
-        // const newComponentData = {...componentData,
-        //     SupervisorId: componentInfo.supervisorId,
-        //     Name: componentInfo.name,
-        // };
-        // if(createAction){
-        //     //create new component logic
-        // } else {
-        //     actions.saveComponentChanges(componentData.Id, newComponentData);
-        //     actions.getComponents();
-        // }
-
+        const newData = {...data,
+          Name: data.name,
+          Description: data.description,
+          Roles: Array.from(data.roles),
+        };
+        if(createAction){
+          actions.createTaskType(newData);
+            //create new component logic
+        } else {
+          actions.updateTaskType(data.Id, newData);
+        };
         closeModalForm()
     };
 
     const taskTypeFormData = useMemo(() => ({
         code: taskTypeData.Code,
         name: taskTypeData.Name,
+        Id: taskTypeData.Id,
         description: taskTypeData.Description,
-        roles: [...taskTypeData.Roles],
+        roles: taskTypeData.Roles ? taskTypeData.Roles.map( item=> item.Id ) :[],
     }), [taskTypeData]);
 
     return (
@@ -151,7 +150,6 @@ const TaskTypeForm = (props) => {
                                                 label={"Роли"}
                                                 required={true}
                                                 options={roleOptions} //todo add all roles
-
                                                 renderValue={(selected) => (
                                                     <Box className={'user-form__roles _with-custom-scroll'}>
                                                         {selected.map((value) => (
@@ -163,27 +161,6 @@ const TaskTypeForm = (props) => {
                                         </div>
                                     </div>
                                 </div>
-
-
-                                {/*<div className='component-form__field'>*/}
-                                {/*    <Field*/}
-                                {/*        name="supervisorId"*/}
-                                {/*        component={Select}*/}
-                                {/*        placeholder="Ответственный"*/}
-                                {/*        label={"Ответственный"}*/}
-                                {/*        options = {responsibles}*/}
-                                {/*        defaultValue={componentData && componentData.SupervisorId ? componentData.SupervisorId : ''}*/}
-                                {/*        multiple={false}*/}
-                                {/*    />*/}
-                                {/*</div>*/}
-                                {/*<div className='component-form__field'>*/}
-                                {/*    <Field name="structName"*/}
-                                {/*           component={TextBox}*/}
-                                {/*           label={"Структура Проекта"}*/}
-                                {/*           placeholder="Структура Проекта"*/}
-                                {/*           disabled={true}>*/}
-                                {/*    </Field>*/}
-                                {/*</div>*/}
                                 <div className='editor-form__action-buttons'>
                                     <button type='submit'
                                             className="task-type-form__confirm-button orange-button big-button"
@@ -205,8 +182,6 @@ const mapState2Props = (state) => {
     return {
         taskTypeData: currentTaskTypeSelector(state),
         roles: rightsDictionarySelector(state)
-        // visible: componentFormOpenedSelector(state),
-        // componentOwners: componentOwnersSelector(state)
     }
 };
 
@@ -215,11 +190,10 @@ const mapDispatch2Props = (dispatch) => {
         actions: bindActionCreators({
             selectTaskType,
             createTaskType,
-            toggleComponentForm,
-            cleanSelectedComponent,
-            saveComponentChanges,
-            getComponents,
-            getRights
+            updateTaskType,
+            getRights,
+            getRolesWithPermissions,
+            getTaskType,
         }, dispatch)
     }
 };

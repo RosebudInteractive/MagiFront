@@ -92,7 +92,6 @@ const TaskTypes = (props) => {
         }
     }, [currentTaskType])
 
-
     const _onResize = useCallback(() => {
         resizeHandler(taskTypes.length)
     }, [taskTypes]);
@@ -139,6 +138,7 @@ const TaskTypes = (props) => {
                 console.log('item', item)
                 if (item && item.Id) {
                     actions.selectTaskType(item.Id);
+                    actions.getTaskType(item.Id)
                     // actions.selectRight(item.Id);
                     // actions.toggleRightForm(true);
                     props.history.push(`/dictionaries/task-types/${item.Id}`);
@@ -206,7 +206,7 @@ const mapState2Props = (state) => {
         fetching: fetchingSelector(state),
         currentTaskType: currentTaskTypeSelector(state),
         supervisors: userWithSupervisorRightsSelector(state),
-        // roles: rightsDictionarySelector(state)
+        roles: rightsDictionarySelector(state)
         // modalVisible: rightFormOpenedSelector(state)
     }
 };

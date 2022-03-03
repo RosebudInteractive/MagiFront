@@ -540,7 +540,6 @@ function* saveTaskSaga({payload}) {
                 put(getProcessElement(elementId)),
             ])
         } else {
-            console.log(result)
             yield all([
                 put(getTask(result.id)),
                 put(getProcessElement(null)),
