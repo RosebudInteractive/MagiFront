@@ -1,0 +1,100 @@
+.ws-prop-editor
+  flex none
+  width 19.8333em
+  .ws-props-content
+    width 100%
+    height 100%
+    overflow-y hidden
+    position relative
+.ws-player-main
+  background-color #2F2F2F
+  margin auto
+  top 50%
+  transform translateY(-50%)
+  position relative
+.ws-player-content
+  width 100%
+  height 100%
+  position relative
+  overflow hidden
+.ws-player-element
+  position absolute
+  display block
+  div.ws-player-elem-content
+    position absolute
+    overflow hidden
+    top 0
+    left 0
+    right 0
+    bottom 0
+  img
+    /*left 50%
+    top 50%
+    transform translate(-50%, -50%)*/
+    width 100%
+    height 100%
+    position absolute
+    /*-webkit-transition height 50ms, width 50ms
+    -moz-transition max-height 50ms, width 50ms
+    -ms-transition max-height 50ms, width 50ms
+    -o-transition max-height 50ms, width 50ms
+    transition max-height 50ms, width 50ms*/
+  .ui-resizable-se
+    opacity 0
+  .ws-ball
+  .ws-maximize
+    position absolute
+    z-index 2
+    display none
+  .ws-maximize
+    top 0
+    left 0.5em
+    .ws-max-icon
+      color #00DBFF
+      font-weight 600
+      font-size 1.2em
+  .ws-ball.ws-ne
+    top 0
+    right 0
+    transform translate(50%, -50%)
+  .ws-ball.ws-e
+    top 50%
+    right 0
+    transform translate(50%, -50%)
+  .ws-ball.ws-se
+    bottom 0
+    right 0
+    transform translate(50%, 50%)
+  .ws-ball.ws-s
+    bottom 0
+    left 50%
+    transform translate(-50%, 60%)
+  .ws-ball.ws-sw
+    bottom 0
+    left 0
+    transform translate(-50%, 50%)
+  .ws-ball.ws-w
+    bottom 50%
+    left 0
+    transform translate(-50%, 50%)
+  .ws-ball.ws-nw
+    top 0
+    left 0
+    transform translate(-50%, -50%)
+  .ws-ball.ws-n
+    top 0
+    left 50%
+    transform translate(-50%, -50%)
+.ws-player-element.focused
+  border 1px solid #00DBFF
+.ws-player-elem-content
+  width 100%
+  height 100%
+  background-size: 100% 100%
+.ws-player-element.focused
+  &:hover
+    .ws-ball
+      display block
+    .ws-maximize
+      display block
+

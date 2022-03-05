@@ -1,0 +1,48 @@
+/* скроллер */
+.iScrollIndicator {
+  cursor: pointer;
+  background: rgba(47,51,55,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 0;
+  -webkit-transition: all 0.1s ease-out;
+  -moz-transition: all 0.1s ease-out;
+  -o-transition: all 0.1s ease-out;
+  transition: all 0.1s ease-out;
+  width: 0.25em;
+}
+.iScrollVerticalScrollbar {
+  -webkit-transition: all 0.1s ease-out;
+  -moz-transition: all 0.1s ease-out;
+  -o-transition: all 0.1s ease-out;
+  transition: all 0.1s ease-out;
+}
+.iScrollVerticalScrollbar.is-hover,
+.iScrollVerticalScrollbar:hover {
+  width: 0.5em !important;
+}
+.iScrollVerticalScrollbar.is-hover .iScrollIndicator,
+.iScrollIndicator:hover {
+  border-radius: 3px;
+  background: rgba(47,51,55,0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.iScrollHorizontalScrollbar {
+  -webkit-transition: all 0.1s ease-out;
+  -moz-transition: all 0.1s ease-out;
+  -o-transition: all 0.1s ease-out;
+  transition: all 0.1s ease-out;
+}
+.iScrollHorizontalScrollbar.is-hover,
+.iScrollHorizontalScrollbar:hover {
+  height: 0.5em !important;
+}
+.iScrollHorizontalScrollbar.is-hover .iScrollIndicator,
+.iScrollIndicator:hover {
+  border-radius: 3px;
+  background: rgba(47,51,55,0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}

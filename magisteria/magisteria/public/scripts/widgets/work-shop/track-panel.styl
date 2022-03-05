@@ -1,0 +1,344 @@
+.ws-footer
+  position fixed
+  bottom 0
+  left 0
+  height 12.5em
+  width 100%
+  background-color #333333
+  input[type="file"]
+    display none
+  .ws-tracks-content
+    position relative
+    width 100%
+    height 100%
+    flex-direction row
+    display flex
+  .ws-track-tools
+    height 100%
+    width 15.3339em
+    flex none
+    background-color #363636
+    position relative
+  .ws-track-tools-background
+    background-color #4D4D4D
+  .ws-track-tools-panel
+    background-color #4D4D4D
+  .ws-track-panel
+    background-color #333333
+  .ws-tools-top
+    width 13.25em
+    height 2.5em
+    margin-bottom 1px
+    position relative
+  .ws-tools-top-right
+    width 2em
+    position absolute
+    top 0px
+    right 0px
+    height 2.5em
+    div
+      font-family "DejaVu Sans"
+      font-size 1.25em
+      line-height 100%
+      color rgba(255, 255, 255, 0.5)
+      opacity 1.00
+      margin-left 0.4em
+      margin-top 0.5em
+  .ws-tools-content
+    height 9.9167em
+    width 100%
+  .ws-tools-left
+    width 13.25em
+    height 100%
+    display inline
+    float left
+    margin-right 1px
+    position relative
+  .ws-tools-center
+    width 100%
+    height 7.3333em
+    margin-bottom 1px
+    z-index 1
+    display block
+  .ws-tools-right
+    width 2em
+    height 100%
+    display inline
+    float left
+    background-color #363636
+    overflow-y hidden
+    .list
+      height auto
+  .ws-track-delete-panel
+    width 100%
+    position relative
+    div.delete-btn
+      font-family "DejaVu Sans"
+      font-size 1.25em
+      line-height 100%
+      color rgba(255, 255, 255, 0.5)
+      opacity 1.00
+      margin-left 0.4em
+      margin-top 0.5em
+      position absolute
+    div.number-text
+      font-family "DejaVu Sans"
+      font-size 1em
+      line-height 100%
+      color rgba(255, 255, 255, 0.25)
+      opacity 1.00
+      margin-left 0.75em
+      margin-bottom 0.75em
+      bottom 0
+      position absolute
+  .ws-tools-top-play
+    /* ▸ */
+    font-family "DejaVu Sans"
+    font-size 2em
+    line-height 100%
+    color #FFFFFF
+    opacity 0.60
+    padding-left 0.5em
+    padding-right 0.5em
+    width 1.5em
+  .ws-left
+    float left
+    display block
+  .ws-right
+    float right
+    display block
+  .ws-tools-top-text
+    /* +0,5 */
+    font-family "PT Sans Caption"
+    font-style normal
+    font-weight normal
+    line-height 100%
+    color #FFFFFF
+    /* opacity 0.60 */
+    padding-top 0.75em
+  .ws-tools-top-refresh
+    /* ⟲ */
+    font-family "DejaVu Sans"
+    font-size 1.75em
+    line-height 100%
+    color #FFFFFF
+    opacity 0.60
+    padding-top 0.25em
+    padding-left 0.5em
+    padding-right 0.5em
+  .ws-tools-center-row
+    display block
+    position relative
+    height 3.3335em
+    padding-top 1em
+    z-index 1
+  .ws-tracks-list
+    flex 1 0 1px
+    position relative
+    overflow hidden
+  .ws-mute-button
+    padding-left 3px
+    padding-top 3px
+  .ws-tracks-list-content
+    display block
+    position relative
+    width 100%
+    height 100%
+    background-color #242424
+    overflow hidden
+  .ws-track-panel
+    background-color #333333
+  .ws-tracks-list-scroll
+    overflow hidden
+    height 9.9167em
+    position relative
+    .iScrollIndicator
+      background-color rgba(255, 255, 255, 0.4)
+    .iScrollHorizontalScrollbar.is-hover
+      .iScrollIndicator
+        background-color rgba(255, 255, 255, 0.4)
+.ws-tracks-scroll-wrapper
+    height auto
+  .ws-track
+    display block
+    height 4.9374em
+    width 100%
+    margin-bottom 1px
+    &:last-child
+      margin-bottom 0px
+  .ws-track-content
+    width 100%
+    height 100%
+    position relative
+  .ws-track-element
+    position absolute
+    height 4.9374em
+    padding-left 1px
+    .ws-element-content
+      border-radius 3px
+    .ws-element-icon
+      /* ◪ */
+      font-family "DejaVu Sans"
+      font-size 1.75em
+      line-height 100%
+      color #FFFFFF
+      opacity 0.40
+    .ws-element-text
+      font-family "PT Sans Caption"
+      font-style normal
+      font-weight normal
+      font-size 1em
+      line-height 100%
+      color #FFFFFF
+      margin-top 0.75em
+    .ui-resizable-se
+      display none!important
+  .ws-track-element.focused
+    .ws-element-content
+      border 3px solid #00DBFF!important
+  .ws-track-element.no-image
+    .ws-element-pict-wrapper
+      display none
+  .ws-track-element.no-icon
+    .ws-element-icon
+      display none
+  .ws-track-element.no-title
+    .ws-element-text
+      display none
+  .ws-track-element.is-empty
+    .ws-element-content
+      background-color #246570
+      border 3px solid #246570
+    .ws-element-text
+      display none
+    .ws-element-icon
+      display none
+    .ws-element-pict-wrapper
+      display none
+  .ws-track-element.pink
+    .ws-element-content
+      background #B35B9F
+      border 3px solid #B35B9F
+  .ws-track-element.dark-pink
+    .ws-element-content
+      background #8C5CA3
+      border 3px solid #8C5CA3
+  .ws-track-element.dark-green
+    .ws-element-content
+      background #80B172
+      border 3px solid #80B172
+  .ws-track-element.dark-gray
+    .ws-element-content
+      background #718AB2
+      border 3px solid #718AB2
+  .ws-element-content
+    width 100%
+    height 100%
+    display flex
+    flex-direction row
+  .ws-element-pict-wrapper
+    flex none
+    width 4.4em
+  .ws-element-pict
+    height 4.4em
+  .ws-element-content-wrapper
+    flex 1 0 1px
+    padding-left 0.5em
+    overflow hidden
+  .ws-track-element-menu
+    position absolute
+    right 0.5em
+    top 0.5em
+    display none
+  .ws-track-element
+    &:hover
+      .ws-track-element-menu
+        display block
+  .ws-track-element.no-menu
+    &:hover
+      .ws-track-element-menu
+        display none
+  .ws-tools-top.ws-track-liner
+    background-color #242424
+    width 100%
+    position relative
+    overflow hidden
+    .ws-liner-list
+      width auto
+      height 100%
+  .ws-track-liner-step
+    height 100%
+    position absolute
+    border-right 1px solid #242424
+    &:last-child
+      border-right none
+  .ws-track-liner-text
+    position absolute
+    z-index 1
+    padding-top 0.75em
+    padding-bottom 0.25em
+    transform translate(-50%)
+    div
+      font-family "PT Sans Caption"
+      font-style normal
+      font-weight normal
+      font-size 11px
+      line-height: 100%
+      color #FFFFFF
+      opacity 0.30
+  .ws-pointer
+    display block
+    position absolute
+    top 1.4em
+    z-index 5
+    transition: left 0 ease-out 0.2s
+    pointer-events none
+    .ws-pointer-icon
+      display block
+      width 100%
+      height auto
+    .ws-pointer-line
+      display block
+      width 100%
+      height 180px
+  .ws-tools-bottom
+    width 100%
+    height 2.5em
+    padding-top 0.75em
+    padding-left 0.75em
+    display block
+  .zoom-left
+    float left
+  .zoom-right
+    float left
+    padding-top 0.2em
+  .zoom-middle
+    float left
+    width 10em
+    height 100%
+    padding-left .75em
+    padding-right .75em
+    padding-top .5em
+  .zoom-line
+    width 100%
+    height .16667em
+    background-color #2f2f2f
+    overflow visible
+    position relative
+  .zoom-circle
+    position absolute
+    top -0.375em
+.ws-tools-center-icon
+  font-family "DejaVu Sans"
+  font-size 2em
+  line-height 100%
+  color #FFFFFF
+  opacity 0.60
+  display inline-block
+  margin-left 0.75em
+  position relative
+.ws-tools-center-icon.big
+  font-size 2.5em
+.ws-tools-center-icon.focused
+  color #00DBFF
+  opacity 1

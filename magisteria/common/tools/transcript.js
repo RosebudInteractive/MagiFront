@@ -1,6 +1,14 @@
 import React from "react"
 import {CONTENT_TYPE} from "../constants/common-consts";
 
+function Intro({innerHtml}) {
+    return <div>
+        <p className='text-intro'>
+            <div dangerouslySetInnerHTML={{__html: innerHtml}}/>
+        </p>
+    </div>
+}
+
 export default class TranscriptParser {
 
     constructor(data) {
@@ -79,11 +87,7 @@ export default class TranscriptParser {
         }
 
         if ((_div.length === 0) && (episode.Transcript)) {
-            _div.push(<div>
-                <p className='text-intro'>
-                    <div dangerouslySetInnerHTML={{__html: episode.Transcript}}/>
-                </p>
-            </div>)
+            _div.push(<Intro innerHtml={episode.Transcript}/>)
         }
 
         return (_div.length > 0) ? _div : null
