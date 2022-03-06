@@ -8,7 +8,8 @@ import Books from "../../../books";
 import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
 import VideoBlock from "./video-block";
 import MoreCourses from "./more-courses";
-import TimelinePreview from "tt-components/timelines/preview";
+import TimelinePreview from "./preview";
+import {Timeline} from "timeline/index";
 
 export default function CourseWrapper(props) {
     const {course, moreCourses} = props
@@ -51,7 +52,8 @@ export default function CourseWrapper(props) {
                                  background={tm.Image ? tm.Image : null}
                                  levels={levelLimits}
                                  minLineWidth={minWidth}
-                                 timeline={tm}/>
+                                 timeline={tm}
+                                 TL={Timeline}/>
             </div>
 
 

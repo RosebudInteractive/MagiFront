@@ -210,7 +210,7 @@ module.exports = function (webpackEnv, argv) {
                 '#common': path.resolve(__dirname, '../../common'),
                 'common-tools': path.resolve(__dirname, '../../common/tools'),
                 'common-styles': path.resolve(__dirname, '../../common/styles'),
-                'timeline': path.resolve(__dirname, '../../timeline-lib'),
+                'timeline': path.resolve(__dirname, '../timeline-lib'),
             }
         },
         resolveLoader: {

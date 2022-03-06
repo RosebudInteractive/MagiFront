@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import './preview.sass'
 import {convertData, Themes, Timeline} from "timeline/index";
-import {useWindowSize} from "../../../tools/window-resize-hook";
+import {useWindowSize} from "tools/window-resize-hook";
 import PropTypes from "prop-types"
 import getInnerSize from "#common/tools/get-inner-size";
 import {PlatformTool} from "#common/tools/platform";
@@ -9,7 +9,7 @@ import {PlatformTool} from "#common/tools/platform";
 let enableSwitch = true;
 
 export default function TimelinePreview(props) {
-    const {timeline, background, levels, minLineWidth, TL} = props;
+    const {timeline, background, levels, minLineWidth} = props;
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(500);
     const [incKey, setIncKey] = useState(0);
