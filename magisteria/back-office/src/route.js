@@ -14,6 +14,8 @@ import Timelines from "./containers/timelines/list";
 import TimelineEditorContainer from "./containers/timelines/editor"
 import DashboardRecords from "./containers/dashboard-records"
 import AccessRights from "./components/dictionaries/roles";
+import TaskTypes from "./components/dictionaries/task-types";
+
 
 type RouterProps = {
     hasSupervisorRights: boolean,
@@ -53,6 +55,8 @@ export default function AppRouter(props: RouterProps) {
                         return <DictionaryComponents/>;
                     case 'rights':
                         return  isAdmin ? <AccessRights/> : <AccessDeniedPlaceholder/>;
+                    case 'task-types':
+                        return <TaskTypes/>;
                     default:
                         return;
                 }

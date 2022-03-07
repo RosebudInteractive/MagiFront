@@ -1,0 +1,52 @@
+@import "~tt-assets/styles/colors"
+
+.outer-background
+  width: 100%
+  height: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  position: fixed
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+  background: rgba(0,0,0,0.3)
+  //z-index: 992
+
+.inner-content
+  display: flex
+  flex-flow: column
+  row-gap: 15px
+  align-items: center
+  border-radius: 8px
+  background: #FFFFFF
+  box-shadow: 0px 2px 10px rgba(41, 42, 49, 0.12)
+  position: relative
+  box-sizing: content-box
+  padding: 16px 16px 16px 16px
+
+  .title
+    align-self: flex-start
+
+
+.task-type-form-fields
+  display: flex
+  flex-flow: row nowrap
+  row-gap: 10px
+  column-gap: 15px
+  width: 100%
+
+.task-type-form__field
+  min-width: 240.8px
+
+.task-type-form__confirm-button
+  align-self: end
+  width: fit-content
+
+.task-type-form__roles
+  display: flex
+  flex-direction: column
+  gap: 8px
+  max-height: 120px
+  flex-grow: 1

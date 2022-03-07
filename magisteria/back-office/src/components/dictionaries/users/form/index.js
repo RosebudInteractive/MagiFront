@@ -2,6 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form, FormSpy} from "react-final-form";
 import {USER_ROLE_STRINGS} from "../../../../constants/dictionary-users";
 import "./form.sass"
+import "../../editor-form.sass"
 import {MultipleSelect, TextBox} from '../../../ui-kit'
 import {
     cleanSelectedUser,
@@ -11,7 +12,6 @@ import {
     toggleUserForm,
     userFormOpenedSelector,
 } from "tt-ducks/users-dictionary";
-
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {EMAIL_REGEXP} from "#common/constants/common-consts";
@@ -41,13 +41,10 @@ const ComposeValidators = (...validators) => value =>
 
 const UserForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const [userRolesArray, setUserRolesArray] = useState(Object.keys(props.userData ? props.userData.PData.roles : []));
-    // rolesPermissions - roles array
-    const { userData, visible, actions, isAdmin, roles, permissionScheme, rolesPermissions, fetching} = props;
+    const [userRolesArray, setUserRolesArray] = useState(props.userData ? Object.keys(props.userData.PData.roles) : []);
+    const {userData, visible, fetching, actions, isAdmin, roles, permissionScheme, rolesPermissions} = props;
 
-    useEffect(() => {getRights()}, [])
-
-    useEffect(()=>{
+    useEffect(() => {
         setActionCreate(!(userData && userData.Id));
     }, [userData]);
 
@@ -99,11 +96,13 @@ const UserForm = (props) => {
             });
         }
 
-        const data = {...userData,
+        const data = {
+            ...userData,
             PData: {
                 roles: _oldRoles,
                 isAdmin: (userInfo.role && (userInfo.role === 'a')) || (userInfo.role && userInfo.role.length > 1 && userInfo.role.includes('a'))
-            }};
+            }
+        };
         actions.saveUserChanges(data);
         closeModalForm()
     };
@@ -132,67 +131,73 @@ const UserForm = (props) => {
                     initialValues={
                         userFormData
                     }
-                     onSubmit={values => {
-                     }}
+                    onSubmit={values => {
+                    }}
                     validate={values => {
                     }
                     }>
                     {
                         (userForm) => (
-                            <form className='user-form' onSubmit={ e => {e.preventDefault(); handleSubmit(userForm.values)} }>
-                                <div className={'user-form-fields'}>
-                                    <div className='user-form__field email-field'>
-                                        <Field name="email"
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Почта"
-                                               label={"Почта"}
-                                               validate={ComposeValidators(vRequired, vMustBeEmail)}
-                                               disabled={!createAction}/>
-                                        {
-                                            (createAction) &&
-                                            <button disabled={vMustBeEmail(userForm.values.email) !== undefined} type="button" className='search-button' onClick={() => findUserByEmail(userForm)}>
-                                                Поиск
-                                            </button>
-                                        }
-                                    </div>
-                                    <div className='user-form__field'>
-                                        <Field name="displayName"
-                                               component={TextBox}
-                                               type="text"
-                                               placeholder="Имя"
-                                               label={"Имя"}
-                                               disabled={true}/>
-                                    </div>
-                                    <div className='user-form__field'>
-                                        <Field name="role"
-                                               component={MultipleSelect}
-                                               multiple={true}
-                                               label={"Роль"}
-                                               required={true}
-                                               options={userRoles}
+                            <form className='editor-form user-form' onSubmit={e => {
+                                e.preventDefault();
+                                handleSubmit(userForm.values)
+                            }}>
+                                <div className='editor-form__two-pane-container'>
+                                    <div className={'left-pane with-fields-column'}>
+                                        <div className='user-form__field email-field'>
+                                            <Field name="email"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Почта"
+                                                   label={"Почта"}
+                                                   validate={ComposeValidators(vRequired, vMustBeEmail)}
+                                                   disabled={!createAction}/>
+                                            {
+                                                (createAction) &&
+                                                <button disabled={vMustBeEmail(userForm.values.email) !== undefined}
+                                                        type="button" className='search-button'
+                                                        onClick={() => findUserByEmail(userForm)}>
+                                                    Поиск
+                                                </button>
+                                            }
+                                        </div>
+                                        <div className='user-form__field'>
+                                            <Field name="displayName"
+                                                   component={TextBox}
+                                                   type="text"
+                                                   placeholder="Имя"
+                                                   label={"Имя"}
+                                                   disabled={true}/>
+                                        </div>
+                                        <div className='user-form__field'>
+                                            <Field name="role"
+                                                   component={MultipleSelect}
+                                                   multiple={true}
+                                                   label={"Роль"}
+                                                   required={true}
+                                                   options={userRoles}
 
-                                               renderValue={(selected) => (
-                                                   <Box className={'user-form__roles _with-custom-scroll'}>
-                                                       {selected.map((value) => (
-                                                           <Chip key={value} label={rolesWithNames[value]} />
-                                                       ))}
-                                                   </Box>
-                                               )}
-                                               validate={ComposeValidators(vRequired)}>
-                                        </Field>
+                                                   renderValue={(selected) => (
+                                                       <Box className={'user-form__roles _with-custom-scroll'}>
+                                                           {selected.map((value) => (
+                                                               <Chip key={value} label={rolesWithNames[value]}/>
+                                                           ))}
+                                                       </Box>
+                                                   )}
+                                                   validate={ComposeValidators(vRequired)}>
+                                            </Field>
+                                        </div>
                                     </div>
-
-                                    <button type='submit' className="user-form__confirm-button orange-button big-button" disabled={!userForm.valid || userForm.pristine}>
+                                    <div className={'right-pane user-permissions'}>
+                                        {roles && <Permissions readonly={true} scheme={mergedScheme}/>}
+                                    </div>
+                                </div>
+                                <div className='editor-form__action-buttons'>
+                                    <button type='submit' className="user-form__confirm-button orange-button big-button"
+                                            disabled={!userForm.valid || userForm.pristine}>
                                         Применить
                                     </button>
-
                                 </div>
-
-                                <div className={'user-permissions'}>
-                                    { roles && <Permissions readonly={true} scheme={mergedScheme} /> }
-                                </div>
-
                                 <FormSpy subscription={{values: true}}
                                          onChange={({values}) => {
                                              setUserRolesArray(values.role)
@@ -203,8 +208,6 @@ const UserForm = (props) => {
                         )
                     }
                 </Form>
-
-
 
 
             </div>

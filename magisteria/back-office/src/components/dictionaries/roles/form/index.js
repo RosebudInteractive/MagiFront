@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {Field, Form} from "react-final-form";
 import "./form.sass"
+import "../../editor-form.sass"
 import {TextBox} from '../../../ui-kit'
 import {
     cleanSelectedRight,
@@ -104,13 +105,13 @@ const RightForm = (props) => {
                     }>
                     {
                         (roleForm) => (
-                            <form className='right-form' onSubmit={e => {
+                            <form className='editor-form right-form' onSubmit={e => {
                                 e.preventDefault();
                                 applyChanges(roleForm.values);
                                 closeModalForm()
                             }}>
-                                <div className="fields-container">
-                                    <div className="left-side">
+                                <div className="editor-form__two-pane-container fields-container">
+                                    <div className="left-pane with-fields-column">
                                         <div className='right-form__field email-field'>
                                             <Field name="Code"
                                                    component={TextBox}
@@ -167,15 +168,13 @@ const RightForm = (props) => {
 
 
                                     </div>
-                                    <div className="right-side">
-                                        <div className='right-form__field'>
-                                            <Permissions scheme={permissionBody} onDirty={dirtyForm}
-                                                         onChange={onChangePermission} opened={true}/>
-                                        </div>
+                                    <div className="right-pane">
+                                        <Permissions scheme={permissionBody} onDirty={dirtyForm}
+                                                     onChange={onChangePermission} opened={true}/>
                                     </div>
                                 </div>
 
-                                <div className="action-buttons">
+                                <div className="editor-form__action-buttons">
                                     <button type='submit'
                                             className="right-form__confirm-button orange-button big-button"
                                             disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty}>

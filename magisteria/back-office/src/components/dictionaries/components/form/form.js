@@ -14,7 +14,6 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {componentOwnersSelector} from "tt-ducks/dictionary";
 
-
 const ComponentForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
     const { componentData, visible, actions, componentOwners} = props;
@@ -58,7 +57,7 @@ const ComponentForm = (props) => {
 
     return (
         (visible && (componentOwners && componentOwners.length > 0)) &&
-        <div className='outer-background'>
+        <div className='outer-background components__editor-form'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
                 <div className="title">
@@ -78,7 +77,6 @@ const ComponentForm = (props) => {
                     {
                         (componentForm) => (
                             <form className='component-form' onSubmit={e => {e.preventDefault(); handleSubmit(componentForm.values)}}>
-
                                 <div className='component-form__field email-field'>
                                         <Field
                                             name="name"
