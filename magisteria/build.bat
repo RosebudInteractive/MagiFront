@@ -43,7 +43,7 @@ call yarn build
 xcopy /E /Y /i build\static ..\build\static
 copy build\index.html ..\build\adm-index.html
 
-
+cd ../back-office
 @echo ------------------
 @echo build back-office
 @echo ------------------
