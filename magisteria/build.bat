@@ -61,7 +61,7 @@ call yarn
 @echo ---------------------
 call yarn build
 xcopy /E /Y build\static ..\build\static
-copy build\index.html ..\build\test-index.html
+copy build\index.html ..\build\tests-index.html
 
 cd ../mailing
 @echo -----------------------
