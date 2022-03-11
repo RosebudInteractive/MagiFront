@@ -10,8 +10,7 @@ import {
         currentTaskTypeSelector, 
         selectTaskType, 
         updateTaskType,
-        getTaskType,
-        getTaskTypes
+        getTaskType
     } from "tt-ducks/task";
 
 import {
@@ -65,7 +64,6 @@ const TaskTypeForm = (props) => {
 
         const newData = {...data,
           Name: data.name,
-          Code: data.code,
           Description: data.description,
           Roles: Array.from(data.roles),
         };
@@ -197,7 +195,6 @@ const mapDispatch2Props = (dispatch) => {
             getRights,
             getRolesWithPermissions,
             getTaskType,
-            getTaskTypes,
         }, dispatch)
     }
 };
