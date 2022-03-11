@@ -76,7 +76,6 @@ const TaskTypeForm = (props) => {
           actions.updateTaskType(data.Id, newData);
         };
         closeModalForm();
-        actions.getTaskTypes();
     };
 
     const taskTypeFormData = useMemo(() => ({
