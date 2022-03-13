@@ -355,13 +355,10 @@ function* createTaskTypeSaga(data) {
 
     try {
         const taskType = yield call(createTaskTypeReq, newTaskType); //todo check status
-
         yield put({type: SUCCESS_REQUEST});
-
         const taskTypes = yield select(taskTypesSelector);
-        taskTypes.push(taskType);
+        taskTypes.push(newTaskType);
         yield put({type: SET_TASK_TYPES, payload: taskTypes})
-
         // yield put({type: LOAD_TASK_TYPES});
     } catch (e) {
         yield put({type: FAIL_REQUEST});
