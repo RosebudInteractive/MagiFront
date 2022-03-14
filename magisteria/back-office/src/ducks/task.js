@@ -360,7 +360,7 @@ function* createTaskTypeSaga(data) {
         const taskTypes = yield select(taskTypesSelector);
         newTaskType.Id = taskType.id;
         taskTypes.push(newTaskType);
-        yield put({type: SET_TASK_TYPES, payload: taskTypes})
+        yield put({type: SET_TASK_TYPES, payload: { ...taskTypes}});
         console.log(JSON.stringify(taskTypes));
         // yield put({type: LOAD_TASK_TYPES});
     } catch (e) {
