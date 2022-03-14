@@ -355,8 +355,10 @@ function* createTaskTypeSaga(data) {
 
     try {
         const taskType = yield call(createTaskTypeReq, newTaskType); //todo check status
+        console.log(JSON.stringify(taskType));
         yield put({type: SUCCESS_REQUEST});
         const taskTypes = yield select(taskTypesSelector);
+        newTaskType.Id = taskType.id;
         taskTypes.push(newTaskType);
         yield put({type: SET_TASK_TYPES, payload: taskTypes})
         console.log(JSON.stringify(taskTypes));
