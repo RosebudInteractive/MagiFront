@@ -10,7 +10,8 @@ import {
         currentTaskTypeSelector, 
         selectTaskType, 
         updateTaskType,
-        getTaskType
+        getTaskType,
+		getTaskTypes
     } from "tt-ducks/task";
 
 import {
@@ -63,6 +64,7 @@ const TaskTypeForm = (props) => {
         console.log('handleSubmit data ', data)
 
         const newData = {...data,
+		  Code: data.code,
           Name: data.name,
           Description: data.description,
           Roles: Array.from(data.roles),
@@ -71,16 +73,15 @@ const TaskTypeForm = (props) => {
           actions.createTaskType(newData);
             //create new component logic
         } else {
-          actions.updateTaskType(data.Id, newData);
+          actions.updateTaskType(data.id, newData);
         };
         closeModalForm();
-        actions.getTaskTypes();
     };
 
     const taskTypeFormData = useMemo(() => ({
         code: taskTypeData.Code,
         name: taskTypeData.Name,
-        Id: taskTypeData.Id,
+        id: taskTypeData.Id,
         description: taskTypeData.Description,
         roles: taskTypeData.Roles ? taskTypeData.Roles.map( item=> item.Id ) :[],
     }), [taskTypeData]);
@@ -195,6 +196,7 @@ const mapDispatch2Props = (dispatch) => {
             getRights,
             getRolesWithPermissions,
             getTaskType,
+			getTaskTypes,
         }, dispatch)
     }
 };
