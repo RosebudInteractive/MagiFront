@@ -686,6 +686,9 @@ export default class CWSPlayer extends CWSBase {
             }
 
             if (this._audioState.stopped) {
+                // Такая хитрая конструкция c setTimeout нужна для iOS 15
+                // после постановки на паузу лекция играть отказывается
+                setTimeout(() => this._audioState.audio.play(), 0);
                 resolve(this._audioState.audio.play());
             } else {
                 resolve();

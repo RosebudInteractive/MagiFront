@@ -77,7 +77,7 @@ class SwitchButtons extends React.Component {
 
         if (isPlayerMode) {
             if (Math.abs(_newValue - this.props.playerTime) <= TIME_DELTA) {
-                this.props.actions.startPlay(lesson.Id)
+                this.props.actions.startPlay({lessonId: lesson.Id})
             } else {
                 this.props.actions.startSetCurrentTime(_newValue)
             }

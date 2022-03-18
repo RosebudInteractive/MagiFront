@@ -179,7 +179,7 @@ class Cover extends React.Component {
         }
 
         this.props.history.replace(`/${courseUrl}/${lesson.URL}?play`)
-        this.props.playerStartActions.startPlay(lesson.Id)
+        this.props.playerStartActions.startPlay({lessonId: lesson.Id})
     }
 
     _crownButtonClick() {

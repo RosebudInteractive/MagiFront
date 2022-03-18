@@ -42,12 +42,12 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(_audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(this.props.lesson.Id)
+        this.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id})
     }
 
     _startPlay() {
         if (this._isLocationPlayerPage()) {
-            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+            this.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id});
             let scrollTarget = $('.js-player').outerHeight() - $(window).height();
             $('html, body').animate({
                 scrollTop: scrollTarget
@@ -55,7 +55,7 @@ class PlayBlock extends React.Component {
         } else {
             this._redirect = true;
             this.forceUpdate()
-            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+            this.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id});
         }
     }
 

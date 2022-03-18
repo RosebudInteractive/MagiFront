@@ -49,7 +49,7 @@ class PlayBlock extends React.Component {
             })
         }
 
-        this.props.playerStartActions.startPlay(lesson.Id)
+        this.props.playerStartActions.startPlay({lessonId: lesson.Id})
     }
 
     _startPlay() {
@@ -57,7 +57,7 @@ class PlayBlock extends React.Component {
         $('html, body').animate({
             scrollTop: scrollTarget
         }, 600, () => {
-            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+            this.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id});
         });
     }
 

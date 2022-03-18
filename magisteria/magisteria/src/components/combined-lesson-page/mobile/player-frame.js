@@ -80,7 +80,7 @@ class PlayerFrame extends Component {
             }
 
             if (_isPauseFrame) {
-                that.props.playerStartActions.startPlay(this.props.lesson.Id)
+                that.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id})
             }
 
             that._hideContentTooltip = that.props.showContentTooltip;
@@ -182,7 +182,7 @@ class PlayerFrame extends Component {
 
     _onPause() {
         if (this.props.paused) {
-            this.props.playerStartActions.startPlay(this.props.lesson.Id)
+            this.props.playerStartActions.startPlay({lessonId: this.props.lesson.Id})
         }
         else {
             this.props.playerStartActions.startPause()

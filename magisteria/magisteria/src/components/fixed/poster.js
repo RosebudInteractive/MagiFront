@@ -105,7 +105,7 @@ class PlayerBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(this.props.lessonId)
+        this.props.playerStartActions.startPlay({lessonId: this.props.lessonId})
     }
 
     _unlock() {

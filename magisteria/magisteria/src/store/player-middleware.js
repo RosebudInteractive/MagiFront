@@ -58,9 +58,9 @@ const playerMiddleware = store => next => action => {
                 _id = null,
                 _lessonsMap = _state.lessonInfoStorage.lessons;
 
-            _isFinished = _lessonsMap.has(action.payload) ? _lessonsMap.get(action.payload).isFinished : false;
+            _isFinished = _lessonsMap.has(action.payload.lessonId) ? _lessonsMap.get(action.payload.lessonId).isFinished : false;
             if (_isFinished) {
-                store.dispatch(storageActions.restoreLesson(action.payload));
+                store.dispatch(storageActions.restoreLesson(action.payload.lessonId));
             }
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
@@ -68,11 +68,12 @@ const playerMiddleware = store => next => action => {
                 _id = _state.player.playingLesson.lessonId;
             }
 
-            if ((_id === action.payload) && Player.getInstance()) {
+            if ((_id === action.payload.lessonId) && Player.getInstance()) {
                 if (_isFinished) {
                     Player.getInstance().replay()
                 } else {
-                    Player.getInstance().play()
+                    // Player.getInstance().play({force: !!action.payload.force})
+                    Player.getInstance().play({force: false})
                 }
             }
 

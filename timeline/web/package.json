@@ -32,6 +32,7 @@
     "declare-react-module": "^1.13.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
+    "es5-ext": "0.10.57",
     "eslint": "^7.32.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
