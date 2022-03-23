@@ -58,15 +58,15 @@ class SocialBlock extends React.Component {
                         </div>
                     </TwitterShareButton>
                 </div>
-                <div className='social-button-wrapper'>
-                    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">
-                        <div className="social-btn__icon">
-                            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                        </div>
-                        <span
-                            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
-                    </FacebookShareButton>
-                </div>
+                {/*<div className='social-button-wrapper'>*/}
+                {/*    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">*/}
+                {/*        <div className="social-btn__icon">*/}
+                {/*            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>*/}
+                {/*        </div>*/}
+                {/*        <span*/}
+                {/*            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>*/}
+                {/*    </FacebookShareButton>*/}
+                {/*</div>*/}
                 <div className='social-button-wrapper'>
                     <VKShareButton url={shareUrl} className="social-btn _active">
                         <div className="social-btn__icon">

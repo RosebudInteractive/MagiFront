@@ -112,8 +112,8 @@ class SocialBlock extends React.Component {
             <div className="social-block-big">
                 <h4 className="social-block-big__title font-universal__title-smallx">Мы в соц. сетях</h4>
                 <div className="social-block-big__inner">
-                    <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18}
-                                href={'https://www.facebook.com/Magisteria.ru/'}/>
+                    {/*<SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18}*/}
+                    {/*            href={'https://www.facebook.com/Magisteria.ru/'}/>*/}
                     <SocialLink text={'Telegram'} logo={'telegram'} icoWidth={16} icoHeight={16}
                                 href={'https://t.me/magisteria_ru'}/>
                     <SocialLink text={'Вконтакте'} logo={'vk'} icoWidth={18} icoHeight={11}
@@ -124,8 +124,8 @@ class SocialBlock extends React.Component {
                                 href={'https://twitter.com/MagisteriaRu'}/>
                     <SocialLink text={'Одноклассники'} logo={'ok'} icoWidth={11} icoHeight={18}
                                 href={'https://ok.ru/group/54503517782126'}/>
-                    <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16}
-                                href={'https://www.instagram.com/magisteria.ru/'}/>
+                    {/*<SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16}*/}
+                    {/*            href={'https://www.instagram.com/magisteria.ru/'}/>*/}
                     <SocialLink text={'RSS'} logo={'rss'} icoWidth={16} icoHeight={16} href={'/feed/'}/>
                     {/*<SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16}*/}
                     {/*            href={'https://zen.yandex.com/magisteria'}/>*/}
