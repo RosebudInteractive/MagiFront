@@ -121,9 +121,16 @@
   line-height: 16px
   letter-spacing: 0
   color: rgba(47, 47, 47, 0.3)
-  text-align: left
+  text-align: right
+  overflow: hidden
+  text-overflow: ellipsis
+  display: -webkit-box
+  -webkit-line-clamp: 1
+  line-clamp: 1
+  -webkit-box-orient: vertical
+
   right: 93px
-  bottom: -10px
+  bottom: -26px
   width: calc(100% - 186px)
   @media (max-width: $tablet-width)
     right: 39px
