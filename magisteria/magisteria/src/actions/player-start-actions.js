@@ -27,10 +27,14 @@ export const cancelStarting = (lessonId) => {
     }
 };
 
-export const startPlay = (lessonId) => {
+
+// type PlayData = {
+//   lessonId: number;
+// }
+export const startPlay = (playData) => {
     return {
         type: PLAYER_START_PLAY,
-        payload: lessonId
+        payload: playData
     };
 };
 

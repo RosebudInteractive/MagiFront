@@ -15,18 +15,18 @@ export function _play() {
     this.props.playerStartActions.preinitAudios(lesson.Audios);
     this._redirect = true;
     this.forceUpdate()
-    this.props.playerStartActions.startPlay(lesson.Id)
+    this.props.playerStartActions.startPlay({lessonId: lesson.Id})
 }
 
 export function _startPlay() {
     let {lesson} = this.props
 
     if (this._isLocationPlayerPage()) {
-        this.props.playerStartActions.startPlay(lesson.Id);
+        this.props.playerStartActions.startPlay({lessonId: lesson.Id});
     } else {
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(lesson.Id);
+        this.props.playerStartActions.startPlay({lessonId: lesson.Id});
     }
 }
 

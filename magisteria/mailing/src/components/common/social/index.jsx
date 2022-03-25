@@ -27,11 +27,11 @@ export default function Social() {
             </a>
           </td>
           <td style={STYLE.SOCIAL.PADDING_CELL}/>
-          <td>
-            <a target="_blank" href={fbUrl}>
-              <img src={window.location.origin + '/images/mail-fb.png'} alt={'facebook'}/>
-            </a>
-          </td>
+          {/*<td>*/}
+          {/*  <a target="_blank" href={fbUrl}>*/}
+          {/*    <img src={window.location.origin + '/images/mail-fb.png'} alt={'facebook'}/>*/}
+          {/*  </a>*/}
+          {/*</td>*/}
           <td style={STYLE.SOCIAL.PADDING_CELL}/>
           <td>
             <a target="_blank" href={vkUrl}>

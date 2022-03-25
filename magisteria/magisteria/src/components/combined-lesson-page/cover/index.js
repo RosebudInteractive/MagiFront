@@ -179,7 +179,7 @@ class Cover extends React.Component {
         }
 
         this.props.history.replace(`/${courseUrl}/${lesson.URL}?play`)
-        this.props.playerStartActions.startPlay(lesson.Id)
+        this.props.playerStartActions.startPlay({lessonId: lesson.Id})
     }
 
     _crownButtonClick() {
@@ -318,7 +318,7 @@ class SocialBlock extends React.Component {
         let {shareUrl, title, counter} = this.props;
 
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
-            _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
+            // _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
 
@@ -331,15 +331,15 @@ class SocialBlock extends React.Component {
                         </div>
                     </TwitterShareButton>
                 </div>
-                <div className='social-button-wrapper'>
-                    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">
-                        <div className="social-btn__icon">
-                            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                        </div>
-                        <span
-                            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
-                    </FacebookShareButton>
-                </div>
+                {/*<div className='social-button-wrapper'>*/}
+                {/*    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">*/}
+                {/*        <div className="social-btn__icon">*/}
+                {/*            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>*/}
+                {/*        </div>*/}
+                {/*        <span*/}
+                {/*            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>*/}
+                {/*    </FacebookShareButton>*/}
+                {/*</div>*/}
                 <div className='social-button-wrapper'>
                     <VKShareButton url={shareUrl} className="social-btn _active">
                         <div className="social-btn__icon">

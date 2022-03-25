@@ -23,8 +23,7 @@ const hotMiddlewareScript = require.resolve(
 
 const getEntries = (isEnvDevelopment) => {
     return {
-        // 'babel-polyfill': 'babel-polyfill',
-        pm: isEnvDevelopment ? [paths.appIndexJs, hotMiddlewareScript] : paths.appIndexJs,
+        tests: isEnvDevelopment ? [paths.appIndexJs, hotMiddlewareScript] : paths.appIndexJs,
     }
 }
 

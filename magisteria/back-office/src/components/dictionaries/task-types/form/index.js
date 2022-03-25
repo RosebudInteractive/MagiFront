@@ -73,7 +73,7 @@ const TaskTypeForm = (props) => {
           actions.createTaskType(newData);
             //create new component logic
         } else {
-          actions.updateTaskType(data.Id, newData);
+          actions.updateTaskType(data.id, newData);
         };
         closeModalForm();
     };
@@ -81,7 +81,7 @@ const TaskTypeForm = (props) => {
     const taskTypeFormData = useMemo(() => ({
         code: taskTypeData.Code,
         name: taskTypeData.Name,
-        Id: taskTypeData.Id,
+        id: taskTypeData.Id,
         description: taskTypeData.Description,
         roles: taskTypeData.Roles ? taskTypeData.Roles.map( item=> item.Id ) :[],
     }), [taskTypeData]);

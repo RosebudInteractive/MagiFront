@@ -14,10 +14,17 @@ import {
     waitingDataSelector as testWaitingAuthData,
 } from 'ducks/test-instance'
 import $ from "jquery";
+import PropTypes from "prop-types";
 
 class ButtonsBlock extends React.Component {
 
+    static propTypes = {
+        showFacebook: PropTypes.bool
+    }
+
     render() {
+        const {authorizationState, showFacebook} = this.props;
+
         const _google = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#google"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk-blue"/>',
             _facebook = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#facebook"/>';
@@ -26,7 +33,7 @@ class ButtonsBlock extends React.Component {
 
         return <div className="register-block">
             {
-                this.props.authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?
+                authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?
                     <p className="register-block__title">Войти с помощью</p>
                     :
                     <p className="register-block__title">Регистрация с помощью</p>
@@ -46,13 +53,16 @@ class ButtonsBlock extends React.Component {
                         </span>
                 <span className="text">Вконтакте</span>
             </a>
-            <a href={'/api/fblogin' + _params}
-               className="btn btn--white register-block__btn register-block__btn--fullwidth">
+            {
+                showFacebook &&
+                <a href={'/api/fblogin' + _params}
+                   className="btn btn--white register-block__btn register-block__btn--fullwidth">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
                         </span>
-                <span className="text">Facebook</span>
-            </a>
+                    <span className="text">Facebook</span>
+                </a>
+            }
         </div>
     }
 

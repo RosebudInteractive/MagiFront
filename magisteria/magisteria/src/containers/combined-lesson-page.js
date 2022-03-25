@@ -546,7 +546,7 @@ class CombineLessonPage extends React.Component {
                 <meta property="og:description" content={lesson.PageMeta.Description}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
-                <meta property="article:publisher" content="https://www.facebook.com/Magisteria.ru/"/>
+                {/*<meta property="article:publisher" content="https://www.facebook.com/Magisteria.ru/"/>*/}
                 <meta property="article:section" content={lesson.Name}/>
                 <meta property="article:published_time" content={lesson.ReadyDate}/>
                 <meta property="article:modified_time" content={lesson.ReadyDate}/>
