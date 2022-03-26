@@ -3,20 +3,21 @@ import {Select} from "../../ui-kit";
 import {Field, getFormValues, isDirty, reduxForm} from "redux-form";
 import {compose} from "redux";
 import {connect} from "react-redux";
-import {getStatesForSelect} from "../../../tools/elements";
+import {getStatesForSelect} from "#src/tools/elements";
 
 const EDITOR_NAME = "ELEMENT_EDITOR"
 
-type ElementEditorProps = {
-    editMode: boolean,
-    value: any,
-    editors: Array,
-    elements: Array,
-    onApply: Function,
-    onClose: Function,
-}
+// type ElementEditorProps = {
+//     editMode: boolean,
+//     value: any,
+//     editors: Array,
+//     elements: Array,
+//     onApply: Function,
+//     onClose: Function,
+// }
 
-function ElementEditor(props: ElementEditorProps) {
+// function ElementEditor(props: ElementEditorProps) {
+function ElementEditor(props) {
     const {value, editors, elements, editMode, onApply, onClose, editorValues} = props
 
     useEffect(() => {

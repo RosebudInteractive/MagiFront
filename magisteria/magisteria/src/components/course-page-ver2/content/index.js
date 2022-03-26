@@ -9,7 +9,8 @@ export default class Content extends React.Component {
     static propTypes = {
         course: PropTypes.object,
         moreCourses: PropTypes.array,
-        shareUrl: PropTypes.string
+        shareUrl: PropTypes.string,
+        hasCoverDescription: PropTypes.bool,
     }
 
     constructor(props) {
@@ -17,7 +18,7 @@ export default class Content extends React.Component {
     }
 
     render() {
-        return <div className="course-page__content">
+        return <div className={"course-page__content" + (this.props.hasCoverDescription ? " _with-ext-margin" : "")}>
             <Statistic course={this.props.course} shareUrl={this.props.shareUrl}/>
             <CourseWrapper course={this.props.course} moreCourses={this.props.moreCourses}/>
         </div>

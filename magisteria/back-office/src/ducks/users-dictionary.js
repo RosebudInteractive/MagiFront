@@ -10,7 +10,6 @@ import {
     showInfo,
     showUserConfirmation
 } from "tt-ducks/messages";
-import {USER_ROLE_STRINGS} from '../constants/dictionary-users'
 import {clearLocationGuard, paramsSelector} from "tt-ducks/route";
 import type {Message} from "../types/messages";
 import {race} from "redux-saga/effects";
@@ -174,19 +173,9 @@ function* getUsersSaga() {
         const params = yield select(paramsSelector);
         const users = yield call(_getUsers, params);
 
-        //map userRoles
-
         users.map(user => {
-            user.Role = user.PData.isAdmin ? 'a' : null;
-            if (!user.Role) {
-                if (Object.entries(user.PData.roles).length > 0) {
-                    let roleList = [];
-                    for (let role in user.PData.roles) {
-                        USER_ROLE_STRINGS[role] && roleList.push(role);
-                    }
-                    user.Role = roleList;
-                }
-            }
+            user.Role = [...Object.keys(user.PData.roles)];
+            if (user.PData.isAdmin) user.Role.unshift('a');
         });
 
         yield put({type: SET_USERS, payload: users});

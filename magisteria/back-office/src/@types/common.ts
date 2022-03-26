@@ -33,3 +33,6 @@ export type ChangeFieldEvent = {
   field: string,
   value: string | Array<number> | UserFilterFieldValue
 };
+
+type SelectOption = { id: string; name: string; };
+export type SelectOptions = Array<SelectOption>;

@@ -1,8 +1,1 @@
-/components/**/*.js
-/constants
-/containers/**/*.js
-/ducks
-/mock-data
-/redux
-/tools/**/*.js
-/types
+/src/**/*.js

@@ -57,7 +57,7 @@ function CreateProcessForm(props) {
             UseAuthorPictures: false,
             UseMusic: false,
             HasTest: false,
-            HasLiterature: false
+            HasLiterature: false,
         })
 
         $("body").addClass("_no-vertical-scroll")
@@ -68,9 +68,12 @@ function CreateProcessForm(props) {
     }, [])
 
     useEffect(() => {
-        if (props.editorValues && !props.editorValues.Name && props.editorValues.LessonId) {
-            let _lesson = lessons && lessons.find(lesson => lesson.Id === props.editorValues.LessonId)
-            props.change(EDITOR_NAME, "Name", _lesson.Name)
+        if (props.editorValues && props.editorValues.LessonId) {
+            let selectedLesson = lessons && lessons.find(lesson => lesson.Id === props.editorValues.LessonId)
+            if (!props.editorValues.Name) {
+                props.change(EDITOR_NAME, "Name", selectedLesson.Name)
+            }
+            props.change(EDITOR_NAME, "HasLiterature", selectedLesson && !selectedLesson.IsSubLesson)
         }
     }, [props.editorValues && props.editorValues.LessonId])
 
