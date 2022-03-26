@@ -65,7 +65,10 @@ export default class Cover extends React.Component {
                     </div>
                 </div>
             </div>
-            { course && course.CoverDescription && <div className="course-page__cover-description">{course.CoverDescription}</div> }
+            {
+                course && course.CoverDescription &&
+                <div className="course-page__cover-description">{course.CoverDescription}</div>
+            }
         </div>
     }
 

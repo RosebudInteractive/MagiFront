@@ -1,21 +1,21 @@
 import React, {useEffect, useMemo, useRef, useState} from "react"
 import Webix from "../../Webix";
 import "./process-elements-grid.sass"
-import {GRID_SORT_DIRECTION} from "../../../constants/common";
+import {GRID_SORT_DIRECTION} from "#src/constants/common";
 import $ from "jquery";
-import {getState} from "../../../tools/elements";
+import {getState} from "#src/tools/elements";
 import ElementEditor from "./editor";
 
-type ProcessElementsGridProps = {
-    values: Array,
-    activeElementId: number,
-    elements: Array,
-    editors: Array,
-    onDelete: Function,
-    onUpdate: Function,
-    onAdd: Function,
-    disabled: boolean,
-}
+// type ProcessElementsGridProps = {
+//     values: Array,
+//     activeElementId: number,
+//     elements: Array,
+//     editors: Array,
+//     onDelete: Function,
+//     onUpdate: Function,
+//     onAdd: Function,
+//     disabled: boolean,
+// }
 
 class GridData {
     constructor() {
@@ -27,7 +27,8 @@ class GridData {
     }
 }
 
-export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
+// export default function ProcessElementsGrid(props: ProcessElementsGridProps) {
+export default function ProcessElementsGrid(props) {
     const {onDelete, onAdd, onUpdate, values, editors, elements,} = props
 
     const [editorVisible, setEditorVisible] = useState(false)

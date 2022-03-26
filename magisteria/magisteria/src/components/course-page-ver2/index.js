@@ -64,11 +64,12 @@ export default class Wrapper extends React.Component {
 
 
     render() {
-        const {course, shareUrl, moreCourses} = this.props
+        const {course, shareUrl, moreCourses} = this.props;
+        const hasCoverDescription = !!(course && course.CoverDescription);
 
         return <div className={"course-page__wrapper"}>
             <Cover {...this.props}/>
-            <Content course={course} shareUrl={shareUrl} moreCourses={moreCourses}/>
+            <Content course={course} shareUrl={shareUrl} moreCourses={moreCourses} hasCoverDescription={hasCoverDescription}/>
             <MobileButton course={course}/>
         </div>
     }

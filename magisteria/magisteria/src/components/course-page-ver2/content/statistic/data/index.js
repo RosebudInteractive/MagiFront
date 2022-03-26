@@ -84,7 +84,7 @@ function ReadyDate(props) {
     return !data.allPublished ?
                 <div className="data__ready-date">
                     <svg width="22" height="22" dangerouslySetInnerHTML={{__html: PUBLISHING}}/>
-                    <div className="ready-date__text-block font-universal__body-small _grey-06">
+                    <div className="ready-date__text-block font-universal__body-small">
                         {`Курс в процессе публикации. Время завершения публикации всех лекций - ${_readyDate}`}
                     </div>
                 </div>
