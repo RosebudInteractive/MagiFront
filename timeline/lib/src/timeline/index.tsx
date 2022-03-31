@@ -2,6 +2,7 @@ import React, {
   SyntheticEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
 import { useResizeDetector } from 'react-resize-detector/build/withPolyfill';
+import { GestureResponderEvent } from 'react-native';
 import Themes from './theme';
 import Header from './header';
 import Footer from './footer';
@@ -14,7 +15,6 @@ import './timeline.sass';
 import ZoomHandler, { OffsetEnum } from '../helpers/zoom-handler';
 import wrap from '../helpers/zoom-container';
 import SETTINGS from './settings';
-import { GestureResponderEvent } from 'react-native';
 
 type TimelineProps = {
   backgroundImage: string,
@@ -52,7 +52,7 @@ export default function Timeline(props: TimelineProps): JSX.Element {
     onCloseFullScreen,
     onChangeOrientation,
     isDeprecatedBrowser,
-    userDefinedWidth
+    userDefinedWidth,
   } = props;
 
   const [fsEnable, setFsEnable] = useState<boolean>(false);
@@ -199,15 +199,14 @@ export default function Timeline(props: TimelineProps): JSX.Element {
   const messageCenter = (e: GestureResponderEvent) => {
     if (activeItem) {
       e.preventDefault();
-      console.log(activeItem);
-      const item = activeItem.item;
+      const { item } = activeItem;
       const newZoom = ZoomHandler.getZoomToFit(item.width * 2);
       ZoomHandler.centrifyPosition(item.left + (item.width / 2));
       if (newZoom > 0) {
         ZoomHandler.adjustForZoom(newZoom);
         setZoom(newZoom);
       }
-    };
+    }
   };
 
   useEffect(() => {
@@ -263,7 +262,7 @@ export default function Timeline(props: TimelineProps): JSX.Element {
         style={containerStyle}
         ref={horizontalContainerRef}
       >
-        {/*<div className="vertical-line" />*/}
+        {/* <div className="vertical-line" /> */}
         {
               !!containerWidth
               && !!containerHeight

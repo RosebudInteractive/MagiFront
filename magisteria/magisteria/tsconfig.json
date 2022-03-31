@@ -56,8 +56,8 @@
     "baseUrl": "./",
     /* Base directory to resolve non-absolute module names. */
     "paths": {
-      "@tt-types": [
-        "./team-task/@types"
+      "#assets": [
+        "./src/assets"
       ]
       //      "@types/react-native-web": [
       //        "../node_modules/@types/react-native"
@@ -69,10 +69,10 @@
     /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
     // "rootDirs": [],                              /* List of root folders whose combined content represents the structure of the project at runtime. */
     /* List of folders to include type definitions from. */
-    "typeRoots": [
-      "node_modules/@types",
-      "frontend/@types"
-    ],
+//    "typeRoots": [
+//      "node_modules/@types",
+//      "frontend/@types"
+//    ],
     // "types": [],                                 /* Type declaration files to be included in compilation. */
     "allowSyntheticDefaultImports": true,
     /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
@@ -101,12 +101,5 @@
       "dom"
     ]
   },
-  "include": [
-    "team-task/**/*.ts",
-    "team-task/**/*.tsx",
-    "frontend/**/*.ts",
-    "frontend/**/*.tsx",
-    "mailing/**/*.ts",
-    "mailing/**/*.tsx"
-  ]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }

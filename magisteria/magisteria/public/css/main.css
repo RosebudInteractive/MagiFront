@@ -16236,8 +16236,6 @@ ul.lectures-tab {
     border-radius: 4px; }
     .register-block__btn:hover {
       opacity: 0.7; }
-    .register-block__btn--fullwidth {
-      width: 100%; }
     .register-block__btn .icon {
       display: -webkit-box;
       display: -webkit-flex;

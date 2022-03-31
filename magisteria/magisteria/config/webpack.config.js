@@ -211,6 +211,7 @@ module.exports = function (webpackEnv,) {
                 'common-tools': path.resolve(__dirname, '../../common/tools'),
                 'common-styles': path.resolve(__dirname, '../../common/styles'),
                 '#common': path.resolve(__dirname, '../../common'),
+                '#assets': path.resolve(__dirname, '../src/assets'),
                 'timeline': path.resolve(__dirname, '../timeline-lib'),
             }
         },

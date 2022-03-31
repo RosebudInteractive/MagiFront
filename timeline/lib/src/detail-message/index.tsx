@@ -43,24 +43,24 @@ export default function Message(props: Props): JSX.Element {
   return (
     <View style={[styles.wrapper, wrapperStyle]}>
       <TouchableOpacity onPress={onCenter}>
-      <View style={[styles.header, { backgroundColor: item.color }]}>
-        <View style={styles.headerText}>
-          <Text style={styles.title} numberOfLines={3}>{item.name}</Text>
-          <Text style={styles.date}>{item.displayDate}</Text>
-        </View>
-        <TouchableOpacity onPress={onClose}>
-          <View
-            style={styles.button}
-          >
-            <CloseButton />
+        <View style={[styles.header, { backgroundColor: item.color }]}>
+          <View style={styles.headerText}>
+            <Text style={styles.title} numberOfLines={3}>{item.name}</Text>
+            <Text style={styles.date}>{item.displayDate}</Text>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.details}>
-        <View style={styles.description}>
-          <Text style={styles.description}>{item.description}</Text>
+          <TouchableOpacity onPress={onClose}>
+            <View
+              style={styles.button}
+            >
+              <CloseButton />
+            </View>
+          </TouchableOpacity>
         </View>
-      </View>
+        <View style={styles.details}>
+          <View style={styles.description}>
+            <Text style={styles.description}>{item.description}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     </View>
   );
