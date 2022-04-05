@@ -40,6 +40,7 @@ const validate = values => {
     if (values.password1 && values.password2 && (values.password1.realPassword !== values.password2.realPassword)) {
         errors.password2 = 'Пароли не совпадают'
     }
+
     return errors
 }
 
@@ -115,9 +116,9 @@ let SignUpForm = class SignUpForm extends React.Component {
                 {
                     this.state.screen === screens.email
                         ?
-                        [
-                            <ButtonsBlock/>,
-                            <span className="register-block-wrapper__label">или</span>,
+                        <React.Fragment>
+                            <ButtonsBlock/>
+                            <span className="register-block-wrapper__label">или</span>
                             <div className="form register-form">,
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
@@ -126,7 +127,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
                             </div>
-                        ]
+                        </React.Fragment>
                         :
                         <div className="form register-form">
                             <Field name="login" component={LoginEdit} hidden={true}/>

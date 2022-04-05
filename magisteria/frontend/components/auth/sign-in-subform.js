@@ -88,7 +88,7 @@ class SignInForm extends React.Component {
         return (
             <div className="register-block-wrapper">
                 <div className='register-block-wrapper__logo'/>
-                <ButtonsBlock showFacebook={true}/>
+                <ButtonsBlock />
                 <span className="register-block-wrapper__label">или</span>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="login" component={LoginEdit} id={'email'}/>

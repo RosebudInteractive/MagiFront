@@ -15,6 +15,8 @@ import {
 } from 'ducks/test-instance'
 import $ from "jquery";
 import PropTypes from "prop-types";
+import AppleLogo from './apple.svg'
+import "./auth.sass"
 
 class ButtonsBlock extends React.Component {
 
@@ -23,7 +25,7 @@ class ButtonsBlock extends React.Component {
     }
 
     render() {
-        const {authorizationState, showFacebook} = this.props;
+        const {authorizationState,} = this.props;
 
         const _google = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#google"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk-blue"/>',
@@ -53,16 +55,18 @@ class ButtonsBlock extends React.Component {
                         </span>
                 <span className="text">Вконтакте</span>
             </a>
-            {
-                showFacebook &&
-                <a href={'/api/fblogin' + _params}
-                   className="btn btn--white register-block__btn register-block__btn--fullwidth">
-                        <span className="icon">
-                            <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
-                        </span>
-                    <span className="text">Facebook</span>
-                </a>
-            }
+            <a href={'/api/fblogin' + _params}
+               className="btn btn--white register-block__btn register-block__btn--fullwidth">
+                    <span className="icon">
+                        <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
+                    </span>
+                <span className="text">Facebook</span>
+            </a>
+            <a href={'/api/applelogin' + _params}
+               className="btn btn--white register-block__btn register-block__btn--fullwidth">
+                <AppleLogo/>
+                <span className="text">Вход с Apple</span>
+            </a>
         </div>
     }
 
