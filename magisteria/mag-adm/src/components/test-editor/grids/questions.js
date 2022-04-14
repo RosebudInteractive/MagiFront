@@ -6,7 +6,7 @@ import {enableButtonsSelector} from "adm-ducks/app";
 import QuestionForm from "../question-editor/editor";
 
 const NEW_QUESTION = {
-    AnswTime: 10,
+    AnswTime: 20,
     Text: null,
     Picture: null,
     PictureMeta: null,

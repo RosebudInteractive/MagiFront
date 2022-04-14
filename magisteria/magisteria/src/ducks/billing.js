@@ -495,7 +495,6 @@ const _fetchCoursePriceInfo = ({courseId, promo}) => {
 }
 
 function* sendPaymentSaga(data) {
-
     yield put({type: SEND_PAYMENT_START});
 
     try {
@@ -503,8 +502,6 @@ function* sendPaymentSaga(data) {
             let _course = yield call(_fetchCoursePriceInfo, {courseId : data.payload.courseId})
             const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought),
                 _buyAsGift = (_course.IsPaid && data.payload.buyAsGift)
-
-            console.log(_isPaidCourse, _buyAsGift)
 
             if (!(_isPaidCourse || _buyAsGift)) {
                 yield put({type: HIDE_BILLING_WINDOW});
@@ -519,8 +516,6 @@ function* sendPaymentSaga(data) {
         yield put({type: SEND_PAYMENT_SUCCESS, payload: _redirectUrl})
         yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
     } catch (error) {
-        console.log(data)
-
         yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
         yield put({type: HIDE_BILLING_WINDOW});
         yield put({type: HIDE_COURSE_PAYMENT_WINDOW});

@@ -167,6 +167,13 @@ export const saga = function* () {
 // isAdmin: false
 // roles: {pmu: 1}
 
+const convertPDataToRoles = (user) => {
+    const roles = [Object.keys(user.PData.roles)];
+    if (user.PData.isAdmin) roles.unshift('a');
+
+    return roles;
+}
+
 function* getUsersSaga() {
     yield put({type: START_REQUEST});
     try {
@@ -174,8 +181,7 @@ function* getUsersSaga() {
         const users = yield call(_getUsers, params);
 
         users.map(user => {
-            user.Role = [...Object.keys(user.PData.roles)];
-            if (user.PData.isAdmin) user.Role.unshift('a');
+            user.Role = convertPDataToRoles(user);
         });
 
         yield put({type: SET_USERS, payload: users});
@@ -211,6 +217,8 @@ function* selectUserEmail(data) {
 
             if (hasPMRights) {
                 yield put(showInfo({content: 'Пользователь есть в системе', title: 'Пользователь есть'}))
+            } else {
+                user.Role = convertPDataToRoles(user);
             }
 
             yield put(setSelectedUser(user));

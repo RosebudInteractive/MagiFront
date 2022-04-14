@@ -29,7 +29,7 @@ import {GET_LESSON_PLAY_INFO_REQUEST} from "../constants/lesson";
 const LessonInfoStorageMiddleware = store => next => action => {
 
     switch (action.type) {
-        case PLAYER_START_INIT:{
+        case PLAYER_START_INIT: {
             let result = next(action)
             LessonInfoStorage.init()
             return result
@@ -123,16 +123,18 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
-                let _id = _state.player.playingLesson.lessonId,
-                    _totalDuration = _state.player.totalDuration,
-                    _lessonsMap = _state.lessonInfoStorage.lessons,
-                    _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
-                    _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false,
-                    _willBeFinished = Math.round(_totalDuration - _currentPosition) <= FINISH_DELTA_TIME;
+                const _id = _state.player.playingLesson.lessonId;
+                const _lessonsMap = _state.lessonInfoStorage.lessons;
+                const _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false;
+
+                const _totalDuration = _state.player.totalDuration;
+                const _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0;
+                const _willBeFinished = Math.round(_totalDuration - _currentPosition) <= FINISH_DELTA_TIME;
+
+                LessonInfoStorage.saveChanges()
 
                 if (_willBeFinished && !_isFinished) {
                     store.dispatch(storageActions.setLessonEnded({id: _id}))
-                    LessonInfoStorage.saveChanges()
                     LessonInfoStorage.clearDeltaStart(_id)
                 }
             }

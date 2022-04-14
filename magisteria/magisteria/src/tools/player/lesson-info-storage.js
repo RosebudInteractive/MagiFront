@@ -193,7 +193,7 @@ export default class LessonInfoStorage {
             let _state = store.getState().lessonInfoStorage;
             if (_state.lessons.size > 0) {
                 let _dbObj = this._convertToDbFormat(_state.lessons)
-                console.log(JSON.stringify(_dbObj))
+                console.log('savePositionToDB', JSON.stringify(_dbObj))
                 store.dispatch(storageActions.updateDbState(_dbObj))
             }
         }
