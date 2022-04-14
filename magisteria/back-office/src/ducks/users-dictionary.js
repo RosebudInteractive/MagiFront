@@ -168,7 +168,7 @@ export const saga = function* () {
 // roles: {pmu: 1}
 
 const convertPDataToRoles = (user) => {
-    const roles = [Object.keys(user.PData.roles)];
+    const roles = Object.keys(user.PData.roles);
     if (user.PData.isAdmin) roles.unshift('a');
 
     return roles;
