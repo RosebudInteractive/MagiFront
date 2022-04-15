@@ -10,6 +10,11 @@ import {
     priceSelector,
     sendPayment,
     switchToSubscription,
+    applyPromo,
+    clearPromo,
+    checkExternalPromo,
+    promoValuesSelector,
+    externalPromoSelector,
 } from "ducks/billing";
 import StoredCard from "./common/stored-card";
 import {
@@ -18,7 +23,6 @@ import {
     OfferMessage,
     Qiwi,
     Sberbank,
-    WebMoney,
     Yandex,
 } from "./common/payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
@@ -36,7 +40,7 @@ export const PAYMENT_TYPE = {
 class PaymentForm extends React.Component {
 
     static propTypes = {
-        paymentType : PropTypes.string,
+        paymentType: PropTypes.string,
     }
 
     static defaultProps = {
@@ -55,7 +59,8 @@ class PaymentForm extends React.Component {
     }
 
     UNSAFE_componentWillMount() {
-        this.props.getSubscriptionInfo()
+        this.props.getSubscriptionInfo();
+        this.props.promoActions.checkExternalPromo();
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
@@ -208,7 +213,7 @@ class PaymentForm extends React.Component {
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
-        let {selectedSubscription, paymentType, user} = this.props;
+        let {selectedSubscription, paymentType, user, promoActions, promoValue, externalPromo} = this.props;
 
         if (!selectedSubscription) {
             return null
@@ -228,7 +233,8 @@ class PaymentForm extends React.Component {
                 selectedSubscription.Title
 
         return <div className="billing-steps__item js-billing-step active">
-            <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
+            <WaitingFrame visible={this.props.loading}
+                          message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
             {paymentType === PAYMENT_TYPE.BILLING ?
                 <div className="modal__header">
                     <p className="modal__headline">Оформить подписку <span className="js-subcribe-period">   </span>
@@ -250,21 +256,34 @@ class PaymentForm extends React.Component {
                                     visible={this.state.showStoredMethod}/>
                         <ul className="payment-methods__list">
                             <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
-                            <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yoo_money'}/>
-                            <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
+                            <Yandex onClick={::this._selectPayment}
+                                    checked={this.state.selectedMethod === 'yoo_money'}/>
+                            <Sberbank onClick={::this._selectPayment}
+                                      checked={this.state.selectedMethod === 'sberbank'}/>
                             <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
-                            <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
                         </ul>
                     </div>
                     <div className="payment-form__footer-wrapper">
                         <div className="fields-editors__block">
-                            { _buyAsGift && <div className="font-universal__title-small">
+                            {_buyAsGift && <div className="font-universal__title-small">
                                 <span className="fields-editors__block-message">Введите e-mail для получения подарочного промокода</span>
                                 <span className="fields-editors__block-message">и фискального чека</span>
-                            </div> }
-                            <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}} promoEnable={_buyAsGift}/>
-                            {/*{!_buyAsGift && <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/> }*/}
-                            <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/>
+                            </div>}
+                            <EmailField ref={(input) => {
+                                this.email = input;
+                            }} defaultValue={user.Email} onChange={() => {
+                                this.forceUpdate()
+                            }} promoEnable={_buyAsGift}/>
+                            <PromoField handleApply={promoActions.apply}
+                                        handleClear={promoActions.clear}
+                                        promo={promoValue}
+                                        ref={(input) => {
+                                            this.promo = input;
+                                        }}
+                                        defaultValue={externalPromo}
+                                        onChange={() => {
+                                            this.forceUpdate()
+                                        }}/>
                         </div>
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton
@@ -272,12 +291,14 @@ class PaymentForm extends React.Component {
                                 checked={this.state.savePayment}
                                 onChange={::this._changeSavePayment}/>
                             <OfferMessage isGift={_isFullDiscount}/>
-                            <button className={"payment-form__submit btn btn--brown " + (_disabledBtn ? ' disabled' : '')}
-                                    onClick={::this._handleSubmit}>
+                            <button
+                                className={"payment-form__submit btn btn--brown " + (_disabledBtn ? ' disabled' : '')}
+                                onClick={::this._handleSubmit}>
                                 {_isFullDiscount ? "Получить" : "Оплатить"}
                                 {
                                     !_isFullDiscount ?
-                                        <span className="total">{this.props.price}<span className="cur">{_currency}</span></span>
+                                        <span className="total">{this.props.price}<span
+                                            className="cur">{_currency}</span></span>
                                         :
                                         null
                                 }
@@ -299,6 +320,8 @@ function mapStateToProps(state) {
         promoLoading: promoFetching(state),
         selectedSubscription: selectedTypeSelector(state),
         error: errorSelector(state),
+        promoValue: promoValuesSelector(state),
+        externalPromo: externalPromoSelector(state),
         user: state.user.user,
     }
 }
@@ -310,6 +333,7 @@ function mapDispatchToProps(dispatch) {
         getSubscriptionInfo: bindActionCreators(getSubscriptionInfo, dispatch),
         notifyPaymentButtonClicked: bindActionCreators(notifyPaymentButtonClicked, dispatch),
         notifyPriceButtonClicked: bindActionCreators(notifyPriceButtonClicked, dispatch),
+        promoActions: bindActionCreators({apply: applyPromo, clear: clearPromo, checkExternalPromo}, dispatch),
     }
 }
 

@@ -74,6 +74,8 @@ export const APPLY_PROMO_ERROR = `${prefix}/APPLY_PROMO_ERROR`
 export const CLEAR_PROMO = `${prefix}/CLEAR_PROMO`
 
 export const SET_PRODUCT_PRICE = `${prefix}/SET_PRODUCT_PRICE`
+export const SET_EXTERNAL_PROMO = `${prefix}/SET_EXTERNAL_PROMO`
+export const CHECK_EXTERNAL_PROMO = `${prefix}/CHECK_EXTERNAL_PROMO`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -113,6 +115,7 @@ export const ReducerRecord = Record({
     fetchingCourseId: null,
     waiting: new Waiting(),
     promo: new Promo(),
+    externalPromoCode: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -242,6 +245,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['promo', 'error'], true)
                 .setIn(['promo', 'perc'], null)
                 .setIn(['promo', 'sum'], null)
+                .set('externalPromoCode', null)
 
         case CLEAR_PROMO:
             return state
@@ -263,6 +267,9 @@ export default function reducer(state = new ReducerRecord(), action) {
                     _new.Promo = Object.assign({}, payload)
                     return _new
                 })
+
+        case SET_EXTERNAL_PROMO:
+            return state.set('externalPromoCode', payload)
 
         default:
             return state
@@ -307,6 +314,7 @@ export const promoValuesSelector = createSelector(promoSelector, (promo) => {
     }
 })
 export const promoFetchingSelector = createSelector(promoSelector, promo => promo.fetching)
+export const externalPromoSelector = createSelector(stateSelector, state => state.externalPromoCode)
 
 /**
  * Action Creators
@@ -401,6 +409,14 @@ export const applyPromo = (data) => {
 
 export const clearPromo = () => {
     return {type: CLEAR_PROMO}
+}
+
+export const setExternalPromoCode = (promo) => {
+    return {type: SET_EXTERNAL_PROMO, payload: promo}
+}
+
+export const checkExternalPromo = () => {
+    return {type: CHECK_EXTERNAL_PROMO}
 }
 
 /**
@@ -679,7 +695,15 @@ export const saga = function* () {
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
         takeEvery([FINISH_LOAD_PROFILE, START_BILLING_BY_REDIRECT], onFinishLoadProfileSaga),
         takeEvery(APPLY_PROMO_REQUEST, applyPromoSaga),
+        takeEvery(CHECK_EXTERNAL_PROMO, checkExternalPromoSaga),
     ])
+}
+
+function* checkExternalPromoSaga() {
+    const externalPromo = yield select(externalPromoSelector);
+
+    if (!externalPromo) return;
+    yield put(applyPromo(externalPromo));
 }
 
 

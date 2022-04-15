@@ -1,17 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import { applyPromo, clearPromo, promoValuesSelector,} from "ducks/billing";
 import {getCurrencySign} from "tools/page-tools";
 
 const APPLY_TIMEOUT = 1000
 
-class PromoField extends React.Component {
+export default class PromoField extends React.Component {
 
     static propTypes = {
+        promo: PropTypes.object.isRequired,
         defaultValue: PropTypes.string,
         onChange: PropTypes.func,
+        handleApply: PropTypes.func.isRequired,
+        handleClear: PropTypes.func.isRequired,
     }
 
     constructor(props) {
@@ -95,7 +95,7 @@ class PromoField extends React.Component {
         const _promo = e.target.value
         if (_promo) {
             this._timer = setTimeout(() => {
-                this.props.applyPromo(_promo)
+                this.props.handleApply(_promo)
             }, APPLY_TIMEOUT)
         }
     }
@@ -108,7 +108,7 @@ class PromoField extends React.Component {
         if (!this.props.promo.checked) {
             const _promo = e.target.value
             if (_promo) {
-                this.props.applyPromo(_promo)
+                this.props.handleApply(_promo)
             }
         }
     }
@@ -116,21 +116,9 @@ class PromoField extends React.Component {
     _onChange(e) {
         e.preventDefault()
         if (this.props.promo.checked) {
-            this.props.clearPromo()
+            this.props.handleClear()
         }
         this._validate(e)
         this.props.onChange()
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        promo: promoValuesSelector(state),
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators({applyPromo, clearPromo}, dispatch)
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(PromoField)
