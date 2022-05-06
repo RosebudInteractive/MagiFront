@@ -20,11 +20,11 @@ const STYLE: Styles = {
   },
 }
 
-const fbUrl = "https://www.facebook.com/Magisteria.ru/",
-  // eslint-disable-next-line no-unused-vars
-  okUrl = "https://ok.ru/group/54503517782126",
-  twUrl = "https://twitter.com/MagisteriaRu",
-  vkUrl = "https://vk.com/magisteriaru"
+const twUrl = "https://twitter.com/MagisteriaRu",
+    vkUrl = "https://vk.com/magisteriaru";
+    // fbUrl = "https://www.facebook.com/Magisteria.ru/",
+    // okUrl = "https://ok.ru/group/54503517782126";
+
 
 export default function Social(): JSX.Element {
   return <tr>
