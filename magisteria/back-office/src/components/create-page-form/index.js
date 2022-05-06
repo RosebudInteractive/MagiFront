@@ -1,15 +1,27 @@
-import React, {useEffect} from "react"
+import React, {useEffect,useState,useMemo} from "react"
 import {change, Field, getFormValues, isDirty, isValid, reduxForm} from "redux-form";
+import actions from "redux-form/lib/actions";
 import {Autocomplete, Checkbox, Select, TextBox} from "../ui-kit";
 import "./create-page-form.sass"
-import {compose} from "redux";
+import {compose,bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import $ from "jquery";
+import { taskTypesSelector,
+         getTaskTypes } from "../../ducks/task";
 
 const EDITOR_NAME = "CREATE_PROCESS_FORM"
 
 function CreateProcessForm(props) {
-    const {supervisors, users, onClose, lessons, editorValues, userId, canChangeSupervisor} = props
+    const {supervisors, users, onClose, lessons, editorValues, userId, canChangeSupervisor, taskTypes,actions} = props
+
+    const [typesLoaded, setTypesLoaded] = useState(false);
+    useEffect(() => {
+        if (!typesLoaded){
+            console.log('loading tasktypes');
+            actions.getTaskTypes();
+            setTypesLoaded(true);
+        };
+    }, [typesLoaded]);
 
     const _onApply = () => {
         if (props.editorValid) {
@@ -48,6 +60,22 @@ function CreateProcessForm(props) {
     const _getLessons = () => {
         return lessons && lessons.map((item) => {return {id: item.Id, name: item.Name}})
     }
+
+    const getFilteredUsers = (taskTypeCode)=>{
+        let filteredUsers = users;
+        if (typesLoaded && taskTypes && taskTypes.length && users){
+            const taskType = taskTypes.find( elem => elem.Code === taskTypeCode);
+            if (taskType){
+                const rolesOfTaskType = taskType.Roles.map( elem => elem.ShortCode );
+                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => user.PData.roles[value]===1 ) ) );
+            };
+        };
+        return filteredUsers && filteredUsers.map((item) => {return {id: item.Id, name: item.DisplayName}})
+    };
+
+    const _getMemoizedUsersFunc = useMemo(() => {
+        return getFilteredUsers;
+    }, [taskTypes, users]);
 
     useEffect(() => {
         props.initialize({
@@ -88,15 +116,15 @@ function CreateProcessForm(props) {
                 <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
                 <Field component={Checkbox} name={"HasTest"} label={"Тесты"}/>
                 <Field component={Checkbox} name={"HasLiterature"} label={"Литература"}/>
-                <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getUsers()}/>
-                <Field component={Select} name={"ExecutorTest"} label={"Исполнитель - Тесты"} options={_getUsers()}/>
+                <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getMemoizedUsersFunc('PSOUND')}/>
+                <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getMemoizedUsersFunc('CSOUND')}/>
+                <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getMemoizedUsersFunc('TRANS')}/>
+                <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={_getMemoizedUsersFunc('FPIC')}/>
+                <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={_getMemoizedUsersFunc('MPIC')}/>
+                <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={_getMemoizedUsersFunc('ETRANS')}/>
+                <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getMemoizedUsersFunc('LIT')}/>
+                <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getMemoizedUsersFunc('FIN')}/>
+                <Field component={Select} name={"ExecutorTest"} label={"Исполнитель - Тесты"} options={_getMemoizedUsersFunc('TEST')}/>
             </div>
             <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!(props.hasChanges && props.editorValid)}>
                 Применить
@@ -119,14 +147,18 @@ const validate = (values) => {
 
 const mapState2Props = (state) => {
     return {
+        taskTypes: taskTypesSelector(state),
         hasChanges: isDirty(EDITOR_NAME)(state),
         editorValues: getFormValues(EDITOR_NAME)(state),
         editorValid: isValid(EDITOR_NAME)(state),
     }
 }
 
-const mapDispatch2Props = {
-    change
+const mapDispatch2Props = (dispatch) => {
+    return {
+        change,
+        actions: bindActionCreators({getTaskTypes}, dispatch)
+    }
 };
 
 const enhance = compose(

@@ -30,7 +30,7 @@ import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
-import {setExternalPromoCode, setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
+import {setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
 import {setWaitingAuthorizeData as setPlayerWaitingAuthorizeData,} from "./ducks/player";
 import {setWaitingAuthorizeData as setTestWaitingAuthorizeData,} from "./ducks/test-instance";
 import {showFeedbackWindowSelector, showModalErrorMessage} from "./ducks/message";
@@ -93,21 +93,17 @@ class App extends Component {
             this.props.appActions.setAppTypeMobile()
         }
 
-        const params = new URLSearchParams(this.props.location.search);
-        const token = params.get('token');
-        const externalPromo = params.get('promocode');
+        const _params = new URLSearchParams(this.props.location.search),
+            _token = _params.get('token')
 
-        if (token) {
-            params.delete('token');
-
-            if (!!externalPromo) {
-                params.delete('promocode')
-                this.props.setExternalPromoCode(externalPromo);
-            }
-            this.props.history.replace({ search: params.toString(), });
+        if (_token) {
+            _params.delete('token')
+            this.props.history.replace({
+                search: _params.toString(),
+            })
         }
 
-        this.props.getAppOptions(token)
+        this.props.getAppOptions(_token)
         window.callback_payment = callbackPayment
     }
 
@@ -142,7 +138,7 @@ class App extends Component {
             _isTest = _params.get('t') ? _params.get('t') === 't' : false,
             _isAuth = _params.get('t') ? _params.get('t') === 'a' : false,
             _isNewUser = _params.get('_is_new_user') ? _params.get('_is_new_user') === 'true' : false,
-            _message = _params.get('message');
+            _message = _params.get('message')
 
         this._scrollPosition = +_params.get('pos');
 
@@ -432,7 +428,6 @@ function mapDispatchToProps(dispatch) {
         disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
         pageChanged: bindActionCreators(pageChanged, dispatch),
         loadLocalSettings: bindActionCreators(loadLocalSettings, dispatch),
-        setExternalPromoCode: bindActionCreators(setExternalPromoCode, dispatch),
     }
 }
 

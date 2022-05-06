@@ -379,7 +379,9 @@ function* getTaskTypesSaga(data) {
 
     try {
 
-        const params = yield select(paramsSelector);
+        let params = yield select(paramsSelector);
+        if (!params)
+            params = 'isDetailed=true';
         const taskTypes = yield call(getTaskTypesReq, params);
 
         yield put({type: SET_TASK_TYPES, payload: taskTypes})
