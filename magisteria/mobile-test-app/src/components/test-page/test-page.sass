@@ -1,0 +1,84 @@
+@import "~tools/variables"
+
+.test-page
+  z-index: 1
+
+  .lectures-menu._plain-menu
+    position: relative
+
+  .lectures-menu__section
+    flex-grow: 0 !important
+    flex-basis: 50%
+    @media(max-width: 899px)
+      flex-basis: auto
+
+  .lectures-list-trigger:after
+    border-color: $color-white-02
+    display: block
+    @media(max-width: 899px)
+      display: none
+
+  .test-page__content
+    position: relative
+    &._result
+      height: 633px
+      @media(max-width: 1679px)
+        height: 512px
+      @media(max-width: 899px)
+        height: 473px
+
+  .content-wrapper
+    position: absolute
+    width: 100%
+    height: 100%
+    padding: 0
+    background-color: $color-main-dark
+
+  .btn--brown
+    outline: none
+
+  &._desktop
+    .lectures-menu._plain-menu
+      position: absolute
+      background-color: transparent
+      border-bottom: $border-white-04
+      &.opened
+        background-color: $color-main-dark
+
+    .test-page__content:not(._result)
+      height: calc(100vh - 53px)
+
+    &._instance-page:not(.added)
+      .content-wrapper
+        padding-top: 53px
+        height: calc(100% - 53px)
+
+  &._mobile
+    .test-page__content:not(._result)
+      height: calc(100vh - 103px)
+    .test-page__content._result
+      height: 512px
+      @media(max-width: $tablet-width)
+        height: 473px
+
+  &.added
+    .test-page__content._result
+      height: 633px
+      @media(max-width: 1679px)
+        height: 512px
+      @media(max-width: $tablet-width)
+        height: 473px
+      @media(max-width: $mobile-phone-width)
+        height: 75vh
+    .lectures-menu._plain-menu
+      position: relative
+      background-color: #2f2f2f
+
+  .lectures-list .lecture__btn svg
+    -webkit-transition: none
+    transition: none
+
+.overflow .test-page
+  .lectures-list .lecture__btn svg
+    -webkit-transition: all .2s ease-in-out
+    transition: all .2s ease-in-out

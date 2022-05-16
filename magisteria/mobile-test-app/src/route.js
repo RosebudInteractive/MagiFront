@@ -1,5 +1,5 @@
 import {Route, Switch} from "react-router-dom";
-import TestPage from "containers/test-page";
+import TestPage from "./containers/test-page";
 import {TEST_PAGE_TYPE} from "#common/constants/common-consts";
 import React from "react";
 

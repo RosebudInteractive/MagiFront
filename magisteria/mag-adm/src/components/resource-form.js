@@ -202,9 +202,8 @@ class ResourceForm extends React.Component {
                                     multiple: false,
                                     datatype: "json",
                                     accept: "image/*",
-                                    // accept: "image/*, video/*",
-                                    type: "iconButton",
-                                    icon: 'upload',
+                                    type: "icon",
+                                    icon: 'fa-upload',
                                     height: 38,
                                     on: {
                                         onBeforeFileAdd: (item) => {
@@ -276,13 +275,11 @@ class ResourceForm extends React.Component {
                                 {},
                                 {
                                     view: "button",
-                                    type: "iconButton",
-                                    icon: 'refresh',
-                                    // value: "R",
-                                    // background
+                                    type:"icon",
+                                    icon:"fa-refresh",
                                     height: 38,
                                     click: function () {
-                                        this._refreshLanguages()
+                                        that._refreshLanguages()
                                     }
                                 }
                             ]
