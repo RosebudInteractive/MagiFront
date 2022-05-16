@@ -1,0 +1,194 @@
+@import "~tools/variables"
+
+.test-result__cover
+  //height: 100%
+  position: relative
+  background-repeat: no-repeat
+  -webkit-background-size: cover
+  background-size: cover
+  background-position: top center
+  height: 633px
+  @media(max-width: 1679px)
+    height: 512px
+  @media(max-width: 899px)
+    height: 100%
+
+  .margin-block
+    height: 100%
+    margin: 0 8.333%
+    @media(max-width: $tablet-width)
+      margin: 0 18.75%
+    @media(max-width: $mobile-phone-width)
+      margin: 0 20px
+
+  .flex-column-block
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+    @media(max-width: $tablet-width)
+      align-items: center
+
+
+  .test-result__info
+    position: relative
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+    width: 90%
+    margin-bottom: 40px
+    color: $color-white
+    @media(max-width: $tablet-width)
+      width: 100%
+      align-items: center
+      margin-bottom: 40px
+    @media(max-width: $mobile-phone-width)
+      align-items: flex-start
+      margin-bottom: 20px
+
+    .title
+      color: $color-white
+      margin: 0 0 20px 0
+      @media(max-width: $tablet-width)
+        margin-bottom: 15px
+
+
+    .message
+      color: $color-white
+      @media(max-width: $tablet-width)
+        text-align: center
+      @media(max-width: $mobile-phone-width)
+        text-align: left
+
+
+  .title__course-pay-status
+    margin-right: 13px
+    margin-left: 7px
+
+    svg
+      top: 50%
+      transform: translateY(-50%)
+
+
+  .title__label
+    vertical-align: initial
+    position: relative
+    font-style: italic
+    display: inline-block
+    margin: 0 13px 0 0
+    letter-spacing: normal
+    @media(max-width: 899px)
+      top: 3px
+
+  .info__detail
+    font-family: $font-fira
+    color: $color-white
+    font-size: 17px
+    line-height: 24px
+
+    .info__detail-item
+      display: inline
+
+
+  .test-page__info-separator
+    font-size: 17px
+    margin: 0 5px
+    @media(max-width: 899px)
+      font-size: 12px
+
+  .social-block__wrapper
+    height: 36px
+    min-height: 36px
+    margin-bottom: 21px
+    display: flex
+    flex-direction: row
+    @media(max-width: $tablet-width)
+      margin-bottom: 39px
+    @media(max-width: $mobile-phone-width)
+      margin-bottom: 43px
+
+    .reinit-button
+      display: block
+      margin-left: 25px
+      @media(max-width: $tablet-width)
+        display: none
+
+  .social-block
+    flex-basis: auto
+    @media(max-width: 899px)
+      flex-basis: 50%
+    @media(max-width: $mobile-phone-width)
+      flex-basis: 100%
+
+  .social-button-wrapper
+    min-width: 48px
+    @media(max-width: 899px)
+      flex-basis: 29%
+      width: auto
+      max-width: none
+
+    &:last-of-type
+      width: 51px
+      @media(max-width: 899px)
+        flex-basis: 13%
+
+  .social-block__title
+    color: $color-white
+    font-family: $font-fira
+    font-size: 17px
+    line-height: 24px
+    margin-bottom: 10px
+    @media(max-width: 899px)
+      font-size: 15px
+      line-height: 21px
+
+  .reinit-button
+    color: $color-white
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 18px
+    letter-spacing: 0.01em
+    align-self: center
+    cursor: pointer
+    span
+      vertical-align: sub
+      margin-right: 4px
+    @media(max-width: 899px)
+      font-size: 12px
+      line-height: 15px
+
+
+  .next-lesson__buttons-block
+    margin: 0 0 32px
+    display: flex
+    flex-direction: column
+    width: auto
+    @media (max-width: $tablet-width)
+      margin: 0 0 28px
+      width: 58%
+      min-width: 230px
+    @media (max-width: $mobile-phone-width)
+      width: 100%
+
+    .next-lesson-button__wrapper
+      width: auto
+      flex-grow: 0
+      @media(max-width: $tablet-width)
+        width: 100%
+        margin-bottom: 10px
+
+    .next-lesson-button
+      padding-left: 0
+      padding-right: 0
+      width: 216px
+      cursor: pointer
+      @media(max-width: 899px)
+        width: 100%
+
+    .reinit-button
+      display: none
+      width: 100%
+      @media (max-width: $tablet-width)
+        display: block
+
+    .button
+      height: 32px

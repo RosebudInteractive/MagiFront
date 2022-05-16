@@ -1,0 +1,45 @@
+@import "~tools/variables"
+
+.test-page
+  .social-block
+    align-items: center
+    position: relative
+    height: 100%
+
+    .social-button-wrapper
+      min-width: 60px
+      position: relative
+      border: none
+      margin: 0
+      height: 100%
+      &:not(:first-child)
+        margin-left: 9px
+
+
+    .social-btn
+      outline: none
+      border: none
+      display: flex
+      align-items: center
+      flex-direction: row
+      height: 100%
+      //margin-left: 3px
+      cursor: pointer
+      border-radius: 50px
+      background: $color-white-02
+      min-width: 48px
+      justify-content: center
+      &._active
+        padding-left: 8px
+        padding-right: 16px
+
+    .social-btn__actions
+      padding: 0
+      min-width: auto
+      color: $color-white
+
+  .social-btn__icon
+    svg
+      fill: $color-white-06
+      width: 18px
+      height: 18px

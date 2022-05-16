@@ -33,8 +33,6 @@ module.exports = function (webpackEnv, argv) {
 
     const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 
-    console.log(path.resolve(__dirname, "../../magisteria/containers"))
-
     return {
         mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
         devtool: isEnvProduction
@@ -215,7 +213,7 @@ module.exports = function (webpackEnv, argv) {
                 'ducks': path.resolve(__dirname, '../../magisteria/src/ducks'),
                 'actions': path.resolve(__dirname, '../../magisteria/src/actions'),
                 'reducers': path.resolve(__dirname, '../../magisteria/src/reducers'),
-                'containers': path.resolve(__dirname, '../../magisteria/src/containers'),
+                '#src': path.resolve(__dirname, '../../magisteria/src'),
             }
         },
         resolveLoader: {
