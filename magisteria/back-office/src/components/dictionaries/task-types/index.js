@@ -6,23 +6,27 @@ import {GRID_SORT_DIRECTION} from "../../../constants/common";
 import FilterRow from "../../filter";
 import Webix from "../../Webix";
 import {
-    // fetchingSelector,
-    getRights,
-    rightFormOpenedSelector,
     rightsDictionarySelector,
     selectRight,
     toggleRightForm,
 } from "tt-ducks/access-rights-dictionary";
-import {getTaskType, getTaskTypes, updateTaskType, deleteTaskType, currentTaskTypeSelector, taskTypesSelector, selectTaskType, fetchingSelector, setNewTaskType} from "../../../ducks/task";
-import {userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
+import {    
+        getTaskType, 
+        getTaskTypes, 
+        updateTaskType, 
+        deleteTaskType, 
+        currentTaskTypeSelector, 
+        taskTypesSelector, 
+        selectTaskType, 
+        fetchingSelector, 
+        setNewTaskType  
+    } from "../../../ducks/task";
 import {bindActionCreators} from "redux";
 import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
 import {connect} from "react-redux";
 import './task-types.sass'
 import PlusIco from "tt-assets/svg/plus.svg";
 import TaskTypeForm from './form'
-
-
 
 let taskTypesCount = 0;
 
@@ -44,11 +48,6 @@ const TaskTypes = (props) => {
         if (taskTypes.length > 0) {
             const splitedPathname = location.pathname.split('/');
             const locationComponentId = +(splitedPathname[splitedPathname.length - 1]);
-
-            if (Number.isInteger(locationComponentId)) {
-                // actions.selectRight(locationComponentId);
-                // actions.toggleRightForm(true);
-            }
         }
     }, [taskTypes]);
 
@@ -56,10 +55,6 @@ const TaskTypes = (props) => {
         console.log('location', location)
         !currentTaskType && actions.selectTaskType()
     }, [location])
-
-    useEffect(() => {
-
-    }, [taskTypes]);
 
     useEffect(() => {
         const initState = parseParams()
@@ -82,7 +77,6 @@ const TaskTypes = (props) => {
 
         if (!fetching) {
             actions.getTaskTypes();
-            // action.getRights()
         }
     }, [location]);
 
@@ -111,8 +105,7 @@ const TaskTypes = (props) => {
             {id: 'Id', header: 'Id'},
             {id: 'Code', header: 'Код'},
             {id: 'Name', header: 'Название', fillspace: true},
-            {
-                id: 'del-btn', header: '', width: 50,
+            {id: 'del-btn', header: '', width: 50,
                 template: function (data) {
                     return "<button class='process-elements-grid__button elem-delete remove-timeline-button'/>";
                     //     return data.State !== 2 ? "<button class='process-elements-grid__button elem-delete remove-timeline-button'/>" : ""
@@ -139,11 +132,8 @@ const TaskTypes = (props) => {
                 if (item && item.Id) {
                     actions.selectTaskType(item.Id);
                     actions.getTaskType(item.Id)
-                    // actions.selectRight(item.Id);
-                    // actions.toggleRightForm(true);
                     props.history.push(`/dictionaries/task-types/${item.Id}`);
                 }
-
             }
         },
         onClick: {
@@ -154,11 +144,7 @@ const TaskTypes = (props) => {
                 const item = this.getItem(data.row);
                 if (item && item.Id) {
                     actions.deleteTaskType(item.Id)
-                    // actions.selectRight(item.Id);
-                    // actions.toggleRightForm(true);
-                    // props.history.push(`/dictionaries/task-types/${item.Id}`);
                 }
-
             }
         },
     };
@@ -167,7 +153,7 @@ const TaskTypes = (props) => {
         return getFilterConfig(filter.current)
     }, [filter.current]);
 
-    const _onApplyFilter = (filterData: null) => {
+    const _onApplyFilter = (filterData = null) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
         actions.applyFilter(params)
@@ -177,7 +163,6 @@ const TaskTypes = (props) => {
         actions.setNewTaskType()
         props.history.push(`/dictionaries/task-types/new`);
     }
-
 
     return (
         <React.Fragment>
@@ -205,9 +190,7 @@ const mapState2Props = (state) => {
         taskTypes: taskTypesSelector(state),
         fetching: fetchingSelector(state),
         currentTaskType: currentTaskTypeSelector(state),
-        supervisors: userWithSupervisorRightsSelector(state),
         roles: rightsDictionarySelector(state)
-        // modalVisible: rightFormOpenedSelector(state)
     }
 };
 

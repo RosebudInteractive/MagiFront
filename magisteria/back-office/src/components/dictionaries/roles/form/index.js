@@ -6,38 +6,33 @@ import {TextBox} from '../../../ui-kit'
 import {
     cleanSelectedRight,
     permissionSchemeSelector,
-    rightFormOpenedSelector,
     saveRightChanges,
-    selectedRightSelector,
-    toggleRightForm,
+    saveNewRight,
+    currentRightsSelector,
 } from "tt-ducks/access-rights-dictionary";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {hasAdminRights} from "tt-ducks/auth";
 import Permissions from "../../../permission-tree";
 import validators from "../../../../tools/validators"
 import {getPermissionsFromScheme, getRoleMergeClojure} from "../../../../tools/permission-functions";
 import {fetchingSelector} from "tt-ducks/access-rights-dictionary";
-import {RoleRightsValue} from "../../../../@types/permissions";
 
 const RightForm = (props) => {
     const [createAction, setActionCreate] = useState(true);
-    const {roleData, visible, actions, isAdmin, permissionScheme, fetching} = props;
+    const {roleData, actions, permissionScheme, fetching} = props;
 
     const [formIsDirty, setFormIsDirty] = useState(false);
     const [permissionBody, setPermissionBody] = useState(null);
 
     useEffect(() => {
-
-        setActionCreate(!(roleData && roleData.Id));
+        console.log('setActionCreate' + JSON.stringify(roleData));
+        setActionCreate(!(roleData && roleData.id));
     }, [roleData]);
 
     const closeModalForm = () => {
-        actions.toggleRightForm(false);
         actions.cleanSelectedRight();
         props.history.push(`/dictionaries/rights`);
     };
-
     const roleFormData = useMemo(() => ({
         Code: (roleData && roleData.code) ? roleData.code : '',
         Name: (roleData && roleData.name) ? roleData.name : '',
@@ -50,7 +45,7 @@ const RightForm = (props) => {
         setFormIsDirty(value)
     };
 
-    const onChangePermission = (path: Array<string>, value: RoleRightsValue | undefined) => {
+    const onChangePermission = (path, value = RoleRightsValue || undefined) => {
         const newPermissions = {...permissionBody};
 
         const permission = path.reduce((current, key) => current
@@ -69,23 +64,25 @@ const RightForm = (props) => {
     }, [permissionBody])
 
     const applyChanges = function (values) {
-        roleData && roleData.id && actions.saveRightChanges(roleData.id, {
-            Permissions: getPermissionsFromScheme(permissionBody),
-            Code: values.code,
-            Name: values.name,
-            ShortCode: values.shortCode,
-            Description: values.description
-        });
+        const newRight = {...values};
+        newRight.Permissions = getPermissionsFromScheme(permissionBody);
+        newRight.Id = roleData.id;
+        if (createAction){
+            actions.saveNewRight(newRight);
+        } else             
+            actions.saveRightChanges(roleData.id, newRight);
     };
 
     const mergeRole = useMemo(() => getRoleMergeClojure(permissionScheme), [permissionScheme]);
 
     const mergedScheme = useMemo(() => mergeRole(roleData ? [roleData] : []), [roleData]);
 
+    console.log(`*roleData: ${JSON.stringify(roleData)}`);
+
     useEffect(() => {setPermissionBody(_.cloneDeep(mergedScheme))}, [mergedScheme])
 
     return (
-        (visible && !fetching) &&
+        (permissionBody &&  (!fetching)) &&
         <div className='outer-background'>
             <div className='inner-content'>
                 <button type="button" className="modal-form__close-button" onClick={closeModalForm}>Закрыть</button>
@@ -138,7 +135,7 @@ const RightForm = (props) => {
                                                    placeholder="Краткое название"
                                                    validate={validators.required}
                                                    label={"Краткое название"}
-                                                   disabled={true}
+                                                   disabled={false}
                                             />
                                         </div>
 
@@ -150,7 +147,6 @@ const RightForm = (props) => {
                                                    rowsMax={4}
                                                    type="text"
                                                    extClass={'_with-custom-scroll'}
-                                                   validate={validators.required}
                                                    placeholder="Описание"
                                                    label={"Описание"}
                                             />
@@ -177,7 +173,7 @@ const RightForm = (props) => {
                                 <div className="editor-form__action-buttons">
                                     <button type='submit'
                                             className="right-form__confirm-button orange-button big-button"
-                                            disabled={(!roleForm.valid || roleForm.pristine) && !formIsDirty}>
+                                            disabled={!roleForm.valid && !formIsDirty}>
                                         Применить
                                     </button>
                                 </div>
@@ -194,9 +190,7 @@ const RightForm = (props) => {
 
 const mapState2Props = (state) => {
     return {
-        roleData: selectedRightSelector(state),
-        visible: rightFormOpenedSelector(state),
-        isAdmin: hasAdminRights(state),
+        roleData: currentRightsSelector(state),
         permissionScheme: permissionSchemeSelector(state),
         fetching: fetchingSelector(state)
     }
@@ -205,8 +199,8 @@ const mapState2Props = (state) => {
 const mapDispatch2Props = (dispatch) => {
     return {
         actions: bindActionCreators({
-            toggleRightForm,
             cleanSelectedRight,
+            saveNewRight,
             saveRightChanges
         }, dispatch)
     }

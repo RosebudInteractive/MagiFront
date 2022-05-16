@@ -8,22 +8,23 @@ import Webix from "../../Webix";
 import {
     fetchingSelector,
     getRights,
-    rightFormOpenedSelector,
     rightsDictionarySelector,
     selectRight,
-    toggleRightForm,
+    currentRightsSelector,
+    createNewRight,
+    deleteRight,
 } from "tt-ducks/access-rights-dictionary";
-import {userWithSupervisorRightsSelector} from "tt-ducks/dictionary"
 import {bindActionCreators} from "redux";
-import {applyFilter, setGridSortOrder, setInitState, setPathname} from "tt-ducks/route";
+import {applyFilter, setGridSortOrder, setInitState} from "tt-ducks/route";
 import {connect} from "react-redux";
 import './access-rights.sass'
+import PlusIco from "tt-assets/svg/plus.svg";
 import RightForm from './form'
 
 let _rightsCount = 0;
 
 const AccessRights = (props) => {
-    const {rights, fetching, actions} = props;
+    const {rights, currentRights, fetching, actions} = props;
     const location = useLocation();
     const _sortRef = useRef({field: null, direction: null}),
         filter = useRef(null);
@@ -40,9 +41,8 @@ const AccessRights = (props) => {
             const splitedPathname = location.pathname.split('/');
             const locationComponentId = +(splitedPathname[splitedPathname.length - 1]);
 
-            if (Number.isInteger(locationComponentId)) {
+            if (locationComponentId && Number.isInteger(locationComponentId)) {
                 actions.selectRight(locationComponentId);
-                actions.toggleRightForm(true);
             }
         }
     }, [rights]);
@@ -92,7 +92,12 @@ const AccessRights = (props) => {
             {id: 'ShortCode', header: 'Краткое название'},
             {id: 'Name', header: 'Название'},
             {id: 'Code', header: 'Код'},
-            {id: 'Description', header: 'Описание', fillspace: true}
+            {id: 'Description', header: 'Описание', fillspace: true},
+            {id: 'del-btn', header: '', width: 50,
+                template: function (data) {
+                    return "<button class='process-elements-grid__button elem-delete remove-timeline-button'/>";
+                }
+            },
         ],
         on: {
             onHeaderClick: function (header) {
@@ -112,14 +117,19 @@ const AccessRights = (props) => {
                 const item = this.getItem(id);
                 if (item && item.Id) {
                     actions.selectRight(item.Id);
-                    actions.toggleRightForm(true);
                     props.history.push(`/dictionaries/rights/${item.Id}`);
                 }
-
             }
         },
         onClick: {
-            "elem-delete": function () {
+            "elem-delete": function (e, data) {
+                console.log('deleting role')
+                e.preventDefault();
+
+                const item = this.getItem(data.row);
+                if (item && item.Id) {
+                    actions.deleteRight(item.Id)
+                }
             }
         },
     };
@@ -128,22 +138,29 @@ const AccessRights = (props) => {
         return getFilterConfig(filter.current)
     }, [filter.current]);
 
-    const _onApplyFilter = (filterData: null) => {
+    const _onApplyFilter = (filterData = null) => {
         filter.current = filterData;
         let params = convertFilter2Params(filterData);
         actions.applyFilter(params)
     };
 
+    const createRole = () => {
+        actions.createNewRight();
+        props.history.push(`/dictionaries/rights/new`);
+    }
 
     return (
         <React.Fragment>
             <div className="dictionary-rights-page form _scrollable-y">
                 <h5 className="form-header _grey70">Справочник ролей</h5>
                 <FilterRow fields={FILTER_CONFIG} onApply={_onApplyFilter} onChangeVisibility={_onResize}/>
+                <button className="open-form-button" onClick={createRole}>
+                    <PlusIco/>
+                </button>
                 <div className="grid-container rights-table unselectable">
                     <Webix ui={GRID_CONFIG} data={rights}/>
                 </div>
-                {props.modalVisible
+                {(currentRights)
                     ? <Route path="/dictionaries/rights/:id" component={RightForm}/>
                     : null
                 }
@@ -157,9 +174,8 @@ const AccessRights = (props) => {
 const mapState2Props = (state) => {
     return {
         rights: rightsDictionarySelector(state),
+        currentRights: currentRightsSelector(state),
         fetching: fetchingSelector(state),
-        supervisors: userWithSupervisorRightsSelector(state),
-        modalVisible: rightFormOpenedSelector(state)
     }
 };
 
@@ -169,10 +185,10 @@ const mapDispatch2Props = (dispatch) => {
             getRights,
             applyFilter,
             setInitState,
-            setPathname,
             setGridSortOrder,
             selectRight,
-            toggleRightForm
+            createNewRight,
+            deleteRight,
         }, dispatch)
     }
 };
