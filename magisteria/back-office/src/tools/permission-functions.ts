@@ -1,4 +1,4 @@
-import {
+import type {
   Scheme,
   Role,
   ServerRole,
@@ -9,7 +9,7 @@ import {
   RoleRightsGroup,
   MergedGroup,
   MergedScheme, RoleRightsValue,
-} from '../@types/permissions';
+} from '#types/permissions';
 
 export type RoleMergeFunction = (roles: Array<Role>) => MergedScheme;
 

@@ -51,7 +51,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case SET_RIGHTS:
-            console.log('SET_RIGHTS', payload);
             return state.set('rights', payload);
         case SET_PERMISSION_SCHEME:
             return state.set('permissionScheme', payload);
