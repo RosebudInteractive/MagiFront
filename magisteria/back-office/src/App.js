@@ -12,7 +12,7 @@ import {
     userAuthSelector,
     userRoleSelector,
     whoAmI
-} from "tt-ducks/auth";
+} from "#src/ducks/auth";
 import './assets/styles/app.sass'
 import './assets/styles/grid.sass'
 import * as webix from 'webix/webix.js';
