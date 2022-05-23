@@ -1,29 +1,27 @@
-import React, {useEffect,useState,useMemo} from "react"
+import React, {useEffect, useState, useCallback} from "react"
 import {change, Field, getFormValues, isDirty, isValid, reduxForm} from "redux-form";
-import actions from "redux-form/lib/actions";
 import {Autocomplete, Checkbox, Select, TextBox} from "../ui-kit";
 import "./create-page-form.sass"
-import {compose,bindActionCreators} from "redux";
+import {compose, bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import $ from "jquery";
 import { taskTypesSelector,
-         getTaskTypes } from "../../ducks/task";
+         getTaskTypes } from "#src/ducks/task";
 
 const EDITOR_NAME = "CREATE_PROCESS_FORM"
 
 function CreateProcessForm(props) {
-    const {supervisors, users, onClose, lessons, editorValues, userId, canChangeSupervisor, taskTypes,actions} = props
+    const {supervisors, users, onClose, lessons, editorValues, userId, canChangeSupervisor, taskTypes, getTaskTypes} = props
 
     const [typesLoaded, setTypesLoaded] = useState(false);
     useEffect(() => {
         if (!typesLoaded){
-            console.log('loading tasktypes');
-            actions.getTaskTypes();
+            getTaskTypes();
             setTypesLoaded(true);
         };
     }, [typesLoaded]);
 
-    const _onApply = () => {
+    const onApply = () => {
         if (props.editorValid) {
             props.onApply({
                 Name: editorValues.Name,
@@ -49,21 +47,17 @@ function CreateProcessForm(props) {
         }
     }
 
-    const _getSupervisors = () => {
+    const getSupervisors = () => {
         return supervisors && supervisors.map((item) => {return {id: item.Id, name: item.DisplayName}})
     }
 
-    const _getUsers = () => {
-        return users && users.map((item) => {return {id: item.Id, name: item.DisplayName}})
-    }
-
-    const _getLessons = () => {
+    const getLessons = () => {
         return lessons && lessons.map((item) => {return {id: item.Id, name: item.Name}})
     }
 
-    const getFilteredUsers = (taskTypeCode)=>{
+    const getFilteredUsers = useCallback((taskTypeCode)=>{
         let filteredUsers = users;
-        if (typesLoaded && taskTypes && taskTypes.length && users){
+        if (taskTypes && taskTypes.length && users){
             const taskType = taskTypes.find( elem => elem.Code === taskTypeCode);
             if (taskType){
                 const rolesOfTaskType = taskType.Roles.map( elem => elem.ShortCode );
@@ -71,10 +65,6 @@ function CreateProcessForm(props) {
             };
         };
         return filteredUsers && filteredUsers.map((item) => {return {id: item.Id, name: item.DisplayName}})
-    };
-
-    const _getMemoizedUsersFunc = useMemo(() => {
-        return getFilteredUsers;
     }, [taskTypes, users]);
 
     useEffect(() => {
@@ -105,28 +95,28 @@ function CreateProcessForm(props) {
         }
     }, [props.editorValues && props.editorValues.LessonId])
 
-    return <form className="modal-form" action={"javascript:void(0)"}>
+    return typesLoaded && <form className="modal-form" action={"javascript:void(0)"}>
         <div className="modal-form__dialog create-process-dialog _with-custom-scroll">
             <h6 className="_grey100">Создание нового процесса</h6>
             <Field component={TextBox} name={"Name"} label={"Название"} extClass={'height-100-input-inside-mui-form-control'}/>
-            <Field component={Autocomplete} name={"LessonId"} label={"Лекция"} options={_getLessons()}/>
-            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={_getSupervisors()} required={true} readOnly={!canChangeSupervisor} disabled={!canChangeSupervisor}/>
+            <Field component={Autocomplete} name={"LessonId"} label={"Лекция"} options={getLessons()}/>
+            <Field component={Select} name={"SupervisorId"} label={"Супервизор"} options={getSupervisors()} required={true} readOnly={!canChangeSupervisor} disabled={!canChangeSupervisor}/>
             <div className="dialog__fields-wrapper _with-custom-scroll">
                 <Field component={Checkbox} name={"UseAuthorPictures"} label={"Картинки автора"}/>
                 <Field component={Checkbox} name={"UseMusic"} label={"Музыка"}/>
                 <Field component={Checkbox} name={"HasTest"} label={"Тесты"}/>
                 <Field component={Checkbox} name={"HasLiterature"} label={"Литература"}/>
-                <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={_getMemoizedUsersFunc('PSOUND')}/>
-                <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={_getMemoizedUsersFunc('CSOUND')}/>
-                <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={_getMemoizedUsersFunc('TRANS')}/>
-                <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={_getMemoizedUsersFunc('FPIC')}/>
-                <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={_getMemoizedUsersFunc('MPIC')}/>
-                <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={_getMemoizedUsersFunc('ETRANS')}/>
-                <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={_getMemoizedUsersFunc('LIT')}/>
-                <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={_getMemoizedUsersFunc('FIN')}/>
-                <Field component={Select} name={"ExecutorTest"} label={"Исполнитель - Тесты"} options={_getMemoizedUsersFunc('TEST')}/>
+                <Field component={Select} name={"ExecutorSound"} label={"Исполнитель - Звук"} options={getFilteredUsers('PSOUND')}/>
+                <Field component={Select} name={"ExecutorSoundControl"} label={"Исполнитель - Звук контроль"} options={getFilteredUsers('CSOUND')}/>
+                <Field component={Select} name={"ExecutorTranscript"} label={"Исполнитель - Транскрипт"} options={getFilteredUsers('TRANS')}/>
+                <Field component={Select} name={"ExecutorPictures"} label={"Исполнитель - Иллюстрации"} options={getFilteredUsers('FPIC')}/>
+                <Field component={Select} name={"ExecutorPicturesControl"} label={"Исполнитель - Иллюстрации контроль"} options={getFilteredUsers('MPIC')}/>
+                <Field component={Select} name={"ExecutorText"} label={"Исполнитель - Тех. стенограмма"} options={getFilteredUsers('ETRANS')}/>
+                <Field component={Select} name={"ExecutorLiterature"} label={"Исполнитель - Литература"} options={getFilteredUsers('LIT')}/>
+                <Field component={Select} name={"ExecutorReadyComponents"} label={"Исполнитель - Готовые компоненты"} options={getFilteredUsers('FIN')}/>
+                <Field component={Select} name={"ExecutorTest"} label={"Исполнитель - Тесты"} options={getFilteredUsers('TEST')}/>
             </div>
-            <button className="element-editor__save-button orange-button big-button" onClick={_onApply} disabled={!(props.hasChanges && props.editorValid)}>
+            <button className="element-editor__save-button orange-button big-button" onClick={onApply} disabled={!(props.hasChanges && props.editorValid)}>
                 Применить
             </button>
             <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>
@@ -155,10 +145,7 @@ const mapState2Props = (state) => {
 }
 
 const mapDispatch2Props = (dispatch) => {
-    return {
-        change,
-        actions: bindActionCreators({getTaskTypes}, dispatch)
-    }
+    return bindActionCreators({change, getTaskTypes}, dispatch)
 };
 
 const enhance = compose(

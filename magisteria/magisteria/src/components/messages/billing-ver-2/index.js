@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import Platform from 'platform';
+
 import {
     showCoursePaymentWindowSelector,
     billingStepSelector,
@@ -78,10 +79,12 @@ class CoursePaymentWrapper extends React.Component {
             <div className={_className}>
                 <div className="modal _billing billing-ver-2 is-opened" id="billing">
                     <div>
-                        <button type="button" className="modal__close js-modal-close" data-target="billing"
-                                onClick={::this._onCloseClick} disabled={fetching}>Закрыть
-                        </button>
-                        <Payment paymentType={PAYMENT_TYPE.COURSE}/>
+                    {/*    <div>*/}
+                            <button type="button" className="modal__close js-modal-close" data-target="billing"
+                                    onClick={::this._onCloseClick} disabled={fetching}>Закрыть
+                            </button>
+                            <Payment paymentType={PAYMENT_TYPE.COURSE}/>
+                        {/*</div>*/}
                     </div>
                 </div>
             </div>
@@ -96,6 +99,8 @@ function mapStateToProps(state) {
         showWindow: showCoursePaymentWindowSelector(state),
         billingStep: billingStepSelector(state),
         fetching: billingFetching(state),
+        // needRedirect: isRedirectActiveSelector(state),
+        // redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
         enabledPaidCourses: enabledPaidCoursesSelector(state),
 
