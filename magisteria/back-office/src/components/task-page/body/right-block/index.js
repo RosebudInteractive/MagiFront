@@ -10,10 +10,11 @@ type TaskBodyProps = {
     users: Array,
     task: any,
     onSaveComment: Function,
+    taskTypes: any,
 }
 
 export default function RightBlock(props: TaskBodyProps) {
-    const {task, users, onSaveComment} = props
+    const {task, users, onSaveComment, taskTypes} = props
 
     const _stateOptions = useMemo(() => {
         return Object.values(TASK_STATE)
@@ -25,6 +26,10 @@ export default function RightBlock(props: TaskBodyProps) {
 
     const _getUsers = () => {
         return users && users.map((item) => {return {id: item.Id, name: item.DisplayName}})
+    }
+
+    const _getTaskTypes = () => {
+        return taskTypes && taskTypes.map((item) => {return {id: item.Id, name: item.Name}})
     }
 
     const _lock = {
@@ -50,6 +55,7 @@ export default function RightBlock(props: TaskBodyProps) {
     }, [task])
 
     return <div className="body__right-block">
+        <Field component={Select} name={"TypeId"} label={"Тип задачи"} options={_getTaskTypes()} disabled={_lock.executor} readOnly={_lock.executor}/>
         <Field component={Select} name={"ExecutorId"} label={"Исполнитель"} options={_getUsers()} disabled={_lock.executor} readOnly={_lock.executor}/>
         <Field component={Select} name={"State"} label={"Состояние"} options={_stateOptions} disabled={_lock.state} readOnly={_lock.state} required={true}/>
         { _alertLog && <Comment {..._alertLog}/> }

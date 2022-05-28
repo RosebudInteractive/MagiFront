@@ -12,7 +12,9 @@ import {
     saveComment,
     saveTask,
     taskSelector,
-    usersSelector
+    usersSelector,
+    taskTypesSelector,
+    getTaskTypes, 
 } from "tt-ducks/task";
 import TaskHeader from "../../components/task-page/header";
 import {getFormValues, isDirty, isValid, reduxForm,} from "redux-form";
@@ -59,6 +61,7 @@ function TaskEditor(props: EditorProps) {
                 ElementId: task.Element && task.Element.Id,
                 ExecutorId: task.Executor && task.Executor.Id,
                 LastComment: "",
+                TypeId: task.TypeId
             }
 
             task.Fields && task.Fields.forEach((field) => {
@@ -80,7 +83,7 @@ function TaskEditor(props: EditorProps) {
             Description: editorValues.Description,
             IsElemReady: !!editorValues.IsElemReady,
             WriteFieldSet: editorValues.WriteFieldSet,
-            Comment: _commentText,
+            Comment: _commentText
         }
 
         if (editorValues.DueDate) {
@@ -93,9 +96,12 @@ function TaskEditor(props: EditorProps) {
 
         if (taskId === -1) {
             _value.ProcessId = processId
+            if (+editorValues.TypeId) {
+                _value.TypeId = +editorValues.TypeId
+            };
             if (parentTaskId) {
                 _value.Dependencies = [parentTaskId]
-            }
+            };
         }
 
         _value.Fields = {}
@@ -122,6 +128,11 @@ function TaskEditor(props: EditorProps) {
 
         actions.getProcessElement(_elemId)
     }, [editorValues && editorValues.ElementId])
+
+    useEffect(() => {
+        console.log('actions.getTaskTypes()');
+            actions.getTaskTypes();
+    }, []);
 
     useEffect(() => {
         const _elemId = editorValues && editorValues.ElementId
@@ -158,6 +169,7 @@ function TaskEditor(props: EditorProps) {
                                   elements={props.elements}
                                   currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
                                   users={props.users}
+                                  taskTypes={props.taskTypes}
                                   currentElement={currentElement}
                                   onChangeElement={_onChangeElement}
                                   onStartClick={_onStartClick}
@@ -192,13 +204,21 @@ const mapState2Props = (state) => {
         editorValid: isValid(EDITOR_NAME)(state),
         user: userSelector(state),
         hasSupervisorRights: hasSupervisorRights(state),
-        hasAdminRights: hasAdminRights(state)
+        hasAdminRights: hasAdminRights(state),
+        taskTypes: taskTypesSelector(state),
     }
 };
 
 const mapDispatch2Props = (dispatch) => {
     return {
-        actions: bindActionCreators({getTask, createTask, saveTask, saveComment, getProcessElement}, dispatch)
+        actions: bindActionCreators(
+        {   getTask, 
+            createTask, 
+            saveTask, 
+            saveComment, 
+            getProcessElement,
+            getTaskTypes,
+        }, dispatch)
     }
 };
 
