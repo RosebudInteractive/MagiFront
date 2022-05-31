@@ -1,4 +1,4 @@
-import React, {useMemo} from "react"
+import React, {useMemo, useCallback} from "react"
 import {Field} from "redux-form";
 import {DatePicker, Select, TextBox} from "../../../ui-kit";
 import CommentBlock, {Comment} from "./сomment-block";
@@ -11,10 +11,11 @@ type TaskBodyProps = {
     task: any,
     onSaveComment: Function,
     taskTypes: any,
+    editorValues: any,
 }
 
 export default function RightBlock(props: TaskBodyProps) {
-    const {task, users, onSaveComment, taskTypes} = props
+    const {task, users, onSaveComment, taskTypes, editorValues} = props
 
     const _stateOptions = useMemo(() => {
         return Object.values(TASK_STATE)
@@ -24,9 +25,19 @@ export default function RightBlock(props: TaskBodyProps) {
             .filter(item => !!item)
     }, [task.State])
 
-    const _getUsers = () => {
-        return users && users.map((item) => {return {id: item.Id, name: item.DisplayName}})
-    }
+    const _getUsers = useCallback(() => {
+
+        let filteredUsers = users;
+        if (taskTypes && taskTypes.length && users && editorValues){
+            const taskType = taskTypes.find( elem => elem.Id === editorValues.TypeId);
+            if (taskType){
+                const rolesOfTaskType = taskType.Roles.map( elem => elem.ShortCode );
+                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => user.PData.roles[value]===1 ) ) );
+            };
+        };
+        return filteredUsers && filteredUsers.map((item) => {return {id: item.Id, name: item.DisplayName}})
+//        return users && users.map((item) => {return {id: item.Id, name: item.DisplayName}})
+    }, [editorValues, taskTypes, users])
 
     const _getTaskTypes = () => {
         return taskTypes && taskTypes.map((item) => {return {id: item.Id, name: item.Name}})

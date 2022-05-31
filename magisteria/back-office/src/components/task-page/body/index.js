@@ -11,12 +11,13 @@ type TaskBodyProps = {
     users: Array,
     taskTypes: Array,
     typeId: Number,
+    editorValues: any,
     onStartClick: Function,
     onSaveComment: Function,
 }
 
 export default function TaskBody(props: TaskBodyProps) {
-    const {task, currentElement, onSaveComment, taskTypes, typeId} = props
+    const {task, currentElement, onSaveComment, taskTypes, editorValues} = props
 
     return <div className="task-page__body">
         <TaskMainBlock elements={props.elements}
@@ -24,6 +25,6 @@ export default function TaskBody(props: TaskBodyProps) {
                        currentWriteFieldSet={props.currentWriteFieldSet}
                        taskState={task.State}
                        onStartClick={props.onStartClick}/>
-        <RightBlock task={task} users={props.users} onSaveComment={onSaveComment} taskTypes={taskTypes}/>
+        <RightBlock task={task} users={props.users} onSaveComment={onSaveComment} taskTypes={taskTypes} editorValues={editorValues}/>
     </div>
 }

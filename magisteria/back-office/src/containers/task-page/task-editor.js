@@ -83,7 +83,8 @@ function TaskEditor(props: EditorProps) {
             Description: editorValues.Description,
             IsElemReady: !!editorValues.IsElemReady,
             WriteFieldSet: editorValues.WriteFieldSet,
-            Comment: _commentText
+            Comment: _commentText,
+            TypeId: editorValues.TypeId
         }
 
         if (editorValues.DueDate) {
@@ -169,6 +170,7 @@ function TaskEditor(props: EditorProps) {
                                   elements={props.elements}
                                   currentWriteFieldSet={editorValues && editorValues.WriteFieldSet}
                                   users={props.users}
+                                  editorValues={editorValues}
                                   taskTypes={props.taskTypes}
                                   currentElement={currentElement}
                                   onChangeElement={_onChangeElement}
