@@ -16,7 +16,7 @@ type TaskBodyProps = {
     onSaveComment: Function,
 }
 
-export default function TaskBody(props: TaskBodyProps) {
+export default function TaskBody(props) {
     const {task, currentElement, onSaveComment, taskTypes, editorValues} = props
 
     return <div className="task-page__body">

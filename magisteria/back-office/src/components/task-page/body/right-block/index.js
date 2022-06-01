@@ -14,7 +14,7 @@ type TaskBodyProps = {
     editorValues: any,
 }
 
-export default function RightBlock(props: TaskBodyProps) {
+export default function RightBlock(props) {
     const {task, users, onSaveComment, taskTypes, editorValues} = props
 
     const _stateOptions = useMemo(() => {
