@@ -29,10 +29,11 @@ export default function RightBlock(props) {
 
         let filteredUsers = users;
         if (taskTypes && taskTypes.length && users && editorValues){
+            let execId = task && task.Executor && task.Executor.Id || editorValues.ExecutorId;
             const taskType = taskTypes.find( elem => elem.Id === editorValues.TypeId);
             if (taskType){
                 const rolesOfTaskType = taskType.Roles.map( elem => elem.ShortCode );
-                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => user.PData && (user.PData.roles[value]===1) ) ) );
+                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => (user.PData && (user.PData.roles[value]===1)) || (user.Id===execId) ) ) );
             };
         };
         return filteredUsers && filteredUsers.map((item) => {return {id: item.Id, name: item.DisplayName}})
