@@ -32,7 +32,7 @@ export default function RightBlock(props) {
             const taskType = taskTypes.find( elem => elem.Id === editorValues.TypeId);
             if (taskType){
                 const rolesOfTaskType = taskType.Roles.map( elem => elem.ShortCode );
-                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => user.PData.roles[value]===1 ) ) );
+                filteredUsers = users.filter( user => ( rolesOfTaskType.find( value => user.PData && (user.PData.roles[value]===1) ) ) );
             };
         };
         return filteredUsers && filteredUsers.map((item) => {return {id: item.Id, name: item.DisplayName}})
