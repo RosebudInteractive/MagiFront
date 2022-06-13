@@ -15,6 +15,7 @@ import TimelineEditorContainer from "./containers/timelines/editor"
 import DashboardRecords from "./containers/dashboard-records"
 import AccessRights from "./components/dictionaries/roles";
 import TaskTypes from "./components/dictionaries/task-types";
+import Images from "#src/containers/images";
 
 type RouterProps = {
     hasSupervisorRights: boolean,
@@ -67,5 +68,6 @@ export default function AppRouter(props: RouterProps) {
             }
 
         }}/>
+        <Route path={'/images'} component={Images}/>
     </Switch>
 }

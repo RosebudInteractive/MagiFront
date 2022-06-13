@@ -51,6 +51,8 @@ function SideBarMenu(props) {
             <MenuLink Icon={PublishPlanIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>
         }
+        <MenuLink Icon={PublishPlanIco} url={"/images"}
+                  title={'Изображения'}/>
     </nav>
 }
 

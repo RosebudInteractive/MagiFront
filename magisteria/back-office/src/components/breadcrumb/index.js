@@ -13,7 +13,8 @@ const PATHES = {
     components: "Компоненты",
     users: "Пользователи",
     timelines: "Таймлайны",
-    rights: 'Роли'
+    rights: 'Роли',
+    images: 'Изображения',
 };
 
 const BreadcrumbLink = props => <Breadcrumb.Item {...props} key={props.index}/>;

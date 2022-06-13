@@ -17,6 +17,7 @@ import {saga as periodsSaga} from 'tt-ducks/periods-timeline'
 import {saga as dashboardRecordsSaga} from 'tt-ducks/dashboard-records'
 import {saga as scriptCommandsTimelineSaga} from 'tt-ducks/script-commands-timeline'
 import {saga as accessRightsSaga} from 'tt-ducks/access-rights-dictionary'
+import {saga as imagesSaga} from '#src/ducks/images'
 
 export default function* rootSaga() {
     yield all([
@@ -37,6 +38,7 @@ export default function* rootSaga() {
         periodsSaga(),
         dashboardRecordsSaga(),
         scriptCommandsTimelineSaga(),
-        accessRightsSaga()
+        accessRightsSaga(),
+        imagesSaga(),
     ])
 }

@@ -2,10 +2,7 @@ import React from 'react'
 import './loading-page.sass'
 
 export default function Preloader() {
-    const _style = {width: "100%", height: "100%"}
-
-    return <div className="lds-css ng-scope preloader-wrapper">
-        <div className="lds-spinner" style={_style}>
+    return <div className="lds-spinner">
             <div key={1}/>
             <div key={2}/>
             <div key={3}/>
@@ -19,5 +16,4 @@ export default function Preloader() {
             <div key={11}/>
             <div key={12}/>
         </div>
-    </div>
 }
