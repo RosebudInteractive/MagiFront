@@ -1,0 +1,30 @@
+@import "#src/assets/styles/colors"
+
+.image-view__dialog
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  display: flex
+  z-index: 10
+  background-color: $color-main-light
+  padding: 24px
+  box-sizing: border-box
+  box-shadow: 0 2px 10px rgba(41, 42, 49, 0.12)
+  border-radius: 8px
+  max-height: 90vh
+  max-width: 90vw
+  inline-size: max-content
+  img
+    object-fit: contain
+
+  &._horizontal
+    width: 100%
+    img
+      width: 100%
+
+  &._vertical
+    height: 100%
+    img
+      height: 100%
+

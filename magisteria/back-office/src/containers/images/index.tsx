@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useLayoutEffect, useMemo, useState,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -7,8 +9,12 @@ import { lessonsSelector, getAllLessons } from '#src/ducks/dictionary';
 import { fetching, imagesSelector, getImages } from '#src/ducks/images';
 import { setInitState } from '#src/ducks/route';
 import { LessonDbInfo } from '#types/lessons';
-import { parseParams } from '#src/containers/images/tools';
+import { parseParams, resizeHandler } from '#src/containers/images/tools';
 import { ImagesGrid } from '#src/components/images/grid';
+import './images.sass';
+import { ImageInfo } from '#types/images';
+import { ImageView } from '#src/components/images/image-view';
+import { useWindowSize } from '#src/tools/window-resize-hook';
 
 const mapState = (state: any) => ({
   lessons: lessonsSelector(state),
@@ -24,17 +30,27 @@ const connector = connect(mapState, mapDispatch);
 
 type Props = ConnectedProps<typeof connector>;
 
+let imagesCount: number = 0;
+
 const Images = ({ lessons, images, actions }: Props) => {
   const [lessonId, setLessonId] = useState<number | null>(null);
+  const [visibleImage, setVisibleImage] = useState<ImageInfo | null>(null);
   const location = useLocation();
 
+  useWindowSize(() => {
+    resizeHandler(imagesCount);
+  });
+
+  useLayoutEffect(() => {
+    imagesCount = images ? images.length : 0;
+    resizeHandler(imagesCount);
+  }, [images]);
+
   useEffect(() => {
-    console.log('getImages', lessonId);
     if (lessonId) actions.getImages({ lessonId });
   }, [lessonId]);
 
   const handleLessonChange = (id: number | null) => {
-    console.log(id);
     setLessonId(id);
   };
 
@@ -77,11 +93,20 @@ const Images = ({ lessons, images, actions }: Props) => {
     }
   }, [location]);
 
+  const handleImageClick = useCallback((data: ImageInfo) => { setVisibleImage(data); },
+    [visibleImage]);
+
+  const handleCloseImageView = useCallback(() => { setVisibleImage(null); }, [visibleImage]);
+
   return (
     <div className="images-page form _scrollable-y">
       <h5 className="form-header _grey70">Изображения</h5>
       <Autocomplete options={options} label="Лекция" input={{ value: lessonId, onChange: handleLessonChange }} />
-      { images && <ImagesGrid data={images} /> }
+      <div className="images-page__grid-container">
+        { images ? <ImagesGrid data={images} onImageClick={handleImageClick} />
+          : <div className="images-page__placeholder">Выберите лекцию</div> }
+        { visibleImage && <ImageView image={visibleImage} onClose={handleCloseImageView} /> }
+      </div>
     </div>
   );
 };

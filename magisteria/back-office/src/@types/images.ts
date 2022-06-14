@@ -22,19 +22,19 @@ export type ImageDbInfo = {
 export type MetaData = {
   'mime-type': string
   path: string,
-  content:{
+  content: {
     icon?: string,
     s?: string,
     m?: string,
     l?: string,
-    name: string,
-    fileId: string,
-    size:{
-      width: number,
-      height: number
-    },
-    description: string,
+  }
+  name: string,
+  fileId: string,
+  size:{
+    width: number,
+    height: number
   },
+  description: string,
 };
 
 export type ImageInfo = {

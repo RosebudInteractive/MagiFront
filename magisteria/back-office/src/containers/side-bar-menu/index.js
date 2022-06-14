@@ -8,6 +8,7 @@ import DictionariesIco from "tt-assets/svg/dictionaries.svg"
 import TimelinesIco from "tt-assets/svg/timeline-v2.svg"
 import PublishPlanIco from "tt-assets/svg/publishplan.svg"
 import ElementIco from "tt-assets/svg/element-arrow.svg"
+import ImageIco from "#src/assets/svg/image.svg"
 import "./side-bar-menu.sass"
 import {NavLink} from "react-router-dom";
 import Logo from "tt-assets/svg/logo.svg"
@@ -51,7 +52,7 @@ function SideBarMenu(props) {
             <MenuLink Icon={PublishPlanIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>
         }
-        <MenuLink Icon={PublishPlanIco} url={"/images"}
+        <MenuLink Icon={ImageIco} url={"/images"} stroke={true}
                   title={'Изображения'}/>
     </nav>
 }
@@ -60,13 +61,14 @@ type MenuLinkProps = {
     Icon: any,
     url: string,
     title: string,
-    nested?: boolean
+    nested?: boolean,
+    stroke?: boolean,
 };
 
 function MenuLink(props: MenuLinkProps) {
-    const {Icon, url, title, nested, notifsCount} = props
+    const {Icon, url, title, nested, notifsCount, stroke} = props
 
-    return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested' : ''}`}
+    return <NavLink to={url} className={`side-bar-menu__item title-font ${nested ? 'nested ' : ' '}${stroke ? 'stroke' : ''}`}
                     activeClassName={"_active"}>
         <Icon/>
         <div className="side-bar-menu__item-title">{title}</div>

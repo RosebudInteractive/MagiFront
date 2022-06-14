@@ -1,4 +1,4 @@
-@import "~tt-assets/styles/colors.sass"
+@import "#src/assets/styles/colors.sass"
 
 .tt-main-area__side-bar-menu
   display: flex
@@ -37,15 +37,28 @@
   margin-bottom: 24px
   transition: color ease 300ms
 
-  svg
-    fill: $grey40
-    transition: fill ease 300ms
-
-  &:hover, &._active
-    color: $grey100
-
+  &:not(.stroke)
     svg
-      fill: $grey100
+      fill: $grey40
+      transition: fill ease 300ms
+
+    &:hover, &._active
+      color: $grey100
+
+      svg
+        fill: $grey100
+
+  &.stroke
+    svg
+      stroke: $grey40
+      stroke-width: 2px
+      transition: stroke ease 300ms
+
+    &:hover, &._active
+      color: $grey100
+
+      svg
+        stroke: $grey100
 
 
 .side-bar-menu__item-title
