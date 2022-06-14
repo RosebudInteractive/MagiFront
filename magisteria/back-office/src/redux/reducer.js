@@ -20,6 +20,7 @@ import periodsReducer, {moduleName as periodsModule} from "tt-ducks/periods-time
 import dashboardRecordsReducer, {moduleName as dashboardRecordsModule} from "tt-ducks/dashboard-records";
 import scriptCommandsTimelineReducer, {moduleName as scriptCommandsTimelineModule} from "tt-ducks/script-commands-timeline";
 import rightsReducer, {moduleName as rightsModule} from "tt-ducks/access-rights-dictionary";
+import imagesReducer, {moduleName as imagesModule} from "#src/ducks/images";
 
 export default combineReducers({
     [appModule]: appReducer,
@@ -41,6 +42,7 @@ export default combineReducers({
     [dashboardRecordsModule]: dashboardRecordsReducer,
     [scriptCommandsTimelineModule]: scriptCommandsTimelineReducer,
     [rightsModule]: rightsReducer,
+    [imagesModule]: imagesReducer,
     routing: routerReducer,
     form: formReducer,
 })

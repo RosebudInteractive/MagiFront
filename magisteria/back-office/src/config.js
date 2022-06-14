@@ -1,1 +1,2 @@
-export const appName = 'team-task'
+// eslint-disable-next-line import/prefer-default-export
+export const appName = 'team-task';

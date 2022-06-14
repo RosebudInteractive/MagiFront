@@ -2,7 +2,7 @@ import {appName} from "../config";
 import {Record} from "immutable";
 import {createSelector} from 'reselect'
 import {MESSAGE_TYPE} from "../constants/messages"
-import type {Message} from "../types/messages";
+// import type {Message} from "../types/messages";
 
 /**
  * Constants
@@ -76,7 +76,7 @@ export const showWarning = (message) => {
     return {type: SHOW_WARNING, payload: {type: MESSAGE_TYPE.WARNING, ...message}}
 };
 
-export const showUserConfirmation = (message: Message) => {
+export const showUserConfirmation = (message) => {
     return {type: SHOW_USER_CONFIRMATION, payload: {type: MESSAGE_TYPE.CONFIRMATION, ...message}}
 };
 
