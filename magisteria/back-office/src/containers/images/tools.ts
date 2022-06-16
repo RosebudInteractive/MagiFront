@@ -1,20 +1,37 @@
 import $ from 'jquery';
 import { stringToDirection, SortDirection } from '#src/constants/common';
 
+export type Filter = {
+  lessonId?: number;
+};
+
+export type Order = { field: string; direction: SortDirection };
+
 export type Params = {
-  lessonId?: string;
-  order?: { field: string; direction: SortDirection };
+  filter?: SearchFilter;
+  parsedFilter?: Filter;
+  order?: Order;
   pathname?: string;
 };
 
-export const parseParams = () => {
+export type SearchFilter = {
+  lessonId?: string | null;
+};
+
+const convertParam2Filter = ({ lessonId }: SearchFilter): Filter | null => {
+  if (!lessonId) return null;
+
+  const filter: Filter = {};
+  filter.lessonId = parseInt(lessonId, 10);
+
+  return filter;
+};
+
+export const parseParams = (): Params => {
   const paramsData: Params = {};
 
   const params = new URLSearchParams(window.location.search);
   const lessonId = params.get('lessonId');
-  if (lessonId) {
-    paramsData.lessonId = lessonId;
-  }
 
   const orderValue = params.get('order');
   if (orderValue) {
@@ -22,7 +39,12 @@ export const parseParams = () => {
     paramsData.order = { field: order[0], direction: stringToDirection(order[1]) };
   }
 
-  return paramsData; // || savedFilters.getFor(FILTER_KEY.TASKS);
+  const filter = convertParam2Filter({ lessonId });
+  if (filter) {
+    paramsData.parsedFilter = filter;
+  }
+
+  return paramsData;
 };
 
 export const resizeHandler = (rowCount: number) => {
@@ -44,4 +66,14 @@ export const resizeHandler = (rowCount: number) => {
       window.$$('images-grid').$setSize(width, gridHeight);
     }, 0);
   }
+};
+
+export const convertFilter2Params = (filter: Filter): SearchFilter => {
+  const data: SearchFilter = {};
+
+  if (filter) {
+    if (filter.lessonId) data.lessonId = filter.lessonId.toString();
+  }
+
+  return data;
 };

@@ -1,15 +1,17 @@
 import React, {
-  useCallback, useEffect, useLayoutEffect, useMemo, useState,
+  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Autocomplete } from '#src/components/ui-kit';
 import { lessonsSelector, getAllLessons } from '#src/ducks/dictionary';
-import { fetching, imagesSelector, getImages } from '#src/ducks/images';
-import { setInitState } from '#src/ducks/route';
+import { imagesSelector, getImages, fetchingSelector } from '#src/ducks/images';
+import { setInitState, applyFilter } from '#src/ducks/route';
 import { LessonDbInfo } from '#types/lessons';
-import { parseParams, resizeHandler } from '#src/containers/images/tools';
+import {
+  convertFilter2Params, Filter, Params, parseParams, resizeHandler,
+} from '#src/containers/images/tools';
 import { ImagesGrid } from '#src/components/images/grid';
 import './images.sass';
 import { ImageInfo } from '#types/images';
@@ -18,12 +20,14 @@ import { useWindowSize } from '#src/tools/window-resize-hook';
 
 const mapState = (state: any) => ({
   lessons: lessonsSelector(state),
-  fetching: fetching(state),
+  fetching: fetchingSelector(state),
   images: imagesSelector(state),
 });
 
 const mapDispatch = (dispatch: any) => ({
-  actions: bindActionCreators({ getAllLessons, getImages, setInitState }, dispatch),
+  actions: bindActionCreators({
+    getAllLessons, getImages, setInitState, applyFilter,
+  }, dispatch),
 });
 
 const connector = connect(mapState, mapDispatch);
@@ -32,10 +36,12 @@ type Props = ConnectedProps<typeof connector>;
 
 let imagesCount: number = 0;
 
-const Images = ({ lessons, images, actions }: Props) => {
-  const [lessonId, setLessonId] = useState<number | null>(null);
+const Images = ({
+  lessons, images, fetching, actions,
+}: Props) => {
   const [visibleImage, setVisibleImage] = useState<ImageInfo | null>(null);
   const location = useLocation();
+  const filter = useRef<Filter | null>(null);
 
   useWindowSize(() => {
     resizeHandler(imagesCount);
@@ -46,19 +52,21 @@ const Images = ({ lessons, images, actions }: Props) => {
     resizeHandler(imagesCount);
   }, [images]);
 
-  useEffect(() => {
-    if (lessonId) actions.getImages({ lessonId });
-  }, [lessonId]);
+  // useEffect(() => {
+  //   if (lessonId) actions.getImages({ lessonId });
+  // }, [lessonId]);
 
   const handleLessonChange = (id: number | null) => {
-    setLessonId(id);
+    filter.current = { ...filter.current, lessonId: id || undefined };
+    actions.applyFilter(convertFilter2Params(filter.current));
+    // setLessonId(id);
   };
 
   const options = useMemo(() => lessons
       && lessons.map((item: LessonDbInfo) => ({ id: item.Id, name: item.Name })), [lessons]);
 
   useEffect(() => {
-    const initState = parseParams();
+    const initState: Params = parseParams();
 
     // if (!isMounted.current && (Object.keys(initState).length === 0)) {
     //   initState = savedFilters.getFor(FILTER_KEY.PROCESSES);
@@ -76,12 +84,12 @@ const Images = ({ lessons, images, actions }: Props) => {
     //     _grid.markSorting(_sortRef.current.field, _sortRef.current.direction);
     //   }
     // }
-    // if (initState.filter) {
-    //   filter.current = initState.filter;
-    //   initState.filter = convertFilter2Params(initState.filter);
-    // } else {
-    //   filter.current = null;
-    // }
+    if (initState.parsedFilter) {
+      filter.current = initState.parsedFilter;
+      initState.filter = convertFilter2Params(initState.parsedFilter);
+    } else {
+      filter.current = null;
+    }
 
     initState.pathname = location.pathname;
 
@@ -89,7 +97,9 @@ const Images = ({ lessons, images, actions }: Props) => {
 
     if (!fetching) {
       actions.getAllLessons();
-      if (lessonId) actions.getImages({ lessonId });
+      if (filter.current && filter.current.lessonId) {
+        actions.getImages({ lessonId: filter.current.lessonId });
+      }
     }
   }, [location]);
 
@@ -97,6 +107,8 @@ const Images = ({ lessons, images, actions }: Props) => {
     [visibleImage]);
 
   const handleCloseImageView = useCallback(() => { setVisibleImage(null); }, [visibleImage]);
+
+  const lessonId = filter.current && filter.current.lessonId;
 
   return (
     <div className="images-page form _scrollable-y">

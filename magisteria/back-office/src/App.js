@@ -24,7 +24,7 @@ import {fetchingSelector as processFetching} from "tt-ducks/process";
 import {fetchingSelector as processesFetching} from "tt-ducks/processes";
 import {fetchingSelector as appFetching, getAppOptions} from "tt-ducks/app";
 import {fetchingSelector as notificationsFetching, getNotifications, getOnlyUnread} from "tt-ducks/notifications";
-import { fetching as imagesFetching } from '#src/ducks/images';
+import { fetchingSelector as imagesFetching } from '#src/ducks/images';
 import LoadingPage from "./components/loading-page";
 import ReduxModalDialog from "./components/messages/modal-dialog/redux-modal-dialog";
 import {dictionaryFetching, getAllDictionaryData} from "tt-ducks/dictionary";

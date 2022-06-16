@@ -37,16 +37,14 @@ export default function reducer(state = initialState, action) {
 }
 /**
  * Selectors
- * */ const stateSelector = (state) => state[moduleName];
-export const fetching = createSelector(stateSelector, (state) => state.fetching);
+ * */
+const stateSelector = (state) => state[moduleName];
+export const fetchingSelector = createSelector(stateSelector, (state) => state.fetching);
 export const imagesSelector = createSelector(stateSelector, (state) => state.images);
-export const getImages = (options) => {
-    console.log(options);
-    return {
-        type: GET_IMAGES_REQUEST,
-        payload: options,
-    };
-};
+export const getImages = (options) => ({
+    type: GET_IMAGES_REQUEST,
+    payload: options,
+});
 /**
  * Sagas
  */
@@ -55,7 +53,6 @@ function* getImagesSaga({ payload }) {
     try {
         // const dbImages: Array<ImageDbInfo> =
         // yield call(commonGetQuery, `/api/pm/pictures?lessonId=${payload?.lessonId}`);
-        console.log('getImagesSaga');
         const dbImages = yield call(commonGetQuery, `/api/pm/pictures?lessonId=${payload.lessonId}`);
         yield put({ type: GET_IMAGES_SUCCESS, payload: convertDbImageInfo(dbImages) });
         yield put({ type: STOP_FETCHING });

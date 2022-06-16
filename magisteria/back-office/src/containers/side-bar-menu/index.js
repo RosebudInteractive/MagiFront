@@ -22,6 +22,7 @@ function SideBarMenu(props) {
     const {hasAdminRights, hasSupervisorRights, sideBarMenuVisible, unreadNotificationsCount, newNotifsCount, permissions} = props
 
     const hasDashboardAccess = useMemo(() => permissions.dsb && permissions.dsb.al, [permissions])
+    const hasImagesAccess = useMemo(() => permissions.pic && permissions.pic.al, [permissions])
 
     return <nav className={"tt-main-area__side-bar-menu" + (sideBarMenuVisible ? "" : " _hidden")}>
         <div className="side-bar-menu__logo">
@@ -52,8 +53,9 @@ function SideBarMenu(props) {
             <MenuLink Icon={PublishPlanIco} url={"/dashboard-records"}
                       title={'План публикаций'}/>
         }
-        <MenuLink Icon={ImageIco} url={"/images"} stroke={true}
-                  title={'Изображения'}/>
+        {hasImagesAccess && <MenuLink Icon={ImageIco} url={"/images"} stroke={true}
+                                      title={'Изображения'}/>
+        }
     </nav>
 }
 

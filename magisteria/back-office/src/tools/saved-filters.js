@@ -1,7 +1,8 @@
 export const FILTER_KEY = {
     TASKS: "tasks",
     PROCESSES: "processes",
-    DASHBOARD_PUBLISHED: "dashboard-published"
+    DASHBOARD_PUBLISHED: "dashboard-published",
+    IMAGES: "images",
 }
 
 const LOCAL_STORAGE_KEY = "TM_FILTERS"

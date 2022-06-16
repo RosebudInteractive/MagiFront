@@ -33,6 +33,7 @@ export default function AppRouter(props: RouterProps) {
     const isAdmin = (userRole === USER_ROLE.ADMIN);
 
     const hasDashboardAccess = useMemo(() => permissions.dsb && permissions.dsb.al, [permissions])
+    const hasImagesAccess = useMemo(() => permissions.pic && permissions.pic.al, [permissions])
 
     return <Switch>
         <Route exact path={'/tasks'} component={Tasks}/>
@@ -68,6 +69,6 @@ export default function AppRouter(props: RouterProps) {
             }
 
         }}/>
-        <Route path={'/images'} component={Images}/>
+        <Route path={'/images'} render={() => {return hasImagesAccess ? <Images/> : <AccessDeniedPlaceholder/>}}/>
     </Switch>
 }
