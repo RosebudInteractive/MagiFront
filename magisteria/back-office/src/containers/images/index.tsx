@@ -6,7 +6,9 @@ import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Autocomplete } from '#src/components/ui-kit';
 import { lessonsSelector, getAllLessons } from '#src/ducks/dictionary';
-import { imagesSelector, getImages, fetchingSelector } from '#src/ducks/images';
+import {
+  imagesSelector, getImages, clearImages, fetchingSelector,
+} from '#src/ducks/images';
 import { setInitState, applyFilter } from '#src/ducks/route';
 import { LessonDbInfo } from '#types/lessons';
 import {
@@ -17,6 +19,7 @@ import './images.sass';
 import { ImageInfo } from '#types/images';
 import { ImageView } from '#src/components/images/image-view';
 import { useWindowSize } from '#src/tools/window-resize-hook';
+import { ImageEditor } from '#src/components/images/image-editor';
 
 const mapState = (state: any) => ({
   lessons: lessonsSelector(state),
@@ -26,7 +29,7 @@ const mapState = (state: any) => ({
 
 const mapDispatch = (dispatch: any) => ({
   actions: bindActionCreators({
-    getAllLessons, getImages, setInitState, applyFilter,
+    getAllLessons, getImages, setInitState, applyFilter, clearImages,
   }, dispatch),
 });
 
@@ -40,6 +43,8 @@ const Images = ({
   lessons, images, fetching, actions,
 }: Props) => {
   const [visibleImage, setVisibleImage] = useState<ImageInfo | null>(null);
+  const [showEditor, setShowEditor] = useState<boolean>(false);
+  const [currentImage, setCurrentImage] = useState<ImageInfo | null>(null);
   const location = useLocation();
   const filter = useRef<Filter | null>(null);
 
@@ -52,14 +57,9 @@ const Images = ({
     resizeHandler(imagesCount);
   }, [images]);
 
-  // useEffect(() => {
-  //   if (lessonId) actions.getImages({ lessonId });
-  // }, [lessonId]);
-
   const handleLessonChange = (id: number | null) => {
     filter.current = { ...filter.current, lessonId: id || undefined };
     actions.applyFilter(convertFilter2Params(filter.current));
-    // setLessonId(id);
   };
 
   const options = useMemo(() => lessons
@@ -68,22 +68,6 @@ const Images = ({
   useEffect(() => {
     const initState: Params = parseParams();
 
-    // if (!isMounted.current && (Object.keys(initState).length === 0)) {
-    //   initState = savedFilters.getFor(FILTER_KEY.PROCESSES);
-    //   initState.replacePath = true;
-    // } else {
-    //   savedFilters.setFor(FILTER_KEY.PROCESSES, { ...initState });
-    // }
-    //
-    // isMounted.current = true;
-
-    // if (initState.order) {
-    //   _sortRef.current = initState.order;
-    //   const _grid = window.webix.$$('processes-grid');
-    //   if (_grid) {
-    //     _grid.markSorting(_sortRef.current.field, _sortRef.current.direction);
-    //   }
-    // }
     if (initState.parsedFilter) {
       filter.current = initState.parsedFilter;
       initState.filter = convertFilter2Params(initState.parsedFilter);
@@ -99,6 +83,8 @@ const Images = ({
       actions.getAllLessons();
       if (filter.current && filter.current.lessonId) {
         actions.getImages({ lessonId: filter.current.lessonId });
+      } else {
+        actions.clearImages();
       }
     }
   }, [location]);
@@ -110,14 +96,27 @@ const Images = ({
 
   const lessonId = filter.current && filter.current.lessonId;
 
+  const editImage = (data: ImageInfo) => {
+    setCurrentImage(data);
+    setShowEditor(true);
+  };
+
+  const handleCloseEditor = () => {
+    setCurrentImage(null);
+    setShowEditor(false);
+  };
+
   return (
     <div className="images-page form _scrollable-y">
       <h5 className="form-header _grey70">Изображения</h5>
       <Autocomplete options={options} label="Лекция" input={{ value: lessonId, onChange: handleLessonChange }} />
       <div className="images-page__grid-container">
-        { images ? <ImagesGrid data={images} onImageClick={handleImageClick} />
+        { images
+          ? <ImagesGrid data={images} onImageClick={handleImageClick} onDoubleClick={editImage} />
           : <div className="images-page__placeholder">Выберите лекцию</div> }
         { visibleImage && <ImageView image={visibleImage} onClose={handleCloseImageView} /> }
+        { showEditor && currentImage
+            && <ImageEditor image={currentImage} onClose={handleCloseEditor} />}
       </div>
     </div>
   );

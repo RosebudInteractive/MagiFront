@@ -15,6 +15,8 @@ const STOP_FETCHING = `${prefix}/STOP_FETCHING`;
 const GET_IMAGES_REQUEST = `${prefix}/GET_IMAGES_REQUEST`;
 const GET_IMAGES_SUCCESS = `${prefix}/GET_IMAGES_SUCCESS`;
 const GET_IMAGES_FAIL = `${prefix}/GET_IMAGES_FAIL`;
+const CLEAR_IMAGES_REQUEST = `${prefix}/CLEAR_IMAGES_REQUEST`;
+const CLEAR_IMAGES = `${prefix}/CLEAR_IMAGES`;
 export const initialState = {
     fetching: false,
     images: null,
@@ -31,6 +33,8 @@ export default function reducer(state = initialState, action) {
             return { ...state, images: payload };
         case GET_IMAGES_FAIL:
             return { ...state, images: null };
+        case CLEAR_IMAGES:
+            return { ...state, images: null };
         default:
             return state;
     }
@@ -44,6 +48,9 @@ export const imagesSelector = createSelector(stateSelector, (state) => state.ima
 export const getImages = (options) => ({
     type: GET_IMAGES_REQUEST,
     payload: options,
+});
+export const clearImages = () => ({
+    type: CLEAR_IMAGES_REQUEST,
 });
 /**
  * Sagas
@@ -62,9 +69,13 @@ function* getImagesSaga({ payload }) {
         yield put(showError({ content: e.message }));
     }
 }
+function* clearImagesSaga() {
+    yield put({ type: CLEAR_IMAGES });
+}
 // eslint-disable-next-line func-names
 export const saga = function* () {
     yield all([
         takeEvery(GET_IMAGES_REQUEST, getImagesSaga),
+        takeEvery(CLEAR_IMAGES_REQUEST, clearImagesSaga),
     ]);
 };

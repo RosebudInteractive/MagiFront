@@ -1,0 +1,50 @@
+@import "#src/assets/styles/colors"
+
+.image-editor
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  display: flex
+  z-index: 10
+  background-color: $color-main-light
+  padding: 24px
+  box-sizing: border-box
+  box-shadow: 0 2px 10px rgba(41, 42, 49, 0.12)
+  border-radius: 8px
+  height: 90vh
+  width: 90vw
+  flex-direction: column
+
+  .open-form-button._grey
+    svg *[fill^='#']
+      fill: $grey60 !important
+
+.image-editor__controls
+  display: flex
+  flex-direction: row
+
+.image-editor__data
+  display: flex
+  flex-direction: row
+  flex: 1 0 auto
+  column-gap: 16px
+
+.image-editor__img
+  flex: 1 0 40%
+  max-width: 40%
+  display: flex
+
+  img
+    object-fit: contain
+    width: -webkit-fill-available
+    height: -webkit-fill-available
+
+.image-editor__pane
+  display: flex
+  flex-direction: column
+  flex: 1 0 auto
+  row-gap: 24px
+
+  .input-field
+    width: 100%

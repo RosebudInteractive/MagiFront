@@ -23,6 +23,9 @@ const GET_IMAGES_REQUEST = `${prefix}/GET_IMAGES_REQUEST`;
 const GET_IMAGES_SUCCESS = `${prefix}/GET_IMAGES_SUCCESS`;
 const GET_IMAGES_FAIL = `${prefix}/GET_IMAGES_FAIL`;
 
+const CLEAR_IMAGES_REQUEST = `${prefix}/CLEAR_IMAGES_REQUEST`;
+const CLEAR_IMAGES = `${prefix}/CLEAR_IMAGES`;
+
 /**
  * Reducer
  * */
@@ -54,6 +57,9 @@ export default function reducer(state = initialState, action: AnyAction) {
     case GET_IMAGES_FAIL:
       return { ...state, images: null };
 
+    case CLEAR_IMAGES:
+      return { ...state, images: null };
+
     default:
       return state;
   }
@@ -76,6 +82,10 @@ export const getImages = (options: QueryOptionsType) => ({
   payload: options,
 });
 
+export const clearImages = () => ({
+  type: CLEAR_IMAGES_REQUEST,
+});
+
 /**
  * Sagas
  */
@@ -93,9 +103,14 @@ function* getImagesSaga({ payload }: any) {
   }
 }
 
+function* clearImagesSaga() {
+  yield put({ type: CLEAR_IMAGES });
+}
+
 // eslint-disable-next-line func-names
 export const saga = function* () {
   yield all([
     takeEvery(GET_IMAGES_REQUEST, getImagesSaga),
+    takeEvery(CLEAR_IMAGES_REQUEST, clearImagesSaga),
   ]);
 };

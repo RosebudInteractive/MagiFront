@@ -3,7 +3,7 @@ import React from 'react';
 import { ReactComponent as PlusIco } from '#src/assets/svg/plus.svg';
 import Webix from '#src/components/Webix';
 import './grid.sass';
-export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
+export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }) => {
     const GRID_CONFIG = {
         view: 'datatable',
         id: 'images-grid',
@@ -34,7 +34,7 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
                 },
             },
             { id: 'name', header: 'Название', fillspace: 25 },
-            { id: 'description', header: 'Описание', fillspace: 25 },
+            { id: 'authorText', header: 'Автор', fillspace: 25 },
             {
                 id: 'isNew',
                 header: 'Новый',
@@ -76,7 +76,7 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
             },
             {
                 id: 'linkTypeId',
-                header: 'Связь',
+                header: 'тип связи',
                 format: (value) => {
                     switch (value) {
                         case 3: return 'И';
@@ -87,15 +87,23 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
                 css: '_container',
                 minWidth: 50,
                 fillspace: 9,
-                // template(obj: ImageInfo) {
-                //   return `<div class='${'check-box-block'} ${obj.showInGallery ? 'checked' : ''}'>
-                //                 <div class=${obj.showInGallery ? 'check-mark' : ''}></div>
-                //                 </div>`;
-                // },
+                template(obj) {
+                    switch (obj.linkTypeId) {
+                        case 3: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
+                            <div class="cell-with-tooltip__text _illustrative">И</div>
+                            <div class="cell-with-tooltip__tooltip">Иллюстративная</div>
+                        </div>`;
+                        case 4: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
+                            <div class="cell-with-tooltip__text _associative">А</div>
+                            <div class="cell-with-tooltip__tooltip">Ассоциативная</div>
+                        </div>`;
+                        default: return '';
+                    }
+                },
             },
             {
                 id: 'status',
-                header: 'Статус',
+                header: 'модерация',
                 format: (value) => {
                     switch (value) {
                         case 3: return 'И';
@@ -113,9 +121,9 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
                 // },
             },
             {
-                id: 'TimeCr',
+                id: 'timeCr',
                 header: 'СОЗДАНО',
-                fillspace: 7,
+                fillspace: 8,
                 format(value) {
                     const fn = window.webix.Date.dateToStr('%d.%m.%Y', false);
                     return value ? fn(new Date(value)) : '';
@@ -148,11 +156,18 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }) => {
             // },
         ],
         on: {
-            onItemClick: function (rowData) {
+            onItemClick(rowData) {
                 if (rowData.column === 'image' && onImageClick) {
+                    // eslint-disable-next-line react/no-this-in-sfc
                     const item = this.getItem(rowData.row);
                     onImageClick(item);
                 }
+            },
+            onItemDblClick(uid) {
+                // eslint-disable-next-line react/no-this-in-sfc
+                const item = this.getItem(uid);
+                if (onDoubleClick)
+                    onDoubleClick(item);
             },
         },
     };

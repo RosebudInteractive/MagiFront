@@ -107,6 +107,7 @@
     "react-dom": "^17.0.2",
     "react-final-form": "^6.5.3",
     "react-google-invisible-recaptcha": "^0.2.11",
+    "react-hook-form": "^7.32.2",
     "react-icons": "^2.2.7",
     "react-input-mask": "^2.0.4",
     "react-meta-tags": "^0.7.1",

@@ -20,4 +20,5 @@ export const convertDbImageInfo = (records: Array<ImageDbInfo>): Array<ImageInfo
   status: rec.Status,
   isNew: rec.IsNew,
   linkTypeId: rec.LinkTypeId,
+  timeCr: rec.TimeCr,
 }));

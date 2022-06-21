@@ -18,4 +18,5 @@ export const convertDbImageInfo = (records) => records.map((rec) => ({
     status: rec.Status,
     isNew: rec.IsNew,
     linkTypeId: rec.LinkTypeId,
+    timeCr: rec.TimeCr,
 }));

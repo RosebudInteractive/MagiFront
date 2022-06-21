@@ -12,10 +12,10 @@ export interface ImagesGridProps {
   onEdit?: () => void;
   onDelete?: (id: number) => void;
   onImageClick?: (metaData: ImageInfo) => void;
+  onDoubleClick?: (metaData: ImageInfo) => void;
 }
 
-export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) => {
-
+export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: ImagesGridProps) => {
   const GRID_CONFIG: ui.datatableConfig = {
     view: 'datatable',
     id: 'images-grid',
@@ -47,7 +47,7 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) 
         },
       },
       { id: 'name', header: 'Название', fillspace: 25 },
-      { id: 'description', header: 'Описание', fillspace: 25 },
+      { id: 'authorText', header: 'Автор', fillspace: 25 },
       {
         id: 'isNew',
         header: 'Новый',
@@ -89,7 +89,7 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) 
       },
       {
         id: 'linkTypeId',
-        header: 'Связь',
+        header: 'тип связи',
         format: (value: number) => {
           switch (value) {
             case 3: return 'И';
@@ -100,15 +100,23 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) 
         css: '_container',
         minWidth: 50,
         fillspace: 9,
-        // template(obj: ImageInfo) {
-        //   return `<div class='${'check-box-block'} ${obj.showInGallery ? 'checked' : ''}'>
-        //                 <div class=${obj.showInGallery ? 'check-mark' : ''}></div>
-        //                 </div>`;
-        // },
+        template(obj: ImageInfo) {
+          switch (obj.linkTypeId) {
+            case 3: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
+                            <div class="cell-with-tooltip__text _illustrative">И</div>
+                            <div class="cell-with-tooltip__tooltip">Иллюстративная</div>
+                        </div>`;
+            case 4: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
+                            <div class="cell-with-tooltip__text _associative">А</div>
+                            <div class="cell-with-tooltip__tooltip">Ассоциативная</div>
+                        </div>`;
+            default: return '';
+          }
+        },
       },
       {
         id: 'status',
-        header: 'Статус',
+        header: 'модерация',
         format: (value: number) => {
           switch (value) {
             case 3: return 'И';
@@ -126,9 +134,9 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) 
         // },
       },
       {
-        id: 'TimeCr',
+        id: 'timeCr',
         header: 'СОЗДАНО',
-        fillspace: 7,
+        fillspace: 8,
         format(value: string) {
           const fn = window.webix.Date.dateToStr('%d.%m.%Y', false);
           return value ? fn(new Date(value)) : '';
@@ -161,11 +169,18 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick }: ImagesGridProps) 
       // },
     ],
     on: {
-      onItemClick: function (rowData: { row: number; column: string }) {
+      onItemClick(rowData: { row: number; column: string }) {
         if (rowData.column === 'image' && onImageClick) {
+          // eslint-disable-next-line react/no-this-in-sfc
           const item: ImageInfo = this.getItem(rowData.row);
           onImageClick(item);
         }
+      },
+      onItemDblClick(uid: string) {
+        // eslint-disable-next-line react/no-this-in-sfc
+        const item: ImageInfo = this.getItem(uid);
+
+        if (onDoubleClick) onDoubleClick(item);
       },
     },
   };

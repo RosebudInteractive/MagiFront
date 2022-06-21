@@ -16,7 +16,8 @@ export type ImageDbInfo = {
   IsFragment: boolean,
   Status: number,
   IsNew: boolean,
-  LinkTypeId: number | null
+  LinkTypeId: number | null,
+  TimeCr: string,
 };
 
 export type MetaData = {
@@ -55,5 +56,6 @@ export type ImageInfo = {
   isFragment: boolean,
   status: number,
   isNew: boolean,
-  linkTypeId: number | null
+  linkTypeId: number | null,
+  timeCr: string,
 };

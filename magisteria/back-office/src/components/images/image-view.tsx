@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import './image-view.sass';
 import type { ImageInfo } from '#types/images';
 import { useWindowSize } from '#src/tools/window-resize-hook';
@@ -53,6 +53,27 @@ export const ImageView = ({ image, onClose } : ImageViewProps) => {
     setLoaded(true);
     resizeHandler();
   };
+
+  useLayoutEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.code === 'Escape') {
+        onClose();
+      }
+    }
+
+    function onClick(e: MouseEvent) {
+      // @ts-ignore
+      if (e.target && !e.target.closest('.image-view__dialog')) onClose();
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('mouseup', onClick);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mouseup', onClick);
+    };
+  }, []);
 
   return (
     <div className={`image-view__dialog ${!loaded ? '_loading' : ''}`}>
