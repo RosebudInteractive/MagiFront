@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react';
 import './image-editor.sass';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import type { ImageInfo } from '#types/images';
 // import { TextBox } from '#src/components/ui-kit';
 import PlusIco from '#src/assets/svg/plus.svg';
@@ -8,7 +8,7 @@ import Forward from '#src/assets/svg/link-arrow-add.svg';
 import Backward from '#src/assets/svg/link-arrow-del.svg';
 import Apply from '#src/assets/svg/edit-apply.svg';
 import Rollback from '#src/assets/svg/edit-cancel.svg';
-import { TextBox } from '#src/components/ui-kit';
+import { RadioButtonsGroup, TextBox } from '#src/components/ui-kit-2';
 
 export interface ImageViewProps {
   image: ImageInfo,
@@ -16,7 +16,7 @@ export interface ImageViewProps {
 }
 
 export const ImageEditor = ({ image, onClose } : ImageViewProps) => {
-  const { register, handleSubmit } = useForm<ImageInfo>();
+  const { control, handleSubmit } = useForm<ImageInfo>({ defaultValues: image });
   const onSubmit: SubmitHandler<ImageInfo> = (data) => console.log(data);
 
   // const ref = useRef<HTMLImageElement | null>(null);
@@ -31,17 +31,10 @@ export const ImageEditor = ({ image, onClose } : ImageViewProps) => {
       }
     }
 
-    function onClick(e: MouseEvent) {
-      // @ts-ignore
-      if (e.target && !e.target.closest('.image-view__dialog')) onClose();
-    }
-
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('mouseup', onClick);
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('mouseup', onClick);
     };
   }, []);
 
@@ -63,10 +56,10 @@ export const ImageEditor = ({ image, onClose } : ImageViewProps) => {
         <button type="button" className="open-form-button _grey" onClick={handleForwardClick}>
           <Forward />
         </button>
-        <button type="button" className="open-form-button" onClick={handleForwardClick}>
+        <button type="submit" className="open-form-button">
           <Apply />
         </button>
-        <button type="button" className="open-form-button" onClick={handleForwardClick}>
+        <button type="reset" className="open-form-button">
           <Rollback />
         </button>
       </div>
@@ -77,14 +70,65 @@ export const ImageEditor = ({ image, onClose } : ImageViewProps) => {
             alt={image.description}
           />
         </div>
-        <div className="image-editor__pane">
-
-          <TextBox label="Название" multiline={true} />
-          <TextBox label="Описание" multiline={true} />
-          <TextBox label="Доп.атрибуты" multiline={true} />
-          <TextBox label="Артефакты" multiline={true} />
-          <TextBox label="Автор" multiline={true} />
-
+        <div className="image-editor__pane _with-custom-scroll">
+          <div className="image-editor__pane-wrapper">
+            <Controller
+              name="name"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Название" multiline {...field} />}
+            />
+            <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Описание" multiline {...field} />}
+            />
+            <Controller
+              name="altAttribute"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Доп.атрибуты" multiline {...field} />}
+            />
+            <Controller
+              name="artifactText"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Артефакты" multiline {...field} />}
+            />
+            <Controller
+              name="authorText"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Автор" multiline {...field} />}
+            />
+            <Controller
+              name="museumText"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Музей" multiline {...field} />}
+            />
+            <Controller
+              name="descriptor"
+              control={control}
+              defaultValue=""
+              render={({ field }) => <TextBox label="Дескриптор" multiline {...field} />}
+            />
+            <Controller
+              name="linkTypeId"
+              control={control}
+              render={({ field }) => (
+                <RadioButtonsGroup
+                  label="Тип связи"
+                  options={[
+                    { value: '3', label: 'Иллюстративная' },
+                    { value: '4', label: 'Ассоциативная' },
+                  ]}
+                  {...field}
+                />
+              )}
+            />
+          </div>
         </div>
         <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>
       </div>

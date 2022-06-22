@@ -29,11 +29,13 @@
   flex-direction: row
   flex: 1 0 auto
   column-gap: 16px
+  max-height: calc(100% - 48px)
 
 .image-editor__img
   flex: 1 0 40%
   max-width: 40%
   display: flex
+  background-color: $grey20
 
   img
     object-fit: contain
@@ -41,10 +43,16 @@
     height: -webkit-fill-available
 
 .image-editor__pane
+  overflow-y: auto
+  flex: 1 0 auto
+
+
+.image-editor__pane-wrapper
   display: flex
   flex-direction: column
   flex: 1 0 auto
   row-gap: 24px
+  padding-right: 8px
 
   .input-field
     width: 100%
