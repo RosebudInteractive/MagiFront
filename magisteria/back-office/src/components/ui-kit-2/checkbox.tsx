@@ -1,11 +1,26 @@
-import React, { forwardRef } from 'react';
-import { TextField, withStyles } from '@material-ui/core';
-import type { StandardTextFieldProps } from '@material-ui/core/TextField/TextField';
+import React from 'react';
+import {
+  FormControlLabel, Checkbox, withStyles,
+} from '@material-ui/core';
+import type { CheckboxProps } from '@material-ui/core/Checkbox/Checkbox';
 
-const CssTextField = withStyles({
+export interface UiCheckBoxProps extends CheckboxProps {
+  label?: string;
+}
+
+const CssFormControlLabel = withStyles({
   root: {
+    '& .MuiCheckbox-colorSecondary.Mui-checked': {
+      color: '#5A5B6A',
+    },
+    '& .MuiIconButton-root:hover': {
+      background: 'none',
+    },
+    '& .MuiCheckbox-colorSecondary.Mui-checked:hover': {
+      background: 'none',
+    },
     minHeight: '48px',
-    '& label': {
+    '& .MuiTypography-body1': {
       'font-family': 'Inter',
       'font-size': '13px',
       'font-style': 'normal',
@@ -15,12 +30,11 @@ const CssTextField = withStyles({
       'text-align': 'left',
       '&.MuiFormLabel-root.Mui-focused': {
         color: '#C8684C',
-        // "color": "#19191D"
       },
     },
-    // '& label[data-shrink="true"]': {
-    //     // display: "none"
-    // },
+    '& label[data-shrink="true"]': {
+      // display: "none"
+    },
     '& .MuiInputLabel-outlined': {
       transform: 'translate(16px, 14px) scale(1)',
       '&.MuiInputLabel-shrink': {
@@ -48,8 +62,6 @@ const CssTextField = withStyles({
       },
       '&.Mui-focused': {
         border: '1px solid #C8684C',
-        // color: "#C8684C"
-        color: '#19191D',
       },
       '&.Mui-disabled': {
         backgroundColor: '#F8F8F8',
@@ -87,42 +99,22 @@ const CssTextField = withStyles({
       },
       '&.Mui-focused input': {
         border: '1px solid #C8684C',
-        // color: "#C8684C"
-        color: '#19191D',
       },
       '&.Mui-disabled input': {
         backgroundColor: '#F8F8F8',
         color: '#9696A0',
       },
-      '& p.MuiFormHelperText-contained.Mui-error.MuiFormHelperText-filled': {
-        backgroundColor: 'green',
-        position: 'fixed !important',
-        top: '45px !important',
-      },
-    },
-    '& p': {
-      position: 'absolute',
-      top: '45px',
     },
   },
-})(TextField) as typeof TextField;
+})(FormControlLabel);
 
-export interface TextBoxProps extends StandardTextFieldProps {
-  extClass?: string;
-}
-
-export const TextBox = forwardRef(({ extClass, error, ...props }: TextBoxProps, ref) => {
-  const className = extClass ? `input-field ${extClass}` : 'input-field';
+export const UiCheckbox = ({ value, label = '', ...props }: UiCheckBoxProps) => {
+  const inputValue = !!value;
 
   return (
-    <CssTextField
-      {...props}
-      error={error}
-      variant="outlined"
-      autoComplete="off"
-      className={className}
-      // @ts-ignore
-      ref={ref}
+    <CssFormControlLabel
+      control={<Checkbox checked={inputValue} {...props} />}
+      label={label}
     />
   );
-});
+}

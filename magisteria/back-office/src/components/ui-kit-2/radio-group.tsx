@@ -3,10 +3,11 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import type { RadioGroupProps } from '@material-ui/core/RadioGroup/RadioGroup';
-import { FormLabel, styled, withStyles } from '@material-ui/core';
+import { FormLabel, styled } from '@material-ui/core';
 
 export interface RadioButtonsGroupProps extends RadioGroupProps {
   label?: string;
+  disabled?: boolean;
   options: Array<{ value: string | number, label: string }>;
 }
 
@@ -27,17 +28,26 @@ const RadioLabel = styled(FormControlLabel)({
 }) as typeof FormControlLabel;
 
 const StyledRadio = styled(Radio)({
-
+  '&.Mui-checked': {
+    color: '#C8684C',
+  },
 }) as typeof Radio;
 
 export const RadioButtonsGroup = forwardRef(({
   label = '',
+  disabled = false,
   options,
   ...props
 }: RadioButtonsGroupProps,
 ref) => {
   const renderOptions = useMemo(() => options.map((item) => (
-    <RadioLabel value={item.value} control={<StyledRadio />} label={item.label} key={item.value} />
+    <RadioLabel
+      value={item.value}
+      disabled={disabled}
+      control={<StyledRadio />}
+      label={item.label}
+      key={item.value}
+    />
   )), [options]);
 
   return (

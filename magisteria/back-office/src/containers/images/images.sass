@@ -1,3 +1,5 @@
+@import "#src/assets/styles/colors.sass"
+
 .images-page
   position: relative
   display: flex
@@ -7,7 +9,6 @@
     min-height: calc(100vh - 64px)
 
 .images-page__grid-container
-  padding-top: 32px
   flex: 1 0 auto
   display: flex
 
@@ -18,3 +19,17 @@
   flex: 1 0 auto
   font-size: 24px
   font-weight: bolder
+
+.images-page__filter-pane
+  margin-bottom: 24px
+
+.images-page__lamp
+  position: absolute
+  top: 24px
+  right: 24px
+  &.green
+    svg
+      fill: $green
+  &.red
+    svg
+      fill: $red

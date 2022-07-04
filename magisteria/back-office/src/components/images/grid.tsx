@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ui } from 'webix';
-// import { GRID_SORT_DIRECTION } from '#src/constants/common';
-import { ReactComponent as PlusIco } from '#src/assets/svg/plus.svg';
 import type { ImageInfo } from '#types/images';
 import Webix from '#src/components/Webix';
 import './grid.sass';
 
 export interface ImagesGridProps {
+  id?: string;
+  absolutePath?: boolean;
   data: Array<ImageInfo> | null;
-  onAdd?: () => void;
-  onEdit?: () => void;
+  selected?: number | string | null;
   onDelete?: (id: number) => void;
   onImageClick?: (metaData: ImageInfo) => void;
   onDoubleClick?: (metaData: ImageInfo) => void;
 }
 
-export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: ImagesGridProps) => {
+export const ImagesGrid = ({
+  id, data = [], onDelete, onImageClick, onDoubleClick, selected, absolutePath = false,
+}: ImagesGridProps) => {
+  const gridId = `images-grid${id ? ` ${id}` : ''}`;
+
   const GRID_CONFIG: ui.datatableConfig = {
     view: 'datatable',
-    id: 'images-grid',
+    id: gridId,
     css: 'tt-grid',
     hover: 'row-hover',
     scroll: 'none',
@@ -42,17 +45,18 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
               || obj.metaData.content.l
               || null;
 
-          const file = path ? obj.metaData.path + path : obj.fileName;
-          return `<img class="image-cell ${horizontal ? ' _horizontal' : ' _vertical'}" src='/data/${file}'/>`;
+          const prefix = absolutePath ? '' : obj.metaData.path;
+          const file = path ? prefix + path : obj.fileName;
+          const src = absolutePath ? file : `/data/${file}`;
+          return `<img class="image-cell ${horizontal ? ' _horizontal' : ' _vertical'}" src='${src}'/>`;
         },
       },
       { id: 'name', header: 'Название', fillspace: 25 },
       { id: 'authorText', header: 'Автор', fillspace: 25 },
       {
         id: 'isNew',
-        header: 'Новый',
-        // format: (value) => {return value ? 'Да' : 'Нет'},
-        css: '_container',
+        header: { text: 'Новый', css: { 'text-align': 'center' } },
+        css: 'center-align-column',
         minWidth: 50,
         fillspace: 7,
         template(obj: ImageInfo) {
@@ -63,9 +67,8 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
       },
       {
         id: 'isFragment',
-        header: 'Фрагмент',
-        // format: (value) => {return value ? 'Да' : 'Нет'},
-        css: '_container',
+        header: { text: 'Фрагмент', css: { 'text-align': 'center' } },
+        css: 'center-align-column',
         minWidth: 50,
         fillspace: 7,
         template(obj: ImageInfo) {
@@ -76,9 +79,8 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
       },
       {
         id: 'showInGallery',
-        header: 'В галерее',
-        // format: (value) => {return value ? 'Да' : 'Нет'},
-        css: '_container',
+        header: { text: 'В галерее', css: { 'text-align': 'center' } },
+        css: 'center-align-column',
         minWidth: 50,
         fillspace: 9,
         template(obj: ImageInfo) {
@@ -90,26 +92,23 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
       {
         id: 'linkTypeId',
         header: 'тип связи',
-        format: (value: number) => {
-          switch (value) {
-            case 3: return 'И';
-            case 4: return 'А';
-            default: return '';
-          }
-        },
-        css: '_container',
+        css: 'column-with-tooltip',
         minWidth: 50,
-        fillspace: 9,
+        fillspace: 8,
         template(obj: ImageInfo) {
           switch (obj.linkTypeId) {
-            case 3: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
-                            <div class="cell-with-tooltip__text _illustrative">И</div>
-                            <div class="cell-with-tooltip__tooltip">Иллюстративная</div>
-                        </div>`;
-            case 4: return `<div class="cell-with-tooltip" style="height: 100%;width: -webkit-fill-available; justify-content: center;align-items: center;display: flex;">
-                            <div class="cell-with-tooltip__text _associative">А</div>
-                            <div class="cell-with-tooltip__tooltip">Ассоциативная</div>
-                        </div>`;
+            case 3: return `<div class="cell-with-tooltip">
+              <div class="cell-with-tooltip__cell">
+                  <div class="cell-with-tooltip__text _green">И</div>
+                  <div class="cell-with-tooltip__tooltip _green">Иллюстративная</div>
+              </div>
+            </div>`;
+            case 4: return `<div class="cell-with-tooltip">
+              <div class="cell-with-tooltip__cell">
+                  <div class="cell-with-tooltip__text _blue">А</div>
+                  <div class="cell-with-tooltip__tooltip _blue">Ассоциативная</div>
+              </div>
+            </div>`;
             default: return '';
           }
         },
@@ -117,21 +116,26 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
       {
         id: 'status',
         header: 'модерация',
-        format: (value: number) => {
-          switch (value) {
-            case 3: return 'И';
-            case 4: return 'А';
+        css: 'column-with-tooltip',
+        minWidth: 50,
+        fillspace: 8,
+        template(obj: ImageInfo) {
+          switch (obj.status) {
+            case 1: return `<div class="cell-with-tooltip">
+              <div class="cell-with-tooltip__cell">
+                  <div class="cell-with-tooltip__circle _green"></div>
+                  <div class="cell-with-tooltip__tooltip _green">Прошел модерацию</div>
+              </div>    
+            </div>`;
+            case 2: return `<div class="cell-with-tooltip">
+              <div class="cell-with-tooltip__cell">
+                  <div class="cell-with-tooltip__circle _red"></div>
+                  <div class="cell-with-tooltip__tooltip _red">Требуется модерация</div>
+              </div>
+            </div>`;
             default: return '';
           }
         },
-        css: '_container',
-        minWidth: 50,
-        fillspace: 9,
-        // template(obj: ImageInfo) {
-        //   return `<div class='${'check-box-block'} ${obj.showInGallery ? 'checked' : ''}'>
-        //                 <div class=${obj.showInGallery ? 'check-mark' : ''}></div>
-        //                 </div>`;
-        // },
       },
       {
         id: 'timeCr',
@@ -142,31 +146,6 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
           return value ? fn(new Date(value)) : '';
         },
       },
-      // {
-      //   id: 'Id', header: 'ID ЗАДАЧИ', autofill: 10, css: '_number-field',
-      // },
-      // { id: 'ElementName', header: 'ЭЛЕМЕНТ', autofill: 8 }, // Нет сортировки
-      // {
-      //   id: 'UserName', header: 'ИСПОЛНИТЕЛЬ', width: 170, autofill: 20,
-      // }, // UserName
-      // {
-      //   id: 'DueDate',
-      //   header: 'ВЫПОЛНИТЬ ДО',
-      //   autofill: 11,
-      //   format(value: string) {
-      //     const fn = window.webix.Date.dateToStr('%d.%m.%Y', false);
-      //     return value ? fn(new Date(value)) : '';
-      //   },
-      // },
-      // {
-      //   id: 'State',
-      //   header: 'СОСТОЯНИЕ',
-      //   width: 150,
-      //   css: '_container',
-      //   template(value: any) {
-      //     return `<div class="task-state ${value.css}">${value.label}</div>`;
-      //   },
-      // },
     ],
     on: {
       onItemClick(rowData: { row: number; column: string }) {
@@ -183,15 +162,42 @@ export const ImagesGrid = ({ data = [], onAdd, onImageClick, onDoubleClick }: Im
         if (onDoubleClick) onDoubleClick(item);
       },
     },
+    onClick: {
+      'js-delete': function (e: MouseEvent, evData:{ row: number; column: string }) {
+        e.preventDefault();
+        // eslint-disable-next-line react/no-this-in-sfc
+        const item = this.getItem(evData.row);
+        if (item && onDelete) {
+          onDelete(item.Id);
+        }
+      },
+    },
   };
+
+  if (onDelete && GRID_CONFIG.columns) {
+    GRID_CONFIG.columns.push({
+      id: 'del-btn',
+      header: '',
+      width: 50,
+      css: 'center-align-column',
+      template() { return "<button class='grid-button _delete js-delete'/>"; },
+    });
+  }
+
+  useEffect(() => {
+    if (selected) {
+      // @ts-ignore
+      const grid = window.$$(gridId);
+      if (grid) {
+        grid.select(selected);
+        const item = grid.getItemNode({ row: selected });
+        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }, [selected]);
 
   return (
     <div className="images-grid">
-      {onAdd && (
-      <button type="button" className="process-button _add" onClick={onAdd}>
-        <PlusIco />
-      </button>
-      )}
       <div className="grid-container unselectable">
         <Webix ui={GRID_CONFIG} data={data} />
       </div>

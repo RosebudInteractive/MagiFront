@@ -303,3 +303,18 @@ body
   -webkit-user-select: none
   -ms-user-select: none
   user-select: none
+
+.toolbar-button
+  width: 48px
+  height: 48px
+  display: flex
+  align-items: center
+  justify-content: center
+  background: none
+  opacity: .4
+  transition: opacity 300ms ease-in-out
+  &:hover
+    opacity: 1
+
+  *[fill^='#']
+    fill: $grey50

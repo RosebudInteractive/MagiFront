@@ -134,5 +134,86 @@
 .webix_ss_sort_single .webix_ss_sort_num
   display: none
 
+.center-align-column
+  .webix_cell
+    height: 100%
+    width: -webkit-fill-available
+    display: flex
+    justify-content: center
+    align-items: center
+
+
+.column-with-tooltip
+  div[role="gridcell"]
+    position: unset
+
+.cell-with-tooltip
+  height: 100%
+  width: -webkit-fill-available
+  display: flex
+  justify-content: center
+  align-items: center
+  ._green
+    color: $green
+  ._blue
+    color: $blue
+  ._red
+    color: $red
+
+.cell-with-tooltip__cell
+  position: absolute
+  width: 100%
+  &:hover
+    .cell-with-tooltip__tooltip
+      opacity: 1
+      visibility: visible
+
+.cell-with-tooltip__text
+  font-weight: bold
+  position: absolute
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+
+.cell-with-tooltip__circle
+  position: absolute
+  width: 14px
+  height: 14px
+  border-radius: 50%
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+  &._green
+    background-color: $green
+  &.red
+    background-color: $red
+
+.cell-with-tooltip__tooltip
+  position: absolute
+  box-shadow: 0 1px 3px 0 dimgrey
+  background: white
+  opacity: 0
+  visibility: hidden
+  width: initial
+  padding: 9px 17px
+  text-align: center
+  left: 50%
+  top: 20px
+  font-size: 1em
+  line-height: 20px
+  border-radius: 6px
+  transition: visibility, opacity 300ms ease
+  transform: translateX(-50%)
+  z-index: 1
+  &::after
+    content: ""
+    position: absolute
+    bottom: 100%
+    left: 50%
+    margin-left: -5px
+    border-width: 5px
+    border-style: solid
+    border-color: transparent transparent white transparent
+
 
 

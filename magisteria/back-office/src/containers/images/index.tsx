@@ -6,8 +6,16 @@ import { connect, ConnectedProps } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Autocomplete } from '#src/components/ui-kit';
 import { lessonsSelector, getAllLessons } from '#src/ducks/dictionary';
+import { permissionsSelector } from '#src/ducks/auth';
 import {
-  imagesSelector, getImages, clearImages, fetchingSelector,
+  fetchingSelector,
+  imagesSelector,
+  searchResultSelector,
+  getImages,
+  saveImages,
+  deleteImage,
+  clearImages,
+  searchImage,
 } from '#src/ducks/images';
 import { setInitState, applyFilter } from '#src/ducks/route';
 import { LessonDbInfo } from '#types/lessons';
@@ -20,16 +28,29 @@ import { ImageInfo } from '#types/images';
 import { ImageView } from '#src/components/images/image-view';
 import { useWindowSize } from '#src/tools/window-resize-hook';
 import { ImageEditor } from '#src/components/images/image-editor';
+import { AccessLevels } from '#src/constants/permissions';
+import Lamp from '#src/assets/svg/lamp.svg';
+import AddImage from '#src/assets/svg/add-image.svg';
+import { ImageSearch } from '#src/components/images/search-form';
 
 const mapState = (state: any) => ({
   lessons: lessonsSelector(state),
   fetching: fetchingSelector(state),
   images: imagesSelector(state),
+  searchResult: searchResultSelector(state),
+  permissions: permissionsSelector(state),
 });
 
 const mapDispatch = (dispatch: any) => ({
   actions: bindActionCreators({
-    getAllLessons, getImages, setInitState, applyFilter, clearImages,
+    getAllLessons,
+    getImages,
+    setInitState,
+    applyFilter,
+    clearImages,
+    saveImages,
+    deleteImage,
+    searchImage,
   }, dispatch),
 });
 
@@ -40,10 +61,10 @@ type Props = ConnectedProps<typeof connector>;
 let imagesCount: number = 0;
 
 const Images = ({
-  lessons, images, fetching, actions,
+  lessons, images, permissions, fetching, actions, searchResult,
 }: Props) => {
   const [visibleImage, setVisibleImage] = useState<ImageInfo | null>(null);
-  const [showEditor, setShowEditor] = useState<boolean>(false);
+  const [searchVisible, setSearchVisible] = useState<boolean>(false);
   const [currentImage, setCurrentImage] = useState<ImageInfo | null>(null);
   const location = useLocation();
   const filter = useRef<Filter | null>(null);
@@ -98,25 +119,142 @@ const Images = ({
 
   const editImage = (data: ImageInfo) => {
     setCurrentImage(data);
-    setShowEditor(true);
   };
 
   const handleCloseEditor = () => {
     setCurrentImage(null);
-    setShowEditor(false);
   };
+
+  const openSearch = () => {
+    setSearchVisible(true);
+    if (currentImage) {
+      setCurrentImage(null);
+    }
+  };
+
+  const handleCloseSearchForm = () => {
+    setSearchVisible(false);
+  };
+
+  const handleForward = () => {
+    if (images && currentImage) {
+      const currentIndex: number = images.findIndex((item) => item.id === currentImage.id);
+      if (currentIndex < (images.length - 1)) {
+        setCurrentImage(images[currentIndex + 1]);
+      }
+    }
+  };
+
+  const handleBackward = () => {
+    if (images && currentImage) {
+      const currentIndex: number = images.findIndex((item) => item.id === currentImage.id);
+      if (currentIndex > 0) {
+        setCurrentImage(images[currentIndex - 1]);
+      }
+    }
+  };
+
+  const handleApply = (data: ImageInfo) => {
+    if (images && filter.current) {
+      const newImages = [...images];
+      const image: ImageInfo | undefined = newImages.find((item) => item.id === data.id);
+      if (image) {
+        image.resType = data.resType;
+        image.fileName = data.fileName;
+        image.resLanguageId = data.resLanguageId;
+        image.showInGallery = data.showInGallery;
+        image.language = data.language;
+        image.name = data.name;
+        image.description = data.description;
+        image.altAttribute = data.altAttribute;
+        image.metaData = { ...data.metaData };
+        image.artifactText = data.artifactText;
+        image.authorText = data.authorText;
+        image.museumText = data.museumText;
+        image.descriptor = data.descriptor;
+        image.isFragment = data.isFragment;
+        image.status = data.status;
+        image.isNew = data.isNew;
+        image.linkTypeId = data.linkTypeId;
+        image.timeCr = data.timeCr;
+      }
+
+      actions.saveImages({ lessonId: filter.current.lessonId, images: newImages });
+    }
+  };
+
+  const handleApplySearch = (data: ImageInfo) => {
+    console.log(data);
+  };
+
+  const handleDelete = (id: number) => {
+    if (images && filter.current) {
+      actions.deleteImage({ lessonId: filter.current.lessonId, imageId: id });
+    }
+  };
+
+  const handleSearch = (searchValue: string) => {
+    actions.searchImage(searchValue);
+  };
+
+  const accessLevel: number = permissions.pic ? permissions.pic.al : 0;
+
+  const lampColor = useMemo<'green' | 'red'>(() => (images && (images.length > 0) && images.some((item) => item.status !== 1) ? 'red' : 'green'), [images]);
 
   return (
     <div className="images-page form _scrollable-y">
+      {lessonId && (accessLevel >= AccessLevels.images.moderate)
+          && (
+          <div className={`images-page__lamp ${lampColor}`}>
+            <Lamp />
+          </div>
+          )}
       <h5 className="form-header _grey70">Изображения</h5>
-      <Autocomplete options={options} label="Лекция" input={{ value: lessonId, onChange: handleLessonChange }} />
+      <div className="images-page__filter-pane">
+        <Autocomplete options={options} label="Лекция" input={{ value: lessonId, onChange: handleLessonChange }} />
+      </div>
+      {
+        lessonId && (accessLevel > AccessLevels.images.view)
+        && (
+          <button type="button" className="toolbar-button _add" onClick={openSearch}>
+            <AddImage />
+          </button>
+        )
+      }
       <div className="images-page__grid-container">
         { images
-          ? <ImagesGrid data={images} onImageClick={handleImageClick} onDoubleClick={editImage} />
+          ? (
+            <ImagesGrid
+              id="main"
+              data={images}
+              selected={currentImage ? currentImage.id : null}
+              onImageClick={handleImageClick}
+              onDoubleClick={editImage}
+              onDelete={accessLevel > AccessLevels.images.view ? handleDelete : undefined}
+            />
+          )
           : <div className="images-page__placeholder">Выберите лекцию</div> }
         { visibleImage && <ImageView image={visibleImage} onClose={handleCloseImageView} /> }
-        { showEditor && currentImage
-            && <ImageEditor image={currentImage} onClose={handleCloseEditor} />}
+        { currentImage
+            && (
+            <ImageEditor
+              image={currentImage}
+              accessLevel={accessLevel}
+              // accessLevel={AccessLevels.images.edit}
+              onClose={handleCloseEditor}
+              onForward={handleForward}
+              onBackward={handleBackward}
+              onApply={handleApply}
+            />
+            )}
+        {searchVisible && (
+        <ImageSearch
+          images={searchResult}
+          onApply={handleApplySearch}
+          onSearch={handleSearch}
+          onClose={handleCloseSearchForm}
+        />
+        ) }
       </div>
     </div>
   );
