@@ -11,11 +11,14 @@ import {
   fetchingSelector,
   imagesSelector,
   searchResultSelector,
+  currentSelector,
   getImages,
-  saveImages,
+  addImage,
+  saveImage,
   deleteImage,
   clearImages,
   searchImage,
+  setCurrentImage,
 } from '#src/ducks/images';
 import { setInitState, applyFilter } from '#src/ducks/route';
 import { LessonDbInfo } from '#types/lessons';
@@ -24,7 +27,7 @@ import {
 } from '#src/containers/images/tools';
 import { ImagesGrid } from '#src/components/images/grid';
 import './images.sass';
-import { ImageInfo } from '#types/images';
+import { ImageInfo, SearchResultItem, UploadMetaData } from '#types/images';
 import { ImageView } from '#src/components/images/image-view';
 import { useWindowSize } from '#src/tools/window-resize-hook';
 import { ImageEditor } from '#src/components/images/image-editor';
@@ -32,12 +35,16 @@ import { AccessLevels } from '#src/constants/permissions';
 import Lamp from '#src/assets/svg/lamp.svg';
 import AddImage from '#src/assets/svg/add-image.svg';
 import { ImageSearch } from '#src/components/images/search-form';
+import { ToolbarButton } from '#src/components/ui-kit-2/toolbar-button';
+import { ModalContainer } from '#src/components/ui-kit-2/modal-container';
+import { convertSearchResultToImageInfo, createImageInfoFromUploadMetaData } from '#src/tools/images';
 
 const mapState = (state: any) => ({
   lessons: lessonsSelector(state),
   fetching: fetchingSelector(state),
   images: imagesSelector(state),
   searchResult: searchResultSelector(state),
+  currentImage: currentSelector(state),
   permissions: permissionsSelector(state),
 });
 
@@ -48,9 +55,11 @@ const mapDispatch = (dispatch: any) => ({
     setInitState,
     applyFilter,
     clearImages,
-    saveImages,
+    addImage,
+    saveImage,
     deleteImage,
     searchImage,
+    setCurrentImage,
   }, dispatch),
 });
 
@@ -61,11 +70,11 @@ type Props = ConnectedProps<typeof connector>;
 let imagesCount: number = 0;
 
 const Images = ({
-  lessons, images, permissions, fetching, actions, searchResult,
+  lessons, images, permissions, fetching, actions, searchResult, currentImage,
 }: Props) => {
   const [visibleImage, setVisibleImage] = useState<ImageInfo | null>(null);
   const [searchVisible, setSearchVisible] = useState<boolean>(false);
-  const [currentImage, setCurrentImage] = useState<ImageInfo | null>(null);
+  // const [currentImage, setCurrentImage] = useState<ImageInfo | null>(null);
   const location = useLocation();
   const filter = useRef<Filter | null>(null);
 
@@ -76,6 +85,11 @@ const Images = ({
   useLayoutEffect(() => {
     imagesCount = images ? images.length : 0;
     resizeHandler(imagesCount);
+
+    if (currentImage) {
+      const image = images && images.find((item) => item.id === currentImage.id);
+      actions.setCurrentImage(image || null);
+    }
   }, [images]);
 
   const handleLessonChange = (id: number | null) => {
@@ -118,17 +132,17 @@ const Images = ({
   const lessonId = filter.current && filter.current.lessonId;
 
   const editImage = (data: ImageInfo) => {
-    setCurrentImage(data);
+    actions.setCurrentImage(data);
   };
 
   const handleCloseEditor = () => {
-    setCurrentImage(null);
+    actions.setCurrentImage(null);
   };
 
   const openSearch = () => {
     setSearchVisible(true);
     if (currentImage) {
-      setCurrentImage(null);
+      actions.setCurrentImage(null);
     }
   };
 
@@ -140,7 +154,7 @@ const Images = ({
     if (images && currentImage) {
       const currentIndex: number = images.findIndex((item) => item.id === currentImage.id);
       if (currentIndex < (images.length - 1)) {
-        setCurrentImage(images[currentIndex + 1]);
+        actions.setCurrentImage(images[currentIndex + 1]);
       }
     }
   };
@@ -149,46 +163,45 @@ const Images = ({
     if (images && currentImage) {
       const currentIndex: number = images.findIndex((item) => item.id === currentImage.id);
       if (currentIndex > 0) {
-        setCurrentImage(images[currentIndex - 1]);
+        actions.setCurrentImage(images[currentIndex - 1]);
       }
     }
   };
 
   const handleApply = (data: ImageInfo) => {
-    if (images && filter.current) {
-      const newImages = [...images];
-      const image: ImageInfo | undefined = newImages.find((item) => item.id === data.id);
-      if (image) {
-        image.resType = data.resType;
-        image.fileName = data.fileName;
-        image.resLanguageId = data.resLanguageId;
-        image.showInGallery = data.showInGallery;
-        image.language = data.language;
-        image.name = data.name;
-        image.description = data.description;
-        image.altAttribute = data.altAttribute;
-        image.metaData = { ...data.metaData };
-        image.artifactText = data.artifactText;
-        image.authorText = data.authorText;
-        image.museumText = data.museumText;
-        image.descriptor = data.descriptor;
-        image.isFragment = data.isFragment;
-        image.status = data.status;
-        image.isNew = data.isNew;
-        image.linkTypeId = data.linkTypeId;
-        image.timeCr = data.timeCr;
-      }
-
-      actions.saveImages({ lessonId: filter.current.lessonId, images: newImages });
+    if (filter.current) {
+      actions.saveImage({ lessonId: filter.current.lessonId, image: data });
     }
   };
 
-  const handleApplySearch = (data: ImageInfo) => {
-    console.log(data);
+  const handleApplySearch = (data: SearchResultItem) => {
+    setSearchVisible(false);
+    if (filter.current) {
+      const inArray = images && images.find((item) => item.id === data.id);
+
+      if (!inArray) {
+        const newImage = convertSearchResultToImageInfo(data);
+        actions.setCurrentImage(newImage);
+        actions.addImage({ lessonId: filter.current.lessonId, image: newImage });
+      } else {
+        actions.setCurrentImage(inArray);
+      }
+    }
+  };
+
+  const handleUploadImage = (data: string) => {
+    const metaData: Array<UploadMetaData> = JSON.parse(data);
+    if (metaData.length > 0) {
+      setSearchVisible(false);
+      if (filter.current) {
+        const newImageInfo = createImageInfoFromUploadMetaData(metaData[0]);
+        actions.addImage({ lessonId: filter.current.lessonId, image: newImageInfo });
+      }
+    }
   };
 
   const handleDelete = (id: number) => {
-    if (images && filter.current) {
+    if (filter.current) {
       actions.deleteImage({ lessonId: filter.current.lessonId, imageId: id });
     }
   };
@@ -199,7 +212,7 @@ const Images = ({
 
   const accessLevel: number = permissions.pic ? permissions.pic.al : 0;
 
-  const lampColor = useMemo<'green' | 'red'>(() => (images && (images.length > 0) && images.some((item) => item.status !== 1) ? 'red' : 'green'), [images]);
+  const lampColor = useMemo<'green' | 'red'>(() => (images && (images.length > 0) && images.some((item) => !item.isModerated) ? 'red' : 'green'), [images]);
 
   return (
     <div className="images-page form _scrollable-y">
@@ -216,9 +229,7 @@ const Images = ({
       {
         lessonId && (accessLevel > AccessLevels.images.view)
         && (
-          <button type="button" className="toolbar-button _add" onClick={openSearch}>
-            <AddImage />
-          </button>
+          <ToolbarButton icon={<AddImage />} tooltipText="Добавить новое" appearance="grey" onClick={openSearch} />
         )
       }
       <div className="images-page__grid-container">
@@ -234,27 +245,41 @@ const Images = ({
             />
           )
           : <div className="images-page__placeholder">Выберите лекцию</div> }
-        { visibleImage && <ImageView image={visibleImage} onClose={handleCloseImageView} /> }
+        { visibleImage && (
+        <ModalContainer
+          renderContent={() => <ImageView image={visibleImage} onClose={handleCloseImageView} />}
+        />
+        )}
         { currentImage
             && (
-            <ImageEditor
-              image={currentImage}
-              accessLevel={accessLevel}
+            <ModalContainer renderContent={(props) => (
+              <ImageEditor
+                image={currentImage}
+                accessLevel={accessLevel}
               // accessLevel={AccessLevels.images.edit}
-              onClose={handleCloseEditor}
-              onForward={handleForward}
-              onBackward={handleBackward}
-              onApply={handleApply}
+                onClose={handleCloseEditor}
+                onForward={handleForward}
+                onBackward={handleBackward}
+                onApply={handleApply}
+                onAdd={openSearch}
+                {...props}
+              />
+            )}
             />
             )}
         {searchVisible && (
-        <ImageSearch
-          images={searchResult}
-          onApply={handleApplySearch}
-          onSearch={handleSearch}
-          onClose={handleCloseSearchForm}
+        <ModalContainer renderContent={(props) => (
+          <ImageSearch
+            images={searchResult}
+            onApply={handleApplySearch}
+            onSearch={handleSearch}
+            onClose={handleCloseSearchForm}
+            onUpload={handleUploadImage}
+            {...props}
+          />
+        )}
         />
-        ) }
+        )}
       </div>
     </div>
   );

@@ -29,6 +29,8 @@ module.exports = {
     'import/extensions': 'off',
 	"linebreak-style": 0,
     'react/jsx-props-no-spreading': 'off',
+    "react/prop-types": 0,
+    'import/prefer-default-export': 'off',
     // "react/function-component-definition": [2, {
     //   "namedComponents": "function-declaration" | "function-expression" | "arrow-function" | Array<"function-declaration" | "function-expression" | "arrow-function">,
     //   "unnamedComponents": "function-expression" | "arrow-function" | Array<"function-expression" | "arrow-function">

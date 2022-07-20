@@ -78,32 +78,20 @@ export const ImagesGrid = ({
         },
       },
       {
-        id: 'showInGallery',
-        header: { text: 'В галерее', css: { 'text-align': 'center' } },
-        css: 'center-align-column',
-        minWidth: 50,
-        fillspace: 9,
-        template(obj: ImageInfo) {
-          return `<div class='${'check-box-block'} ${obj.showInGallery ? 'checked' : ''}'>
-                        <div class=${obj.showInGallery ? 'check-mark' : ''}></div>
-                        </div>`;
-        },
-      },
-      {
         id: 'linkTypeId',
         header: 'тип связи',
         css: 'column-with-tooltip',
         minWidth: 50,
         fillspace: 8,
         template(obj: ImageInfo) {
-          switch (obj.linkTypeId) {
-            case 3: return `<div class="cell-with-tooltip">
+          switch ((obj.linkTypeId || '').toString()) {
+            case '3': return `<div class="cell-with-tooltip">
               <div class="cell-with-tooltip__cell">
                   <div class="cell-with-tooltip__text _green">И</div>
                   <div class="cell-with-tooltip__tooltip _green">Иллюстративная</div>
               </div>
             </div>`;
-            case 4: return `<div class="cell-with-tooltip">
+            case '4': return `<div class="cell-with-tooltip">
               <div class="cell-with-tooltip__cell">
                   <div class="cell-with-tooltip__text _blue">А</div>
                   <div class="cell-with-tooltip__tooltip _blue">Ассоциативная</div>
@@ -120,21 +108,19 @@ export const ImagesGrid = ({
         minWidth: 50,
         fillspace: 8,
         template(obj: ImageInfo) {
-          switch (obj.status) {
-            case 1: return `<div class="cell-with-tooltip">
+          return obj.isModerated
+            ? `<div class="cell-with-tooltip">
               <div class="cell-with-tooltip__cell">
                   <div class="cell-with-tooltip__circle _green"></div>
                   <div class="cell-with-tooltip__tooltip _green">Прошел модерацию</div>
               </div>    
-            </div>`;
-            case 2: return `<div class="cell-with-tooltip">
+            </div>`
+            : `<div class="cell-with-tooltip">
               <div class="cell-with-tooltip__cell">
                   <div class="cell-with-tooltip__circle _red"></div>
                   <div class="cell-with-tooltip__tooltip _red">Требуется модерация</div>
               </div>
             </div>`;
-            default: return '';
-          }
         },
       },
       {
@@ -166,9 +152,9 @@ export const ImagesGrid = ({
       'js-delete': function (e: MouseEvent, evData:{ row: number; column: string }) {
         e.preventDefault();
         // eslint-disable-next-line react/no-this-in-sfc
-        const item = this.getItem(evData.row);
+        const item: ImageInfo = this.getItem(evData.row);
         if (item && onDelete) {
-          onDelete(item.Id);
+          onDelete(item.id);
         }
       },
     },
@@ -189,9 +175,12 @@ export const ImagesGrid = ({
       // @ts-ignore
       const grid = window.$$(gridId);
       if (grid) {
-        grid.select(selected);
         const item = grid.getItemNode({ row: selected });
-        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+        if (item) {
+          grid.select(selected);
+          item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
       }
     }
   }, [selected]);

@@ -46,7 +46,8 @@ export default class Uploader extends React.Component {
         }
     }
 
-    _uploadFiles() {
+    _uploadFiles(e) {
+        console.log(e);
         let _files = this._uploader.files,
             _count = _files.length
 

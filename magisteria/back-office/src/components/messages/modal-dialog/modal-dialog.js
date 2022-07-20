@@ -1,11 +1,10 @@
-import React, {useEffect} from "react";
+import React from "react";
 import './modal-dialog.sass';
 import CloseIco from "tt-assets/svg/close.svg"
 import ExclamationPointIco from "tt-assets/svg/exclamation-point.svg"
-import type {ModalDialogProps} from "../../../types/messages";
-import {MESSAGE_TYPE} from "../../../constants/messages";
+import {MESSAGE_TYPE} from "#src/constants/messages";
 
-export default function ModalDialog(props: ModalDialogProps) {
+export default function ModalDialog(props) {
     const MESSAGE_CONFIRMATION_TYPE = MESSAGE_TYPE.CONFIRMATION;
     const {message, actions} = props;
 

@@ -1,14 +1,33 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import './image-view.sass';
-import type { ImageInfo } from '#types/images';
+import styled, { css } from 'styled-components';
+import type { ImageViewable } from '#types/images';
 import { useWindowSize } from '#src/tools/window-resize-hook';
 
 export interface ImageViewProps {
-  image: ImageInfo,
+  image: ImageViewable,
+  absolutePath?: boolean,
   onClose: () => void
 }
 
-export const ImageView = ({ image, onClose } : ImageViewProps) => {
+const typography = css`
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.1px;
+`;
+
+const SizeInfo = styled.div`
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  ${typography}
+`;
+
+export const ImageView = ({ image, onClose, absolutePath = false } : ImageViewProps) => {
   const ref = useRef<HTMLImageElement | null>(null);
   const [width, setWidth] = useState<number | null>(null);
   const [height, setHeight] = useState<number | null>(null);
@@ -20,22 +39,22 @@ export const ImageView = ({ image, onClose } : ImageViewProps) => {
       const landscape = imageRatio > 1;
 
       if (landscape) {
-        let imgWidth = window.innerWidth * 0.9 - 48;
+        let imgWidth = window.innerWidth * 0.9 - 64;
         let imgHeight = imgWidth / imageRatio;
 
-        if (imgHeight > window.innerHeight * 0.9 - 48) {
-          imgHeight = window.innerHeight * 0.9 - 48;
+        if (imgHeight > window.innerHeight * 0.9 - 64) {
+          imgHeight = window.innerHeight * 0.9 - 64;
           imgWidth = imgHeight * imageRatio;
         }
 
         setWidth(imgWidth);
         setHeight(imgHeight);
       } else {
-        let imgHeight = window.innerHeight * 0.9 - 48;
+        let imgHeight = window.innerHeight * 0.9 - 64;
         let imgWidth = imgHeight * imageRatio;
 
-        if (imgWidth > window.innerWidth * 0.9 - 48) {
-          imgWidth = window.innerWidth * 0.9 - 48;
+        if (imgWidth > window.innerWidth * 0.9 - 64) {
+          imgWidth = window.innerWidth * 0.9 - 64;
           imgHeight = imgWidth / imageRatio;
         }
 
@@ -80,10 +99,11 @@ export const ImageView = ({ image, onClose } : ImageViewProps) => {
       <img
         ref={ref}
         style={{ width: width || 'auto', height: height || 'auto' }}
-        src={`/data/${image.fileName}`}
-        alt={image.description}
+        src={absolutePath ? image.fileName : `/data/${image.fileName}`}
+        alt={image.description || ''}
         onLoad={handleImageLoad}
       />
+      <SizeInfo>{`${image.metaData.size.width}x${image.metaData.size.height}px`}</SizeInfo>
       <button type="button" className="modal-form__close-button" onClick={onClose}>Закрыть</button>
     </div>
   );
