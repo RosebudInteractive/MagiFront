@@ -101,7 +101,7 @@ export default class Scheme extends React.Component {
             const _title = item.Name.match(/[-.?!)(,:]$/g) ? item.Name : (item.Name + '.')
 
             if (this.props.course.IsPaid && item.IsFreeInPaidCourse) {
-                return <tr>
+                return <tr key={item.Id}>
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
                             <span style={STYLE.TEXT.COUNTER}>{item.Number + '. '}</span>
@@ -113,7 +113,7 @@ export default class Scheme extends React.Component {
                     </td>
                 </tr>
             } else if (item.State === "D") {
-                return <tr>
+                return <tr key={item.Id}>
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
                             <span style={STYLE.TEXT.COUNTER}>{item.Number + '. '}</span>
@@ -122,7 +122,7 @@ export default class Scheme extends React.Component {
                     </td>
                 </tr>
             } else {
-                return <tr>
+                return <tr key={item.Id}>
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
                             <span style={STYLE.TEXT.COUNTER}>{item.Number + '. '}</span>

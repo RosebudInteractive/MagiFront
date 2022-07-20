@@ -1,14 +1,17 @@
 import React from 'react';
+import CourseCover from '#src/components/common/course-cover';
+import type { Course } from '#types/course';
 
 type Styles = {
   TITLE: React.CSSProperties,
   IMG: React.CSSProperties,
-  IMAGE_CELL: React.CSSProperties,
   COURSE: {
     WRAPPER: React.CSSProperties,
     TITLE: React.CSSProperties,
     NAME: React.CSSProperties,
   },
+  LINK: React.CSSProperties,
+  AUTHOR: React.CSSProperties,
 };
 
 const STYLE: Styles = {
@@ -51,34 +54,50 @@ const STYLE: Styles = {
     width: '100%',
     display: 'block',
   },
-  IMAGE_CELL: {
-    width: '552px',
+  LINK: {
+    textDecoration: 'none',
+  },
+  AUTHOR: {
+    fontFamily: 'Arial',
+    fontStyle: 'normal',
+    fontWeight: 'normal',
+    fontSize: '15px',
+    lineHeight: '140%',
+    color: '#2F2F2F',
+    display: 'inline',
   },
 };
 
-type Props = {
-  linkUrl: string;
-  imageUrl: string;
-  altText: string;
-  height?: number;
-};
+export interface HeaderProps {
+  course: Course
+}
 
-export default function Cover({
-  imageUrl, linkUrl, altText, height = 0,
-}: Props): JSX.Element {
+const Header = ({ course } : HeaderProps) => {
+  const authors = course.Authors.map((author) => `${author.FirstName} ${author.LastName}`).join(', ');
+
   return (
     <>
       <tr>
-        <td style={STYLE.IMAGE_CELL}>
-          <a target="_blank" href={linkUrl} rel="noreferrer">
-            {
-            height
-              ? <img src={imageUrl} width="552" height={height.toString()} alt={altText} style={STYLE.IMG} />
-              : <img src={imageUrl} width="552" alt={altText} style={STYLE.IMG} />
-          }
+        <td style={STYLE.TITLE}>Новый курс</td>
+      </tr>
+      <tr>
+        <td>
+          <a target="_blank" href={course.URL} rel="noreferrer" style={STYLE.LINK}>
+            <span style={STYLE.COURSE.TITLE}>Курс: </span>
+            <span style={STYLE.COURSE.NAME}>{course.Name}</span>
           </a>
         </td>
       </tr>
+      <tr>
+        <td style={STYLE.COURSE.WRAPPER}>
+          <span style={STYLE.AUTHOR}>{authors}</span>
+        </td>
+      </tr>
+      <tr>
+        <CourseCover course={course} />
+      </tr>
     </>
   );
-}
+};
+
+export default Header;

@@ -214,6 +214,8 @@ module.exports = function (webpackEnv, argv) {
                 'actions': path.resolve(__dirname, '../../magisteria/src/actions'),
                 'reducers': path.resolve(__dirname, '../../magisteria/src/reducers'),
                 'containers': path.resolve(__dirname, '../../magisteria/src/containers'),
+                "#src": paths.appSrc,
+                "#types": path.join(paths.appSrc, '/@types'),
             }
         },
         resolveLoader: {
