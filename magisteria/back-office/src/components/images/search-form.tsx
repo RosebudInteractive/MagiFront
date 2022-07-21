@@ -9,6 +9,9 @@ import { useWindowSize } from '#src/tools/window-resize-hook';
 import { ModalContainer, RenderContentProps } from '#src/components/ui-kit-2/modal-container';
 import { ImageView } from '#src/components/images/image-view';
 import { SearchResultGrid } from '#src/components/images/search-result-grid';
+import { ToolbarButton } from '#src/components/ui-kit-2/toolbar-button';
+import Fit from '#src/assets/svg/fit.svg';
+import Strech from '#src/assets/svg/strech.svg';
 
 export interface ImageEditorProps extends RenderContentProps {
   images: Array<SearchResultItem> | null,
@@ -48,6 +51,7 @@ export const ImageSearch = ({
   const [searchValue, setSearchValue] = useState<string>('');
   const [clear, setClear] = useState<boolean>(true);
   const [visibleImage, setVisibleImage] = useState<SearchResultItem | null>(null);
+  const [fitImageToCell, setFitImageToCell] = useState<boolean>(true);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -90,11 +94,18 @@ export const ImageSearch = ({
 
   const handleCloseImageView = useCallback(() => { setVisibleImage(null); }, [visibleImage]);
 
+  const handleCheckboxChange = () => {
+    setFitImageToCell(!fitImageToCell);
+  };
+
+  const icon = fitImageToCell ? <Strech /> : <Fit />;
+
   return (
     <div>
       <div className="search-form">
         <div className="search-form__search-string">
           <TextField label="Что ищем?" value={searchValue} onChange={handleChangeSearch} autoFocus />
+          <ToolbarButton icon={icon} onClick={handleCheckboxChange} />
         </div>
         <div className="search-form__grid _with-custom-scroll">
           <div className="search-form__grid-container">
@@ -105,6 +116,7 @@ export const ImageSearch = ({
                 ? (
                   <SearchResultGrid
                     data={images}
+                    fitImageToCell={fitImageToCell}
                     onDoubleClick={onApply}
                     onImageClick={setVisibleImage}
                   />

@@ -5,6 +5,9 @@ import { useWindowSize } from '#src/tools/window-resize-hook';
 import { ModalContainer } from '#src/components/ui-kit-2/modal-container';
 import { ImageView } from '#src/components/images/image-view';
 import { SearchResultGrid } from '#src/components/images/search-result-grid';
+import { ToolbarButton } from '#src/components/ui-kit-2/toolbar-button';
+import Fit from '#src/assets/svg/fit.svg';
+import Strech from '#src/assets/svg/strech.svg';
 const TIMEOUT = 1000;
 export const resizeHandler = (rowCount) => {
     const form = $('.search-form__grid');
@@ -27,6 +30,7 @@ export const ImageSearch = ({ images = [], onSearch, onClose, onApply, onUpload,
     const [searchValue, setSearchValue] = useState('');
     const [clear, setClear] = useState(true);
     const [visibleImage, setVisibleImage] = useState(null);
+    const [fitImageToCell, setFitImageToCell] = useState(true);
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (searchValue)
@@ -62,10 +66,15 @@ export const ImageSearch = ({ images = [], onSearch, onClose, onApply, onUpload,
         setSearchValue(e.target.value);
     };
     const handleCloseImageView = useCallback(() => { setVisibleImage(null); }, [visibleImage]);
+    const handleCheckboxChange = () => {
+        setFitImageToCell(!fitImageToCell);
+    };
+    const icon = fitImageToCell ? <Strech /> : <Fit />;
     return (<div>
       <div className="search-form">
         <div className="search-form__search-string">
           <TextField label="Что ищем?" value={searchValue} onChange={handleChangeSearch} autoFocus/>
+          <ToolbarButton icon={icon} onClick={handleCheckboxChange}/>
         </div>
         <div className="search-form__grid _with-custom-scroll">
           <div className="search-form__grid-container">
@@ -73,7 +82,7 @@ export const ImageSearch = ({ images = [], onSearch, onClose, onApply, onUpload,
             {clear
             ? <div className="search-form__container-text">Введите текст для поиска</div>
             : images && images.length
-                ? (<SearchResultGrid data={images} onDoubleClick={onApply} onImageClick={setVisibleImage}/>)
+                ? (<SearchResultGrid data={images} fitImageToCell={fitImageToCell} onDoubleClick={onApply} onImageClick={setVisibleImage}/>)
                 : (<div className="search-form__container-text">
                     Ничего не найдено, Вы можете загрузить свою картинку
                     <Uploader uploadURL="/api/pm/upload" buttonTitle="Загрузить картинку" onUploadFile={onUpload}/>

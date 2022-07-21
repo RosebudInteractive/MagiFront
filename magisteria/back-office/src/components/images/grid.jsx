@@ -31,7 +31,9 @@ export const ImagesGrid = ({ id, data = [], onDelete, onImageClick, onDoubleClic
                     const prefix = absolutePath ? '' : obj.metaData.path;
                     const file = path ? prefix + path : obj.fileName;
                     const src = absolutePath ? file : `/data/${file}`;
-                    return `<img class="image-cell ${horizontal ? ' _horizontal' : ' _vertical'}" src='${src}'/>`;
+                    return `<div class="image-cell__wrapper">
+                    <img class="image-cell ${horizontal ? ' _horizontal' : ' _vertical'}" src='${src}' alt='${obj.name}'/>
+                </div>`;
                 },
             },
             { id: 'name', header: 'Название', fillspace: 25 },

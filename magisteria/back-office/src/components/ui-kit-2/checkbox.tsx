@@ -117,4 +117,4 @@ export const UiCheckbox = ({ value, label = '', ...props }: UiCheckBoxProps) => 
       label={label}
     />
   );
-}
+};

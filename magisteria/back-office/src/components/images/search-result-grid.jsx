@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Webix from '#src/components/Webix';
 import './grid.sass';
-export const SearchResultGrid = ({ id, data = [], onImageClick, onDoubleClick, }) => {
+export const SearchResultGrid = ({ id, fitImageToCell = true, data = [], onImageClick, onDoubleClick, }) => {
     const gridId = `images-search-grid${id ? ` ${id}` : ''}`;
+    const containerRef = useRef(null);
     const GRID_CONFIG = {
         view: 'datatable',
         id: gridId,
@@ -18,17 +19,18 @@ export const SearchResultGrid = ({ id, data = [], onImageClick, onDoubleClick, }
             {
                 id: 'image',
                 header: 'Изображение',
-                css: 'webix__image-cell',
+                css: `webix__image-cell${fitImageToCell ? ' _cropped' : ''}`,
                 fillspace: 20,
                 maxWidth: 300,
                 template(obj) {
-                    const horizontal = obj.metaData.size.width > obj.metaData.size.height;
                     const path = obj.metaData.content.s
                         || obj.metaData.content.m
                         || obj.metaData.content.l
                         || null;
                     const src = path || obj.fileName;
-                    return `<img class="image-cell ${horizontal ? ' _horizontal' : ' _vertical'}" src='${src}'/>`;
+                    return `<div class="image-cell__wrapper">
+                    <img class="image-cell ${!fitImageToCell ? ' _cropped' : ''}" src='${src}' alt='${obj.name}'/>
+                </div>`;
                 },
             },
             {
@@ -71,7 +73,22 @@ export const SearchResultGrid = ({ id, data = [], onImageClick, onDoubleClick, }
             },
         },
     };
-    return (<div className="grid-container unselectable _with-custom-scroll">
+    useEffect(() => {
+        if (containerRef && containerRef.current) {
+            const list = containerRef.current.getElementsByClassName('image-cell');
+            if (list) {
+                Array.from(list).forEach((item) => {
+                    if (!fitImageToCell) {
+                        item.classList.add('_cropped');
+                    }
+                    else {
+                        item.classList.remove('_cropped');
+                    }
+                });
+            }
+        }
+    }, [fitImageToCell]);
+    return (<div ref={containerRef} className="grid-container unselectable _with-custom-scroll">
       <Webix ui={GRID_CONFIG} data={data}/>
     </div>);
 };
